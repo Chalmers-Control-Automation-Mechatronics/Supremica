@@ -10,19 +10,25 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.THashSet;
+import gnu.trove.TIntHashSet;
+
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Queue;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
@@ -87,7 +93,6 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     (final List<TraceStepProxy> traceSteps)
     throws AnalysisException
   {
-    // Skip certain conflicts if trace end state is already blocking ...
     final int numTraceSteps = traceSteps.size();
     final ListIterator<TraceStepProxy> iter =
       traceSteps.listIterator(numTraceSteps);
@@ -101,14 +106,18 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     final int initResult;
     if (isDumpState(resultAut, lastState)) {
       // Trace goes into certain conflicts.
-      // Remove the last step of the trace, so it can be replaced ...
       if (iter.hasPrevious()) {
+        // Remove the last step of the trace, so it can be replaced
+        // by something in the real certain conflicts ...
+        // Searching starts from the step before this ...
         mLastTraceStep = iter.previous();
         final Map<AutomatonProxy,StateProxy> predMap =
           mLastTraceStep.getStateMap();
         final StateProxy predState = predMap.get(resultAut);
         initResult = getResultAutomatonStateCode(predState);
       } else {
+        // Starting from initial state, which is certain conflict ...
+        // Searching starts from all initial states ...
         mLastTraceStep = null;
         initResult = -1;
       }
@@ -120,8 +129,8 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
       initResult = getResultAutomatonStateCode(lastState);
     }
 
-    // Try to add steps into certain conflicts and further
-    // into blocking, or prove that the rest of the system blocks ...
+    // Rerun certain conflicts simplifier
+    // to obtain partition and level information ...
     final int config = mSimplifier.getPreferredInputConfiguration();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     ListBufferTransitionRelation copy =
@@ -137,49 +146,43 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
       stateMap == null || initResult < 0 ? initResult : stateMap[initResult];
     newTraceSteps = relabelInitialTraceSteps(newTraceSteps, stateMap);
 
+    // Extend the trace to lowest (= most blocking) possible level ...
     final AbstractCompositionalModelVerifier verifier = getModelVerifier();
     final ProductDESProxyFactory factory = verifier.getFactory();
-    final EventEncoding eventEnc = getEventEncoding();
     mTestAutomatonStateEncoding = new StateEncoding();
     mCheckedProposition =
       factory.createEventProxy(":certainconf", EventKind.UNCONTROLLABLE);
     List<TraceStepProxy> additionalSteps = null;
     final int maxLevel = mSimplifier.getMaxLevel();
     assert maxLevel >= 0;
-    for (int level = 0; level <= maxLevel; level += 2) {
-      mTestAutomaton = mSimplifier.createTestAutomaton
-        (factory, eventEnc, mTestAutomatonStateEncoding,
-         initTest, mCheckedProposition, level);
-      additionalSteps = computeAdditionalSteps();
-      if (additionalSteps != null) {
-        break;
+    int level = maxLevel | 1;
+    int foundLevel = 0;
+    do {
+      level = findNextLevel(initTest, level);
+      if (level >= 0) {
+        foundLevel = level;
+        additionalSteps = getAdditionalSteps();
+        level |= 1;
       }
+      level -= 2;
       mTestAutomatonStateEncoding.clear();
-    }
+    } while (level >= 0);
 
+    // Add the search results to the end of the trace ...
     if (additionalSteps != null) {
       newTraceSteps.addAll(additionalSteps);
+      if ((foundLevel & 1) == 1) {
+        // Odd level indicates tau-transitions can go one level further ...
+        final int numExtendedSteps = newTraceSteps.size();
+        final ListIterator<TraceStepProxy> extendedIter =
+          newTraceSteps.listIterator(numExtendedSteps);
+        final TraceStepProxy extendedLastStep = extendedIter.previous();
+        additionalSteps =
+          getAdditionalTauSteps(extendedLastStep, foundLevel - 1);
+        newTraceSteps.addAll(additionalSteps);
+      }
     }
     return newTraceSteps;
-
-    /*
-    if (additionalSteps != null) {
-      newTraceSteps.addAll(additionalSteps);
-    } else if (startLevel > 0 && (startLevel & 1) != 0) {
-      final int endStateCode =
-        mSimplifier.findTauReachableState(lastStateCode, startLevel & ~1);
-      origState = getOriginalAutomatonState(endStateCode);
-      final Map<AutomatonProxy,StateProxy> newMap =
-        new HashMap<AutomatonProxy,StateProxy>(lastStepMap);
-      newMap.remove(resultAut);
-      final AutomatonProxy origAut = getOriginalAutomaton();
-      newMap.put(origAut, origState);
-      final EventProxy tau = getTauEvent();
-      final TraceStepProxy newStep =
-        factory.createTraceStepProxy(tau, newMap);
-      traceSteps.add(newStep);
-    }
-    */
   }
 
 
@@ -203,46 +206,227 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     }
   }
 
-  /*
-  private int findCertainConflictsState(final TraceStepProxy predStep,
-                                        final TraceStepProxy lastStep)
+
+  //#########################################################################
+  //# Trace Extension
+  private List<TraceStepProxy> relabelInitialTraceSteps
+  (final List<TraceStepProxy> steps, final int[] stateMap)
+  {
+    final int numSteps = steps.size();
+    final List<TraceStepProxy> newSteps =
+      new ArrayList<TraceStepProxy>(numSteps);
+    for (final TraceStepProxy step : steps) {
+      final TraceStepProxy newStep = relabelInitialTraceStep(step, stateMap);
+      newSteps.add(newStep);
+    }
+    return newSteps;
+  }
+
+  private TraceStepProxy relabelInitialTraceStep
+    (final TraceStepProxy resultStep, final int[] stateMap)
+  {
+    final AutomatonProxy resultAut = getResultAutomaton();
+    final Map<AutomatonProxy,StateProxy> resultMap = resultStep.getStateMap();
+    final int size = resultMap.size();
+    final Map<AutomatonProxy,StateProxy> origMap =
+      new HashMap<AutomatonProxy,StateProxy>(size);
+    for (final Map.Entry<AutomatonProxy,StateProxy> entry :
+      resultMap.entrySet()) {
+      final AutomatonProxy aut = entry.getKey();
+      final StateProxy state = entry.getValue();
+      if (aut == resultAut) {
+        final AutomatonProxy origAut = getOriginalAutomaton();
+        final int resultCode = getResultAutomatonStateCode(state);
+        final int origCode =
+          stateMap != null ? stateMap[resultCode] : resultCode;
+          assert origCode >= 0;
+          final StateProxy origState = getOriginalAutomatonState(origCode);
+          origMap.put(origAut, origState);
+      } else {
+        origMap.put(aut, state);
+      }
+    }
+    final AbstractCompositionalModelVerifier verifier = getModelVerifier();
+    final ProductDESProxyFactory factory = verifier.getFactory();
+    final EventProxy event = resultStep.getEvent();
+    return factory.createTraceStepProxy(event, origMap);
+  }
+
+  private int findNextLevel(final int initTest, final int level)
+    throws AnalysisException
+  {
+    final AbstractCompositionalModelVerifier verifier = getModelVerifier();
+    final ProductDESProxyFactory factory = verifier.getFactory();
+    final EventEncoding eventEnc = getEventEncoding();
+      mTestAutomaton = mSimplifier.createTestAutomaton
+        (factory, eventEnc, mTestAutomatonStateEncoding,
+         initTest, mCheckedProposition, level);
+    final ProductDESProxy des = createLanguageInclusionModel();
+    mSafetyVerifier.setModel(des);
+    //MarshallingTools.saveModule(des, "xxx.wmod");
+    if (mSafetyVerifier.run()) {
+      return -1;
+    } else {
+      final SafetyTraceProxy trace = mSafetyVerifier.getCounterExample();
+      final int state = getTestAutomatonEndState(trace);
+      return mSimplifier.getLevel(state);
+    }
+  }
+
+  private int getTestAutomatonEndState(final SafetyTraceProxy trace)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    int maxLevel = -1;
-    int state = -1;
-    if (predStep == null) {
-      final int numStates = rel.getNumberOfStates();
-      for (int s = 0; s < numStates; s++) {
-        if (rel.isInitial(s)) {
-          final int level = mSimplifier.getLevel(s);
-          if (level > maxLevel) {
-            maxLevel = level;
-            state = s;
+    final List<TraceStepProxy> steps = trace.getTraceSteps();
+    final int numSteps = steps.size();
+    final ListIterator<TraceStepProxy> iter = steps.listIterator(numSteps);
+    int current = -1;
+    back:
+    do {
+      final TraceStepProxy step = iter.previous();
+      final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
+      final StateProxy state = stepMap.get(mTestAutomaton);
+      if (state != null) {
+        current = mTestAutomatonStateEncoding.getStateCode(state);
+        break;
+      } else if (step.getEvent() == null) {
+        final int numStates = rel.getNumberOfStates();
+        for (int s = 0; s < numStates; s++) {
+          if (rel.isInitial(s)) {
+            current = s;
+            break back;
           }
         }
       }
-    } else {
-      final AutomatonProxy resultAut = getResultAutomaton();
-      final Map<AutomatonProxy,StateProxy> predStepMap = predStep.getStateMap();
-      final StateProxy predState = predStepMap.get(resultAut);
-      final int predStateCode = getResultAutomatonStateCode(predState);
-      final EventProxy event = lastStep.getEvent();
-      final EventEncoding eventEnc = getEventEncoding();
-      final int eventCode = eventEnc.getEventCode(event);
-      final TransitionIterator iter =
-        rel.createSuccessorsReadOnlyIterator(predStateCode, eventCode);
+    } while (current < 0);
+    final TransitionIterator transIter = rel.createSuccessorsReadOnlyIterator();
+    final EventEncoding eventEnc = getEventEncoding();
+    while (iter.hasNext()) {
+      final TraceStepProxy step = iter.next();
+      final EventProxy event = step.getEvent();
+      final int e = eventEnc.getEventCode(event);
+      if (e >= 0) {
+        transIter.reset(current, e);
+        transIter.advance();
+        current = transIter.getCurrentTargetState();
+      }
+    }
+    return current;
+  }
+
+  private List<TraceStepProxy> getAdditionalSteps()
+    throws AnalysisException
+  {
+    final SafetyTraceProxy trace = mSafetyVerifier.getCounterExample();
+    final List<TraceStepProxy> steps = trace.getTraceSteps();
+    final List<TraceStepProxy> saturatedSteps =
+      getSaturatedTraceSteps(steps, mCheckAutomata);
+    final List<TraceStepProxy> relabelledSteps =
+      relabelSafetyTraceSteps(saturatedSteps);
+    return relabelledSteps;
+  }
+
+  private List<TraceStepProxy> relabelSafetyTraceSteps
+    (final List<TraceStepProxy> steps)
+  {
+    final Iterator<TraceStepProxy> iter = steps.iterator();
+    int numSteps = steps.size() - 1; // skip last ...
+    if (mLastTraceStep != null) {
+      iter.next(); // skip first if continuing from a nonempty trace ...
+      numSteps--;
+    }
+    final List<TraceStepProxy> newsteps =
+      new ArrayList<TraceStepProxy>(numSteps);
+    for (int i = 0; i < numSteps; i++) {
+      final TraceStepProxy oldstep = iter.next();
+      final TraceStepProxy newstep = relabelSafetyTraceStep(oldstep);
+      newsteps.add(newstep);
+    }
+    return newsteps;
+  }
+
+  private TraceStepProxy relabelSafetyTraceStep(final TraceStepProxy checkStep)
+  {
+    final Map<AutomatonProxy,StateProxy> checkMap = checkStep.getStateMap();
+    final int size = checkMap.size();
+    final Map<AutomatonProxy,StateProxy> refMap =
+      new HashMap<AutomatonProxy,StateProxy>(size);
+    final Iterator<AutomatonProxy> checkIter = mCheckAutomata.iterator();
+    final Iterator<AutomatonProxy> refIter = mReferenceAutomata.iterator();
+    while (refIter.hasNext()) {
+      final AutomatonProxy checkAut = checkIter.next();
+      final AutomatonProxy refAut = refIter.next();
+      final StateProxy checkState = checkMap.get(checkAut);
+      if (checkAut == mTestAutomaton) {
+        final AutomatonProxy origAut = getOriginalAutomaton();
+        final int stateCode =
+          mTestAutomatonStateEncoding.getStateCode(checkState);
+        final StateProxy origState = getOriginalAutomatonState(stateCode);
+        refMap.put(origAut, origState);
+      } else {
+        final StateProxy refState = mReverseStateMap.get(checkState);
+        refMap.put(refAut, refState);
+      }
+    }
+    final AbstractCompositionalModelVerifier verifier = getModelVerifier();
+    final ProductDESProxyFactory factory = verifier.getFactory();
+    final EventProxy event = checkStep.getEvent();
+    return factory.createTraceStepProxy(event, refMap);
+  }
+
+  private List<TraceStepProxy> getAdditionalTauSteps
+    (final TraceStepProxy startStep, final int level)
+  {
+    final AutomatonProxy origAut = getOriginalAutomaton();
+    final Map<AutomatonProxy,StateProxy> stepMap = startStep.getStateMap();
+    final StateProxy initState = stepMap.get(origAut);
+    int scode = getOriginalAutomatonStateCode(initState);
+
+    final int tau = EventEncoding.TAU;
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+    final int size = rel.getNumberOfStates();
+    final TIntHashSet visited = new TIntHashSet(size);
+    visited.add(scode);
+    SearchRecord record = new SearchRecord(scode);
+    final Queue<SearchRecord> queue = new ArrayDeque<SearchRecord>();
+    queue.add(record);
+    search:
+    while (true) {
+      record = queue.remove();
+      scode = record.getState();
+      iter.reset(scode, tau);
       while (iter.advance()) {
-        final int s = iter.getCurrentTargetState();
-        final int level = mSimplifier.getLevel(s);
-        if (level > maxLevel) {
-          maxLevel = level;
-          state = s;
+        scode = iter.getCurrentTargetState();
+        if (visited.add(scode)) {
+          final SearchRecord newRecord =
+            new SearchRecord(scode, 0, tau, record);
+          if (mSimplifier.getLevel(scode) <= level) {
+            record = newRecord;
+            break search;
+          }
+          queue.add(newRecord);
         }
       }
     }
-    return state;
+
+    final AbstractCompositionalModelVerifier verifier = getModelVerifier();
+    final ProductDESProxyFactory factory = verifier.getFactory();
+    final List<TraceStepProxy> additionalSteps =
+      new LinkedList<TraceStepProxy>();
+    final EventProxy tauEvent = getTauEvent();
+    final Map<AutomatonProxy,StateProxy> workMap =
+      new HashMap<AutomatonProxy,StateProxy>(stepMap);
+    do {
+      scode = record.getState();
+      final StateProxy state = getOriginalAutomatonState(scode);
+      workMap.put(origAut, state);
+      final TraceStepProxy step =
+        factory.createTraceStepProxy(tauEvent, workMap);
+      additionalSteps.add(0, step);
+      record = record.getPredecessor();
+    } while (record.getPredecessor() != null);
+    return additionalSteps;
   }
-  */
 
 
   //#########################################################################
@@ -353,26 +537,6 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     return factory.createAutomatonProxy(name, kind, events, states, null);
   }
 
-  private List<TraceStepProxy> computeAdditionalSteps()
-    throws AnalysisException
-  {
-    final ProductDESProxy des = createLanguageInclusionModel();
-    mSafetyVerifier.setModel(des);
-    //MarshallingTools.saveModule(des, "xxx.wmod");
-    if (mSafetyVerifier.run()) {
-      return null;
-    } else {
-      final SafetyTraceProxy trace = mSafetyVerifier.getCounterExample();
-      final List<TraceStepProxy> steps = trace.getTraceSteps();
-      final List<TraceStepProxy> saturatedSteps =
-        getSaturatedTraceSteps(steps, mCheckAutomata);
-
-      final List<TraceStepProxy> relabelledSteps =
-        relabelSafetyTraceSteps(saturatedSteps);
-      return relabelledSteps;
-    }
-  }
-
   private int[] createStateMap(final List<int[]> partition)
   {
     if (partition != null) {
@@ -390,97 +554,6 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     } else {
       return null;
     }
-
-  }
-  private List<TraceStepProxy> relabelInitialTraceSteps
-    (final List<TraceStepProxy> steps, final int[] stateMap)
-  {
-    final int numSteps = steps.size();
-    final List<TraceStepProxy> newSteps =
-      new ArrayList<TraceStepProxy>(numSteps);
-    for (final TraceStepProxy step : steps) {
-      final TraceStepProxy newStep = relabelInitialTraceStep(step, stateMap);
-      newSteps.add(newStep);
-    }
-    return newSteps;
-  }
-
-  private TraceStepProxy relabelInitialTraceStep
-    (final TraceStepProxy resultStep, final int[] stateMap)
-  {
-    final AutomatonProxy resultAut = getResultAutomaton();
-    final Map<AutomatonProxy,StateProxy> resultMap = resultStep.getStateMap();
-    final int size = resultMap.size();
-    final Map<AutomatonProxy,StateProxy> origMap =
-      new HashMap<AutomatonProxy,StateProxy>(size);
-    for (final Map.Entry<AutomatonProxy,StateProxy> entry :
-         resultMap.entrySet()) {
-      final AutomatonProxy aut = entry.getKey();
-      final StateProxy state = entry.getValue();
-      if (aut == resultAut) {
-        final AutomatonProxy origAut = getOriginalAutomaton();
-        final int resultCode = getResultAutomatonStateCode(state);
-        final int origCode =
-          stateMap != null ? stateMap[resultCode] : resultCode;
-        assert origCode >= 0;
-        final StateProxy origState = getOriginalAutomatonState(origCode);
-        origMap.put(origAut, origState);
-      } else {
-        origMap.put(aut, state);
-      }
-    }
-    final AbstractCompositionalModelVerifier verifier = getModelVerifier();
-    final ProductDESProxyFactory factory = verifier.getFactory();
-    final EventProxy event = resultStep.getEvent();
-    return factory.createTraceStepProxy(event, origMap);
-  }
-
-  private List<TraceStepProxy> relabelSafetyTraceSteps
-    (final List<TraceStepProxy> steps)
-  {
-    final Iterator<TraceStepProxy> iter = steps.iterator();
-    int numSteps = steps.size() - 1; // skip last ...
-    if (mLastTraceStep != null) {
-      iter.next(); // skip first if continuing from a nonempty trace ...
-      numSteps--;
-    }
-    final List<TraceStepProxy> newsteps =
-      new ArrayList<TraceStepProxy>(numSteps);
-    for (int i = 0; i < numSteps; i++) {
-      final TraceStepProxy oldstep = iter.next();
-      final TraceStepProxy newstep = relabelSafetyTraceStep(oldstep);
-      newsteps.add(newstep);
-    }
-    return newsteps;
-  }
-
-  private TraceStepProxy relabelSafetyTraceStep(final TraceStepProxy checkStep)
-  {
-    final Map<AutomatonProxy,StateProxy> checkMap = checkStep.getStateMap();
-    final int size = checkMap.size();
-    final Map<AutomatonProxy,StateProxy> refMap =
-      new HashMap<AutomatonProxy,StateProxy>(size);
-    final Iterator<AutomatonProxy> checkIter = mCheckAutomata.iterator();
-    final Iterator<AutomatonProxy> refIter = mReferenceAutomata.iterator();
-    while (refIter.hasNext()) {
-      final AutomatonProxy checkAut = checkIter.next();
-      final AutomatonProxy refAut = refIter.next();
-      final StateProxy checkState = checkMap.get(checkAut);
-      if (checkAut == mTestAutomaton) {
-        final AutomatonProxy origAut = getOriginalAutomaton();
-        final int stateCode =
-          mTestAutomatonStateEncoding.getStateCode(checkState);
-        final StateProxy origState = getOriginalAutomatonState(stateCode);
-        refMap.put(origAut, origState);
-      } else {
-        final StateProxy refState = mReverseStateMap.get(checkState);
-        refMap.put(refAut, refState);
-      }
-    }
-    final AbstractCompositionalModelVerifier verifier = getModelVerifier();
-    final ProductDESProxyFactory factory = verifier.getFactory();
-    final EventProxy event = checkStep.getEvent();
-    return factory.createTraceStepProxy(event, refMap);
   }
 
 

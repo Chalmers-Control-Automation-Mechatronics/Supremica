@@ -117,11 +117,32 @@ public class LimitedCertainConflictsTRSimplifier
     return mHasRemovedTransitions;
   }
 
+  /**
+   * Returns the maximum level assigned to any state during the last run.
+   * @see #getLevel(int) getLevel()
+   */
   public int getMaxLevel()
   {
     return mMaxLevel;
   }
 
+  /**
+   * Returns the level of certain conflicts for the given state.
+   * After completion of the algorithm, each state is assigned a level
+   * as follows.
+   * <UL>
+   * <LI>States with level COREACHABLE = -1 are not states of certain
+   *     conflicts.</LI>
+   * <LI>States with level BLOCKING = 0 are blocking states.</LI>
+   * <LI>States with a positive odd level can reach a state of the
+   *     lower level using local transitions.</LI>
+   * <LI>States with a positive even level can reach a state of a
+   *     lower level using shared transitions, but not using only local
+   *     transitions.</LI>
+   * </UL>
+   * @param  state    State code of the state to be checked.
+   * @return The level of certain conflicts for this state.
+   */
   public int getLevel(final int state)
   {
     return mStateInfo[state];
@@ -382,9 +403,9 @@ public class LimitedCertainConflictsTRSimplifier
   //# Trace Computation Support
   /**
    * Creates a test automaton to check whether certain conflict states of
-   * the given level can be reached. States of certain conflicts of the
-   * given level are flagged using selfloops of the given event
-   * <CODE>prop</CODE>, so their reachability can be tested using language
+   * the given or a lower level can be reached. States of certain conflicts
+   * of levels to be checked are flagged using selfloops of the given event
+   * <CODE>prop</CODE>, so their reachability can be tested using a language
    * inclusion check.
    */
   public AutomatonProxy createTestAutomaton
@@ -425,13 +446,14 @@ public class LimitedCertainConflictsTRSimplifier
       new ArrayList<TransitionProxy>(numTrans + numCritical);
     int code = 0;
     for (int state = 0; state < numStates; state++) {
-      if (isTestState(state, level)) {
+      if (rel.isReachable(state)) {
         final boolean init =
           initCode >= 0 ? state == initCode : rel.isInitial(state);
         final StateProxy memstate = new MemStateProxy(code++, init);
         states[state] = memstate;
         reachable.add(memstate);
-        if (mStateInfo[state] == level) {
+        final int info = mStateInfo[state];
+        if (info != COREACHABLE && info <= level) {
           final TransitionProxy trans =
             factory.createTransitionProxy(memstate, prop, memstate);
           transitions.add(trans);
@@ -442,8 +464,8 @@ public class LimitedCertainConflictsTRSimplifier
     final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
     while (iter.advance()) {
       final int s = iter.getCurrentSourceState();
-      final int t = iter.getCurrentTargetState();
-      if (isTestState(s, level) && isTestState(t, level)) {
+      if (rel.isReachable(s)) {
+        final int t = iter.getCurrentTargetState();
         final StateProxy source = states[s];
         final int e = iter.getCurrentEvent();
         final EventProxy event = eventEnc.getProperEvent(e);

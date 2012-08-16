@@ -11,8 +11,6 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.HashFunctions;
 import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectIntHashMap;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -76,7 +74,7 @@ public abstract class TRTraceExpander
     throws AnalysisException
   {
     this(verifier, null, tau, preconditionMarking,
-         resultAut, resultStateEnc.getStateCodeMap(),
+         resultAut, resultStateEnc,
          originalAut, originalStateEnc,
          partition, preconditionMarkingReduced);
   }
@@ -86,7 +84,7 @@ public abstract class TRTraceExpander
                           final EventProxy tau,
                           final EventProxy preconditionMarking,
                           final AutomatonProxy resultAut,
-                          final TObjectIntHashMap<StateProxy> resultStateMap,
+                          final StateEncoding resultStateEnc,
                           final AutomatonProxy originalAut,
                           final StateEncoding originalStateEnc,
                           final List<int[]> partition,
@@ -127,7 +125,7 @@ public abstract class TRTraceExpander
     }
     mTauEvent = tau;
     mResultAutomaton = resultAut;
-    mReverseOutputStateMap = resultStateMap;
+    mResultStateEncoding = resultStateEnc;
     mOriginalAutomaton = originalAut;
     if (originalStateEnc != null) {
       mOriginalStateEncoding = originalStateEnc;
@@ -181,9 +179,14 @@ public abstract class TRTraceExpander
     return mOriginalStateEncoding.getState(code);
   }
 
+  int getOriginalAutomatonStateCode(final StateProxy state)
+  {
+    return mOriginalStateEncoding.getStateCode(state);
+  }
+
   int getResultAutomatonStateCode(final StateProxy state)
   {
-    return mReverseOutputStateMap.get(state);
+    return mResultStateEncoding.getStateCode(state);
   }
 
 
@@ -267,7 +270,8 @@ public abstract class TRTraceExpander
         // Step by a proper event ---
         // 1) Add a step to the source state unless initial.
         if (crucialEventID != tau) {
-          final int crucialStateID = mReverseOutputStateMap.get(crucialState);
+          final int crucialStateID =
+            mResultStateEncoding.getStateCode(crucialState);
           record = new SearchRecord(crucialStateID, crucialEventID);
           crucialSteps.add(record);
         }
@@ -278,7 +282,7 @@ public abstract class TRTraceExpander
       }
     }
     // Add step to last target state.
-    final int crucialStateID = mReverseOutputStateMap.get(crucialState);
+    final int crucialStateID = mResultStateEncoding.getStateCode(crucialState);
     record = new SearchRecord(crucialStateID, crucialEventID);
     crucialSteps.add(record);
     // Add final step to reach alpha.
@@ -606,10 +610,11 @@ public abstract class TRTraceExpander
 
   private final AutomatonProxy mResultAutomaton;
   /**
-   * Reverse encoding of output states. Maps states in output automaton
-   * (simplified automaton) to state code in output transition relation.
+   * State encoding of the result automaton. Maps state codes in the input
+   * transition relation to state objects in the input automaton.
    */
-  private final TObjectIntHashMap<StateProxy> mReverseOutputStateMap;
+  private final StateEncoding mResultStateEncoding;
+
   private final AutomatonProxy mOriginalAutomaton;
   /**
    * State encoding of the original automaton. Maps state codes in the input
