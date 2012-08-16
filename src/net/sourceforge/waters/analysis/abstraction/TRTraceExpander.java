@@ -98,9 +98,14 @@ public abstract class TRTraceExpander
       final KindTranslator translator = verifier.getKindTranslator();
       final Collection<EventProxy> props = verifier.getPropositions();
       if (preconditionMarking == null) {
+        final int filterMode;
+        if (props == null) {
+          filterMode = EventEncoding.FILTER_NONE;
+        } else {
+          filterMode = EventEncoding.FILTER_PROPOSITIONS;
+        }
         mEventEncoding =
-          new EventEncoding(originalAut, translator, tau, props,
-                            EventEncoding.FILTER_PROPOSITIONS);
+          new EventEncoding(originalAut, translator, tau, props, filterMode);
         mPreconditionMarkingID = -1;
       } else {
         final Collection<EventProxy> filter;

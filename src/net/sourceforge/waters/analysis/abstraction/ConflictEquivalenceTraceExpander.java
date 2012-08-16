@@ -71,7 +71,6 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   @Override
   public List<TraceStepProxy> convertTraceSteps
     (final List<TraceStepProxy> traceSteps)
-    throws AnalysisException
   {
     final List<SearchRecord> crucialSteps = getCrucialSteps(traceSteps);
     final List<SearchRecord> convertedSteps =
