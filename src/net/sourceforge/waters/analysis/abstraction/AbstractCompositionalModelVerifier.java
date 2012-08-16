@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -375,6 +374,15 @@ public abstract class AbstractCompositionalModelVerifier
      final Collection<AutomatonProxy> automata)
   throws AnalysisException;
 
+  /**
+   * Returns a list of all automata that should be included when starting
+   * to construct a counterexample.
+   */
+  protected Collection<AutomatonProxy> getAllTraceAutomata()
+  {
+    return getCurrentAutomata();
+  }
+
 
   //#########################################################################
   //# Trace Computation
@@ -382,21 +390,25 @@ public abstract class AbstractCompositionalModelVerifier
     throws AnalysisException
   {
     final List<TraceStepProxy> unsat = trace.getTraceSteps();
-    final Collection<AutomatonProxy> currentAutomata = getCurrentAutomata();
+    final Collection<AutomatonProxy> currentAutomata = getAllTraceAutomata();
     List<TraceStepProxy> traceSteps =
       getSaturatedTraceSteps(unsat, currentAutomata);
     final int size = mAbstractionSteps.size();
     final ListIterator<AbstractionStep> iter =
       mAbstractionSteps.listIterator(size);
+    /*
     final Collection<AutomatonProxy> check =
       new THashSet<AutomatonProxy>(currentAutomata);
     testCounterExample(traceSteps, check);
+    */
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
+      /*
       check.removeAll(step.getResultAutomata());
       check.addAll(step.getOriginalAutomata());
       testCounterExample(traceSteps, check);
+      */
     }
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> modelAutomata = model.getAutomata();
