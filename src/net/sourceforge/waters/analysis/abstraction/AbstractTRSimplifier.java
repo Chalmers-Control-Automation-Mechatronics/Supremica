@@ -16,6 +16,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.base.ProxyTools;
 
 import org.apache.log4j.Logger;
 
@@ -93,10 +94,12 @@ public abstract class AbstractTRSimplifier
     final long start = System.currentTimeMillis();
     boolean completed = false;
     try {
+      logStart();
       setUp();
       recordStart();
       final boolean success = runSimplifier();
       recordFinish(success);
+      logFinish(success);
       completed = true;
       return success;
     } catch (final OutOfMemoryError error) {
@@ -281,6 +284,37 @@ public abstract class AbstractTRSimplifier
   {
     if (mStatistics != null) {
       mStatistics.recordRunTime(runtime);
+    }
+  }
+
+  /**
+   * Prints a message to the current logger indicating that this simplifier
+   * has just started.
+   */
+  protected void logStart()
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      logger.debug(ProxyTools.getShortClassName(this) + " ...");
+    }
+  }
+
+  /**
+   * Prints a message to the current logger indicating that this simplifier
+   * has just completed.
+   * @param  success  Whether or not the simplifier has been able to
+   *                  actually simplify the transition relation.
+   */
+  protected void logFinish(final boolean success)
+  {
+    if (success) {
+      final Logger logger = getLogger();
+      if (logger.isDebugEnabled()) {
+        logger.debug
+          (mTransitionRelation.getNumberOfReachableStates() + " states, " +
+           mTransitionRelation.getNumberOfTransitions() + " transitions, " +
+           mTransitionRelation.getNumberOfMarkings() + " markings.");
+      }
     }
   }
 

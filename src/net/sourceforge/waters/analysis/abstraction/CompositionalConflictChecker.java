@@ -1597,6 +1597,7 @@ public class CompositionalConflictChecker
         ListBufferTransitionRelation rel =
           new ListBufferTransitionRelation(aut, eventEnc,
                                            inputStateEnc, config);
+        showDebugLog(rel);
         final int numStates = rel.getNumberOfStates();
         final int numTrans = rel.getNumberOfTransitions();
         final int numMarkings = rel.getNumberOfMarkings();

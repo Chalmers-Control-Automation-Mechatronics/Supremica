@@ -12,15 +12,11 @@ package net.sourceforge.waters.analysis.abstraction;
 import gnu.trove.TIntArrayList;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.base.ProxyTools;
-
-import org.apache.log4j.Logger;
 
 
 public class ChainTRSimplifier
@@ -118,13 +114,6 @@ public class ChainTRSimplifier
     return mIsPartitioning;
   }
 
-  public boolean run()
-    throws AnalysisException
-  {
-    mStopIndex = size();
-    return super.run();
-  }
-
   @Override
   public boolean isObservationEquivalentAbstraction()
   {
@@ -166,6 +155,16 @@ public class ChainTRSimplifier
     }
   }
 
+  @Override
+  protected void logStart()
+  {
+  }
+
+  @Override
+  protected void logFinish(final boolean success)
+  {
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -180,41 +179,19 @@ public class ChainTRSimplifier
 
 
   //#########################################################################
-  //# Specific Access
-  public boolean runTo(final int index)
-  throws AnalysisException
-  {
-    mStopIndex = index;
-    return super.run();
-  }
-
-
-  //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.
   //# AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()
   throws AnalysisException
   {
-    final Logger logger = getLogger();
     mIsObservationEquivalentAbstraction = true;
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (logger.isDebugEnabled()) {
-      logger.debug(rel.getName());
-      logger.debug(rel.getNumberOfReachableStates() + " states, " +
-                   rel.getNumberOfTransitions() + " transitions, " +
-                   rel.getNumberOfMarkings() + " markings.");
-    }
     final int numProps = rel.getNumberOfPropositions();
     mReducedMarkings = new boolean[numProps];
     boolean result = false;
-    final Iterator<TransitionRelationSimplifier> iter = mSteps.iterator();
-    for (int index = 0; index < mStopIndex; index++) {
+    for (final TransitionRelationSimplifier step : mSteps) {
       checkAbort();
-      final TransitionRelationSimplifier step = iter.next();
-      if (logger.isDebugEnabled()) {
-        logger.debug(ProxyTools.getShortClassName(step) + " ...");
-      }
       final int config = step.getPreferredInputConfiguration();
       if (config != 0) {
         rel.reconfigure(config);
@@ -223,11 +200,6 @@ public class ChainTRSimplifier
       if (step.run()) {
         final ListBufferTransitionRelation rel1 = step.getTransitionRelation();
         setTransitionRelation(rel1);
-        if (logger.isDebugEnabled()) {
-          logger.debug(rel.getNumberOfReachableStates() + " states, " +
-                       rel.getNumberOfTransitions() + " transitions, " +
-                       rel.getNumberOfMarkings() + " markings.");
-        }
         result = true;
         mIsObservationEquivalentAbstraction &=
           step.isObservationEquivalentAbstraction();
@@ -278,7 +250,6 @@ public class ChainTRSimplifier
   //#########################################################################
   //# Data Members
   private final List<TransitionRelationSimplifier> mSteps;
-  private int mStopIndex;
   private boolean mIsPartitioning;
   private boolean mIsObservationEquivalentAbstraction;
   private boolean[] mReducedMarkings;
