@@ -216,7 +216,7 @@ public class ExtendedAutomaton
         final EventListExpressionProxy blockedEvents = component.getGraph().getBlockedEvents();
         if(blockedEvents != null)
         {
-            for(final Proxy event:blockedEvents.getEventList())
+            for(final Proxy event:blockedEvents.getEventIdentifierList())
             {
                 final String eventName = ((SimpleIdentifierSubject)event).getName();
                 final EventDeclProxy e = automata.eventIdToProxy(eventName);
@@ -234,7 +234,7 @@ public class ExtendedAutomaton
 
         for(final EdgeSubject edge:component.getGraph().getEdgesModifiable())
         {
-            for(final Proxy event:edge.getLabelBlock().getEventList())
+            for(final Proxy event:edge.getLabelBlock().getEventIdentifierList())
             {
                 final String eventName = ((SimpleIdentifierSubject)event).getName();
                 final EventDeclProxy e = automata.eventIdToProxy(eventName);
@@ -772,7 +772,7 @@ public class ExtendedAutomaton
         for(final NodeProxy node : locationToOutgoingEdgesMap.keySet()){
             final HashSet<EventDeclProxy> events = new HashSet<EventDeclProxy>();
             for(final EdgeSubject tran : locationToOutgoingEdgesMap.get(node)){
-                for(final Proxy event : tran.getLabelBlock().getEventList()){
+                for(final Proxy event : tran.getLabelBlock().getEventIdentifierList()){
                     final EventDeclProxy e = getEvent(event);
                     final boolean added = events.add(e);
                     if(!added){

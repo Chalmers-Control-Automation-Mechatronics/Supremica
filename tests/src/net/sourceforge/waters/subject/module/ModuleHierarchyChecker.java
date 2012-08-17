@@ -172,7 +172,7 @@ class ModuleHierarchyChecker
       (EventListExpressionSubject) proxy;
     visitExpressionProxy(proxy);
     final Collection<AbstractSubject> events =
-      subject.getEventListModifiable();
+      subject.getEventIdentifierListModifiable();
     visitProxyCollectionChild(events, proxy);
     return null;
   }

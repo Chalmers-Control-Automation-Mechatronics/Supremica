@@ -106,9 +106,10 @@ public interface ModuleProxy
 
   /**
    * Gets the event alias list of this module.
-   * @return The list event aliases.
-   *         Each element is of type {@link AliasProxy}
-   *         or {@link ForeachProxy}.
+   * @return The list event aliases. Each element is of type {@link
+   *         net.sourceforge.waters.model.module.AliasProxy AliasProxy}
+   *         or {@link net.sourceforge.waters.model.module.ForeachProxy
+   *         ForeachProxy}.
    */
   public List<Proxy> getEventAliasList();
 
@@ -119,9 +120,10 @@ public interface ModuleProxy
    * ({@link VariableComponentProxy}) and module instances ({@link
    * InstanceProxy}). All these items can be nested in foreach blocks
    * ({@link ForeachProxy}).
-   * @return The component list.
-   *         Each element is of type {@link ComponentProxy}
-   *         or {@link ForeachProxy}.
+   * @return The component list. Each element is of type {@link
+   *         net.sourceforge.waters.model.module.ComponentProxy ComponentProxy}
+   *         or {@link net.sourceforge.waters.model.module.ForeachProxy
+   *         ForeachProxy}.
    */
   public List<Proxy> getComponentList();
 }

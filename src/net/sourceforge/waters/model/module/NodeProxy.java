@@ -51,7 +51,6 @@ public interface NodeProxy extends NamedProxy {
    * This method returns the set of simple nodes or group nodes
    * that are directly contained in this group node.
    * @return An unmodifiable set of nodes.
-   *         Each element is of type {@link NodeProxy}.
    */
   public Set<NodeProxy> getImmediateChildNodes();
 

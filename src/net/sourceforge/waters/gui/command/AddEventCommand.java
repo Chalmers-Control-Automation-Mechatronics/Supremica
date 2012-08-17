@@ -49,7 +49,7 @@ public class AddEventCommand
       new ArrayList<IdentifierSubject>(identifiers.size());
     final Set<IdentifierSubject> contents =
       new TreeSet<IdentifierSubject>(NamedComparator.getInstance());
-    for (final AbstractSubject a : mList.getEventListModifiable()) {
+    for (final AbstractSubject a : mList.getEventIdentifierListModifiable()) {
       contents.add((IdentifierSubject)a);
     }
     for (final IdentifierSubject n: identifiers) {
@@ -77,12 +77,12 @@ public class AddEventCommand
   //# Interface net.sourceforge.waters.gui.command
   public void execute()
   {
-    mList.getEventListModifiable().addAll(mPosition, mIdentifiers);
+    mList.getEventIdentifierListModifiable().addAll(mPosition, mIdentifiers);
   }
 
   public void undo()
   {
-    mList.getEventListModifiable().removeAll(mIdentifiers);
+    mList.getEventIdentifierListModifiable().removeAll(mIdentifiers);
   }
 
   public void setUpdatesSelection(final boolean update)

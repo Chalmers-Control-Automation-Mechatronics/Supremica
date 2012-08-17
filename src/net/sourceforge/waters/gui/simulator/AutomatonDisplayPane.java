@@ -331,7 +331,7 @@ public class AutomatonDisplayPane
       }
       // Labels have precedence over edges.
       for (final EdgeProxy edge : graph.getEdges()) {
-        for (final Proxy proxy : edge.getLabelBlock().getEventList()) {
+        for (final Proxy proxy : edge.getLabelBlock().getEventIdentifierList()) {
           final ProxyShape shape = producer.getShape(proxy);
           if (shape.isClicked(x, y)) {
             return proxy;

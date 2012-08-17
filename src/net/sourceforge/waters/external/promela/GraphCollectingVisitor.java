@@ -512,7 +512,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
           }
           if(e!=null)
           {
-            final Collection<Proxy> copy = cloner.getClonedList(e.getLabelBlock().getEventList());
+            final Collection<Proxy> copy = cloner.getClonedList(e.getLabelBlock().getEventIdentifierList());
             copy.addAll(labelBlock3);
             final LabelBlockProxy label4 = mFactory.createLabelBlockProxy(cloner.getClonedList(copy),null);
             mEdges.remove(e);

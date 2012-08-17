@@ -287,7 +287,7 @@ public class EditorReadFisherThompsonAction
                         {
                             for(final EdgeSubject edge:efa.getGraph().getEdgesModifiable())
                             {
-                                final String eventName = ((SimpleIdentifierSubject)edge.getLabelBlock().getEventList().get(0)).getName();
+                                final String eventName = ((SimpleIdentifierSubject)edge.getLabelBlock().getEventIdentifierList().get(0)).getName();
 
                                 edge.setGuardActionBlock(efa2Event2GuardAction.get(efaName).get(eventName));
                             }

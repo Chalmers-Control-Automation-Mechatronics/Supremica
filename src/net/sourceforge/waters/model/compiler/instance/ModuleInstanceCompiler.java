@@ -381,7 +381,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   {
     try {
       mCurrentEventList = new CompiledEventList(mask);
-      final List<Proxy> list = proxy.getEventList();
+      final List<Proxy> list = proxy.getEventIdentifierList();
       visitCollection(list);
       return mCurrentEventList;
     } finally {
@@ -626,7 +626,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     (final LabelBlockProxy block, final int mask)
     throws VisitorException
   {
-    final List<Proxy> list = block.getEventList();
+    final List<Proxy> list = block.getEventIdentifierList();
     if (list.isEmpty()) {
       final EmptyLabelBlockException exception =
         new EmptyLabelBlockException(block, mCurrentEdge, mCurrentComponent);

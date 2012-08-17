@@ -1911,9 +1911,9 @@ class EditorGraph
     {
       try {
         final List<? extends ProxySubject> originalList =
-          original.getEventListModifiable();
+          original.getEventIdentifierListModifiable();
         final List<? extends ProxySubject> fakeList =
-          fake.getEventListModifiable();
+          fake.getEventIdentifierListModifiable();
         visitLists(originalList, fakeList);
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();

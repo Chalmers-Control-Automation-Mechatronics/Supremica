@@ -228,9 +228,9 @@ public class ModuleHashCodeVisitor
     throws VisitorException
   {
     int result = visitExpressionProxy(proxy);
-    final List<Proxy> eventList = proxy.getEventList();
+    final List<Proxy> eventIdentifierList = proxy.getEventIdentifierList();
     result *= 5;
-    result += computeListHashCode(eventList);
+    result += computeListHashCode(eventIdentifierList);
     return result;
   }
 

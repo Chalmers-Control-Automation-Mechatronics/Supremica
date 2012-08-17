@@ -46,7 +46,7 @@ public class Renderer
         context.getRenderingInformation(blocked);
       queue.offer(new ShapeToRender(shape, info));
 
-      listToRender(blocked.getEventList(), queue, producer);
+      listToRender(blocked.getEventIdentifierList(), queue, producer);
     }
 
     // Nodes
@@ -68,7 +68,7 @@ public class Renderer
       queue.offer(new ShapeToRender(producer.getShape(edge.getLabelBlock()),
           context.getRenderingInformation(edge.getLabelBlock())));
 
-      listToRender(edge.getLabelBlock().getEventList(), queue, producer);
+      listToRender(edge.getLabelBlock().getEventIdentifierList(), queue, producer);
 
       if (edge.getGuardActionBlock() != null) {
         queue.offer(new ShapeToRender(producer.getShape(edge

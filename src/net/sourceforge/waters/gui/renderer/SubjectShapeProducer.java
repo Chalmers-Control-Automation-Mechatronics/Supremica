@@ -181,7 +181,7 @@ public class SubjectShapeProducer
       if (esource instanceof EventDeclProxy) {
         for (final NodeProxy node : getGraph().getNodes()) {
           final EventListExpressionProxy props = node.getPropositions();
-          if (!props.getEventList().isEmpty()) {
+          if (!props.getEventIdentifierList().isEmpty()) {
             removeMapping(node);
           }
         }
@@ -312,7 +312,7 @@ public class SubjectShapeProducer
       throws VisitorException
     {
       visitProxy(block);
-      for (final Proxy proxy : block.getEventList()) {
+      for (final Proxy proxy : block.getEventIdentifierList()) {
         proxy.acceptVisitor(this);
       }
       return null;
