@@ -317,7 +317,7 @@ abstract class JAXBProductDESElementExporter
       mTraceAutomata.checkUnique(aut);
       final StateProxy state = statemap.get(aut);
       if (state != null) {
-        // check whether automaton contains state
+        // TODO Check whether automaton contains state
         final TraceState tracestate = mFactory.createTraceState();
         tracestate.setAutomaton(aut.getName());
         tracestate.setState(state.getName());

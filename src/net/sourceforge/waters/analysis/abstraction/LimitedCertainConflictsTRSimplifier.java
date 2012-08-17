@@ -432,9 +432,9 @@ public class LimitedCertainConflictsTRSimplifier
     int numReachable = 0;
     int numCritical = 0;
     for (int state = 0; state < numStates; state++) {
-      if (isTestState(state, level)) {
+      if (rel.isReachable(state)) {
         numReachable++;
-        if (mStateInfo[state] == level) {
+        if (mStateInfo[state] <= level) {
           numCritical++;
         }
       }
@@ -561,17 +561,6 @@ public class LimitedCertainConflictsTRSimplifier
       }
     }
     return coreachable;
-  }
-
-  private boolean isTestState(final int state, final int level)
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (rel.isReachable(state)) {
-      final int status = mStateInfo[state];
-      return status == COREACHABLE || status >= level;
-    } else {
-      return false;
-    }
   }
 
 
