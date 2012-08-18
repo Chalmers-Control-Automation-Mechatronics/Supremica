@@ -340,13 +340,11 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       // select dump state as first item
       int[] allBadStates = mBadStates.toArray();
       l("!!!!!All Bad States: ", allBadStates);
-      //final boolean useoldrel = false;
-      //r (int i = 0; i < mBadStates.size(); i++)
-      //{
+
+
           if (CheckAllBad() && mOldRel.getNumberOfStates() < rel.getNumberOfStates() && mOldRel.getNumberOfTransitions() < rel.getNumberOfTransitions())
           {
-            l("new thing!!");
-              // replace rel with oldrel
+            // replace rel with oldrel
             setTransitionRelation(mOldRel);
             rel = getTransitionRelation();
               mBadStates = new TIntHashSet();
@@ -358,8 +356,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
               }
               allBadStates = mBadStates.toArray();
           }
-
-     // }
 
 
 
@@ -376,8 +372,8 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
           iter.resetState(s);
           if (rel.isInitial(s))
           {
-              rel.setInitial(dumpstate, true);
               rel.setInitial(s, false);
+              rel.setInitial(dumpstate, true);
               l("Setting " + s + " no initial");
           }
           while (iter.advance())
