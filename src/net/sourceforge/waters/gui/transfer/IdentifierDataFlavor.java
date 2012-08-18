@@ -99,7 +99,7 @@ class IdentifierDataFlavor extends ModuleDataFlavor
       (final EventListExpressionProxy elist)
     throws VisitorException
     {
-      final List<Proxy> list = elist.getEventList();
+      final List<Proxy> list = elist.getEventIdentifierList();
       return visitCollection(list);
     }
 

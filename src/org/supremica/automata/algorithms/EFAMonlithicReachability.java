@@ -228,7 +228,7 @@ for3:       for(final String var:es.getVar2val().keySet())
     private void computeLe2GalMap() {
         le2gals = new HashMap<LocationEvent, List<GuardActionLoc>>();
         for (final EdgeProxy anEdge : efa.getGraph().getEdges()) {
-            for (final Proxy anEvent : anEdge.getLabelBlock().getEventList()) {
+            for (final Proxy anEvent : anEdge.getLabelBlock().getEventIdentifierList()) {
                 final LocationEvent tmpLocEvent = new LocationEvent(anEdge.getSource(), ((SimpleIdentifierProxy)anEvent).getName());
                 final GuardActionLoc gal = new GuardActionLoc(anEdge.getGuardActionBlock(), anEdge.getTarget());
                 if(!le2gals.containsKey(tmpLocEvent))

@@ -208,7 +208,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                             final NodeProxy targetLocation = anEdge.getTarget();
 
                             for (final EdgeSubject anOutgoingEdge : currExAutomaton.getLocationToOutgoingEdgesMap().get(targetLocation)) {
-                                for (final Proxy event : anOutgoingEdge.getLabelBlock().getEventList()) {
+                                for (final Proxy event : anOutgoingEdge.getLabelBlock().getEventIdentifierList()) {
                                     final String eventName = ((SimpleIdentifierSubject) event).getName();
                                     final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
                                     if (!forwardEventDependencySet.containsKey(eventIndex)) {
@@ -251,7 +251,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                     for (final Map.Entry<ExtendedAutomaton, ArrayList<EdgeProxy>> entry : automataEdges.entrySet()) {
                         for (final EdgeProxy anEdge : entry.getValue()) {
                             for (final EdgeSubject anIngoingEdge : entry.getKey().getLocationToIngoingEdgesMap().get(anEdge.getSource())) {
-                                for (final Proxy event : anIngoingEdge.getLabelBlock().getEventList()) {
+                                for (final Proxy event : anIngoingEdge.getLabelBlock().getEventIdentifierList()) {
                                     final String eventName = ((SimpleIdentifierSubject) event).getName();
                                     final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
                                     if (!backwardEventDependencySet.containsKey(eventIndex)) {

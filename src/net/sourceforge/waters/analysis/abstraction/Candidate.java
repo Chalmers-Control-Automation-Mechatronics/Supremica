@@ -29,7 +29,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * events, this class provides some support to evaluate different heuristics
  * for candidate selection.
  *
- * @see OPConflictChecker
+ * @see AbstractCompositionalModelAnalyzer
  * @author Rachel Francis
  */
 

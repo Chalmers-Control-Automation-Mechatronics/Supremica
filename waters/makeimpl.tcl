@@ -1012,6 +1012,10 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             regsub {^Gets the } $getcomment {Gets the modifiable } setcomment
             Java_WriteLn $stream $umap "  /**"
             Java_WriteLn $stream $umap "   * $setcomment"
+            set eachcomment [Java_AttribGetEachComment $attrib $impl]
+            if {[string compare $eachcomment ""] != 0} {
+              Java_WriteLn $stream $umap "   * $eachcomment"
+            }
             Java_WriteLn $stream $umap "   */"
           }
           set gettername [Java_AttribGetGetterName $attrib $impl]
@@ -1211,7 +1215,7 @@ proc Java_GenerateFactory {impl subpack prefix destname classnames
     }
 
   ############################################################################
-  # Write Creator Methods
+  # Write Cloner Methods
     if {!$iface} {
       Java_GenerateSeparatorComment $stream $umap \
           "Interface net.sourceforge.waters.model.$subpack.$interfacename"
@@ -1231,6 +1235,9 @@ proc Java_GenerateFactory {impl subpack prefix destname classnames
       Java_WriteLn $stream $umap "  \}"
     }
     Java_WriteLn $stream $umap ""
+
+  ############################################################################
+  # Write Creator Methods
     set classnames [lsort $classnames]
     foreach classname $classnames {
       set classinfo $classMap($classname)
@@ -2961,6 +2968,33 @@ proc Java_AttribGetEnglishDescription {attrib impl} {
   }
 }
 
+proc Java_AttribGetEachComment {attrib impl} {
+  set comment [Java_AttribGetComment $attrib $impl]
+  set needle "Each element is"
+  set start [string first $needle $comment]
+  if {$start >= 0} {
+    set end [expr $start + [string length $needle]]
+    set len [string length $comment]
+    set braced 0
+    while {$end < $len} {
+      set ch [string index $comment $end]
+      if {$braced == 0 && [string compare $ch "."] == 0} {
+        break
+      } elseif {[string compare $ch "\{"] == 0} {
+        incr braced
+      } elseif {[string compare $ch "\}"] == 0} {
+        incr braced -1
+      }
+      incr end
+    }
+    set eachcomment [string range $comment $start $end]
+    return $eachcomment
+  } else {
+    return ""
+  }
+}
+
+
 
 ##############################################################################
 # Utilities
@@ -3123,6 +3157,13 @@ proc Java_WriteConstructorComment {stream umap impl methodkind
         Java_Write $stream $umap ", or <CODE>null</CODE>"
       }
       Java_WriteLn $stream $umap "."
+      set decltype [Java_AttribGetDeclaredType $attrib $impl]
+      if {[Java_IsCollectionType $decltype]} {
+        set eachcomment [Java_AttribGetEachComment $attrib $impl]
+        if {[string compare $eachcomment ""] != 0} {
+          Java_WriteLn $stream $umap "   *        $eachcomment"
+        }
+      }
     }
   }
   Java_WriteLn $stream $umap "   */"
@@ -3178,6 +3219,7 @@ proc Java_WriteLn {stream useMapName line} {
 
 proc Java_RecordString {useMapName line} {
   upvar $useMapName useMap
+  regsub -all "\{@link \[^\}\.\]*\.\[^\}\]*\}" $line "" line
   set words [split $line "{}<>();,. "]
   foreach word $words {
     if {[regexp {^[A-Z][A-Za-z0-9]+$} $word all]} {

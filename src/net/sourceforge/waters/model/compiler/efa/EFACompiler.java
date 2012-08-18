@@ -571,7 +571,7 @@ public class EFACompiler
     public Object visitLabelBlockProxy(final LabelBlockProxy block)
       throws VisitorException
     {
-      final List<Proxy> list = block.getEventList();
+      final List<Proxy> list = block.getEventIdentifierList();
       visitCollection(list);
       return null;
     }
@@ -784,7 +784,7 @@ public class EFACompiler
         mLabelList = new LinkedList<IdentifierProxy>();
         final LabelBlockProxy blocked0 = graph.getBlockedEvents();
         if (blocked0 != null) {
-          final List<Proxy> list = blocked0.getEventList();
+          final List<Proxy> list = blocked0.getEventIdentifierList();
           visitCollection(list);
         }
         final Collection<EFAEvent> events =
@@ -867,7 +867,7 @@ public class EFACompiler
     {
       try {
         mLabelList = new LinkedList<IdentifierProxy>();
-        final List<Proxy> list = block.getEventList();
+        final List<Proxy> list = block.getEventIdentifierList();
         visitCollection(list);
         return mFactory.createLabelBlockProxy(mLabelList, null);
       } finally {

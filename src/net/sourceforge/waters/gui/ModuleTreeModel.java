@@ -387,7 +387,7 @@ class ModuleTreeModel
       if (event.getExpression() instanceof PlainEventListSubject) {
         final PlainEventListSubject plain =
           (PlainEventListSubject) event.getExpression();
-        return plain.getEventListModifiable();
+        return plain.getEventIdentifierListModifiable();
       } else {
         return null;
       }
@@ -418,7 +418,7 @@ class ModuleTreeModel
       final ParameterBindingSubject para = (ParameterBindingSubject)binding;
       if(para.getExpression() instanceof EventListExpressionSubject){
         final EventListExpressionSubject list = (EventListExpressionSubject) para.getExpression();
-         return (ListSubject<? extends ProxySubject>) list.getEventListModifiable();
+         return (ListSubject<? extends ProxySubject>) list.getEventIdentifierListModifiable();
       }
       return null;
     }

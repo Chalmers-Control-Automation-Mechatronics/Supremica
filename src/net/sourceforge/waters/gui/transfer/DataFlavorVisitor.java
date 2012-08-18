@@ -207,7 +207,7 @@ class DataFlavorVisitor extends DefaultModuleProxyVisitor
     (final EventListExpressionProxy elist)
   throws VisitorException
   {
-    final List<Proxy> list = elist.getEventList();
+    final List<Proxy> list = elist.getEventIdentifierList();
     return visitCollection(list);
   }
 
@@ -242,7 +242,7 @@ class DataFlavorVisitor extends DefaultModuleProxyVisitor
     (final LabelBlockProxy block)
   throws VisitorException
   {
-    final List<Proxy> list = block.getEventList();
+    final List<Proxy> list = block.getEventIdentifierList();
     if(list.isEmpty()){
       return LIST_GRAPH;
     }

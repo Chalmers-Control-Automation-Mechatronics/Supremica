@@ -758,7 +758,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       // gets the existing events
       final List<Proxy> existingEvents =
-          mEdges.get(edgeIndex).getLabelBlock().getEventList();
+          mEdges.get(edgeIndex).getLabelBlock().getEventIdentifierList();
 
       // adds each event that already exists to the new list (since these
       // objects are immutable and can't be updated)

@@ -64,8 +64,7 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
  * </UL>
  *
  * <P>This class also implements the {@link AttributeFactory} interface for
- * use with the GUI class {@link net.sourceforge.waters.gui.AttributesPanel
- * AttributePanel}.</P>
+ * use with GUI classes.</P>
  *
  * @author Robi Malik
  */

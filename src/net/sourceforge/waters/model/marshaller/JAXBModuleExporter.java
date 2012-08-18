@@ -624,7 +624,7 @@ public class JAXBModuleExporter
 
     final LabelBlockProxy labelBlockProxy = proxy.getLabelBlock();
 
-    if (!labelBlockProxy.getEventList().isEmpty()) {
+    if (!labelBlockProxy.getEventIdentifierList().isEmpty()) {
       final LabelBlock labelBlockElement =
         visitLabelBlockProxy(labelBlockProxy);
       element.setLabelBlock(labelBlockElement);
@@ -880,7 +880,7 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyProxy(proxy, element);
-    final List<Proxy> eventListProxy = proxy.getEventList();
+    final List<Proxy> eventListProxy = proxy.getEventIdentifierList();
     final List<?> untyped = element.getList();
     @SuppressWarnings("unchecked")
     final List<ElementType> eventListElement = (List<ElementType>) untyped;
@@ -969,7 +969,7 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyExpressionProxy(proxy, element);
-    final List<Proxy> eventListProxy = proxy.getEventList();
+    final List<Proxy> eventListProxy = proxy.getEventIdentifierList();
     mEventListExpressionEventListHandler.toJAXB(this, eventListProxy, element);
   }
 

@@ -59,7 +59,7 @@ public class FORCEAutomatonVariableSorter {
             var2AutVar.put(efa.getName(), new AutVar(AutVar.TYPE_EFA, efa, efa.getName(), new HashSet<EventDeclProxy>(efa.getAlphabet())));
             for (final EdgeProxy anEdge : efa.getTransitions()) {
                 final HashSet<EventDeclProxy> eventsOfCurrEdge = new HashSet<EventDeclProxy>();
-                for (final Iterator<Proxy> eventIterator = anEdge.getLabelBlock().getEventList().iterator(); eventIterator.hasNext();) {
+                for (final Iterator<Proxy> eventIterator = anEdge.getLabelBlock().getEventIdentifierList().iterator(); eventIterator.hasNext();) {
                     final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
                     eventsOfCurrEdge.add(origin.eventIdToProxy(eventName));
                 }
