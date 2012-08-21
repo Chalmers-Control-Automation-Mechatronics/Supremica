@@ -135,8 +135,8 @@ public class BDDExtendedAutomaton {
             // Then add state properties
             final int locationIndex = bddExAutomata.getLocationIndex(theExAutomaton, currLocation);
             System.err.println(currLocation.getName() + ": " + locationIndex);
-            if (currLocation.getClockInvariant() != null) {
-                manager.addLocationInvariant(locationInvariants, manager.guard2BDD(currLocation.getClockInvariant()), locationIndex, sourceLocationDomain);
+            if (true){//currLocation.getClockInvariant() != null) {
+                manager.addLocationInvariant(locationInvariants, manager.guard2BDD(null), locationIndex, sourceLocationDomain);
             } else {
                 manager.addLocation(locationInvariants, locationIndex, sourceLocationDomain);
             }
@@ -190,7 +190,7 @@ public class BDDExtendedAutomaton {
         final NodeProxy sourceLocation = theEdge.getSource();
         final NodeProxy destLocation = theEdge.getTarget();
 //        ListSubject<AbstractSubject> theEvent = theEdge.getLabelBlock().getEventListModifiable();
-        final Iterator<Proxy> eventIterator = theEdge.getLabelBlock().getEventList().iterator();
+        final Iterator<Proxy> eventIterator = theEdge.getLabelBlock().getEventIdentifierList().iterator();
         while (eventIterator.hasNext()) {
 //            String eventName = ((SimpleIdentifierSubject)theEdge.getLabelBlock().getEventList().iterator().next()).getName();
             final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
@@ -267,7 +267,7 @@ public class BDDExtendedAutomaton {
 
     private void addNodeProxy(final EdgeSubject theEdge) {
 
-        final Iterator<Proxy> eventIterator = theEdge.getLabelBlock().getEventList().iterator();
+        final Iterator<Proxy> eventIterator = theEdge.getLabelBlock().getEventIdentifierList().iterator();
         while (eventIterator.hasNext()) {
 
             final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
@@ -362,7 +362,7 @@ public class BDDExtendedAutomaton {
                 final NodeProxy state = currEdge.getTarget();
 
                 // Is this an epsilon event that we care about?
-                final String eventName = ((SimpleIdentifierSubject) currEdge.getLabelBlock().getEventListModifiable().iterator().next()).getName();
+                final String eventName = ((SimpleIdentifierSubject) currEdge.getLabelBlock().getEventIdentifierListModifiable().iterator().next()).getName();
                 final EventDeclProxy currEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
 
                 if (!currEvent.isObservable() && (currEdge.getSource() != currEdge.getTarget()) && !result.contains(state)) {

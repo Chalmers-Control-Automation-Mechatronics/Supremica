@@ -294,6 +294,8 @@ public final class Config
     public static final BooleanProperty SYNTHESIS_INDEPENDENT_HEURISTIC = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "independentHeuristic", true, "Apply the independent heuristic");
     public static final BooleanProperty SYNTHESIS_SAVE_IDD_IN_FILE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "saveIDDInFile", true, "Save the guard-event pairs as an IDD in a file");
     public static final BooleanProperty SYNTHESIS_REACHABILITY = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "reachability", false, "Remove the unreachable states");
+    public static final BooleanProperty SYNTHESIS_OPTIMIZATION = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "optimization", false, "Compute the global optimal time");
+    
 
     // ALGORITHMS_MINIMIZATION
     public static final ObjectProperty MINIMIZATION_EQUIVALENCE_RELATION = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationEquivalenceRelation", EquivalenceRelation.LANGUAGEEQUIVALENCE, "Default equivalence relation", EquivalenceRelation.values());

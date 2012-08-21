@@ -263,7 +263,7 @@ public class BDDExtendedSynthesizer {
                     SimpleExpressionSubject ses1 = null;
                     SimpleExpressionSubject ses2 = null;
 
-                    final String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
+                    final String currEvent = ep.getLabelBlock().getEventIdentifierList().iterator().next().toString();
                     currBDDGG = event2guard.get(currEvent);
 
                     if(ep.getGuardActionBlock()==null)
