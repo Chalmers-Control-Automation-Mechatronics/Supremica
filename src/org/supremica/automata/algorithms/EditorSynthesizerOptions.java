@@ -72,6 +72,8 @@ public final class EditorSynthesizerOptions
     private boolean indpHeuristic;
     private boolean reachability;
     private boolean rememberDisabledUncontrollableEvents;
+    private boolean optimization;
+    private long globalClockDomain = 0;
 
     private boolean bddExtractSupervisor;
 
@@ -99,7 +101,8 @@ public final class EditorSynthesizerOptions
             Config.SYNTHESIS_PRINT_GUARD.get(),
             Config.SYNTHESIS_ADD_GUARDS.get(),
             Config.SYNTHESIS_SAVE_IN_FILE.get(),
-            Config.SYNTHESIS_REACHABILITY.get());
+            Config.SYNTHESIS_REACHABILITY.get(),
+            Config.SYNTHESIS_OPTIMIZATION.get());
     }
 
     /**
@@ -111,7 +114,7 @@ public final class EditorSynthesizerOptions
     private EditorSynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm,
     		boolean purge, boolean removeUnnecessarySupervisors, boolean maximallyPermissive,
     		boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor, 
-                boolean computePrintGuard, boolean addGuards, boolean saveInFile, boolean reachability)
+                boolean computePrintGuard, boolean addGuards, boolean saveInFile, boolean reachability, boolean optimization)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -125,6 +128,7 @@ public final class EditorSynthesizerOptions
         this.addGuards = addGuards;
         this.saveInFile = saveInFile;
         this.reachability = reachability;
+        this.optimization = optimization;
 
         this.event = "";
 		this.expressionType = 2;
@@ -344,6 +348,25 @@ public final class EditorSynthesizerOptions
         reachability = bool;
     }
 
+    public boolean getOptimization()
+    {
+        return optimization;
+    }
+
+    public void setOptimization(boolean bool)
+    {
+        optimization = bool;
+    }
+
+    public void setGlobalClockDomain(long domain)
+    {
+        globalClockDomain = domain;
+    }
+
+    public long getGlobalClockDomain()
+    {
+        return globalClockDomain;
+    }
 
     /**
      * Stores the current set of options in SupremicaProperties.
@@ -372,7 +395,7 @@ public final class EditorSynthesizerOptions
      */
     public static EditorSynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.BDD, true, true, true, true, true, false,true, true, false, true);
+        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.BDD, true, true, true, true, true, false,true, true, false, true, false);
     }
 
     /**
