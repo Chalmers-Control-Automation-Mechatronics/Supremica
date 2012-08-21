@@ -75,15 +75,19 @@ class EditorSynthesizerDialogStandardPanel
     private final JCheckBox reachableBox;
     private final Box guardBox;
     private final Box genGuardComputeSupBox;
+    private final Box optimizationSupBox;
 
     private final JCheckBox printGuardBox;
     private final JCheckBox addGuardsBox;
     private final JCheckBox saveEventGuardInFileBox;
     private final JCheckBox saveIDDInFileBox;
 
+    private final JCheckBox optimizationBox;
+
     private final JCheckBox complementHeuristicBox;
     private final JCheckBox independentHeuristicBox;
 
+    private final JTextField globalClockDomainField;
 
     private final JRadioButton fromAllowedStatesButton;
     private final JRadioButton fromForbiddenStatesButton;
@@ -311,6 +315,29 @@ class EditorSynthesizerDialogStandardPanel
 
         this.add(genGuardComputeSupBox);
 
+        //Optimization options
+        optimizationSupBox = Box.createVerticalBox();
+
+        optimizationBox = new JCheckBox("Compute optimal time");
+        optimizationBox.setToolTipText("Compute the supervisor that will direct the plant to reach a marked state with the minimum time.");
+
+        optimizationBox.addActionListener(this);
+
+        final JPanel optimizationPanel = new JPanel();
+        optimizationPanel.setBorder(BorderFactory.createTitledBorder("Optimization"));
+        optimizationPanel.setLayout(new GridLayout(4, 1));
+        optimizationPanel.add(optimizationBox);
+
+        optimizationPanel.add(new JLabel("Enter the global time domain:"));
+        globalClockDomainField = new JTextField("0");
+        globalClockDomainField.setToolTipText("Guess a reasonably large amount of time to reach a marked state");
+        globalClockDomainField.setEnabled(false);
+        optimizationPanel.add(globalClockDomainField);
+
+        optimizationSupBox.add(optimizationPanel);
+
+        this.add(optimizationSupBox);
+
         updatePanel();
     }
 
@@ -320,6 +347,7 @@ class EditorSynthesizerDialogStandardPanel
         algorithmSelector.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
         printGuardBox.setSelected(synthesizerOptions.getPrintGuard());
         reachableBox.setSelected(synthesizerOptions.getReachability());
+        globalClockDomainField.setEnabled(optimizationBox.isSelected());
         
 /*
         boolean selected = saveIDDInFileBox.isSelected() || saveEventGuardInFileBox.isSelected() || 
@@ -335,6 +363,7 @@ class EditorSynthesizerDialogStandardPanel
 
     public void updatePanel()
     {
+        globalClockDomainField.setEnabled(optimizationBox.isSelected());
         //At present, it is only possible to perform the synthesis via BDDs
         final SynthesisAlgorithm selected = algorithmSelector.getAlgorithm();
         // Clear, then add the ones that are implemented
@@ -377,6 +406,16 @@ class EditorSynthesizerDialogStandardPanel
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
 */
         }
+        else if (typeSelector.getType() == SynthesisType.UNSAFETY)
+        {
+            algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY);
+/*
+            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
+            algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
+            algorithmSelector.addItem(SynthesisAlgorithm.BDD);
+*/
+        }
+
 
         // Default selection
 
@@ -396,6 +435,8 @@ class EditorSynthesizerDialogStandardPanel
         synthesizerOptions.setReachability(reachableBox.isSelected());
         synthesizerOptions.setCompHeuristic(complementHeuristicBox.isSelected());
         synthesizerOptions.setIndpHeuristic(independentHeuristicBox.isSelected());
+        synthesizerOptions.setOptimization(optimizationBox.isSelected());
+        synthesizerOptions.setGlobalClockDomain(Long.parseLong(globalClockDomainField.getText()));
 
         if(fromForbiddenStatesButton.isSelected())
         {
@@ -467,11 +508,10 @@ public class EditorSynthesizerDialog
         dialog = new JDialog(parentFrame, true);    // modal
         this.parentFrame = parentFrame;
         this.synthesizerOptions = synthesizerOptions;
-        synthesizerOptions.setPrintGuard(true);
         synthesizerOptions.setReachability(true);
 
         dialog.setTitle("Synthesizer options");
-        dialog.setSize(new Dimension(420, 450));
+        dialog.setSize(new Dimension(520, 500));
 
         final Container contentPane = dialog.getContentPane();
 
@@ -550,7 +590,7 @@ public class EditorSynthesizerDialog
         }
         else if (source == cancelButton)
         {
-            synthesizerOptions.setDialogOK(false);    // Already done...
+            synthesizerOptions.setDialogOK(false);
             dialog.setVisible(false);
             dialog.dispose();
         }
