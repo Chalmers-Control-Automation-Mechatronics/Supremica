@@ -496,7 +496,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                 {
                     final int varIndex = theIndexMap.getVariableIndex(var);
                     final BDD noneUpdateVar =
-                            bddExAutomata.BDDBitVecTargetVarsMap.get(var.getName()).equ(bddExAutomata.BDDBitVecSourceVarsMap.get(var.getName()));
+                            bddExAutomata.getBDDBitVecTarget(varIndex).equ(bddExAutomata.getBDDBitVecSource(varIndex));
                     transCorrespondingToUpdatedVariables[varIndex] =
                             transCorrespondingToUpdatedVariablesWithoutActions[varIndex].ite(transCorrespondingToUpdatedVariables[varIndex],noneUpdateVar);
                 }
@@ -547,7 +547,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                 for (final VariableComponentProxy var : orgAutomata.getVars())
                 {
                     final int varIndex = theIndexMap.getVariableIndex(var);
-                    final BDD compensate = bddExAutomata.BDDBitVecTargetVarsMap.get(var.getName()).equ(bddExAutomata.BDDBitVecSourceVarsMap.get(var.getName()));
+                    final BDD compensate = bddExAutomata.getBDDBitVecTarget(varIndex).equ(bddExAutomata.getBDDBitVecTarget(varIndex));
                     transCorrespondingToUpdatedVariables[varIndex] = transCorrespondingToUpdatedVariablesWithoutActions[varIndex].ite(transCorrespondingToUpdatedVariables[varIndex],compensate);
                 }
 
@@ -562,14 +562,15 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             for (int i = 0; i < bddExAutomata.orgExAutomata.getVars().size(); i++)
             {
                 final String varName = theIndexMap.getVariableAt(i).getName();
+                final int varIndex = theIndexMap.getVariableIndex(theIndexMap.getVariableAt(i));
                 transCorrespondingToUpdatedVariables[i] =
-                        transCorrespondingToUpdatedVariables[i].and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)));
+                        transCorrespondingToUpdatedVariables[i].and(bddExAutomata.getBDDBitVecSource(varIndex).lte(bddExAutomata.getMaxBDDBitVecOf(varIndex)));
                 transCorrespondingToUpdatedVariables[i] =
-                        transCorrespondingToUpdatedVariables[i].and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).lte(bddExAutomata.getMaxBDDBitVecOf(varName)));
+                        transCorrespondingToUpdatedVariables[i].and(bddExAutomata.getBDDBitVecTarget(varIndex).lte(bddExAutomata.getMaxBDDBitVecOf(varIndex)));
                 transCorrespondingToUpdatedVariables[i] =
-                        transCorrespondingToUpdatedVariables[i].and(bddExAutomata.BDDBitVecSourceVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
+                        transCorrespondingToUpdatedVariables[i].and(bddExAutomata.getBDDBitVecSource(varIndex).gte(bddExAutomata.getMinBDDBitVecOf(varIndex)));
                 transCorrespondingToUpdatedVariables[i] =
-                        transCorrespondingToUpdatedVariables[i].and(bddExAutomata.BDDBitVecTargetVarsMap.get(varName).gte(bddExAutomata.getMinBDDBitVecOf(varName)));
+                        transCorrespondingToUpdatedVariables[i].and(bddExAutomata.getBDDBitVecTarget(varIndex).gte(bddExAutomata.getMinBDDBitVecOf(varIndex)));
 
                 tmp.andWith(transCorrespondingToUpdatedVariables[i]);
             }
@@ -671,7 +672,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
                     qualifiedForInitialComponent = true;
                 }
 
-                if (anAutomaton.isLocationAccepted(anEdge.getTarget()) || bddExAutomata.getBDDExAutomaton(anAutomaton).getAllMarked())
+                if (anAutomaton.isLocationAccepted(anEdge.getTarget()))
                 {
                     qualifiedForMarkedComponent = true;
                 }
