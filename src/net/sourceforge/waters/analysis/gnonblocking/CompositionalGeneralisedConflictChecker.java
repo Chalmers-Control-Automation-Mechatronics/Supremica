@@ -56,6 +56,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
 import org.apache.log4j.Logger;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
 
 
 /**
@@ -270,7 +271,7 @@ public class CompositionalGeneralisedConflictChecker
           AutomatonProxy abstractedAut = aut;
           final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
           final Set<EventProxy> localEvents = identifyLocalEvents(autAsList);
-          if (localEvents.size() > 0) {
+          //if (localEvents.size() > 0) {
             try {
               abstractedAut = hideAndAbstract(aut, localEvents);
               modified = true;
@@ -279,9 +280,9 @@ public class CompositionalGeneralisedConflictChecker
               // abstractedAut remains aut ...
             }
             mTemporaryModifyingSteps.clear();
-          } else {
+          //} else {
             // abstractedAut remains aut ...
-          }
+          //}
           remainingAut.add(abstractedAut);
         }
       }
@@ -341,6 +342,7 @@ public class CompositionalGeneralisedConflictChecker
           }
         }
       }
+      MarshallingTools.saveModule(model, "model.wmod");
       final ConflictChecker checker =
           new NativeConflictChecker(model, getUsedMarkingProposition(),
               getFactory());
@@ -629,7 +631,7 @@ public class CompositionalGeneralisedConflictChecker
       final KindTranslator translator = getKindTranslator();
       mAbstractionRules = new LinkedList<AbstractionRule>();
 
-      final TauLoopRemovalRule tlrRule =
+      /*final TauLoopRemovalRule tlrRule =
           new TauLoopRemovalRule(factory, translator, mPropositions);
       mAbstractionRules.add(tlrRule);
 
@@ -675,7 +677,14 @@ public class CompositionalGeneralisedConflictChecker
               factory, translator, mPropositions);
       rttonsRule.setAlphaMarking(alpha);
       rttonsRule.setDefaultMarking(omega);
-      mAbstractionRules.add(rttonsRule);
+      mAbstractionRules.add(rttonsRule);*/
+      
+      final CanonizeAbstractionRule canonRule =
+          new CanonizeAbstractionRule(factory, translator,
+                                               mPropositions);
+      canonRule.setAlphaMarking(alpha);
+      canonRule.setOmegaMarking(omega);
+      mAbstractionRules.add(canonRule);
     }
   }
 
@@ -704,6 +713,12 @@ public class CompositionalGeneralisedConflictChecker
   {
     final Logger logger = getLogger();
     AutomatonProxy abstractedAut = autToAbstract;
+    HashSet<AutomatonProxy> autui = new HashSet<AutomatonProxy>();
+    autui.add(abstractedAut);
+    if (abstractedAut.getName().equals("observer_L1x")) {
+    MarshallingTools.saveModule(getFactory().createProductDESProxy("model", abstractedAut.getEvents(), autui), "orig.wmod");
+    }
+    int i = 0;
     for (final AbstractionRule rule : mAbstractionRules) {
       try {
         if (logger.isDebugEnabled()) {
@@ -715,6 +730,13 @@ public class CompositionalGeneralisedConflictChecker
           logger.debug(msg);
         }
         abstractedAut = rule.applyRule(autToAbstract, tau);
+        autui.clear();
+        autui.add(abstractedAut);
+        System.out.println("abstracted:" + abstractedAut.getStates().size());
+        i++;
+        //if (autToAbstract.getName().equals("observer_L1x")) {
+        MarshallingTools.saveModule(getFactory().createProductDESProxy("model", abstractedAut.getEvents(), autui), rule.getClass() + ".wmod");
+        //}
         if (logger.isDebugEnabled()) {
           final String msg =
             "Finished " + ProxyTools.getShortClassName(rule) +
@@ -1590,7 +1612,8 @@ public class CompositionalGeneralisedConflictChecker
     {
       final double localEvents = countCandidatesLocalEvents(candidate);
       final double totalEvents = countCandidatesTotalEvents(candidate);
-      return localEvents / totalEvents;
+      //return localEvents / totalEvents;
+      return localEvents;
     }
   }
 

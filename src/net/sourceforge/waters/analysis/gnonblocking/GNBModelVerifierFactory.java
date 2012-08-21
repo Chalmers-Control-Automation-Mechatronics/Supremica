@@ -78,11 +78,11 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     return new ComposingControllabilityChecker(factory);
   }
 
-  /*public CompositionalGeneralisedConflictChecker createConflictChecker
+  public CompositionalGeneralisedConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
     return new CompositionalGeneralisedConflictChecker(null, factory);
-  }*/
+  }
 
   /*public AlphaNonBlockingChecker createConflictChecker
     (final ProductDESProxyFactory factory)   
@@ -90,11 +90,11 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     return new AlphaNonBlockingChecker(null, factory);
   }*/
 
-  public CanonicalGeneralisedConflictChecker createConflictChecker
+  /*public CanonicalGeneralisedConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
     return new CanonicalGeneralisedConflictChecker(null, factory);
-  }
+  }*/
 
   public ComposingLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)

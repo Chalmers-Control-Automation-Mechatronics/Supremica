@@ -69,8 +69,8 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
     setUp();
     try {
       final ProductDESProxy model = getModel();
-      final SICPropertyBuilder builder =
-          new SICPropertyBuilder(model, getFactory());
+      final CompositionalSICPropertyBuilder builder =
+          new CompositionalSICPropertyBuilder(model, getFactory());
       final List<EventProxy> answers =
           (List<EventProxy>) builder.getAnswerEvents();
       setConflictCheckerMarkings(builder);
@@ -126,7 +126,7 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  private void setConflictCheckerMarkings(final SICPropertyBuilder builder)
+  private void setConflictCheckerMarkings(final CompositionalSICPropertyBuilder builder)
   {
     builder.setOutputMarkings();
     final EventProxy defaultMark = builder.getOutputMarking();
