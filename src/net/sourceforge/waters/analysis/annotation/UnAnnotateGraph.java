@@ -50,9 +50,18 @@ public class UnAnnotateGraph
     mTransitionRelation = transitionrelation;
     mMarked = marked;
   }
+  
+  public UnAnnotateGraph(final TransitionRelation transitionrelation, final EventProxy marked,
+                         final EventProxy tau)
+  {
+    mTransitionRelation = transitionrelation;
+    mMarked = marked;
+    mTau = tau;
+  }
 
   public AutomatonProxy run(final ProductDESProxyFactory factory)
   {
+    //mTransitionRelation.printstuff();
     TIME -= System.currentTimeMillis();
     final boolean containsmarked = mTransitionRelation.getEvents().contains(mMarked);
     final Map<TIntHashSet, TIntArrayList> statesWithAnnotation =
@@ -247,15 +256,13 @@ public class UnAnnotateGraph
       final StateProxy target = nextStates.get(ot);
       newTransitions.add(factory.createTransitionProxy(source, event, target));
     }
-    mTau = factory.createEventProxy("tau:" + mTransitionRelation.getName(), EventKind.UNCONTROLLABLE);
+    //mTau = factory.createEventProxy("tau:" + mTransitionRelation.getName(), EventKind.UNCONTROLLABLE);
     for (int i = 0; i < newStates.size(); i++) {
       final StateProxy source = nextStates.get(i);
       final TIntArrayList taus = newStates.get(i);
-      //System.out.println("Taus:" + taus.size());
       for (int j = 0; j < taus.size(); j++) {
         final int state = taus.get(j);
         if (i == state) {continue;}
-        //System.out.println("tau:" + state);
         final StateProxy target = nextStates.get(state);
         newTransitions.add(factory.createTransitionProxy(source, mTau, target));
       }

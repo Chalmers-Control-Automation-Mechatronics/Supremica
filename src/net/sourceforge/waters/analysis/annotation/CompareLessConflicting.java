@@ -19,6 +19,24 @@ import net.sourceforge.waters.analysis.gnonblocking.FindBlockingStates;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import java.util.Arrays;
 import java.lang.RuntimeException;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import java.util.List;
+import java.io.File;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.base.DocumentProxy;
+import gnu.trove.TIntObjectHashMap;
 
 
 public class CompareLessConflicting
@@ -54,7 +72,9 @@ public class CompareLessConflicting
     FindBlockingStates fbs = new FindBlockingStates(second, mMarking);
     mSecondBlocking = fbs.getBlockingStates();
     fbs = new FindBlockingStates(first, mMarking);
-    System.out.println("block: " + Arrays.toString(fbs.getBlockingStates().toArray()));
+    System.out.println(Arrays.toString(mSecondBlocking.toArray()));
+    System.out.println("First: " + mFirstRelation.getNumberOfStates());
+    System.out.println("Second: " + mSecondRelation.getNumberOfStates());
     mSuccessors = new ArrayList<TIntArrayList>();
     mPredeccessors = new ArrayList<TIntHashSet[]>();
   }
@@ -124,10 +144,11 @@ public class CompareLessConflicting
       if (tup.firstset.contains(-1)) {
         mFirstLC.add(state);
       }
-      TIntIterator it = tup.firstset.iterator();
+      TIntIterator it = tup.secondset.iterator();
       while (it.hasNext()) {
-        if (mSecondBlocking.contains(it.next())) {
-          mFirstLC.add(state); continue;
+        int num = it.next();
+        if (mSecondBlocking.contains(num)) {
+          mFirstLC.add(state); break;
         }
       }
     }
@@ -196,7 +217,6 @@ public class CompareLessConflicting
         }
       }
       while (!tobeexpanded.isEmpty()) {
-        System.out.println(MCTriples.size());
         Triple triple = tobeexpanded.remove(tobeexpanded.size() - 1);
         for (int e = 0; e < mFirstRelation.getNumberOfProperEvents() + 1; e++) {
           if (e == EventEncoding.TAU) {continue;}
@@ -222,6 +242,7 @@ public class CompareLessConflicting
           }
         }
       }
+      System.out.println("MC: " + MCTriples.size());
       LCPAIRS:
       for (int i = 0; i < makelc.size(); i++) {
         int state = makelc.get(i);
@@ -259,8 +280,15 @@ public class CompareLessConflicting
                                        calculateTauReachable(second, mSecondRelation)));
   }
   
+  public boolean isLessConflicting(int s1, int s2)
+  {
+    return isLessConflicting(new Tuple(calculateTauReachable(s1, mFirstRelation),
+                                       calculateTauReachable(s2, mSecondRelation)));
+  }
+  
   public boolean isLessConflicting(Tuple tuple)
   {
+    long time = System.currentTimeMillis();
     int initial = getState(tuple);
     // adds the certain conflict states to the calculation
     getState(new Tuple(new TIntHashSet(), tuple.secondset));
@@ -313,6 +341,8 @@ public class CompareLessConflicting
             }
           }
         }
+        time -= System.currentTimeMillis();
+        System.out.println("Time: " + time);
         return false;
       }
       TIntArrayList succs = mSuccessors.get(s);
@@ -326,6 +356,8 @@ public class CompareLessConflicting
         }
       }
     }
+    time -= System.currentTimeMillis();
+    System.out.println("Time: " + time);
     return true;
   }
   
@@ -371,6 +403,48 @@ public class CompareLessConflicting
     }
   }
   
+  public static void main(String[] args)
+  {
+    String modname = args[0];
+    String lessconf = args[1];             
+    String moreconf = args[2];
+    String markname = args[3];
+    String tauname = args[4];
+    try {
+      final ProductDESProxy model = getCompiledDES(new File(modname), null);
+      AutomatonProxy lprox = null;
+      AutomatonProxy mprox = null;
+      EventProxy mproxy = null;
+      EventProxy tauproxy = null;
+      for (AutomatonProxy aut : model.getAutomata()) {
+        if (aut.getName().equals(lessconf)) {lprox = aut;}
+        if (aut.getName().equals(moreconf)) {mprox = aut;}
+      }
+      for (EventProxy ev : model.getEvents()) {
+        if (ev.getName().equals(markname)) {mproxy = ev;}
+        if (ev.getName().equals(tauname)) {tauproxy = ev;}
+      }
+      EventEncoding ee = new EventEncoding(lprox,
+                                ConflictKindTranslator.getInstance(), tauproxy);
+      if (!lprox.getEvents().contains(mproxy)) {
+        ee.addEvent(mproxy, ConflictKindTranslator.getInstance(), true);
+      }
+      ListBufferTransitionRelation lessbuff =
+        new ListBufferTransitionRelation(lprox, ee,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      ListBufferTransitionRelation morebuff =
+        new ListBufferTransitionRelation(mprox, ee,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      int mint = ee.getEventCode(mproxy);
+      CompareLessConflicting clc = new CompareLessConflicting(lessbuff, morebuff, mint);
+      System.out.println(lessbuff);
+      System.out.println(morebuff);
+      System.out.println("Is LC: " + clc.isLessConflicting());
+    } catch(Throwable t) {
+      t.printStackTrace();
+    }
+  }
+  
   private class Tuple
   {
     public final TIntHashSet firstset;
@@ -405,6 +479,69 @@ public class CompareLessConflicting
     public String toString()
     {
       return Arrays.toString(firstset.toArray()) + " : " + Arrays.toString(secondset.toArray());
+    }
+  }
+  
+  private static ProductDESProxy getCompiledDES
+    (final File filename,
+     final List<ParameterBindingProxy> bindings)
+    throws Exception
+  {
+    final DocumentProxy doc = mDocumentManager.load(filename);
+    if (doc instanceof ProductDESProxy) {
+      return (ProductDESProxy) doc;
+    } else if (doc instanceof ModuleProxy) {
+      final ModuleProxy module = (ModuleProxy) doc;
+      final ModuleCompiler compiler =
+        new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
+      return compiler.compile(bindings);
+    } else {
+      return null;
+    }
+  }
+  
+  public static ListBufferTransitionRelation
+    mergeConflictEquivalent(ListBufferTransitionRelation aut, int marking)
+  {
+    CompareLessConflicting clc = new CompareLessConflicting(aut, aut, marking);
+    TIntObjectHashMap<TIntArrayList> statetogroup = new TIntObjectHashMap<TIntArrayList>();
+    List<TIntArrayList> values = new ArrayList<TIntArrayList>();
+    for (int s1 = 0; s1 < aut.getNumberOfStates(); s1++) {
+      if (statetogroup.containsKey(s1)) {continue;}
+      TIntArrayList group = new TIntArrayList();
+      group.add(s1);
+      statetogroup.put(s1, group);
+      values.add(group);
+      for (int s2 = s1 + 1; s2 < aut.getNumberOfStates(); s2++) {
+        if (statetogroup.containsKey(s2)) {continue;}
+        if (clc.isLessConflicting(s1, s2) && clc.isLessConflicting(s2, s1)) {
+          group.add(s2);
+          statetogroup.put(s2, group);
+        }
+      }
+      System.out.println("same:" + group.size());
+    }
+    List<int[]> partitions = new ArrayList<int[]>();
+    System.out.println(aut.getNumberOfStates() + "vs" + values.size());
+    for (TIntArrayList list : values) {
+      partitions.add(list.toNativeArray());
+    }
+    aut.merge(partitions);
+    return aut;
+  }
+
+  private static DocumentManager mDocumentManager = new DocumentManager();
+  private static ProductDESProxyFactory mProductDESProxyFactory = ProductDESElementFactory.getInstance();
+
+  static {
+    final ModuleElementFactory mModuleFactory = ModuleElementFactory.getInstance();
+    final OperatorTable optable = CompilerOperatorTable.getInstance();
+    try {
+      final JAXBModuleMarshaller modmarshaller =
+        new JAXBModuleMarshaller(mModuleFactory, optable);
+      mDocumentManager.registerUnmarshaller(modmarshaller);
+    } catch (final Exception e) {
+      e.printStackTrace();
     }
   }
 }
