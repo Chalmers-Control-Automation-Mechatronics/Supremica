@@ -49,7 +49,9 @@ public abstract class SupremicaBDDBitVector
     protected void initialize(final int[] var)
     {
         for (int n=0 ; n<bitNum ; n++)
-            bitvec[n] = mFactory.ithVar(var[n]);
+        {
+            bitvec[bitNum-n-1] = mFactory.ithVar(var[n]);
+        }
     }
 
     protected abstract void initialize(long val);
@@ -121,6 +123,8 @@ public abstract class SupremicaBDDBitVector
         return res;
     }        
     
+    public abstract BDD getBDDThatResultsMaxValue();
+
     public abstract ResultOverflows addConsideringOverflows(final SupremicaBDDBitVector that);
 
     public abstract ResultOverflows subConsideringOverflows(final SupremicaBDDBitVector that);
@@ -130,6 +134,8 @@ public abstract class SupremicaBDDBitVector
     public abstract SupremicaBDDBitVector sub(final SupremicaBDDBitVector that);
 
     protected abstract BDD lthe(final SupremicaBDDBitVector r, BDD thanORequal);
+
+    public abstract BDD equ(final SupremicaBDDBitVector r);
 
     public BDD lth(final SupremicaBDDBitVector r)
     {
@@ -158,31 +164,6 @@ public abstract class SupremicaBDDBitVector
 
         final BDD tmp = lth(r);
         final BDD p = tmp.not();
-        return p;
-    }
-
-    public BDD equ(final SupremicaBDDBitVector r)
-    {
-//        if (this.bitNum != r.bitNum)
-//            throw new BDDException("equ operator: The length of the left-side vector is not equal to the right-side!");
-      
-        BDD p = mFactory.one();
-        for (int n=0 ; n< getLargerLength(r); n++)
-        {
-
-            BDD leftBDD = mFactory.zero();
-            BDD rightBDD = mFactory.zero();
-
-            if(n < this.bitNum)
-                leftBDD = bitvec[n];
-
-            if(n < r.bitNum)
-                rightBDD = r.bitvec[n];
-
-            final BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.biimp);
-            final BDD tmp2 = tmp1.and(p);
-            p = tmp2;
-        }
         return p;
     }
 
@@ -294,26 +275,26 @@ public abstract class SupremicaBDDBitVector
     public SupremicaBDDBitVector mul(final SupremicaBDDBitVector right)
     {
         int n;
-        final int bitNum = this.bitNum + right.length();
+        final int localBitNum = this.bitNum + right.length();
         SupremicaBDDBitVector res,leftshifttmp, leftshift;
 
-        if (bitNum == 0  ||  right.length() == 0)
+        if (localBitNum == 0  ||  right.length() == 0)
             throw new BDDException();
 
-        res = buildSupBDDBitVector(bitNum, false);
+        res = buildSupBDDBitVector(localBitNum, false);
         leftshifttmp = copy();
-        leftshift = leftshifttmp.coerce(bitNum);
+        leftshift = leftshifttmp.coerce(localBitNum);
         //bvec_delref(leftshifttmp);
         leftshifttmp.free();
         for (n=0 ; n<right.length() ; n++)
         {
             final SupremicaBDDBitVector added = (SupremicaBDDBitVector)res.add(leftshift);
             int m;
-            for (m=0 ; m<bitNum ; m++)
+            for (m=0 ; m<localBitNum ; m++)
                 res.bitvec[m] = right.bitvec[n].ite(added.bitvec[m], res.bitvec[m]);
 
             // Shift 'leftshift' one bit left
-            for (m=bitNum-1 ; m>=1 ; m--)
+            for (m=localBitNum-1 ; m>=1 ; m--)
             leftshift.bitvec[m] = leftshift.bitvec[m-1];
             leftshift.bitvec[0] = mFactory.zero();
             //bvec_delref(added);
