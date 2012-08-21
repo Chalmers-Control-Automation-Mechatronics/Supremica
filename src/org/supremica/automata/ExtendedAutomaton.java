@@ -54,7 +54,6 @@
  * @version %I%, %G%
  * @since 1.0
  */
-
 package org.supremica.automata;
 
 import java.util.*;
@@ -70,9 +69,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
-
-public class ExtendedAutomaton
-{
+public class ExtendedAutomaton {
 
     private boolean allAcceptingStates = false;
 
@@ -162,8 +159,7 @@ public class ExtendedAutomaton
         actionVariables = null;
     }
 
-    public ExtendedAutomaton(final ExtendedAutomata automata, final SimpleComponentSubject component)
-    {
+    public ExtendedAutomaton(final ExtendedAutomata automata, final SimpleComponentSubject component) {
         this.name = component.getName();
         factory = ModuleSubjectFactory.getInstance();
         this.automata = automata;
@@ -192,31 +188,27 @@ public class ExtendedAutomaton
         guardVariables = new HashMap<EventDeclProxy, Set<VariableComponentProxy>>();
         actionVariables = new HashMap<EventDeclProxy, Set<VariableComponentProxy>>();
 
-        for(final NodeProxy node:nodes)
-        {
-            nameToLocationMap.put(node.getName(),node);
+        for (final NodeProxy node : nodes) {
+            nameToLocationMap.put(node.getName(), node);
             locationToOutgoingEdgesMap.put(node, new ArrayList<EdgeSubject>());
             locationToIngoingEdgesMap.put(node, new ArrayList<EdgeSubject>());
             locationToOutgoingEventsMap.put(node, new HashSet<String>());
 
-            if (new StringTokenizer(node.toString(), " ").nextToken().equals("initial"))
-            {
+            if (new StringTokenizer(node.toString(), " ").nextToken().equals("initial")) {
                 initialLocations.add(node);
             }
-            if (node.toString().contains(EventDeclProxy.DEFAULT_MARKING_NAME))
-            {
+            if (node.toString().contains(EventDeclProxy.DEFAULT_MARKING_NAME)) {
                 acceptedLocations.add(node);
             }
-            if (node.toString().contains(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
-            {
-               forbiddenLocations.add(node);
+            if (node.toString().contains(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+                forbiddenLocations.add(node);
             }
         }
 
         final EventListExpressionProxy blockedEvents = component.getGraph().getBlockedEvents();
         if(blockedEvents != null)
         {
-            for(final Proxy event:blockedEvents.getEventIdentifierList())
+            for(final Proxy event:blockedEvents.getEventList())
             {
                 final String eventName = ((SimpleIdentifierSubject)event).getName();
                 final EventDeclProxy e = automata.eventIdToProxy(eventName);
@@ -232,11 +224,9 @@ public class ExtendedAutomaton
         }
 
 
-        for(final EdgeSubject edge:component.getGraph().getEdgesModifiable())
-        {
-            for(final Proxy event:edge.getLabelBlock().getEventIdentifierList())
-            {
-                final String eventName = ((SimpleIdentifierSubject)event).getName();
+        for (final EdgeSubject edge : component.getGraph().getEdgesModifiable()) {
+            for (final Proxy event : edge.getLabelBlock().getEventList()) {
+                final String eventName = ((SimpleIdentifierSubject) event).getName();
                 final EventDeclProxy e = automata.eventIdToProxy(eventName);
                 //The variables that appear in the guards and actions will later be used in the weighted matrix of the PCG
                 if(edge.getGuardActionBlock() != null)
@@ -248,14 +238,14 @@ public class ExtendedAutomaton
                         final Set<VariableComponentProxy> vars = automata.extractVariablesFromExpr(guard);
 
                         usedSourceVariables.addAll(vars);
-                        if(guardVariables.get(e) == null)
+                        if (guardVariables.get(e) == null) {
                             guardVariables.put(e, vars);
-                        else
+                        } else {
                             guardVariables.get(e).addAll(vars);
+                        }
 
                         //Create the relations between different variables (if two variables appear in the same guard, they are related!)
-                        for(final VariableComponentProxy v:vars)
-                        {
+                        for (final VariableComponentProxy v : vars) {
                             final ArrayList<VariableComponentProxy> varsExtended = new ArrayList<VariableComponentProxy>(vars);
                             varsExtended.remove(v);
                             automata.addToRelatedVars(v, varsExtended);
@@ -269,10 +259,11 @@ public class ExtendedAutomaton
                             allActions.add(action);
                             final Set<VariableComponentProxy> vars = automata.extractVariablesFromExpr(action.getLeft());
                             usedTargetVariables.addAll(vars);
-                            if(actionVariables.get(e) == null)
+                            if (actionVariables.get(e) == null) {
                                 actionVariables.put(e, vars);
-                            else
+                            } else {
                                 actionVariables.get(e).addAll(vars);
+                            }
                         }
                     }
                 }
@@ -288,10 +279,10 @@ public class ExtendedAutomaton
 
                 locationToOutgoingEventsMap.get(edge.getSource()).add(e.getName());
 
-                if(e.getKind() == EventKind.UNCONTROLLABLE)
-                {
-                    if(!uncontrollableAlphabet.contains(e))
+                if (e.getKind() == EventKind.UNCONTROLLABLE) {
+                    if (!uncontrollableAlphabet.contains(e)) {
                         uncontrollableAlphabet.add(e);
+                    }
                 }
             }
             locationToOutgoingEdgesMap.get(edge.getSource()).add(edge);
@@ -303,8 +294,7 @@ public class ExtendedAutomaton
         this.allAcceptingStates = allAcceptingStates;
     }
 
-    public Collection<EdgeProxy> getTransitions()
-    {
+    public Collection<EdgeProxy> getTransitions(){
         return component.getGraph().getEdges();
     }
 
@@ -370,58 +360,53 @@ public class ExtendedAutomaton
         return usedTargetVariables;
     }
 
-    public NodeProxy getblockedLocation()
-    {
+    public NodeProxy getblockedLocation() {
         return blockedLocation;
     }
 
-    public boolean isLocationPlantifiedBlocked(final NodeProxy node)
-    {
-        if(node.equals(blockedLocation))
+    public boolean isLocationPlantifiedBlocked(final NodeProxy node) {
+        if (node.equals(blockedLocation)) {
             return true;
+        }
 
         return false;
     }
 
-    public NodeProxy getInitialLocation()
-    {
+    public NodeProxy getInitialLocation() {
         return initialLocations.iterator().next();
     }
 
-    public boolean isLocationInitial(final NodeProxy node)
-    {
-        if(initialLocations.contains(node))
+    public boolean isLocationInitial(final NodeProxy node) {
+        if (initialLocations.contains(node)) {
             return true;
+        }
         return false;
     }
 
-    public boolean isLocationForbidden(final NodeProxy node)
-    {
-        if(forbiddenLocations.contains(node))
+    public boolean isLocationForbidden(final NodeProxy node) {
+        if (forbiddenLocations.contains(node)) {
             return true;
+        }
         return false;
     }
 
-    public boolean isLocationAccepted(final NodeProxy node)
-    {
-        if(acceptedLocations.contains(node))
+    public boolean isLocationAccepted(final NodeProxy node) {
+        if (acceptedLocations.contains(node)) {
             return true;
+        }
         return false;
     }
 
-    public Set<NodeProxy> getMarkedLocations()
-    {
+    public Set<NodeProxy> getMarkedLocations() {
         return acceptedLocations;
     }
 
-    public  HashMap<NodeProxy,ArrayList<EdgeSubject>> getLocationToOutgoingEdgesMap()
-    {
-        return  locationToOutgoingEdgesMap;
+    public HashMap<NodeProxy, ArrayList<EdgeSubject>> getLocationToOutgoingEdgesMap() {
+        return locationToOutgoingEdgesMap;
     }
 
-    public  HashMap<NodeProxy,ArrayList<EdgeSubject>> getLocationToIngoingEdgesMap()
-    {
-        return  locationToIngoingEdgesMap;
+    public HashMap<NodeProxy, ArrayList<EdgeSubject>> getLocationToIngoingEdgesMap() {
+        return locationToIngoingEdgesMap;
     }
 
     public  ArrayList<EdgeSubject> getOutgoingEdges(final NodeProxy location)
@@ -442,10 +427,9 @@ public class ExtendedAutomaton
     public List<NodeProxy> getNodes()
     {
         return new ArrayList<NodeProxy>(nodes);
-    }
+    }    
 
-    public NodeProxy getLocationWithName(final String name)
-    {
+    public NodeProxy getLocationWithName(final String name) {
         return nameToLocationMap.get(name);
     }
 
@@ -464,8 +448,7 @@ public class ExtendedAutomaton
         return nodes.size();
     }
 
-    public String getName()
-    {
+    public String getName() {
         return component.getName();
     }
 
@@ -503,8 +486,7 @@ public class ExtendedAutomaton
     public NodeProxy addState(final String name, final boolean accepting, final boolean initial, final boolean forbidden)
     {
         SimpleNodeSubject node = (SimpleNodeSubject) graph.getNodesModifiable().get(name);
-        if (node == null)
-        {
+        if (node == null) {
             final List<Proxy> propList = new LinkedList<Proxy>();
             if (accepting)
             {
@@ -514,11 +496,10 @@ public class ExtendedAutomaton
             {
                 propList.add(factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
             }
-            final PlainEventListSubject markingProposition =
-              factory.createPlainEventListProxy(propList);
-            node = factory.createSimpleNodeProxy(name, markingProposition,
-                                                 null, initial,
-                                                 null, null, null);
+
+            final PlainEventListSubject markingProposition = factory.createPlainEventListProxy(propList);
+
+            node = factory.createSimpleNodeProxy(name, markingProposition,initial, null, null, null);
             graph.getNodesModifiable().add (node);
             nodes.add(node);
             nameToLocationMap.put(name, node);
@@ -534,8 +515,7 @@ public class ExtendedAutomaton
         return node;
     }
 
-    public boolean isSpecification()
-    {
+    public boolean isSpecification() {
         return (component.getKind() == ComponentKind.SPEC);
     }
 
@@ -772,7 +752,7 @@ public class ExtendedAutomaton
         for(final NodeProxy node : locationToOutgoingEdgesMap.keySet()){
             final HashSet<EventDeclProxy> events = new HashSet<EventDeclProxy>();
             for(final EdgeSubject tran : locationToOutgoingEdgesMap.get(node)){
-                for(final Proxy event : tran.getLabelBlock().getEventIdentifierList()){
+                for(final Proxy event : tran.getLabelBlock().getEventList()){
                     final EventDeclProxy e = getEvent(event);
                     final boolean added = events.add(e);
                     if(!added){
