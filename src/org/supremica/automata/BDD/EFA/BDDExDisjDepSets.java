@@ -44,7 +44,7 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         this.bddExAutomata = bddExAutomata;
         this.orgAutomata = bddExAutomata.orgExAutomata;
         this.theExAutomata = bddExAutomata.theExAutomata;
-        this.manager = bddExAutomata.manager;
+        this.manager = bddExAutomata.getManager();
         this.theIndexMap = bddExAutomata.theIndexMap;
     }
 
@@ -157,7 +157,7 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
 
         int workCount = relationSet.length;
 
-        BDD currentCoreachableStatesBDD = markedStates.id().replaceWith(bddExAutomata.sourceToDestLocationPairing).replaceWith(bddExAutomata.sourceToDestVariablePairing);
+        BDD currentCoreachableStatesBDD = markedStates.id().replaceWith(bddExAutomata.getSourceToDestLocationPairing()).replaceWith(bddExAutomata.getSourceToDestVariablePairing());
 
         BDD previousCoreachablestatesBDD = null;
 
@@ -185,7 +185,7 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
                 }
             }
         }
-        return currentCoreachableStatesBDD.replaceWith(bddExAutomata.destToSourceLocationPairing).replaceWith(bddExAutomata.destToSourceVariablePairing);
+        return currentCoreachableStatesBDD.replaceWith(bddExAutomata.getDestToSourceLocationPairing()).replaceWith(bddExAutomata.getDestToSourceVariablePairing());
     }
 
     /* Implement all the methods defined in BDDExDisjAlgorithms. 
@@ -231,8 +231,8 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
            by exchanging the location and variable domains. 
          */
         BDD currentCoreachableStatesBDD = markedStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+                .replaceWith(bddExAutomata.getSourceToDestLocationPairing())
+                .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
 
         BDD previousCoreachableStatesBDD = null;
 
@@ -243,8 +243,8 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
             int choice = workset.pickOne(forward);
             if (choice == Integer.MAX_VALUE) {
                 return currentCoreachableStatesBDD
-                        .replaceWith(bddExAutomata.destToSourceLocationPairing)
-                        .replaceWith(bddExAutomata.destToSourceVariablePairing);
+                        .replaceWith(bddExAutomata.getDestToSourceLocationPairing())
+                        .replaceWith(bddExAutomata.getDestToSourceVariablePairing());
             } else {
                 BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice);
                 currentCoreachableStatesBDD = preImage(bddExAutomata, currentCoreachableStatesBDD, currentTransitionRelation);
@@ -252,8 +252,8 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
             }
         }
         return currentCoreachableStatesBDD
-                .replaceWith(bddExAutomata.destToSourceLocationPairing)
-                .replaceWith(bddExAutomata.destToSourceVariablePairing);
+                .replaceWith(bddExAutomata.getDestToSourceLocationPairing())
+                .replaceWith(bddExAutomata.getDestToSourceVariablePairing());
     }
 
     @Override
@@ -263,12 +263,12 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         workset.setStart();
 
         BDD reachableStatesAsTargetStates = reachableStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+                .replaceWith(bddExAutomata.getSourceToDestLocationPairing())
+                .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
 
         BDD markedStatesAsTargetStates = markedStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+                .replaceWith(bddExAutomata.getSourceToDestLocationPairing())
+                .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
 
         BDD currentReachableAndCoreachableStatesBDD = markedStatesAsTargetStates.and(reachableStatesAsTargetStates);
 
@@ -281,8 +281,8 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
             int choice = workset.pickOne(forward);
             if (choice == Integer.MAX_VALUE) {
                 return currentReachableAndCoreachableStatesBDD
-                        .replaceWith(bddExAutomata.destToSourceLocationPairing)
-                        .replaceWith(bddExAutomata.destToSourceVariablePairing);
+                        .replaceWith(bddExAutomata.getDestToSourceLocationPairing())
+                        .replaceWith(bddExAutomata.getDestToSourceVariablePairing());
             } else {
                 BDD currentTransitionRelation = getComponentToComponentTransMap().get(choice);
                 currentReachableAndCoreachableStatesBDD = preImage2(bddExAutomata, currentReachableAndCoreachableStatesBDD, 
@@ -291,8 +291,8 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
             }
         }
         return currentReachableAndCoreachableStatesBDD
-                .replaceWith(bddExAutomata.destToSourceLocationPairing)
-                .replaceWith(bddExAutomata.destToSourceVariablePairing);
+                .replaceWith(bddExAutomata.getDestToSourceLocationPairing())
+                .replaceWith(bddExAutomata.getDestToSourceVariablePairing());
     }
 
     @Override
@@ -333,12 +333,12 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
     public BDD backwardRestrictedWorkSetAlgorithm(BDD markedStates, BDD forbiddenStates) {
         
         BDD markedStatesAsTargetStates = markedStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+                .replaceWith(bddExAutomata.getSourceToDestLocationPairing())
+                .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
 
         BDD forbiddenStatesAsTargetStates = forbiddenStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+                .replaceWith(bddExAutomata.getSourceToDestLocationPairing())
+                .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
 
         BDD currentCoreachableStatesBDD = markedStatesAsTargetStates;//.and(forbiddenStatesAsTargetStates.not());
         BDD previousCoreachableStatesBDD = null;
@@ -349,8 +349,8 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         } while (!previousCoreachableStatesBDD.equals(currentCoreachableStatesBDD));
         
         return currentCoreachableStatesBDD
-                .replaceWith(bddExAutomata.destToSourceLocationPairing)
-                .replaceWith(bddExAutomata.destToSourceVariablePairing);
+                .replaceWith(bddExAutomata.getDestToSourceLocationPairing())
+                .replaceWith(bddExAutomata.getDestToSourceVariablePairing());
     }
     
     private BDD internalBRWA (BDD coreachableStatesAsTargetStates, BDD forbiddenStatesAsTargetStates)
@@ -377,12 +377,12 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
     public BDD reachableBackwardRestrictedWorkSetAlgorithm (BDD markedStates, BDD forbiddenStates, BDD reachableStates) 
     {
         BDD markedStatesAsTargetStates = markedStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+                .replaceWith(bddExAutomata.getSourceToDestLocationPairing())
+                .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
 
         BDD forbiddenStatesAsTargetStates = forbiddenStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+                .replaceWith(bddExAutomata.getSourceToDestLocationPairing())
+                .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
         
         BDD currentCoreachableStatesBDDAsTargetStates = markedStatesAsTargetStates;
         BDD previousCoreachableStatesBDDAsTargetStates = null;
@@ -394,8 +394,8 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         } while (!previousCoreachableStatesBDDAsTargetStates.equals(currentCoreachableStatesBDDAsTargetStates));
         
         return currentCoreachableStatesBDDAsTargetStates
-                .replaceWith(bddExAutomata.destToSourceLocationPairing)
-                .replaceWith(bddExAutomata.destToSourceVariablePairing);
+                .replaceWith(bddExAutomata.getDestToSourceLocationPairing())
+                .replaceWith(bddExAutomata.getDestToSourceVariablePairing());
     }
     
     private BDD internalRBRWA (BDD coreachableStatesBDDAsTargetStates, BDD forbiddenStatesAsTargetStates, BDD reachableStates) {
@@ -424,8 +424,8 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         BDD uncontrollableTransitionRelationBDD = bddExAutomata.getDepSets().getUncontrollableTransitionRelationBDD();
 
         BDD forbiddenStatesAsTargetstates = forbiddenStates.id()
-                .replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+                .replaceWith(bddExAutomata.getSourceToDestLocationPairing())
+                .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
 
         BDD currentForbiddenStates = forbiddenStatesAsTargetstates;
         BDD previousForbiddenStates = null;
@@ -433,15 +433,15 @@ public abstract class BDDExDisjDepSets implements BDDExDisjAlgorithms {
         do {
             previousForbiddenStates = currentForbiddenStates.id();
             BDD nextStatesAsSourceStates = currentForbiddenStates.and(uncontrollableTransitionRelationBDD)
-                    .exist(bddExAutomata.destStateVariables);
+                    .exist(bddExAutomata.getDestStatesVarSet());
             BDD nextStates = nextStatesAsSourceStates
-                    .replaceWith(bddExAutomata.sourceToDestLocationPairing)
-                    .replaceWith(bddExAutomata.sourceToDestVariablePairing);
+                    .replaceWith(bddExAutomata.getSourceToDestLocationPairing())
+                    .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
             currentForbiddenStates.orWith(nextStates);
         } while (!currentForbiddenStates.equals(previousForbiddenStates));
 
         return currentForbiddenStates
-                .replaceWith(bddExAutomata.destToSourceLocationPairing)
-                .replaceWith(bddExAutomata.destToSourceVariablePairing);
+                .replaceWith(bddExAutomata.getDestToSourceLocationPairing())
+                .replaceWith(bddExAutomata.getDestToSourceVariablePairing());
     }
 }
