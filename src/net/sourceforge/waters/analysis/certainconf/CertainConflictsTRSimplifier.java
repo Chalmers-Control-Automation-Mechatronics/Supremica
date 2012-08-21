@@ -1,6 +1,7 @@
 package net.sourceforge.waters.analysis.certainconf;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import gnu.trove.TIntArrayList;
@@ -57,6 +58,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         mSetOffsets = new TIntArrayList(numStates);
         mStateSetBuffer = new IntSetBuffer(numStates, 0, -1);
         mTransitionBuffer = new PreTransitionBuffer(numEvents, mTransitionLimit);
+        isFindingCounterExample = false;
     }
 
     @Override
@@ -84,6 +86,9 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     protected void l(final String s, final TIntHashSet tihs) {
         l(s, tihs.toArray());
     }
+    protected void l(final String s, final TIntArrayList tihs) {
+      l(s, tihs.toNativeArray());
+  }
     protected void l(final String s, final int[] ia)
     {
         if (!logging) return;
@@ -103,7 +108,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       logging = false;
       l("Running on " + rel.getName());
       mBadStates = new TIntHashSet();
-      if (updateBadStates(rel, true) == 0) return false;
+      if (updateBadStates(rel, true, -1) == 0) return false;
       l("is blocking");
       if (rel.isUsedEvent(EventEncoding.TAU)) {
         mIsDeterministic = false;
@@ -137,7 +142,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       l("not deterministic");
       // 1. Collect initial state set.
       final int numStates = rel.getNumberOfStates();
-      final TIntHashSet init = new TIntHashSet();
+      final TIntArrayList init = new TIntArrayList();
       for (int state = 0; state < numStates; state++) {
           if (rel.isInitial(state)) {
               if (mTauIterator == null) {
@@ -154,7 +159,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       }
       l("init states", init);
       int last = 0;
-      final int[] arrInit = init.toArray();
+      final int[] arrInit = init.toNativeArray();
       if (!init.isEmpty()) {
           numInit = arrInit.length;
           for (int i = 0; i < arrInit.length; i++)
@@ -279,6 +284,12 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         if (dumpstate > -1) rel.removeOutgoingTransitions(dumpstate);
         rel.checkReachability();
         rel.removeProperSelfLoopEvents();
+        //logging = true;
+        //l("BadStates",mBadStates);
+       // l("Levels",mBadStatesLevels);
+        //l(rel+"");
+        //logging = false;
+
       }
 
     }
@@ -287,6 +298,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     {
         // mBadStates was already populated at beginning
         final int[] allBadStates = mBadStates.toArray();
+        Arrays.sort(allBadStates);
         final int dumpstate = allBadStates[0];
 
         for (int i = 0; i < mBadStates.size(); i++)
@@ -324,22 +336,30 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       boolean brothersAdded = false;
       // keep track of bad states
       mBadStates = new TIntHashSet();
+      mBadStatesLevels = new int[rel.getNumberOfStates()];
+      for (int i = 0; i < mBadStatesLevels.length; i++) mBadStatesLevels[i] = -1;
+
       // total number of states
       //final int numStates = rel.getNumberOfStates();
       l("start of certain conf");
+      int level = 0;
       do
       {
-          final int before = updateBadStates(rel, false);
+          final int before = updateBadStates(rel, false, level++);
           l("mBadStates is now: ",mBadStates.toArray());
           if (before == 0) return -1;
           // find brothers of bad states (they'll be added to mBadStates
           // and go again if new states were added.
-          brothersAdded = findBrothers(rel) != before;
+          brothersAdded = findBrothers(rel, level) != before;
       } while (brothersAdded);
 
       // select dump state as first item
       int[] allBadStates = mBadStates.toArray();
+
       l("!!!!!All Bad States: ", allBadStates);
+
+      isFindingCounterExample = true;
+      if (isFindingCounterExample) return -1;
 
 
           if (CheckAllBad() && mOldRel.getNumberOfStates() < rel.getNumberOfStates() && mOldRel.getNumberOfTransitions() < rel.getNumberOfTransitions())
@@ -348,6 +368,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
             setTransitionRelation(mOldRel);
             rel = getTransitionRelation();
               mBadStates = new TIntHashSet();
+
               // replace bad states with states the original automaton knows about
               for (int i = 0; i < allBadStates.length; i++)
               {
@@ -358,11 +379,13 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
           }
 
 
-
+          Arrays.sort(allBadStates);
 
 
 
       final int dumpstate = allBadStates[0];
+      rel.setMarked(dumpstate, getDefaultMarkingID(), false);
+
       for (int i = 0; i < mBadStates.size(); i++)
       {
           final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
@@ -438,7 +461,7 @@ l("Found a transition coming into " + s + " from " + from);
     }
 
 
-    protected int findBrothers(final ListBufferTransitionRelation rel)
+    protected int findBrothers(final ListBufferTransitionRelation rel, final int level)
     {
       l("========looking for brothers===========");
       final int[] arr_mBadStates = mBadStates.toArray();
@@ -469,7 +492,8 @@ l("Found a transition coming into " + s + " from " + from);
               final int testinbuffer = mStateSetBuffer.get(badStateSet);
 
               if (testinbuffer > -1) {
-                  mBadStates.add(mSetOffsets.binarySearch(testinbuffer));
+                  final int stateNum = mSetOffsets.binarySearch(testinbuffer);
+                  if (mBadStates.add(stateNum)) mBadStatesLevels[stateNum] = level;
 
                   l("brother found: " + testinbuffer);
               }
@@ -488,7 +512,7 @@ l("Found a transition coming into " + s + " from " + from);
 
     // this function updates the values in the variable mBadStates
     // it returns the number of states in mBadStates
-    protected int updateBadStates(final ListBufferTransitionRelation rel, final boolean intial) throws AnalysisException
+    protected int updateBadStates(final ListBufferTransitionRelation rel, final boolean intial, final int level) throws AnalysisException
     {
         final TransitionIterator prediter = rel.createPredecessorsReadOnlyIterator();
         final int defaultID = getDefaultMarkingID();
@@ -529,16 +553,23 @@ l("Found a transition coming into " + s + " from " + from);
 
         for (int sourceID = 0; sourceID < numStates; sourceID++) {
             if (rel.isReachable(sourceID) && !coreachableStates.contains(sourceID)) {
-                mBadStates.add(sourceID);
+                if (mBadStates.add(sourceID) && level > -1) mBadStatesLevels[sourceID] = level;
                 // remove marking
                 l("Found " + sourceID);
-                if (!intial) rel.setMarked(sourceID, getDefaultMarkingID(), false);
+                if (!intial && isFindingCounterExample) rel.setMarked(sourceID, getDefaultMarkingID(), false);
             }
         }
         l("There are now " + mBadStates.size() + " bad states");
         return mBadStates.size();
     }
 
+    public void runForCE() throws AnalysisException
+    {
+
+      setUp();
+      isFindingCounterExample = true;
+      runSimplifier();
+    }
     //#########################################################################
     //# Data Members
     private final int mStateLimit = Integer.MAX_VALUE;
@@ -550,11 +581,12 @@ l("Found a transition coming into " + s + " from " + from);
     private TransitionIterator mEventIterator;
     private TIntArrayList mSetOffsets;
     private TIntHashSet mBadStates;
+    private int[] mBadStatesLevels;
     private IntSetBuffer mStateSetBuffer;
     private PreTransitionBuffer mTransitionBuffer;
     private ListBufferTransitionRelation mOldRel;
     private boolean logging; // temporary variable to enable console messages
     private int numInit; // number of initial states
-
+    private boolean isFindingCounterExample;
 
 }
