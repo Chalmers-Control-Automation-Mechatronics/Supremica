@@ -16,7 +16,6 @@ import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntProcedure;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -79,9 +78,9 @@ public class ConfRevBiSimulator
     for (int i = 0; i < mTrans.numberOfStates(); i++) {
       if (mTrans.isInitial(i)) {
         init.add(i); mStates++; continue;
+      } else if (mTrans.hasPredecessors(i)) {
+        notinit.add(i); mStates++; continue States;
       }
-      if (mTrans.hasPredecessors(i)) {notinit.add(i); mStates++; continue States;}
-
     }
     if (!init.isEmpty()) {mWS.add(new SimpleEquivalenceClass(init.toNativeArray()));}
     if (!notinit.isEmpty()) {mWS.add(new SimpleEquivalenceClass(notinit.toNativeArray()));}
@@ -110,19 +109,19 @@ public class ConfRevBiSimulator
       return false;
     }
     for (final SimpleEquivalenceClass sec : mP) {
-      System.out.println("sec:" + Arrays.toString(sec.mStates));
+      //System.out.println("sec:" + Arrays.toString(sec.mStates));
       if (sec.mStates.length == 1) {continue;}
       /*mTrans.mergewithannotations(sec.mStates);
       STATESREMOVED += sec.mStates.length -1;*/
       int eq = -1;
       for (int si = 0; si < sec.mStates.length; si++) {
         final int s = sec.mStates[si];
-        if (canbemerged(s)) {
+        //if (canbemerged(s)) {
           if (eq == -1) {eq = s; continue;}
-          System.out.println("merge rev:" + Arrays.toString(new int[]{eq, s}));
+          //System.out.println("merge rev:" + Arrays.toString(new int[]{eq, s}));
           mTrans.mergewithannotations(new int[]{eq, s});
           STATESREMOVED++;
-        }
+        //}
       }
     }
     if (mP.size() == 0) {
@@ -167,6 +166,7 @@ public class ConfRevBiSimulator
     return succs.toArray();*/
   }
 
+  @SuppressWarnings("unused")
   private boolean canbemerged(final int state)
   {
     Annotations:

@@ -361,7 +361,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       isFindingCounterExample = true;
       if (isFindingCounterExample) return -1;
 
-
           if (CheckAllBad() && mOldRel.getNumberOfStates() < rel.getNumberOfStates() && mOldRel.getNumberOfTransitions() < rel.getNumberOfTransitions())
           {
             // replace rel with oldrel

@@ -432,11 +432,12 @@ public class TransitionRelation
         final Iterator<TIntHashSet> it = anns.iterator();
         while (it.hasNext()) {
           final TIntHashSet ann = it.next();
-          //System.out.println(Arrays.toString(ann.toArray()));
           if (ann.contains(event)) {
-            //System.out.println("removed");
             it.remove();
           }
+        }          
+        if (anns.isEmpty()) {
+          mAnnotations[s] = null;
         }
       }
     }
@@ -1042,7 +1043,7 @@ public class TransitionRelation
   public void removeAnnotations(final int state, final Set<TIntHashSet> remanns)
   {
     mAnnotations[state].removeAll(remanns);
-    if (mAnnotations[state].isEmpty()) {mAnnotations[state] = null;}
+    if (mAnnotations[state].isEmpty()) {mAnnotations[state] = null;}      
   }
 
   public void saturatetaus(final int state, final int tau)
@@ -1158,6 +1159,20 @@ public class TransitionRelation
     }
     addTransition(state, tau, state);
   }*/
+  
+  public void printstuff()
+  {
+    System.out.println("marking: " + mEventToInt.get(mMarkedEvent));
+    for (int s = 0; s < mPredecessors.length; s++) {
+      System.out.print(s + ": " + Arrays.toString(getActiveEvents(s).toArray()));
+      System.out.print("ANNS:" + getAnnotations2(s).size());
+      System.out.println();
+      for (TIntHashSet ann : getAnnotations2(s)) {
+        System.out.print(Arrays.toString(ann.toArray()) + ", ");
+      }
+      System.out.println();
+    }
+  }
 
   public int unreachableStates()
   {

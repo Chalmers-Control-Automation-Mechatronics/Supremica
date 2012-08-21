@@ -367,13 +367,14 @@ public class BiSimulatorRedundant
     mWS.clear();
     mWC.clear();
     mP.clear();
-    final Map<TIntHashSet, TIntArrayList> map =
-      new THashMap<TIntHashSet, TIntArrayList>();
+    final Map<Set<TIntHashSet>, TIntArrayList> map =
+      new THashMap<Set<TIntHashSet>, TIntArrayList>();
     mStates = 0;
     for (int i = 0; i < mTrans.numberOfStates(); i++) {
       if (!mTrans.hasPredecessors(i)) {continue;}
       mStates++;
-      final TIntHashSet prop = mTrans.getActiveEvents(i);
+      //final Set<TIntHashSet> prop = new HashSet<TIntHashSet>(); prop.add(mTrans.getActiveEvents(i));
+      final Set<TIntHashSet> prop = mTrans.getAnnotations2(i);
       TIntArrayList p = map.get(prop);
       if (p == null) {p = new TIntArrayList(); map.put(prop, p);}
       p.add(i);
