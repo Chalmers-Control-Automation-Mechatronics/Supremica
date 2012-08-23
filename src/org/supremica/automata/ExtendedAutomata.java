@@ -50,6 +50,7 @@
 
 /*
  * @author Goran Cengic (cengic@chalmers.se)
+ * @author Sajed Miremadi (miremads@chalmers.se)
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
  * @since 1.0
@@ -94,10 +95,11 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public HashSet<EventDeclProxy> controllableAlphabet = null;
     public HashSet<EventDeclProxy> forcibleAlphabet = null;
     HashSet<EventDeclProxy> plantAlphabet = null;
-    String locaVarSuffix = ".curr";
-    String CLOCK_PREFIX = "clock_";
-    String GLOBAL_PREFIX = "global";
-    String PARAM_PREFIX = "param_";
+    
+    final static String LOCAL_VAR_SUFFIX = ".curr";
+    final static String CLOCK_PREFIX = "clock_";
+    final static String GLOBAL_PREFIX = "global";
+    final static String PARAM_PREFIX = "param_";
    /**
    * The name to be used for the default forcible property used for timed EFAs.
    */
@@ -199,7 +201,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             if (sub instanceof VariableComponentProxy) {
                 final VariableComponentProxy var = (VariableComponentProxy) sub;
                 var2relatedVarsMap.put(var, new ArrayList<VariableComponentProxy>());
-                if (!sub.toString().contains(locaVarSuffix)) {
+                if (!sub.toString().contains(LOCAL_VAR_SUFFIX)) {
                     variables.add(((VariableComponentProxy) sub));
                 }
 
@@ -353,7 +355,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     }
 
     public String getlocVarSuffix() {
-        return locaVarSuffix;
+        return LOCAL_VAR_SUFFIX;
     }
 
     public HashSet<EventDeclProxy> getUncontrollableAlphabet() {
@@ -388,7 +390,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         }
 
         throw new IllegalArgumentException("There does not exists a variable in the model with name " + varName + "!");
-    }
+    }   
 
     public List<VariableComponentProxy> getVars() {
         return variables;
