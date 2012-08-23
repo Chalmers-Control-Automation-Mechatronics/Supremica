@@ -135,8 +135,9 @@ public class BDDExtendedAutomaton {
             // Then add state properties
             final int locationIndex = bddExAutomata.getLocationIndex(theExAutomaton, currLocation);
             System.err.println(currLocation.getName() + ": " + locationIndex);
-            if (true){//currLocation.getClockInvariant() != null) {
-                manager.addLocationInvariant(locationInvariants, manager.guard2BDD(null), locationIndex, sourceLocationDomain);
+            SimpleExpressionProxy invariant = TimeInvariantAttributeFactory.getInvariant(currLocation.getAttributes());
+            if (invariant != null) {                
+                manager.addLocationInvariant(locationInvariants, manager.guard2BDD(invariant), locationIndex, sourceLocationDomain);
             } else {
                 manager.addLocation(locationInvariants, locationIndex, sourceLocationDomain);
             }

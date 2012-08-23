@@ -3,7 +3,7 @@ package org.supremica.automata.BDD.EFA;
 
 /**
  *
- * @author Sajed Miremadi, Zhennan Fei
+ * @author Sajed Miremadi
  */
 
 import java.util.ArrayList;
@@ -15,7 +15,16 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 
 public class TimeInvariantAttributeFactory implements AttributeFactory
@@ -52,23 +61,34 @@ public class TimeInvariantAttributeFactory implements AttributeFactory
 
   public List<String> getApplicableValues(final String attrib)
   {
-    final List<String> values = ATTRIBUTE_VALUES.get(attrib);
-    if (values == null) {
       return Collections.emptyList();
-    } else {
-      return values;
-    }
   }
 
+  
+  public static SimpleExpressionProxy getInvariant(final Map<String,
+                                                   String> attribs)
+  {
+
+    final String value = attribs.get(TimeInvariant_KEY);
+    ExpressionParser parser = new ExpressionParser(
+                    ModuleSubjectFactory.getInstance(), 
+                    CompilerOperatorTable.getInstance());    
+    if (value != null) {                        
+            try {
+                return (SimpleExpressionSubject) (parser.parse(value, 
+                                                    Operator.TYPE_BOOLEAN));
+            } catch (final ParseException pe) {
+                System.err.println(pe);
+            }
+    }
+    
+    return null;
+  }  
 
   //#########################################################################
   //# String Constants
-
+   public static final String TimeInvariant_KEY = "Time:Invariant";  
+  
    private static final Collection<String> ATTRIBUTES_FOR_NODE =
-     Collections.singletonList("Time:Invariant");
-  
-  
-   private static final Map<String,List<String>> ATTRIBUTE_VALUES =
-     new HashMap<String,List<String>>(2);
-
+     Collections.singletonList(TimeInvariant_KEY);
 }

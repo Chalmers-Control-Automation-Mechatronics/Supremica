@@ -69,6 +69,7 @@ import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
 
 
 public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
@@ -97,13 +98,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     HashSet<EventDeclProxy> plantAlphabet = null;
     
     final static String LOCAL_VAR_SUFFIX = ".curr";
-    final static String CLOCK_PREFIX = "clock_";
+    final static String CLOCK_PREFIX = "clock:";
     final static String GLOBAL_PREFIX = "global";
-    final static String PARAM_PREFIX = "param_";
+    final static String PARAM_PREFIX = "param:";
    /**
    * The name to be used for the default forcible property used for timed EFAs.
    */
-    String DEFAULT_FORCIBLE_NAME = "forcible";  
     
     //Variable that are used when the input model is a Resource Allocation System
     private List<VariableComponentProxy> stageVars;
@@ -159,9 +159,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                     uncontrollableAlphabet.add(e);
                 } else {
                     controllableAlphabet.add(e);
-                }                
-                if (e.getAttributes().get(DEFAULT_FORCIBLE_NAME) != null &&
-                        e.getAttributes().get(DEFAULT_FORCIBLE_NAME).equals("true")) {                    
+                }    
+                if (ForcibleEventAttributeFactory.isForcible(e.getAttributes())) {                    
                     forcibleAlphabet.add(e);
                 }
             }
