@@ -7,7 +7,7 @@ import net.sf.javabdd.*;
  *
  * @author Sajed
  */
-public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
+public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 {
     int signBitIndex;
 
@@ -56,6 +56,12 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         return new TCSupremicaBDDBitVector(mFactory, bitNum, val);
     }
 
+    //Not implemented yet
+    public BDD getBDDThatResultsMaxValue()
+    {
+        return bitvec[bitNum-2];
+    }
+
     protected void initialize(final long val)
     {
         long absVal = Math.abs(val);
@@ -71,8 +77,7 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         if (val<0)
         {
             final TCSupremicaBDDBitVector res = toTwosComplement();
-            for (int n = 0; n < bitNum; n++)
-                bitvec[n] = res.bitvec[n];
+            System.arraycopy(res.bitvec, 0, bitvec, 0, bitNum);
         }
     }
 
@@ -91,8 +96,7 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         if (val.intValue()<0)
         {
             final TCSupremicaBDDBitVector res = toTwosComplement();
-            for (int n = 0; n < bitNum; n++)
-                bitvec[n] = res.bitvec[n];
+            System.arraycopy(res.bitvec, 0, bitvec, 0, bitNum);
         }
     }
 
@@ -130,10 +134,35 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
             res.bitvec[n] = bitvec[n].not();
 
         return (TCSupremicaBDDBitVector)res.add(buildSupBDDBitVector(bitNum, 1));
-    }  
+    }
 
-    public ResultOverflows addConsideringOverflows
-      (final SupremicaBDDBitVector that)
+
+    public BDD equ(final SupremicaBDDBitVector that)
+    {
+//        if (this.bitNum != r.bitNum)
+//            throw new BDDException("equ operator: The length of the left-side vector is not equal to the right-side!");
+
+        BDD p = mFactory.one();
+        for (int n=0 ; n< getLargerLength(that); n++)
+        {
+
+            BDD leftBDD = bitvec[signBitIndex];
+            BDD rightBDD = that.bitvec[((TCSupremicaBDDBitVector)that).getSignBitIndex()];
+
+            if(n < this.bitNum)
+                leftBDD = bitvec[n];
+
+            if(n < that.bitNum)
+                rightBDD = that.bitvec[n];
+
+            final BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.biimp);
+            final BDD tmp2 = tmp1.and(p);
+            p = tmp2;
+        }
+        return p;
+    }
+
+    public ResultOverflows addConsideringOverflows(final SupremicaBDDBitVector that)
     {
 //        if (bitNum != that.bitNum)
 //            throw new BDDException();
@@ -199,9 +228,8 @@ public class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
     {
 //        if (this.bitNum != r.bitNum)
 //            throw new BDDException();
-        
         BDD p = thanORequal;
-        for (int n=0 ; n<getLargerLength(that) ; n++)
+        for (int n = 0; n < getLargerLength(that); n++)
         {
             BDD leftBDD = bitvec[signBitIndex];
             BDD rightBDD = that.bitvec[((TCSupremicaBDDBitVector)that).getSignBitIndex()];
