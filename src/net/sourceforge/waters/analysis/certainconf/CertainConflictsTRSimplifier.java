@@ -2,7 +2,9 @@ package net.sourceforge.waters.analysis.certainconf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
@@ -13,13 +15,21 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
 import net.sourceforge.waters.analysis.tr.IntStateBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
+import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
@@ -38,7 +48,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         super.setUp();
         final ListBufferTransitionRelation rel = getTransitionRelation();
         mOldRel = new ListBufferTransitionRelation(rel, rel.getConfiguration());
-       // mOldRel = new ListBufferTransitionRelation(new AutomatonProxy(), 0, EventEncoding.FILTER_ALL);
         final int numEvents = rel.getNumberOfProperEvents();
         int index = 0;
         for (int event = 0; event < numEvents; event++) {
@@ -284,14 +293,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         if (dumpstate > -1) rel.removeOutgoingTransitions(dumpstate);
         rel.checkReachability();
         rel.removeProperSelfLoopEvents();
-        //logging = true;
-        //l("BadStates",mBadStates);
-       // l("Levels",mBadStatesLevels);
-        //l(rel+"");
-        //logging = false;
-
       }
-
     }
 
     protected int detcertainconfalgo(final ListBufferTransitionRelation rel) throws AnalysisException
@@ -358,7 +360,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
       l("!!!!!All Bad States: ", allBadStates);
 
-      isFindingCounterExample = true;
       if (isFindingCounterExample) return -1;
 
           if (CheckAllBad() && mOldRel.getNumberOfStates() < rel.getNumberOfStates() && mOldRel.getNumberOfTransitions() < rel.getNumberOfTransitions())
@@ -562,13 +563,89 @@ l("Found a transition coming into " + s + " from " + from);
         return mBadStates.size();
     }
 
-    public void runForCE() throws AnalysisException
+    public int[] runForCE() throws AnalysisException
     {
 
       setUp();
       isFindingCounterExample = true;
       runSimplifier();
+      return mBadStatesLevels;
     }
+
+    public AutomatonProxy createTestAutomaton(final ProductDESProxyFactory factory,
+                                              final EventEncoding eventEnc,
+                                              final StateEncoding testAutomatonStateEncoding,
+                                              final int initTest,
+                                              final EventProxy checkedProposition,
+                                              final int level)
+    {
+
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int numEvents = eventEnc.getNumberOfEvents();
+      final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
+      for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
+        if (rel.isUsedEvent(e)) {
+          final EventProxy event = eventEnc.getProperEvent(e);
+          if (event != null) {
+            events.add(event);
+          }
+        }
+      }
+      events.add(checkedProposition);
+      final int numStates = rel.getNumberOfStates();
+      int numReachable = 0;
+      int numCritical = 0;
+      for (int state = 0; state < numStates; state++) {
+        if (rel.isReachable(state)) {
+          numReachable++;
+          if (mBadStatesLevels[state] >= level) {
+            numCritical++;
+          }
+        }
+      }
+      final StateProxy[] states = new StateProxy[numStates];
+      final List<StateProxy> reachable = new ArrayList<StateProxy>(numReachable);
+      final int numTrans = rel.getNumberOfTransitions();
+      final Collection<TransitionProxy> transitions =
+        new ArrayList<TransitionProxy>(numTrans + numCritical);
+      int code = 0;
+      for (int state = 0; state < numStates; state++) {
+        if (rel.isReachable(state)) {
+          final boolean init =
+            initTest >= 0 ? state == initTest : rel.isInitial(state);
+          final StateProxy memstate = new MemStateProxy(code++, init);
+          states[state] = memstate;
+          reachable.add(memstate);
+          final int info = mBadStatesLevels[state];
+          if (info != -1 && info >= level) {
+            final TransitionProxy trans =
+              factory.createTransitionProxy(memstate, checkedProposition, memstate);
+            transitions.add(trans);
+          }
+        }
+      }
+      testAutomatonStateEncoding.init(states);
+      final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+      while (iter.advance()) {
+        final int s = iter.getCurrentSourceState();
+        if (rel.isReachable(s)) {
+          final int t = iter.getCurrentTargetState();
+          final StateProxy source = states[s];
+          final int e = iter.getCurrentEvent();
+          final EventProxy event = eventEnc.getProperEvent(e);
+          final StateProxy target = states[t];
+          final TransitionProxy trans =
+            factory.createTransitionProxy(source, event, target);
+          transitions.add(trans);
+        }
+      }
+      final String name = rel.getName() + ":certainconf:" + level;
+      final ComponentKind kind = ComponentKind.PLANT;
+      return factory.createAutomatonProxy(name, kind,
+                                          events, reachable, transitions);
+    }
+
+
     //#########################################################################
     //# Data Members
     private final int mStateLimit = Integer.MAX_VALUE;

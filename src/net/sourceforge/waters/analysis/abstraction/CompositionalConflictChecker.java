@@ -2299,6 +2299,15 @@ public class CompositionalConflictChecker
              resultAut, mResultStateEncoding,
              originalAut, mOriginalStateEncoding);
         return expander.convertTraceSteps(traceSteps);
+      } else if (mSimplifier instanceof CertainConflictsTRSimplifier) {
+          final CertainConflictsTRSimplifier simplifier = (CertainConflictsTRSimplifier) mSimplifier;
+          final AutomatonProxy resultAut = getResultAutomaton();
+          final AutomatonProxy originalAut = getOriginalAutomaton();
+          final CertainConflictsTraceExpander expander =
+            new CertainConflictsTraceExpander
+              (CompositionalConflictChecker.this, simplifier, mTau,
+               resultAut, mResultStateEncoding, originalAut, mOriginalStateEncoding);
+          return expander.convertTraceSteps(traceSteps);
       } else {
         throw new UnsupportedOperationException
           ("Trace expansion for " +
