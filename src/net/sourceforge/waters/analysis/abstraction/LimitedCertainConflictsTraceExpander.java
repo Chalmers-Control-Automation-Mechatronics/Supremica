@@ -327,7 +327,8 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
 
   //#########################################################################
   //# Language Inclusion Model
-  private ProductDESProxy createLanguageInclusionModel(final AutomatonProxy mTestAutomaton)
+  private ProductDESProxy createLanguageInclusionModel
+    (final AutomatonProxy testAut)
   {
     final int numAutomata = mReferenceAutomata.size();
     int numStates = 0;
@@ -340,11 +341,11 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     final AutomatonProxy resultAut = getResultAutomaton();
     final Map<AutomatonProxy,StateProxy> stepMap =
       mLastTraceStep == null ? null : mLastTraceStep.getStateMap();
-    final Collection<EventProxy> ccevents = mTestAutomaton.getEvents();
+    final Collection<EventProxy> ccevents = testAut.getEvents();
     final Collection<EventProxy> events = new THashSet<EventProxy>(ccevents);
     for (final AutomatonProxy aut : mReferenceAutomata) {
       if (aut == resultAut) {
-        checkAutomata.add(mTestAutomaton);
+        checkAutomata.add(testAut);
       } else {
         final StateProxy init = stepMap == null ? null : stepMap.get(aut);
         final AutomatonProxy checkAut =
@@ -637,10 +638,33 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
   private final KindTranslator mKindTranslator;
   private final SafetyVerifier mSafetyVerifier;
 
+  /**
+   * The last step of the counterexample being converted, which includes
+   * a state outside of certain conflicts in the abstracted automaton.
+   * This may be <CODE>null</CODE> in the case of an abstracted automaton
+   * that consists just of a single certain-conflicts state.
+   */
   private TraceStepProxy mLastTraceStep;
+  /**
+   * An event used to mark certain conflict states with selfloops in the
+   * language inclusion check to determine whether certain conflicts are
+   * reachable.
+   */
   private EventProxy mCheckedProposition;
+  /**
+   * A one-state automaton that blocks the {@link #mCheckedProposition}.
+   */
   private AutomatonProxy mPropertyAutomaton;
+  /**
+   * List of automata in the trace to be converted. Contains the abstracted
+   * automaton plus any other automata in the model.
+   */
   private List<AutomatonProxy> mReferenceAutomata;
+  /**
+   * A map used when creating the language inclusion model. It relates
+   * states of the automata in the language inclusion model to states
+   * of the automata in {@link #mReferenceAutomata}.
+   */
   private Map<StateProxy,StateProxy> mReverseStateMap;
 
 }
