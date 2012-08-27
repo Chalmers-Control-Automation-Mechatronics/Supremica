@@ -1,11 +1,9 @@
 package org.supremica.automata.BDD.EFA;
 
 import gnu.trove.TIntArrayList;
+
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import net.sf.javabdd.BDD;
@@ -25,7 +23,7 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
-import org.supremica.automata.algorithms.Guard.GeneticMinimizer.*;
+import org.supremica.automata.algorithms.Guard.GeneticMinimizer.Chromosome;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
@@ -136,7 +134,7 @@ public class BDDExtendedSynthesizer {
     }
 
 
-    public String getFeasibleValues(String variable)
+    public String getFeasibleValues(final String variable)
     {
         return bddAutomata.intListToFormula(
                             variable,
@@ -179,7 +177,7 @@ public class BDDExtendedSynthesizer {
 
         guardTimer = new ActionTimer();
 
-        Iterator<String> it = eventNames.iterator();
+        final Iterator<String> it = eventNames.iterator();
         guardTimer.start();
         while(it.hasNext())
         {
@@ -211,20 +209,20 @@ public class BDDExtendedSynthesizer {
 //            int[] optimalVarOrdering = decodeToIntArray((new Genetics(fitnessEvaluation, genes, new Genetics.GeneticOptions()).runGenetics()));
 //            bddAutomata.getManager().getFactory().setVarOrder(optimalVarOrdering);
 
-            bddgg = new BDDExtendedGuardGenerator(bddAutomata, sigmaName, statesAfterSynthesis, options);            
+            bddgg = new BDDExtendedGuardGenerator(bddAutomata, sigmaName, statesAfterSynthesis, options);
             event2guard.put(sigmaName, bddgg);
         }
         guardTimer.stop();
 
     }
 
-    int[] decodeToIntArray(Chromosome chromosome)
+    int[] decodeToIntArray(final Chromosome chromosome)
     {
-        TIntArrayList intArray = new TIntArrayList(bddAutomata.getEventDomain().vars());
-        for(String gene:chromosome.getGenes())
+        final TIntArrayList intArray = new TIntArrayList(bddAutomata.getEventDomain().vars());
+        for(final String gene:chromosome.getGenes())
         {
-            Integer geneIndex = geneIndex = bddAutomata.getIndexMap().getVariableIndexByName(gene);
-            
+            final Integer geneIndex = bddAutomata.getIndexMap().getVariableIndexByName(gene);
+
             if(bddAutomata.getSourceLocationDomain(gene) != null)
             {
                 intArray.add(bddAutomata.getTempLocationDomain(gene).vars());
@@ -241,8 +239,8 @@ public class BDDExtendedSynthesizer {
                 throw new IllegalArgumentException("The gene does not exist!");
 
         }
-        
-        TIntArrayList remainingVars = new TIntArrayList(bddAutomata.getManager().getFactory().getVarOrder());
+
+        final TIntArrayList remainingVars = new TIntArrayList(bddAutomata.getManager().getFactory().getVarOrder());
         remainingVars.remove(0, intArray.size());
         intArray.add(remainingVars.toNativeArray());
         return intArray.toNativeArray();

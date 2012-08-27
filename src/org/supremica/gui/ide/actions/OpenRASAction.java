@@ -1,19 +1,14 @@
 package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.filechooser.FileFilter;
-import org.supremica.automata.ExtendedAutomata;
-import org.supremica.automata.ExtendedAutomaton;
+
 import org.supremica.automata.FlowerEFABuilder;
 import org.supremica.gui.ide.IDE;
 
@@ -29,7 +24,7 @@ public class OpenRASAction extends net.sourceforge.waters.gui.actions.IDEAction 
         super(ide);
         putValue(Action.NAME, "Open RAS ...");
         putValue(Action.SHORT_DESCRIPTION, "Open/import a RAS module");
-        putValue(Action.SMALL_ICON, 
+        putValue(Action.SMALL_ICON,
                 new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Open16.gif")));
     }
 
@@ -47,12 +42,12 @@ public class OpenRASAction extends net.sourceforge.waters.gui.actions.IDEAction 
         final int choice = chooser.showOpenDialog(frame);
         // Load the files ...
         if (choice == JFileChooser.APPROVE_OPTION) {
-           File selectedRAS = chooser.getSelectedFile();
+           final File selectedRAS = chooser.getSelectedFile();
 
            FlowerEFABuilder flbuilder = null;
            try{
                 flbuilder = new FlowerEFABuilder(selectedRAS, ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject());
-           }catch(IOException e){e.printStackTrace();};
+           }catch(final IOException e){e.printStackTrace();};
            flbuilder.buildEFA();
         }
     }

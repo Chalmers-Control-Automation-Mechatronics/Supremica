@@ -1611,6 +1611,13 @@ public class GraphEditorPanel
   {
 
     //#######################################################################
+    //# Simple Access
+    Point getStartPoint()
+    {
+      return mStartPoint;
+    }
+
+    //#######################################################################
     //# Highlighting and Selecting
     int getHighlightPriority(final ProxySubject item)
     {
@@ -1888,15 +1895,14 @@ public class GraphEditorPanel
 
     public void mousePressed(final MouseEvent event)
     {
-      if(mIsPermanentFocusOwner){
+      if (mIsPermanentFocusOwner) {
         mousePressedWhenInFocus(event);
-      }
-      else{
+      } else {
         requestFocusInWindow();
         SwingUtilities.invokeLater(new Runnable() {
           public void run()
           {
-            if(mIsPermanentFocusOwner){
+            if (mIsPermanentFocusOwner) {
               mousePressedWhenInFocus(event);
             }
           }
@@ -1961,7 +1967,7 @@ public class GraphEditorPanel
       updateHighlighting(point);
     }
 
-    protected Point mStartPoint;
+    private Point mStartPoint;
     private ProxySubject mItem;
 
   }
@@ -2054,25 +2060,26 @@ public class GraphEditorPanel
     public void mouseDragged(final MouseEvent event)
     {
       if (mInternalDragAction == null) {
+        final Point start = getStartPoint();
         if (mFocusedObject == null) {
-          mInternalDragAction =
-            new InternalDragActionSelect(mStartPoint, event.isShiftDown() || event.isControlDown());
+          mInternalDragAction = new InternalDragActionSelect
+            (start, event.isShiftDown() || event.isControlDown());
         } else {
           final ProxySubject subject = getItemToBeSelected(event);
           if (mFocusedObject == subject || !isSelected(subject)) {
-            final Handle handle = getClickedHandle(subject, mStartPoint);
+            final Handle handle = getClickedHandle(subject, start);
             if (handle == null) {
-              mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
+              mInternalDragAction = new InternalDragActionMove
+                (start, event.isShiftDown() || event.isControlDown());
             } else {
               switch (handle.getType()) {
               case INITIAL:
-                mInternalDragAction =
-                  new InternalDragActionInitial(mStartPoint);
+                mInternalDragAction = new InternalDragActionInitial(start);
                 break;
               case SOURCE:
               case TARGET:
                 mInternalDragAction =
-                  new InternalDragActionEdge(handle, mStartPoint);
+                  new InternalDragActionEdge(handle, start);
                 break;
               case NW:
               case N:
@@ -2083,7 +2090,7 @@ public class GraphEditorPanel
               case S:
               case SE:
                 mInternalDragAction =
-                  new InternalDragActionResizeGroupNode(handle, mStartPoint);
+                  new InternalDragActionResizeGroupNode(handle, start);
                 break;
               default:
                 throw new IllegalStateException("Unknown handle type: " +
@@ -2091,7 +2098,7 @@ public class GraphEditorPanel
               }
             }
           } else {
-            mInternalDragAction = new InternalDragActionDND(mStartPoint);
+            mInternalDragAction = new InternalDragActionDND(start);
           }
         }
       }
@@ -2195,22 +2202,22 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionSelect(mStartPoint, event.isShiftDown() || event.isControlDown());
+            new InternalDragActionSelect(getStartPoint(), event.isShiftDown() || event.isControlDown());
         } else {
           final ProxySubject subject = getItemToBeSelected(event);
           if (mFocusedObject == subject || !isSelected(subject)) {
-            final Handle handle = getClickedHandle(subject, mStartPoint);
+            final Handle handle = getClickedHandle(subject, getStartPoint());
             if (handle == null) {
               mInternalDragAction =
-                new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
+                new InternalDragActionMove(getStartPoint(), event.isShiftDown() || event.isControlDown());
             } else {
               if(handle.getType() == HandleType.INITIAL){
                 mInternalDragAction =
-                  new InternalDragActionInitial(mStartPoint);
+                  new InternalDragActionInitial(getStartPoint());
               }
               else{
                 mInternalDragAction =
-                new InternalDragActionSelect(mStartPoint);
+                new InternalDragActionSelect(getStartPoint());
               }
             }
           }
@@ -2253,14 +2260,14 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionCreateGroupNode(mStartPoint);
+            new InternalDragActionCreateGroupNode(getStartPoint());
         } else {
-          final Handle handle = getClickedHandle(mFocusedObject, mStartPoint);
+          final Handle handle = getClickedHandle(mFocusedObject, getStartPoint());
           if (handle == null) {
-            mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
+            mInternalDragAction = new InternalDragActionMove(getStartPoint(), event.isShiftDown() || event.isControlDown());
           } else {
             mInternalDragAction =
-              new InternalDragActionResizeGroupNode(handle, mStartPoint);
+              new InternalDragActionResizeGroupNode(handle, getStartPoint());
           }
         }
       }
@@ -2333,28 +2340,28 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionSelect(mStartPoint, event.isShiftDown() || event.isControlDown());
+            new InternalDragActionSelect(getStartPoint(), event.isShiftDown() || event.isControlDown());
         } else {
           final ProxySubject item = getItemToBeSelected(event);
           if (mFocusedObject == item || !isSelected(item)){
-            final Handle handle = getClickedHandle(item, mStartPoint);
+            final Handle handle = getClickedHandle(item, getStartPoint());
             if (handle == null && canBeSelected(item)){
-              mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
+              mInternalDragAction = new InternalDragActionMove(getStartPoint(), event.isShiftDown() || event.isControlDown());
             } else if (item instanceof NodeSubject) {
               // Clicking on node or nodegroup --- create edge.
-              mInternalDragAction = new InternalDragActionEdge(mStartPoint);
+              mInternalDragAction = new InternalDragActionEdge(getStartPoint());
             } else if (item instanceof EdgeSubject) {
               if (handle == null) {
-                mInternalDragAction = new InternalDragActionMove(mStartPoint, event.isShiftDown() || event.isControlDown());
+                mInternalDragAction = new InternalDragActionMove(getStartPoint(), event.isShiftDown() || event.isControlDown());
               } else {
                 mInternalDragAction =
-                  new InternalDragActionEdge(handle, mStartPoint);
+                  new InternalDragActionEdge(handle, getStartPoint());
               }
             }
           }
           else{
             mInternalDragAction =
-              new InternalDragActionDND(mStartPoint);
+              new InternalDragActionDND(getStartPoint());
           }
 
         }

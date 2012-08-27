@@ -67,7 +67,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
     public BDD uncontrollableBackward(final BDD forbidden) {
         System.err.println("Entering uncontrollableBackward...");
-        BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
+        final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         final BDD t_u = bddEdges.getMonolithicUncontrollableEdgesBackwardBDD();
         final BDD backwardTime = bddEdges.getBackwardClocksWithTheSameRate();
         final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();
@@ -79,11 +79,11 @@ public class BDDExtendedManager extends BDDAbstractManager {
         BDD newCstates = null;
         BDD Qkn = forbidden.id();
         if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
-            Qkn = timeEvolSource(Qkn, backwardTime);        
+            Qkn = timeEvolSource(Qkn, backwardTime);
             newCstates = Qkn.and(bddEdges.getMonolithicForcibleEdgesForwardBDD().exist(bddExAutomata.getDestStatesVarSet()));
-            newCstates = timeEvolSource(newCstates, backwardTime);        
+            newCstates = timeEvolSource(newCstates, backwardTime);
             Qkn = Qkn.and(newCstates.not());
-            Qkn = timeEvolSource(Qkn, forwardTime);        
+            Qkn = timeEvolSource(Qkn, forwardTime);
 
 //        System.out.println("Qknnnnnnn: "+(Qkn.isOne()?"one":""));
 //        Qkn.printDot();
@@ -91,7 +91,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
             Qkn = Qkn.or(forbidden);
             bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(Qkn);
         }
-        int iteration = 0;
         do {
 //            System.out.println("UBackward: "+iteration++);
             Qk = Qkn.id();
@@ -129,7 +128,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
         } catch (final Exception e){}
         final BufferedWriter out = new BufferedWriter(fstream);
          */
-        int iteration = 0;
 
         do {
 //            System.out.println("RBackward "+iteration++);
@@ -167,7 +165,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         return Qkn;
     }
 
-    public BDD restrictedForward(BDD initialStates, final BDD forbidden) {
+    public BDD restrictedForward(final BDD initialStates, final BDD forbidden) {
         System.err.println("Entering restrictedForward...");
         final BDD trans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesForwardBDD();
         final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getForwardClocksWithTheSameRate();
@@ -185,8 +183,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
 //            fstream = new FileWriter("/Users/sajed/Desktop/fxdPoint.txt");
 //        } catch (final Exception e){}
 //        out = new BufferedWriter(fstream);
-
-        int iteration = 0;
 
         do {
 //            System.err.println("RForward "+(iteration++) + "\t" + Qkn.nodeCount());
@@ -235,7 +231,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
         BDD Q1 = null;
         BDD Q2 = null;
 
-        int iteration = 0;
         do {
 //            System.out.println("nbc: "+(iteration++));
             Qk = Qkn.id();
@@ -350,14 +345,13 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
 
         BDD upUnsafeStates = unsafeStates.id();
-        int i = 0;
         do {
 //            System.err.println("computeUnsafeStates: "+(i++));
-            BDD[] elements = computeElements(upUnsafeStates);
+            final BDD[] elements = computeElements(upUnsafeStates);
             upUnsafeStates = elements[0].id();
 
 //            System.err.println("Performing the larger operator...");
-            BDD newTauTrans = elements[1].or(getLarger(sigmaTrans.and(elements[1].not()), elements[1])).and(getFeasibleSourceStates());
+            final BDD newTauTrans = elements[1].or(getLarger(sigmaTrans.and(elements[1].not()), elements[1])).and(getFeasibleSourceStates());
 //            System.err.println("Done.");
             sigmaTrans = sigmaTrans.and(newTauTrans.not());
             tauTrans = tauTrans.or(newTauTrans);
@@ -376,18 +370,17 @@ public class BDDExtendedManager extends BDDAbstractManager {
      * @param unsafeStates
      * @return The new inevitable states and $\tau$Trans
      */
-    private BDD[] computeElements(BDD unsafeStates) {
-        BDD[] elements = new BDD[2];
+    private BDD[] computeElements(final BDD unsafeStates) {
+        final BDD[] elements = new BDD[2];
         BDD upUnsafeStates = unsafeStates.id();
         BDD inevitableStates = getZeroBDD();
         BDD tauTrans = getZeroBDD();
-        int i = 0;
         do {
 //            System.err.println("computeElements: "+(i++));
-            BDD tauSuperBckwdTrans = upUnsafeStates.and(bckwdTransEvents);
-            BDD tauSuperFrwdTrans = tauSuperBckwdTrans.exist(bddExAutomata.getSourceStatesVarSet()).replace(
+            final BDD tauSuperBckwdTrans = upUnsafeStates.and(bckwdTransEvents);
+            final BDD tauSuperFrwdTrans = tauSuperBckwdTrans.exist(bddExAutomata.getSourceStatesVarSet()).replace(
                     bddExAutomata.getDestToSourceVariablePairing());
-            BDD boundaryOtherStates = frwdTransEvents.and(tauSuperFrwdTrans.not()).exist(bddExAutomata.getEventVarSet());
+            final BDD boundaryOtherStates = frwdTransEvents.and(tauSuperFrwdTrans.not()).exist(bddExAutomata.getEventVarSet());
 //            upUnsafeStates = (tauSuperFrwdTrans.and(boundaryOtherStates.not())).exist(bddExAutomata.getEventVarSet());
             upUnsafeStates = (tauSuperFrwdTrans.exist(bddExAutomata.getEventVarSet()).and(boundaryOtherStates.not())).and(getFeasibleSourceStates());
             inevitableStates = inevitableStates.or(upUnsafeStates);
@@ -405,16 +398,16 @@ public class BDDExtendedManager extends BDDAbstractManager {
      * @param trans
      * @return The new found unsafe states
      */
-    private BDD extractNewUnsafeStates(BDD trans) {
+    private BDD extractNewUnsafeStates(final BDD trans) {
         return (trans.exist(bddExAutomata.getEventVarSet()).and(
                 frwdTransEvents.and(trans.not()).exist(bddExAutomata.getEventVarSet()).not()));
     }
 
-    private BDD getLarger(BDD trans1, BDD trans2) {
-        BDD tmpTrans1 = trans1.replace(bddExAutomata.sourceToTempVariablePairing);
-        BDD pairs = trans2.and(tmpTrans1);
+    private BDD getLarger(final BDD trans1, final BDD trans2) {
+        final BDD tmpTrans1 = trans1.replace(bddExAutomata.sourceToTempVariablePairing);
+        final BDD pairs = trans2.and(tmpTrans1);
 
-        BDD larger = (pairs.and(getGlobalLargerBDD()).exist(bddExAutomata.getSourceStatesVarSet()));
+        final BDD larger = (pairs.and(getGlobalLargerBDD()).exist(bddExAutomata.getSourceStatesVarSet()));
         return larger.replace(bddExAutomata.tempToSourceVariablePairing);
     }
 
@@ -422,23 +415,23 @@ public class BDDExtendedManager extends BDDAbstractManager {
         if (globalLargerBDD == null) {
             BDD equalsBDD = getOneBDD();
             globalLargerBDD = getOneBDD();
-            List<VariableComponentProxy> stageVars = bddExAutomata.orgExAutomata.getStageVars();
-            for (VariableComponentProxy stage : stageVars) {
-                int stageIndex = bddExAutomata.theIndexMap.getVariableIndex(stage);
-                int stageDomain = bddExAutomata.orgExAutomata.getVarDomain(stage.getName());
-                BDDDomain stageSourceDomain = bddExAutomata.sourceVarDomains[stageIndex];
-                BDDDomain stageTempDomain = bddExAutomata.tempVarDomains[stageIndex];
-                SupremicaBDDBitVector stageBDDBitVectorSource = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
+            final List<VariableComponentProxy> stageVars = bddExAutomata.orgExAutomata.getStageVars();
+            for (final VariableComponentProxy stage : stageVars) {
+                final int stageIndex = bddExAutomata.theIndexMap.getVariableIndex(stage);
+                final int stageDomain = bddExAutomata.orgExAutomata.getVarDomain(stage.getName());
+                final BDDDomain stageSourceDomain = bddExAutomata.sourceVarDomains[stageIndex];
+                final BDDDomain stageTempDomain = bddExAutomata.tempVarDomains[stageIndex];
+                final SupremicaBDDBitVector stageBDDBitVectorSource = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
                         bddExAutomata.orgExAutomata.getMinValueofVar(stage.getName()) < 0,
                         stageSourceDomain);
-                SupremicaBDDBitVector stageBDDBitVectorTemp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
+                final SupremicaBDDBitVector stageBDDBitVectorTemp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
                         bddExAutomata.orgExAutomata.getMinValueofVar(stage.getName()) < 0,
                         stageTempDomain);
                 BDD stageLargerBDD = getZeroBDD();
                 for (int j = 0; j < stageDomain; j++) {
-                    BDD jSource = createBDD(j, bddExAutomata.getSourceVariableDomain(stageIndex));
-                    SupremicaBDDBitVector vector_j = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, stageTempDomain.varNum(), j);
-                    BDD greaterThanJBDD = stageBDDBitVectorTemp.gte(vector_j);
+                    final BDD jSource = createBDD(j, bddExAutomata.getSourceVariableDomain(stageIndex));
+                    final SupremicaBDDBitVector vector_j = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, stageTempDomain.varNum(), j);
+                    final BDD greaterThanJBDD = stageBDDBitVectorTemp.gte(vector_j);
                     stageLargerBDD = stageLargerBDD.or(jSource.and(greaterThanJBDD));
                 }
                 equalsBDD = equalsBDD.and(stageBDDBitVectorSource.equ(stageBDDBitVectorTemp));
@@ -452,8 +445,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
     }
 
     private BDD getMinimalDeadlocks() {
-        BDD feasibleTrans = frwdTransEvents.and(getFeasibleSourceStates());
-        BDD feasSourceStates = feasibleTrans.exist(bddExAutomata.getEventVarSet());
+        final BDD feasibleTrans = frwdTransEvents.and(getFeasibleSourceStates());
+        final BDD feasSourceStates = feasibleTrans.exist(bddExAutomata.getEventVarSet());
         BDD deadlocks = getFeasibleSourceStates().and(feasSourceStates.not());
         deadlocks = deadlocks.and(bddExAutomata.getInitialState().exist(bddExAutomata.getSourceLocationVarSet()).not());
 //       BDD forward = ((BDDMonolithicEdges)bddExAutomata.getBDDEdges()).getMonolithicEdgesForwardWithEventsBDD();
@@ -468,7 +461,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
     private BDD getFeasibleSourceStates() {
         if (feasibleSourceStates == null) {
-            ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
+            final ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
 
             SimpleExpressionSubject feasibleEquation = null;
             try {
@@ -496,9 +489,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
         return feasibleDestStates;
     }
 
-    BDD getInitialUnreachableStates(BDD localBckwdTransEvents) {
-        BDD notInitialFeasibleStates = getFeasibleSourceStates().and(localBckwdTransEvents);
-        BDD initialFeasibleStates = getFeasibleSourceStates().and(notInitialFeasibleStates.exist(
+    BDD getInitialUnreachableStates(final BDD localBckwdTransEvents) {
+        final BDD notInitialFeasibleStates = getFeasibleSourceStates().and(localBckwdTransEvents);
+        final BDD initialFeasibleStates = getFeasibleSourceStates().and(notInitialFeasibleStates.exist(
                 bddExAutomata.getEventVarSet()).exist(
                 bddExAutomata.getDestStatesVarSet()).not());
         return initialFeasibleStates.and(bddExAutomata.getInitialState().exist(bddExAutomata.getSourceLocationVarSet()).not());

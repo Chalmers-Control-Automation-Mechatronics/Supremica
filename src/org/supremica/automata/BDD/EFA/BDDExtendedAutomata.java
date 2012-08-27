@@ -47,7 +47,7 @@ import org.supremica.log.LoggerFactory;
 public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
-    private BDDExtendedManager manager;
+    private final BDDExtendedManager manager;
     List<ExtendedAutomaton> theExAutomata;
     ExtendedAutomata orgExAutomata;
     List<BDDExtendedAutomaton> theBDDAutomataList = new LinkedList<BDDExtendedAutomaton>();
@@ -59,6 +59,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     List<EventDeclProxy> unionAlphabet;
     BDDEdges bddEdges = null;
     private BDDDomain eventDomain;
+    @SuppressWarnings("unused")
     private BDDDomain constantDomain;
     private BDDVarSet sourceStateVarSet = null;
     private BDDVarSet destStateVarSet = null;
@@ -87,7 +88,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     private BDDPairing destToSourceLocationPairing = null;
     private BDDPairing sourceToDestVariablePairing = null;
     private BDDPairing destToSourceVariablePairing = null;
-    private BDDPairing destToSourceClockPairing = null;
+    private final BDDPairing destToSourceClockPairing = null;
     BDDPairing tempToSourceClockPairing = null;
     BDDPairing tempToDestClockPairing = null;
     BDDPairing sourceToTempLocationPairing = null;
@@ -122,9 +123,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     long nbrOfNonblockingControllableStates = -1;
     long nbrOfControllableStates = -1;
     long nbrOfUnsafeStates = -1; // for RAS models
-    private HashMap<Integer, SupremicaBDDBitVector> BDDBitVecSourceVarsMap;
-    private HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTargetVarsMap;
-    private HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTempVarsMap;
+    private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecSourceVarsMap;
+    private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTargetVarsMap;
+    private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTempVarsMap;
     Map<String, Integer> variableToMinSourceBDDVar;
     BDD initValuesBDD = null;
     BDD markedValuesBDD = null;
@@ -217,6 +218,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         initialize();
     }
 
+    @SuppressWarnings("unchecked")
     private void initialize() {
         unionAlphabet = orgExAutomata.getUnionAlphabet();
 
@@ -419,17 +421,17 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         if (!orgExAutomata.getClocks().isEmpty()) {
             tempClock1ToDestClockPairing = manager.getFactory().makePair();
         }
-        for (VariableComponentProxy clockComponent : orgExAutomata.getClocks()) {
-            int clockIndex = theIndexMap.getVariableIndex(clockComponent);
-            BDDDomain bddDomainTemp = tempClockDomains1[clockIndex];
-            BDDDomain bddDomainDest = destVarDomains[clockIndex];
+        for (final VariableComponentProxy clockComponent : orgExAutomata.getClocks()) {
+            final int clockIndex = theIndexMap.getVariableIndex(clockComponent);
+            final BDDDomain bddDomainTemp = tempClockDomains1[clockIndex];
+            final BDDDomain bddDomainDest = destVarDomains[clockIndex];
 
             for (int i = 0; i < bddDomainDest.varNum(); i++) {
                 tempClock1ToDestClockPairing.set((bddDomainTemp.vars())[bddDomainTemp.varNum() - 1 - i], (bddDomainDest.vars())[bddDomainDest.varNum() - 1 - i]);
             }
         }
 
-        for (EventDeclProxy event : unionAlphabet) {
+        for (final EventDeclProxy event : unionAlphabet) {
             System.err.println(event.getName() + " index: " + theIndexMap.getEventIndex(event));
         }
 
@@ -620,16 +622,16 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         System.err.println("variable name: " + varName);
 //        int domain = orgExAutomata.getDomain();
-        final int domain = orgExAutomata.getVarDomain(varName);   
-        
-        if (orgExAutomata.getClocks().contains(var)) {        
+        final int domain = orgExAutomata.getVarDomain(varName);
+
+        if (orgExAutomata.getClocks().contains(var)) {
             tempClockDomains1[varIndex] = manager.createDomain(orgExAutomata.getLargestClockDomain() * 2);
             System.err.println("tempClock1 variables: " + tempClockDomains1[varIndex].set().toString());
             tempClockDomains2[varIndex] = manager.createDomain(orgExAutomata.getLargestClockDomain() * 2);
             System.err.println("tempClock2 variables: " + tempClockDomains2[varIndex].set().toString());
         }
 
-        BDDDomain tempDomain = manager.createDomain(domain);
+        final BDDDomain tempDomain = manager.createDomain(domain);
         BDDBitVecTempVarsMap.put(theIndexMap.getVariableIndex(var),
                 manager.createSupremicaBDDBitVector(BDDBitVectoryType,
                 orgExAutomata.getMinValueofVar(varName) < 0,
@@ -729,8 +731,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         destVarDomains[varIndex].setName(var.getName());
     }
 
-    public BDD sourceTooTdest(BDD bdd) {
-        BDD newBDD = bdd.id();
+    public BDD sourceTooTdest(final BDD bdd) {
+        final BDD newBDD = bdd.id();
 
         newBDD.replaceWith(sourceToTempLocationPairing);
         newBDD.replaceWith(destToSourceLocationPairing);
@@ -750,7 +752,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return backwardClocksExtensionBDD;
     }
 
-    public int getMinSourceBDDVar(String varName) {
+    public int getMinSourceBDDVar(final String varName) {
         return variableToMinSourceBDDVar.get(varName);
     }
 
@@ -858,21 +860,21 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return destStateVarSet;
     }
 
-    public BDDVarSet MinusVarSet(BDDVarSet b1, BDDVarSet b2) {
-        TIntHashSet varSet1 = new TIntHashSet(b1.toArray());
+    public BDDVarSet MinusVarSet(final BDDVarSet b1, final BDDVarSet b2) {
+        final TIntHashSet varSet1 = new TIntHashSet(b1.toArray());
         varSet1.removeAll(b2.toArray());
         return manager.getFactory().makeSet(varSet1.toArray());
     }
 
-    public SupremicaBDDBitVector getBDDBitVecSource(int index) {
+    public SupremicaBDDBitVector getBDDBitVecSource(final int index) {
         return BDDBitVecSourceVarsMap.get(index);
     }
 
-    public SupremicaBDDBitVector getBDDBitVecTarget(int index) {
+    public SupremicaBDDBitVector getBDDBitVecTarget(final int index) {
         return BDDBitVecTargetVarsMap.get(index);
     }
 
-    public SupremicaBDDBitVector getBDDBitVecTemp(int index) {
+    public SupremicaBDDBitVector getBDDBitVecTemp(final int index) {
         return BDDBitVecTempVarsMap.get(index);
     }
 
@@ -955,7 +957,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     }
 
     public BDD getInitialState() {
-        BDD initLocationInvariants = locationInvariantsBDD.and(initialLocationsBDD);
+        final BDD initLocationInvariants = locationInvariantsBDD.and(initialLocationsBDD);
         return initLocationInvariants.and(initValuesBDD).and(initClocksBDD);
     }
 
@@ -987,8 +989,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                 if (initValue >= 0) {
                     initBDD = getConstantBDD(var.getName(), initValue);
                 } else {
-                    int varIndex = theIndexMap.getVariableIndex(var);
-                    TCSupremicaBDDBitVector tcs = ((TCSupremicaBDDBitVector) manager.createSupremicaBDDBitVector(1,
+                    final int varIndex = theIndexMap.getVariableIndex(var);
+                    final TCSupremicaBDDBitVector tcs = ((TCSupremicaBDDBitVector) manager.createSupremicaBDDBitVector(1,
                             getSourceVariableDomain(varIndex).varNum(),
                             initValue));
                     initBDD = getBDDBitVecSource(varIndex).equ(tcs);
@@ -1006,7 +1008,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
         // Create initial values of clocks with the same rate
         for (int i = 1; i < orgExAutomata.getClocks().size(); i++) {
-            int newClockIndex = theIndexMap.getVariableIndex(orgExAutomata.getClocks().get(i));
+            final int newClockIndex = theIndexMap.getVariableIndex(orgExAutomata.getClocks().get(i));
 
             initClocksBDD = initClocksBDD.and(getBDDBitVecSource(clockIndex).equ(getBDDBitVecSource(newClockIndex)));
 
@@ -1029,12 +1031,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
     }
 
-    public SupremicaBDDBitVector getMaxBDDBitVecOf(int varIndex) {
+    public SupremicaBDDBitVector getMaxBDDBitVecOf(final int varIndex) {
         return manager.createSupremicaBDDBitVector(BDDBitVectoryType,
                 getBDDBitVecSource(varIndex).length(), orgExAutomata.getMaxValueofVar(theIndexMap.getVariableAt(varIndex).getName()));
     }
 
-    public SupremicaBDDBitVector getMinBDDBitVecOf(int varIndex) {
+    public SupremicaBDDBitVector getMinBDDBitVecOf(final int varIndex) {
         return manager.createSupremicaBDDBitVector(BDDBitVectoryType,
                 getBDDBitVecSource(varIndex).length(), orgExAutomata.getMinValueofVar(theIndexMap.getVariableAt(varIndex).getName()));
     }
@@ -1053,8 +1055,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     public void computeOptimalTimeBDD() {
         if (optimalTimeBDD == null) {
-            BDD bdd = getMarkedStates().and(getReachableStates());
-            TIntArrayList valuations = BDD2valuations(bdd, orgExAutomata.getGlobalClockName());
+            final BDD bdd = getMarkedStates().and(getReachableStates());
+            final TIntArrayList valuations = BDD2valuations(bdd, orgExAutomata.getGlobalClockName());
             if (valuations.isEmpty()) {
                 logger.error("Your guess for the time domain is too small to compute the minimum time. Please try a larger time domain.");
                 optimalTimeBDD = manager.getOneBDD();
@@ -1210,7 +1212,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        nonblockingStatesBDD = getOptimalNonblockingStates();
         if (nonblockingStatesBDD == null) {
             nonblockingStatesBDD = getReachableStates().and(getCoreachableStates());
-            
+
 //            getReachableStates().printDot();
             //nonblockingStatesBDD = (getCoreachableStates());
 //                final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
@@ -1241,7 +1243,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        System.err.println("compute reachable states --- begin");
 //        computeReachableStates();
 //        System.err.println("compute reachable states --- end");
-        BDD unsafeStates = manager.computeUnsafeStates();
+        final BDD unsafeStates = manager.computeUnsafeStates();
 
 //        unsafeStates.printDot();
 
@@ -1253,11 +1255,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return unsafeStates;
     }
 
-    public TIntArrayList BDD2valuations(BDD bdd, String variable) {
-        TIntArrayList output = new TIntArrayList();
+    public TIntArrayList BDD2valuations(final BDD bdd, final String variable) {
+        final TIntArrayList output = new TIntArrayList();
         for (int i = 0; i <= orgExAutomata.getMaxValueofVar(variable); i++) {
-            BDD iBDD = manager.getFactory().buildCube(i, getSourceVariableDomain(theIndexMap.getVariableIndexByName(variable)).vars());
-            BDD opBDD = bdd.and(iBDD);
+            final BDD iBDD = manager.getFactory().buildCube(i, getSourceVariableDomain(theIndexMap.getVariableIndexByName(variable)).vars());
+            final BDD opBDD = bdd.and(iBDD);
             if (!opBDD.isZero()) {
                 output.add(i);
             }
@@ -1273,16 +1275,16 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return optimalTime;
     }
 
-    public String intListToFormula(String variable, TIntArrayList list) {
+    public String intListToFormula(final String variable, final TIntArrayList list) {
         if (list.isEmpty()) {
             return "";
         }
 
-        String eq = CompilerOperatorTable.getInstance().getEqualsOperator().getName();
-        String leq = CompilerOperatorTable.getInstance().getLessEqualsOperator().getName();
-        String geq = CompilerOperatorTable.getInstance().getGreaterEqualsOperator().getName();
-        String and = CompilerOperatorTable.getInstance().getAndOperator().getName();
-        String or = " " + CompilerOperatorTable.getInstance().getOrOperator().getName() + " ";
+        final String eq = CompilerOperatorTable.getInstance().getEqualsOperator().getName();
+        final String leq = CompilerOperatorTable.getInstance().getLessEqualsOperator().getName();
+        final String geq = CompilerOperatorTable.getInstance().getGreaterEqualsOperator().getName();
+        final String and = CompilerOperatorTable.getInstance().getAndOperator().getName();
+        final String or = " " + CompilerOperatorTable.getInstance().getOrOperator().getName() + " ";
 
         int prevVal = list.get(0);
         if (list.size() == 1) {
@@ -1294,7 +1296,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         int j = 0;
         for (int i = 1; i < list.size(); i++) {
-            int currVal = list.get(i);
+            final int currVal = list.get(i);
             if (currVal == (prevVal + 1)) {
                 j++;
             } else {
@@ -1322,12 +1324,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return output;
     }
 
-    public BDD fitIntoClockDomains(BDD states) {
+    public BDD fitIntoClockDomains(final BDD states) {
         BDD output = states.id();
-        for (VariableComponentProxy var : orgExAutomata.getVars()) {
+        for (final VariableComponentProxy var : orgExAutomata.getVars()) {
 
             if (orgExAutomata.getClocks().contains(var)) {
-                int varIndex = theIndexMap.getVariableIndex(var);
+                final int varIndex = theIndexMap.getVariableIndex(var);
                 output = output.and(getBDDBitVecSource(varIndex).lte(getMaxBDDBitVecOf(varIndex)));
                 output = output.and(getBDDBitVecSource(varIndex).gte(
                         manager.createSupremicaBDDBitVector(BDDBitVectoryType, getSourceVariableDomain(varIndex).varNum(), 0)));
@@ -1582,7 +1584,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
 
         String firstVarAut = "";
-        for (Object va : variableOrdering) {
+        for (final Object va : variableOrdering) {
             if (va instanceof ExtendedAutomaton) {
                 firstVarAut = ((ExtendedAutomaton) va).getName();
                 break;
@@ -1592,8 +1594,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                 break;
             }
         }
-        int indexVar1 = variableOrderingNames.indexOf(firstVarAut);
-        int indexVar2 = variableOrderingNames.indexOf(idd.getRoot().getName());
+        final int indexVar1 = variableOrderingNames.indexOf(firstVarAut);
+        final int indexVar2 = variableOrderingNames.indexOf(idd.getRoot().getName());
         return nbrOfStatesIDD(idd, new HashMap<IDDNode, BigInteger>()).multiply(statesBetweenVars(indexVar1, indexVar2));
     }
 
@@ -1603,8 +1605,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             return BigInteger.ONE;
         } else {
             for (final IDD child : idd.getChildren()) {
-                int indexVar1 = variableOrderingNames.indexOf(idd.getRoot().getName());
-                int indexVar2 = variableOrderingNames.indexOf(child.getRoot().getName());
+                final int indexVar1 = variableOrderingNames.indexOf(idd.getRoot().getName());
+                final int indexVar2 = variableOrderingNames.indexOf(child.getRoot().getName());
                 final BigInteger statesBetweenChildren = statesBetweenVars(indexVar1 + 1, indexVar2);
                 final BigInteger currStates = BigInteger.valueOf(idd.labelOfChild(child).size());
                 BigInteger newNbrOfStates = cache.get(child.getRoot());
@@ -1690,39 +1692,39 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return theIndexMap;
     }
 
-    public BDD[] getForwardTransAndNextValsForV(BDDExtendedAutomaton aut) {
+    public BDD[] getForwardTransAndNextValsForV(final BDDExtendedAutomaton aut) {
         return forwardTransAndNextValsForV[theIndexMap.getExAutomatonIndex(aut.getExAutomaton().getName())];
     }
 
-    public BDD[] getForwardTransWhereVisUpdated(BDDExtendedAutomaton aut) {
+    public BDD[] getForwardTransWhereVisUpdated(final BDDExtendedAutomaton aut) {
         return forwardTransWhereVisUpdated[theIndexMap.getExAutomatonIndex(aut.getExAutomaton().getName())];
     }
 
-    public BDD[] getForwardTransWhereVHasAppearedInGuard(BDDExtendedAutomaton aut) {
+    public BDD[] getForwardTransWhereVHasAppearedInGuard(final BDDExtendedAutomaton aut) {
         return forwardTransWhereVHasAppearedInGuard[theIndexMap.getExAutomatonIndex(aut.getExAutomaton().getName())];
     }
 
-    public BDD[] getBackwardTransAndNextValsForV(BDDExtendedAutomaton aut) {
+    public BDD[] getBackwardTransAndNextValsForV(final BDDExtendedAutomaton aut) {
         return backwardTransAndNextValsForV[theIndexMap.getExAutomatonIndex(aut.getExAutomaton().getName())];
     }
 
-    public BDD[] getBackwardTransWhereVisUpdated(BDDExtendedAutomaton aut) {
+    public BDD[] getBackwardTransWhereVisUpdated(final BDDExtendedAutomaton aut) {
         return backwardTransWhereVisUpdated[theIndexMap.getExAutomatonIndex(aut.getExAutomaton().getName())];
     }
 
-    public BDD[] getTransAndNextValsForVWithoutDestClocks(BDDExtendedAutomaton aut) {
+    public BDD[] getTransAndNextValsForVWithoutDestClocks(final BDDExtendedAutomaton aut) {
         return transAndNextValsForVWithoutDestClocks[theIndexMap.getExAutomatonIndex(aut.getExAutomaton().getName())];
     }
 
-    public BDD[] getTransAndNextValsForVWithoutDestLW(BDDExtendedAutomaton aut) {
+    public BDD[] getTransAndNextValsForVWithoutDestLW(final BDDExtendedAutomaton aut) {
         return transAndNextValsForVWithoutDestLW[theIndexMap.getExAutomatonIndex(aut.getExAutomaton().getName())];
     }
 
-    public BDD[] getTransWhereVisUpdatedWithoutDestClocks(BDDExtendedAutomaton aut) {
+    public BDD[] getTransWhereVisUpdatedWithoutDestClocks(final BDDExtendedAutomaton aut) {
         return transWhereVisUpdatedWithoutDestClocks[theIndexMap.getExAutomatonIndex(aut.getExAutomaton().getName())];
     }
 
-    public BDD[] getTransWhereVisUpdatedWithoutDestLW(BDDExtendedAutomaton aut) {
+    public BDD[] getTransWhereVisUpdatedWithoutDestLW(final BDDExtendedAutomaton aut) {
         return transWhereVisUpdatedWithoutDestLW[theIndexMap.getExAutomatonIndex(aut.getExAutomaton().getName())];
     }
 

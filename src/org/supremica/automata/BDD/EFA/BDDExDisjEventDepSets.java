@@ -561,6 +561,7 @@ public class BDDExDisjEventDepSets extends BDDExDisjDepSets {
             final BDD tmp = manager.getOneBDD();
             for (int i = 0; i < bddExAutomata.orgExAutomata.getVars().size(); i++)
             {
+                @SuppressWarnings("unused")
                 final String varName = theIndexMap.getVariableAt(i).getName();
                 final int varIndex = theIndexMap.getVariableIndex(theIndexMap.getVariableAt(i));
                 transCorrespondingToUpdatedVariables[i] =

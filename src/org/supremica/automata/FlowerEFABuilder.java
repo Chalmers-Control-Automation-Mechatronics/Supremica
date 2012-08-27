@@ -17,7 +17,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 /**
  *
  * @author Sajed
- * 
+ *
  * The class builds a set of EFAs (one location plus several self-loops, aka
  * flower structure).
  * The structure was firstly introduced in CASE11 authored by
@@ -25,34 +25,34 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class FlowerEFABuilder {
-    
-    private int nbrOfJobs;
-    private int nbrOfResources;
 
-    private int[] resourceCapacities;
-    private int[] nbrOfTransitionsForJob;
-    private int[] nbrOfStagesForJob;
-    private int[][][] demandAtStage;
-    private int[][] maxInstancesAtStage;
+    private final int nbrOfJobs;
+    private final int nbrOfResources;
 
-    private Map<Integer,Set<Pair>> resourceToUsedInStages;
-    private Map<Integer, Set<Pair>> jobToTransitions;
-    private Map<Integer, Set<Integer>> jobToInitialStages;
-    private Map<Integer, Set<Integer>> jobToLastStages;
+    private final int[] resourceCapacities;
+    private final int[] nbrOfTransitionsForJob;
+    private final int[] nbrOfStagesForJob;
+    private final int[][][] demandAtStage;
+    private final int[][] maxInstancesAtStage;
+
+    private final Map<Integer,Set<Pair>> resourceToUsedInStages;
+    private final Map<Integer, Set<Pair>> jobToTransitions;
+    private final Map<Integer, Set<Integer>> jobToInitialStages;
+    private final Map<Integer, Set<Integer>> jobToLastStages;
 
     public static String STAGE_PREFIX = "s";
     public static String RESOURCE_PREFIX = "r";
     public static String LOAD_EVENT_PREFIX = "load";
     public static String feasibleEquation = "";
-    
+
     private ExtendedAutomata exAutomata;
-    private ModuleSubject module;
-    
-    public FlowerEFABuilder (File rasFile, ModuleSubject module)
+    private final ModuleSubject module;
+
+    public FlowerEFABuilder (final File rasFile, final ModuleSubject module)
             throws IOException
     {
         this.module = module;
-        BufferedReader br = new BufferedReader(new FileReader(rasFile));
+        final BufferedReader br = new BufferedReader(new FileReader(rasFile));
         nbrOfJobs = Integer.parseInt(br.readLine());
         nbrOfTransitionsForJob = new int[nbrOfJobs];
         nbrOfStagesForJob = new int[nbrOfJobs];
@@ -82,8 +82,8 @@ public class FlowerEFABuilder {
 
             demandAtStage[i] = new int[nbrOfStagesForJob[i]][];
 
-            Set<Integer> initialStages = new HashSet<Integer>();
-            Set<Integer> lastStages = new HashSet<Integer>();
+            final Set<Integer> initialStages = new HashSet<Integer>();
+            final Set<Integer> lastStages = new HashSet<Integer>();
             for(int j = 0; j < nbrOfStagesForJob[i]; j++)
             {
                 maxInstancesAtStage[i][j] = Integer.MAX_VALUE;
@@ -95,7 +95,7 @@ public class FlowerEFABuilder {
                 int maxInstances;
                 while(st.hasMoreTokens())
                 {
-                    int nbrOfNeededResources = Integer.parseInt(st.nextToken());
+                    final int nbrOfNeededResources = Integer.parseInt(st.nextToken());
                     if(nbrOfNeededResources > 0)
                     {
                         maxInstances = resourceCapacities[k] /
@@ -111,13 +111,13 @@ public class FlowerEFABuilder {
             }
 
             nbrOfTransitionsForJob[i] = Integer.parseInt(br.readLine());
-            Set<Pair> trans = new HashSet<Pair>();
+            final Set<Pair> trans = new HashSet<Pair>();
 
             for(int j = 0; j < nbrOfTransitionsForJob[i]; j++)
             {
                 st = new StringTokenizer(br.readLine());
-                int sourceStage = Integer.parseInt(st.nextToken());
-                int targetStage = Integer.parseInt(st.nextToken());
+                final int sourceStage = Integer.parseInt(st.nextToken());
+                final int targetStage = Integer.parseInt(st.nextToken());
                 trans.add(new Pair(sourceStage,targetStage));
                 initialStages.remove(targetStage);
                 lastStages.remove(sourceStage);
@@ -132,13 +132,13 @@ public class FlowerEFABuilder {
         for(i = 0; i < nbrOfResources; i++)
         {
             String resourceGuard = "";
-            for(Pair jobStage:resourceToUsedInStages.get(i))
+            for(final Pair jobStage:resourceToUsedInStages.get(i))
             {
-                String plus = resourceGuard.isEmpty() ? "(" : " + ";
+                final String plus = resourceGuard.isEmpty() ? "(" : " + ";
                 if(demandAtStage[jobStage.p1][jobStage.p2][i] > 0 &&
                         !jobToLastStages.get(jobStage.p1).contains(jobStage.p2))
                 {
-                    String coefficient =
+                    final String coefficient =
                             demandAtStage[jobStage.p1][jobStage.p2][i] > 1 ?
                                 demandAtStage[jobStage.p1][jobStage.p2][i]+"*" :
                                 "";
@@ -152,7 +152,7 @@ public class FlowerEFABuilder {
             {
                 resourceGuard = resourceGuard + " + " + RESOURCE_PREFIX + i +
                                 ") == " + resourceCapacities[i];
-                String and = feasibleEquation.isEmpty() ? "" : " & ";
+                final String and = feasibleEquation.isEmpty() ? "" : " & ";
                 feasibleEquation = feasibleEquation + and + resourceGuard;
             }
 
@@ -164,7 +164,7 @@ public class FlowerEFABuilder {
     public void buildEFA()
     {
         exAutomata = new ExtendedAutomata(module);
-        ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+        final ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
         module.getEventDeclListModifiable().add(
                         factory.createEventDeclProxy(
                                     factory.createSimpleIdentifierProxy(
@@ -183,27 +183,29 @@ public class FlowerEFABuilder {
 
         for(i = 0; i < nbrOfJobs; i++)
         {
-            ExtendedAutomaton efa = new ExtendedAutomaton("Job"+i, 
+            @SuppressWarnings("deprecation")
+            final
+            ExtendedAutomaton efa = new ExtendedAutomaton("Job"+i,
                                                           exAutomata,
                                                           true);
             efa.addState("J"+i, true, true, false);
 
             exAutomata.addEvent(LOAD_EVENT_PREFIX+i);
 
-            for(Integer init : jobToInitialStages.get(i))
+            for(final Integer init : jobToInitialStages.get(i))
             {
-                String targetStageVar = STAGE_PREFIX+i+init;
+                final String targetStageVar = STAGE_PREFIX+i+init;
 
                 String guard = "";
                 String action = targetStageVar+"+=1";;
 
                 for(int r = 0; r < nbrOfResources; r++)
                 {
-                    int targetDemand = demandAtStage[i][init][r];
+                    final int targetDemand = demandAtStage[i][init][r];
                     if(targetDemand > 0)
                     {
-                        String resourceVar = RESOURCE_PREFIX+r;
-                        String and = guard.isEmpty() ? "" : " & ";
+                        final String resourceVar = RESOURCE_PREFIX+r;
+                        final String and = guard.isEmpty() ? "" : " & ";
                         guard = guard + and + resourceVar + ">=" +
                                         targetDemand;
 
@@ -220,13 +222,13 @@ public class FlowerEFABuilder {
                                   action);
             }
 
-            for(Pair tran:jobToTransitions.get(i))
+            for(final Pair tran:jobToTransitions.get(i))
             {
                 String guard = "";
                 String action = "";
 
-                String sourceStageVar = STAGE_PREFIX+i+tran.p1;
-                String targetStageVar = STAGE_PREFIX+i+tran.p2;
+                final String sourceStageVar = STAGE_PREFIX+i+tran.p1;
+                final String targetStageVar = STAGE_PREFIX+i+tran.p2;
 
                 action = sourceStageVar + "-=1";
                 if(!jobToLastStages.get(i).contains(tran.p2))
@@ -236,19 +238,19 @@ public class FlowerEFABuilder {
 
                 for(int r = 0; r < nbrOfResources; r++)
                 {
-                    int sourceDemand = demandAtStage[i][tran.p1][r];
+                    final int sourceDemand = demandAtStage[i][tran.p1][r];
                     if(sourceDemand > 0)
                     {
-                        String resourceVar = RESOURCE_PREFIX+r;
+                        final String resourceVar = RESOURCE_PREFIX+r;
 
                         action = action + ";" + resourceVar+ "+=" +
                                           sourceDemand + ";";
                     }
 
-                    int targetDemand = demandAtStage[i][tran.p2][r];
+                    final int targetDemand = demandAtStage[i][tran.p2][r];
                     if(targetDemand > 0)
                     {
-                        String resourceVar = RESOURCE_PREFIX+r;
+                        final String resourceVar = RESOURCE_PREFIX+r;
                         guard = guard + " & " + resourceVar + ">=" +
                                         targetDemand;
 
@@ -260,10 +262,10 @@ public class FlowerEFABuilder {
                     }
 
                 }
-                
+
 
                 exAutomata.addEvent(sourceStageVar + targetStageVar);
-                efa.addTransition("J"+i, 
+                efa.addTransition("J"+i,
                                   "J"+i,
                                   (sourceStageVar + targetStageVar)+";",
                                   guard,
@@ -276,7 +278,7 @@ public class FlowerEFABuilder {
             {
                 exAutomata.addIntegerVariable(STAGE_PREFIX+i+j,
                                               0,
-                                              maxInstancesAtStage[i][j], 
+                                              maxInstancesAtStage[i][j],
                                               0,
                                               0);
             }
@@ -286,9 +288,9 @@ public class FlowerEFABuilder {
 
     class Pair
     {
-        private int p1;
-        private int p2;
-        Pair(int p1, int p2)
+        private final int p1;
+        private final int p2;
+        Pair(final int p1, final int p2)
         {
             this.p1 = p1;
             this.p2 = p2;
