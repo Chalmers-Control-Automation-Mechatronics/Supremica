@@ -160,24 +160,32 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
     int[] block = mBlocks.get(blockno);
     int offset = index & BLOCK_MASK;
-    int data = block[offset];
-    final int count = data & mSizeMask;
+    long data = block[offset];
+    final int count = (int)data & mSizeMask;
     final int[] result = new int[count];
     data = data >>> mSizeShift;
     int totalShifted = mSizeShift;
     for (int i = 0; i < count; i++)
     {
-        if (totalShifted >= 32)
+        if (totalShifted + mDataShift >= 32)
         {
           offset++;
           if (offset >= BLOCK_SIZE) {
             offset = 0;
             block = mBlocks.get(++blockno);
           }
-           totalShifted = 0;
-           data = block[offset];
+          final int bitsleft = 32 - totalShifted;
+
+           totalShifted = 0 - bitsleft;
+           long newblock = block[offset];
+           // negative? get rid of the upper 32 bits of 1's
+           newblock = newblock << 32;
+           newblock = newblock >>> 32;
+           newblock = newblock << bitsleft;
+           data |= (newblock);
         }
-        result[i] = data & mDataMask;
+        // this cast is OK as mDataMask < 32
+        result[i] = (int)data & mDataMask;
         data = data >>> mDataShift;
         totalShifted += mDataShift;
     }

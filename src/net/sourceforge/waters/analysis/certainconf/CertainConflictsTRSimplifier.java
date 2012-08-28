@@ -89,39 +89,17 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       return ListBufferTransitionRelation.CONFIG_ALL;
     }
 
-    protected void l(final String s) {
-      if (logging) System.out.println(s);
-    }
-    protected void l(final String s, final TIntHashSet tihs) {
-        l(s, tihs.toArray());
-    }
-    protected void l(final String s, final TIntArrayList tihs) {
-      l(s, tihs.toNativeArray());
-  }
-    protected void l(final String s, final int[] ia)
-    {
-        if (!logging) return;
-        System.out.print(s + " [");
-        for (int i = 0; i < ia.length; i++) {
-           if (i < ia.length - 1) System.out.print(ia[i]+",");
-           else System.out.print(ia[i]+"]\n");
-        }
-
-    }
     @Override
     protected boolean runSimplifier() throws AnalysisException
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-    // if (rel.getName().equals("certainconf")) logging = true;
-     //else logging = false;
-      logging = false;
-      l("Running on " + rel.getName());
+
       mBadStates = new TIntHashSet();
       if (updateBadStates(rel, true, -1) == 0) return false;
-      l("is blocking");
+
       if (rel.isUsedEvent(EventEncoding.TAU)) {
         mIsDeterministic = false;
-        l("tau used");
+
         final TauClosure closure =
           rel.createSuccessorsTauClosure(mTransitionLimit);
         mTauIterator = closure.createIterator();
@@ -140,7 +118,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
       if (mIsDeterministic)
       {
-        l("is deterministic...");
         final int dumpstate = detcertainconfalgo(rel);
         rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
         if (dumpstate > -1) rel.removeOutgoingTransitions(dumpstate);
@@ -148,7 +125,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
           rel.removeProperSelfLoopEvents();
           return true;
       }
-      l("not deterministic");
       // 1. Collect initial state set.
       final int numStates = rel.getNumberOfStates();
       final TIntArrayList init = new TIntArrayList();
@@ -166,7 +142,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
               }
           }
       }
-      l("init states", init);
       int last = 0;
       final int[] arrInit = init.toNativeArray();
       if (!init.isEmpty()) {
@@ -188,10 +163,8 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
       for (int source = 0; source < mSetOffsets.size(); source++) {
           final int set = mSetOffsets.get(source);
-          l("~~~~~~~~set: "+ set, mStateSetBuffer.getSet(set));
           for (final int event : mEventIndexes) {
           checkAbort();
-          l("looking at event " + event);
           // set iterators
           mEventIterator.resetEvent(event);
           iter.reset(set);
@@ -201,23 +174,18 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
           // for each state in current set
           while (iter.advance()) {
             final int state = iter.getCurrentData();
-            l("At state " + state);
             if (firstiter) leading = state;
             firstiter = false;
             mEventIterator.resume(state);
             while (mEventIterator.advance()) {
               final int target = mEventIterator.getCurrentTargetState();
-              final int s = mEventIterator.getCurrentSourceState();
-              l("iter advanced to " + target + " from " + s + " by event " + event);
               current.add(target);
-              //if (event == 0) current.add(s);
               if (state == leading) {
                 leadingcurrent.add(target);
               }
             }
           }
           if (current.isEmpty()) continue;
-          logging = false;
           if (!leadingcurrent.isEmpty()) {
             for (int l = 0; l < leadingcurrent.size(); l++) {
               // swap leading to the front
@@ -228,7 +196,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
               for (int i = 0; i < acurrent.length; i++) acurrent[i] = current.get(i);
 
               final int offset = mStateSetBuffer.add(acurrent);
-              l("Added new state set with id " + offset + ":", acurrent);
               final int target;
               if (offset > last) {
                   target = mSetOffsets.size();
@@ -236,17 +203,14 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
                       throw new OverflowException(OverflowKind.STATE, mStateLimit);
                   }
                   mSetOffsets.add(offset);
-                  l("mSetOffsets is now: ",mSetOffsets.toNativeArray());
                   last = offset;
               } else {
                   target = mSetOffsets.binarySearch(offset);
               }
               // add transitions for each permutation we just added
               mTransitionBuffer.addTransition(source, event, target);
-              l("--New Transition from " + source + " to " + target + " with event " + event);
             }
           }
-          logging = false;
           current.clear();
           leadingcurrent.clear();
         }
@@ -288,7 +252,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
         final int dumpstate = certainconfalgo(rel);
         rel = getTransitionRelation();
-        l("dumpstate is " + dumpstate);
         rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
         if (dumpstate > -1) rel.removeOutgoingTransitions(dumpstate);
         rel.checkReachability();
@@ -302,6 +265,8 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         final int[] allBadStates = mBadStates.toArray();
         Arrays.sort(allBadStates);
         final int dumpstate = allBadStates[0];
+        mBadStatesLevels = new int[rel.getNumberOfStates()];
+        for (int i = 0; i < mBadStatesLevels.length; i++) mBadStatesLevels[i] = 0;
 
         for (int i = 0; i < mBadStates.size(); i++)
         {
@@ -322,7 +287,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
                     {
                         rel.setInitial(dumpstate, true);
                         rel.setInitial(s, false); // its being set afterwards
-                        l("dSetting " + s + " no initial");
                     }
                 }
                 iter.remove();
@@ -333,7 +297,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
     protected int certainconfalgo(ListBufferTransitionRelation rel) throws AnalysisException
     {
-      logging = false;
       // to determine when no new states have been added to bad states
       boolean brothersAdded = false;
       // keep track of bad states
@@ -343,12 +306,10 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
       // total number of states
       //final int numStates = rel.getNumberOfStates();
-      l("start of certain conf");
       int level = 0;
       do
       {
           final int before = updateBadStates(rel, false, level++);
-          l("mBadStates is now: ",mBadStates.toArray());
           if (before == 0) return -1;
           // find brothers of bad states (they'll be added to mBadStates
           // and go again if new states were added.
@@ -358,13 +319,14 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       // select dump state as first item
       int[] allBadStates = mBadStates.toArray();
 
-      l("!!!!!All Bad States: ", allBadStates);
 
-      if (isFindingCounterExample) return -1;
 
+          mOptimisationUsed = false;
           if (CheckAllBad() && mOldRel.getNumberOfStates() < rel.getNumberOfStates() && mOldRel.getNumberOfTransitions() < rel.getNumberOfTransitions())
           {
             // replace rel with oldrel
+            mOptimisationUsed = true;
+            if (isFindingCounterExample) return -1;
             setTransitionRelation(mOldRel);
             rel = getTransitionRelation();
               mBadStates = new TIntHashSet();
@@ -377,11 +339,8 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
               }
               allBadStates = mBadStates.toArray();
           }
-
-
           Arrays.sort(allBadStates);
-
-
+          if (isFindingCounterExample) return -1;
 
       final int dumpstate = allBadStates[0];
       rel.setMarked(dumpstate, getDefaultMarkingID(), false);
@@ -390,28 +349,22 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       {
           final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
           final int s = allBadStates[i];
-          l("looking at " + s);
-          l(s + " is initial: " + rel.isInitial(s));
           iter.resetState(s);
           if (rel.isInitial(s))
           {
               rel.setInitial(s, false);
               rel.setInitial(dumpstate, true);
-              l("Setting " + s + " no initial");
           }
           while (iter.advance())
           {
 
               final int from = iter.getCurrentSourceState();
-l("Found a transition coming into " + s + " from " + from);
               if (i == 0 && !mBadStates.contains(from))
                   continue;
               if (!mBadStates.contains(from))
               {
-                  l("redirecting to dump state");
                   rel.addTransition(from, iter.getCurrentEvent(), dumpstate);
               }
-             l("aaand removing it");
               iter.remove();
 
           }
@@ -421,40 +374,28 @@ l("Found a transition coming into " + s + " from " + from);
 
     protected boolean CheckAllBad()
     {
-        l("starting all bad check");
         final int[] allBadStates = mBadStates.toArray();
-        l("there are "  + mBadStates.size() + " bad states");
         for (int i = 0; i < mBadStates.size(); i++)
         {
-          l("looking at bad state " + allBadStates[i]);
             final int badSetoffset = mSetOffsets.get(allBadStates[i]);
             final int[] badSet = mStateSetBuffer.getSet(badSetoffset);
-            l("it is ",badSet);
             final int originalBad = badSet[0];
-            l("Finding all with start of " + originalBad);
             boolean returnVal = true;
             for (int j = 0; j < mStateSetBuffer.size(); j++)
             {
                 final int testoffset = mSetOffsets.get(j);
                 final int[] test = mStateSetBuffer.getSet(testoffset);
-                l("Checking", test);
                 final int nTest = test[0];
                 if (nTest == originalBad)
                 {
                     if (!mBadStates.contains(j))
                     {
-                        l("Ah! Not bad!",test);
                         returnVal = false;
-                    }
-                    else
-                    {
-                        l("found at ");
                     }
 
                 }
             }
             if (!returnVal) return false;
-            else l("All ok");
         }
 
         return true;
@@ -463,7 +404,6 @@ l("Found a transition coming into " + s + " from " + from);
 
     protected int findBrothers(final ListBufferTransitionRelation rel, final int level)
     {
-      l("========looking for brothers===========");
       final int[] arr_mBadStates = mBadStates.toArray();
 
       for (int i = 0; i < arr_mBadStates.length; i++)
@@ -471,8 +411,6 @@ l("Found a transition coming into " + s + " from " + from);
           final int currentbadoffset = mSetOffsets.get(arr_mBadStates[i]);
 
           final int[] badStateSet = mStateSetBuffer.getSet(currentbadoffset);
-          l("looking for brothers of " + arr_mBadStates[i]);
-          l("state set is", badStateSet);
 
           //now permute badStateSet
           // first order it, but remember what was originally first, no need to do that one again
@@ -494,8 +432,6 @@ l("Found a transition coming into " + s + " from " + from);
               if (testinbuffer > -1) {
                   final int stateNum = mSetOffsets.binarySearch(testinbuffer);
                   if (mBadStates.add(stateNum)) mBadStatesLevels[stateNum] = level;
-
-                  l("brother found: " + testinbuffer);
               }
           }
       }
@@ -516,7 +452,6 @@ l("Found a transition coming into " + s + " from " + from);
     {
         final TransitionIterator prediter = rel.createPredecessorsReadOnlyIterator();
         final int defaultID = getDefaultMarkingID();
-        l("========looking for bad states===========");
         final int numStates = rel.getNumberOfStates();
         final TIntHashSet coreachableStates = new TIntHashSet(numStates);
         final TIntStack unvisitedStates = new TIntStack();
@@ -524,7 +459,6 @@ l("Found a transition coming into " + s + " from " + from);
         // marked state
         for (int sourceID = 0; sourceID < numStates; sourceID++)
         {
-            if (rel.isMarked(sourceID, defaultID)) l(sourceID + " is marked");
             if (rel.isMarked(sourceID, defaultID) &&
                 rel.isReachable(sourceID) &&
                 !mBadStates.contains(sourceID) &&
@@ -550,16 +484,22 @@ l("Found a transition coming into " + s + " from " + from);
             }
         }
         // Blacklist states which cannot reach a state marked.
-
         for (int sourceID = 0; sourceID < numStates; sourceID++) {
             if (rel.isReachable(sourceID) && !coreachableStates.contains(sourceID)) {
-                if (mBadStates.add(sourceID) && level > -1) mBadStatesLevels[sourceID] = level;
+                //if (mBadStates.add(sourceID))
+                  mBadStates.add(sourceID);
+                 // {
+                  if (level > -1) // level == -1 if initial badstates check
+                  {
+                    if (mBadStatesLevels[sourceID] == -1) mBadStatesLevels[sourceID] = level;
+                  }
+
+                 // }
                 // remove marking
-                l("Found " + sourceID);
+
                 if (!intial && isFindingCounterExample) rel.setMarked(sourceID, getDefaultMarkingID(), false);
             }
         }
-        l("There are now " + mBadStates.size() + " bad states");
         return mBadStates.size();
     }
 
@@ -598,7 +538,7 @@ l("Found a transition coming into " + s + " from " + from);
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
           numReachable++;
-          if (mBadStatesLevels[state] >= level) {
+          if (mBadStatesLevels[state] <= level && mBadStatesLevels[state] > -1) {
             numCritical++;
           }
         }
@@ -617,7 +557,7 @@ l("Found a transition coming into " + s + " from " + from);
           states[state] = memstate;
           reachable.add(memstate);
           final int info = mBadStatesLevels[state];
-          if (info != -1 && info >= level) {
+          if (info != -1 && info <= level) {
             final TransitionProxy trans =
               factory.createTransitionProxy(memstate, checkedProposition, memstate);
             transitions.add(trans);
@@ -645,6 +585,54 @@ l("Found a transition coming into " + s + " from " + from);
                                           events, reachable, transitions);
     }
 
+    public int[] getStateSet(final int state)
+    {
+      int[] set;
+      if (mIsDeterministic)
+      {
+          set = new int[1];
+          set[0] = state;
+      } else
+      {
+        final int offset = mSetOffsets.get(state);
+        set = mStateSetBuffer.getSet(offset);
+      }
+
+      return set;
+    }
+
+    public ArrayList<Integer> getStateSetArrayList(final int state)
+    {
+        final ArrayList<Integer> ali = new ArrayList<Integer>();
+        final int[] set = getStateSet(state);
+        for (int i = 0; i < set.length; i++)
+        {
+            ali.add(set[i]);
+        }
+        return ali;
+    }
+
+    public int findStateFromSet(final int[] stateSet)
+    {
+      if (mIsDeterministic)
+      {
+          if (stateSet.length > 1) return -1;
+          return stateSet[0];
+
+      } else {
+
+        final int testinbuffer = mStateSetBuffer.get(stateSet);
+        if (testinbuffer == -1) return -1;
+        return mSetOffsets.binarySearch(testinbuffer);
+      }
+    }
+
+    public boolean getWasOptimisationUsed()
+    {
+
+      return mOptimisationUsed;
+    }
+
 
     //#########################################################################
     //# Data Members
@@ -661,8 +649,8 @@ l("Found a transition coming into " + s + " from " + from);
     private IntSetBuffer mStateSetBuffer;
     private PreTransitionBuffer mTransitionBuffer;
     private ListBufferTransitionRelation mOldRel;
-    private boolean logging; // temporary variable to enable console messages
     private int numInit; // number of initial states
     private boolean isFindingCounterExample;
+    private boolean mOptimisationUsed;
 
 }
