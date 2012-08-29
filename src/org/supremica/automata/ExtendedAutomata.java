@@ -248,15 +248,15 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                     double ub = Math.abs(upperBound);
 
                     if (ub >= lb) {
-                        currDomain = ((int) Math.pow(2, (int) Math.ceil(Math.log(ub + 1) / Math.log(2)) + 1)) + 1;
+                        currDomain = ((int) Math.pow(2, (int) Math.ceil(Math.log(ub + 1) / Math.log(2)) + 1));
                     } else {
-                        currDomain = ((int) Math.pow(2, (int) Math.ceil(Math.log(lb) / Math.log(2)) + 1)) + 1;
+                        currDomain = ((int) Math.pow(2, (int) Math.ceil(Math.log(lb) / Math.log(2)) + 1));
                     }
 
                 } else {
                     currDomain = upperBound + 1;
                 }
-
+                
                 var2domainMap.put(var.getName(), currDomain);
 
                 if (currDomain > domain) {

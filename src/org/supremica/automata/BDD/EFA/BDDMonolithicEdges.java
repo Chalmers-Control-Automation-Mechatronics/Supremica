@@ -135,6 +135,7 @@ public class BDDMonolithicEdges
         uncontrollableEdgesBackwardBDD = uncontrollableEdgesBackwardBDD.exist(bddExAutomata.getEventVarSet());
 
         forcibleEdgesForwardBDD = edgesForwardBDD.and(bddExAutomata.forcibleEventsBDD);
+//        forcibleEdgesForwardBDD.printDot();
         forcibleEdgesForwardBDD = forcibleEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());
 
 //        if(!uncontrollableEdgesForwardBDD.isZero())

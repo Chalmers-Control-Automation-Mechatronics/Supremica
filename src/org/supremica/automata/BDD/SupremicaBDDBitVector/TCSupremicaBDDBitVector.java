@@ -64,17 +64,17 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
     protected void initialize(final long val)
     {
-        long absVal = Math.abs(val);
+        long absVal = Math.abs(val);        
         for (int n = 0; n < bitNum; n++)
         {
             if ((absVal & 0x1) != 0)
                 bitvec[n] = mFactory.one();
             else
                 bitvec[n] = mFactory.zero();
-
+            
             absVal >>= 1;
         }
-        if (val<0)
+        if (val < 0)
         {
             final TCSupremicaBDDBitVector res = toTwosComplement();
             System.arraycopy(res.bitvec, 0, bitvec, 0, bitNum);
@@ -154,11 +154,12 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
             if(n < that.bitNum)
                 rightBDD = that.bitvec[n];
-
+            
             final BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.biimp);
             final BDD tmp2 = tmp1.and(p);
             p = tmp2;
         }
+        
         return p;
     }
 
