@@ -80,7 +80,7 @@ public abstract class BDDAbstractManager {
         } else if (P_TC == 1) {
             TCSupremicaBDDBitVector output = new TCSupremicaBDDBitVector(getFactory(), domain);
             if (!negativesIncluded) {
-                output.setBit(output.length() - 1, getZeroBDD());
+                output.setBit(output.length() - 1, factory.ithVar(domain.vars()[0]).not());
             }
 
             return output;
@@ -400,7 +400,6 @@ public abstract class BDDAbstractManager {
         if (guards != null && guards.size() > 0) {
             //Only the first guard should be considered. If there are more, it will just affect the GUI.
             guardBDD = guard2BDD(guards.get(0));
-//            guardBDD.printDot();
         }
 
         //Add guard to event and source and dest state
@@ -543,6 +542,16 @@ public abstract class BDDAbstractManager {
 
         return nextStates;
     }
+    
+    BDD image_preImage(final BDD states, final BDD transitions) {
+        BDD nextStates = transitions.relprod(states.id(), bddExAutomata.getSourceStatesVarSet());
+
+        nextStates.replaceWith(bddExAutomata.getDestToSourceLocationPairing());
+        nextStates.replaceWith(bddExAutomata.getDestToSourceVariablePairing());
+
+        return nextStates;
+    }
+    
 
     BDD timeEvolDest(final BDD states, final BDD clocksEvol) {
         BDD output = states.id();

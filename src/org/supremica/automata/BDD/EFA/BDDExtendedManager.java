@@ -91,19 +91,22 @@ public class BDDExtendedManager extends BDDAbstractManager {
             Qkn = Qkn.or(forbidden);
             bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(Qkn);
         }
+
         do {
 //            System.out.println("UBackward: "+iteration++);
             Qk = Qkn.id();
-            newUCstates = image_preImage(Qk, t_u, backwardTime);
+            newUCstates = image_preImage(Qk, t_u);            
+            Qkn = Qk.or(newUCstates); 
+            BDD ucDueToTime = getZeroBDD();
             if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
-                //remove the states from newUCstates that are not uncontrollable due to forcible events
-                newCstates = newUCstates.and(bddEdges.getMonolithicForcibleEdgesForwardBDD().exist(bddExAutomata.getDestStatesVarSet()));
+                ucDueToTime = timeEvolSource(newUCstates, backwardTime).and(newUCstates.not());
+                newCstates = ucDueToTime.and(bddEdges.getMonolithicForcibleEdgesForwardBDD().exist(bddExAutomata.getDestStatesVarSet()));
                 newCstates = timeEvolSource(newCstates, backwardTime);
-                newUCstates = newUCstates.and(newCstates.not());
-                newUCstates = timeEvolSource(newUCstates, forwardTime);
-                bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(newUCstates);
+                ucDueToTime = ucDueToTime.and(newCstates.not());
+                ucDueToTime = timeEvolSource(ucDueToTime, forwardTime);
+                bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(ucDueToTime);
             }
-            Qkn = Qk.or(newUCstates);
+            Qkn = Qkn.or(ucDueToTime);
         } while (!Qkn.equals(Qk));
 
         System.err.println("Exiting uncontrollableBackward...");

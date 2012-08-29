@@ -1089,6 +1089,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             //System.err.println("Reachable states computed!" + ": " + reachableStatesBDD.satCount(sourceStateVarSet));
 
             //nbrOfReachableStates = nbrOfStatesBDD(reachableStatesBDD);
+            
+//            reachableStatesBDD.printDot();
+//            System.err.println("sat number of reachable states: "+reachableStatesBDD.satCount(sourceStateVarSet));
+            
+//            reachableStatesBDD.printDot();
             final IDD idd = generateIDD(reachableStatesBDD, reachableStatesBDD);
             nbrOfReachableStates = nbrOfStatesIDD(idd).longValue();
             System.err.println(nbrOfReachableStates + " reachable states found.");
@@ -1152,6 +1157,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             }
 
             System.err.println("Nonblocking and controllable states computed!");
+            
 
             nonblockingControllableStatesBDD = fitIntoClockDomains(nonblockingControllableStatesBDD);
 
