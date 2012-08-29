@@ -260,11 +260,11 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 var2domainMap.put(var.getName(), currDomain);
 
                 if (currDomain > domain) {
-                    domain = currDomain;
-                    if (clocks.contains(var)) {
-                        largestClockDomain = currDomain;
-                    }
+                    domain = currDomain;                    
                 }
+                if (clocks.contains(var) && currDomain > largestClockDomain) {
+                        largestClockDomain = currDomain;
+                }                
             }
         }
 
