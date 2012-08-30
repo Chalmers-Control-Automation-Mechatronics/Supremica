@@ -132,8 +132,8 @@ public class EventDeclEditorDialog
     mNameInput.requestFocusInWindow();
     setVisible(true);
     mActionListeners = new LinkedList<ActionListener>();
+    setMinimumSize(getSize());
   }
-
 
   //#########################################################################
   //# Access to Created Item
@@ -265,7 +265,7 @@ public class EventDeclEditorDialog
         mChosenColor = geo.getColorSet().iterator().next();
       }
     }
-    if (mDisplayingMoreOptions && mIndexPanel == null) {
+    if (mDisplayingMoreOptions && mExtendedPanel == null) {
       // Initialising with more options, and index panel not used before.
       // Need to create extra components for name panel ...
       mObservableButton = new JCheckBox("Observable");
@@ -316,7 +316,7 @@ public class EventDeclEditorDialog
       mPropositionButton.addActionListener(kindlistener);
       updateColorEnabled();
       // ... and create index panel.
-      mIndexPanel = new RaisedDialogPanel();
+      mExtendedPanel = new RaisedDialogPanel();
       final List<SimpleExpressionSubject> ranges =
         template.getRangesModifiable();
       final List<SimpleExpressionSubject> copy =
@@ -379,10 +379,10 @@ public class EventDeclEditorDialog
       mIndexDownButton = new JButton(mIndexDownAction);
       mIndexDownButton.setRequestFocusEnabled(false);
       updateListControlEnabled();
-      layoutIndexPanel();
       final Map<String,String> attribs = template.getAttributes();
       mAttributesPanel = new EventDeclAttributesPanel(attribs);
       mAttributesPanel.setFocusTraversalKeys(forward, backward);
+      layoutIndexAndAttributesPanel();
     }
   }
 
@@ -403,6 +403,7 @@ public class EventDeclEditorDialog
     constraints.weightx = 1.0;
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     if (mDisplayingMoreOptions) {
+      setMinimumSize(getSize());
       constraints.weighty = 0.0;
       constraints.fill = GridBagConstraints.HORIZONTAL;
       layoutExtendedNamePanel();
@@ -414,14 +415,11 @@ public class EventDeclEditorDialog
     layout.setConstraints(mNamePanel, constraints);
     contents.add(mNamePanel);
 
-    mExtendedPanel = new RaisedDialogPanel();
     if (mDisplayingMoreOptions) {
       constraints.weighty = 1.0;
       constraints.fill = GridBagConstraints.BOTH;
-      layout.setConstraints(mIndexPanel, constraints);
-      contents.add(mIndexPanel);
-      layout.setConstraints(mAttributesPanel, constraints);
-      contents.add(mAttributesPanel);
+      layout.setConstraints(mExtendedPanel, constraints);
+      contents.add(mExtendedPanel);
       constraints.weighty = 0.0;
       constraints.fill = GridBagConstraints.HORIZONTAL;
     }
@@ -570,15 +568,15 @@ public class EventDeclEditorDialog
 
 
   /**
-   * Fill and layout the index panel for the extended version of the
-   * dialog. This method is called only once when the index panel is
+   * Fill and layout the index and attribute panels for the extended version
+   * of the dialog. This method is called only once when the index panel is
    * first created, and sets up the components and their action listeners
    * add the same time.
    */
-  private void layoutIndexPanel()
+  private void layoutIndexAndAttributesPanel()
   {
     final GridBagLayout layout = new GridBagLayout();
-    mIndexPanel.setLayout(layout);
+    mExtendedPanel.setLayout(layout);
     final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridx = 0;
     constraints.gridy = 0;
@@ -591,7 +589,7 @@ public class EventDeclEditorDialog
     constraints.gridheight = 4;
     constraints.anchor = GridBagConstraints.NORTHWEST;
     layout.setConstraints(label, constraints);
-    mIndexPanel.add(label);
+    mExtendedPanel.add(label);
     // List
     constraints.gridx++;
     constraints.weightx = 1.0;
@@ -600,22 +598,47 @@ public class EventDeclEditorDialog
     final Border border = BorderFactory.createLoweredBevelBorder();
     scrolled.setBorder(border);
     layout.setConstraints(scrolled, constraints);
-    mIndexPanel.add(scrolled);
+    mExtendedPanel.add(scrolled);
     // List control buttons
     constraints.gridx++;
     constraints.weightx = 0.0;
+    constraints.weighty = 3.0;
     constraints.gridheight = 1;
+    constraints.anchor = GridBagConstraints.SOUTHWEST;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mIndexAddButton, constraints);
-    mIndexPanel.add(mIndexAddButton);
+    mExtendedPanel.add(mIndexAddButton);
     constraints.gridy++;
+    constraints.weighty = 0.0;
+    constraints.anchor = GridBagConstraints.WEST;
     layout.setConstraints(mIndexRemoveButton, constraints);
-    mIndexPanel.add(mIndexRemoveButton);
+    mExtendedPanel.add(mIndexRemoveButton);
     constraints.gridy++;
+    constraints.anchor = GridBagConstraints.WEST;
     layout.setConstraints(mIndexUpButton, constraints);
-    mIndexPanel.add(mIndexUpButton);
+    mExtendedPanel.add(mIndexUpButton);
     constraints.gridy++;
+    constraints.weighty = 3.0;
+    constraints.anchor = GridBagConstraints.NORTHWEST;
     layout.setConstraints(mIndexDownButton, constraints);
-    mIndexPanel.add(mIndexDownButton);
+    mExtendedPanel.add(mIndexDownButton);
+
+    constraints.gridx = 0;
+    constraints.gridy++;
+    constraints.gridwidth = 1;
+    constraints.weighty = 1.0;
+    constraints.fill = GridBagConstraints.NONE;
+    constraints.insets = new Insets(0, 0, 0, 0);
+    final JLabel attributesLabel = new JLabel(AttributesPanel.LABEL_NAME);
+    layout.setConstraints(attributesLabel, constraints);
+    mExtendedPanel.add(attributesLabel);
+
+    constraints.gridx++;
+    constraints.gridwidth = 2;
+    constraints.weightx = 3.0;
+    constraints.fill = GridBagConstraints.BOTH;
+    layout.setConstraints(mAttributesPanel, constraints);
+    mExtendedPanel.add(mAttributesPanel);
   }
 
 
@@ -686,12 +709,19 @@ public class EventDeclEditorDialog
     createComponents();
     layoutComponents();
     pack();
+    if(mDisplayingMoreOptions){
+      setMinimumSize(MIN_MORE_OPTIONS_SIZE);
+    }
+    else{
+      setMinimumSize(MIN_LESS_OPTIONS_SIZE);
+      setSize(MIN_LESS_OPTIONS_SIZE);
+    }
+
     mNameInput.requestFocusInWindow();
     if (restorer != null) {
       SwingUtilities.invokeLater(restorer);
     }
   }
-
 
   /**
    * Enables or disables the 'required' checkbox.
@@ -950,7 +980,7 @@ public class EventDeclEditorDialog
       final ScopeKind scope;
       final List<SimpleExpressionSubject> ranges;
       final Map<String,String> attribs;
-      if (mIndexPanel != null) {
+      if (mExtendedPanel != null) {
         observable = mObservableButton.isSelected();
         if (!mParameterButton.isSelected()) {
           scope = ScopeKind.LOCAL;
@@ -1354,7 +1384,7 @@ public class EventDeclEditorDialog
   private JButton mColorButton;
   private JPanel mColorDisplay;
   private JButton mMoreOptionsButton;
-  private JPanel mIndexPanel;
+  private JPanel mExtendedPanel;
   private ListTableModel<SimpleExpressionSubject> mIndexModel;
   private NonTypingTable mIndexTable;
   private Action mIndexAddAction;
@@ -1369,7 +1399,6 @@ public class EventDeclEditorDialog
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
-  private JPanel mExtendedPanel;
 
   // Action Listeners
   private final List<ActionListener> mActionListeners;
@@ -1404,5 +1433,7 @@ public class EventDeclEditorDialog
     new SimpleIdentifierSubject("");
   private static final EventDeclSubject TEMPLATE =
     new EventDeclSubject(TEMPLATE_IDENT, EventKind.CONTROLLABLE);
+  private static Dimension MIN_LESS_OPTIONS_SIZE = new Dimension(485, 195);
+  private static Dimension MIN_MORE_OPTIONS_SIZE = new Dimension(502, 437);
 
 }

@@ -30,6 +30,7 @@ public class Actions extends WatersActionManager
         super(ide);
         addAction(new NewAction(ide));
         addAction(new OpenAction(ide));
+        addAction(new OpenRASAction(ide));
         addAction(new SaveAction(ide));
         addAction(new SaveAsAction(ide));
         addAction(new ImportAction(ide));

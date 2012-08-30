@@ -72,6 +72,7 @@ public class NodeEditorDialog
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
+    setMinimumSize(getSize());
   }
 
 //#########################################################################
@@ -215,6 +216,7 @@ public class NodeEditorDialog
     constraints.gridwidth = 2;
     constraints.weightx = 3.0;
     constraints.fill = GridBagConstraints.BOTH;
+    constraints.insets = new Insets(0, 0, 0, 0);
     mainlayout.setConstraints(mAttributesPanel, constraints);
     mMainPanel.add(mAttributesPanel);
 

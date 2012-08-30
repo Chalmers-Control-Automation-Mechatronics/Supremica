@@ -77,6 +77,7 @@ public class ConstantAliasEditorDialog
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
+    setMinimumSize(getSize());
   }
 
 

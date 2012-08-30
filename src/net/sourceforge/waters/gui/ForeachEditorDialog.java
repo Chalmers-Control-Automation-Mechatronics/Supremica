@@ -85,6 +85,7 @@ public class ForeachEditorDialog
     setLocationRelativeTo(mRoot.getRootWindow());
     mVariableInput.requestFocusInWindow();
     setVisible(true);
+    setMinimumSize(getSize());
   }
 
 

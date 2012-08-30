@@ -15,6 +15,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -129,6 +130,7 @@ class AttributesPanel extends JPanel
     final GridBagLayout layout = new GridBagLayout();
     setLayout(layout);
     final GridBagConstraints constraints = new GridBagConstraints();
+    constraints.insets = INSETS;
     constraints.gridx = 0;
     constraints.gridy = 0;
     constraints.weightx = 1.0;
@@ -144,12 +146,13 @@ class AttributesPanel extends JPanel
     // List control buttons
     constraints.gridx++;
     constraints.weightx = 0.0;
-    constraints.gridheight = 2;
+    constraints.weighty = 1.0;
+    constraints.gridheight = 1;
     constraints.anchor = GridBagConstraints.SOUTHWEST;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mAddButton, constraints);
     add(mAddButton);
-    constraints.gridy+=2;
+    constraints.gridy++;
     constraints.anchor = GridBagConstraints.NORTHWEST;
     layout.setConstraints(mRemoveButton, constraints);
     add(mRemoveButton);
@@ -442,7 +445,7 @@ class AttributesPanel extends JPanel
         throw new IllegalArgumentException
           ("Unknown column " + column + " in attribute table!");
       }
-      final String text = value.toString();      
+      final String text = value.toString();
       final DefaultComboBoxModel model =
         completions == null ?
         new DefaultComboBoxModel() :
@@ -499,8 +502,8 @@ class AttributesPanel extends JPanel
     }
 
     // A condition could be added to check if the model contains any clocks
-    ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());    
-    ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());    
+    ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());
+    ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());
     //=======================================================================
   }
 
@@ -540,6 +543,7 @@ class AttributesPanel extends JPanel
   //# Class Constants
   private static final long serialVersionUID = 1L;
 
+  private static final Insets INSETS = new Insets(2, 4, 2, 4);
   public static final String LABEL_NAME = "Attributes:";
   private static final String[] COLUMNS = {"Key", "Value"};
   private static final String[] EMPTY_ROW = {"", ""};

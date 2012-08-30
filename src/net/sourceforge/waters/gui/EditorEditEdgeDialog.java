@@ -45,7 +45,6 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
-
 import org.supremica.gui.Utility;
 
 
@@ -76,6 +75,7 @@ public class EditorEditEdgeDialog
                               final ModuleWindowInterface root)
   {
 	super(root.getRootWindow());
+    setMinimumSize(MIN_SIZE);
     mEdge = edge;
     mRoot = root;
 
@@ -320,5 +320,6 @@ public class EditorEditEdgeDialog
   private static final long serialVersionUID = 1L;
   private static final int fieldHeight = 100;
   private static final int fieldWidth = 200;
+  private static Dimension MIN_SIZE = new Dimension(273, 284);
 
 }

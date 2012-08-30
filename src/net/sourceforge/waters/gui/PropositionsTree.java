@@ -36,7 +36,7 @@ public class PropositionsTree extends ModuleTree
 
   ListSubject<? extends ProxySubject> getRootList()
   {
-    return ((NodeSubject) getRoot()).getPropositions().getEventListModifiable();
+    return ((NodeSubject) getRoot()).getPropositions().getEventIdentifierListModifiable();
   }
 
   String getRootName()

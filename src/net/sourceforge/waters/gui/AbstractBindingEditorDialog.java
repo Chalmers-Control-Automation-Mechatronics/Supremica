@@ -71,6 +71,7 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
+    setMinimumSize(getSize());
   }
 
 

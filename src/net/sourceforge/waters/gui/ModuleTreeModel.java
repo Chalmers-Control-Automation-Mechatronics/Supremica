@@ -406,7 +406,7 @@ class ModuleTreeModel
     @Override
     public ListSubject<? extends ProxySubject> visitGroupNodeProxy(final GroupNodeProxy simple){
       final GroupNodeSubject node = (GroupNodeSubject)simple;
-      return node.getPropositions().getEventListModifiable();
+      return node.getPropositions().getEventIdentifierListModifiable();
     }
 
     public IndexedListSubject<ParameterBindingSubject> visitInstanceProxy(final InstanceProxy inst)
@@ -435,7 +435,7 @@ class ModuleTreeModel
     @Override
     public ListSubject<? extends ProxySubject> visitSimpleNodeProxy(final SimpleNodeProxy simple){
       final SimpleNodeSubject node = (SimpleNodeSubject)simple;
-      return node.getPropositions().getEventListModifiable();
+      return node.getPropositions().getEventIdentifierListModifiable();
     }
   }
 
