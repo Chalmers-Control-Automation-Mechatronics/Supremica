@@ -1195,7 +1195,12 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
       final List<AutomatonProxy> singleton = Collections.singletonList(aut);
       final Candidate candidate = new Candidate(singleton, local);
-      result |= applyCandidate(candidate);
+      try {
+        result |= applyCandidate(candidate);
+      } catch (final OverflowException exception) {
+        // TODO Add to mOverflowCandidates? What about local events changing?
+        recordUnsuccessfulComposition();
+      }
     }
     return result;
   }

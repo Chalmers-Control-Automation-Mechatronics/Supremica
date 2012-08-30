@@ -92,6 +92,7 @@ public class InstanceEditorDialog extends JDialog
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
+    setMinimumSize(getSize());
   }
 
   private void createComponents()

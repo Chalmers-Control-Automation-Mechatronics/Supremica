@@ -2183,19 +2183,21 @@ public class GraphEditorPanel
           else{
             mLastNodeCommand = null;
           }
-        } else if (event.getClickCount() == 2 && mFocusedObject != null
-                   && mFocusedObject instanceof LabelGeometrySubject) {
-          // Double-click to rename nodes
-          final SimpleNodeSubject node =
+        } else if (event.getClickCount() == 2 && mFocusedObject != null) {
+          if (mFocusedObject instanceof LabelGeometrySubject) {
+            final SimpleNodeSubject node =
             (SimpleNodeSubject) mFocusedObject.getParent();
-          editStateName(node);
+            editStateName(node);
+          }
+          else if(mFocusedObject instanceof SimpleNodeSubject){
+            final SimpleNodeSubject node = (SimpleNodeSubject)mFocusedObject;
+            NodeEditorDialog.showDialog(node, mRoot);
+          }
         } else {
           mLastNodeCommand = null;
         }
       }
     }
-
-    Command mLastNodeCommand = null;
 
     public void mouseDragged(final MouseEvent event)
     {
@@ -2226,6 +2228,7 @@ public class GraphEditorPanel
       super.mouseDragged(event);
     }
 
+    Command mLastNodeCommand = null;
   }
 
 
@@ -2248,6 +2251,20 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.awt.MouseListener
+    public void mouseClicked(final MouseEvent event)
+    {
+      super.mouseClicked(event);
+      //double clicks
+      if (event.getButton() == MouseEvent.BUTTON1 &&
+          event.getClickCount() == 2 &&
+          mFocusedObject != null) {
+         if(mFocusedObject instanceof GroupNodeSubject){
+          final GroupNodeSubject node = (GroupNodeSubject)mFocusedObject;
+          NodeEditorDialog.showDialog(node, mRoot);
+        }
+      }
+    }
+
     public void mousePressed(final MouseEvent event)
     {
       abortExternalDrag(event);

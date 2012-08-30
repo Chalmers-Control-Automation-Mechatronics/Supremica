@@ -81,6 +81,7 @@ public class SimpleComponentEditorDialog
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
+    setMinimumSize(getSize());
   }
 
 
@@ -203,7 +204,7 @@ public class SimpleComponentEditorDialog
   {
     final GridBagConstraints constraints = new GridBagConstraints();
     constraints.weightx = 1.0;
-    constraints.weighty = 1.0;
+    constraints.weighty = 0.0;
     constraints.insets = INSETS;
 
     // First, layout the main panel ...
@@ -265,6 +266,23 @@ public class SimpleComponentEditorDialog
     mainlayout.setConstraints(mDeterministicButton, constraints);
     mMainPanel.add(mDeterministicButton);
 
+    constraints.gridx = 0;
+    constraints.gridy++;
+    constraints.gridwidth = 1;
+    constraints.weightx = 0.0;
+    constraints.weighty = 1.0;
+    constraints.fill = GridBagConstraints.NONE;
+    constraints.anchor = GridBagConstraints.NORTHWEST;
+    final JLabel attributesLabel = new JLabel(AttributesPanel.LABEL_NAME);
+    mainlayout.setConstraints(attributesLabel, constraints);
+    mMainPanel.add(attributesLabel);
+
+    constraints.gridx++;
+    constraints.gridwidth = 2;
+    constraints.weightx = 3.0;
+    constraints.fill = GridBagConstraints.BOTH;
+    mainlayout.setConstraints(mAttributesPanel, constraints);
+    mMainPanel.add(mAttributesPanel);
     // Attributes, error, and buttons panel do not need layouting.
 
     // Finally, build the full dialog ...
@@ -275,15 +293,13 @@ public class SimpleComponentEditorDialog
     constraints.gridy = GridBagConstraints.RELATIVE;
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.weightx = 1.0;
-    constraints.weighty = 0.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.weighty = 1.0;
+    constraints.fill = GridBagConstraints.BOTH;
     constraints.insets = new Insets(0, 0, 0, 0);
     layout.setConstraints(mMainPanel, constraints);
     contents.add(mMainPanel);
-    constraints.weighty = 1.0;
-    constraints.fill = GridBagConstraints.BOTH;
-    layout.setConstraints(mAttributesPanel, constraints);
-    contents.add(mAttributesPanel);
+
+
     constraints.weighty = 0.0;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mErrorPanel, constraints);

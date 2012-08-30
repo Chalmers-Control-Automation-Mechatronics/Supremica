@@ -37,8 +37,8 @@
                 <EdgeList>
                     <Edge Target="RQ" Source="IN">
                         <LabelBlock>
-                            <SimpleIdentifier Name="ER"/>
                             <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="ER"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-36" X="-13"/>
                             </LabelGeometry>

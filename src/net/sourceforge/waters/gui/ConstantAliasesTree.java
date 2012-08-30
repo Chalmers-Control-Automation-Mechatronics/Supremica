@@ -19,7 +19,7 @@ public class ConstantAliasesTree extends ModuleTree
   public ConstantAliasesTree(final ModuleWindowInterface root,
                              final WatersPopupActionManager manager)
   {
-    super(root, manager);
+    super(root, manager, root.getModuleSubject(), root.getUndoInterface());
     mPopupFactory = new AliasesTreePopupFactory(manager, root.getModuleContext());
   }
 
@@ -27,7 +27,7 @@ public class ConstantAliasesTree extends ModuleTree
   //#########################################################################
   //# Abstract Methods
   ListSubject<? extends ProxySubject> getRootList(){
-    return getRoot().getModuleSubject().getConstantAliasListModifiable();
+    return getRootWindow().getModuleSubject().getConstantAliasListModifiable();
   }
 
   String getRootName(){

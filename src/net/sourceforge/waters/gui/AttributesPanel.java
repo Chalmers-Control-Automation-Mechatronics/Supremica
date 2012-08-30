@@ -39,7 +39,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -55,7 +55,6 @@ import javax.swing.table.TableModel;
 
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.gui.util.NonTypingTable;
-import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
 import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
@@ -73,7 +72,7 @@ import org.supremica.properties.Config;
  * @author Robi Malik
  */
 
-class AttributesPanel extends RaisedDialogPanel
+class AttributesPanel extends JPanel
 {
 
   //#########################################################################
@@ -134,18 +133,10 @@ class AttributesPanel extends RaisedDialogPanel
     constraints.insets = INSETS;
     constraints.gridx = 0;
     constraints.gridy = 0;
-    constraints.gridwidth = 1;
-    constraints.weighty = 1.0;
-    // Label
-    constraints.weightx = 0.0;
-    constraints.gridheight = 2;
-    constraints.anchor = GridBagConstraints.NORTHWEST;
-    final JLabel label = new JLabel("Attributes:");
-    layout.setConstraints(label, constraints);
-    add(label);
-    // Table
-    constraints.gridx++;
     constraints.weightx = 1.0;
+    constraints.weighty = 1.0;
+    constraints.gridheight = 4;
+    constraints.anchor = GridBagConstraints.NORTHWEST;
     constraints.fill = GridBagConstraints.BOTH;
     final JScrollPane scrolled = new JScrollPane(mTable);
     final Border border = BorderFactory.createLoweredBevelBorder();
@@ -155,10 +146,14 @@ class AttributesPanel extends RaisedDialogPanel
     // List control buttons
     constraints.gridx++;
     constraints.weightx = 0.0;
+    constraints.weighty = 1.0;
     constraints.gridheight = 1;
+    constraints.anchor = GridBagConstraints.SOUTHWEST;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mAddButton, constraints);
     add(mAddButton);
     constraints.gridy++;
+    constraints.anchor = GridBagConstraints.NORTHWEST;
     layout.setConstraints(mRemoveButton, constraints);
     add(mRemoveButton);
   }
@@ -205,7 +200,6 @@ class AttributesPanel extends RaisedDialogPanel
       }
     }
   }
-
 
   //#########################################################################
   //# Configuration
@@ -451,7 +445,7 @@ class AttributesPanel extends RaisedDialogPanel
         throw new IllegalArgumentException
           ("Unknown column " + column + " in attribute table!");
       }
-      final String text = value.toString();      
+      final String text = value.toString();
       final DefaultComboBoxModel model =
         completions == null ?
         new DefaultComboBoxModel() :
@@ -489,18 +483,6 @@ class AttributesPanel extends RaisedDialogPanel
 
 
   //#########################################################################
-  //# Data Members
-  private final AttributeInfo mAttributeValues;
-  private final TableCellEditor mEditor;
-  private final NonTypingTable mTable;
-  private final JButton mAddButton;
-  private final JButton mRemoveButton;
-
-  private final Action mAddAction;
-  private final Action mRemoveAction;
-
-
-  //#########################################################################
   //# Attribute Maps
   private static class AttributeInfo extends TreeMap<String,List<String>>
   {
@@ -520,8 +502,8 @@ class AttributesPanel extends RaisedDialogPanel
     }
 
     // A condition could be added to check if the model contains any clocks
-    ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());    
-    ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());    
+    ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());
+    ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());
     //=======================================================================
   }
 
@@ -544,10 +526,25 @@ class AttributesPanel extends RaisedDialogPanel
 
 
   //#########################################################################
+  //# Data Members
+  private final AttributeInfo mAttributeValues;
+  private final TableCellEditor mEditor;
+  private final NonTypingTable mTable;
+  private final JButton mAddButton;
+  private final JButton mRemoveButton;
+
+  private final Action mAddAction;
+  private final Action mRemoveAction;
+
+
+
+
+  //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
 
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
+  public static final String LABEL_NAME = "Attributes:";
   private static final String[] COLUMNS = {"Key", "Value"};
   private static final String[] EMPTY_ROW = {"", ""};
 
