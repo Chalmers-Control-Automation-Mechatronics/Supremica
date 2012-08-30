@@ -54,6 +54,7 @@ public enum SynthesisType
     CONTROLLABLE("controllable"),
     NONBLOCKING("nonblocking"),
     NONBLOCKINGCONTROLLABLE("nonblocking and controllable"),
+    UNSAFETY("unsafety (for RAS models)"),
     NONBLOCKINGCONTROLLABLEOBSERVABLE("nonblocking, controllable and observable");
 
     
@@ -67,11 +68,11 @@ public enum SynthesisType
 
     public static SynthesisType[] editorValues()
     {
-        SynthesisType[] vals = new SynthesisType[3];
+        SynthesisType[] vals = new SynthesisType[4];
         int i = 0;
         for(SynthesisType v:SynthesisType.values())
         {
-            if(i < 3)
+            if(i < 4)
             {
                 vals[i] = v;
             }

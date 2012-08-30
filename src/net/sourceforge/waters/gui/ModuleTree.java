@@ -1034,7 +1034,7 @@ public abstract class ModuleTree
       final EventAliasSubject event = (EventAliasSubject) alias;
       final EventListExpressionSubject exp =
         (EventListExpressionSubject) event.getExpression();
-      return modifyList(exp.getEventListModifiable());
+      return modifyList(exp.getEventIdentifierListModifiable());
     }
 
     @SuppressWarnings("unchecked")
@@ -1093,7 +1093,7 @@ public abstract class ModuleTree
       final ParameterBindingSubject event = (ParameterBindingSubject) binding;
       final EventListExpressionSubject exp =
         (EventListExpressionSubject) event.getExpression();
-      return modifyList(exp.getEventListModifiable());
+      return modifyList(exp.getEventIdentifierListModifiable());
     }
 
     private Transferable mTransferable;
@@ -1164,7 +1164,7 @@ public abstract class ModuleTree
       final EventAliasSubject event = (EventAliasSubject) alias;
       final ExpressionProxy exp = event.getExpression();
       if (exp instanceof EventListExpressionProxy) {
-        if (!isInList(((EventListExpressionProxy) exp).getEventList())) {
+        if (!isInList(((EventListExpressionProxy) exp).getEventIdentifierList())) {
           return WatersDataFlavor.IDENTIFIER;
         }
       }
@@ -1205,7 +1205,7 @@ public abstract class ModuleTree
       EventListExpressionProxy list;
       if (exp instanceof EventListExpressionProxy) {
         list = (EventListExpressionProxy) exp;
-        if (!isInList(list.getEventList())
+        if (!isInList(list.getEventIdentifierList())
             && !(exp instanceof SimpleExpressionProxy)) {
           return WatersDataFlavor.IDENTIFIER;
         }

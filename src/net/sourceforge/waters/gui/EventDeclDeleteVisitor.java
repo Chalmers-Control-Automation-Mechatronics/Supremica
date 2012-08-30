@@ -227,7 +227,7 @@ class EventDeclDeleteVisitor
     throws VisitorException
   {
     mVictim = null;
-    final Collection<? extends Proxy> list = elist.getEventList();
+    final Collection<? extends Proxy> list = elist.getEventIdentifierList();
     return visitCollection(list);
   }
 

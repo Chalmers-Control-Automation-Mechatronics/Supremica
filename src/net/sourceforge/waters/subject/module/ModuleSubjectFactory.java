@@ -338,10 +338,10 @@ public class ModuleSubjectFactory
   }
 
   public LabelBlockSubject createLabelBlockProxy
-      (final Collection<? extends Proxy> eventList,
+      (final Collection<? extends Proxy> eventIdentifierList,
        final LabelGeometryProxy geometry)
   {
-    return new LabelBlockSubject(eventList,
+    return new LabelBlockSubject(eventIdentifierList,
                                  geometry);
   }
 
@@ -419,9 +419,9 @@ public class ModuleSubjectFactory
   }
 
   public PlainEventListSubject createPlainEventListProxy
-      (final Collection<? extends Proxy> eventList)
+      (final Collection<? extends Proxy> eventIdentifierList)
   {
-    return new PlainEventListSubject(eventList);
+    return new PlainEventListSubject(eventIdentifierList);
   }
 
   public PlainEventListSubject createPlainEventListProxy()

@@ -118,8 +118,7 @@ public interface ForeachProxy extends NamedProxy
 
   /**
    * Gets the body of this foreach construct.
-   * @return The list of body elements. Each element is of type {@link
-   *         net.sourceforge.waters.model.base.Proxy}. The type of
+   * @return The list of body elements. The possible types of
    *         elements depends on the particular type of foreach construct.
    */
   public List<Proxy> getBody();

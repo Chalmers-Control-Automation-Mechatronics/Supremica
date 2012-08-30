@@ -36,17 +36,18 @@ public final class PlainEventListElement
   //# Constructors
   /**
    * Creates a new plain event list.
-   * @param eventList The list of events of the new plain event list, or <CODE>null</CODE> if empty.
+   * @param eventIdentifierList The list of event identifiers of the new plain event list, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
-  public PlainEventListElement(final Collection<? extends Proxy> eventList)
+  public PlainEventListElement(final Collection<? extends Proxy> eventIdentifierList)
   {
-    super(eventList);
+    super(eventIdentifierList);
   }
 
   /**
    * Creates a new plain event list using default values.
    * This constructor creates a plain event list with
-   * an empty list of events.
+   * an empty list of event identifiers.
    */
   public PlainEventListElement()
   {

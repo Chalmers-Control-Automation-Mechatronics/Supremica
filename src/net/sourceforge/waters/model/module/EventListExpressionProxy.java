@@ -46,10 +46,12 @@ public interface EventListExpressionProxy extends ExpressionProxy {
   //#########################################################################
   //# Getters and Setters
   /**
-   * Gets the list of events consituting this event list expression.
-   * @return The list of components, each element is of type
-   *         {@link IdentifierProxy} or {@link ForeachProxy}.
+   * Gets the list of event identifiers constituting this event list
+   * expression. Each element is of type {@link
+   * net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or
+   * {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
+   * @return A list of identifiers or expressions.
    */
-  public List<Proxy> getEventList();
+  public List<Proxy> getEventIdentifierList();
 
 }

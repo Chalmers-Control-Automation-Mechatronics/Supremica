@@ -359,17 +359,18 @@ public interface ModuleProxyFactory
 
   /**
    * Creates a new label block.
-   * @param eventList The list of events of the new label block, or <CODE>null</CODE> if empty.
+   * @param eventIdentifierList The list of event identifiers of the new label block, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    * @param geometry The geometry of the new label block, or <CODE>null</CODE>.
    */
   public LabelBlockProxy createLabelBlockProxy
-      (Collection<? extends Proxy> eventList,
+      (Collection<? extends Proxy> eventIdentifierList,
        LabelGeometryProxy geometry);
 
   /**
    * Creates a new label block using default values.
    * This method creates a label block with
-   * an empty list of events and
+   * an empty list of event identifiers and
    * the geometry set to <CODE>null</CODE>.
    */
   public LabelBlockProxy createLabelBlockProxy();
@@ -400,7 +401,9 @@ public interface ModuleProxyFactory
    * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
    * @param eventDeclList The event declaration list of the new module, or <CODE>null</CODE> if empty.
    * @param eventAliasList The event alias list of the new module, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.AliasProxy AliasProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    * @param componentList The component list of the new module, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.ComponentProxy ComponentProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
   public ModuleProxy createModuleProxy
       (String name,
@@ -462,15 +465,16 @@ public interface ModuleProxyFactory
 
   /**
    * Creates a new plain event list.
-   * @param eventList The list of events of the new plain event list, or <CODE>null</CODE> if empty.
+   * @param eventIdentifierList The list of event identifiers of the new plain event list, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
   public PlainEventListProxy createPlainEventListProxy
-      (Collection<? extends Proxy> eventList);
+      (Collection<? extends Proxy> eventIdentifierList);
 
   /**
    * Creates a new plain event list using default values.
    * This method creates a plain event list with
-   * an empty list of events.
+   * an empty list of event identifiers.
    */
   public PlainEventListProxy createPlainEventListProxy();
 

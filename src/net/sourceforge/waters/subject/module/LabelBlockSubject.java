@@ -39,13 +39,14 @@ public final class LabelBlockSubject
   //# Constructors
   /**
    * Creates a new label block.
-   * @param eventList The list of events of the new label block, or <CODE>null</CODE> if empty.
+   * @param eventIdentifierList The list of event identifiers of the new label block, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    * @param geometry The geometry of the new label block, or <CODE>null</CODE>.
    */
-  public LabelBlockSubject(final Collection<? extends Proxy> eventList,
+  public LabelBlockSubject(final Collection<? extends Proxy> eventIdentifierList,
                            final LabelGeometryProxy geometry)
   {
-    super(eventList);
+    super(eventIdentifierList);
     mGeometry = (LabelGeometrySubject) geometry;
     if (mGeometry != null) {
       mGeometry.setParent(this);
@@ -55,7 +56,7 @@ public final class LabelBlockSubject
   /**
    * Creates a new label block using default values.
    * This constructor creates a label block with
-   * an empty list of events and
+   * an empty list of event identifiers and
    * the geometry set to <CODE>null</CODE>.
    */
   public LabelBlockSubject()

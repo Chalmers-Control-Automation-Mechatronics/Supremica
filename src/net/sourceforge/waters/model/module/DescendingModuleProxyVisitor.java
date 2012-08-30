@@ -157,8 +157,8 @@ public class DescendingModuleProxyVisitor
     throws VisitorException
   {
     visitExpressionProxy(proxy);
-    final List<Proxy> eventList = proxy.getEventList();
-    visitCollection(eventList);
+    final List<Proxy> eventIdentifierList = proxy.getEventIdentifierList();
+    visitCollection(eventIdentifierList);
     return null;
   }
 

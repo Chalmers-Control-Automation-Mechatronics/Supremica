@@ -125,7 +125,7 @@ public class ModuleIdentifierChecker
       (final EventListExpressionProxy expr)
     throws VisitorException
     {
-      final List<Proxy> elist = expr.getEventList();
+      final List<Proxy> elist = expr.getEventIdentifierList();
       visitCollection(elist);
       return null;
     }

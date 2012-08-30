@@ -9,14 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.HashFunctions;
-import gnu.trove.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -282,7 +278,7 @@ public abstract class AbstractCompositionalModelVerifier
     throws AnalysisException
   {
     setupMonolithicVerifier();
-    mModifyingSteps = new ArrayList<AbstractionStep>();
+    mAbstractionSteps = new ArrayList<AbstractionStep>();
     super.setUp();
   }
 
@@ -291,7 +287,7 @@ public abstract class AbstractCompositionalModelVerifier
   {
     super.tearDown();
     mCurrentMonolithicVerifier = null;
-    mModifyingSteps = null;
+    mAbstractionSteps = null;
   }
 
 
@@ -300,7 +296,7 @@ public abstract class AbstractCompositionalModelVerifier
   @Override
   protected void recordAbstractionStep(final AbstractionStep step)
   {
-    mModifyingSteps.add(step);
+    mAbstractionSteps.add(step);
   }
 
   @Override
@@ -378,6 +374,15 @@ public abstract class AbstractCompositionalModelVerifier
      final Collection<AutomatonProxy> automata)
   throws AnalysisException;
 
+  /**
+   * Returns a list of all automata that should be included when starting
+   * to construct a counterexample.
+   */
+  protected Collection<AutomatonProxy> getAllTraceAutomata()
+  {
+    return getCurrentAutomata();
+  }
+
 
   //#########################################################################
   //# Trace Computation
@@ -385,21 +390,25 @@ public abstract class AbstractCompositionalModelVerifier
     throws AnalysisException
   {
     final List<TraceStepProxy> unsat = trace.getTraceSteps();
-    final Collection<AutomatonProxy> currentAutomata = getCurrentAutomata();
+    final Collection<AutomatonProxy> currentAutomata = getAllTraceAutomata();
     List<TraceStepProxy> traceSteps =
       getSaturatedTraceSteps(unsat, currentAutomata);
-    final int size = mModifyingSteps.size();
+    final int size = mAbstractionSteps.size();
     final ListIterator<AbstractionStep> iter =
-      mModifyingSteps.listIterator(size);
+      mAbstractionSteps.listIterator(size);
+    /*
     final Collection<AutomatonProxy> check =
       new THashSet<AutomatonProxy>(currentAutomata);
-    //checkCounterExample(traceSteps, check);
+    testCounterExample(traceSteps, check);
+    */
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
+      /*
       check.removeAll(step.getResultAutomata());
       check.addAll(step.getOriginalAutomata());
-      //checkCounterExample(traceSteps, check);
+      testCounterExample(traceSteps, check);
+      */
     }
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> modelAutomata = model.getAutomata();
@@ -536,7 +545,6 @@ public abstract class AbstractCompositionalModelVerifier
     {
       super(resultAut, originalAut);
       mTau = tau;
-      mOriginalStateEncodingIsTemporary = (originalStateEnc == null);
       mOriginalStateEncoding = originalStateEnc;
     }
 
@@ -557,129 +565,11 @@ public abstract class AbstractCompositionalModelVerifier
       return mEventEncoding;
     }
 
-    //#######################################################################
-    //# Trace Computation
-    protected void setupTraceConversion()
-      throws AnalysisException
+    protected StateEncoding getOriginalStateEncoding()
     {
-      final AutomatonProxy originalAutomaton = getOriginalAutomaton();
-      final KindTranslator translator = getKindTranslator();
-      final Collection<EventProxy> props = getPropositions();
-      final Collection<EventProxy> filter;
-      if (props != null) {
-        filter = props;
-      } else {
-        filter = Collections.emptyList();
-      }
-      mEventEncoding =
-        new EventEncoding(originalAutomaton, translator, mTau, filter,
-                          EventEncoding.FILTER_PROPOSITIONS);
-      if (mOriginalStateEncodingIsTemporary) {
-        mOriginalStateEncoding = new StateEncoding(originalAutomaton);
-      }
-      mTransitionRelation = new ListBufferTransitionRelation
-        (originalAutomaton, mEventEncoding, mOriginalStateEncoding,
-         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      return mOriginalStateEncoding;
     }
 
-    protected void setupTraceConversion
-      (final EventEncoding enc,
-       final ListBufferTransitionRelation rel)
-    {
-      mEventEncoding = enc;
-      mTransitionRelation = rel;
-      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    }
-
-    protected void tearDownTraceConversion()
-    {
-      if (mOriginalStateEncodingIsTemporary) {
-        mOriginalStateEncoding = null;
-      }
-      mEventEncoding = null;
-      mTransitionRelation = null;
-    }
-
-    protected void mergeTraceSteps(final List<TraceStepProxy> traceSteps,
-                                   final List<SearchRecord> convertedSteps)
-    {
-      final int tau = EventEncoding.TAU;
-      final ProductDESProxyFactory factory = getFactory();
-      final AutomatonProxy resultAutomaton = getResultAutomaton();
-      final AutomatonProxy originalAutomaton = getOriginalAutomaton();
-      final ListIterator<TraceStepProxy> stepIter = traceSteps.listIterator();
-      final TraceStepProxy initStep = stepIter.next();
-      final Iterator<SearchRecord> convertedIter = convertedSteps.iterator();
-      final SearchRecord initRecord = convertedIter.next();
-      final Map<AutomatonProxy,StateProxy> map =
-        new HashMap<AutomatonProxy,StateProxy>(initStep.getStateMap());
-      map.remove(resultAutomaton);
-      final int initID = initRecord.getState();
-      final StateProxy initState = mOriginalStateEncoding.getState(initID);
-      map.put(originalAutomaton, initState);
-      final TraceStepProxy newInitStep =
-        factory.createTraceStepProxy(null, map);
-      stepIter.set(newInitStep);
-      TraceStepProxy step = stepIter.hasNext() ? stepIter.next() : null;
-      SearchRecord record =
-        convertedIter.hasNext() ? convertedIter.next() : null;
-      while (step != null || record != null) {
-        if (step != null) {
-          final EventProxy event = step.getEvent();
-          final int eventID = mEventEncoding.getEventCode(event);
-          if (eventID == tau) {
-            // Skip tau in master trace, will insert later from converted.
-            stepIter.remove();
-            step = stepIter.hasNext() ? stepIter.next() : null;
-            continue;
-          } else if (eventID < 0) {
-            // Step of another automaton only.
-            final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
-            map.putAll(stepMap);
-            map.remove(resultAutomaton);
-            final TraceStepProxy newStep =
-              factory.createTraceStepProxy(event, map);
-            stepIter.set(newStep);
-            step = stepIter.hasNext() ? stepIter.next() : null;
-            continue;
-          }
-        }
-        if (record != null) {
-          final int eventID = record.getEvent();
-          if (eventID == tau) {
-            // Step by local tau only.
-            final int stateID = record.getState();
-            final StateProxy state = mOriginalStateEncoding.getState(stateID);
-            map.put(originalAutomaton, state);
-            final TraceStepProxy newStep =
-              factory.createTraceStepProxy(mTau, map);
-            if (step == null) {
-              stepIter.add(newStep);
-            } else {
-              stepIter.previous();
-              stepIter.add(newStep);
-              stepIter.next();
-            }
-            record = convertedIter.hasNext() ? convertedIter.next() : null;
-            continue;
-          }
-        }
-        // Step by shared event
-        assert step != null;
-        assert record != null;
-        final EventProxy event = step.getEvent();
-        final int stateID = record.getState();
-        final StateProxy state = mOriginalStateEncoding.getState(stateID);
-        map.put(originalAutomaton, state);
-        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
-        map.putAll(stepMap);
-        map.remove(resultAutomaton);
-        final TraceStepProxy newStep = factory.createTraceStepProxy(event, map);
-        stepIter.set(newStep);
-        step = stepIter.hasNext() ? stepIter.next() : null;
-        record = convertedIter.hasNext() ? convertedIter.next() : null;
-      }
-    }
 
     //#######################################################################
     //# Data Members
@@ -689,15 +579,10 @@ public abstract class AbstractCompositionalModelVerifier
      */
     private final EventProxy mTau;
     /**
-     * A flag, indicating that the state encoding is only used temporarily
-     * during trace expansion.
-     */
-    private final boolean mOriginalStateEncodingIsTemporary;
-    /**
      * State encoding of original automaton. Maps state codes in the input
      * transition relation to state objects in the input automaton.
      */
-    private StateEncoding mOriginalStateEncoding;
+    private final StateEncoding mOriginalStateEncoding;
     /**
      * Transition relation that was simplified.
      * Only used when expanding trace.
@@ -712,111 +597,9 @@ public abstract class AbstractCompositionalModelVerifier
 
 
   //#########################################################################
-  //# Inner Class SearchRecord
-  /**
-   * A record to store information about a visited state while searching
-   * to expand counterexamples.
-   */
-  protected static class SearchRecord
-  {
-
-    //#######################################################################
-    //# Constructors
-    protected SearchRecord(final int state)
-    {
-      this(state, -1);
-    }
-
-    protected SearchRecord(final int state, final int event)
-    {
-      this(state, 0, event, null);
-    }
-
-    protected SearchRecord(final int state,
-                           final int depth,
-                           final int event,
-                           final SearchRecord pred)
-    {
-      mState = state;
-      mDepth = depth;
-      mEvent = event;
-      mPredecessor = pred;
-    }
-
-    //#######################################################################
-    //# Getters
-    protected int getState()
-    {
-      return mState;
-    }
-
-    protected int getDepth()
-    {
-      return mDepth;
-    }
-
-    protected SearchRecord getPredecessor()
-    {
-      return mPredecessor;
-    }
-
-    protected int getEvent()
-    {
-      return mEvent;
-    }
-
-    //#######################################################################
-    //# Trace Construction
-    protected List<SearchRecord> getTrace()
-    {
-      final List<SearchRecord> trace = new LinkedList<SearchRecord>();
-      for (SearchRecord record = this;
-           record != null;
-           record = record.getPredecessor()) {
-        trace.add(0, record);
-      }
-      return trace;
-    }
-
-    //#######################################################################
-    //# Overrides for java.lang.Object
-    @Override
-    public String toString()
-    {
-      return
-        "{state=" + mState + "; event=" + mEvent + "; depth=" + mDepth + "}";
-    }
-
-    @Override
-    public boolean equals(final Object other)
-    {
-      if (other.getClass() == getClass()) {
-        final SearchRecord record = (SearchRecord) other;
-        return mState == record.mState && mDepth == record.mDepth;
-      } else {
-        return false;
-      }
-    }
-
-    @Override
-    public int hashCode()
-    {
-      return HashFunctions.hash(mState) + 5 * HashFunctions.hash(mDepth);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final int mState;
-    private final int mDepth;
-    private final int mEvent;
-    private final SearchRecord mPredecessor;
-  }
-
-
-  //#########################################################################
   //# Data Members
   private ModelVerifier mMonolithicVerifier;
   private ModelVerifier mCurrentMonolithicVerifier;
-  private List<AbstractionStep> mModifyingSteps;
+  private List<AbstractionStep> mAbstractionSteps;
 
 }

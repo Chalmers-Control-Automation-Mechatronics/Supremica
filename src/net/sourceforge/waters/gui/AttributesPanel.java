@@ -56,6 +56,8 @@ import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
+import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
+import org.supremica.automata.BDD.EFA.TimeInvariantAttributeFactory;
 
 import org.supremica.properties.Config;
 
@@ -440,7 +442,7 @@ class AttributesPanel extends JPanel
         throw new IllegalArgumentException
           ("Unknown column " + column + " in attribute table!");
       }
-      final String text = value.toString();
+      final String text = value.toString();      
       final DefaultComboBoxModel model =
         completions == null ?
         new DefaultComboBoxModel() :
@@ -495,6 +497,10 @@ class AttributesPanel extends JPanel
     if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
       ATTRIBUTE_FACTORIES.add(HISCAttributeFactory.getInstance());
     }
+
+    // A condition could be added to check if the model contains any clocks
+    ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());    
+    ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());    
     //=======================================================================
   }
 

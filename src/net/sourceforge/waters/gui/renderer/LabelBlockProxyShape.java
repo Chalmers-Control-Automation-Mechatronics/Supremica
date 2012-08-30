@@ -36,7 +36,7 @@ public class LabelBlockProxyShape
   //#########################################################################
   //# Simple Access
   boolean shouldBeDrawn(){
-    return !getProxy().getEventList().isEmpty();
+    return !getProxy().getEventIdentifierList().isEmpty();
   }
 
   double getHeight()

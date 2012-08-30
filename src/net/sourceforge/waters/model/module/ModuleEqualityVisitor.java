@@ -359,9 +359,10 @@ public class ModuleEqualityVisitor
     if (visitExpressionProxy(proxy)) {
       final EventListExpressionProxy expected =
         (EventListExpressionProxy) getSecondProxy();
-      final List<Proxy> eventList1 = proxy.getEventList();
-      final List<Proxy> eventList2 = expected.getEventList();
-      if (!compareExpressionLists(eventList1, eventList2)) {
+      final List<Proxy> eventIdentifierList1 = proxy.getEventIdentifierList();
+      final List<Proxy> eventIdentifierList2 =
+        expected.getEventIdentifierList();
+      if (!compareLists(eventIdentifierList1, eventIdentifierList2)) {
         return false;
       }
       setSecondProxy(expected);

@@ -30,8 +30,8 @@ public class ReachabilityUtilities {
         
         do {
             previousReachableStates = reachableStatesBDD.id();
-            nextStates = reachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.sourceStateVariables);
-            nextStates.replaceWith(bddAutomata.destToSourceLocationPairing).replaceWith(bddAutomata.destToSourceVariablePairing);
+            nextStates = reachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.getSourceStatesVarSet());
+            nextStates.replaceWith(bddAutomata.getDestToSourceLocationPairing()).replaceWith(bddAutomata.getDestToSourceVariablePairing());
             reachableStatesBDD.orWith(nextStates);
         } while (!reachableStatesBDD.equals(previousReachableStates));
 
@@ -47,8 +47,8 @@ public class ReachabilityUtilities {
 
         do {
             previousCoreachableStates = coreachableStatesBDD.id();
-            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.destStateVariables);
-            nextStates.replaceWith(bddAutomata.sourceToDestLocationPairing).replaceWith(bddAutomata.sourceToDestVariablePairing);
+            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.getDestStatesVarSet());
+            nextStates.replaceWith(bddAutomata.getSourceToDestLocationPairing()).replaceWith(bddAutomata.getSourceToDestVariablePairing());
             coreachableStatesBDD = coreachableStatesBDD.orWith(nextStates);
         } while (!coreachableStatesBDD.equals(previousCoreachableStates));
 
@@ -64,9 +64,9 @@ public class ReachabilityUtilities {
 
         do {
             previousCoreachableStates = coreachableStatesBDD.id();
-            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.destStateVariables);
+            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.getDestStatesVarSet());
             nextStates = nextStates.and(reachableStates)
-                    .replaceWith(bddAutomata.sourceToDestLocationPairing).replaceWith(bddAutomata.sourceToDestVariablePairing);
+                    .replaceWith(bddAutomata.getSourceToDestLocationPairing()).replaceWith(bddAutomata.getSourceToDestVariablePairing());
             coreachableStatesBDD = coreachableStatesBDD.orWith(nextStates);
         } while (!coreachableStatesBDD.equals(previousCoreachableStates));
 
@@ -84,8 +84,8 @@ public class ReachabilityUtilities {
         
         do {
             previousReachableStates = reachableStatesBDD.id();
-            nextStates = reachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.sourceStateVariables);
-            nextStates.replaceWith(bddAutomata.destToSourceLocationPairing).replaceWith(bddAutomata.destToSourceVariablePairing);
+            nextStates = reachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.getSourceStatesVarSet());
+            nextStates.replaceWith(bddAutomata.getDestToSourceLocationPairing()).replaceWith(bddAutomata.getDestToSourceVariablePairing());
             reachableStatesBDD.orWith(nextStates);
             reachableStatesBDD = reachableStatesBDD.and(premittedStates);
         } while (!reachableStatesBDD.equals(previousReachableStates));
@@ -104,8 +104,8 @@ public class ReachabilityUtilities {
 
         do {
             previousCoreachableStates = coreachableStatesBDD.id();
-            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.destStateVariables);
-            nextStates.replaceWith(bddAutomata.sourceToDestLocationPairing).replaceWith(bddAutomata.sourceToDestVariablePairing);
+            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.getDestStatesVarSet());
+            nextStates.replaceWith(bddAutomata.getSourceToDestLocationPairing()).replaceWith(bddAutomata.getSourceToDestVariablePairing());
             coreachableStatesBDD.orWith(nextStates);
             coreachableStatesBDD = coreachableStatesBDD.and(permittedStates);
         } while (!coreachableStatesBDD.equals(previousCoreachableStates));
@@ -127,9 +127,9 @@ public class ReachabilityUtilities {
 
         do {
             previousCoreachableStates = coreachableStatesBDD.id();
-            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.destStateVariables);
+            nextStates = coreachableStatesBDD.and(curTransitionRelation).exist(bddAutomata.getDestStatesVarSet());
             nextStates = nextStates.and(reachableStates)
-                    .replaceWith(bddAutomata.sourceToDestLocationPairing).replaceWith(bddAutomata.sourceToDestVariablePairing)
+                    .replaceWith(bddAutomata.getSourceToDestLocationPairing()).replaceWith(bddAutomata.getSourceToDestVariablePairing())
                     .and(permittedStates);
             coreachableStatesBDD.orWith(nextStates);
         } while (!coreachableStatesBDD.equals(previousCoreachableStates));

@@ -918,6 +918,23 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
   }
 
+
+  //#######################################################################
+  //# Logging
+  protected void showDebugLog(final ListBufferTransitionRelation rel)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      logger.debug(rel.getName());
+      logger.debug(rel.getNumberOfReachableStates() + " states, " +
+                   rel.getNumberOfTransitions() + " transitions, " +
+                   rel.getNumberOfMarkings() + " markings.");
+    }
+  }
+
+
+  //#######################################################################
+  //# Private Methods
   /**
    * Finds the set of events that are local to the given automata.
    */
@@ -1470,6 +1487,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         ListBufferTransitionRelation rel =
           new ListBufferTransitionRelation(aut, eventEnc,
                                            inputStateEnc, config);
+        showDebugLog(rel);
         mSimplifier.setTransitionRelation(rel);
         final int numStates = rel.getNumberOfStates();
         final int numTrans = rel.getNumberOfTransitions();

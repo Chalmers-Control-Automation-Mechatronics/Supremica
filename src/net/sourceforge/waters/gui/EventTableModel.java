@@ -335,7 +335,7 @@ public class EventTableModel
                              final EventListExpressionProxy source)
   {
     if (source != null) {
-      collectEvents(dest, source.getEventList());
+      collectEvents(dest, source.getEventIdentifierList());
     }
   }
 
@@ -687,7 +687,7 @@ public class EventTableModel
       (final EventListExpressionProxy expr)
       throws VisitorException
     {
-      final List<? extends Proxy> eventlist = expr.getEventList();
+      final List<? extends Proxy> eventlist = expr.getEventIdentifierList();
       visitCollection(eventlist);
       return null;
     }
@@ -770,7 +770,7 @@ public class EventTableModel
       (final EventListExpressionProxy expr)
       throws VisitorException
     {
-      final List<? extends Proxy> eventlist = expr.getEventList();
+      final List<? extends Proxy> eventlist = expr.getEventIdentifierList();
       return processList(eventlist);
     }
 

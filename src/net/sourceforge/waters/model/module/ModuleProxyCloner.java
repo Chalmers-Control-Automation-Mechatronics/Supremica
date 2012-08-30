@@ -461,12 +461,14 @@ public class ModuleProxyCloner
     (final LabelBlockProxy proxy)
     throws VisitorException
   {
-    final Collection<Proxy> eventList0 = proxy.getEventList();
-    final Collection<Proxy> eventList = cloneProxyCollection(eventList0);
+    final Collection<Proxy> eventIdentifierList0 =
+      proxy.getEventIdentifierList();
+    final Collection<Proxy> eventIdentifierList =
+      cloneProxyCollection(eventIdentifierList0);
     final LabelGeometryProxy geometry0 = proxy.getGeometry();
     final LabelGeometryProxy geometry =
       geometry0 == null ? null : visitLabelGeometryProxy(geometry0);
-    return mFactory.createLabelBlockProxy(eventList,
+    return mFactory.createLabelBlockProxy(eventIdentifierList,
                                           geometry);
   }
 
@@ -551,9 +553,11 @@ public class ModuleProxyCloner
     (final PlainEventListProxy proxy)
     throws VisitorException
   {
-    final Collection<Proxy> eventList0 = proxy.getEventList();
-    final Collection<Proxy> eventList = cloneProxyCollection(eventList0);
-    return mFactory.createPlainEventListProxy(eventList);
+    final Collection<Proxy> eventIdentifierList0 =
+      proxy.getEventIdentifierList();
+    final Collection<Proxy> eventIdentifierList =
+      cloneProxyCollection(eventIdentifierList0);
+    return mFactory.createPlainEventListProxy(eventIdentifierList);
   }
 
   @Override

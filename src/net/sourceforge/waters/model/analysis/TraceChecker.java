@@ -10,13 +10,13 @@
 package net.sourceforge.waters.model.analysis;
 
 import gnu.trove.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
@@ -139,7 +139,7 @@ public class TraceChecker
     assertTrue(trace.getAutomata().contains(aut),
                "Automaton " + aut.getName() + " is not mentioned in trace!");
     final List<TraceStepProxy> steps = trace.getTraceSteps();
-    return checkCounterExample(steps, aut, null, sat);
+    return checkCounterExample(steps, aut, null, sat, false);
   }
 
   /**
@@ -197,8 +197,52 @@ public class TraceChecker
      final boolean sat)
   {
     for (final AutomatonProxy aut : automata) {
-      checkCounterExample(steps, aut, prop, sat);
+      checkCounterExample(steps, aut, prop, sat, false);
     }
+  }
+
+  /**
+   * Checks whether the given list of trace steps forms a correct safety
+   * error trace for the given automata. A safety error trace must be
+   * accepted by all the given automata except that at least one of the
+   * specifications must reject an uncontrollable event in the final step.
+   * @param  steps      List of trace steps to be checked.
+   * @param  automata   Collection of automata for which the trace steps are to
+   *                    be checked.
+   * @param  sat        A flag, indicating that the trace is expected to be
+   *                    saturated. If true, any missing step entry for the
+   *                    any of the given automata will also lead to an exception.
+   * @param  translator Kind translator used to distinguish plants and
+   *                    specifications, and controllable and uncontrollable
+   *                    events.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static void checkSafetyCounterExample
+    (final List<TraceStepProxy> steps,
+     final Collection<AutomatonProxy> automata,
+     final boolean sat,
+     final KindTranslator translator)
+  {
+    final int length = steps.size();
+    assertTrue(length > 0, "Trace has no initial step!");
+    if (length > 1) {
+      final ListIterator<TraceStepProxy> iter = steps.listIterator(length);
+      final TraceStepProxy lastStep = iter.previous();
+      final EventProxy lastEvent = lastStep.getEvent();
+      assertTrue(translator.getEventKind(lastEvent) == EventKind.UNCONTROLLABLE,
+                 "Last event " + lastEvent.getName() +
+                 " of safety trace is not uncontrollable!");
+    }
+    boolean rejected = false;
+    for (final AutomatonProxy aut : automata) {
+      if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
+        checkCounterExample(steps, aut, null, sat, false);
+      } else {
+        rejected |= checkCounterExample(steps, aut, null, sat, true) == null;
+      }
+    }
+    assertTrue(rejected, "Safety trace is not rejected by any specification!");
   }
 
   /**
@@ -232,11 +276,14 @@ public class TraceChecker
      final KindTranslator translator)
   throws AnalysisException
   {
+    final int length = steps.size();
+    assertTrue(length > 0, "Trace has no initial step!");
     final int numAutomata = automata.size();
     final Map<AutomatonProxy,StateProxy> map =
       new HashMap<AutomatonProxy,StateProxy>(numAutomata);
     for (final AutomatonProxy aut : automata) {
-      final StateProxy state = checkCounterExample(steps, aut, premarking, sat);
+      final StateProxy state =
+        checkCounterExample(steps, aut, premarking, sat, false);
       map.put(aut, state);
     }
     final ProductDESProxy des =
@@ -260,7 +307,7 @@ public class TraceChecker
   public static StateProxy checkCounterExample(final List<TraceStepProxy> steps,
                                                final AutomatonProxy aut)
   {
-    return checkCounterExample(steps, aut, null, false);
+    return checkCounterExample(steps, aut, null, false, false);
   }
 
   /**
@@ -274,15 +321,20 @@ public class TraceChecker
    * @param  sat      A flag, indicating that the trace is expected to be
    *                  saturated. If true, any missing step entry for the
    *                  given automaton will also lead to an exception.
+   * @param  safety   A flag, indicating that the given automaton is a spec
+   *                  or property in a safety check. For safety checks, the
+   *                  final step does not have to be accepted by the automaton.
    * @return Predicted end state of the automaton after execution of the
-   *         trace steps.
+   *         trace steps, or <CODE>null</CODE> if the trace fails to accept
+   *         the last step in a safety check.
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
   public static StateProxy checkCounterExample(final List<TraceStepProxy> steps,
                                                final AutomatonProxy aut,
                                                final EventProxy prop,
-                                               final boolean sat)
+                                               final boolean sat,
+                                               final boolean safety)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
@@ -292,7 +344,8 @@ public class TraceChecker
     final Map<AutomatonProxy,StateProxy> initMap = initStep.getStateMap();
     StateProxy current = initMap.get(aut);
     if (current == null) {
-      assertTrue(!sat,
+      final boolean lastInSafety = safety && !iter.hasNext();
+      assertTrue(lastInSafety || !sat,
                  "Missing entry for automaton " + aut.getName() +
                  " in initial step!");
       for (final StateProxy state : states) {
@@ -303,8 +356,18 @@ public class TraceChecker
           current = state;
         }
       }
-      assertTrue(current != null,
-                 "The automaton " + aut.getName() + " has no initial state!");
+      if (lastInSafety) {
+        if (current != null) {
+          assertTrue(current == null,
+                     "Trace reports failure at initial state of specification " +
+                     aut.getName() +
+                     ", but the automaton has the initial state" +
+                     current.getName() + "!");
+        }
+      } else {
+        assertTrue(current != null,
+                   "The automaton " + aut.getName() + " has no initial state!");
+      }
     } else {
       assertTrue(current.isInitial(),
         "Trace initial state " + current.getName() + " for automaton " +
@@ -312,11 +375,12 @@ public class TraceChecker
     }
     while (iter.hasNext()) {
       final TraceStepProxy traceStep = iter.next();
+      final boolean lastInSafety = safety && !iter.hasNext();
       final EventProxy event = traceStep.getEvent();
       final Map<AutomatonProxy,StateProxy> stepMap = traceStep.getStateMap();
       final StateProxy target = stepMap.get(aut);
       if (target == null) {
-        assertTrue(!sat,
+        assertTrue(lastInSafety || !sat,
                    "Missing entry for automaton " + aut.getName() +
                    " in trace step!");
         if (events.contains(event)) {
@@ -332,11 +396,27 @@ public class TraceChecker
               next = trans.getTarget();
             }
           }
-          assertTrue(next != null,
-                     "The automaton " + aut.getName() +
-                     " has no successor state for event " + event.getName() +
-                     " from state " + current.getName() + "!");
+          if (lastInSafety) {
+            if (next != null) {
+              assertTrue(next == null,
+                         "Trace reports failure on event " + event.getName() +
+                         " from state " + current.getName() +
+                         " in specification " + aut.getName() +
+                         ", but the automaton has the successor state" +
+                         next.getName() + "!");
+            }
+          } else {
+            assertTrue(next != null,
+                       "The automaton " + aut.getName() +
+                       " has no successor state for event " + event.getName() +
+                       " from state " + current.getName() + "!");
+          }
           current = next;
+        } else {
+          assertTrue(!lastInSafety,
+                     "Trace reports failure on event " + event.getName() +
+                     " in specification " + aut.getName() +
+                     ", but the event is not in the automaton alphabet!");
         }
       } else {
         if (events.contains(event)) {

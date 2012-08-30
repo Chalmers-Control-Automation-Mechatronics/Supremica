@@ -44,7 +44,6 @@ public interface IndexedIdentifierProxy extends IdentifierProxy {
    * Gets the list of array indexes of this identifier.
    * @return An unmodifiable list of expression, representing the
    *         indexes into the array identified by the identifier's name.
-   *         Each element is of type {@link SimpleExpressionProxy}.
    */
   // @default none
   public List<SimpleExpressionProxy> getIndexes();

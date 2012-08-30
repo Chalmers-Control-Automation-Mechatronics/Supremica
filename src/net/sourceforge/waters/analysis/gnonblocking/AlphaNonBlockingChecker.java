@@ -152,7 +152,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
                                       getFactory());
       checker
           .setPreconditionMarking(mAlpha);
-      checker.setNodeLimit(100000);
+      checker.setNodeLimit(50000000);
       System.out.println("2");
       result = checker.run();
      System.out.println(result);
@@ -893,7 +893,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
           if (minSize >= t.getNew().getStates().size()) {
             minlist = t;
             minSize = t.getNew().getStates().size();
-            //break;
+            break;
           }
         } catch (final AnalysisException exception) {
         }

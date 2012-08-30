@@ -91,6 +91,7 @@ import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
+import org.supremica.gui.ide.actions.OpenRASAction;
 
 /**
  * <P>
@@ -246,6 +247,8 @@ public class IDEMenuBar extends JMenuBar
       mFileMenu.add(open);
       final Action save = actions.getAction(SaveAction.class);
       mFileMenu.add(save);
+	  final Action openRas = actions.getAction(OpenRASAction.class);
+      mFileMenu.add(openRas);      
       final Action saveas = actions.getAction(SaveAsAction.class);
       mFileMenu.add(saveas);
       final Action close = actions.getAction(CloseAction.class);

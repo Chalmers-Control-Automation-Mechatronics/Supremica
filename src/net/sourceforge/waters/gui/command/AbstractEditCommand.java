@@ -157,7 +157,7 @@ public abstract class AbstractEditCommand
         } else if (SubjectTools.isAncestor(block, subject)) {
            newLabelBlock = false;
         }
-        if (block == null || block.getEventList().size() != size) {
+        if (block == null || block.getEventIdentifierList().size() != size) {
           newLabelBlock = false;
         }
       }
