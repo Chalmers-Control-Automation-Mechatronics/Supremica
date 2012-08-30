@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="ftechnik_conflict" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test case for certain conflicts trace expansion.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="init_done"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_right">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau:{observer_L1x,observer_L2x}"/>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_right">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau:{init_L1X1}"/>
+        <EventDecl Kind="CONTROLLABLE" Name="init"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau:{init_Y[2],magnet_L2,plant_move_Ly[2],spec_move_Ly[2]}"/>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mY1">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mY2">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mY3">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau:{init_L2X8}"/>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mX5">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mX6">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mX7">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mX4">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mX3">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mX2">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mX1">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mag_on">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_mag_off">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_left">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_left">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_forward">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE">
+            <IndexedIdentifier Name="L_back">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X8">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X7">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X7">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X6">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X6">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X5">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X5">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X4">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X4">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X3">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X3">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X2">
+                <IntConstant Value="2"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X2">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE">
+            <IndexedIdentifier Name="L_at_X1">
+                <IntConstant Value="1"/>
+            </IndexedIdentifier>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="magnet[2]">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="mag_off">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="256" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="start">
+                        <PointGeometry>
+                            <Point Y="80" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="init">
+                        <PointGeometry>
+                            <Point Y="176" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="mag_on">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="336" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="mag_off" Source="init">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="init_done"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="mag_off" Source="mag_off">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="init_done"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-32" X="-43"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="256" X="73"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="mag_on" Source="mag_off">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="L_mag_on">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="-86"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="300" X="102"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="mag_off" Source="mag_on">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="L_mag_off">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="300" X="123"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="init" Source="start">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="L_mag_off">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="init_L2X8">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S:0">
+                        <PointGeometry>
+                            <Point Y="80" X="112"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="21" X="-18"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:1">
+                        <PointGeometry>
+                            <Point Y="80" X="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="176" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S:0" Source="S:0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="L_right">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-26" X="-28"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="46" X="68"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S:1" Source="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:{init_L2X8}"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="71" X="161"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S:2" Source="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="init_done"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-6" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="132" X="192"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S:0" Source="S:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="init"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="131" X="128"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S:2" Source="S:2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="L_right">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-33" X="-69"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="223" X="160"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="{plant_move_L2x,{magnet[1],{magnet_L1,{plant_move_Ly[1],{init_Y[1],{spec_move_Ly[1],{init,{init_LZ1[1],{plant_move_Lz[1],spec_move_Lz[1]}},{init_LZ1[2],{plant_move_Lz[2],spec_move_Lz[2]}}}}}}}}}">
+            <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name="init"/>
+                    <SimpleIdentifier Name="init_done"/>
+                    <IndexedIdentifier Name="L_at_X1">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X2">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X2">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X3">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X3">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X4">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X4">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X5">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X5">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X6">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X6">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X7">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X7">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_at_X8">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_back">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_forward">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_left">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_left">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_mX1">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_mX2">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_mX3">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_mX4">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_mX5">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_mX6">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_mX7">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_right">
+                        <IntConstant Value="1"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="L_right">
+                        <IntConstant Value="2"/>
+                    </IndexedIdentifier>
+                    <SimpleIdentifier Name=":accepting"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="62" X="310"/>
+                    </LabelGeometry>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S:0">
+                        <PointGeometry>
+                            <Point Y="112" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="2" X="-29"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="S:1">
+                        <PointGeometry>
+                            <Point Y="304" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="4" X="-28"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:2">
+                        <PointGeometry>
+                            <Point Y="208" X="161"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-3" X="-29"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="S:0" Source="S:0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="L_mag_off">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="L_mag_on">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="113" X="205"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="S:2" Source="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S:1" Source="S:2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="L_mY1">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="L_mY2">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="L_mY3">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-30" X="-59"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="S:2" Source="S:2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="L_mag_off">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="L_mag_on">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="208" X="206"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

@@ -144,7 +144,6 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     final int[] stateMap = createStateMap(partition);
     final int initTest =
       stateMap == null || initResult < 0 ? initResult : stateMap[initResult];
-    newTraceSteps = relabelInitialTraceSteps(newTraceSteps, stateMap);
 
     // Extend the trace to lowest (= most blocking) possible level ...
     final AbstractCompositionalModelVerifier verifier = getModelVerifier();
@@ -161,6 +160,11 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
       foundData = newData;
       level = (foundData.getLevel() | 1) - 2;
     } while (level >= 0);
+
+    // Fix the initial segment of the trace ...
+    final int ccState =
+      foundData == null ? -1 : foundData.getTestAutomatonEndState();
+    newTraceSteps = relabelInitialTraceSteps(newTraceSteps, stateMap, ccState);
 
     // Add the search results to the end of the trace ...
     if (foundData != null) {
@@ -207,20 +211,21 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
   //#########################################################################
   //# Trace Extension
   private List<TraceStepProxy> relabelInitialTraceSteps
-  (final List<TraceStepProxy> steps, final int[] stateMap)
+  (final List<TraceStepProxy> steps, final int[] stateMap, final int ccState)
   {
     final int numSteps = steps.size();
     final List<TraceStepProxy> newSteps =
       new ArrayList<TraceStepProxy>(numSteps);
     for (final TraceStepProxy step : steps) {
-      final TraceStepProxy newStep = relabelInitialTraceStep(step, stateMap);
+      final TraceStepProxy newStep =
+        relabelInitialTraceStep(step, stateMap, ccState);
       newSteps.add(newStep);
     }
     return newSteps;
   }
 
   private TraceStepProxy relabelInitialTraceStep
-    (final TraceStepProxy resultStep, final int[] stateMap)
+    (final TraceStepProxy resultStep, final int[] stateMap, final int ccState)
   {
     final AutomatonProxy resultAut = getResultAutomaton();
     final Map<AutomatonProxy,StateProxy> resultMap = resultStep.getStateMap();
@@ -234,11 +239,17 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
       if (aut == resultAut) {
         final AutomatonProxy origAut = getOriginalAutomaton();
         final int resultCode = getResultAutomatonStateCode(state);
-        final int origCode =
-          stateMap != null ? stateMap[resultCode] : resultCode;
-          assert origCode >= 0;
-          final StateProxy origState = getOriginalAutomatonState(origCode);
-          origMap.put(origAut, origState);
+        final int origCode;
+        if (stateMap == null) {
+          origCode = resultCode;
+        } else if (stateMap[resultCode] >= 0) {
+          origCode = stateMap[resultCode];
+        } else {
+          origCode = ccState;
+        }
+        assert origCode >= 0;
+        final StateProxy origState = getOriginalAutomatonState(origCode);
+        origMap.put(origAut, origState);
       } else {
         origMap.put(aut, state);
       }
@@ -507,6 +518,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
           }
         }
       } while (current < 0);
+      iter.next();  // Discard result from previous() above
       final TransitionIterator transIter =
         rel.createSuccessorsReadOnlyIterator();
       final EventEncoding eventEnc = getEventEncoding();

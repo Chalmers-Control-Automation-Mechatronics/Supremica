@@ -254,6 +254,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testFTechnikConflict() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "ftechnik_conflict.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testJpt10Counter() throws Exception
   {
     final String group = "tests";
