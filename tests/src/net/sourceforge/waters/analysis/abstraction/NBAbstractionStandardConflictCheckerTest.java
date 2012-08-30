@@ -53,4 +53,18 @@ public class NBAbstractionStandardConflictCheckerTest
     return checker;
   }
 
+
+  //#########################################################################
+  //# Test Cases
+  public void testBigComponent() throws Exception
+  {
+    final CompositionalConflictChecker checker =
+      (CompositionalConflictChecker) getModelVerifier();
+    checker.setInternalStateLimit(1000);
+    final String group = "tests";
+    final String subdir = "nasty";
+    final String name = "big_component.wmod";
+    runModelVerifier(group, subdir, name, false);
+  }
+
 }
