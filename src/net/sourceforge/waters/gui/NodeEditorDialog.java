@@ -28,6 +28,7 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
+import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -63,11 +64,7 @@ public class NodeEditorDialog
                                      final NodeSubject node)
   {
     super(root.getRootWindow());
-    if (node == null) {
-      setTitle("Creating new simple node");
-    } else {
-      setTitle("Editing simple node '" + node.getName() + "'");
-    }
+    setTitle("Editing " + ProxyNamer.getItemClassName(node) + " '" + node.getName() + "'");
     mRoot = root;
     mNode = node;
     createComponents();
@@ -130,6 +127,8 @@ public class NodeEditorDialog
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter node name, eg. \"IDLE\" or \"WORKING\"");
 
+    mPropostionsPanel = new PropositionsPanel(mRoot, mNode);
+
     // Attributes panel ...
     mAttributesPanel =
       new SimpleNodeAttributesPanel(template.getAttributes());
@@ -164,18 +163,17 @@ public class NodeEditorDialog
   private void layoutComponents()
   {
     final GridBagConstraints constraints = new GridBagConstraints();
-    constraints.weightx = 1.0;
-    constraints.weighty = 1.0;
-    constraints.insets = INSETS;
-
-    // First, layout the main panel ...
     final GridBagLayout mainlayout = new GridBagLayout();
     mMainPanel.setLayout(mainlayout);
-    // mNameLabel
+    //constraints.weightx = 1.0;
+    constraints.insets = INSETS;
+    constraints.anchor = GridBagConstraints.NORTHWEST;
+
+    //mNameLabel
     constraints.gridx = 0;
     constraints.gridy = 0;
     constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
+    constraints.weighty = 0.0;
     mainlayout.setConstraints(mNameLabel, constraints);
     mMainPanel.add(mNameLabel);
     // mNameInput
@@ -186,30 +184,63 @@ public class NodeEditorDialog
     constraints.fill = GridBagConstraints.HORIZONTAL;
     mainlayout.setConstraints(mNameInput, constraints);
     mMainPanel.add(mNameInput);
+    //mPropositionsLabel
+    constraints.gridx = 0;
+    constraints.gridy++;
+    constraints.gridwidth = 1;
+    constraints.weightx = 0.0;
+    constraints.weighty = 1.0;
+    constraints.fill = GridBagConstraints.NONE;
+    final JLabel propositionsLabel = new JLabel("Propositions:");
+    mainlayout.setConstraints(propositionsLabel, constraints);
+    mMainPanel.add(propositionsLabel);
+    //mPropositionsPanel
+    constraints.gridx++;
+    constraints.gridwidth = 2;
+    constraints.weightx = 3.0;
+    constraints.fill = GridBagConstraints.BOTH;
+    mainlayout.setConstraints(mPropostionsPanel, constraints);
+    mMainPanel.add(mPropostionsPanel);
+    //mAttributesLabel
+    constraints.gridx = 0;
+    constraints.gridy++;
+    constraints.gridwidth = 1;
+    constraints.weightx = 0.0;
+    constraints.fill = GridBagConstraints.NONE;
+    final JLabel attributesLabel = new JLabel(AttributesPanel.LABEL_NAME);
+    mainlayout.setConstraints(attributesLabel, constraints);
+    mMainPanel.add(attributesLabel);
+    //mAttributesPanel
+    constraints.gridx++;
+    constraints.gridwidth = 2;
+    constraints.weightx = 3.0;
+    constraints.fill = GridBagConstraints.BOTH;
+    mainlayout.setConstraints(mAttributesPanel, constraints);
+    mMainPanel.add(mAttributesPanel);
 
-    // Attributes, error, and buttons panel do not need layouting.
-
-    // Finally, build the full dialog ...
     final Container contents = getContentPane();
     final GridBagLayout layout = new GridBagLayout();
     contents.setLayout(layout);
+
     constraints.gridx = 0;
     constraints.gridy = GridBagConstraints.RELATIVE;
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     constraints.weightx = 1.0;
-    constraints.weighty = 0.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.weighty = 1.0;
+    constraints.fill = GridBagConstraints.BOTH;
     constraints.insets = new Insets(0, 0, 0, 0);
     layout.setConstraints(mMainPanel, constraints);
     contents.add(mMainPanel);
-    constraints.weighty = 1.0;
-    constraints.fill = GridBagConstraints.BOTH;
-    layout.setConstraints(mAttributesPanel, constraints);
-    contents.add(mAttributesPanel);
+
+    //mErrorPanel
     constraints.weighty = 0.0;
+    constraints.gridx = 0;
+    constraints.gridy = GridBagConstraints.RELATIVE;
+    constraints.gridwidth = 3;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mErrorPanel, constraints);
     contents.add(mErrorPanel);
+    //mButtonsPanel
     layout.setConstraints(mButtonsPanel, constraints);
     contents.add(mButtonsPanel);
     pack();
@@ -354,6 +385,7 @@ public class NodeEditorDialog
   // Swing components
   private JPanel mMainPanel;
   private JLabel mNameLabel;
+  private PropositionsPanel mPropostionsPanel;
   private SimpleExpressionCell mNameInput;
   private AttributesPanel mAttributesPanel;
   private JPanel mErrorPanel;
@@ -365,6 +397,6 @@ public class NodeEditorDialog
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
-  private static final Insets INSETS = new Insets(2, 4, 2, 4);
+  private static final Insets INSETS = new Insets(2,4,2,4);
 
 }

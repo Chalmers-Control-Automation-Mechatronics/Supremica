@@ -31,13 +31,13 @@ public class ComponentsTree extends ModuleTree
   public ComponentsTree(final ModuleWindowInterface root,
                         final WatersPopupActionManager manager)
   {
-    super(root, manager);
+    super(root, manager, root.getModuleSubject(), root.getUndoInterface());
     mPopupFactory = new ComponentsTreePopupFactory(manager, root.getModuleContext());
   }
 
   ListSubject<? extends ProxySubject> getRootList()
   {
-    return getRoot().getModuleSubject().getComponentListModifiable();
+    return getRootWindow().getModuleSubject().getComponentListModifiable();
   }
 
   String getRootName()

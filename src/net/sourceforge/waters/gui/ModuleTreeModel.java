@@ -26,12 +26,14 @@ import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -42,10 +44,11 @@ import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 
 /**
@@ -61,10 +64,10 @@ class ModuleTreeModel
 
   //#########################################################################
   //# Constructor
-  ModuleTreeModel(final ModuleSubject module,
+  ModuleTreeModel(final ProxySubject root,
                    final ListSubject<? extends ProxySubject> list)
   {
-    mModule = module;
+    mRoot = root;
     mRootList = list;
     mChildrenGetterVisitor = new ChildrenGetterVisitor();
     mTypeCheckerVisitor = new TypeCheckerVisitor();
@@ -129,9 +132,9 @@ class ModuleTreeModel
     }
   }
 
-  public ModuleSubject getRoot()
+  public ProxySubject getRoot()
   {
-    return mModule;
+    return mRoot;
   }
 
   public boolean isLeaf(final Object node)
@@ -400,6 +403,12 @@ class ModuleTreeModel
       return foreachSub.getBodyModifiable();
     }
 
+    @Override
+    public ListSubject<? extends ProxySubject> visitGroupNodeProxy(final GroupNodeProxy simple){
+      final GroupNodeSubject node = (GroupNodeSubject)simple;
+      return node.getPropositions().getEventListModifiable();
+    }
+
     public IndexedListSubject<ParameterBindingSubject> visitInstanceProxy(final InstanceProxy inst)
     {
       final InstanceSubject instance = (InstanceSubject)inst;
@@ -421,6 +430,12 @@ class ModuleTreeModel
          return (ListSubject<? extends ProxySubject>) list.getEventListModifiable();
       }
       return null;
+    }
+
+    @Override
+    public ListSubject<? extends ProxySubject> visitSimpleNodeProxy(final SimpleNodeProxy simple){
+      final SimpleNodeSubject node = (SimpleNodeSubject)simple;
+      return node.getPropositions().getEventListModifiable();
     }
   }
 
@@ -514,7 +529,7 @@ class ModuleTreeModel
 
   //#########################################################################
   //# Data Members
-  private final ModuleSubject mModule;
+  private final ProxySubject mRoot;
   private Collection<TreeModelListener> mListeners;
   private final ListSubject<? extends ProxySubject> mRootList;
   private final ChildrenGetterVisitor mChildrenGetterVisitor;

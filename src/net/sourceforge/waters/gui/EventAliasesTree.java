@@ -19,14 +19,14 @@ public class EventAliasesTree extends ModuleTree
   public EventAliasesTree(final ModuleWindowInterface root,
                              final WatersPopupActionManager manager)
   {
-    super(root, manager);
+    super(root, manager, root.getModuleSubject(), root.getUndoInterface());
     mPopupFactory = new AliasesTreePopupFactory(manager, root.getModuleContext());
   }
 
   //#########################################################################
   //# Abstract Methods
   ListSubject<? extends ProxySubject> getRootList(){
-    return getRoot().getModuleSubject().getEventAliasListModifiable();
+    return getRootWindow().getModuleSubject().getEventAliasListModifiable();
   }
 
   String getRootName(){

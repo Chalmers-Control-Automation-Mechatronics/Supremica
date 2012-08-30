@@ -413,6 +413,8 @@ public class EventDeclEditorDialog
     }
     layout.setConstraints(mNamePanel, constraints);
     contents.add(mNamePanel);
+
+    mExtendedPanel = new RaisedDialogPanel();
     if (mDisplayingMoreOptions) {
       constraints.weighty = 1.0;
       constraints.fill = GridBagConstraints.BOTH;
@@ -1367,6 +1369,7 @@ public class EventDeclEditorDialog
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+  private JPanel mExtendedPanel;
 
   // Action Listeners
   private final List<ActionListener> mActionListeners;
