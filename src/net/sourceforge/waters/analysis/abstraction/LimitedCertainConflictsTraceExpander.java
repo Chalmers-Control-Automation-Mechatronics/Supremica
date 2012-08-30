@@ -476,6 +476,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
                             final StateEncoding stateEnc)
     {
       mCheckAutomata = mSafetyVerifier.getModel().getAutomata();
+      mCheckStateMap = mReverseStateMap;
       mTrace = mSafetyVerifier.getCounterExample();
       mTestAutomaton = testAut;
       mTestAutomatonStateEncoding = stateEnc;
@@ -585,7 +586,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
           final StateProxy origState = getOriginalAutomatonState(stateCode);
           refMap.put(origAut, origState);
         } else {
-          final StateProxy refState = mReverseStateMap.get(checkState);
+          final StateProxy refState = mCheckStateMap.get(checkState);
           refMap.put(refAut, refState);
         }
       }
@@ -599,6 +600,11 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     //# Data Members
     private final SafetyTraceProxy mTrace;
     private final Collection<AutomatonProxy> mCheckAutomata;
+    /**
+     * The reverse state map that was used when creating the language
+     * inclusion model. See {@link #mReverseStateMap}.
+     */
+    private final Map<StateProxy,StateProxy> mCheckStateMap;
     private final AutomatonProxy mTestAutomaton;
     private final StateEncoding mTestAutomatonStateEncoding;
     private final int mLevel;
