@@ -28,7 +28,6 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -52,7 +51,7 @@ public class Canonize
   }
 
   public ListBufferTransitionRelation run(final ProductDESProxyFactory factory)
-    throws OverflowException, AnalysisException
+    throws AnalysisException
   {
     final ListBufferTauLoopRemoval lbtr = new ListBufferTauLoopRemoval(mAutomaton);
     lbtr.run();
@@ -138,7 +137,7 @@ public class Canonize
     final TObjectIntHashMap<TIntHashSet> statesets = determinizer.getSetStateMap();
     final THashMap<TIntHashSet, TIntArrayList> alphaset = new THashMap<TIntHashSet, TIntArrayList>();
     final LessMarkedFullCache lm = new LessMarkedFullCache(lower, mMarking, new TIntHashSet());
-    final TIntArrayList nonAlphas = new TIntArrayList(); 
+    final TIntArrayList nonAlphas = new TIntArrayList();
     lower.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     System.out.println("subsumption");
     statesets.forEachEntry(new TObjectIntProcedure<TIntHashSet>(){
@@ -289,7 +288,7 @@ public class Canonize
         return true;
       }
     });
-    int[] alphaarr = alphas.toArray();
+    final int[] alphaarr = alphas.toArray();
     //Systemc.out.println("glue to upper");
     for (int i = 0; i < alphaarr.length; i++) {
       final int state = alphaarr[i];
