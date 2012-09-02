@@ -651,6 +651,27 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
+   * Creates an abstraction step representing a synchronous product operation.
+   * This hook is called after two or more automata have been composed to
+   * prepare an abstraction step, which may later be files by a call to
+   * {@link #recordAbstractionStep(AbstractionStep) recordAbstractionStep()}.
+   * @param  automata     The automata that have been composed.
+   * @param  sync         The synchronous product automaton that was created.
+   * @param  hidden       The local events that have been hidden.
+   * @param  tau          The tau event that replaces the local events in the
+   *                      synchronous product.
+   * @return A step object that can be filed.
+   */
+  protected HidingStep createSynchronousProductStep
+    (final Collection<AutomatonProxy> automata,
+     final AutomatonProxy sync,
+     final Collection<EventProxy> hidden,
+     final EventProxy tau)
+  {
+    return new HidingStep(automata, sync, hidden, tau);
+  }
+
+  /**
    * Removes the given events from the model.
    * This method is called when redundant events have been identified to
    * remove them.
@@ -1374,9 +1395,8 @@ public abstract class AbstractCompositionalModelAnalyzer
       final AutomatonProxy sync =
         mCurrentSynchronousProductBuilder.getComputedAutomaton();
       mMayBeSplit |= sync.getEvents().size() < expectedNumberOfEvents;
-      final SynchronousProductStateMap stateMap =
-        mCurrentSynchronousProductBuilder.getStateMap();
-      return new HidingStep(sync, hidden, tau, stateMap);
+      final Collection<AutomatonProxy> automata = des.getAutomata();
+      return createSynchronousProductStep(automata, sync, hidden, tau);
     } finally {
       final CompositionalAnalysisResult stats = getAnalysisResult();
       final AutomatonResult result =
@@ -2083,6 +2103,36 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
 
     //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      final StringBuffer buffer = new StringBuffer();
+      buffer.append(ProxyTools.getShortClassName(this));
+      buffer.append("\nOriginal: ");
+      boolean first = true;
+      for (final AutomatonProxy aut : mOriginalAutomata) {
+        if (first) {
+          first = false;
+        } else {
+          buffer.append("; ");
+        }
+        buffer.append(aut.getName());
+      }
+      buffer.append("\nResult: ");
+      first = true;
+      for (final AutomatonProxy aut : mResultAutomata) {
+        if (first) {
+          first = false;
+        } else {
+          buffer.append("; ");
+        }
+        buffer.append(aut.getName());
+      }
+      return buffer.toString();
+    }
+
+    //#######################################################################
     //# Data Members
     private final List<AutomatonProxy> mResultAutomata;
     private final List<AutomatonProxy> mOriginalAutomata;
@@ -2165,11 +2215,33 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   //#########################################################################
   //# Inner Class HidingStep
-  private class HidingStep extends AbstractionStep
+  protected class HidingStep extends AbstractionStep
   {
 
     //#######################################################################
-    //# Constructor
+    //# Constructors
+    protected HidingStep(final Collection<AutomatonProxy> originals,
+                         final AutomatonProxy composedAut,
+                         final Collection<EventProxy> localEvents,
+                         final EventProxy tau)
+    {
+      super(composedAut, originals);
+      mLocalEvents = localEvents;
+      mHiddenEvent = tau;
+      mStateMap = null;
+    }
+
+    protected HidingStep(final AutomatonProxy composedAut,
+                         final Collection<EventProxy> localEvents,
+                         final EventProxy tau,
+                         final SynchronousProductStateMap stateMap)
+    {
+      super(composedAut, stateMap.getInputAutomata());
+      mLocalEvents = localEvents;
+      mHiddenEvent = tau;
+      mStateMap = stateMap;
+    }
+
     private HidingStep(final AutomatonProxy composedAut,
                        final AutomatonProxy originalAut,
                        final Collection<EventProxy> localEvents,
@@ -2181,64 +2253,70 @@ public abstract class AbstractCompositionalModelAnalyzer
       mStateMap = null;
     }
 
-    private HidingStep(final AutomatonProxy composedAut,
-                       final Collection<EventProxy> localEvents,
-                       final EventProxy tau,
-                       final SynchronousProductStateMap stateMap)
-    {
-      super(composedAut, stateMap.getInputAutomata());
-      mLocalEvents = localEvents;
-      mHiddenEvent = tau;
-      mStateMap = stateMap;
-    }
-
     //#######################################################################
     //# Simple Access
-    EventProxy getTauEvent()
+    protected EventProxy getTauEvent()
     {
       return mHiddenEvent;
     }
 
+    protected Collection<EventProxy> getLocalEvents()
+    {
+      return mLocalEvents;
+    }
+
     //#######################################################################
     //# Trace Computation
+    @Override
     protected List<TraceStepProxy> convertTraceSteps
       (final List<TraceStepProxy> steps)
     {
-      final ProductDESProxyFactory factory = getFactory();
-      final AutomatonProxy resultAutomaton = getResultAutomaton();
-      final Collection<AutomatonProxy> originalAutomata = getOriginalAutomata();
-      final int convertedNumAutomata =
-        steps.iterator().next().getStateMap().size() +
-        originalAutomata.size() - 1;
-      Map<AutomatonProxy,StateProxy> previousMap = null;
+      Map<AutomatonProxy,StateProxy> previousMapOrig = null;
       final ListIterator<TraceStepProxy> iter = steps.listIterator();
       while (iter.hasNext()) {
         final TraceStepProxy step = iter.next();
-        final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
-        final Map<AutomatonProxy,StateProxy> convertedStepMap =
-          new HashMap<AutomatonProxy,StateProxy>(convertedNumAutomata);
-        convertedStepMap.putAll(stepMap);
-        final StateProxy convertedState =
-          convertedStepMap.remove(resultAutomaton);
-        for (final AutomatonProxy aut : originalAutomata) {
-          final StateProxy originalState =
-            getOriginalState(convertedState, aut);
-          convertedStepMap.put(aut, originalState);
-        }
-        EventProxy event = step.getEvent();
-        if (event != null && event == mHiddenEvent) {
-          event = findEvent(previousMap, convertedStepMap);
-        }
+        final Map<AutomatonProxy,StateProxy> nextMapResult =
+          step.getStateMap();
+        final EventProxy event = step.getEvent();
         final TraceStepProxy convertedStep =
-          factory.createTraceStepProxy(event, convertedStepMap);
+          findNextStep(previousMapOrig, nextMapResult, event);
         iter.set(convertedStep);
-        previousMap = convertedStepMap;
+        previousMapOrig = convertedStep.getStateMap();
       }
       return steps;
     }
 
-    private EventProxy findEvent(final Map<AutomatonProxy,StateProxy> sources,
-                                 final Map<AutomatonProxy,StateProxy> targets)
+    protected TraceStepProxy findNextStep
+      (final Map<AutomatonProxy,StateProxy> previousMapOrig,
+       final Map<AutomatonProxy,StateProxy> nextMapResult,
+       final EventProxy resultEvent)
+    {
+      final Map<AutomatonProxy,StateProxy> nextMapOrig =
+        new HashMap<AutomatonProxy,StateProxy>(nextMapResult);
+      final AutomatonProxy resultAutomaton = getResultAutomaton();
+      final StateProxy nextStateResult =
+        nextMapOrig.remove(resultAutomaton);
+      final Collection<AutomatonProxy> originalAutomata =
+        getOriginalAutomata();
+      for (final AutomatonProxy aut : originalAutomata) {
+        final StateProxy nextStateOrig =
+          getOriginalState(nextStateResult, aut);
+        assert nextStateOrig != null;
+        nextMapOrig.put(aut, nextStateOrig);
+      }
+      final EventProxy origEvent;
+      if (resultEvent != null && resultEvent == mHiddenEvent) {
+        origEvent = findEvent(previousMapOrig, nextMapOrig);
+      } else {
+        origEvent = resultEvent;
+      }
+      final ProductDESProxyFactory factory = getFactory();
+      return factory.createTraceStepProxy(origEvent, nextMapOrig);
+    }
+
+    protected EventProxy findEvent
+      (final Map<AutomatonProxy,StateProxy> sources,
+       final Map<AutomatonProxy,StateProxy> targets)
     {
       final Collection<EventProxy> possible =
         new LinkedList<EventProxy>(mLocalEvents);
@@ -2251,7 +2329,8 @@ public abstract class AbstractCompositionalModelAnalyzer
         final Collection<EventProxy> alphabet =
           new THashSet<EventProxy>(aut.getEvents());
         final int size = alphabet.size();
-        final Collection<EventProxy> retained = new THashSet<EventProxy>(size);
+        final Collection<EventProxy> retained =
+          new THashSet<EventProxy>(size);
         for (final TransitionProxy trans : aut.getTransitions()) {
           if (trans.getSource() == source && trans.getTarget() == target) {
             final EventProxy event = trans.getEvent();
@@ -2275,13 +2354,23 @@ public abstract class AbstractCompositionalModelAnalyzer
       return possible.iterator().next();
     }
 
-    final StateProxy getOriginalState(final StateProxy convertedState,
-                                      final AutomatonProxy aut)
+    protected StateProxy getOriginalState(final StateProxy convertedState,
+                                          final AutomatonProxy aut)
     {
       if (mStateMap == null) {
         return convertedState;
       } else {
         return mStateMap.getOriginalState(convertedState, aut);
+      }
+    }
+
+    protected boolean isMatchingEvent(final EventProxy origEvent,
+                                      final EventProxy resultEvent)
+    {
+      if (resultEvent == mHiddenEvent) {
+        return mLocalEvents.contains(origEvent);
+      } else {
+        return origEvent == resultEvent;
       }
     }
 

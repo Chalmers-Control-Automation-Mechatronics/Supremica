@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -23,6 +26,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -300,6 +305,19 @@ public abstract class AbstractCompositionalModelVerifier
   }
 
   @Override
+  protected HidingStep createSynchronousProductStep
+    (final Collection<AutomatonProxy> automata,
+     final AutomatonProxy sync,
+     final Collection<EventProxy> hidden,
+     final EventProxy tau)
+  {
+    final SynchronousProductBuilder builder =
+      getCurrentSynchronousProductBuilder();
+    final SynchronousProductStateMap stateMap =  builder.getStateMap();
+    return new HidingStep(sync, hidden, tau, stateMap);
+  }
+
+  @Override
   protected boolean doMonolithicAnalysis
     (final List<AutomatonProxy> automata)
     throws AnalysisException
@@ -396,19 +414,15 @@ public abstract class AbstractCompositionalModelVerifier
     final int size = mAbstractionSteps.size();
     final ListIterator<AbstractionStep> iter =
       mAbstractionSteps.listIterator(size);
-    /*
     final Collection<AutomatonProxy> check =
       new THashSet<AutomatonProxy>(currentAutomata);
     testCounterExample(traceSteps, check);
-    */
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
-      /*
       check.removeAll(step.getResultAutomata());
       check.addAll(step.getOriginalAutomata());
       testCounterExample(traceSteps, check);
-      */
     }
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> modelAutomata = model.getAutomata();

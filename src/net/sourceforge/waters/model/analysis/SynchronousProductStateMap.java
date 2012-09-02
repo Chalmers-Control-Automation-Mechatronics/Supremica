@@ -37,7 +37,8 @@ public interface SynchronousProductStateMap
    *                is requested. This automaton must be contained in the
    *                collection returned by {@link #getInputAutomata()}.
    * @return The state of automaton <CODE>aut</CODE> that corresponds to the
-   *         given state tuple <CODE>tuple</CODE>.
+   *         given state tuple <CODE>tuple</CODE>, or <CODE>null</CODE> if
+   *         no unique state can be assigned.
    */
   public StateProxy getOriginalState(final StateProxy tuple,
                                      final AutomatonProxy aut);
