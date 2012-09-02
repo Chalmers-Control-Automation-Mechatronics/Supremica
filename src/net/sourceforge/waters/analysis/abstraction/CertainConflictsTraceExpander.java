@@ -62,7 +62,7 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
     mSafetyVerifier.setKindTranslator(mKindTranslator);
     mLevels = null;
     mCertainConfRel = null;
-    logging = false;
+    logging = true;
   }
 
   //#######################################################################

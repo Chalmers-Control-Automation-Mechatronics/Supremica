@@ -616,6 +616,7 @@ public class CompositionalConflictChecker
   private AbstractionProcedure createStandardNonblockingAbstractionChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
      final boolean includeNonAlphaDeterminisation,
+     final boolean useLimitedCertainConflicts,
      final boolean useProperCertainConflicts)
   {
     final ChainTRSimplifier preChain = new ChainTRSimplifier();
@@ -638,11 +639,18 @@ public class CompositionalConflictChecker
     final int limit = getInternalTransitionLimit();
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     preChain.add(incomingEquivalenceSimplifier);
-    final TransitionRelationSimplifier certainConflictsRemover;
+    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
+    if (useLimitedCertainConflicts) {
+      limitedCertainConflictsRemover =
+        new LimitedCertainConflictsTRSimplifier();
+    } else {
+      limitedCertainConflictsRemover = null;
+    }
+    final CertainConflictsTRSimplifier certainConflictsRemover;
     if (useProperCertainConflicts) {
       certainConflictsRemover = new CertainConflictsTRSimplifier();
     } else {
-      certainConflictsRemover = new LimitedCertainConflictsTRSimplifier();
+      certainConflictsRemover = null;
     }
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
@@ -665,7 +673,8 @@ public class CompositionalConflictChecker
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
     return new StandardConflictCheckerAbstractionProcedure
-      (preChain, certainConflictsRemover, postChain);
+      (preChain, limitedCertainConflictsRemover,
+       certainConflictsRemover, postChain);
   }
 
   private AbstractionProcedure createGeneralisedNonblockingAbstractionChain
@@ -942,6 +951,26 @@ public class CompositionalConflictChecker
   public enum AbstractionMethod
   {
     /**
+     * <P>Minimisation is performed according to a sequence of abstraction
+     * rules for standard nonblocking, but using weak observation
+     * equivalence instead of observation equivalence, and using proper
+     * certain conflicts simplification instead of limited certain
+     * conflicts.</P>
+     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
+     * Verification in Supervisory Control. SIAM Journal of Control and
+     * Optimization, 48(3), 1914-1938, 2009.</P>
+     */
+    CC {
+      @Override
+      AbstractionProcedure createAbstractionRule
+        (final CompositionalConflictChecker checker)
+      {
+        return checker.createStandardNonblockingAbstractionChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           OBSERVATION_EQUIVALENCE, false, false, true);
+      }
+    },
+    /**
       * <P>Minimisation is performed according to a sequence of abstraction
      * rules for generalised nonblocking proposed, but using weak observation
      * equivalence instead of observation equivalence.</P>
@@ -975,7 +1004,7 @@ public class CompositionalConflictChecker
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, false, false);
+           WEAK_OBSERVATION_EQUIVALENCE, false, true, false);
       }
     },
     /**
@@ -994,20 +1023,27 @@ public class CompositionalConflictChecker
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, true, false);
+           WEAK_OBSERVATION_EQUIVALENCE, true, true, false);
       }
     },
     /**
-     * Automata are minimised according to <I>certain conflicts</I>.
+     * <P>Minimisation is performed according to a sequence of abstraction rules
+     * for standard nonblocking, but using weak observation
+     * equivalence instead of observation equivalence, and using proper
+     * certain conflicts simplification in addition to limited certain
+     * conflicts.</P>
+     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
+     * Verification in Supervisory Control. SIAM Journal of Control and
+     * Optimization, 48(3), 1914-1938, 2009.</P>
      */
-    CC {
+    NBC {
       @Override
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           OBSERVATION_EQUIVALENCE, false, true);
+           WEAK_OBSERVATION_EQUIVALENCE, false, true, true);
       }
     },
     /**
@@ -1592,15 +1628,22 @@ public class CompositionalConflictChecker
     //# Constructor
     protected StandardConflictCheckerAbstractionProcedure
       (final ChainTRSimplifier preChain,
-       final TransitionRelationSimplifier ccSimplifier,
+        final LimitedCertainConflictsTRSimplifier limitedCCSimplifier,
+        final CertainConflictsTRSimplifier ccSimplifier,
        final ChainTRSimplifier postChain)
     {
       mPreChain = preChain;
+      mLimitedCertainConflictsSimplifier = limitedCCSimplifier;
       mCertainConflictsSimplifier = ccSimplifier;
       mPostChain = postChain;
       mCompleteChain = new ChainTRSimplifier();
       mCompleteChain.add(preChain);
-      mCompleteChain.add(ccSimplifier);
+      if (limitedCCSimplifier != null) {
+        mCompleteChain.add(limitedCCSimplifier);
+      }
+      if (ccSimplifier != null) {
+        mCompleteChain.add(ccSimplifier);
+      }
       mCompleteChain.add(postChain);
     }
 
@@ -1641,24 +1684,53 @@ public class CompositionalConflictChecker
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
           partition = mPreChain.getResultPartition();
           oeq = mPreChain.isObservationEquivalentAbstraction();
-          preStep = createStep(mPreChain, lastAut, lastStateEnc,
+          preStep = createStep(aut, inputStateEnc,
                                outputAut, outputStateEnc, tau,
                                partition, oeq, false);
           lastAut = outputAut;
           lastStateEnc = outputStateEnc;
         }
-        mCertainConflictsSimplifier.setTransitionRelation(rel);
+        boolean maybeBlocking = true;
+        AbstractionStep lccStep = null;
+        if (mLimitedCertainConflictsSimplifier != null) {
+          mLimitedCertainConflictsSimplifier.setTransitionRelation(rel);
+          if (mLimitedCertainConflictsSimplifier.run()) {
+            rel = mLimitedCertainConflictsSimplifier.getTransitionRelation();
+            final StateEncoding outputStateEnc = new StateEncoding();
+            final AutomatonProxy outputAut =
+              rel.createAutomaton(factory, eventEnc, outputStateEnc);
+            if (mLimitedCertainConflictsSimplifier.hasRemovedTransitions()) {
+              lccStep = new LimitedCertainConflictsStep
+                (mLimitedCertainConflictsSimplifier, outputAut, lastAut,
+                 tau, lastStateEnc, outputStateEnc);
+            } else {
+              final List<int[]> ccPart =
+                mLimitedCertainConflictsSimplifier.getResultPartition();
+              partition = ChainTRSimplifier.mergePartitions(partition, ccPart);
+              preStep = createStep(aut, inputStateEnc,
+                                   outputAut, outputStateEnc, tau,
+                                   partition, oeq, false);
+            }
+            lastAut = outputAut;
+            lastStateEnc = outputStateEnc;
+          }
+          maybeBlocking =
+            mLimitedCertainConflictsSimplifier.getMaxLevel() >= 0;
+        }
         AbstractionStep ccStep = null;
-        if (mCertainConflictsSimplifier.run()) {
-          rel = mCertainConflictsSimplifier.getTransitionRelation();
-          final StateEncoding outputStateEnc = new StateEncoding();
-          final AutomatonProxy outputAut =
-            rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          ccStep = new LimitedCertainConflictsStep
-            (mCertainConflictsSimplifier, outputAut, lastAut,
-             tau, lastStateEnc, outputStateEnc);
-          lastAut = outputAut;
-          lastStateEnc = outputStateEnc;
+        if (maybeBlocking && mCertainConflictsSimplifier != null) {
+          mCertainConflictsSimplifier.setTransitionRelation(rel);
+          if (mCertainConflictsSimplifier.run()) {
+            rel = mCertainConflictsSimplifier.getTransitionRelation();
+            final StateEncoding outputStateEnc = new StateEncoding();
+            final AutomatonProxy outputAut =
+              rel.createAutomaton(factory, eventEnc, outputStateEnc);
+            ccStep = new LimitedCertainConflictsStep
+              (mCertainConflictsSimplifier, outputAut, lastAut,
+               tau, lastStateEnc, outputStateEnc);
+            lastAut = outputAut;
+            lastStateEnc = outputStateEnc;
+          }
         }
         mPostChain.setTransitionRelation(rel);
         if (mPostChain.run()) {
@@ -1667,7 +1739,7 @@ public class CompositionalConflictChecker
               rel.getNumberOfTransitions() == numTrans &&
               rel.getNumberOfMarkings() == numMarkings) {
             return false;
-          } else if (ccStep == null) {
+          } else if (lccStep == null && ccStep == null) {
             lastAut = aut;
             lastStateEnc = inputStateEnc;
             final List<int[]> postPart = mPostChain.getResultPartition();
@@ -1675,6 +1747,7 @@ public class CompositionalConflictChecker
             oeq &= mPostChain.isObservationEquivalentAbstraction();
           } else {
             recordStep(steps, preStep);
+            recordStep(steps, lccStep);
             recordStep(steps, ccStep);
             partition = mPostChain.getResultPartition();
             oeq = mPostChain.isObservationEquivalentAbstraction();
@@ -1684,12 +1757,12 @@ public class CompositionalConflictChecker
           final AutomatonProxy outputAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
           final AbstractionStep postStep =
-            createStep(mPostChain, lastAut, lastStateEnc,
-                       outputAut, outputStateEnc, tau,
-                       partition, oeq, reduced);
+            createStep(lastAut, lastStateEnc, outputAut, outputStateEnc,
+                       tau, partition, oeq, reduced);
           recordStep(steps, postStep);
         } else {
           recordStep(steps, preStep);
+          recordStep(steps, lccStep);
           recordStep(steps, ccStep);
         }
         return !steps.isEmpty();
@@ -1742,8 +1815,7 @@ public class CompositionalConflictChecker
       return enc;
     }
 
-    private AbstractionStep createStep(final ChainTRSimplifier simplifier,
-                                       final AutomatonProxy input,
+    private AbstractionStep createStep(final AutomatonProxy input,
                                        final StateEncoding inputStateEnc,
                                        final AutomatonProxy output,
                                        final StateEncoding outputStateEnc,
@@ -1774,7 +1846,9 @@ public class CompositionalConflictChecker
     //#######################################################################
     //# Data Members
     private final ChainTRSimplifier mPreChain;
-    private final TransitionRelationSimplifier
+    private final LimitedCertainConflictsTRSimplifier
+      mLimitedCertainConflictsSimplifier;
+    private final CertainConflictsTRSimplifier
       mCertainConflictsSimplifier;
     private final ChainTRSimplifier mPostChain;
     private final ChainTRSimplifier mCompleteChain;

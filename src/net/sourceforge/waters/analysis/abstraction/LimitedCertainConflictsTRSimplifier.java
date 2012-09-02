@@ -112,6 +112,13 @@ public class LimitedCertainConflictsTRSimplifier
 
   //#########################################################################
   //# Specific Access
+  /**
+   * Returns whether the last run has removed transitions from coreachable
+   * states. If this returns <CODE>false</CODE>, the result may be treated
+   * as the merging of blocking states, which allows for simple trace
+   * expansion. Otherwise proper certain conflicts trace expansion using
+   * {@link LimitedCertainConflictsTraceExpander} is necessary.
+   */
   public boolean hasRemovedTransitions()
   {
     return mHasRemovedTransitions;
