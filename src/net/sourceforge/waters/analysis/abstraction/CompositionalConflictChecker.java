@@ -1699,7 +1699,7 @@ public class CompositionalConflictChecker
             final StateEncoding outputStateEnc = new StateEncoding();
             final AutomatonProxy outputAut =
               rel.createAutomaton(factory, eventEnc, outputStateEnc);
-            if (mLimitedCertainConflictsSimplifier.hasRemovedTransitions()) {
+            if (mLimitedCertainConflictsSimplifier.hasCertainConflictTransitions()) {
               lccStep = new LimitedCertainConflictsStep
                 (mLimitedCertainConflictsSimplifier, outputAut, lastAut,
                  tau, lastStateEnc, outputStateEnc);
