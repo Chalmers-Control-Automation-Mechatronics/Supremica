@@ -127,7 +127,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       }
       // 1. Collect initial state set.
       final int numStates = rel.getNumberOfStates();
-      final TIntArrayList init = new TIntArrayList();
+      final TIntHashSet init = new TIntHashSet();
       for (int state = 0; state < numStates; state++) {
           if (rel.isInitial(state)) {
               if (mTauIterator == null) {
@@ -143,7 +143,8 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
           }
       }
       int last = 0;
-      final int[] arrInit = init.toNativeArray();
+      final int[] arrInit = init.toArray();
+      Arrays.sort(arrInit);
       if (!init.isEmpty()) {
           numInit = arrInit.length;
           for (int i = 0; i < arrInit.length; i++)
