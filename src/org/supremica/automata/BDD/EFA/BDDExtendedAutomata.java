@@ -1099,10 +1099,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             
 //            reachableStatesBDD.printDot();
             
-//            final IDD idd = generateIDD(reachableStatesBDD, reachableStatesBDD);
-//            nbrOfReachableStates = nbrOfStatesIDD(idd).longValue();
+            final IDD idd = generateIDD(reachableStatesBDD, reachableStatesBDD);
+            nbrOfReachableStates = nbrOfStatesIDD(idd).longValue();
             
-            ((BDDMonolithicEdges) getBDDEdges()).makeTheEdgesReachable();
+//            ((BDDMonolithicEdges) getBDDEdges()).makeTheEdgesReachable();
             
             System.err.println(nbrOfReachableStates + " reachable states found.");
 
