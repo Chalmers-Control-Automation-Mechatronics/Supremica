@@ -112,9 +112,16 @@ public class LimitedCertainConflictsTRSimplifier
 
   //#########################################################################
   //# Specific Access
-  public boolean hasRemovedTransitions()
+  /**
+   * Returns whether the last run has removed transitions from coreachable
+   * states. If this returns <CODE>false</CODE>, the result may be treated
+   * as the merging of blocking states, which allows for simple trace
+   * expansion. Otherwise proper certain conflicts trace expansion using
+   * {@link LimitedCertainConflictsTraceExpander} is necessary.
+   */
+  public boolean hasCertainConflictTransitions()
   {
-    return mHasRemovedTransitions;
+    return mHasCertainConflictTransitions;
   }
 
   /**
@@ -158,6 +165,7 @@ public class LimitedCertainConflictsTRSimplifier
     super.setUp();
     mStateInfo = null;
     mHasRemovedTransitions = false;
+    mHasCertainConflictTransitions = false;
   }
 
   @Override
@@ -213,7 +221,8 @@ public class LimitedCertainConflictsTRSimplifier
             }
           }
           if (!victims.isEmpty()) {
-            mHasRemovedTransitions = modified = true;
+            mHasRemovedTransitions = mHasCertainConflictTransitions =
+              modified = true;
             for (int index = 0; index < victims.size(); index++) {
               final int victim = victims.get(index);
               rel.removeOutgoingTransitions(victim);
@@ -257,6 +266,20 @@ public class LimitedCertainConflictsTRSimplifier
               final int victim = victims.get(index);
               final int event = (victim & ~root) >>> shift;
               final int pred = victim & mask;
+              if (!mHasCertainConflictTransitions && mStateInfo[pred] < 0) {
+                // We have certain conflict transitions if we are deleting a
+                // transition from a coreachable state to another coreachable
+                // state.
+                assert level == 0;
+                succIter.reset(pred, event);
+                while (succIter.advance()) {
+                  final int target = succIter.getCurrentTargetState();
+                  if (mStateInfo[target] < 0) {
+                    mHasCertainConflictTransitions = true;
+                    break;
+                  }
+                }
+              }
               rel.removeOutgoingTransitions(pred, event);
               if ((victim & root) != 0) {
                 rel.addTransition(pred, event, state);
@@ -567,6 +590,7 @@ public class LimitedCertainConflictsTRSimplifier
   //#########################################################################
   //# Data Members
   private boolean mHasRemovedTransitions;
+  private boolean mHasCertainConflictTransitions;
 
   private int mMaxLevel;
   private int[] mStateInfo;

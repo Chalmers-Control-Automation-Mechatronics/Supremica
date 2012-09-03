@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -23,6 +24,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -297,6 +300,19 @@ public abstract class AbstractCompositionalModelVerifier
   protected void recordAbstractionStep(final AbstractionStep step)
   {
     mAbstractionSteps.add(step);
+  }
+
+  @Override
+  protected HidingStep createSynchronousProductStep
+    (final Collection<AutomatonProxy> automata,
+     final AutomatonProxy sync,
+     final Collection<EventProxy> hidden,
+     final EventProxy tau)
+  {
+    final SynchronousProductBuilder builder =
+      getCurrentSynchronousProductBuilder();
+    final SynchronousProductStateMap stateMap =  builder.getStateMap();
+    return new HidingStep(sync, hidden, tau, stateMap);
   }
 
   @Override

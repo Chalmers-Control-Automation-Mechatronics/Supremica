@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   NBAbstractionStandardConflictCheckerTest
+//# CLASS:   NBCAbstractionStandardConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NBAbstractionStandardConflictCheckerTest
+public class NBCAbstractionStandardConflictCheckerTest
   extends AbstractStandardConflictCheckerTest
 {
 
@@ -26,7 +26,7 @@ public class NBAbstractionStandardConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(NBAbstractionStandardConflictCheckerTest.class);
+      new TestSuite(NBCAbstractionStandardConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -44,7 +44,7 @@ public class NBAbstractionStandardConflictCheckerTest
   {
     final CompositionalConflictChecker checker =
       new CompositionalConflictChecker
-        (CompositionalConflictChecker.AbstractionMethod.NB, factory);
+        (CompositionalConflictChecker.AbstractionMethod.NBC, factory);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
