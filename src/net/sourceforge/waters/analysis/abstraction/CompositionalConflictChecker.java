@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.THashSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,6 +40,8 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.TraceChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -480,6 +484,28 @@ public class CompositionalConflictChecker
   //#########################################################################
   //# Hooks
   @Override
+  protected void setupSynchronousProductBuilder()
+  {
+    super.setupSynchronousProductBuilder();
+    final MonolithicSynchronousProductBuilder builder =
+      getCurrentSynchronousProductBuilder();
+    builder.setPruningDeadlocks(true);
+  }
+
+  @Override
+  protected HidingStep createSynchronousProductStep
+    (final Collection<AutomatonProxy> automata,
+     final AutomatonProxy sync,
+     final Collection<EventProxy> hidden,
+     final EventProxy tau)
+  {
+    final SynchronousProductBuilder builder =
+      getCurrentSynchronousProductBuilder();
+    final SynchronousProductStateMap stateMap =  builder.getStateMap();
+    return new ConflictHidingStep(sync, hidden, tau, stateMap);
+  }
+
+  @Override
   protected boolean isSubsystemTrivial
     (final Collection<AutomatonProxy> automata)
     throws AnalysisException
@@ -590,6 +616,7 @@ public class CompositionalConflictChecker
   private AbstractionProcedure createStandardNonblockingAbstractionChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
      final boolean includeNonAlphaDeterminisation,
+     final boolean useLimitedCertainConflicts,
      final boolean useProperCertainConflicts)
   {
     final ChainTRSimplifier preChain = new ChainTRSimplifier();
@@ -612,11 +639,18 @@ public class CompositionalConflictChecker
     final int limit = getInternalTransitionLimit();
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     preChain.add(incomingEquivalenceSimplifier);
-    final TransitionRelationSimplifier certainConflictsRemover;
+    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
+    if (useLimitedCertainConflicts) {
+      limitedCertainConflictsRemover =
+        new LimitedCertainConflictsTRSimplifier();
+    } else {
+      limitedCertainConflictsRemover = null;
+    }
+    final CertainConflictsTRSimplifier certainConflictsRemover;
     if (useProperCertainConflicts) {
       certainConflictsRemover = new CertainConflictsTRSimplifier();
     } else {
-      certainConflictsRemover = new LimitedCertainConflictsTRSimplifier();
+      certainConflictsRemover = null;
     }
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
@@ -639,7 +673,8 @@ public class CompositionalConflictChecker
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
     return new StandardConflictCheckerAbstractionProcedure
-      (preChain, certainConflictsRemover, postChain);
+      (preChain, limitedCertainConflictsRemover,
+       certainConflictsRemover, postChain);
   }
 
   private AbstractionProcedure createGeneralisedNonblockingAbstractionChain
@@ -916,6 +951,26 @@ public class CompositionalConflictChecker
   public enum AbstractionMethod
   {
     /**
+     * <P>Minimisation is performed according to a sequence of abstraction
+     * rules for standard nonblocking, but using weak observation
+     * equivalence instead of observation equivalence, and using proper
+     * certain conflicts simplification instead of limited certain
+     * conflicts.</P>
+     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
+     * Verification in Supervisory Control. SIAM Journal of Control and
+     * Optimization, 48(3), 1914-1938, 2009.</P>
+     */
+    CC {
+      @Override
+      AbstractionProcedure createAbstractionRule
+        (final CompositionalConflictChecker checker)
+      {
+        return checker.createStandardNonblockingAbstractionChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           OBSERVATION_EQUIVALENCE, false, false, true);
+      }
+    },
+    /**
       * <P>Minimisation is performed according to a sequence of abstraction
      * rules for generalised nonblocking proposed, but using weak observation
      * equivalence instead of observation equivalence.</P>
@@ -949,7 +1004,7 @@ public class CompositionalConflictChecker
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, false, false);
+           WEAK_OBSERVATION_EQUIVALENCE, false, true, false);
       }
     },
     /**
@@ -968,20 +1023,27 @@ public class CompositionalConflictChecker
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, true, false);
+           WEAK_OBSERVATION_EQUIVALENCE, true, true, false);
       }
     },
     /**
-     * Automata are minimised according to <I>certain conflicts</I>.
+     * <P>Minimisation is performed according to a sequence of abstraction rules
+     * for standard nonblocking, but using weak observation
+     * equivalence instead of observation equivalence, and using proper
+     * certain conflicts simplification in addition to limited certain
+     * conflicts.</P>
+     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
+     * Verification in Supervisory Control. SIAM Journal of Control and
+     * Optimization, 48(3), 1914-1938, 2009.</P>
      */
-    CC {
+    NBC {
       @Override
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
         return checker.createStandardNonblockingAbstractionChain
           (ObservationEquivalenceTRSimplifier.Equivalence.
-           OBSERVATION_EQUIVALENCE, false, true);
+           WEAK_OBSERVATION_EQUIVALENCE, false, true, true);
       }
     },
     /**
@@ -1566,15 +1628,22 @@ public class CompositionalConflictChecker
     //# Constructor
     protected StandardConflictCheckerAbstractionProcedure
       (final ChainTRSimplifier preChain,
-       final TransitionRelationSimplifier ccSimplifier,
+        final LimitedCertainConflictsTRSimplifier limitedCCSimplifier,
+        final CertainConflictsTRSimplifier ccSimplifier,
        final ChainTRSimplifier postChain)
     {
       mPreChain = preChain;
+      mLimitedCertainConflictsSimplifier = limitedCCSimplifier;
       mCertainConflictsSimplifier = ccSimplifier;
       mPostChain = postChain;
       mCompleteChain = new ChainTRSimplifier();
       mCompleteChain.add(preChain);
-      mCompleteChain.add(ccSimplifier);
+      if (limitedCCSimplifier != null) {
+        mCompleteChain.add(limitedCCSimplifier);
+      }
+      if (ccSimplifier != null) {
+        mCompleteChain.add(ccSimplifier);
+      }
       mCompleteChain.add(postChain);
     }
 
@@ -1615,24 +1684,53 @@ public class CompositionalConflictChecker
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
           partition = mPreChain.getResultPartition();
           oeq = mPreChain.isObservationEquivalentAbstraction();
-          preStep = createStep(mPreChain, lastAut, lastStateEnc,
+          preStep = createStep(aut, inputStateEnc,
                                outputAut, outputStateEnc, tau,
                                partition, oeq, false);
           lastAut = outputAut;
           lastStateEnc = outputStateEnc;
         }
-        mCertainConflictsSimplifier.setTransitionRelation(rel);
+        boolean maybeBlocking = true;
+        AbstractionStep lccStep = null;
+        if (mLimitedCertainConflictsSimplifier != null) {
+          mLimitedCertainConflictsSimplifier.setTransitionRelation(rel);
+          if (mLimitedCertainConflictsSimplifier.run()) {
+            rel = mLimitedCertainConflictsSimplifier.getTransitionRelation();
+            final StateEncoding outputStateEnc = new StateEncoding();
+            final AutomatonProxy outputAut =
+              rel.createAutomaton(factory, eventEnc, outputStateEnc);
+            if (mLimitedCertainConflictsSimplifier.hasCertainConflictTransitions()) {
+              lccStep = new LimitedCertainConflictsStep
+                (mLimitedCertainConflictsSimplifier, outputAut, lastAut,
+                 tau, lastStateEnc, outputStateEnc);
+            } else {
+              final List<int[]> ccPart =
+                mLimitedCertainConflictsSimplifier.getResultPartition();
+              partition = ChainTRSimplifier.mergePartitions(partition, ccPart);
+              preStep = createStep(aut, inputStateEnc,
+                                   outputAut, outputStateEnc, tau,
+                                   partition, oeq, false);
+            }
+            lastAut = outputAut;
+            lastStateEnc = outputStateEnc;
+          }
+          maybeBlocking =
+            mLimitedCertainConflictsSimplifier.getMaxLevel() >= 0;
+        }
         AbstractionStep ccStep = null;
-        if (mCertainConflictsSimplifier.run()) {
-          rel = mCertainConflictsSimplifier.getTransitionRelation();
-          final StateEncoding outputStateEnc = new StateEncoding();
-          final AutomatonProxy outputAut =
-            rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          ccStep = new LimitedCertainConflictsStep
-            (mCertainConflictsSimplifier, outputAut, lastAut,
-             tau, lastStateEnc, outputStateEnc);
-          lastAut = outputAut;
-          lastStateEnc = outputStateEnc;
+        if (maybeBlocking && mCertainConflictsSimplifier != null) {
+          mCertainConflictsSimplifier.setTransitionRelation(rel);
+          if (mCertainConflictsSimplifier.run()) {
+            rel = mCertainConflictsSimplifier.getTransitionRelation();
+            final StateEncoding outputStateEnc = new StateEncoding();
+            final AutomatonProxy outputAut =
+              rel.createAutomaton(factory, eventEnc, outputStateEnc);
+            ccStep = new LimitedCertainConflictsStep
+              (mCertainConflictsSimplifier, outputAut, lastAut,
+               tau, lastStateEnc, outputStateEnc);
+            lastAut = outputAut;
+            lastStateEnc = outputStateEnc;
+          }
         }
         mPostChain.setTransitionRelation(rel);
         if (mPostChain.run()) {
@@ -1641,7 +1739,7 @@ public class CompositionalConflictChecker
               rel.getNumberOfTransitions() == numTrans &&
               rel.getNumberOfMarkings() == numMarkings) {
             return false;
-          } else if (ccStep == null) {
+          } else if (lccStep == null && ccStep == null) {
             lastAut = aut;
             lastStateEnc = inputStateEnc;
             final List<int[]> postPart = mPostChain.getResultPartition();
@@ -1649,6 +1747,7 @@ public class CompositionalConflictChecker
             oeq &= mPostChain.isObservationEquivalentAbstraction();
           } else {
             recordStep(steps, preStep);
+            recordStep(steps, lccStep);
             recordStep(steps, ccStep);
             partition = mPostChain.getResultPartition();
             oeq = mPostChain.isObservationEquivalentAbstraction();
@@ -1658,12 +1757,12 @@ public class CompositionalConflictChecker
           final AutomatonProxy outputAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
           final AbstractionStep postStep =
-            createStep(mPostChain, lastAut, lastStateEnc,
-                       outputAut, outputStateEnc, tau,
-                       partition, oeq, reduced);
+            createStep(lastAut, lastStateEnc, outputAut, outputStateEnc,
+                       tau, partition, oeq, reduced);
           recordStep(steps, postStep);
         } else {
           recordStep(steps, preStep);
+          recordStep(steps, lccStep);
           recordStep(steps, ccStep);
         }
         return !steps.isEmpty();
@@ -1716,8 +1815,7 @@ public class CompositionalConflictChecker
       return enc;
     }
 
-    private AbstractionStep createStep(final ChainTRSimplifier simplifier,
-                                       final AutomatonProxy input,
+    private AbstractionStep createStep(final AutomatonProxy input,
                                        final StateEncoding inputStateEnc,
                                        final AutomatonProxy output,
                                        final StateEncoding outputStateEnc,
@@ -1748,7 +1846,9 @@ public class CompositionalConflictChecker
     //#######################################################################
     //# Data Members
     private final ChainTRSimplifier mPreChain;
-    private final TransitionRelationSimplifier
+    private final LimitedCertainConflictsTRSimplifier
+      mLimitedCertainConflictsSimplifier;
+    private final CertainConflictsTRSimplifier
       mCertainConflictsSimplifier;
     private final ChainTRSimplifier mPostChain;
     private final ChainTRSimplifier mCompleteChain;
@@ -1996,6 +2096,219 @@ public class CompositionalConflictChecker
     //# Data Members
     private final OPSearchAutomatonSimplifier mSimplifier;
     private OPSearchTRSimplifierStatistics mStatistics;
+  }
+
+
+  //#########################################################################
+  //# Inner Class ConflictHidingStep
+  private class ConflictHidingStep extends HidingStep
+  {
+
+    //#######################################################################
+    //# Constructor
+    private ConflictHidingStep(final AutomatonProxy composedAut,
+                               final Collection<EventProxy> localEvents,
+                               final EventProxy tau,
+                               final SynchronousProductStateMap stateMap)
+    {
+      super(composedAut, localEvents, tau, stateMap);
+    }
+
+    //#######################################################################
+    //# Trace Computation
+    @Override
+    protected TraceStepProxy findNextStep
+      (final Map<AutomatonProxy,StateProxy> previousMapOrig,
+       final Map<AutomatonProxy,StateProxy> nextMapResult,
+       final EventProxy resultEvent)
+    {
+      final AutomatonProxy resultAutomaton = getResultAutomaton();
+      final StateProxy nextStateResult = nextMapResult.get(resultAutomaton);
+      for (final AutomatonProxy aut : getOriginalAutomata()) {
+        if (getOriginalState(nextStateResult, aut) == null) {
+          return findDumpStep(previousMapOrig, nextMapResult, resultEvent);
+        }
+      }
+      return super.findNextStep(previousMapOrig, nextMapResult, resultEvent);
+    }
+
+    private TraceStepProxy findDumpStep
+      (final Map<AutomatonProxy,StateProxy> previousMapOrig,
+       final Map<AutomatonProxy,StateProxy> nextMapResult,
+       final EventProxy resultEvent)
+    {
+      final Collection<AutomatonProxy> originalAutomata =
+        getOriginalAutomata();
+      final int numAutomata = originalAutomata.size();
+
+      final Map<EventProxy,DumpStateSearchData> searchMap;
+      if (resultEvent == getTauEvent()) {
+        final Collection<EventProxy> local = getLocalEvents();
+        final int numLocal = local.size();
+        searchMap =
+          new HashMap<EventProxy,DumpStateSearchData>(numLocal);
+        for (final EventProxy event : local) {
+          final DumpStateSearchData data =
+            new DumpStateSearchData(numAutomata);
+          searchMap.put(event, data);
+        }
+      } else {
+        final DumpStateSearchData data =
+          new DumpStateSearchData(numAutomata);
+        searchMap = Collections.singletonMap(resultEvent, data);
+      }
+
+      final EventProxy marking = getUsedDefaultMarking();
+      for (final AutomatonProxy aut : originalAutomata) {
+        final Collection<EventProxy> alphabet =
+          new THashSet<EventProxy>(aut.getEvents());
+        final Collection<StateProxy> states = aut.getStates();
+        final StateProxy prev;
+        if (previousMapOrig == null) {
+          // Initial step ...
+          assert resultEvent == null;
+          prev = null;
+          final DumpStateSearchData data = searchMap.get(null);
+          for (final StateProxy state : states) {
+            if (state.isInitial()) {
+              data.addTargetState(state);
+            }
+          }
+        } else {
+          prev = previousMapOrig.get(aut);
+        }
+        final Collection<StateProxy> nonDumpStates;
+        if (alphabet.contains(marking)) {
+          final int numStates = states.size();
+          nonDumpStates = new THashSet<StateProxy>(numStates);
+        } else {
+          nonDumpStates = null;
+        }
+        if (prev != null || nonDumpStates != null) {
+          for (final TransitionProxy trans : aut.getTransitions()) {
+            final StateProxy src = trans.getSource();
+            if (nonDumpStates != null) {
+              nonDumpStates.add(src);
+            }
+            if (src == prev) {
+              final EventProxy event = trans.getEvent();
+              final DumpStateSearchData data = searchMap.get(event);
+              if (data != null) {
+                final StateProxy target = trans.getTarget();
+                data.addTargetState(target);
+              }
+            }
+          }
+        }
+        final Iterator<Map.Entry<EventProxy,DumpStateSearchData>> iter =
+          searchMap.entrySet().iterator();
+        while (iter.hasNext()) {
+          final Map.Entry<EventProxy,DumpStateSearchData> entry = iter.next();
+          final EventProxy event = entry.getKey();
+          final DumpStateSearchData data = entry.getValue();
+          if (!alphabet.contains(event)) {
+            final StateProxy state = previousMapOrig.get(aut);
+            data.setTarget(aut, state);
+          } else if (data.findTarget(aut, nonDumpStates) == null) {
+            iter.remove();
+          }
+        }
+      }
+
+      EventProxy event = null;
+      DumpStateSearchData data = null;
+      for (final Map.Entry<EventProxy,DumpStateSearchData> entry :
+           searchMap.entrySet()) {
+        data = entry.getValue();
+        if (data.hasDumpState()) {
+          event = entry.getKey();
+          break;
+        }
+      }
+      assert event != null;
+      final AutomatonProxy resultAutomaton = getResultAutomaton();
+      final Map<AutomatonProxy,StateProxy> nextMapOrig =
+        new HashMap<AutomatonProxy,StateProxy>(nextMapResult);
+      nextMapOrig.remove(resultAutomaton);
+      final Map<AutomatonProxy,StateProxy> recordMap =
+        data.getTargetStateMap();
+      nextMapOrig.putAll(recordMap);
+      final ProductDESProxyFactory factory = getFactory();
+      return factory.createTraceStepProxy(event, nextMapOrig);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class DumpStateSearchData
+  private class DumpStateSearchData
+  {
+    //#######################################################################
+    //# Constructor
+    private DumpStateSearchData(final int numAutomata)
+    {
+      mTargetStateMap = new HashMap<AutomatonProxy,StateProxy>(numAutomata);
+      mCurrentTargets = new ArrayList<StateProxy>();
+      mHasDumpState = false;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private boolean hasDumpState()
+    {
+      return mHasDumpState;
+    }
+
+    private Map<AutomatonProxy,StateProxy> getTargetStateMap()
+    {
+      return mTargetStateMap;
+    }
+
+    //#######################################################################
+    //# Searching
+    private void addTargetState(final StateProxy target)
+    {
+      mCurrentTargets.add(target);
+    }
+
+    private StateProxy setTarget(final AutomatonProxy aut, final StateProxy state)
+    {
+      mTargetStateMap.put(aut, state);
+      return state;
+    }
+    private StateProxy findTarget(final AutomatonProxy aut,
+                                  final Collection<StateProxy> nonDumpStates)
+    {
+      StateProxy state = null;
+      if (mCurrentTargets.isEmpty()) {
+        // No successor with this event ...
+        return null;
+      } else if (nonDumpStates == null) {
+        // Marking proposition not in automaton alphabet ...
+        state = mCurrentTargets.get(0);
+      } else {
+        // Event and marking in alphabet --- try to find a dump state ...
+        final EventProxy marking = getUsedDefaultMarking();
+        for (final StateProxy succ : mCurrentTargets) {
+          if (!nonDumpStates.contains(succ) &&
+              !succ.getPropositions().contains(marking)) {
+            state = succ;
+            mHasDumpState = true;
+            break;
+          } else if (state == null) {
+            state = succ;
+          }
+        }
+      }
+      mCurrentTargets.clear();
+      return setTarget(aut, state);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Map<AutomatonProxy,StateProxy> mTargetStateMap;
+    private final List<StateProxy> mCurrentTargets;
+    private boolean mHasDumpState;
   }
 
 

@@ -201,7 +201,7 @@ public class MonolithicSynchronousProductBuilder
   {
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();
-    final MemStateMap stateMap = new MemStateMap(automata);
+    final MemStateMap stateMap = new MemStateMap(automata, mDeadlockState);
     return stateMap;
   }
 
@@ -823,7 +823,8 @@ public class MonolithicSynchronousProductBuilder
   {
     //#######################################################################
     //# Constructor
-    private MemStateMap(final Collection<AutomatonProxy> automata)
+    private MemStateMap(final Collection<AutomatonProxy> automata,
+                        final int dumpState)
     {
       mInputAutomata = new ArrayList<AutomatonProxy>(automata);
       final int numaut = automata.size();
@@ -837,6 +838,7 @@ public class MonolithicSynchronousProductBuilder
         final int size = states.size();
         mStateLists[a++] = states.toArray(new StateProxy[size]);
       }
+      mDumpState = dumpState;
     }
 
     //#######################################################################
@@ -852,9 +854,13 @@ public class MonolithicSynchronousProductBuilder
     {
       final int a = getAutomatonIndex(aut);
       final MemStateProxy memstate = (MemStateProxy) state;
-      final int[] tuple = memstate.getStateTuple();
-      final int code = tuple[a];
-      return mStateLists[a][code];
+      if (memstate.getCode() == mDumpState) {
+        return null;
+      } else {
+        final int[] tuple = memstate.getStateTuple();
+        final int code = tuple[a];
+        return mStateLists[a][code];
+      }
     }
 
     //#######################################################################
@@ -872,6 +878,7 @@ public class MonolithicSynchronousProductBuilder
     //# Data Members
     private final List<AutomatonProxy> mInputAutomata;
     private final StateProxy[][] mStateLists;
+    private final int mDumpState;
   }
 
 
@@ -910,6 +917,11 @@ public class MonolithicSynchronousProductBuilder
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName, mStateTuple, mProps, mIsInitial);
+    }
+
+    public int getCode()
+    {
+      return mName;
     }
 
     public String getName()
