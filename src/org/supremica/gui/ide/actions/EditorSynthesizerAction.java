@@ -20,11 +20,13 @@ import java.util.Vector;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+import org.supremica.automata.BDD.BDDSynthesizer;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
@@ -49,7 +51,7 @@ public class EditorSynthesizerAction
 
         setEditorActiveRequired(true);
 
-        putValue(Action.NAME, "Seamless Synthesize...");
+        putValue(Action.NAME, "Symbolic Synthesis/Optimization on TEFAs...");
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SHORT_DESCRIPTION, "Synthesize a modular supervisor by adding guards to the original automata");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
@@ -58,16 +60,6 @@ public class EditorSynthesizerAction
     public void actionPerformed(final ActionEvent e)
     {
         doAction();
-    }
-
-    public static int max(final int[] t) {
-        int maximum = t[0];
-        for (int i=1; i<t.length; i++) {
-            if (t[i] > maximum) {
-                maximum = t[i];
-            }
-        }
-        return maximum;
     }
 
     public void doAction()
@@ -111,11 +103,19 @@ public class EditorSynthesizerAction
                 eventNames.add(sigmaS.getName());
             }
         }
+        
+        final Vector<String> variableNamesForBox = new Vector<String>();
+        variableNamesForBox.add("No variable selected");
+        for (final Proxy sub : module.getComponentList()) {
+            if (sub instanceof VariableComponentProxy) {
+                variableNamesForBox.add(((VariableComponentProxy)sub).getName());
+            }                    
+        }
 
         final Vector<String> eventNamesForBox = new Vector<String>(eventNames);
         eventNamesForBox.add(0,"Generate guards for ALL controllable events");
 
-        final EditorSynthesizerDialog synthesizerDialog = new EditorSynthesizerDialog(ide.getFrame(), nbrOfComponents, options, eventNamesForBox);
+        final EditorSynthesizerDialog synthesizerDialog = new EditorSynthesizerDialog(ide.getFrame(), nbrOfComponents, options, eventNamesForBox, variableNamesForBox);
         synthesizerDialog.show();
 
         if (!options.getDialogOK())
@@ -193,7 +193,13 @@ public class EditorSynthesizerAction
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
         logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.numberOfReachableStates());
         if(options.getOptimization())
-            logger.info("The minimum time to reach a marked state from the initial state: "+bddSynthesizer.bddAutomata.getOptimalTime()+".");
+            logger.info("The minimum time to reach a marked state from the initial state: "+bddSynthesizer.bddAutomata.getOptimalTime()+".");       
+        
+        if(!options.getMinVaribale().isEmpty())
+        {
+            logger.info("The minimum value of variable "+ options.getMinVaribale()+" among the reachable marked states is: "+bddSynthesizer.bddAutomata.getMinValueOfVar()+"."); 
+        }
+        
         logger.info("The "+options.getSynthesisType().toString()+" supervisor consists of "+(double)bddSynthesizer.nbrOfStates()+" states.");
 
         List<VariableComponentProxy> pars = bddSynthesizer.bddAutomata.getExtendedAutomata().getParameters();

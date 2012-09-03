@@ -93,6 +93,8 @@ class EditorSynthesizerDialogStandardPanel
     private final JRadioButton fromForbiddenStatesButton;
     private final JRadioButton optimalButton;
     private final JComboBox eventList;
+    private final JComboBox variablesList;
+
 
     static class AlgorithmSelector
         extends JComboBox
@@ -177,7 +179,7 @@ class EditorSynthesizerDialogStandardPanel
     }
 
 
-    public EditorSynthesizerDialogStandardPanel(final int num, final Vector<String> events)
+    public EditorSynthesizerDialogStandardPanel(final int num, final Vector<String> events, final Vector<String> variables)
     {
 
         algorithmSelector = AlgorithmSelector.create(num);
@@ -325,7 +327,7 @@ class EditorSynthesizerDialogStandardPanel
 
         final JPanel optimizationPanel = new JPanel();
         optimizationPanel.setBorder(BorderFactory.createTitledBorder("Optimization"));
-        optimizationPanel.setLayout(new GridLayout(4, 1));
+        optimizationPanel.setLayout(new GridLayout(5, 1));
         optimizationPanel.add(optimizationBox);
 
         optimizationPanel.add(new JLabel("Enter the global time domain:"));
@@ -333,6 +335,12 @@ class EditorSynthesizerDialogStandardPanel
         globalClockDomainField.setToolTipText("Guess a reasonably large amount of time to reach a marked state");
         globalClockDomainField.setEnabled(false);
         optimizationPanel.add(globalClockDomainField);
+        JLabel miniSupLabel = new JLabel("Minimize variable:");
+        miniSupLabel.setToolTipText("Compute the supervisor that ensures the variable will have its minimum value among the reachable markes states.");
+        optimizationPanel.add(miniSupLabel);
+
+        variablesList = new JComboBox(variables);
+        optimizationPanel.add(variablesList);
 
         optimizationSupBox.add(optimizationPanel);
 
@@ -455,6 +463,12 @@ class EditorSynthesizerDialogStandardPanel
             synthesizerOptions.setEvent("");
         else
             synthesizerOptions.setEvent((String)eventList.getSelectedItem());
+        
+        if(variablesList.getSelectedIndex() == 0)
+            synthesizerOptions.setMinVariable("");
+        else
+            synthesizerOptions.setMinVariable((String)variablesList.getSelectedItem());
+        
     }
 
     public void actionPerformed(final ActionEvent e)
@@ -503,7 +517,7 @@ public class EditorSynthesizerDialog
     /**
      * Creates modal dialog box for input of synthesizer and guard  options.
      */
-    public EditorSynthesizerDialog(final Frame parentFrame, final int numSelected, final EditorSynthesizerOptions synthesizerOptions, final Vector<String> events)
+    public EditorSynthesizerDialog(final Frame parentFrame, final int numSelected, final EditorSynthesizerOptions synthesizerOptions, final Vector<String> events, final Vector<String> variables)
     {
         dialog = new JDialog(parentFrame, true);    // modal
         this.parentFrame = parentFrame;
@@ -515,7 +529,7 @@ public class EditorSynthesizerDialog
 
         final Container contentPane = dialog.getContentPane();
 
-        standardPanel = new EditorSynthesizerDialogStandardPanel(numSelected, events);
+        standardPanel = new EditorSynthesizerDialogStandardPanel(numSelected, events, variables);
 
 //        final JTabbedPane tabbedPane = new JTabbedPane();
 

@@ -66,7 +66,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
     }
 
     public BDD uncontrollableBackward(final BDD forbidden) {
-        System.err.println("Entering uncontrollableBackward...");
+        System.err.println("UncontrollableBackward entered.");
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         final BDD t_u = bddEdges.getMonolithicUncontrollableEdgesBackwardBDD();
         final BDD backwardTime = bddEdges.getBackwardClocksWithTheSameRate();
@@ -95,7 +95,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         do {
 //            System.out.println("UBackward: "+iteration++);
             Qk = Qkn.id();
-            newUCstates = image_preImage(Qk, t_u);            
+            newUCstates = image_preImage(Qk, t_u);
             Qkn = Qk.or(newUCstates); 
             BDD ucDueToTime = getZeroBDD();
             if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
@@ -109,12 +109,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
             Qkn = Qkn.or(ucDueToTime);
         } while (!Qkn.equals(Qk));
 
-        System.err.println("Exiting uncontrollableBackward...");
+        System.err.println("UncontrollableBackward exited.");
         return Qkn;
     }
 
     public BDD restrictedBackward(final BDD markedStates, final BDD forbidden) {
-        System.err.println("Entering restrictedBackward...");
+        System.err.println("RestrictedBackward entered.");
         final BDD delta_all = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesBackwardBDD();
         final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getBackwardClocksWithTheSameRate();
 
@@ -163,13 +163,13 @@ public class BDDExtendedManager extends BDDAbstractManager {
 //        System.err.println("number of iterations in restrictedBackward: "+iteration);
 
 //        try{out.close();}catch (final Exception e){}
-        System.err.println("Exiting restrictedBackward...");
+        System.err.println("RestrictedBackward exited.");
 
         return Qkn;
     }
 
     public BDD restrictedForward(final BDD initialStates, final BDD forbidden) {
-        System.err.println("Entering restrictedForward...");
+        System.err.println("RestrictedForward entered.");
         final BDD trans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesForwardBDD();
         final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getForwardClocksWithTheSameRate();
 
@@ -221,12 +221,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
 //        System.err.println("number of iterations in restrictedForward: "+iteration);
 
-        System.err.println("Exiting restrictedForward...");
+        System.err.println("RestrictedForward exited.");
         return Qkn;
     }
 
     public BDD nonblockingControllable(final BDD forbidden, final boolean reachable) {
-        System.err.println("Entering nonblockingControllable...");
+        System.err.println("NonblockingControllable entered.");
         final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getForwardClocksWithTheSameRate();
 
         BDD Qkn = forbidden;
@@ -248,7 +248,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
             Qkn = Qk.or(Q2);
         } while ((!Qkn.equals(Qk)));
 
-        System.err.println("Exiting nonblockingControllable...");
+        System.err.println("NonblockingControllable exited.");
 
         if (reachable) {
             return restrictedForward(bddExAutomata.getInitialState(), Qkn);
