@@ -9,6 +9,7 @@
 
 package org.supremica.gui.ide.actions;
 
+import gnu.trove.TIntArrayList;
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,6 +21,7 @@ import java.util.Vector;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
@@ -30,6 +32,7 @@ import org.supremica.automata.BDD.BDDSynthesizer;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
+import org.supremica.automata.BDD.EFA.BDDMonolithicEdges;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.gui.EditorSynthesizerDialog;
@@ -187,17 +190,41 @@ public class EditorSynthesizerAction
 //        double LD = (double)max(efaDegree)/(double)exAutomata.nbrOfEFAsVars;
 //        System.err.println("LD: "+ LD);
 
+        
+        int i = 1;
+        final BDD bdd =  bddSynthesizer.bddAutomata.getMarkedLocations().and(bddSynthesizer.bddAutomata.getMarkedValuations()).and(bddSynthesizer.bddAutomata.getReachableStates());            
+        final TIntArrayList valuations = bddSynthesizer.bddAutomata.BDD2valuations(bdd, options.getOptVaribale());
+        
+//        do
+//        {
+//            System.err.println("cheking "+valuations.get(i)+"...");
+//            bddSynthesizer.bddAutomata.minValueOfVar = valuations.get(i++);
+//            bddSynthesizer.bddAutomata.minValueOfVarBDD = bdd.and(
+//                    bddSynthesizer.bddAutomata.getManager().getFactory().buildCube((int) bddSynthesizer.bddAutomata.minValueOfVar, bddSynthesizer.bddAutomata.getSourceVariableDomain(
+//                    bddSynthesizer.bddAutomata.getIndexMap().getVariableIndexByName(options.getMinVaribale())).vars()));              
+//            
+//            bddSynthesizer.bddAutomata.nonblockingControllableStatesBDD = null;
+//            bddSynthesizer.bddAutomata.nbrOfNonblockingControllableStates = -1;            
+//            ((BDDMonolithicEdges) bddSynthesizer.bddAutomata.getBDDEdges()).forcibleEdgesForwardBDD = ((BDDMonolithicEdges) bddSynthesizer.bddAutomata.getBDDEdges()).forcibleEdgesForwardBDDCopy.id();          
+//                
+//            bddSynthesizer.bddAutomata.markedStatesBDD = bddSynthesizer.bddAutomata.getMarkedLocations().and(bddSynthesizer.bddAutomata.getMarkedValuations()).and(bddSynthesizer.bddAutomata.minValueOfVarBDD);
+//                
+//            bddSynthesizer.synthesize(options);
+//            System.err.println("number of supervisor states: "+bddSynthesizer.nbrOfStates());
+//        }while(bddSynthesizer.nbrOfStates() <= 0);                                                       
+                
+
         bddSynthesizer.synthesize(options);
-
-
+        
+        
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
         logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.numberOfReachableStates());
         if(options.getOptimization())
             logger.info("The minimum time to reach a marked state from the initial state: "+bddSynthesizer.bddAutomata.getOptimalTime()+".");       
         
-        if(!options.getMinVaribale().isEmpty())
+        if(!options.getOptVaribale().isEmpty())
         {
-            logger.info("The minimum value of variable "+ options.getMinVaribale()+" among the reachable marked states is: "+bddSynthesizer.bddAutomata.getMinValueOfVar()+"."); 
+            logger.info("The minimum value of variable "+ options.getOptVaribale()+" among the reachable marked states is: "+bddSynthesizer.bddAutomata.getMinValueOfVar()+"."); 
         }
         
         logger.info("The "+options.getSynthesisType().toString()+" supervisor consists of "+(double)bddSynthesizer.nbrOfStates()+" states.");
