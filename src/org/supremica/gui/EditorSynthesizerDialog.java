@@ -75,14 +75,13 @@ class EditorSynthesizerDialogStandardPanel
     private final JCheckBox reachableBox;
     private final Box guardBox;
     private final Box genGuardComputeSupBox;
-    private final Box optimizationSupBox;
 
     private final JCheckBox printGuardBox;
     private final JCheckBox addGuardsBox;
     private final JCheckBox saveEventGuardInFileBox;
     private final JCheckBox saveIDDInFileBox;
 
-    private final JCheckBox optimizationBox;
+    private final JCheckBox timeOptBox;
 
     private final JCheckBox complementHeuristicBox;
     private final JCheckBox independentHeuristicBox;
@@ -91,7 +90,11 @@ class EditorSynthesizerDialogStandardPanel
 
     private final JRadioButton fromAllowedStatesButton;
     private final JRadioButton fromForbiddenStatesButton;
-    private final JRadioButton optimalButton;
+    
+    private final JRadioButton minVarButton;
+    private final JRadioButton maxVarButton;
+    
+    private final JRadioButton optimalButton;        
     private final JComboBox eventList;
     private final JComboBox variablesList;
 
@@ -236,7 +239,7 @@ class EditorSynthesizerDialogStandardPanel
         fromAllowedStatesButton.setToolTipText("Generate the guard from the states where the event is allowed to occur");
 
         fromForbiddenStatesButton = new JRadioButton("From forbidden states");
-		fromForbiddenStatesButton.setToolTipText("Generate the guard from the states where the event is forbidden to occur");
+	fromForbiddenStatesButton.setToolTipText("Generate the guard from the states where the event is forbidden to occur");
 
         optimalButton = new JRadioButton("Adaptive solution");
         optimalButton.setToolTipText("Generate the guard from the state set that yields the best result");
@@ -245,7 +248,7 @@ class EditorSynthesizerDialogStandardPanel
 //		eventField = new JTextField(15);
 //		eventField.setToolTipText("The name of the desired event");
 
-        final ButtonGroup group = new ButtonGroup();
+        ButtonGroup group = new ButtonGroup();
         group.add(fromAllowedStatesButton);
         group.add(fromForbiddenStatesButton);
         group.add(optimalButton);
@@ -317,34 +320,51 @@ class EditorSynthesizerDialogStandardPanel
 
         this.add(genGuardComputeSupBox);
 
-        //Optimization options
-        optimizationSupBox = Box.createVerticalBox();
-
-        optimizationBox = new JCheckBox("Compute optimal time");
-        optimizationBox.setToolTipText("Compute the supervisor that will direct the plant to reach a marked state with the minimum time.");
-
-        optimizationBox.addActionListener(this);
-
-        final JPanel optimizationPanel = new JPanel();
+        final JPanel optimizationPanel = new JPanel(new GridLayout(5, 2));
         optimizationPanel.setBorder(BorderFactory.createTitledBorder("Optimization"));
-        optimizationPanel.setLayout(new GridLayout(5, 1));
-        optimizationPanel.add(optimizationBox);
+        
+        //Optimization options
 
+        timeOptBox = new JCheckBox("Compute optimal time");
+        timeOptBox.setToolTipText("Compute the supervisor that will restrict the plant to reach a marked state with the minimum time.");
+
+        timeOptBox.addActionListener(this);
+
+        optimizationPanel.add(timeOptBox);
+        optimizationPanel.add(new JLabel());
+        
         optimizationPanel.add(new JLabel("Enter the global time domain:"));
         globalClockDomainField = new JTextField("0");
         globalClockDomainField.setToolTipText("Guess a reasonably large amount of time to reach a marked state");
-        globalClockDomainField.setEnabled(false);
+        globalClockDomainField.setEnabled(false);        
         optimizationPanel.add(globalClockDomainField);
-        JLabel miniSupLabel = new JLabel("Minimize variable:");
-        miniSupLabel.setToolTipText("Compute the supervisor that ensures the variable will have its minimum value among the reachable markes states.");
+        
+        JLabel miniSupLabel = new JLabel("Optimize variable:");
+        miniSupLabel.setToolTipText("Compute the supervisor that ensures the variable will have its optimal value among the reachable markes states.");
         optimizationPanel.add(miniSupLabel);
+        optimizationPanel.add(new JLabel());
+                
+        minVarButton = new JRadioButton("Minimize");
+        minVarButton.setSelected(true);
+        maxVarButton = new JRadioButton("Maximize");
 
+//		eventField = new JTextField(15);
+//		eventField.setToolTipText("The name of the desired event");
+
+        group = new ButtonGroup();
+        group.add(minVarButton);
+        group.add(maxVarButton);
+        
+        optimizationPanel.add(minVarButton);
+        optimizationPanel.add(maxVarButton);
+        
         variablesList = new JComboBox(variables);
         optimizationPanel.add(variablesList);
 
-        optimizationSupBox.add(optimizationPanel);
+        
+//        optimizationSupBox.add(optimizationPanel);
 
-        this.add(optimizationSupBox);
+        this.add(optimizationPanel);
 
         updatePanel();
     }
@@ -355,7 +375,7 @@ class EditorSynthesizerDialogStandardPanel
         algorithmSelector.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
         printGuardBox.setSelected(synthesizerOptions.getPrintGuard());
         reachableBox.setSelected(synthesizerOptions.getReachability());
-        globalClockDomainField.setEnabled(optimizationBox.isSelected());
+        globalClockDomainField.setEnabled(timeOptBox.isSelected());
         
 /*
         boolean selected = saveIDDInFileBox.isSelected() || saveEventGuardInFileBox.isSelected() || 
@@ -371,7 +391,7 @@ class EditorSynthesizerDialogStandardPanel
 
     public void updatePanel()
     {
-        globalClockDomainField.setEnabled(optimizationBox.isSelected());
+        globalClockDomainField.setEnabled(timeOptBox.isSelected());
         //At present, it is only possible to perform the synthesis via BDDs
         final SynthesisAlgorithm selected = algorithmSelector.getAlgorithm();
         // Clear, then add the ones that are implemented
@@ -443,7 +463,7 @@ class EditorSynthesizerDialogStandardPanel
         synthesizerOptions.setReachability(reachableBox.isSelected());
         synthesizerOptions.setCompHeuristic(complementHeuristicBox.isSelected());
         synthesizerOptions.setIndpHeuristic(independentHeuristicBox.isSelected());
-        synthesizerOptions.setOptimization(optimizationBox.isSelected());
+        synthesizerOptions.setOptimization(timeOptBox.isSelected());
         synthesizerOptions.setGlobalClockDomain(Long.parseLong(globalClockDomainField.getText()));
 
         if(fromForbiddenStatesButton.isSelected())
@@ -465,9 +485,15 @@ class EditorSynthesizerDialogStandardPanel
             synthesizerOptions.setEvent((String)eventList.getSelectedItem());
         
         if(variablesList.getSelectedIndex() == 0)
-            synthesizerOptions.setMinVariable("");
+            synthesizerOptions.setOptVariable("");
         else
-            synthesizerOptions.setMinVariable((String)variablesList.getSelectedItem());
+            synthesizerOptions.setOptVariable((String)variablesList.getSelectedItem());
+        
+        if(minVarButton.isSelected())
+            synthesizerOptions.setTypeOfVarOpt(true);
+        
+        if(maxVarButton.isSelected())
+            synthesizerOptions.setTypeOfVarOpt(false);        
         
     }
 

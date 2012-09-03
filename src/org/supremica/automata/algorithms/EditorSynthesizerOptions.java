@@ -82,11 +82,13 @@ public final class EditorSynthesizerOptions
 
 
     //Guard options
-	private String event;
-	private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from allowed states; 2: Adaptive case
+    private String event;
+    private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from allowed states; 2: Adaptive case
         
     //Optimization options
-        private String minVariable;
+    private String optVariable;
+    private boolean typeOfVarOpt = true;
+        
 
     /**
      * The current options, based on earlier user preferences.
@@ -136,7 +138,7 @@ public final class EditorSynthesizerOptions
         this.event = "";
         this.expressionType = 2;
         
-        this.minVariable = "";
+        this.optVariable = "";
     }
 
     public boolean isValid()
@@ -449,15 +451,25 @@ public final class EditorSynthesizerOptions
 	event = set;
     }
     
-    public String getMinVaribale()
+    public String getOptVaribale()
     {
-        return minVariable;
+        return optVariable;
     }
     
-    public void setMinVariable(String var)
+    public void setOptVariable(String var)
     {
-        minVariable = var;
+        optVariable=  var;
     }
+    
+    public boolean getTypeOfVarOpt()
+    {
+        return typeOfVarOpt;
+    }
+    
+    public void setTypeOfVarOpt(boolean minMax)
+    {
+        typeOfVarOpt = minMax;
+    } 
 
 
 }

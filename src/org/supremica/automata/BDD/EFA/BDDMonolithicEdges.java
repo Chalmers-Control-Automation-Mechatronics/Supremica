@@ -15,7 +15,10 @@ public class BDDMonolithicEdges
     private BDDExtendedManager manager;
     private BDD edgesForwardBDD = null;
     private BDD forcibleEdgesForwardBDD = null;
-    private BDD edgesForwardWithoutDestBDD = null;
+    
+//    public BDD forcibleEdgesForwardBDDCopy = null;
+
+    private BDD edgesForwardWithoutDestBDD = null;    
     private BDD edgesBackwardBDD = null;
     private BDD edgesForwardWithEventsBDD = null;
     private BDD edgesBackwardWithEventsBDD = null;
@@ -226,6 +229,7 @@ public class BDDMonolithicEdges
         System.err.println("1");
 //        edgesForwardWithEventsBDD = edgesForwardWithEventsBDD.and(bddExAutomata.getReachableStates());
         forcibleEdgesForwardBDD = forcibleEdgesForwardBDD.and(bddExAutomata.getReachableStates());
+//        forcibleEdgesForwardBDDCopy = forcibleEdgesForwardBDD.id();
         System.err.println("2");
 //        plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(bddExAutomata.getReachableStates());
 //        specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(bddExAutomata.getReachableStates());
