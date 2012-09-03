@@ -217,6 +217,29 @@ public class BDDMonolithicEdges
         }
         return newEdgesBDD;
     }
+    
+    public void makeTheEdgesReachable()
+    {
+        System.err.println("Start making the edges reachable...");
+        
+        edgesForwardBDD = edgesForwardBDD.and(bddExAutomata.getReachableStates());
+        System.err.println("1");
+//        edgesForwardWithEventsBDD = edgesForwardWithEventsBDD.and(bddExAutomata.getReachableStates());
+        forcibleEdgesForwardBDD = forcibleEdgesForwardBDD.and(bddExAutomata.getReachableStates());
+        System.err.println("2");
+//        plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(bddExAutomata.getReachableStates());
+//        specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(bddExAutomata.getReachableStates());
+        
+        BDD destReachableStates = bddExAutomata.getReachableStates().replace(bddExAutomata.getSourceToDestLocationPairing());
+        destReachableStates = destReachableStates.replace(bddExAutomata.getSourceToDestVariablePairing());
+        edgesBackwardBDD = edgesBackwardBDD.and(destReachableStates);
+        System.err.println("3");
+        
+//        edgesBackwardWithEventsBDD = edgesBackwardWithEventsBDD.and(destReachableStates);                
+        uncontrollableEdgesBackwardBDD = uncontrollableEdgesBackwardBDD.and(destReachableStates);
+        
+        System.err.println("The edges only including reachable states are computed.");            
+    }
 
 //    private BDD synchronizeForwardClocks()
 //    {
