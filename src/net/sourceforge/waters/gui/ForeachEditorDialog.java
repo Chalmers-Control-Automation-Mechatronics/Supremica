@@ -11,6 +11,7 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -18,6 +19,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +30,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
-
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
@@ -86,6 +88,17 @@ public class ForeachEditorDialog
     mVariableInput.requestFocusInWindow();
     setVisible(true);
     setMinimumSize(getSize());
+    addComponentListener(new ComponentAdapter() {
+
+    @Override
+    public void componentResized(final ComponentEvent e) {
+      System.out.println(getMaximumSize());
+        setSize(new Dimension(getWidth(), 182));
+        super.componentResized(e);
+    }
+
+    });
+
   }
 
 
@@ -300,7 +313,7 @@ public class ForeachEditorDialog
         final List<InsertInfo> list = Collections.singletonList(insert);
         final Command command = new InsertCommand(list, mPanel, mRoot);
         mForeach = template;
-        mRoot.getUndoInterface().executeCommand(command);
+        executeCommand(command);
       } else {
         final String oldname = mForeach.getName();
         final boolean namechange = !name.equals(oldname);
@@ -322,7 +335,7 @@ public class ForeachEditorDialog
             template.setGuard(guard);
           }
           final Command command = new EditCommand(mForeach, template, mPanel);
-          mRoot.getUndoInterface().executeCommand(command);
+          executeCommand(command);
         }
       }
       dispose();
@@ -349,7 +362,6 @@ public class ForeachEditorDialog
       mGuardInput.isFocusOwner() && !mGuardInput.shouldYieldFocus();
   }
 
-
   private SimpleExpressionSubject makeUnique
     (final SimpleExpressionSubject subject)
   {
@@ -357,6 +369,15 @@ public class ForeachEditorDialog
       return subject;
     } else {
       return subject.clone();
+    }
+  }
+
+  private void executeCommand(final Command command){
+    if(mPanel.getUndoInterface(null) == null){
+      command.execute();
+    }
+    else{
+      mPanel.getUndoInterface(null).executeCommand(command);
     }
   }
 

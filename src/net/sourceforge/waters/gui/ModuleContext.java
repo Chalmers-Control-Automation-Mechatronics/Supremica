@@ -818,7 +818,7 @@ public class ModuleContext
             if (!props.getEventIdentifierList().isEmpty()) {
               return true;
             }
-          } else {
+          } else if(value instanceof Proxy){
             final Proxy proxy = (Proxy) value;
             final Boolean found =
               mPropositionFinderVisitor.hasPropositions(proxy);

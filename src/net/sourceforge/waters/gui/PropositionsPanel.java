@@ -24,6 +24,7 @@ import javax.swing.border.Border;
 
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
 
 import org.supremica.gui.ide.IDE;
 
@@ -76,6 +77,11 @@ class PropositionsPanel extends JPanel
     scrolled.setBorder(border);
     layout.setConstraints(scrolled, constraints);
     add(scrolled);
+  }
+
+  public PlainEventListSubject getPropositions(){
+    final NodeSubject node = (NodeSubject)mPropositionsTree.getRoot();
+    return node.getPropositions();
   }
 
   //#########################################################################

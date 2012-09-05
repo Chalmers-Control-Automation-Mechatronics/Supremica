@@ -1,6 +1,8 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -43,6 +45,16 @@ public class EventAliasesTree extends ModuleTree
   PopupFactory getPopupFactory()
   {
     return mPopupFactory;
+  }
+
+  boolean shouldForceCopy(final DataFlavor flavor,
+                          final Transferable transferable)
+  {
+    if (flavor == WatersDataFlavor.IDENTIFIER
+        && transferable.isDataFlavorSupported(WatersDataFlavor.EVENT_ALIAS)) {
+      return true;
+    }
+    return false;
   }
 
   private final PopupFactory mPopupFactory;

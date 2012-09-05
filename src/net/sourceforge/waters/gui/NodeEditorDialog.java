@@ -128,7 +128,8 @@ public class NodeEditorDialog
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter node name, eg. \"IDLE\" or \"WORKING\"");
 
-    mPropostionsPanel = new PropositionsPanel(mRoot, mNode);
+    final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+    mPropostionsPanel = new PropositionsPanel(mRoot, (NodeSubject) cloner.getClone(mNode));
 
     // Attributes panel ...
     mAttributesPanel =
@@ -273,7 +274,7 @@ public class NodeEditorDialog
         ModuleSubjectFactory.getCloningInstance();
       NodeSubject template = null;
       final PlainEventListProxy propositions =
-        (PlainEventListProxy) cloner.getClone(mNode.getPropositions());
+        (PlainEventListProxy) cloner.getClone(mPropostionsPanel.getPropositions());
       final String name = mNameInput.getText();
       if (mNode instanceof SimpleNodeSubject) {
         final SimpleNodeSubject node = (SimpleNodeSubject) mNode;

@@ -30,13 +30,14 @@ public class PropositionsTree extends ModuleTree
                           final NodeSubject root, final UndoInterface undo)
   {
     super(rootWindow, manager, root, undo);
-    mPopupFactory = new AliasesTreePopupFactory(manager, rootWindow.getModuleContext());
+    mPopupFactory = new PropositionsTreePopupFactory(manager, rootWindow.getModuleContext());
     setRootVisible(false);
   }
 
   ListSubject<? extends ProxySubject> getRootList()
   {
-    return ((NodeSubject) getRoot()).getPropositions().getEventIdentifierListModifiable();
+    return ((NodeSubject) getRoot())
+      .getPropositions().getEventIdentifierListModifiable();
   }
 
   String getRootName()
@@ -46,7 +47,6 @@ public class PropositionsTree extends ModuleTree
 
   DataFlavor getSupportedDataFlavor()
   {
-    // TODO Auto-generated method stub
     return WatersDataFlavor.IDENTIFIER;
   }
 
