@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Supremica/Waters IDE
 //# PACKAGE: org.supremica.gui.ide.actions
-//# CLASS:   AnalyzerSynthesizerAction
+//# CLASS:   EditorSynthesizerAction
 //###########################################################################
 //# $Id$
 //###########################################################################

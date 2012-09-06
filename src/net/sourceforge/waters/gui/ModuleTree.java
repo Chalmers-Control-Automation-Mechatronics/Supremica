@@ -72,6 +72,7 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
@@ -82,12 +83,15 @@ import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.IdentifiedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 
 /**
- * The Aliases Tree used to view the constant aliases and the event aliases of
- * a module.
+ * The Tree used to view the constant aliases, event aliases, components and
+ * propositions of a module.
  *
  * @author Carly Hona, Robi Malik
  */
@@ -173,6 +177,10 @@ public abstract class ModuleTree
   abstract DataFlavor getSupportedDataFlavor();
 
   abstract PopupFactory getPopupFactory();
+
+  boolean shouldForceCopy(final DataFlavor flavor, final Transferable transferable){
+    return false;
+  }
 
 
   //#######################################################################
@@ -876,6 +884,7 @@ public abstract class ModuleTree
       mDropList = null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean canImport(final TransferSupport support)
     {
@@ -913,14 +922,26 @@ public abstract class ModuleTree
         final DataFlavor acceptingFlavor =
           mAcceptTransferableVisitor.getFlavorIfDropAllowed(parent,
                                                             transferable);
-        if (acceptingFlavor == WatersDataFlavor.IDENTIFIER
-            && transferable
-              .isDataFlavorSupported(WatersDataFlavor.EVENT_ALIAS)) {
+        if (acceptingFlavor == null) {
+          return false;
+        }
+        if (shouldForceCopy(acceptingFlavor, transferable)) {
           support.setDropAction(COPY);
         }
-        if (acceptingFlavor != null) {
-          return true;
+        if(parent instanceof NodeSubject){
+          try {
+            final List<Proxy> result = (List<Proxy>) transferable.getTransferData(WatersDataFlavor.IDENTIFIER);
+            final ModuleContext context =  mRootWindow.getModuleContext();
+            if(!context.canDropOnNode(result)){
+              return false;
+            }
+          } catch (final UnsupportedFlavorException exception) {
+            throw new WatersRuntimeException(exception);
+          } catch (final IOException exception) {
+            throw new WatersRuntimeException(exception);
+          }
         }
+        return true;
       }
       return false;
     }
@@ -952,6 +973,7 @@ public abstract class ModuleTree
             final InsertCommand allCopies =
               new InsertCommand(inserts, ModuleTree.this, mRootWindow);
             executeCommand(allCopies);
+
           } catch (final IOException exception) {
             throw new WatersRuntimeException(exception);
           } catch (final UnsupportedFlavorException exception) {
@@ -1096,6 +1118,13 @@ public abstract class ModuleTree
       return modifyList(exp.getEventIdentifierListModifiable());
     }
 
+    public List<Proxy> visitSimpleNodeProxy(final SimpleNodeProxy node){
+      final SimpleNodeSubject sub = (SimpleNodeSubject)node;
+      final PlainEventListSubject list = sub.getPropositions();
+      return modifyList(list.getEventIdentifierListModifiable());
+    }
+
+
     private Transferable mTransferable;
     private DataFlavor mFlavor;
   }
@@ -1211,6 +1240,11 @@ public abstract class ModuleTree
         }
       }
       return null;
+    }
+
+    public DataFlavor visitSimpleNodeProxy(final SimpleNodeProxy node){
+
+      return WatersDataFlavor.IDENTIFIER;
     }
 
     private Transferable mTransferable;

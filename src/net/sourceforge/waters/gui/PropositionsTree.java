@@ -10,6 +10,9 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.datatransfer.DataFlavor;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -30,13 +33,15 @@ public class PropositionsTree extends ModuleTree
                           final NodeSubject root, final UndoInterface undo)
   {
     super(rootWindow, manager, root, undo);
-    mPopupFactory = new AliasesTreePopupFactory(manager, rootWindow.getModuleContext());
+    mPopupFactory = new PropositionsTreePopupFactory(manager, rootWindow.getModuleContext());
     setRootVisible(false);
+    addKeyListener(new KeySpy());
   }
 
   ListSubject<? extends ProxySubject> getRootList()
   {
-    return ((NodeSubject) getRoot()).getPropositions().getEventIdentifierListModifiable();
+    return ((NodeSubject) getRoot())
+      .getPropositions().getEventIdentifierListModifiable();
   }
 
   String getRootName()
@@ -46,7 +51,6 @@ public class PropositionsTree extends ModuleTree
 
   DataFlavor getSupportedDataFlavor()
   {
-    // TODO Auto-generated method stub
     return WatersDataFlavor.IDENTIFIER;
   }
 
@@ -55,6 +59,26 @@ public class PropositionsTree extends ModuleTree
     return mPopupFactory;
   }
 
+  private class KeySpy implements KeyListener
+  {
+
+    public void keyTyped(final KeyEvent e)
+    {
+    }
+
+    public void keyPressed(final KeyEvent e)
+    {
+    }
+
+    public void keyReleased(final KeyEvent e)
+    {
+      if(e.getKeyCode() == KeyEvent.VK_DELETE){
+        deleteItems(getDeletionVictims(getCurrentSelection()));
+      }
+
+    }
+
+  }
 
   //#########################################################################
   //# Class Constants
