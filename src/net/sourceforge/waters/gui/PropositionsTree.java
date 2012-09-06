@@ -10,6 +10,9 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.datatransfer.DataFlavor;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -32,6 +35,7 @@ public class PropositionsTree extends ModuleTree
     super(rootWindow, manager, root, undo);
     mPopupFactory = new PropositionsTreePopupFactory(manager, rootWindow.getModuleContext());
     setRootVisible(false);
+    addKeyListener(new KeySpy());
   }
 
   ListSubject<? extends ProxySubject> getRootList()
@@ -55,6 +59,26 @@ public class PropositionsTree extends ModuleTree
     return mPopupFactory;
   }
 
+  private class KeySpy implements KeyListener
+  {
+
+    public void keyTyped(final KeyEvent e)
+    {
+    }
+
+    public void keyPressed(final KeyEvent e)
+    {
+    }
+
+    public void keyReleased(final KeyEvent e)
+    {
+      if(e.getKeyCode() == KeyEvent.VK_DELETE){
+        deleteItems(getDeletionVictims(getCurrentSelection()));
+      }
+
+    }
+
+  }
 
   //#########################################################################
   //# Class Constants

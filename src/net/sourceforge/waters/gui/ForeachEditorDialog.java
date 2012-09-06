@@ -19,8 +19,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -88,17 +86,9 @@ public class ForeachEditorDialog
     mVariableInput.requestFocusInWindow();
     setVisible(true);
     setMinimumSize(getSize());
-    addComponentListener(new ComponentAdapter() {
 
-    @Override
-    public void componentResized(final ComponentEvent e) {
-      System.out.println(getMaximumSize());
-        setSize(new Dimension(getWidth(), 182));
-        super.componentResized(e);
-    }
-
-    });
-
+    //set max size does not work!!!
+    setMaximumSize(new Dimension(getWidth(), 182));
   }
 
 
