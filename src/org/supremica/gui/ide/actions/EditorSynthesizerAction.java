@@ -191,9 +191,9 @@ public class EditorSynthesizerAction
 //        System.err.println("LD: "+ LD);
 
         
-        int i = 1;
-        final BDD bdd =  bddSynthesizer.bddAutomata.getMarkedLocations().and(bddSynthesizer.bddAutomata.getMarkedValuations()).and(bddSynthesizer.bddAutomata.getReachableStates());            
-        final TIntArrayList valuations = bddSynthesizer.bddAutomata.BDD2valuations(bdd, options.getOptVaribale());
+//        int i = 1;
+//        final BDD bdd =  bddSynthesizer.bddAutomata.getMarkedLocations().and(bddSynthesizer.bddAutomata.getMarkedValuations()).and(bddSynthesizer.bddAutomata.getReachableStates());            
+//        final TIntArrayList valuations = bddSynthesizer.bddAutomata.BDD2valuations(bdd, options.getOptVaribale());
         
 //        do
 //        {

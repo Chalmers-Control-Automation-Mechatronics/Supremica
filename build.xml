@@ -1081,7 +1081,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement path="${java.class.path}" />
             </classpath>            
             <jvmarg value="-Xms128M"/>
-            <jvmarg value="-Xmx1024M" />
+            <jvmarg value="-Xmx512M" />
             <jvmarg value="-Djava.library.path=${dist}"/>
         </java>
     </target>
