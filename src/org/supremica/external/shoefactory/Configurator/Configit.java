@@ -107,10 +107,10 @@ public class Configit
 	JRadioButton lGend2 = new JRadioButton("Female");
 	JRadioButton lGT1 = new JRadioButton("Children");
 	JRadioButton lGT2 = new JRadioButton("Adult");
-	JComboBox lCol = new JComboBox();
-	JComboBox lSole = new JComboBox();
-	JComboBox lSize = new JComboBox();
-	JComboBox lShoeType = new JComboBox();
+	JComboBox<String> lCol = new JComboBox<String>();
+	JComboBox<String> lSole = new JComboBox<String>();
+	JComboBox<String> lSize = new JComboBox<String>();
+	JComboBox<String> lShoeType = new JComboBox<String>();
 	JLabel JL;
 	JLabel mainTitle = new JLabel("Select your shoe!");
 	JLabel selectColor = new JLabel("Color");

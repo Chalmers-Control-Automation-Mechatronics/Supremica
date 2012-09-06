@@ -551,7 +551,7 @@ public class PropertiesDialog
         private final ObjectProperty property;
 
         private JTextField text = null;
-        private JComboBox selector = null;
+        private JComboBox<Object> selector = null;
         private JLabel label = null;
 
         StringChooser(final ObjectProperty property)
@@ -569,7 +569,7 @@ public class PropertiesDialog
             }
             else
             {
-                selector = new JComboBox(property.legalValues());
+                selector = new JComboBox<Object>(property.legalValues());
                 if (property.get() != null)
                 {
                     selector.setSelectedItem(property.get());

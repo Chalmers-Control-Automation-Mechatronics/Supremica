@@ -37,11 +37,11 @@ public class EventChooserDialog extends JDialog
     cancelled = true;
     final JPanel panel = new JPanel();
     panel.setLayout(new BorderLayout());
-    mList = new JList(labels);
+    mList = new JList<JLabel>(labels);
     mList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     mList.setSelectedIndex(0);
-    mList.setCellRenderer(new ListCellRenderer(){
-      public Component getListCellRendererComponent(final JList list, final Object value,
+    mList.setCellRenderer(new ListCellRenderer<JLabel>(){
+      public Component getListCellRendererComponent(final JList<? extends JLabel> list, final JLabel value,
           final int index, final boolean isSelected, final boolean cellHasFocus)
       {
         final JLabel output = (JLabel) value;
@@ -149,7 +149,7 @@ public class EventChooserDialog extends JDialog
   // ####################################################################
   // # Data Members
 
-  private final JList mList;
+  private final JList<JLabel> mList;
   private boolean cancelled;
   private final SimulatorStep[] eventList;
 

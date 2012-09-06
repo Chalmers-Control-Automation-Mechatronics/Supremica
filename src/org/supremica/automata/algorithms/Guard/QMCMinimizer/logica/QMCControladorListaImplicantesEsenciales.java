@@ -27,7 +27,7 @@ public class QMCControladorListaImplicantesEsenciales extends MouseAdapter {
      */
     int index;
     QMCImplicanteBean item;
-    JList listaCabecerasFilasImplicantes;
+    JList<Object> listaCabecerasFilasImplicantes;
     QMCInicio aplicacion;
     QMCAlgoritmo algoritmo;
 
@@ -41,9 +41,10 @@ public class QMCControladorListaImplicantesEsenciales extends MouseAdapter {
      * Implementación del método mouseClicked que realiza las comprobaciones pertinentes
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
      */
+    @SuppressWarnings("unchecked")
     public void mouseClicked(final MouseEvent e)
     {
-        listaCabecerasFilasImplicantes = (JList)e.getSource();
+        listaCabecerasFilasImplicantes = (JList<Object>)e.getSource();
         index = listaCabecerasFilasImplicantes.locationToIndex(e.getPoint());
         item = (QMCImplicanteBean)listaCabecerasFilasImplicantes.getModel().getElementAt(index);
         item.setEsencial(!item.isEsencial());

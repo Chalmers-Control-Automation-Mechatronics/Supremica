@@ -26,7 +26,7 @@ import net.sourceforge.waters.subject.module.IdentifiedSubject;
 
 
 public class IndexedListModel<E extends IdentifiedSubject>
-  extends AbstractListModel
+  extends AbstractListModel<E>
   implements ModelObserver
 {
 

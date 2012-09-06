@@ -72,7 +72,7 @@ import org.supremica.util.SupremicaException;
 
 class Util
 {
-     public Point[] zigzagTraversing(Point[] result, int i, int x, int y, int di, int dj, int min_x, int min_y, int max_x, int max_y, boolean firstTime)
+     public Point[] zigzagTraversing(final Point[] result, final int i, int x, int y, int di, int dj, final int min_x, final int min_y, final int max_x, final int max_y, final boolean firstTime)
     {
         result[i] = new Point(x,y);
 
@@ -81,7 +81,7 @@ class Util
             di=1;
             dj=0;
         }
-        
+
         x += di;
         y += dj;
 
@@ -157,18 +157,18 @@ class Util
                 dj=1;
             }
         }
-        
+
        zigzagTraversing(result,i+1,x,y,di,dj,min_x,min_y,max_x,max_y, false);
 
 	return null;
-    }    
-    
-    public Point[] verticalTraversing(Point[] result, int i, int x, int y, int min_x, int min_y, int max_x, int max_y)
+    }
+
+    public Point[] verticalTraversing(final Point[] result, final int i, int x, int y, final int min_x, final int min_y, final int max_x, final int max_y)
     {
         result[i] = new Point(x,y);
 
         y++;
-        
+
         if(y > max_y)
         {
             x++;
@@ -182,29 +182,29 @@ class Util
         }
         else
             verticalTraversing(result, i+1, x, y, min_x, min_y, max_x, max_y);
-        
+
         return null;
     }
-     
-    public void writeToFile(BufferedWriter bw, String text, boolean tokenizable) throws Exception
+
+    public void writeToFile(final BufferedWriter bw, final String text, final boolean tokenizable) throws Exception
     {
         if(tokenizable)
         {
-            StringTokenizer st = new StringTokenizer(text,"\n");
+            final StringTokenizer st = new StringTokenizer(text,"\n");
             String token;
             while(st.hasMoreTokens())
             {
                 token = st.nextToken();
                 bw.newLine();
-                try { bw.write(token); } 
-                catch (IOException e) {}
+                try { bw.write(token); }
+                catch (final IOException e) {}
             }
-            
+
         }
         else
         {
-            try { bw.write(text); } 
-            catch (IOException e) {}
+            try { bw.write(text); }
+            catch (final IOException e) {}
         }
     }
 }
@@ -213,25 +213,25 @@ class TextArea extends JFrame {
 	private static final long serialVersionUID = 1L;
 	JTextArea _resultArea = new JTextArea(20, 70);
 
-	public TextArea(String text) {
+	public TextArea(final String text) {
         //... Set textarea's initial text, scrolling, and border.
         _resultArea.setText(text);
          _resultArea.setEditable(false);
-        JScrollPane scrollingArea = new JScrollPane(_resultArea);
-        
+        final JScrollPane scrollingArea = new JScrollPane(_resultArea);
+
         //... Get the content pane, set layout, add to center
-        JPanel content = new JPanel();
+        final JPanel content = new JPanel();
         content.setLayout(new BorderLayout());
         content.add(scrollingArea, BorderLayout.CENTER);
-        
-        
+
+
         //... Set window characteristics.
         this.setContentPane(content);
         this.setTitle("Results");
         this.pack();
     }
-     
-     public void setText(String text)
+
+     public void setText(final String text)
      {
         _resultArea.setText(text);
      }
@@ -243,7 +243,7 @@ class IntegerField
 {
     private static final long serialVersionUID = 1L;
 
-    public IntegerField(String init, int cols)
+    public IntegerField(final String init, final int cols)
     {
         super(init, cols);
     }
@@ -259,7 +259,7 @@ class DoubleField
 {
     private static final long serialVersionUID = 1L;
 
-    public DoubleField(String init, int cols)
+    public DoubleField(final String init, final int cols)
     {
         super(init, cols);
     }
@@ -274,7 +274,7 @@ interface TestCase
 {
     Project doIt()
     throws Exception;
-    
+
     void compute(IDE ide)
     throws Exception;
 }
@@ -294,14 +294,14 @@ class UsersPanel
     {
         super(new GridLayout(2, 1, 10, 10));
 
-        JPanel cont = new JPanel();
+        final JPanel cont = new JPanel();
 
         cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
         cont.add(req);
         cont.add(acc);
         cont.add(rel);
 
-        JPanel num_users = new JPanel();
+        final JPanel num_users = new JPanel();
 
         num_users.add(new JLabel("Number of resources: "));
         num_users.add(int_rsc = new IntegerField("1", 6));
@@ -310,13 +310,13 @@ class UsersPanel
         add(BorderLayout.NORTH, cont);
         add(BorderLayout.SOUTH, num_users);
     }
-    
-    public void compute(IDE ide){}
+
+    public void compute(final IDE ide){}
 
     public Project doIt()
     throws Exception
     {
-        Users users = new Users(int_num.get(), int_rsc.get(), req.isSelected(), acc.isSelected(), rel.isSelected());
+        final Users users = new Users(int_num.get(), int_rsc.get(), req.isSelected(), acc.isSelected(), rel.isSelected());
 
         return users.getProject();
     }
@@ -332,13 +332,13 @@ class OperationPanel
     {
         super();//(new GridLayout(2, 1, 10, 10));
     }
-    
-    public void compute(IDE ide){}
+
+    public void compute(final IDE ide){}
 
     public Project doIt()
     throws Exception
     {
-        OperationBasedSystems obs = new OperationBasedSystems();
+        final OperationBasedSystems obs = new OperationBasedSystems();
 
         return obs.getProject();
     }
@@ -364,7 +364,7 @@ class PhilosPanel
         // super(new GridLayout(2, 1, 10, 10));
         super();
 
-        JPanel cont = new JPanel();
+        final JPanel cont = new JPanel();
         //cont.setLayout(new BoxLayout());
         cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
         cont.add(l_take);
@@ -372,29 +372,29 @@ class PhilosPanel
         cont.add(l_put);
         cont.add(r_put);
 
-        JPanel num_users = new JPanel();
+        final JPanel num_users = new JPanel();
         num_users.add(new JLabel("Number of philosophers and forks: "), BorderLayout.NORTH);
         num_users.add(int_num, BorderLayout.NORTH);
 
-        JPanel animationPanel = new JPanel();
+        final JPanel animationPanel = new JPanel();
         animationPanel.add(animation);
         animationPanel.add(memory);
         animationPanel.add(multiple);
 
-        Box theBox = Box.createVerticalBox();
+        final Box theBox = Box.createVerticalBox();
         theBox.add(cont);
         theBox.add(num_users);
         theBox.add(animationPanel);
         add(theBox, BorderLayout.NORTH);
     }
-    
-    public void compute(IDE ide){}
+
+    public void compute(final IDE ide){}
 
     public Project doIt()
     throws Exception
     {
-        DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected(), memory.isSelected());
-        
+        final DiningPhilosophers dp = new DiningPhilosophers(int_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected(), memory.isSelected());
+
         /*
         Iterator<LabeledEvent> uit;
         for(int i=0;i<dp.getProject().nbrOfAutomata();i++)
@@ -412,7 +412,7 @@ class PhilosPanel
 
 class ExtPhilosPanel
     extends JPanel
-    implements TestCase, ActionListener 
+    implements TestCase, ActionListener
 {
     private static final long serialVersionUID = 1L;
     IntegerField int_num = new IntegerField("5", 6);
@@ -429,16 +429,16 @@ class ExtPhilosPanel
     JCheckBox memory = new JCheckBox("Forks have memory", false);
     JCheckBox multiple = new JCheckBox("Multiple instances", false);
     JCheckBox synth_algorithm = new JCheckBox("Choose synthesis algorithm manually (deafult is BDD)", false);
-    
+
     IntegerField int_N = new IntegerField("0", 6);
     IntegerField int_K = new IntegerField("0", 6);
     JCheckBox all_cases = new JCheckBox("Compute all cases for n in interval (5,N) and k in interval (3,K)",false);
-    
+
     JPanel traversing_algorithms;
-    JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");    
+    JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");
     JRadioButton verticalButton = new JRadioButton("Vertical traversing");
 
-    
+
     Util util = new Util();
 
     public ExtPhilosPanel()
@@ -446,20 +446,20 @@ class ExtPhilosPanel
         // super(new GridLayout(2, 1, 10, 10));
         super();
 
-        JPanel cont = new JPanel();
+        final JPanel cont = new JPanel();
         cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
         cont.setLayout(new GridLayout(2, 1));
-        JPanel ext_control = new JPanel();
+        final JPanel ext_control = new JPanel();
         ext_control.add(i_l_take,BorderLayout.NORTH);
-        
+
         i_l_take.setSelected(true);
         i_l_take.setEnabled(true);
         l_take.setEnabled(false);
         r_take.setEnabled(false);
         l_put.setEnabled(false);
         r_put.setEnabled(false);
-        
-        JPanel normal_control = new JPanel();
+
+        final JPanel normal_control = new JPanel();
         normal_control.add(l_take,BorderLayout.SOUTH);
         normal_control.add(r_take,BorderLayout.SOUTH);
         normal_control.add(l_put,BorderLayout.SOUTH);
@@ -467,66 +467,66 @@ class ExtPhilosPanel
         cont.add(ext_control);
         cont.add(normal_control);
 
-        JPanel num_users = new JPanel();
+        final JPanel num_users = new JPanel();
         num_users.add(new JLabel("Number of philosophers and forks: "), BorderLayout.NORTH);
         num_users.add(int_num, BorderLayout.NORTH);
-        
-        JPanel num_intermStates = new JPanel();
+
+        final JPanel num_intermStates = new JPanel();
         num_intermStates.add(new JLabel("Number of intermediate states: "), BorderLayout.NORTH);
         num_intermStates.add(int_interm_num, BorderLayout.NORTH);
 
-        JPanel animationPanel = new JPanel();
+        final JPanel animationPanel = new JPanel();
         animationPanel.add(animation);
         animationPanel.add(memory);
         animationPanel.add(multiple);
         animationPanel.add(synth_algorithm);
-        
+
         multiple.addActionListener(this);
         i_l_take.addActionListener(this);
-        
-        JPanel numberOfInstances = new JPanel();
+
+        final JPanel numberOfInstances = new JPanel();
         numberOfInstances.add(new JLabel("Number of instances: "), BorderLayout.NORTH);
         numberOfInstances.add(int_numberOfInstances, BorderLayout.SOUTH);
         int_numberOfInstances.setEnabled(false);
-        
-        JPanel step_phils = new JPanel();
+
+        final JPanel step_phils = new JPanel();
         step_phils.add(new JLabel("step_P (increasement of number of phils for each instance): "), BorderLayout.NORTH);
         step_phils.add(int_step_phils, BorderLayout.SOUTH);
         int_step_phils.setEnabled(false);
-        
-        JPanel step_intermStates = new JPanel();
+
+        final JPanel step_intermStates = new JPanel();
         step_intermStates.add(new JLabel("step_S (increasement of number of intermediate states for each instance): "), BorderLayout.NORTH);
         step_intermStates.add(int_step_intermStates, BorderLayout.SOUTH);
         int_step_intermStates.setEnabled(false);
-        
+
         all_cases.addActionListener(this);
-        
-        JPanel NK = new JPanel();
+
+        final JPanel NK = new JPanel();
         NK.add(new JLabel("N: "), BorderLayout.SOUTH);
         NK.add(int_N, BorderLayout.SOUTH);
         NK.add(new JLabel("K: "), BorderLayout.SOUTH);
         NK.add(int_K, BorderLayout.SOUTH);
         int_N.setEnabled(false);
         int_K.setEnabled(false);
-        
+
         zigzagButton.setSelected(false);
         verticalButton.setSelected(true);
-        
+
         traversing_algorithms = new JPanel();
-        
-        Border border = BorderFactory.createTitledBorder("Traversing order of the test cases for the N*K plane");
+
+        final Border border = BorderFactory.createTitledBorder("Traversing order of the test cases for the N*K plane");
         traversing_algorithms.setBorder(border);
-        ButtonGroup group = new ButtonGroup();
+        final ButtonGroup group = new ButtonGroup();
         group.add(zigzagButton);
         group.add(verticalButton);
-        
+
         traversing_algorithms.add(zigzagButton);
         traversing_algorithms.add(verticalButton);
-        
+
         zigzagButton.setEnabled(false);
         verticalButton.setEnabled(false);
 
-        Box theBox = Box.createVerticalBox();
+        final Box theBox = Box.createVerticalBox();
         theBox.add(cont);
         theBox.add(num_users);
         theBox.add(num_intermStates);
@@ -539,8 +539,8 @@ class ExtPhilosPanel
         theBox.add(traversing_algorithms);
         add(theBox, BorderLayout.NORTH);
     }
-    
-    public void actionPerformed(ActionEvent e) {
+
+    public void actionPerformed(final ActionEvent e) {
         if (multiple.isSelected()) {
             int_step_phils.setEnabled(true);
             int_step_intermStates.setEnabled(true);
@@ -550,7 +550,7 @@ class ExtPhilosPanel
             int_step_intermStates.setEnabled(false);
             int_numberOfInstances.setEnabled(false);
         }
-        
+
         if (i_l_take.isSelected()) {
             l_take.setEnabled(false);
             r_take.setEnabled(false);
@@ -562,14 +562,14 @@ class ExtPhilosPanel
             l_put.setEnabled(true);
             r_put.setEnabled(true);
         }
-        
+
         if(all_cases.isSelected())
         {
             int_N.setEnabled(true);
             int_K.setEnabled(true);
             zigzagButton.setEnabled(true);
             verticalButton.setEnabled(true);
-            
+
         }
         else
         {
@@ -578,34 +578,34 @@ class ExtPhilosPanel
             zigzagButton.setEnabled(false);
             verticalButton.setEnabled(false);
         }
-        
-    }    
-    
+
+    }
+
     public Project doIt()
     throws Exception
     {
-        ExtDiningPhilosophers dp = new ExtDiningPhilosophers(i_l_take.isSelected(), int_num.get(), int_interm_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected(), memory.isSelected());
-        
+        final ExtDiningPhilosophers dp = new ExtDiningPhilosophers(i_l_take.isSelected(), int_num.get(), int_interm_num.get(), l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected(), memory.isSelected());
+
         return dp.getProject();
     }
-    
-    public void compute (IDE ide)
+
+    public void compute (final IDE ide)
     throws Exception
-    {   
+    {
         int number_of_phils = int_num.get();
         int number_of_interm_states = int_interm_num.get();
-        int number_of_instances = int_numberOfInstances.get();
-        
-        TextArea result = new TextArea("");
-       
+        final int number_of_instances = int_numberOfInstances.get();
+
+        final TextArea result = new TextArea("");
+
         String result_text = "n \t k \t t \t m \t s \n \n";
-        
+
         BufferedWriter[] out_back;
-       
-        SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
+
+        final SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
         if(synth_algorithm.isSelected())
         {
-            SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), 2*number_of_phils, synthesizerOptions);
+            final SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), 2*number_of_phils, synthesizerOptions);
             synthesizerDialog.show();
         }
         else
@@ -616,12 +616,12 @@ class ExtPhilosPanel
             synthesizerOptions.setMaximallyPermissive(true);
             synthesizerOptions.setMaximallyPermissiveIncremental(true);
         }
- 
+
         AutomataSynthesizer synthesizer;
-        
+
         ExtDiningPhilosophers dp;
         AutomataSynthesisWorker asw;
-        
+
         int finalNbrOfInstances;
         Point[] p = null;
         if(all_cases.isSelected())
@@ -630,22 +630,22 @@ class ExtPhilosPanel
             p = new Point[finalNbrOfInstances];
             if(zigzagButton.isSelected())
                 util.zigzagTraversing(p,0,int_num.get(),int_interm_num.get(),0,1,int_num.get(),int_interm_num.get(),int_N.get(),int_K.get(),true);
-            
+
             if(verticalButton.isSelected())
                 util.verticalTraversing(p,0,int_num.get(),int_interm_num.get(),int_num.get(),int_interm_num.get(),int_N.get(),int_K.get());
         }
         else
             finalNbrOfInstances = number_of_instances;
-        
+
         out_back = new BufferedWriter[finalNbrOfInstances];
-        
+
         for(int i=0;i<finalNbrOfInstances;i++)
         {
             result_text += "\n";
-            
-            try { out_back[i] = new BufferedWriter(new FileWriter("Results/DP/results_diningPhil"+i+".txt"));} 
-            catch (IOException e) {}
-            
+
+            try { out_back[i] = new BufferedWriter(new FileWriter("Results/DP/results_diningPhil"+i+".txt"));}
+            catch (final IOException e) {}
+
             if(all_cases.isSelected())
             {
                 number_of_phils = p[i].x;
@@ -656,7 +656,7 @@ class ExtPhilosPanel
                 number_of_phils = i*int_step_phils.get() + int_num.get();
                 number_of_interm_states = i*int_step_intermStates.get()+ int_interm_num.get();
             }
-             
+
             System.err.println("number of philosophers: "+number_of_phils);
             System.err.println("number of intermediate states: "+number_of_interm_states);
             System.err.println("computing supervisor... ");
@@ -664,18 +664,18 @@ class ExtPhilosPanel
             result_text += ""+number_of_phils+"\t";
 
             result_text += " "+number_of_interm_states+"\t";
-            
+
             dp = new ExtDiningPhilosophers(i_l_take.isSelected(), number_of_phils, number_of_interm_states, l_take.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put.isSelected(), animation.isSelected(), memory.isSelected());
-            
+
             if(synth_algorithm.isSelected())
             {
                 asw = new AutomataSynthesisWorker(null, dp.getAutomata(), synthesizerOptions);
                 asw.join();
-                
+
                 result_text += " "+asw.getTimeSeconds()+"\t";
                 result_text += " \t ";
-                
-                Automaton supervisor = asw.getSupervisor();
+
+                final Automaton supervisor = asw.getSupervisor();
                 result_text +=" "+supervisor.nbrOfStates();
             }
             else
@@ -686,39 +686,39 @@ class ExtPhilosPanel
                 {
                     synthesizer.execute();
 
-                    BigDecimal time = synthesizer.getTimeSeconds();
+                    final BigDecimal time = synthesizer.getTimeSeconds();
                     result_text += " "+time+"\t";
                     result_text += " \t";
 
-                    long nbrOfStates = synthesizer.getNbrOfStatesBDD();
+                    final long nbrOfStates = synthesizer.getNbrOfStatesBDD();
                     result_text +=" "+nbrOfStates+"\t";
-                    
-                    long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
+
+                    final long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
                     result_text +=" "+nbrOfNodes;
                 }
                 else
                 {
-                    Automaton supervisor = synthesizer.execute().getFirstAutomaton();
+                    final Automaton supervisor = synthesizer.execute().getFirstAutomaton();
 
-                    BigDecimal time = synthesizer.getTimeSeconds();
+                    final BigDecimal time = synthesizer.getTimeSeconds();
                     result_text += " "+time+"\t";
                     result_text += " \t";
 
-                    int nbrOfStates = supervisor.getStateSet().size();
+                    final int nbrOfStates = supervisor.getStateSet().size();
                     result_text +=" "+nbrOfStates;
                 }
             }
 
             System.err.println("Finished. ");
             System.err.println("--------------------------------");
-            
+
             result_text += "\t";
-            
-            util.writeToFile(out_back[i],result_text,true); 
-            
-            try { out_back[i].close(); } 
-            catch (IOException e) {}
-            
+
+            util.writeToFile(out_back[i],result_text,true);
+
+            try { out_back[i].close(); }
+            catch (final IOException e) {}
+
             System.gc();
         }
         result_text += "\n \n------------------------------------------------------------------ \n";
@@ -752,16 +752,16 @@ class CatMousePanel
         num_users.add(new JLabel("Number of cats (or mice): "), BorderLayout.NORTH);
         num_users.add(int_num, BorderLayout.NORTH);
 
-        JPanel multiplePanel = new JPanel();
+        final JPanel multiplePanel = new JPanel();
         multiplePanel.add(multiple);
-        
+
         multiple.addActionListener(this);
-        
+
         steps = new JPanel();
         steps.add(new JLabel("step (increasement of number of cats (or mice) for each instance): "), BorderLayout.NORTH);
         steps.add(int_step_cats, BorderLayout.SOUTH);
         int_step_cats.setEnabled(false);
-        
+
         numberOfInstances = new JPanel();
         numberOfInstances.add(new JLabel("Number of instances: "), BorderLayout.NORTH);
         numberOfInstances.add(int_numberOfInstances, BorderLayout.SOUTH);
@@ -774,30 +774,30 @@ class CatMousePanel
         theBox.add(numberOfInstances);
         add(theBox, BorderLayout.NORTH);
     }
-    
-    public void compute(IDE ide)throws Exception{}
-    
-    public void actionPerformed(ActionEvent e) 
+
+    public void compute(final IDE ide)throws Exception{}
+
+    public void actionPerformed(final ActionEvent e)
     {
         if (multiple.isSelected()) {
             int_step_cats.setEnabled(true);
             int_numberOfInstances.setEnabled(true);
-        } 
-        else 
+        }
+        else
         {
             int_step_cats.setEnabled(false);
             int_numberOfInstances.setEnabled(false);
         }
     }
-    
+
     public Project doIt()
     throws Exception
     {
-        CatMouse cm = new CatMouse(int_num.get());
+        final CatMouse cm = new CatMouse(int_num.get());
 
         return cm.getProject();
     }
- 
+
 }
 
 class ExtCatMousePanel
@@ -811,9 +811,9 @@ class ExtCatMousePanel
     IntegerField int_K = new IntegerField("0", 6);
     JCheckBox synth_algorithm = new JCheckBox("Choose synthesis algorithm manually (deafult is BDD)", false);
     JCheckBox all_cases = new JCheckBox("Compute all cases for n in interval (1,N) and k in interval (1,K)",false);
-    
+
     JPanel traversing_algorithms;
-    JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");    
+    JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");
     JRadioButton verticalButton = new JRadioButton("Vertical traversing");
 
 
@@ -823,62 +823,62 @@ class ExtCatMousePanel
         super();
         num_users.add(new JLabel("     Number of levels: "), BorderLayout.NORTH);
         num_users.add(int_num_levels, BorderLayout.NORTH);
-        
-        JPanel stepsL = new JPanel();
+
+        final JPanel stepsL = new JPanel();
         stepsL.add(new JLabel("stepL (increasement of number levels for each instance): "), BorderLayout.SOUTH);
         stepsL.add(int_step_levels, BorderLayout.SOUTH);
         int_step_levels.setEnabled(false);
 
         all_cases.addActionListener(this);
-        
-        JPanel NK = new JPanel();
+
+        final JPanel NK = new JPanel();
         NK.add(new JLabel("N: "), BorderLayout.SOUTH);
         NK.add(int_N, BorderLayout.SOUTH);
         NK.add(new JLabel("K: "), BorderLayout.SOUTH);
         NK.add(int_K, BorderLayout.SOUTH);
         int_N.setEnabled(false);
         int_K.setEnabled(false);
-        
+
         zigzagButton.setSelected(false);
         verticalButton.setSelected(true);
-        
+
         traversing_algorithms = new JPanel();
-        
-        Border border = BorderFactory.createTitledBorder("Traversing order of the test cases for the N*K plane");
+
+        final Border border = BorderFactory.createTitledBorder("Traversing order of the test cases for the N*K plane");
         traversing_algorithms.setBorder(border);
-        ButtonGroup group = new ButtonGroup();
+        final ButtonGroup group = new ButtonGroup();
         group.add(zigzagButton);
         group.add(verticalButton);
-        
+
         traversing_algorithms.add(zigzagButton);
         traversing_algorithms.add(verticalButton);
-        
+
         zigzagButton.setEnabled(false);
         verticalButton.setEnabled(false);
-        
+
         theBox.add(stepsL);
         theBox.add(numberOfInstances);
         theBox.add(synth_algorithm);
         theBox.add(all_cases);
         theBox.add(traversing_algorithms);
         theBox.add(NK);
-        
+
     }
-    
-    public void actionPerformed(ActionEvent e) 
+
+    public void actionPerformed(final ActionEvent e)
     {
         if (multiple.isSelected()) {
             int_step_cats.setEnabled(true);
             int_step_levels.setEnabled(true);
             int_numberOfInstances.setEnabled(true);
-        } 
-        else 
+        }
+        else
         {
             int_step_cats.setEnabled(false);
             int_step_levels.setEnabled(false);
             int_numberOfInstances.setEnabled(false);
         }
-        
+
         if(all_cases.isSelected())
         {
             int_N.setEnabled(true);
@@ -894,26 +894,26 @@ class ExtCatMousePanel
             verticalButton.setEnabled(false);
         }
     }
-    
+
     //This function will be called when "Syntheisize" button is pressed
-    public void compute(IDE ide) throws Exception
+    public void compute(final IDE ide) throws Exception
     {
         int number_of_cats = int_num.get();
         int number_of_levels = int_num_levels.get();
-        int number_of_instances = int_numberOfInstances.get();
-        
-        TextArea result = new TextArea("");
-        
+        final int number_of_instances = int_numberOfInstances.get();
+
+        final TextArea result = new TextArea("");
+
         String result_text = "n \t k \t t \t m \t s \t d \n";
-       
+
         BufferedWriter[] out_back;
-       
-        SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
-        
+
+        final SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
+
         if(synth_algorithm.isSelected())
         {
-            //Manually select the synthesis algorithm 
-            SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), 2*number_of_cats+5*number_of_levels, synthesizerOptions);
+            //Manually select the synthesis algorithm
+            final SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), 2*number_of_cats+5*number_of_levels, synthesizerOptions);
             synthesizerDialog.show();
         }
         else
@@ -925,15 +925,15 @@ class ExtCatMousePanel
             synthesizerOptions.setMaximallyPermissive(true);
             synthesizerOptions.setMaximallyPermissiveIncremental(true);
         }
- 
+
         AutomataSynthesizer synthesizer;
 
         ExtCatMouse ecm;
         AutomataSynthesisWorker asw;
-        
+
         int finalNbrOfInstances;
         Point[] p = null;
-        
+
         if(all_cases.isSelected())
         {
             //All instances for a N*K plane
@@ -942,22 +942,22 @@ class ExtCatMousePanel
             if(zigzagButton.isSelected())
                 util.zigzagTraversing(p,0,int_num.get(),int_num_levels.get(),0,1,int_num.get(),int_num_levels.get(),int_N.get(),int_K.get(),true);
 //                            util.zigzagTraversing(p,0,int_num.get(),int_num_levels.get(),-1,1,1,1,int_N.get(),int_K.get(),true);
-            
+
             if(verticalButton.isSelected())
                 util.verticalTraversing(p,0,int_num.get(),int_num_levels.get(),int_num.get(),int_num_levels.get(),int_N.get(),int_K.get());
         }
         else
             finalNbrOfInstances = number_of_instances;
-        
+
         out_back = new BufferedWriter[finalNbrOfInstances];
 
         for(int i=0;i<finalNbrOfInstances;i++)
         {
             result_text += "\n";
-            
-            try { out_back[i] = new BufferedWriter(new FileWriter("Results/CM/results_catmouse"+i+".txt"));} 
-            catch (IOException e) {}
-            
+
+            try { out_back[i] = new BufferedWriter(new FileWriter("Results/CM/results_catmouse"+i+".txt"));}
+            catch (final IOException e) {}
+
             if(all_cases.isSelected())
             {
                 number_of_cats = p[i].y;
@@ -968,11 +968,11 @@ class ExtCatMousePanel
                 number_of_cats = i*int_step_cats.get() + int_num.get();
                 number_of_levels = i*int_step_levels.get()+ int_num_levels.get();
             }
-            
+
             System.err.println("number of cats: "+number_of_cats);
             System.err.println("number of levels: "+number_of_levels);
             System.err.println("computing supervisor... ");
-            
+
             result_text += ""+number_of_cats+"\t";
 
             result_text += " "+number_of_levels+"\t";
@@ -980,16 +980,16 @@ class ExtCatMousePanel
             //INSTANCE GENERATION
             ecm = new ExtCatMouse(number_of_cats, number_of_levels);
             //INSTANCE GENERATION
-            
+
             if(synth_algorithm.isSelected())
             {
                 asw = new AutomataSynthesisWorker(null, ecm.getAutomata(), synthesizerOptions);
                 asw.join();
-                
+
                 result_text += " "+asw.getTimeSeconds()+"\t";
                 result_text += " \t ";
-                
-                Automaton supervisor = asw.getSupervisor();
+
+                final Automaton supervisor = asw.getSupervisor();
                 result_text +=" "+supervisor.nbrOfStates();
             }
             else
@@ -1000,55 +1000,55 @@ class ExtCatMousePanel
                 {
                     synthesizer.execute();
 
-                    BigDecimal time = synthesizer.getTimeSeconds();
+                    final BigDecimal time = synthesizer.getTimeSeconds();
                     result_text += " "+time+"\t";
                     result_text += " \t";
 
-                    long nbrOfStates = synthesizer.getNbrOfStatesBDD();
+                    final long nbrOfStates = synthesizer.getNbrOfStatesBDD();
                     result_text +=" "+nbrOfStates+"\t";
-                    
-                    long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
+
+                    final long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
                     result_text +=" "+nbrOfNodes;
                 }
                 else
                 {
-                    Automaton supervisor = synthesizer.execute().getFirstAutomaton();
+                    final Automaton supervisor = synthesizer.execute().getFirstAutomaton();
 
-                    BigDecimal time = synthesizer.getTimeSeconds();
+                    final BigDecimal time = synthesizer.getTimeSeconds();
                     result_text += " "+time+"\t";
                     result_text += " \t";
 
-                    int nbrOfStates = supervisor.getStateSet().size();
+                    final int nbrOfStates = supervisor.getStateSet().size();
                     result_text +=" "+nbrOfStates;
                 }
             }
 
             System.err.println("Finished. ");
             System.err.println("--------------------------------");
-            
+
             result_text += "\t";
-            
-            util.writeToFile(out_back[i],result_text,true); 
-            
-            try { out_back[i].close(); } 
-            catch (IOException e) {}
-            
+
+            util.writeToFile(out_back[i],result_text,true);
+
+            try { out_back[i].close(); }
+            catch (final IOException e) {}
+
         }
-        
+
         result_text += "\n \n------------------------------------------------------------------ \n";
         result_text += "\n n: Number of levels \n k: Number of cats and mice \n t: Computation time in seconds \n m: The memory used in Mbytes \n s: Number of states for the supervisor \n d: Number of nodes for BDD";
         result.setText(result_text);
         result.setVisible(true);
     }
-    
+
 
     public Project doIt()
     throws Exception
     {
-        ExtCatMouse cm = new ExtCatMouse(int_num.get(), int_num_levels.get());
+        final ExtCatMouse cm = new ExtCatMouse(int_num.get(), int_num_levels.get());
         return cm.getProject();
     }
- 
+
 }
 
 class BricksPanel
@@ -1061,7 +1061,7 @@ class BricksPanel
 
     BricksPanel()
     {
-        JPanel panel = new JPanel(new GridLayout(2, 2));
+        final JPanel panel = new JPanel(new GridLayout(2, 2));
 
         add(panel, BorderLayout.WEST);
         panel.add(new JLabel("Number of rows: "));
@@ -1070,12 +1070,12 @@ class BricksPanel
         panel.add(num_cols);
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
-        BricksGame bg = new BricksGame(num_rows.get(), num_cols.get());
+        final BricksGame bg = new BricksGame(num_rows.get(), num_cols.get());
 
         return bg.getProject();
     }
@@ -1094,7 +1094,7 @@ class WarehousePanel
 
     WarehousePanel()
     {
-        JPanel panel = new JPanel(new GridLayout(3, 2));
+        final JPanel panel = new JPanel(new GridLayout(3, 2));
 
         add(panel, BorderLayout.WEST);
         panel.add(new JLabel("Number of operator events (k): "));
@@ -1102,11 +1102,11 @@ class WarehousePanel
         panel.add(new JLabel("Number of supervisor events (m): "));
         panel.add(nbr_events_m);
 
-        JButton selectOperatorEventsButton = new JButton("Select operator events");
+        final JButton selectOperatorEventsButton = new JButton("Select operator events");
 
         selectOperatorEventsButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 if (selectOperatorEventsWindow == null)
                 {
@@ -1122,11 +1122,11 @@ class WarehousePanel
 
         //JButton selectControlEventsButton = new JButton("Select control events");
         //panel.add(selectControlEventsButton);
-        JButton selectUnobservableEventsButton = new JButton("Select unobservable events");
+        final JButton selectUnobservableEventsButton = new JButton("Select unobservable events");
 
         selectUnobservableEventsButton.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(final ActionEvent e)
             {
                 if (selectUnobservableEventsWindow == null)
                 {
@@ -1141,8 +1141,8 @@ class WarehousePanel
         panel.add(selectUnobservableEventsButton);
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
@@ -1164,7 +1164,7 @@ class StickGamePanel
 
     StickGamePanel()
     {
-        JPanel panel = new JPanel(new GridLayout(2, 2));
+        final JPanel panel = new JPanel(new GridLayout(2, 2));
 
         add(panel, BorderLayout.WEST);
         panel.add(new JLabel("Number of players: "));
@@ -1173,14 +1173,14 @@ class StickGamePanel
         panel.add(num_sticks);
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
 
         // System.err.println("SticksGamePanel::doIt()");
-        StickPickingGame spg = new StickPickingGame(num_players.get(), num_sticks.get());
+        final StickPickingGame spg = new StickPickingGame(num_players.get(), num_sticks.get());
 
         return spg.getProject();
     }
@@ -1198,7 +1198,7 @@ class AllocationBatchPanel
     {
         super(new BorderLayout(10, 10));
 
-        JPanel pCenter = new JPanel(new GridLayout(4, 2));
+        final JPanel pCenter = new JPanel(new GridLayout(4, 2));
 
         add(pCenter, BorderLayout.WEST);
         pCenter.add(new JLabel("batch file:  "));
@@ -1209,16 +1209,16 @@ class AllocationBatchPanel
         add(new JLabel("Experimental serialized allocation batch"), BorderLayout.NORTH);
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
-        String file = filename.getText();
+        final String file = filename.getText();
 
         if (file.length() > 0)
         {
-            AllocationBatch ab = new AllocationBatch(file);
+            final AllocationBatch ab = new AllocationBatch(file);
 
             return ab.getProject();
         }    // else...
@@ -1226,17 +1226,17 @@ class AllocationBatchPanel
         throw new SupremicaException("you must choose a filename");
     }
 
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(final ActionEvent e)
     {
-        Object src = e.getSource();
+        final Object src = e.getSource();
 
         if (src == browse)
         {
-            JFileChooser chooser = new JFileChooser();
+            final JFileChooser chooser = new JFileChooser();
 
             chooser.setDialogTitle("Please choose a batch file");
 
-            int returnVal = chooser.showOpenDialog(this);
+            final int returnVal = chooser.showOpenDialog(this);
 
             if (returnVal == JFileChooser.APPROVE_OPTION)
             {
@@ -1256,7 +1256,7 @@ class CountersPanel
 
     public CountersPanel()
     {
-        JPanel panel = new JPanel(new GridLayout(2, 2));
+        final JPanel panel = new JPanel(new GridLayout(2, 2));
 
         add(panel, BorderLayout.CENTER);
         panel.add(new JLabel("Number of counters: "));
@@ -1265,12 +1265,12 @@ class CountersPanel
         panel.add(int_size = new IntegerField("8", 6));
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
-        Counters counters = new Counters(int_num.get(), int_size.get());
+        final Counters counters = new Counters(int_num.get(), int_size.get());
 
         return counters.getProject();
     }
@@ -1288,7 +1288,7 @@ class RandomPanel
 
     public RandomPanel()
     {
-        JPanel panel = new JPanel(new GridLayout(4, 2));
+        final JPanel panel = new JPanel(new GridLayout(4, 2));
 
         add(panel, BorderLayout.WEST);
         panel.add(new JLabel("Number of automata: "));
@@ -1301,12 +1301,12 @@ class RandomPanel
         panel.add(dbl_dens = new DoubleField("0.75", 6));
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
-        RandomAutomata ra = new RandomAutomata(int_num.get(), int_size.get(), int_events.get(), dbl_dens.get());
+        final RandomAutomata ra = new RandomAutomata(int_num.get(), int_size.get(), int_events.get(), dbl_dens.get());
 
         return ra.getProject();
     }
@@ -1329,7 +1329,7 @@ class TransferLinePanel
 
     public TransferLinePanel()
     {
-        JPanel panel = new JPanel(new GridLayout(4, 2));
+        final JPanel panel = new JPanel(new GridLayout(4, 2));
 
         add(panel, BorderLayout.CENTER);
         panel.add(new JLabel("Ref: 'Notes on Control of Discrete", SwingConstants.RIGHT));
@@ -1342,20 +1342,20 @@ class TransferLinePanel
         panel.add(int_cap2 = new IntegerField("1", 5));
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
-        int cap1 = int_cap1.get();
-        int cap2 = int_cap2.get();
+        final int cap1 = int_cap1.get();
+        final int cap2 = int_cap2.get();
 
         if ((cap1 < 1) || (cap2 < 1))
         {
             throw new SupremicaException("Buffer capacity must be at least 1");
         }
 
-        TransferLine tl = new TransferLine(int_cells.get(), cap1, cap2, false);
+        final TransferLine tl = new TransferLine(int_cells.get(), cap1, cap2, false);
 
         return tl.getProject();
     }
@@ -1371,15 +1371,15 @@ class PigeonHolePanel
 
     public PigeonHolePanel()
     {
-        Box theBox = Box.createVerticalBox();
+        final Box theBox = Box.createVerticalBox();
 
         add(theBox, BorderLayout.NORTH);
 
-        JPanel labelPanel = new JPanel();
+        final JPanel labelPanel = new JPanel();
 
         labelPanel.add(new JLabel("Ref: 'The Intractability of Resolution', Armin Haken."));
 
-        JPanel panel = new JPanel(new GridLayout(2, 2));
+        final JPanel panel = new JPanel(new GridLayout(2, 2));
 
         panel.add(new JLabel("Number of pigeons: "));
         panel.add(int_pigeons = new IntegerField("5", 3));
@@ -1389,20 +1389,20 @@ class PigeonHolePanel
         theBox.add(panel);
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
-        int p = int_pigeons.get();
-        int h = int_holes.get();
+        final int p = int_pigeons.get();
+        final int h = int_holes.get();
 
         if ((p < 1) || (h < 1))
         {
             throw new SupremicaException("Weird configuration...");
         }
 
-        PigeonHole ph = new PigeonHole(p, h);
+        final PigeonHole ph = new PigeonHole(p, h);
 
         return ph.getProject();
     }
@@ -1414,13 +1414,13 @@ class SanchezPanel
 {
     private static final long serialVersionUID = 1L;
     IntegerField int_blocks = null;
-    JComboBox choice = null;
+    JComboBox<String> choice = null;
     static final String[] choice_items = { "#1: Async prod", "#2: Synch prod",
     "#3: SupC" };
 
     public SanchezPanel()
     {
-        JPanel panel = new JPanel(new GridLayout(3, 2));
+        final JPanel panel = new JPanel(new GridLayout(3, 2));
 
         add(panel, BorderLayout.NORTH);
         panel.add(new JLabel("Ref: 'A Comparision of Synthesis", SwingConstants.RIGHT));
@@ -1428,17 +1428,17 @@ class SanchezPanel
         panel.add(new JLabel("Number of blocks: "));
         panel.add(int_blocks = new IntegerField("5", 3));
         panel.add(new JLabel("Benchmark: "));
-        panel.add(choice = new JComboBox(choice_items));
+        panel.add(choice = new JComboBox<String>(choice_items));
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
-        int p = int_blocks.get();
-        int type = choice.getSelectedIndex();
-        SanchezTestCase stc = new SanchezTestCase(p, type);
+        final int p = int_blocks.get();
+        final int type = choice.getSelectedIndex();
+        final SanchezTestCase stc = new SanchezTestCase(p, type);
 
         return stc.getProject();
     }
@@ -1453,15 +1453,15 @@ class RoundRobinPanel
 
     public RoundRobinPanel()
     {
-        Box theBox = Box.createVerticalBox();
+        final Box theBox = Box.createVerticalBox();
 
         add(theBox, BorderLayout.NORTH);
 
-        JPanel labelPanel = new JPanel();
+        final JPanel labelPanel = new JPanel();
 
         labelPanel.add(new JLabel("Ref: 'Compositional Minimization of " + "Finite State Systems', S. Graf et. al."));
 
-        JPanel panel = new JPanel(new GridLayout(1, 2));
+        final JPanel panel = new JPanel(new GridLayout(1, 2));
 
         panel.add(new JLabel("Number of processes: "));
         panel.add(num_proc);
@@ -1469,12 +1469,12 @@ class RoundRobinPanel
         theBox.add(panel);
     }
 
-    public void compute(IDE ide){}
-    
+    public void compute(final IDE ide){}
+
     public Project doIt()
     throws Exception
     {
-        RoundRobin rr = new RoundRobin(num_proc.get());
+        final RoundRobin rr = new RoundRobin(num_proc.get());
 
         return rr.getProject();
     }
@@ -1490,24 +1490,24 @@ class ArbiterPanel
 
     public ArbiterPanel()
     {
-        Box theBox = Box.createVerticalBox();
+        final Box theBox = Box.createVerticalBox();
         add(theBox, BorderLayout.NORTH);
 
-        JPanel labelPanel = new JPanel();
+        final JPanel labelPanel = new JPanel();
         labelPanel.add(new JLabel("Ref: 'Compositional Model Checking', E.M. Clarke et. al."));
 
-        JPanel panel = new JPanel(new GridLayout(1, 2));
+        final JPanel panel = new JPanel(new GridLayout(1, 2));
         panel.add(new JLabel("Number of users: "));
         panel.add(num_users);
 
-        JPanel synchronizePanel = new JPanel();
+        final JPanel synchronizePanel = new JPanel();
         synchronizePanel.add(synchronize, BorderLayout.NORTH);
         theBox.add(labelPanel);
         theBox.add(panel);
         theBox.add(synchronizePanel);
     }
-    
-    public void compute(IDE ide){}
+
+    public void compute(final IDE ide){}
 
     public Project doIt()
     throws Exception
@@ -1519,7 +1519,7 @@ class ArbiterPanel
         }
 
         //Arbiter arb = new Arbiter(users, synchronize.isSelected());
-        Arbiter arb = new Arbiter(num_users.get(), synchronize.isSelected());
+        final Arbiter arb = new Arbiter(num_users.get(), synchronize.isSelected());
 
         return arb.getProject();
     }
@@ -1558,10 +1558,10 @@ public class TestCasesDialog
 {
     private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(TestCasesDialog.class);
-    private ExampleTab extab = new ExampleTab();
+    private final ExampleTab extab = new ExampleTab();
     private Project project = null;
-    private Object gui;
-    
+    private final Object gui;
+
     public class ComputeButton
         extends JButton
     {
@@ -1574,7 +1574,7 @@ public class TestCasesDialog
             setToolTipText("Run the example for multiple instances");
             addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                public void actionPerformed(final ActionEvent e)
 
                 // throws Exception // cannot do this - what the f**k!
                 {
@@ -1587,7 +1587,7 @@ public class TestCasesDialog
                             System.out.println("ide is null: (TestCasesDialog in ComputeButton)");
                         compute(ide);
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
                         logger.error("Exception while constructing test case: " + ex);
                         logger.debug(ex.getStackTrace());
@@ -1611,7 +1611,7 @@ public class TestCasesDialog
             setToolTipText("Go ahead and do it");
             addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                public void actionPerformed(final ActionEvent e)
 
                 // throws Exception // cannot do this - what the f**k!
                 {
@@ -1619,7 +1619,7 @@ public class TestCasesDialog
                     {
                         doit();
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
                         logger.error("Exception while constructing test case: " + ex);
                         logger.debug(ex.getStackTrace());
@@ -1643,7 +1643,7 @@ public class TestCasesDialog
             setToolTipText("Enough of this");
             addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                public void actionPerformed(final ActionEvent e)
                 {
                     action();
                 }
@@ -1668,7 +1668,7 @@ public class TestCasesDialog
             setToolTipText("Want some help?");
             addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                public void actionPerformed(final ActionEvent e)
                 {
                     action();
                 }
@@ -1678,33 +1678,33 @@ public class TestCasesDialog
         void action()
         {}
     }
-    
-    void compute(IDE ide)
+
+    void compute(final IDE ide)
     throws Exception
     {
-        Component comp = extab.getSelectedComponent();
+        final Component comp = extab.getSelectedComponent();
 
         // We know that this is actually also a TestCase (right?)
-        TestCase tc = (TestCase) comp;
+        final TestCase tc = (TestCase) comp;
 
         setVisible(false);
 
-        tc.compute(ide);  
+        tc.compute(ide);
     }
 
-    
+
     void doit()
     throws Exception
     {
-        Component comp = extab.getSelectedComponent();
+        final Component comp = extab.getSelectedComponent();
 
         // We know that this is actually also a TestCase (right?)
-        TestCase tc = (TestCase) comp;
+        final TestCase tc = (TestCase) comp;
 
         setVisible(false);
 
         project = tc.doIt();    // Should return a Project (named)
-        
+
 //        System.out.println("Name of project: "+project);
 
         if (gui instanceof Gui)
@@ -1726,14 +1726,14 @@ public class TestCasesDialog
     {
         return project;
     }
-    
-    public TestCasesDialog(Frame frame, Object gui)
+
+    public TestCasesDialog(final Frame frame, final Object gui)
     {
         super(frame, "Example Generator", false);    // modal dialog with frame as parent
 
         this.gui = gui;
 
-        Container pane = getContentPane();
+        final Container pane = getContentPane();
 
         pane.setLayout(new BorderLayout(10, 10));
 
@@ -1742,9 +1742,9 @@ public class TestCasesDialog
         // Point point = Utility.getPosForCenter(size);
         // setSize(size);
         // setLocation(point);
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton tmp;
-        
+
 //        ComputeButton cb = new ComputeButton();
         buttons.add(new ComputeButton());
         buttons.add(tmp = new DoitButton());
@@ -1755,7 +1755,7 @@ public class TestCasesDialog
         getRootPane().setDefaultButton(tmp);    // :)
         pack();
 
-        Point point = Utility.getPosForCenter(getSize());
+        final Point point = Utility.getPosForCenter(getSize());
 
         setLocation(point);
     }

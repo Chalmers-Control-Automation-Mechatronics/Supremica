@@ -27,80 +27,80 @@ import org.supremica.manufacturingTables.xsd.processeditor.ROPType;
  */
 public class ResourceCellInfoWindow extends JDialog implements ActionListener,
 							       MouseListener
-{    
+{
 	private static final long serialVersionUID = 1L;
 
-	private int sizeX = 300;
-    private int sizeY = 350;
+	private final int sizeX = 300;
+    private final int sizeY = 350;
 
-    private String[] types = {"DOP", "COP"};
+    private final String[] types = {"DOP", "COP"};
 
-    private JPanel main = new JPanel();
-    
-    private JComboBox type = new JComboBox(types);
+    private final JPanel main = new JPanel();
+
+    private final JComboBox<String> type = new JComboBox<String>(types);
     private JTextField machine;
     private JTextField id;
     private JTextField comment;
     private JButton ok,cancel;
 
     private ROP r = null;
-    
+
     public static final int APPROVE_OPTION = 1;
     public static final int CANCEL_OPTION = 2;
     public static final int ERROR_OPTION = 3;
     private int option = ERROR_OPTION;
-    
+
     /**
      * Creates a new instance of the class
-     * 
+     *
      * @param o the object that is to be edit by this info window
      */
-    public ResourceCellInfoWindow(ROP o)
-    {	    
+    public ResourceCellInfoWindow(final ROP o)
+    {
 	r = o;
-	String title = "  Resource  ";	
+	final String title = "  Resource  ";
 	main.setBorder(new TitledBorder(title));
-	main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));	
-	
-	
+	main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
+
+
 	main.add(type);
 	type.setSelectedItem(r.getType());
-	type.setBorder(new TitledBorder("  Type  "));	    
-	type.setBackground(main.getBackground());	    
+	type.setBorder(new TitledBorder("  Type  "));
+	type.setBackground(main.getBackground());
 	type.addActionListener(this);
-	
+
 	main.add(machine = new JTextField(r.getMachine(),15));
-	machine.setBorder(new TitledBorder("  Machine  "));	    
+	machine.setBorder(new TitledBorder("  Machine  "));
 	machine.setBackground(main.getBackground());
-	machine.addMouseListener(this);	    	    
-	
+	machine.addMouseListener(this);
+
 	main.add(id = new JTextField(r.getId(),15));
-	id.setBorder(new TitledBorder("  Id  "));		    
+	id.setBorder(new TitledBorder("  Id  "));
 	id.setBackground(main.getBackground());
 	id.addMouseListener(this);
-	
+
 	main.add(comment = new JTextField(15));
 	try {
 	    comment.setText(r.getComment());
-	}catch(Exception ex) {
+	}catch(final Exception ex) {
 	    comment.setText("");
 	}
-	comment.setBorder(new TitledBorder("  Comment  "));		    
+	comment.setBorder(new TitledBorder("  Comment  "));
 	comment.setBackground(main.getBackground());
 	comment.addMouseListener(this);
-	
-	JToolBar tool = new JToolBar();
+
+	final JToolBar tool = new JToolBar();
 	tool.setLayout(new FlowLayout(FlowLayout.LEFT));
-	tool.setFloatable(false);	    
-	tool.add(ok = new JButton("OK")); 	    	    	    	    
-	tool.add(cancel = new JButton("Cancel"));	    
+	tool.setFloatable(false);
+	tool.add(ok = new JButton("OK"));
+	tool.add(cancel = new JButton("Cancel"));
 	ok.addActionListener(this);
 	cancel.addActionListener(this);
-	
+
 	main.add(tool);
-	
+
 	add(main);
-	setSize(sizeX,sizeY);		    
+	setSize(sizeX,sizeY);
 	setLocation((Toolkit.getDefaultToolkit().getScreenSize().width-sizeX)/2,
 		     (Toolkit.getDefaultToolkit().getScreenSize().height-sizeY)/2);
 	setModal(true);
@@ -121,16 +121,16 @@ public class ResourceCellInfoWindow extends JDialog implements ActionListener,
     	return option;
     }
     /**
-     * Is invoked when an action has occured. 
+     * Is invoked when an action has occured.
      */
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
 	//DEBUG
 	//System.out.println("ResourceCellInfoWindow.actionPerformed()");
-	//END DEBUG          
-	if(e.getSource() == ok){	   
-	    option = APPROVE_OPTION;	    
+	//END DEBUG
+	if(e.getSource() == ok){
+	    option = APPROVE_OPTION;
 	    if(((String)type.getSelectedItem()).equals("DOP")) {
-		r.setType(ROPType.ROP);	    
+		r.setType(ROPType.ROP);
 	    }else if(((String)type.getSelectedItem()).equals("COP")) {
 		r.setType(ROPType.COP);
 	    }
@@ -143,50 +143,50 @@ public class ResourceCellInfoWindow extends JDialog implements ActionListener,
 	    }
 	    dispose();
 	}
-	else if(e.getSource() == cancel){	    		
+	else if(e.getSource() == cancel){
 	    option = CANCEL_OPTION;
 	    dispose();
 	}
-    } 
+    }
     /**
      * Invoked when the mouse button has been cliked on this window.
      * <p>
      * <i>The method is not in use.</i>
      */
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(final MouseEvent e) {}
      /**
      * Invoked when the mouse enters this window.
      * <p>
      * <i>This method is not in use.</i>
      */
-    public void mouseEntered(MouseEvent e) {}
+    public void mouseEntered(final MouseEvent e) {}
      /**
      * Invoked when the mouse exits this window.
      * <p>
      * <i>This method is not in use.</i>
      */
-    public void mouseExited(MouseEvent e) {}
+    public void mouseExited(final MouseEvent e) {}
     /**
      * Invoked when the mouse is pressed on this window.
      */
-    public void mousePressed(MouseEvent e) {	    
+    public void mousePressed(final MouseEvent e) {
 	machine.setBackground(main.getBackground());
 	id.setBackground(main.getBackground());
-	comment.setBackground(main.getBackground());	    
+	comment.setBackground(main.getBackground());
 	if(e.getSource() == machine){
-	    machine.setBackground(Color.white);   
+	    machine.setBackground(Color.white);
 	}
 	else if(e.getSource() == id){
 	    id.setBackground(Color.white);
 	}
 	else if(e.getSource() == comment){
 	    comment.setBackground(Color.white);
-	}	    
-    }    
+	}
+    }
     /**
      * Invoked when a mouse button has been released on this window.
      * <p>
      * <i>This method is not in use.</i>
      */
-    public void mouseReleased(MouseEvent e) {}    
+    public void mouseReleased(final MouseEvent e) {}
 }

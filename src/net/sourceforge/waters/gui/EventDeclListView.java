@@ -67,7 +67,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class EventDeclListView
-  extends JList
+  extends JList<EventDeclSubject>
   implements SelectionOwner, FocusListener, ListSelectionListener
 {
 

@@ -418,18 +418,19 @@ class AttributesPanel extends JPanel
     //# Constructors
     private AttributeEditor()
     {
-      super(new JComboBox());
-      final JComboBox combo = getComboBox();
+      super(new JComboBox<String>());
+      final JComboBox<String> combo = getComboBox();
       combo.setEditable(true);
     }
 
     //#######################################################################
     //# Overrides for base class javax.swing.DefaultCellEditor
-    public JComboBox getTableCellEditorComponent
+    public JComboBox<String> getTableCellEditorComponent
       (final JTable table, final Object value, final boolean isSelected,
        final int row, final int column)
     {
-      final JComboBox combo = (JComboBox) super.getTableCellEditorComponent
+      @SuppressWarnings("unchecked")
+      final JComboBox<String> combo = (JComboBox<String>) super.getTableCellEditorComponent
                                       (table, value, isSelected, row, column);
       final Collection<String> completions;
       switch (column) {
@@ -446,10 +447,14 @@ class AttributesPanel extends JPanel
           ("Unknown column " + column + " in attribute table!");
       }
       final String text = value.toString();
-      final DefaultComboBoxModel model =
-        completions == null ?
-        new DefaultComboBoxModel() :
-        new DefaultComboBoxModel(completions.toArray());
+      final DefaultComboBoxModel<String> model;
+      if(completions == null){
+        model = new DefaultComboBoxModel<String>();
+      }
+      else{
+        final String[] array = new String[completions.size()];
+        model = new DefaultComboBoxModel<String>(array);
+      }
       model.setSelectedItem(text);
       combo.setModel(model);
       return combo;
@@ -463,14 +468,15 @@ class AttributesPanel extends JPanel
 
     //#######################################################################
     //# Auxiliary Methods
-    private JComboBox getComboBox()
+    @SuppressWarnings("unchecked")
+    private JComboBox<String> getComboBox()
     {
-      return (JComboBox) getComponent();
+      return (JComboBox<String>) getComponent();
     }
 
     private JTextField getTextField()
     {
-      final JComboBox combo = getComboBox();
+      final JComboBox<String> combo = getComboBox();
       final ComboBoxEditor editor = combo.getEditor();
       return (JTextField) editor.getEditorComponent();
     }

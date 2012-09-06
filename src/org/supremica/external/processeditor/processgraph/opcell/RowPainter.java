@@ -21,95 +21,95 @@ import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
  */
 public class RowPainter extends JPanel implements MouseListener,
 						  KeyListener
-						 
-{       
+
+{
     private static final long serialVersionUID = 1L;
-	
-	private DefaultListModel mod = new DefaultListModel();
-    private JList list = new JList(mod);
+
+	private final DefaultListModel<AttributePanel> mod = new DefaultListModel<AttributePanel>();
+    private final JList<AttributePanel> list = new JList<AttributePanel>(mod);
     @SuppressWarnings("unused")
-	private AttributeCellRenderer renderer = null;       
+	private final AttributeCellRenderer renderer = null;
 
     private AttributeListener myListener = null;
 
-    private Activity operand;    
+    private final Activity operand;
 
     /**
      * Creates a new instance of the class that is associated with the specified activity object.
      *
      * @param a the activity object this instance will be associated with
      */
-    public RowPainter(Activity a)
-    {      	
-	setLayout(new FlowLayout(FlowLayout.LEFT,0,0));	
-	setBackground(new Color(0,0,0,0));	
-	
+    public RowPainter(final Activity a)
+    {
+	setLayout(new FlowLayout(FlowLayout.LEFT,0,0));
+	setBackground(new Color(0,0,0,0));
+
 	operand = a;
 	Object[] attributes;
 	try {
 	    attributes = operand.getProperties().getAttribute().toArray();
-	}catch(Exception ex) {
+	}catch(final Exception ex) {
 	    attributes = new Object[0];
-	}	       
-	
-	for(int i = 0; i < attributes.length; i++) 
-	    {			
+	}
+
+	for(int i = 0; i < attributes.length; i++)
+	    {
 		Boolean up; Boolean down;
 		try{
 		    up = new Boolean(((Attribute)attributes[i]).getUpperIndicator().isIndicatorValue());
-		}catch(Exception ex) {		    
+		}catch(final Exception ex) {
 		    up = null;
 		}
 		try{
 		    down = new Boolean(((Attribute)attributes[i]).getLowerIndicator().isIndicatorValue());
-		}catch(Exception ex) {		   		    
+		}catch(final Exception ex) {
 		    down = null;
-		}		    	       				
-		AttributePanel tmpPanel = new AttributePanel(((Attribute)attributes[i]).getAttributeValue(), ((Attribute)attributes[i]).getType(), up, down);		
+		}
+		final AttributePanel tmpPanel = new AttributePanel(((Attribute)attributes[i]).getAttributeValue(), ((Attribute)attributes[i]).getType(), up, down);
 		tmpPanel.setOpaque(true);
 		try {
 		    if(!((Attribute)attributes[i]).isInvisible()) {
-			mod.addElement(tmpPanel);		
+			mod.addElement(tmpPanel);
 		    }
-		}catch(Exception ex) {};
-	    }	
-	       
-	AttributeCellRenderer renderer = new AttributeCellRenderer(this);
+		}catch(final Exception ex) {};
+	    }
+
+	final AttributeCellRenderer renderer = new AttributeCellRenderer(this);
 	renderer.setPreferredSize(new Dimension(AttributePanel.sizeX, AttributePanel.sizeY));
-	list.setCellRenderer(renderer);	
-		
-	       		
+	list.setCellRenderer(renderer);
+
+
 	add(list);
-	
+
 	list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
 	list.setVisibleRowCount(1);
-	
+
 	list.addMouseListener(this);
 	list.addKeyListener(this);
-	
+
 	setSize(new Dimension(mod.getSize()*AttributePanel.sizeX, AttributePanel.sizeY));
-	
-    }    
+
+    }
     /**
      * Updates the size of this attribute row.
      */
-    public void update() {	              
-	list.setFixedCellWidth(AttributePanel.sizeX);		
+    public void update() {
+	list.setFixedCellWidth(AttributePanel.sizeX);
 	list.setFixedCellHeight(AttributePanel.sizeY);
-	setSize(new Dimension(mod.getSize()*AttributePanel.sizeX, AttributePanel.sizeY));	       
-    }     
+	setSize(new Dimension(mod.getSize()*AttributePanel.sizeX, AttributePanel.sizeY));
+    }
     /**
      * Clears the selection attribute.
      */
     public void clearSelectedAttributes() {
 	list.clearSelection();
-    }    
+    }
     /**
      * Adds the specified attribute listener to recieve attribute events.
      *
      * @param l the attribute listener
      */
-    public void addListener(AttributeListener l) {
+    public void addListener(final AttributeListener l) {
 	myListener = l;
     }
     /**
@@ -118,13 +118,13 @@ public class RowPainter extends JPanel implements MouseListener,
      * @param uAtt the unique attribute types
      * @param uAttC the attribute type's corresponding color
      */
-    public void setAttributeTypeColor(String[] uAtt, Color[] uAttC) {	
-	Object[] attributes = mod.toArray();
+    public void setAttributeTypeColor(final String[] uAtt, final Color[] uAttC) {
+	final Object[] attributes = mod.toArray();
 	for(int i = 0; i < attributes.length; i++) {
 	    int index = -1;
-	    for(int j = 0; j < uAtt.length; j++) {		
-		if(((AttributePanel)attributes[i]).type.equals(uAtt[j])) {		    
-		    index = j;		    
+	    for(int j = 0; j < uAtt.length; j++) {
+		if(((AttributePanel)attributes[i]).type.equals(uAtt[j])) {
+		    index = j;
 		    break;
 		}
 	    }
@@ -143,46 +143,46 @@ public class RowPainter extends JPanel implements MouseListener,
      * @param visible if <code>true</code> the attribute is set visible,
      * otherwise <code>false</code>
      */
-    public void setAttributeTypeVisible(String type, boolean visible) {	    
+    public void setAttributeTypeVisible(final String type, final boolean visible) {
 	if(operand.getProperties() != null) {
-	    Object[] attributes = operand.getProperties().getAttribute().toArray();
-	    for(int j = 0; j < attributes.length; j++) {	       
+	    final Object[] attributes = operand.getProperties().getAttribute().toArray();
+	    for(int j = 0; j < attributes.length; j++) {
 		if((attributes[j] instanceof Attribute)&&
-		   (type.equals(((Attribute)attributes[j]).getType()))) { 
+		   (type.equals(((Attribute)attributes[j]).getType()))) {
 		    ((Attribute)attributes[j]).setInvisible(!visible);
 		    operand.getProperties().getAttribute().add(j, (Attribute)attributes[j]);
 		}
-	    }	 
-	}      	      
+	    }
+	}
     }
     /**
      * Invoked when a mouse button has been clicked on this attribute row.
      * <p>
      * This method is intentionally left empty.
-     */            
-    public void mouseClicked(MouseEvent e){}
+     */
+    public void mouseClicked(final MouseEvent e){}
     /**
      * Invoked when the mouse enters this attribute row.
      * <p>
      * This method is intentionally left empty.
-     */   	
-    public void mouseEntered(MouseEvent e){}
+     */
+    public void mouseEntered(final MouseEvent e){}
     /**
      * Invoked when the mouse exits this attribute row.
      * <p>
      * this method is intentionally left empty.
      */
-    public void mouseExited(MouseEvent e){}			    
+    public void mouseExited(final MouseEvent e){}
     /**
      * Invoked when a mouse button has been pressed on this attribute row.
      * <p>
      * Selects the pressed attribute panel in this attribute row.
      */
-    public void mousePressed(MouseEvent e){
+    public void mousePressed(final MouseEvent e){
 	//DEBUG
 	//System.out.println("RowPainter.mousePressed()");
 	//END DEBUG
-	if(myListener != null) {	    
+	if(myListener != null) {
 	    myListener.removeSelection();
 	    myListener.setList(list);
 	}
@@ -192,7 +192,7 @@ public class RowPainter extends JPanel implements MouseListener,
      * <p>
      * This method is intentionally left empty.
      */
-    public void mouseReleased(MouseEvent e){
+    public void mouseReleased(final MouseEvent e){
     }
     /**
      * Invoked when a key is pressed.
@@ -200,27 +200,27 @@ public class RowPainter extends JPanel implements MouseListener,
      * If it is the <code>Del</code> key the selected attribute panel will
      * become invisible.
      */
-    public void keyPressed(KeyEvent e)
+    public void keyPressed(final KeyEvent e)
     {
-	Object[] sel =  list.getSelectedValues();
- 	
+	final Object[] sel =  list.getSelectedValuesList().toArray();
+
 	if(e.getKeyCode()==KeyEvent.VK_DELETE && sel.length > 0)
-	    {		
+	    {
 		for(int i = 0; i < sel.length; i++)
 		    {
-			Object[] attributes = operand.getProperties().getAttribute().toArray();
-			for(int j = 0; j < attributes.length; j++) {	       
+			final Object[] attributes = operand.getProperties().getAttribute().toArray();
+			for(int j = 0; j < attributes.length; j++) {
 			    if((attributes[j] instanceof Attribute)&&
 			       (((AttributePanel)sel[i]).type.equals(((Attribute)attributes[j]).getType()))&&
-			       (((AttributePanel)sel[i]).value.equals(((Attribute)attributes[j]).getAttributeValue()))) {	     
+			       (((AttributePanel)sel[i]).value.equals(((Attribute)attributes[j]).getAttributeValue()))) {
 				((Attribute)attributes[j]).setInvisible(true);
-				operand.getProperties().getAttribute().add(j, (Attribute)attributes[j]);			
+				operand.getProperties().getAttribute().add(j, (Attribute)attributes[j]);
 			    }
-			}			
+			}
 		    }
-		if(myListener !=  null) {		   
+		if(myListener !=  null) {
 		    myListener.rebuild();
-		}	       		
+		}
 	    }
     }
     /**
@@ -228,14 +228,14 @@ public class RowPainter extends JPanel implements MouseListener,
      * <p>
      * This method is intentionally left empty.
      */
-    public void keyReleased(KeyEvent e){
+    public void keyReleased(final KeyEvent e){
     }
     /**
      * Invoked when a key is typed.
      * <p>
      * This method is intentionally left empty.
      */
-    public void keyTyped(KeyEvent e){	
-    }     
+    public void keyTyped(final KeyEvent e){
+    }
 }
 

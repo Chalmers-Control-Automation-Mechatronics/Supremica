@@ -181,8 +181,8 @@ public class VerificationDialog
     {
         private static final long serialVersionUID = 1L;
 
-        private final JComboBox verificationTypeBox;
-        private final JComboBox algorithmSelector;
+        private final JComboBox<VerificationType> verificationTypeBox;
+        private final JComboBox<VerificationAlgorithm> algorithmSelector;
         private final JCheckBox showTrace;
         private final JTextArea note;
 
@@ -194,10 +194,10 @@ public class VerificationDialog
         public VerificationDialogStandardPanel()
         {
             verificationTypeBox =
-              new JComboBox(VerificationType.enabledValues());
+              new JComboBox<VerificationType>(VerificationType.enabledValues());
             verificationTypeBox.addActionListener(this);
 
-            algorithmSelector = new JComboBox();
+            algorithmSelector = new JComboBox<VerificationAlgorithm>();
             algorithmSelector.addActionListener(this);
 
             showTrace = new JCheckBox("Show trace to bad states");
@@ -409,8 +409,8 @@ public class VerificationDialog
     {
         private static final long serialVersionUID = 1L;
 
-        JComboBox minimizationStrategy;
-        JComboBox minimizationHeuristic;
+        JComboBox<Object> minimizationStrategy;
+        JComboBox<Object> minimizationHeuristic;
         JCheckBox ruleSC;
         JCheckBox ruleOSI;
         JCheckBox ruleAE;
@@ -418,8 +418,8 @@ public class VerificationDialog
 
         public VerificationDialogAdvancedPanelModularNonblocking()
         {
-            minimizationStrategy = new JComboBox(MinimizationStrategy.values());
-            minimizationHeuristic = new JComboBox(MinimizationHeuristic.values());
+            minimizationStrategy = new JComboBox<Object>(MinimizationStrategy.values());
+            minimizationHeuristic = new JComboBox<Object>(MinimizationHeuristic.values());
             ruleSC = new JCheckBox("Rule SC");
             ruleOSI = new JCheckBox("Rule OSI");
             ruleAE = new JCheckBox("Rule AE");

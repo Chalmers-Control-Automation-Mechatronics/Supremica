@@ -20,15 +20,15 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCImplicante
  **/
 public class QMCRendererListaImplicantes
     extends JCheckBox
-    implements ListCellRenderer
+    implements ListCellRenderer<QMCImplicanteBean>
 {
     private static final long serialVersionUID = 1L;
 
     /**
      * Constructor que define el formato de las celdas
      **/
-    public QMCRendererListaImplicantes(JTable table) {
-        JTableHeader header = table.getTableHeader();
+    public QMCRendererListaImplicantes(final JTable table) {
+        final JTableHeader header = table.getTableHeader();
         setOpaque(true);
         setBorder(UIManager.getBorder("TableHeader.cellBorder"));
         setHorizontalAlignment(CENTER);
@@ -36,21 +36,21 @@ public class QMCRendererListaImplicantes
         setBackground(header.getBackground());
         setFont(header.getFont());
     }
-    
+
     /**
      * Implementación del método getListCellRendererComponent de la interfaz ListCellRenderer
      * @return this el componente que dibuja la celda
      */
-    public Component getListCellRendererComponent( JList list,
-    Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        
+    public Component getListCellRendererComponent( final JList<? extends QMCImplicanteBean> list,
+          final QMCImplicanteBean value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+
         //setText((value == null) ? "" : value.toString());
         setEnabled(list.isEnabled());
         setSelected(((QMCImplicanteBean)value).isEsencial());
         setFont(list.getFont());
         setText(String.valueOf(((QMCImplicanteBean)value).getNombre()));
-       
-      
+
+
         return this;
 
     }

@@ -62,155 +62,155 @@ import org.supremica.automata.execution.Control;
 import org.supremica.automata.execution.Condition;
 
 public class SimulatorEventListModel
-    extends AbstractListModel
+    extends AbstractListModel<Object>
     implements SignalObserver
 {
 	private static final long serialVersionUID = 1L;
 
 	private static Logger logger = LoggerFactory.createLogger(SimulatorEventListModel.class);
-    
+
     // private int[] currState;
-    private int[] events;
+    private final int[] events;
     private int eventAmount = 0;
-    private Automata theAutomata;
+    private final Automata theAutomata;
     @SuppressWarnings("unused")
-	private Project theProject;
-    private Controls theControls;
-    private Alphabet theAlphabet;
+	private final Project theProject;
+    private final Controls theControls;
+    private final Alphabet theAlphabet;
     @SuppressWarnings("unused")
 	private boolean showState = false;
-    private boolean showDisabledEvents = false;
-    private AutomataSynchronizerHelper helper;
-    
+    private final boolean showDisabledEvents = false;
+    private final AutomataSynchronizerHelper helper;
+
 //      private AnimationSignals theSignals;
-    private SimulatorExecuter theExecuter;
+    private final SimulatorExecuter theExecuter;
     protected boolean isLocked = false;
-    
-    public SimulatorEventListModel(SimulatorExecuter theExecuter, AutomataSynchronizerHelper helper, Project theProject)
+
+    public SimulatorEventListModel(final SimulatorExecuter theExecuter, final AutomataSynchronizerHelper helper, final Project theProject)
     {
         this.helper = helper;
         this.theAutomata = helper.getAutomata();
         this.theProject = theProject;
         this.theControls = theProject.getControls();
         this.theAlphabet = helper.getUnionAlphabet();
-        
+
 //              this.showDisabledEvents = showDisabledEvents;
 //              this.theSignals = theSignals;
         this.theExecuter = theExecuter;
         events = new int[helper.getNbrOfEvents() + 1];
-        
+
 //              theExecuter.registerSignalObserver(this);
 //              theSignals.registerInterest(this);
     }
-    
+
 //      public void setCurrState(int[] currState)
 //      {
 //              this.currState = currState;
 //
 //              update();
 //      }
-    public void setShowStateId(boolean showState)
+    public void setShowStateId(final boolean showState)
     {
         this.showState = showState;
     }
-    
+
     public void update()
     {
         enterLock();
-        
+
         //logger.info("SimulatorEventListModel.update");
         //AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
-        AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
-        int[] extEvents = onlineSynchronizer.getOutgoingEvents(theExecuter.getCurrentState());
-        
+        final AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
+        final int[] extEvents = onlineSynchronizer.getOutgoingEvents(theExecuter.getCurrentState());
+
         System.arraycopy(extEvents, 0, events, 0, events.length);
-        
+
         if (!showDisabledEvents)
         {
             int currEventIndex = 0;
             int nbrOfEvents = 0;
-            
+
             while (extEvents[currEventIndex] != Integer.MAX_VALUE)
             {
                 LabeledEvent currEvent;
-                
+
                 try
                 {
                     currEvent = helper.getIndexMap().getEventAt(events[currEventIndex]);
                     //currEvent = theAlphabet.getEventWithIndex(events[currEventIndex]);
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
-                    
+
                     //logger.error("Exception in SimulatorEventListModel.update");
                     logger.debug(ex.getStackTrace());
-                    
+
                     return;
                 }
-                
+
                 if (theControls.hasControl(currEvent.getLabel()))
                 {
-                    
+
                     //logger.info("hasControl: " + currEvent.getLabel());
-                    Control currControl = theControls.getControl(currEvent.getLabel());
+                    final Control currControl = theControls.getControl(currEvent.getLabel());
                     boolean conditionsFulfilled = true;
-                    
-                    for (Iterator<Condition> condIt = currControl.conditionIterator();
+
+                    for (final Iterator<Condition> condIt = currControl.conditionIterator();
                     condIt.hasNext(); )
                     {
-                        Condition condition = (Condition) condIt.next();
-                        
+                        final Condition condition = condIt.next();
+
                         conditionsFulfilled = conditionsFulfilled && theExecuter.isTrue(condition);
                     }
-                    
+
                     if (conditionsFulfilled)
                     {
                         events[nbrOfEvents] = events[currEventIndex];
-                        
+
                         nbrOfEvents++;
                     }
                     else
                     {
-                        
+
                         //logger.info("hasControl, event disabled: " + events[currEventIndex] + " " + currEvent.getLabel());
                     }
                 }
                 else
                 {
                     events[nbrOfEvents] = events[currEventIndex];
-                    
+
                     nbrOfEvents++;
                 }
-                
+
                 currEventIndex++;
             }
-            
+
             events[nbrOfEvents] = Integer.MAX_VALUE;
         }
-        
+
         eventAmount = 0;
-        
+
         while (events[eventAmount] != Integer.MAX_VALUE)
         {
             eventAmount++;
         }
-        
+
         logger.debug("Before fireContentsChanged");
         fireContentsChanged(this, 0, eventAmount - 1);
         logger.debug("After fireContentsChanged");
         exitLock();
     }
-    
+
     public Automata getAutomata()
     {
         return theAutomata;
     }
-    
+
     public Alphabet getAlphabet()
     {
         return theAlphabet;
     }
-    
+
     public synchronized void enterLock()
     {
         try
@@ -219,85 +219,85 @@ public class SimulatorEventListModel
             {
                 wait();
             }
-            
+
             setLock(true);
         }
-        catch (InterruptedException e)
+        catch (final InterruptedException e)
         {
             logger.error("enterLock interrupted");
         }
     }
-    
+
     public synchronized void exitLock()
     {
         setLock(false);
         notifyAll();
     }
-    
+
     public synchronized boolean isLocked()
     {
         return isLocked;
     }
-    
-    private synchronized void setLock(boolean doLock)
+
+    private synchronized void setLock(final boolean doLock)
     {
         this.isLocked = doLock;
     }
-    
+
     public int getSize()
     {
         return eventAmount;
     }
-    
-    public Object getElementAt(int index)
+
+    public Object getElementAt(final int index)
     {
         LabeledEvent currEvent;
-        
+
         try
-        {            
+        {
             //currEvent = theAlphabet.getEventWithIndex(events[index]);
             currEvent = helper.getIndexMap().getEventAt(events[index]);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Error: Could not find event in alphabet.", ex);
             logger.debug(ex.getStackTrace());
-            
+
             return null;
         }
-        
-        StringBuffer responseString = new StringBuffer();
-        
+
+        final StringBuffer responseString = new StringBuffer();
+
         if (!currEvent.isControllable())
         {
             responseString.append("!");
         }
-        
+
         responseString.append(currEvent.getLabel());
-        
+
         return responseString.toString();
     }
-    
-    public LabeledEvent getEventAt(int index)
+
+    public LabeledEvent getEventAt(final int index)
     {
         LabeledEvent currEvent;
-        
+
         try
         {
             //currEvent = theAlphabet.getEventWithIndex(events[index]);
             currEvent = helper.getIndexMap().getEventAt(events[index]);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Error: Could not find event in alphabet.", ex);
             logger.debug(ex.getStackTrace());
-            
+
             return null;
         }
-        
+
         return currEvent;
     }
-    
+
 //      public int[] getStateAt(int index)
 //      {
 //              //System.err.println("getStateAt: " + index);

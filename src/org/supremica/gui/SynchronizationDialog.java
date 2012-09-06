@@ -68,14 +68,14 @@ class SynchronizationDialogStandardPanel
 	extends SynchronizationPanel
 {
 	private static final long serialVersionUID = 1L;
-	private JCheckBox forbidUnconStatesBox;
-	private JCheckBox buildAutomatonBox;
-	private JCheckBox useShortStateNamesBox;
-	private JTextField stateNameSeparator;
+	private final JCheckBox forbidUnconStatesBox;
+	private final JCheckBox buildAutomatonBox;
+	private final JCheckBox useShortStateNamesBox;
+	private final JTextField stateNameSeparator;
 
 	public SynchronizationDialogStandardPanel()
 	{
-		Box standardBox = Box.createVerticalBox();
+		final Box standardBox = Box.createVerticalBox();
 
 		forbidUnconStatesBox = new JCheckBox("Mark uncontrollable states as forbidden");
 		forbidUnconStatesBox.setToolTipText("If checked, uncontrollable states become forbidden " +
@@ -85,7 +85,7 @@ class SynchronizationDialogStandardPanel
 		useShortStateNamesBox = new JCheckBox("Use short state names");
 		useShortStateNamesBox.setToolTipText("Give the states in the composition short, abstract names instead of keeping the original state names");
 
-		JLabel stateNameSeparatorLabel = new JLabel("State name separator");
+		final JLabel stateNameSeparatorLabel = new JLabel("State name separator");
 		stateNameSeparator = new JTextField();
 		stateNameSeparator.setToolTipText("The name of the synchronized state is a concatenation of the names of the states, separated by this string.");
 
@@ -97,7 +97,7 @@ class SynchronizationDialogStandardPanel
 		this.add(standardBox);
 	}
 
-	public void update(SynchronizationOptions synchronizationOptions)
+	public void update(final SynchronizationOptions synchronizationOptions)
 	{
 		forbidUnconStatesBox.setSelected(synchronizationOptions.forbidUncontrollableStates());
 		buildAutomatonBox.setSelected(synchronizationOptions.buildAutomaton());
@@ -105,7 +105,7 @@ class SynchronizationDialogStandardPanel
 		stateNameSeparator.setText(synchronizationOptions.getStateNameSeparator());
 	}
 
-	public void regain(SynchronizationOptions synchronizationOptions)
+	public void regain(final SynchronizationOptions synchronizationOptions)
 	{
 		synchronizationOptions.setForbidUncontrollableStates(forbidUnconStatesBox.isSelected());
 		synchronizationOptions.setBuildAutomaton(buildAutomatonBox.isSelected());
@@ -119,15 +119,15 @@ class SynchronizationDialogAdvancedPanel
 	implements ActionListener
 {
 	private static final long serialVersionUID = 1L;
-	private JComboBox synchronizationTypeBox;
-	private JCheckBox expandForbiddenStatesBox;
-	private JCheckBox rememberDisabledEventsBox;
+	private final JComboBox<SynchronizationType> synchronizationTypeBox;
+	private final JCheckBox expandForbiddenStatesBox;
+	private final JCheckBox rememberDisabledEventsBox;
 
 	public SynchronizationDialogAdvancedPanel()
 	{
 		this.setLayout(new BorderLayout());
 
-		synchronizationTypeBox = new JComboBox(SynchronizationType.values());
+		synchronizationTypeBox = new JComboBox<SynchronizationType>(SynchronizationType.values());
 		synchronizationTypeBox.setToolTipText("Choose the type of composition");
 		expandForbiddenStatesBox = new JCheckBox("Expand forbidden states");
 		expandForbiddenStatesBox.setToolTipText("If checked, transitions from forbidden states are " +
@@ -136,14 +136,14 @@ class SynchronizationDialogAdvancedPanel
 		rememberDisabledEventsBox = new JCheckBox("Include disabled transitions");
 		rememberDisabledEventsBox.setToolTipText("Adds transitions to a new 'dump'-state for all transitions in a plant that are disabled by a specification");
 
-		JPanel choicePanel = new JPanel();
+		final JPanel choicePanel = new JPanel();
 		choicePanel.setLayout(new FlowLayout());
 		choicePanel.add(synchronizationTypeBox);
 		this.add("North", choicePanel);
 
-		JPanel checkBoxPanel = new JPanel();
+		final JPanel checkBoxPanel = new JPanel();
 		checkBoxPanel.setLayout(new FlowLayout());
-		Box checkBoxBox = Box.createVerticalBox();
+		final Box checkBoxBox = Box.createVerticalBox();
 		//checkBoxBox.setLayout(new FlowLayout());
 		checkBoxBox.add(expandForbiddenStatesBox);
 		checkBoxBox.add(rememberDisabledEventsBox);
@@ -169,7 +169,7 @@ class SynchronizationDialogAdvancedPanel
 		*/
 	}
 
-	public void update(SynchronizationOptions synchronizationOptions)
+	public void update(final SynchronizationOptions synchronizationOptions)
 	{
 		synchronizationTypeBox.setSelectedItem(synchronizationOptions.getSynchronizationType());
 		expandForbiddenStatesBox.setSelected(synchronizationOptions.expandForbiddenStates());
@@ -186,14 +186,14 @@ class SynchronizationDialogAdvancedPanel
 		}
 	}
 
-	public void regain(SynchronizationOptions synchronizationOptions)
+	public void regain(final SynchronizationOptions synchronizationOptions)
 	{
 		synchronizationOptions.setSynchronizationType((SynchronizationType) synchronizationTypeBox.getSelectedItem());
 		synchronizationOptions.setExpandForbiddenStates(expandForbiddenStatesBox.isSelected());
 		synchronizationOptions.setRememberDisabledEvents(rememberDisabledEventsBox.isSelected());
 	}
 
-	public void actionPerformed(ActionEvent e)
+	public void actionPerformed(final ActionEvent e)
 	{
 		if (!expandForbiddenStatesBox.isSelected())
 		{
@@ -210,18 +210,18 @@ class SynchronizationDialogAdvancedPanel
 public class SynchronizationDialog
 	implements ActionListener
 {
-	private JButton okButton;
-	private JButton cancelButton;
-	private SynchronizationOptions synchronizationOptions;
+	private final JButton okButton;
+	private final JButton cancelButton;
+	private final SynchronizationOptions synchronizationOptions;
 	SynchronizationDialogStandardPanel standardPanel;
 	SynchronizationDialogAdvancedPanel advancedPanel;
-	private JDialog dialog;
-	private Frame parentFrame;
+	private final JDialog dialog;
+	private final Frame parentFrame;
 
 	/**
 	 * Creates modal dialog box for input of synthesizer options.
 	 */
-	public SynchronizationDialog(Frame parentFrame, SynchronizationOptions synchronizationOptions)
+	public SynchronizationDialog(final Frame parentFrame, final SynchronizationOptions synchronizationOptions)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.parentFrame = parentFrame;
@@ -230,18 +230,18 @@ public class SynchronizationDialog
 		dialog.setTitle("Synchronization options");
 		dialog.setSize(new Dimension(400, 300));
 
-		Container contentPane = dialog.getContentPane();
+		final Container contentPane = dialog.getContentPane();
 
 		standardPanel = new SynchronizationDialogStandardPanel();
 		advancedPanel = new SynchronizationDialogAdvancedPanel();
 
-		JTabbedPane tabbedPane = new JTabbedPane();
+		final JTabbedPane tabbedPane = new JTabbedPane();
 
 		tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
 		tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
 
 		// buttonPanel
-		JPanel buttonPanel = new JPanel();
+		final JPanel buttonPanel = new JPanel();
 
 		okButton = addButton(buttonPanel, "OK");
 		cancelButton = addButton(buttonPanel, "Cancel");
@@ -251,7 +251,7 @@ public class SynchronizationDialog
 		Utility.setDefaultButton(dialog, okButton);
 
 		// ** MF ** Fix to get the frigging thing centered
-		Dimension dim = dialog.getMinimumSize();
+		final Dimension dim = dialog.getMinimumSize();
 
 		dialog.setLocation(Utility.getPosForCenter(dim));
 		dialog.setResizable(false);
@@ -268,9 +268,9 @@ public class SynchronizationDialog
 		advancedPanel.update(synchronizationOptions);
 	}
 
-	private JButton addButton(Container container, String name)
+	private JButton addButton(final Container container, final String name)
 	{
-		JButton button = new JButton(name);
+		final JButton button = new JButton(name);
 
 		button.addActionListener(this);
 		container.add(button);
@@ -283,9 +283,9 @@ public class SynchronizationDialog
 		dialog.setVisible(true);
 	}
 
-	public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
-		Object source = event.getSource();
+		final Object source = event.getSource();
 
 		if (source == okButton)
 		{
