@@ -390,7 +390,6 @@
                includeJavaRuntime="yes"
                deprecation="false"
                verbose="false"
-               source="1.5"
                includeantruntime="false"
         >
             <classpath> 

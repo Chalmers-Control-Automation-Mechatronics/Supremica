@@ -670,6 +670,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     return auts.remove(i);
   }
 
+  /*
   @SuppressWarnings({"unused", "unchecked"})
   private List<Set<AutomatonProxy>> getTuples(final ProductDESProxy model, final Set<AutomatonProxy> automata)
   {
@@ -700,7 +701,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
       heur.put(s, common.size());
     }
     mCommon = heur;
-    /*Collections.sort(possible, new Comparator<Set<AutomatonProxy>>() {
+    Collections.sort(possible, new Comparator<Set<AutomatonProxy>>() {
         public int compare(Set<AutomatonProxy> a1, Set<AutomatonProxy> a2)
         {
           double heur1 = mNumOccurinng.get(a1);
@@ -709,9 +710,10 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
           else if (heur1 == heur2) {return 0;}
           else {return 1;}
         }
-    });*/
+    });
     return possible;
   }
+  */
 
 
   @SuppressWarnings("unused")
@@ -1777,10 +1779,10 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     new THashSet<AutomataHidden>();
   private final Set<AutomatonProxy> mDontOnOwn =
     new THashSet<AutomatonProxy>();
-  private final TObjectIntHashMap<Set<AutomatonProxy>> mNumOccurinng = null;
   private TObjectIntHashMap<Set<AutomatonProxy>> mCommon = null;
 
   /*
+  private final TObjectIntHashMap<Set<AutomatonProxy>> mNumOccurinng = null;
   private final int mLargestComposition = 0;
   private final int mLargestTransitions = 0;
   private final int mAggComposition = 0;
