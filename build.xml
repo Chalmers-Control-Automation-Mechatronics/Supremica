@@ -1018,8 +1018,8 @@ Class-Path: ${manifest.pathlist}</echo>
                 <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
                 <exclude name="org/supremica/softplc/**"/>
             </packageset>       
-            <link href="${java14.api.url}"
-                  offline="true" packagelistLoc="${docsrc}/offline/j2sdk1.4.2"/>
+            <link href="${java17.api.url}"
+                  offline="true" packagelistLoc="${docsrc}/offline/j2sdk"/>
             <link href="${jaxme.api.url}"
                   offline="true" packagelistLoc="${docsrc}/offline/jaxme"/>
             <link href="${junit.api.url}"
@@ -1041,8 +1041,8 @@ Class-Path: ${manifest.pathlist}</echo>
                 <exclude name="net/sourceforge/waters/gui/**"/>
             </packageset>
             <doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>
-            <link href="${java14.api.url}"
-                  offline="true" packagelistLoc="${docsrc}/offline/j2sdk1.4.2"/>
+            <link href="${java17.api.url}"
+                  offline="true" packagelistLoc="${docsrc}/offline/j2sdk"/>
             <link href="${jaxme.api.url}"
                   offline="true" packagelistLoc="${docsrc}/offline/jaxme"/>
             <link href="${junit.api.url}"
