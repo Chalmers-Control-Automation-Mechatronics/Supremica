@@ -355,7 +355,8 @@ class EditorGraph
   {
     final SimpleNodeSubject node1 = node0.clone();
     mNodes.add(node1);
-    mObserverMap.put(node1, new EditorSimpleNode(node1));
+    final EditorSimpleNode esn =  new EditorSimpleNode(node1);
+    mObserverMap.put(node1, esn);
     new SimpleNodeChangeRecord(node0, node1);
   }
 
@@ -984,7 +985,7 @@ class EditorGraph
     public EditorSimpleNode(final SimpleNodeSubject node)
     {
       super(node);
-      mPoint = node.getPointGeometry().getPoint();
+       mPoint = node.getPointGeometry().getPoint();
     }
 
     //#######################################################################
