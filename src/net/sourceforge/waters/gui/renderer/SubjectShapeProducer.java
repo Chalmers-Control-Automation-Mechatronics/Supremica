@@ -163,16 +163,25 @@ public class SubjectShapeProducer
       if (esource instanceof EdgeProxy ||
           esource instanceof SimpleNodeProxy){
         removeMapping(esource);
-      }else if(esource instanceof IdentifierProxy) {
-      final IdentifierSubject simple = (IdentifierSubject)esource;
-        final Subject ancestor = (Subject) SubjectTools.getAncestor
-                (simple, SimpleNodeSubject.class, LabelBlockSubject.class);
-        if(ancestor != null){
+      } else if (esource instanceof IdentifierProxy) {
+        final IdentifierSubject simple = (IdentifierSubject) esource;
+        final Subject ancestor =
+          (Subject) SubjectTools.getAncestor(simple, SimpleNodeSubject.class,
+                                             LabelBlockSubject.class);
+        if (ancestor != null) {
           removeMapping(ancestor);
         }
-     } else if (esource == getGraph() &&
-                 getGraph().getBlockedEvents() == null &&
-                 mOldBlockedEventsList != null) {
+      } else if (esource instanceof EventDeclProxy) {
+        final EventDeclProxy decl = (EventDeclProxy) esource;
+        // remove all labelblock mappings with an identifier with this name
+        for(final EdgeProxy edge : getGraph().getEdges()){
+          final LabelBlockProxy block = edge.getLabelBlock();
+          removeMapping(block);
+        }
+        removeMapping(decl);
+      } else if (esource == getGraph()
+                 && getGraph().getBlockedEvents() == null
+                 && mOldBlockedEventsList != null) {
         removeMapping(mOldBlockedEventsList);
         mOldBlockedEventsList = null;
       }
