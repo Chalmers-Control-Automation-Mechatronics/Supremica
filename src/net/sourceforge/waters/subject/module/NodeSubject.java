@@ -89,7 +89,7 @@ public abstract class NodeSubject
   {
     if (this != partner) {
       final NodeSubject downcast = (NodeSubject) partner;
-      boolean change = super.assignFrom(partner);
+      final boolean change = super.assignFrom(partner);
       final PlainEventListSubject propositions = downcast.getPropositions();
       mPropositions.assignFrom(propositions);
       final AttributeMapSubject attributes =

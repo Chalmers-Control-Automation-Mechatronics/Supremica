@@ -44,6 +44,7 @@ import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
@@ -169,6 +170,9 @@ class ModuleTreeModel
       case ModelChangeEvent.ITEM_REMOVED:
         final ProxySubject visibleAncestor = getProperAncestorInTree(source);
         if (visibleAncestor != null) {
+          if (SubjectTools.getAncestor(visibleAncestor, GraphSubject.class) != null) {
+            break;
+          }
           final Object value = event.getValue();
           final int index = event.getIndex();
           final TreeModelEvent newevent =
