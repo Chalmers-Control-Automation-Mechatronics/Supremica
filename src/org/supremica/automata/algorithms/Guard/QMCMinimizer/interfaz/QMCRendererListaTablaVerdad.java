@@ -23,15 +23,15 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCBinarioBea
  **/
     public class QMCRendererListaTablaVerdad
         extends JCheckBox
-        implements ListCellRenderer
+        implements ListCellRenderer<QMCBinarioBean>
     {
         private static final long serialVersionUID = 1L;
 
-        JTableHeader header;            
+        JTableHeader header;
         /**
          * Método constructor del renderer que establece las características de la tabla
          */
-        public QMCRendererListaTablaVerdad(JTable table) {
+        public QMCRendererListaTablaVerdad(final JTable table) {
             header = table.getTableHeader();
             setOpaque(true);
             setBorder(UIManager.getBorder("TableHeader.cellBorder"));
@@ -40,28 +40,28 @@ import org.supremica.automata.algorithms.Guard.QMCMinimizer.logica.QMCBinarioBea
             setBackground(header.getBackground());
             setFont(header.getFont());
         }
-        
+
         /**
         * Implementación del método getListCellRendererComponent de la interfaz ListCellRenderer
         * @return this el componente que dibuja la celda
         */
-        public Component getListCellRendererComponent( JList list,
-        Object value, int index, boolean isSelected, boolean cellHasFocus) {
-           
+        public Component getListCellRendererComponent( final JList<? extends QMCBinarioBean> list,
+            final QMCBinarioBean value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+
             setEnabled(list.isEnabled());
             //setSelected(((QMCBinarioBean)value).isTermino());
             if(((QMCBinarioBean)value).isTermino() || ((QMCBinarioBean)value).isIndiferencia())
             {
-            	setSelected(true);            	
+            	setSelected(true);
             }
             else
             {
             	setSelected(false);
             }
-            setFont(list.getFont());            
+            setFont(list.getFont());
             setText(String.valueOf(((QMCBinarioBean)value).getValorDec()));
-            
-          
+
+
             return this;
 
         }

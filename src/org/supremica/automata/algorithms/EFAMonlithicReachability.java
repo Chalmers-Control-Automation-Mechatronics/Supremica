@@ -45,8 +45,8 @@ import org.supremica.automata.LocationEvent;
  */
 public class EFAMonlithicReachability {
 
-    private SimpleComponentProxy efa;
-    private List<VariableComponentProxy> vars;
+    private final SimpleComponentProxy efa;
+    private final List<VariableComponentProxy> vars;
     private Map<LocationEvent, List<GuardActionLoc>> le2gals;
     Map<String,Integer> var2val;
     List<EventDeclProxy> alphabet;
@@ -54,17 +54,17 @@ public class EFAMonlithicReachability {
     Map<String,Integer> var2initialVal;
     Set<EFAState> reachableStates;
 
-    public EFAMonlithicReachability(SimpleComponentProxy efa, List<VariableComponentProxy> vars, List<EventDeclProxy> alphabet){
+    public EFAMonlithicReachability(final SimpleComponentProxy efa, final List<VariableComponentProxy> vars, final List<EventDeclProxy> alphabet){
         this.efa = efa;
         this.vars = vars;
         this.alphabet = alphabet;
         computeLe2GalMap();
     }
 
-    public String createStateName(EFAState state)
+    public String createStateName(final EFAState state)
     {
         String name = state.getLocation().getName()+"[";
-        for(String var:state.getVar2val().keySet())
+        for(final String var:state.getVar2val().keySet())
         {
             name+= (var+"="+state.getVar2val().get(var)+", ");
         }
@@ -74,20 +74,20 @@ public class EFAMonlithicReachability {
 
     public SimpleComponentSubject createEFA()
     {
-        Map<String,VariableComponentProxy> varStr2VarCP = new HashMap<String, VariableComponentProxy>();
-        for(VariableComponentProxy var:vars)
+        final Map<String,VariableComponentProxy> varStr2VarCP = new HashMap<String, VariableComponentProxy>();
+        for(final VariableComponentProxy var:vars)
         {
             varStr2VarCP.put(var.getName(), var);
         }
-        Set<EFAState> reachableStates = computeReachableStates();
-        Set<NodeSubject> newStates = new HashSet<NodeSubject>();
-        Map<EFAState,NodeProxy> state2node = new HashMap<EFAState, NodeProxy>();
-        for(EFAState es:reachableStates)
-        {            
+        final Set<EFAState> reachableStates = computeReachableStates();
+        final Set<NodeSubject> newStates = new HashSet<NodeSubject>();
+        final Map<EFAState,NodeProxy> state2node = new HashMap<EFAState, NodeProxy>();
+        for(final EFAState es:reachableStates)
+        {
             boolean isInitial = es.getLocation().equals(initLocation);
             if(isInitial)
             {
-for2:           for(String var:es.getVar2val().keySet())
+for2:           for(final String var:es.getVar2val().keySet())
                 {
                     if(!es.getVar2val().get(var).equals(var2initialVal.get(var)))
                     {
@@ -97,10 +97,10 @@ for2:           for(String var:es.getVar2val().keySet())
                 }
             }
             boolean isMarked = true;
-for3:       for(String var:es.getVar2val().keySet())
+for3:       for(final String var:es.getVar2val().keySet())
             {
                 var2val = es.getVar2val();
-                for(VariableMarkingProxy vmp:varStr2VarCP.get(var).getVariableMarkings())
+                for(final VariableMarkingProxy vmp:varStr2VarCP.get(var).getVariableMarkings())
                 {
                     if(eval(vmp.getPredicate()) == 0)
                     {
@@ -109,47 +109,49 @@ for3:       for(String var:es.getVar2val().keySet())
                     }
                 }
             }
-            PlainEventListProxy props = new PlainEventListSubject();            
+            PlainEventListProxy props = new PlainEventListSubject();
             if(isMarked)
                 props = (PlainEventListProxy)es.getLocation().getPropositions().clone();
 
-            SimpleNodeSubject newState = new SimpleNodeSubject(createStateName(es),props,isInitial,null,null,null);
+            final SimpleNodeSubject newState =
+              new SimpleNodeSubject(createStateName(es), props, null,
+                                    isInitial, null, null, null);
             state2node.put(es, newState);
             newStates.add(newState);
         }
 
-        Set<EdgeSubject> newEdges = new HashSet<EdgeSubject>();
-        for(EFAState es:reachableStates)
+        final Set<EdgeSubject> newEdges = new HashSet<EdgeSubject>();
+        for(final EFAState es:reachableStates)
         {
-            for(EventDeclProxy currEvent:alphabet)
+            for(final EventDeclProxy currEvent:alphabet)
             {
-                for(EFAState currState: next(es, currEvent.getName()))
+                for(final EFAState currState: next(es, currEvent.getName()))
                 {
-                    List<SimpleIdentifierSubject> events = new ArrayList<SimpleIdentifierSubject>();
+                    final List<SimpleIdentifierSubject> events = new ArrayList<SimpleIdentifierSubject>();
                     events.add(new SimpleIdentifierSubject(currEvent.getName()));
-                    EdgeSubject edge = new EdgeSubject(state2node.get(es), state2node.get(currState), new LabelBlockSubject(events, null), new GuardActionBlockSubject(), null, null, null);
+                    final EdgeSubject edge = new EdgeSubject(state2node.get(es), state2node.get(currState), new LabelBlockSubject(events, null), new GuardActionBlockSubject(), null, null, null);
                     newEdges.add(edge);
                 }
             }
         }
 
-        GraphSubject graph = new GraphSubject(true, null, newStates, newEdges);
+        final GraphSubject graph = new GraphSubject(true, null, newStates, newEdges);
         return new SimpleComponentSubject(new SimpleIdentifierSubject(efa.getName()+"_reachabilityGraph"), efa.getKind(), graph);
     }
 
     public Set<EFAState> computeReachableStates()
     {
         reachableStates = new HashSet<EFAState>();
-        Map<String,Integer> var2val = new HashMap<String,Integer>();
-        for(VariableComponentProxy var:vars)
+        final Map<String,Integer> var2val = new HashMap<String,Integer>();
+        for(final VariableComponentProxy var:vars)
         {
-            int i = Integer.parseInt(((BinaryExpressionProxy)(var.getInitialStatePredicate())).getRight().toString());
+            final int i = Integer.parseInt(((BinaryExpressionProxy)(var.getInitialStatePredicate())).getRight().toString());
             var2val.put(var.getName(), i);
         }
         var2initialVal = new HashMap<String, Integer>(var2val);
 
-        for(NodeProxy loc:efa.getGraph().getNodes())
-        {                      
+        for(final NodeProxy loc:efa.getGraph().getNodes())
+        {
             if(new StringTokenizer(loc.toString(), " ").nextToken().equals("initial"))
             {
                 initLocation = loc;
@@ -159,19 +161,19 @@ for3:       for(String var:es.getVar2val().keySet())
         if(initLocation == null)
             throw new IllegalArgumentException("The EFA has not an initial location!");
 
-        EFAState initState = new EFAState(initLocation, var2val);
+        final EFAState initState = new EFAState(initLocation, var2val);
 
-        Set<EFAState> currentReachableStates = new HashSet<EFAState>();
+        final Set<EFAState> currentReachableStates = new HashSet<EFAState>();
         currentReachableStates.add(initState);
         Set<EFAState> freshStates = new HashSet<EFAState>();
         freshStates.add(initState);
 
         while(freshStates.size() > 0)
         {
-            Set<EFAState> nextStates = new HashSet<EFAState>();
-            for(EFAState currState:freshStates)
-            {                
-                for(EventDeclProxy currEvent:alphabet)
+            final Set<EFAState> nextStates = new HashSet<EFAState>();
+            for(final EFAState currState:freshStates)
+            {
+                for(final EventDeclProxy currEvent:alphabet)
                 {
                     nextStates.addAll(next(currState, currEvent.getName()));
                 }
@@ -185,32 +187,32 @@ for3:       for(String var:es.getVar2val().keySet())
 
     }
 
-    public List<EFAState> next(EFAState aState, String aEvent) {
+    public List<EFAState> next(final EFAState aState, final String aEvent) {
 
         reachableStates.add(aState);
-        LocationEvent le = new LocationEvent(aState.getLocation(), aEvent);
-        List<EFAState> result = new ArrayList<EFAState>();        
+        final LocationEvent le = new LocationEvent(aState.getLocation(), aEvent);
+        final List<EFAState> result = new ArrayList<EFAState>();
         if (le2gals.containsKey(le)) {
-            List<GuardActionLoc> gals = le2gals.get(le);
-            for (GuardActionLoc gal : gals) 
+            final List<GuardActionLoc> gals = le2gals.get(le);
+            for (final GuardActionLoc gal : gals)
             {
-                var2val = aState.getVar2val();                
+                var2val = aState.getVar2val();
                 if (evaluateGuard(gal.getGuard()))
                 {
-                    EFAState eState = new EFAState(gal.getLocation(), evaluateActions(gal.getActions()));
-                    EFAState efaState = extractState(eState);
+                    final EFAState eState = new EFAState(gal.getLocation(), evaluateActions(gal.getActions()));
+                    final EFAState efaState = extractState(eState);
                     reachableStates.add(efaState);
                     result.add(efaState);
                 }
             }
         }
- 
+
         return result;
     }
 
-    public EFAState extractState(EFAState state)
+    public EFAState extractState(final EFAState state)
     {
-        for(EFAState st:reachableStates)
+        for(final EFAState st:reachableStates)
         {
             if(state.equals(st))
                 return st;
@@ -225,10 +227,10 @@ for3:       for(String var:es.getVar2val().keySet())
 
     private void computeLe2GalMap() {
         le2gals = new HashMap<LocationEvent, List<GuardActionLoc>>();
-        for (EdgeProxy anEdge : efa.getGraph().getEdges()) {
-            for (Proxy anEvent : anEdge.getLabelBlock().getEventList()) {
-                LocationEvent tmpLocEvent = new LocationEvent(anEdge.getSource(), ((SimpleIdentifierProxy)anEvent).getName());
-                GuardActionLoc gal = new GuardActionLoc(anEdge.getGuardActionBlock(), anEdge.getTarget());
+        for (final EdgeProxy anEdge : efa.getGraph().getEdges()) {
+            for (final Proxy anEvent : anEdge.getLabelBlock().getEventIdentifierList()) {
+                final LocationEvent tmpLocEvent = new LocationEvent(anEdge.getSource(), ((SimpleIdentifierProxy)anEvent).getName());
+                final GuardActionLoc gal = new GuardActionLoc(anEdge.getGuardActionBlock(), anEdge.getTarget());
                 if(!le2gals.containsKey(tmpLocEvent))
                     le2gals.put(tmpLocEvent, new ArrayList<GuardActionLoc>());
                 le2gals.get(tmpLocEvent).add(gal);
@@ -236,15 +238,15 @@ for3:       for(String var:es.getVar2val().keySet())
         }
     }
 
-    private Map<String,Integer> evaluateActions(List<BinaryExpressionProxy> actions)
+    private Map<String,Integer> evaluateActions(final List<BinaryExpressionProxy> actions)
     {
-        Map<String,Integer> tmpVar2val = new HashMap<String, Integer>(var2val);
-        for(BinaryExpressionProxy action : actions)
+        final Map<String,Integer> tmpVar2val = new HashMap<String, Integer>(var2val);
+        for(final BinaryExpressionProxy action : actions)
         {
             if(action.getOperator().equals(CompilerOperatorTable.getInstance().getAssignmentOperator()))
             {
                 tmpVar2val.put(((SimpleIdentifierProxy)action.getLeft()).getName(), eval(action.getRight()));
-            }           
+            }
             else
             {
                 throw new IllegalArgumentException("Binary operator "+action.getOperator()+" not known or not implemented yet!");
@@ -254,17 +256,17 @@ for3:       for(String var:es.getVar2val().keySet())
         return tmpVar2val;
     }
 
-    private boolean evaluateGuard(SimpleExpressionProxy guard)
+    private boolean evaluateGuard(final SimpleExpressionProxy guard)
     {
         return ( eval(guard) != 0);
     }
 
-    int eval(SimpleExpressionProxy expr)
+    int eval(final SimpleExpressionProxy expr)
     {
 
         if(expr instanceof UnaryExpressionProxy)
         {
-            UnaryExpressionProxy unExpr = (UnaryExpressionProxy)expr;
+            final UnaryExpressionProxy unExpr = (UnaryExpressionProxy)expr;
             if(unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getNotOperator()))
             {
                 if(eval(unExpr.getSubTerm()) == 0)
@@ -284,7 +286,7 @@ for3:       for(String var:es.getVar2val().keySet())
         }
         else if(expr instanceof BinaryExpressionProxy)
         {
-            BinaryExpressionProxy bexpr = (BinaryExpressionProxy)expr;
+            final BinaryExpressionProxy bexpr = (BinaryExpressionProxy)expr;
             if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getAndOperator()))
             {
                 if(eval(bexpr.getLeft()) != 0 &&  eval(bexpr.getRight())!=0)

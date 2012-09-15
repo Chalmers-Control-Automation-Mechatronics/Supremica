@@ -355,7 +355,8 @@ class EditorGraph
   {
     final SimpleNodeSubject node1 = node0.clone();
     mNodes.add(node1);
-    mObserverMap.put(node1, new EditorSimpleNode(node1));
+    final EditorSimpleNode esn =  new EditorSimpleNode(node1);
+    mObserverMap.put(node1, esn);
     new SimpleNodeChangeRecord(node0, node1);
   }
 
@@ -413,7 +414,7 @@ class EditorGraph
   {
     moveEdgeStart(edge0, dx, dy);
     moveEdgeEnd(edge0, dx, dy);
-    moveEdgeHandle(edge0, dx, dy);
+    moveEdgeHandle(edge0, dx, dy, false, null);
   }
 
   /**
@@ -469,12 +470,97 @@ class EditorGraph
    */
   void moveEdgeHandle(final EdgeSubject edge0,
                       final double dx,
-                      final double dy)
+                      final double dy,
+                      final boolean moveAlongHalfWay,
+                      final Point2D dragStart)
   {
     final EdgeSubject edge1 = (EdgeSubject) getCopy(edge0);
     final Point2D point = GeometryTools.getTurningPoint1(edge0);
-    point.setLocation(point.getX() + dx, point.getY() + dy);
-    GeometryTools.createMidGeometry(edge1, point, SplineKind.INTERPOLATING);
+    final Point2D newpoint = new Point2D.Double(point.getX() + dx, point.getY() + dy);
+    final Point2D start = GeometryTools.getStartPoint(edge1);
+    final Point2D end = GeometryTools.getEndPoint(edge1);
+    double x = newpoint.getX();
+    double y = newpoint.getY();
+    //dragstart will == null if the self loop is just following a node
+    if(GeometryTools.isSelfloop(edge1) && dragStart != null){
+      double hx = dragStart.getX() - start.getX();
+      double hy = dragStart.getY() - start.getY();
+      double px = hx + dx;
+      double py = hy + dy;
+      double h = (hx * hx + hy * hy);
+      double a0011 = (hx * px) + (hy * py);
+      double a01 = (hx * py) - (hy * px);
+      final double pointX = point.getX() - start.getX();
+      final double pointY = point.getY() - start.getY();
+      x = (a0011 * pointX - a01 * pointY) / h;
+      y = (a01 * pointX + a0011 * pointY) / h;
+      if (moveAlongHalfWay) {
+        //directional move
+        final double xDistAbs = Math.abs(x);
+        final double yDistAbs = Math.abs(y);
+        if (xDistAbs <= (TAN225 * yDistAbs)) {
+          px = 0;
+          py = y < 0 ? -1 : 1;
+          a0011 = (x * px) + (y * py);
+          a01 = (x * py) - (y * px);
+          h = Math.sqrt(x * x + y * y);
+          y = (a01 * x + a0011 * y) / h;
+          x = 0;
+        } else if (yDistAbs < (TAN225 * xDistAbs)) {
+          px = x < 0 ? -1 : 1;
+          py = 0;
+          a0011 = (x * px) + (y * py);
+          a01 = (x * py) - (y * px);
+          h = Math.sqrt(x * x + y * y);
+          x = (a0011 * x - a01 * y) / h;
+          y = 0;
+        } else {
+          hx = x;
+          hy = y;
+          px = hx < 0 ? -HALF_SQRT2 : HALF_SQRT2;
+          py = hy < 0 ? -HALF_SQRT2 : HALF_SQRT2;
+          a0011 = (hx * px) + (hy * py);
+          a01 = (hx * py) - (hy * px);
+          h = Math.sqrt(hx * hx + hy * hy);
+          x = (a0011 * hx - a01 * hy) / h;
+          y = (a01 * hx + a0011 * hy) / h;
+        }
+      }
+      x += start.getX();
+      y += start.getY();
+    }
+    else{
+      if(moveAlongHalfWay){
+        //edge half way move
+        final double sx = start.getX();
+        final double sy = start.getY();
+        final double ex = end.getX();
+        final double ey = end.getY();
+        final double px = newpoint.getX();
+        final double py = newpoint.getY();
+        final double mx = (sx + ex) / 2;
+        final double my = (sy + ey) / 2;
+        final double sxex = sx - ex;
+        final double syey = sy - ey;
+        //slope is undefined (vertical)
+        if (sxex == 0) {
+          x = px;
+          y = my;
+        }
+        //slope = 0 (horizontal)
+        else if (syey == 0) {
+          x = mx;
+          y = py;
+        } else {
+          final double eSlope = syey / sxex;
+          final double pSlope = (-1) / eSlope;
+          x = (-(eSlope * px) + (pSlope * mx) + py - my) / (pSlope - eSlope);
+          y = (eSlope * (x - px)) + py;
+        }
+      }
+    }
+    newpoint.setLocation(x, y);
+    GeometryTools.createMidGeometry(edge1, newpoint, SplineKind.INTERPOLATING);
   }
 
   /**
@@ -899,7 +985,7 @@ class EditorGraph
     public EditorSimpleNode(final SimpleNodeSubject node)
     {
       super(node);
-      mPoint = node.getPointGeometry().getPoint();
+       mPoint = node.getPointGeometry().getPoint();
     }
 
     //#######################################################################
@@ -1707,7 +1793,6 @@ class EditorGraph
       else {
         return mBlockedEvents;
       }
-
     }
 
     public GuardActionBlockSubject visitGuardActionBlockProxy
@@ -1827,9 +1912,9 @@ class EditorGraph
     {
       try {
         final List<? extends ProxySubject> originalList =
-          original.getEventListModifiable();
+          original.getEventIdentifierListModifiable();
         final List<? extends ProxySubject> fakeList =
-          fake.getEventListModifiable();
+          fake.getEventIdentifierListModifiable();
         visitLists(originalList, fakeList);
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
@@ -1961,6 +2046,9 @@ class EditorGraph
   private static final int FIRST_PASS = PASS0_UNLINK;
   @SuppressWarnings("unused")
   private static final int LAST_PASS = PASS3_RELINK;
+
+  private static final double TAN225 = Math.sqrt(2) -1;
+  private static final double HALF_SQRT2 = 0.5*Math.sqrt(2);
 
   private static final LabelGeometrySubject DEFAULT_LABELBLOCK_GEO =
     new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);

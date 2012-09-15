@@ -138,6 +138,7 @@ public class BackupGraphPanel
     producer.close();
     final GraphSubject graph = getGraph();
     graph.removeModelObserver(mGraphModelObserver);
+    getModule().removeModelObserver(mGraphModelObserver);
     unregisterSupremicaPropertyChangeListeners();
   }
 
@@ -150,6 +151,9 @@ public class BackupGraphPanel
   {
     final GraphSubject graph = getGraph();
     graph.addModelObserver(mGraphModelObserver);
+    if(getModule() != null){
+      getModule().getEventDeclListModifiable().addModelObserver(mGraphModelObserver);
+    }
   }
 
 
@@ -179,11 +183,7 @@ public class BackupGraphPanel
   protected void runEmbedder()
   {
     try {
-      mEmbedder.setUpGeometry();
-      // ***BUG***
-      // For clean undo, geometry should only be added to the secondary graph;
-      // Unfortunately, this does not work yet and will cause exceptions...
-      // ~~~Robi
+      mEmbedder.setUpNodeGeometry();
       createSecondaryGraph();
       final SimpleComponentSubject comp =
         (SimpleComponentSubject) getGraph().getParent();

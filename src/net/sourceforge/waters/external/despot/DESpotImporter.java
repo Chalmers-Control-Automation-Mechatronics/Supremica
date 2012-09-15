@@ -31,7 +31,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -424,11 +424,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       Map<String,String> attributes = null;
       if (eventType.equals("a")) {
-        attributes = HISCAttributes.ATTRIBUTES_ANSWER;
+        attributes = HISCAttributeFactory.ATTRIBUTES_ANSWER;
       } else if (eventType.equals("r")) {
-        attributes = HISCAttributes.ATTRIBUTES_REQUEST;
+        attributes = HISCAttributeFactory.ATTRIBUTES_REQUEST;
       } else if (eventType.equals("ld")) {
-        attributes = HISCAttributes.ATTRIBUTES_LOWDATA;
+        attributes = HISCAttributeFactory.ATTRIBUTES_LOWDATA;
       }
       eventDecl =
           mFactory.createEventDeclProxy(identifier, controllability, true,
@@ -503,7 +503,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       mComponents.add(mFactory
           .createSimpleComponentProxy(identifier, kind, graph,
-                                      HISCAttributes.ATTRIBUTES_INTERFACE));
+                                      HISCAttributeFactory.ATTRIBUTES_INTERFACE));
     }
   }
 
@@ -758,7 +758,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       // gets the existing events
       final List<Proxy> existingEvents =
-          mEdges.get(edgeIndex).getLabelBlock().getEventList();
+          mEdges.get(edgeIndex).getLabelBlock().getEventIdentifierList();
 
       // adds each event that already exists to the new list (since these
       // objects are immutable and can't be updated)
@@ -886,7 +886,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    */
   private SimpleNodeProxy convertState(final Element state)
   {
-    final String marked = "1";
     final String stateName = formatIdentifier(state.getAttribute("nm"));
     // reads and stores the geometry (layout) data for the node
     String xPosStr = state.getAttribute("sx");
@@ -909,55 +908,30 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final Point2D labelPoint = new Point2D.Double(xPos, yPos);
       labelPos = mFactory.createLabelGeometryProxy(labelPoint);
     }
-    if (state.getTagName().equals("St")) {
-      // checks if the state is marked (i.e. accepting)
-      if (state.getAttribute("mk").equals(marked)) {
-        return markState(stateName, false, nodePos, labelPos);
-      } else {
-        return mFactory.createSimpleNodeProxy(stateName, null, false, nodePos,
-                                              null, labelPos);
-      }
-    }
-    // the state needs to be set as the initial state.
-    else {
-      // checks if the state is marked (i.e. accepting)
-      if (state.getAttribute("mk").equals(marked)) {
-        return markState(stateName, true, nodePos, labelPos);
-      }
-      return mFactory.createSimpleNodeProxy(stateName, null, true, nodePos,
-                                            null, labelPos);
-    }
-
+    final boolean initial = !state.getTagName().equals("St");
+    final boolean marked = state.getAttribute("mk").equals(ONE);
+    return createNode(stateName, initial, marked, nodePos, labelPos);
   }
 
-  /**
-   * Marks a state as accepting.
-   *
-   * @param state
-   *          The marked state.
-   * @param initial
-   *          States whether this is the initial state.
-   */
-  private SimpleNodeProxy markState(final String stateName,
-                                    final Boolean initial,
-                                    final PointGeometryProxy nodePos,
-                                    final LabelGeometryProxy labelPos)
+  private SimpleNodeProxy createNode(final String stateName,
+                                     final boolean initial,
+                                     final boolean marked,
+                                     final PointGeometryProxy nodePos,
+                                     final LabelGeometryProxy labelPos)
   {
-    // holds the :accepting constant
-    final String accepting = EventDeclProxy.DEFAULT_MARKING_NAME;
-
-    final List<SimpleIdentifierProxy> markList =
-        new ArrayList<SimpleIdentifierProxy>(1);
-    markList.add(mFactory.createSimpleIdentifierProxy(accepting));
-    final PlainEventListProxy accept =
-        mFactory.createPlainEventListProxy(markList);
-    if (!initial) {
-      return mFactory.createSimpleNodeProxy(stateName, accept, false, nodePos,
-                                            null, labelPos);
+    final PlainEventListProxy props;
+    if (marked) {
+      final String acceptingName = EventDeclProxy.DEFAULT_MARKING_NAME;
+      final SimpleIdentifierProxy acceptingIdent =
+        mFactory.createSimpleIdentifierProxy(acceptingName);
+      final List<SimpleIdentifierProxy> identList =
+        Collections.singletonList(acceptingIdent);
+      props = mFactory.createPlainEventListProxy(identList);
     } else {
-      return mFactory.createSimpleNodeProxy(stateName, accept, true, nodePos,
-                                            null, labelPos);
+      props = null;
     }
+    return mFactory.createSimpleNodeProxy(stateName, props, null,
+                                          initial, nodePos, null, labelPos);
   }
 
 
@@ -1084,4 +1058,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           + DESPOTEXT + "]", DESPOTEXT);
   private static final Collection<FileFilter> FILTERS =
       Collections.singletonList(DESPOTFILTER);
+
+  private static final String ONE = "1";
+
 }

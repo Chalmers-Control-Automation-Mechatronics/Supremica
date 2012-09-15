@@ -551,7 +551,7 @@ public class ObservationEquivalenceTRSimplifier
       if (mEventIterator == null) {
         final ListBufferTransitionRelation rel = getTransitionRelation();
         final TransitionIterator inner =
-          rel.createPredecessorsReadOnlyIterator(EventEncoding.TAU);
+          rel.createPredecessorsReadOnlyIterator(-1, EventEncoding.TAU);
         mEventIterator =
           new OneEventCachingTransitionIterator(inner, EventEncoding.TAU);
       }

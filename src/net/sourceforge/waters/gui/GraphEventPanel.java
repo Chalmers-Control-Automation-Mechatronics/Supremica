@@ -1128,7 +1128,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       final EventListExpressionSubject subject =
         (EventListExpressionSubject) expr;
       final ListSubject<? extends ProxySubject> eventlist =
-        subject.getEventListModifiable();
+        subject.getEventIdentifierListModifiable();
       processList(eventlist);
       return null;
     }
@@ -1238,7 +1238,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       final EventListExpressionSubject subject =
         (EventListExpressionSubject) expr;
       final ListSubject<? extends ProxySubject> eventlist =
-        subject.getEventListModifiable();
+        subject.getEventIdentifierListModifiable();
       processList(eventlist);
       return null;
     }

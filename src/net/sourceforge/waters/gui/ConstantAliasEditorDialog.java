@@ -77,6 +77,8 @@ public class ConstantAliasEditorDialog
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
+    setMinimumSize(MIN_SIZE);
+    setMaximumSize(MAX_SIZE);
   }
 
 
@@ -260,8 +262,6 @@ public class ConstantAliasEditorDialog
     layout.setConstraints(mButtonsPanel, constraints);
     contents.add(mButtonsPanel);
     pack();
-    final Dimension size = getSize();
-    setMinimumSize(size);
   }
 
 
@@ -411,5 +411,6 @@ public class ConstantAliasEditorDialog
     new ConstantAliasSubject(new SimpleIdentifierSubject(""), new SimpleIdentifierSubject(""));
   private static final Transferable TRANSFERABLE =
     WatersDataFlavor.createTransferable(TEMPLATE);
-
+  private static Dimension MIN_SIZE = new Dimension(333, 213);
+  private static Dimension MAX_SIZE = new Dimension(433, 213);
 }

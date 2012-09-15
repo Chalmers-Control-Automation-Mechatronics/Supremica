@@ -91,6 +91,7 @@ import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
+import org.supremica.gui.ide.actions.OpenRASAction;
 
 /**
  * <P>
@@ -213,6 +214,8 @@ public class IDEMenuBar extends JMenuBar
     updateModulesMenu();
     final IDEListener ideListener = new IDEListener();
     ide.attach(ideListener);
+    final SupremicaPropertyChangeListener fileListener =
+      new FilePropertyListener();
     final SupremicaPropertyChangeListener createListener =
         new CreatePropertyListener();
     Config.INCLUDE_INSTANTION.addPropertyChangeListener(createListener);
@@ -223,6 +226,7 @@ public class IDEMenuBar extends JMenuBar
     Config.INCLUDE_EXTERNALTOOLS.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
+    Config.INCLUDE_RAS_SUPPORT.addPropertyChangeListener(fileListener);
     Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_HISC.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_SD.addPropertyChangeListener(analyzeListener);
@@ -244,6 +248,11 @@ public class IDEMenuBar extends JMenuBar
       mFileMenu.add(newmod);
       final Action open = actions.getAction(OpenAction.class);
       mFileMenu.add(open);
+      if(Config.INCLUDE_RAS_SUPPORT.isTrue()){
+        final Action openRas = actions.getAction(OpenRASAction.class);
+        mFileMenu.add(openRas);
+      }
+
       final Action save = actions.getAction(SaveAction.class);
       mFileMenu.add(save);
       final Action saveas = actions.getAction(SaveAsAction.class);
@@ -675,6 +684,19 @@ public class IDEMenuBar extends JMenuBar
     }
   }
 
+  // #########################################################################
+  // # Inner Class ToolsPropertyListener
+  private class FilePropertyListener implements
+      SupremicaPropertyChangeListener
+  {
+    // #######################################################################
+    // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      mFileMenu = null;
+      rebuildMenus();
+    }
+  }
 
   // #########################################################################
   // # Inner Class CreatePropertyListener
@@ -689,7 +711,6 @@ public class IDEMenuBar extends JMenuBar
       rebuildMenus();
     }
   }
-
 
   // #########################################################################
   // # Inner Class ToolsPropertyListener

@@ -229,7 +229,9 @@ public class ModuleContainer
       break;
     case ModelChangeEvent.ITEM_REMOVED:
       final Object value = event.getValue();
-      mUpdateGraphPanelVisitor.updateGraphPanel((Proxy) value);
+      if(value instanceof Proxy){
+        mUpdateGraphPanelVisitor.updateGraphPanel((Proxy) value);
+      }
       mCompiledDES = null;
       break;
     case ModelChangeEvent.GEOMETRY_CHANGED:

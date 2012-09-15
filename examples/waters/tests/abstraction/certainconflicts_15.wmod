@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="certainconflicts_15" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for certain conflicts simplifiers. This tests whether a tau-transition to a blocking state is handled correctly.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MER_an"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="RQ">
+                        <PointGeometry>
+                            <Point Y="80" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="6" X="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="IN">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="80" X="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="7" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="RQ" Source="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-36" X="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="80" X="48"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="80" X="104"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="80" X="160"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="RQ" Source="RQ">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER"/>
+                            <SimpleIdentifier Name="MER_an"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-17" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="80" X="160"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="80" X="201"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="80" X="160"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph>
+                <LabelBlock>
+                    <SimpleIdentifier Name="ER"/>
+                    <SimpleIdentifier Name="MER_an"/>
+                    <SimpleIdentifier Name=":accepting"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point Y="31" X="66"/>
+                    </LabelGeometry>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="IN">
+                        <PointGeometry>
+                            <Point Y="80" X="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="7" X="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

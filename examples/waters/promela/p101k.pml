@@ -2,7 +2,8 @@
 
 chan name = [0] of { byte, byte };
 hidden byte state;
-/* byte name; 	typo  - this line shouldn't have been here */
+/* byte test; */
+/* this checks that the variable test is not created, as it is in a comment */
 
 proctype A()
 {	name!msgtype(124);

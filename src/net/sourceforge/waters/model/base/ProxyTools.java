@@ -101,11 +101,14 @@ public class ProxyTools
   public static String getShortClassName(final Class<?> clazz)
   {
     final String name = clazz.getName();
-    final int dotpos = name.lastIndexOf('.');
-    if (dotpos < 0) {
+    int splitPos = name.lastIndexOf('$');
+    if (splitPos < 0) {
+      splitPos = name.lastIndexOf('.');
+    }
+    if (splitPos < 0) {
       return name;
     } else {
-      return name.substring(dotpos + 1);
+      return name.substring(splitPos + 1);
     }
   }
 

@@ -815,10 +815,10 @@ public class ModuleContext
           if (value instanceof SimpleNodeProxy) {
             final SimpleNodeProxy node = (SimpleNodeProxy) value;
             final PlainEventListProxy props = node.getPropositions();
-            if (!props.getEventList().isEmpty()) {
+            if (!props.getEventIdentifierList().isEmpty()) {
               return true;
             }
-          } else {
+          } else if(value instanceof Proxy){
             final Proxy proxy = (Proxy) value;
             final Boolean found =
               mPropositionFinderVisitor.hasPropositions(proxy);
@@ -853,10 +853,10 @@ public class ModuleContext
           if (value instanceof SimpleNodeProxy) {
             final SimpleNodeProxy node = (SimpleNodeProxy) value;
             final PlainEventListProxy props = node.getPropositions();
-            if (!props.getEventList().isEmpty()) {
+            if (!props.getEventIdentifierList().isEmpty()) {
               return true;
             }
-          } else {
+          } else if(value instanceof Proxy){
             final Proxy proxy = (Proxy) value;
             final Boolean found =
               mPropositionFinderVisitor.hasPropositions(proxy);
@@ -1195,7 +1195,7 @@ public class ModuleContext
           mColorSet = new HashSet<Color>();
         }
         mForbidden = false;
-        final List<Proxy> props = node.getPropositions().getEventList();
+        final List<Proxy> props = node.getPropositions().getEventIdentifierList();
         visitCollection(props);
         final PropositionIcon.ColorInfo result =
           new PropositionIcon.ColorInfo(mColorList, mForbidden);
@@ -1307,7 +1307,7 @@ public class ModuleContext
     public Boolean visitEventListExpressionProxy(final EventListExpressionProxy elist)
       throws VisitorException
     {
-      final List<Proxy> list = elist.getEventList();
+      final List<Proxy> list = elist.getEventIdentifierList();
       return visitIdentifiers(list);
     }
 

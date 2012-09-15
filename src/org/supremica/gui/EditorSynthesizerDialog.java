@@ -81,17 +81,26 @@ class EditorSynthesizerDialogStandardPanel
     private final JCheckBox saveEventGuardInFileBox;
     private final JCheckBox saveIDDInFileBox;
 
+    private final JCheckBox timeOptBox;
+
     private final JCheckBox complementHeuristicBox;
     private final JCheckBox independentHeuristicBox;
 
+    private final JTextField globalClockDomainField;
 
     private final JRadioButton fromAllowedStatesButton;
     private final JRadioButton fromForbiddenStatesButton;
+
+    private final JRadioButton minVarButton;
+    private final JRadioButton maxVarButton;
+
     private final JRadioButton optimalButton;
-    private final JComboBox eventList;
+    private final JComboBox<String> eventList;
+    private final JComboBox<String> variablesList;
+
 
     static class AlgorithmSelector
-        extends JComboBox
+        extends JComboBox<SynthesisAlgorithm>
     {
         private static final long serialVersionUID = 1L;
 
@@ -100,7 +109,7 @@ class EditorSynthesizerDialogStandardPanel
             super();
         }
 
-        private AlgorithmSelector(final Object[] array)
+        private AlgorithmSelector(final SynthesisAlgorithm[] array)
         {
             super(array);
         }
@@ -147,7 +156,7 @@ class EditorSynthesizerDialogStandardPanel
     }
 
     static class SynthesisSelector
-        extends JComboBox
+        extends JComboBox<SynthesisType>
     {
         private static final long serialVersionUID = 1L;
 
@@ -173,7 +182,7 @@ class EditorSynthesizerDialogStandardPanel
     }
 
 
-    public EditorSynthesizerDialogStandardPanel(final int num, final Vector<String> events)
+    public EditorSynthesizerDialogStandardPanel(final int num, final Vector<String> events, final Vector<String> variables)
     {
 
         algorithmSelector = AlgorithmSelector.create(num);
@@ -185,7 +194,7 @@ class EditorSynthesizerDialogStandardPanel
         // Create layout!
         final Box mainBox = Box.createVerticalBox();
 
-        JPanel supervisorPanel = new JPanel();
+        final JPanel supervisorPanel = new JPanel();
 	supervisorPanel.setBorder(BorderFactory.createTitledBorder("Supervisor"));
         supervisorPanel.setLayout(new GridLayout(3, 1));
 
@@ -221,7 +230,7 @@ class EditorSynthesizerDialogStandardPanel
         mainBox.add(supervisorPanel);
 
         // Add components
-        this.add(mainBox);        
+        this.add(mainBox);
 
         //Guard options
         guardBox = Box.createVerticalBox();
@@ -230,7 +239,7 @@ class EditorSynthesizerDialogStandardPanel
         fromAllowedStatesButton.setToolTipText("Generate the guard from the states where the event is allowed to occur");
 
         fromForbiddenStatesButton = new JRadioButton("From forbidden states");
-		fromForbiddenStatesButton.setToolTipText("Generate the guard from the states where the event is forbidden to occur");
+	fromForbiddenStatesButton.setToolTipText("Generate the guard from the states where the event is forbidden to occur");
 
         optimalButton = new JRadioButton("Adaptive solution");
         optimalButton.setToolTipText("Generate the guard from the state set that yields the best result");
@@ -239,7 +248,7 @@ class EditorSynthesizerDialogStandardPanel
 //		eventField = new JTextField(15);
 //		eventField.setToolTipText("The name of the desired event");
 
-        final ButtonGroup group = new ButtonGroup();
+        ButtonGroup group = new ButtonGroup();
         group.add(fromAllowedStatesButton);
         group.add(fromForbiddenStatesButton);
         group.add(optimalButton);
@@ -267,7 +276,7 @@ class EditorSynthesizerDialogStandardPanel
         panel.add(independentHeuristicBox);
         expressionTypePanel.add(panel);
 
-        eventList = new JComboBox(events);
+        eventList = new JComboBox<String>(events);
 
         expressionTypePanel.add(eventList);
 
@@ -311,6 +320,52 @@ class EditorSynthesizerDialogStandardPanel
 
         this.add(genGuardComputeSupBox);
 
+        final JPanel optimizationPanel = new JPanel(new GridLayout(5, 2));
+        optimizationPanel.setBorder(BorderFactory.createTitledBorder("Optimization"));
+
+        //Optimization options
+
+        timeOptBox = new JCheckBox("Compute optimal time");
+        timeOptBox.setToolTipText("Compute the supervisor that will restrict the plant to reach a marked state with the minimum time.");
+
+        timeOptBox.addActionListener(this);
+
+        optimizationPanel.add(timeOptBox);
+        optimizationPanel.add(new JLabel());
+
+        optimizationPanel.add(new JLabel("Enter the global time domain:"));
+        globalClockDomainField = new JTextField("0");
+        globalClockDomainField.setToolTipText("Guess a reasonably large amount of time to reach a marked state");
+        globalClockDomainField.setEnabled(false);
+        optimizationPanel.add(globalClockDomainField);
+
+        final JLabel miniSupLabel = new JLabel("Optimize variable:");
+        miniSupLabel.setToolTipText("Compute the supervisor that ensures the variable will have its optimal value among the reachable markes states.");
+        optimizationPanel.add(miniSupLabel);
+        optimizationPanel.add(new JLabel());
+
+        minVarButton = new JRadioButton("Minimize");
+        minVarButton.setSelected(true);
+        maxVarButton = new JRadioButton("Maximize");
+
+//		eventField = new JTextField(15);
+//		eventField.setToolTipText("The name of the desired event");
+
+        group = new ButtonGroup();
+        group.add(minVarButton);
+        group.add(maxVarButton);
+
+        optimizationPanel.add(minVarButton);
+        optimizationPanel.add(maxVarButton);
+
+        variablesList = new JComboBox<String>(variables);
+        optimizationPanel.add(variablesList);
+
+
+//        optimizationSupBox.add(optimizationPanel);
+
+        this.add(optimizationPanel);
+
         updatePanel();
     }
 
@@ -320,9 +375,10 @@ class EditorSynthesizerDialogStandardPanel
         algorithmSelector.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
         printGuardBox.setSelected(synthesizerOptions.getPrintGuard());
         reachableBox.setSelected(synthesizerOptions.getReachability());
-        
+        globalClockDomainField.setEnabled(timeOptBox.isSelected());
+
 /*
-        boolean selected = saveIDDInFileBox.isSelected() || saveEventGuardInFileBox.isSelected() || 
+        boolean selected = saveIDDInFileBox.isSelected() || saveEventGuardInFileBox.isSelected() ||
                                 addGuardsBox.isSelected() || printGuardBox.isSelected();
         optimalButton.setEnabled(selected);
         fromAllowedStatesButton.setEnabled(selected);
@@ -335,6 +391,7 @@ class EditorSynthesizerDialogStandardPanel
 
     public void updatePanel()
     {
+        globalClockDomainField.setEnabled(timeOptBox.isSelected());
         //At present, it is only possible to perform the synthesis via BDDs
         final SynthesisAlgorithm selected = algorithmSelector.getAlgorithm();
         // Clear, then add the ones that are implemented
@@ -377,6 +434,16 @@ class EditorSynthesizerDialogStandardPanel
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
 */
         }
+        else if (typeSelector.getType() == SynthesisType.UNSAFETY)
+        {
+            algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY);
+/*
+            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
+            algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
+            algorithmSelector.addItem(SynthesisAlgorithm.BDD);
+*/
+        }
+
 
         // Default selection
 
@@ -396,6 +463,8 @@ class EditorSynthesizerDialogStandardPanel
         synthesizerOptions.setReachability(reachableBox.isSelected());
         synthesizerOptions.setCompHeuristic(complementHeuristicBox.isSelected());
         synthesizerOptions.setIndpHeuristic(independentHeuristicBox.isSelected());
+        synthesizerOptions.setOptimization(timeOptBox.isSelected());
+        synthesizerOptions.setGlobalClockDomain(Long.parseLong(globalClockDomainField.getText()));
 
         if(fromForbiddenStatesButton.isSelected())
         {
@@ -414,6 +483,18 @@ class EditorSynthesizerDialogStandardPanel
             synthesizerOptions.setEvent("");
         else
             synthesizerOptions.setEvent((String)eventList.getSelectedItem());
+
+        if(variablesList.getSelectedIndex() == 0)
+            synthesizerOptions.setOptVariable("");
+        else
+            synthesizerOptions.setOptVariable((String)variablesList.getSelectedItem());
+
+        if(minVarButton.isSelected())
+            synthesizerOptions.setTypeOfVarOpt(true);
+
+        if(maxVarButton.isSelected())
+            synthesizerOptions.setTypeOfVarOpt(false);
+
     }
 
     public void actionPerformed(final ActionEvent e)
@@ -462,20 +543,19 @@ public class EditorSynthesizerDialog
     /**
      * Creates modal dialog box for input of synthesizer and guard  options.
      */
-    public EditorSynthesizerDialog(final Frame parentFrame, final int numSelected, final EditorSynthesizerOptions synthesizerOptions, final Vector<String> events)
+    public EditorSynthesizerDialog(final Frame parentFrame, final int numSelected, final EditorSynthesizerOptions synthesizerOptions, final Vector<String> events, final Vector<String> variables)
     {
         dialog = new JDialog(parentFrame, true);    // modal
         this.parentFrame = parentFrame;
         this.synthesizerOptions = synthesizerOptions;
-        synthesizerOptions.setPrintGuard(true);
         synthesizerOptions.setReachability(true);
 
         dialog.setTitle("Synthesizer options");
-        dialog.setSize(new Dimension(420, 450));
+        dialog.setSize(new Dimension(520, 500));
 
         final Container contentPane = dialog.getContentPane();
 
-        standardPanel = new EditorSynthesizerDialogStandardPanel(numSelected, events);
+        standardPanel = new EditorSynthesizerDialogStandardPanel(numSelected, events, variables);
 
 //        final JTabbedPane tabbedPane = new JTabbedPane();
 
@@ -550,7 +630,7 @@ public class EditorSynthesizerDialog
         }
         else if (source == cancelButton)
         {
-            synthesizerOptions.setDialogOK(false);    // Already done...
+            synthesizerOptions.setDialogOK(false);
             dialog.setVisible(false);
             dialog.dispose();
         }

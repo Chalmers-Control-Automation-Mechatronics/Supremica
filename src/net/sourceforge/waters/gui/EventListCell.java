@@ -17,11 +17,12 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
 
 
 class EventListCell
   extends JLabel
-  implements ListCellRenderer
+  implements ListCellRenderer<EventDeclSubject>
 {
 
   //#########################################################################
@@ -34,11 +35,11 @@ class EventListCell
 
   //#########################################################################
   //# Interface javax.swing.ListCellRenderer
-  public Component getListCellRendererComponent(JList list,
-                                                Object value,
-                                                int index,
-                                                boolean isSelected,
-                                                boolean cellHasFocus)
+  public Component getListCellRendererComponent(final JList<? extends EventDeclSubject> list,
+                                                final EventDeclSubject value,
+                                                final int index,
+                                                final boolean isSelected,
+                                                final boolean cellHasFocus)
   {
     final EventDeclProxy decl = (EventDeclProxy) value;
     final String text = HTMLPrinter.getHTMLString(decl);

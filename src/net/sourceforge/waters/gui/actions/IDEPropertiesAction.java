@@ -23,6 +23,7 @@ import net.sourceforge.waters.gui.InstanceEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.ParameterBindingEditorDialog;
 import net.sourceforge.waters.gui.SimpleComponentEditorDialog;
+import net.sourceforge.waters.gui.NodeEditorDialog;
 import net.sourceforge.waters.gui.VariableEditorDialog;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -37,6 +38,7 @@ import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
@@ -46,6 +48,7 @@ import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
@@ -250,6 +253,17 @@ public class IDEPropertiesAction
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final SimpleComponentSubject subject = (SimpleComponentSubject) comp;
         new SimpleComponentEditorDialog(root, subject);
+      }
+      return true;
+    }
+
+    public Boolean visitNodeProxy
+      (final NodeProxy comp)
+    {
+      if (mDoEdit) {
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        final NodeSubject subject = (NodeSubject) comp;
+        new NodeEditorDialog(root, subject);
       }
       return true;
     }

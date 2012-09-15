@@ -76,7 +76,7 @@ public class DefaultRenderingContext
                                 final SimpleNodeProxy node)
   {
     final PlainEventListProxy props = node.getPropositions();
-    final List<Proxy> elist = props.getEventList();
+    final List<Proxy> elist = props.getEventIdentifierList();
     if (elist.isEmpty()) {
       return PropositionIcon.getUnmarkedColors();
     } else {

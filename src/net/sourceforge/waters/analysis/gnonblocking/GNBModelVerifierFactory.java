@@ -83,9 +83,19 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new CompositionalGeneralisedConflictChecker(null, factory);
-    //return new AlphaNonBlockingChecker(null, factory);
-    //return new CanonicalGeneralisedConflictChecker(null, factory);
   }
+
+  /*public AlphaNonBlockingChecker createConflictChecker
+    (final ProductDESProxyFactory factory)   
+  {
+    return new AlphaNonBlockingChecker(null, factory);
+  }*/
+
+  /*public CanonicalGeneralisedConflictChecker createConflictChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new CanonicalGeneralisedConflictChecker(null, factory);
+  }*/
 
   @Override
   public ComposingLanguageInclusionChecker createLanguageInclusionChecker

@@ -68,36 +68,36 @@ public class SimulatorEventList
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(SimulatorEventList.class);
     @SuppressWarnings("unused")
-	private boolean showStateId = false;
+	private final boolean showStateId = false;
     @SuppressWarnings("unused")
-	private Automata theAutomata;
+	private final Automata theAutomata;
     @SuppressWarnings("unused")
 	private int[] currState;
-    
+
 //      private SimulatorStateViewer stateViewer;
-    private SimulatorExecuter theExecuter;
-    private SimulatorEventListModel eventsList;
-    private JList theList;
-    
+    private final SimulatorExecuter theExecuter;
+    private final SimulatorEventListModel eventsList;
+    private final JList<Object> theList;
+
 //      private boolean allowEventSelection = false;
-    public SimulatorEventList(SimulatorExecuter theExecuter, AutomataSynchronizerHelper helper, Project theProject)
+    public SimulatorEventList(final SimulatorExecuter theExecuter, final AutomataSynchronizerHelper helper, final Project theProject)
     {
         setLayout(new BorderLayout());
-        
+
 //              this.stateViewer = stateViewer;
         this.theExecuter = theExecuter;
         this.theAutomata = helper.getAutomata();
         eventsList = new SimulatorEventListModel(theExecuter, helper, theProject);
-        
+
 //              allowEventSelection = true;
-        theList = new JList(eventsList);
-        
-        JScrollPane scrollPanel = new JScrollPane(theList);
-        
+        theList = new JList<Object>(eventsList);
+
+        final JScrollPane scrollPanel = new JScrollPane(theList);
+
         theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
+
         JLabel jLabel = null;
-        
+
 //              if (showDisabledEvents)
 //              {
 //                      jLabel = new JLabel("Outgoing events");
@@ -105,29 +105,29 @@ public class SimulatorEventList
 //              else
 //              {
         jLabel = new JLabel("Enabled events");
-        
+
 //              }
         add(jLabel, BorderLayout.NORTH);
         add(scrollPanel, BorderLayout.CENTER);
         theList.addMouseListener(new MouseAdapter()
         {
-            public void mouseClicked(MouseEvent e)
+            public void mouseClicked(final MouseEvent e)
             {
                 if (clickable())
                 {
                     if (e.getClickCount() == 2)
                     {
-                        int index = theList.locationToIndex(e.getPoint());
-                        
+                        final int index = theList.locationToIndex(e.getPoint());
+
                         if (index >= 0)
                         {
-                            
+
                             // KA : These two commands should probably be executed without interruption
                             // Try with a wrapper object
-                            LabeledEvent currEvent = eventsList.getEventAt(index);
-                            
+                            final LabeledEvent currEvent = eventsList.getEventAt(index);
+
                             executeEvent(currEvent);
-                            
+
 //                                                      int[] newState = eventsList.getStateAt(index);
 //                                                      if (!eventsList.executeEvent(currEvent))
 //                                                      {
@@ -143,17 +143,17 @@ public class SimulatorEventList
             }
         });
     }
-    
+
     public boolean clickable()
     {
         return !eventsList.isLocked();
     }
-    
-    public void setShowStateId(boolean showStateId)
+
+    public void setShowStateId(final boolean showStateId)
     {
         eventsList.setShowStateId(showStateId);
     }
-    
+
 //      public void setCurrState(int[] currState)
 //      {
 //              this.currState = currState;
@@ -164,10 +164,10 @@ public class SimulatorEventList
     public void update()
     {
         theList.clearSelection();
-        
+
 //              eventsList.setCurrState(currState);
     }
-    
+
 //      private void updateStateViewer(int[] newState)
 //      {
 //              stateViewer.setCurrState(newState);
@@ -177,27 +177,27 @@ public class SimulatorEventList
 //      {
 //              stateViewer.executeEvent(event);
 //      }
-    private void executeEvent(LabeledEvent currEvent)
+    private void executeEvent(final LabeledEvent currEvent)
     {
         theExecuter.executeEvent(currEvent);
     }
-    
+
     public SimulatorEventListModel getEventListModel()
     {
         return eventsList;
     }
-    
-    public void contentsChanged(ListDataEvent e)
+
+    public void contentsChanged(final ListDataEvent e)
     {
         update();
     }
-    
-    public void intervalAdded(ListDataEvent e)
+
+    public void intervalAdded(final ListDataEvent e)
     {
         contentsChanged(e);
     }
-    
-    public void intervalRemoved(ListDataEvent e)
+
+    public void intervalRemoved(final ListDataEvent e)
     {
         contentsChanged(e);
     }

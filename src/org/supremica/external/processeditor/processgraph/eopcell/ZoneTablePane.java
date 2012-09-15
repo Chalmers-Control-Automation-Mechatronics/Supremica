@@ -21,8 +21,8 @@ import org.supremica.external.processeditor.processgraph.table.ValueChangedCellR
 import org.supremica.manufacturingTables.xsd.eop.Action;
 import org.supremica.manufacturingTables.xsd.eop.Zones;
 
-public class ZoneTablePane 
-						extends 
+public class ZoneTablePane
+						extends
 							BasicTablePane
 						implements
 							ActionListener,
@@ -30,122 +30,122 @@ public class ZoneTablePane
 {
     private static final long serialVersionUID = 1L;
 
-    private List<JComboBox> comboBoxList = null;
+    private List<JComboBox<String>> comboBoxList = null;
 	private ZoneDataEditor editor = null;
-	
-	public ZoneTablePane(Zones zones){
+
+	public ZoneTablePane(final Zones zones){
 		super();
 		setHeader("Zones");
-		
+
 		table.getModel().setRowEditable(0, false);
 		table.setDefaultRenderer(Object.class, new ValueChangedCellRenderer());
-		
+
 		jbTableHeader.addActionListener(this);
 		jbTableHeader.addMouseListener(this);
-		
-		comboBoxList = new LinkedList<JComboBox>();
-		
+
+		comboBoxList = new LinkedList<JComboBox<String>>();
+
 		if( null == zones ){
 			return;
 		}
-		
+
 		//Add columns
-		List<String> stringList = zones.getZone();
-		for(String actuator : stringList){
+		final List<String> stringList = zones.getZone();
+		for(final String actuator : stringList){
 			addZone(actuator);
 		}
 	}
-	
-	private JComboBox buildComboBox(String[] values){
-		JComboBox comboBox = null;
+
+	private JComboBox<String> buildComboBox(final String[] values){
+		JComboBox<String> comboBox = null;
 		if(values != null && values.length > 0){
-			comboBox = new JComboBox();
+			comboBox = new JComboBox<String>();
 			for(int i = 0; i < values.length; i++){
 				comboBox.addItem(values[i]);
 			}
 		}
 		return comboBox;
 	}
-	
+
 	private void setUpTypeRow() {
-		int numberOfColumns = table.getColumnCount();
+		final int numberOfColumns = table.getColumnCount();
 		for(int col = 0; col < numberOfColumns; col++){
 			table.getColumnModel().
 				  getColumn( col ).
 				  	setCellEditor( new InternalCellEditor(comboBoxList.get(col)) );
 		}
 	}
-	
-	public void addZone(String zone){
+
+	public void addZone(final String zone){
 		addZone(zone, null);
 	}
-	public void addZone(String zone, String[] values){
+	public void addZone(final String zone, final String[] values){
 		addCol( zone );
 		table.setValueAt("- # -", 0, getColumnCount()-1);
 		comboBoxList.add(buildComboBox(values));
 		setUpTypeRow();
 	}
-	
-	public void removeZone(String name){
+
+	public void removeZone(final String name){
 		if(name == null){
 			return;
 		}
 		comboBoxList.remove(table.removeCol(name));
 		setUpTypeRow();
 	}
-	
-	public void setCellEditor(int col, String[] values){
+
+	public void setCellEditor(final int col, final String[] values){
 		comboBoxList.set(col, buildComboBox(values));
 		setUpTypeRow();
 	}
-	
+
 	public Zones getZones(){
 		return EOPTableExtractor.getZonesFromTable(table);
 	}
-	
-	public void insertActions(List<Action> actionList){
-		for(Action term : actionList){
+
+	public void insertActions(final List<Action> actionList){
+		for(final Action term : actionList){
 			EOPTableFiller.insertZoneConditionFromActionToTable(term, table);
 		}
 	}
-	
-	
+
+
 	// --- ActionListener ---
-	public void actionPerformed(ActionEvent e) {
-        Object o = e.getSource();
+	public void actionPerformed(final ActionEvent e) {
+        final Object o = e.getSource();
         if(o == jbTableHeader){
-        	Point pos =  jbTableHeader.getLocationOnScreen();
-        	
+        	final Point pos =  jbTableHeader.getLocationOnScreen();
+
         	editor = new ZoneDataEditor(this);
         	pos.translate( 0, -editor.getHeight()/2 );
-        	
+
         	if(pos.y < 0){
         		pos.translate( 0, editor.getHeight()/2 );
         	}
-        	
-        	editor.setLocation(pos);     	
+
+        	editor.setLocation(pos);
         	editor.setVisible(true);
 		}else{
         	System.err.println("unknown source " + o);
         }
     }
-	
+
 	/* --- MouseListener --- */
-    public void mouseClicked(MouseEvent e){}
-    public void mouseEntered(MouseEvent e){
+    public void mouseClicked(final MouseEvent e){}
+    public void mouseEntered(final MouseEvent e){
     	if(e.getSource().equals(jbTableHeader)){
     		jbTableHeader.setContentAreaFilled(true);
     		jbTableHeader.setBorderPainted(true);
     	}
     }
-    public void mouseExited(MouseEvent e){
+    public void mouseExited(final MouseEvent e){
     	if(e.getSource().equals(jbTableHeader)){
     		jbTableHeader.setContentAreaFilled(false);
     		jbTableHeader.setBorderPainted(false);
     	}
-    } 
-    public void mousePressed(MouseEvent e){}
-    public void mouseReleased(MouseEvent e){}
+    }
+    public void mousePressed(final MouseEvent e){}
+    public void mouseReleased(final MouseEvent e){}
 }
 
 /**
@@ -160,51 +160,51 @@ class ZoneCellEditor extends
 	private static final String ACTUATOR = "Actuator";
 	private static final String VARIABLE = "Variable";
 	private static final String SENSOR = "Sensor";
-	
+
 	private int editor = -1;
-	
-	JComboBox validTypesComboBox = null;
-	JComboBox validDataComboBox = null;
-	
+
+	JComboBox<String> validTypesComboBox = null;
+	JComboBox<String> validDataComboBox = null;
+
 	JTextField txtField = null;
-	
-	public ZoneCellEditor( JComboBox dataComboBox ){
+
+	public ZoneCellEditor( final JComboBox<String> dataComboBox ){
 		super(new JTextField());
-		
+
 		//Set up the editor
-		validTypesComboBox = new JComboBox();
-		
+		validTypesComboBox = new JComboBox<String>();
+
 		validDataComboBox = dataComboBox;
-		
+
 		validTypesComboBox.addItem(ACTUATOR);
 		validTypesComboBox.addItem(VARIABLE);
 		validTypesComboBox.addItem(SENSOR);
-		
+
 		txtField = new JTextField();
 		txtField.setBorder(BorderFactory.createLineBorder(Color.black));
 	}
-	
+
 	public Object[] getValidValues(){
 		if(validDataComboBox == null){
 			return null;
 		}
-		
-		int numberOfItems = validDataComboBox.getItemCount();
-		
-		Object[] os = new Object[numberOfItems];
+
+		final int numberOfItems = validDataComboBox.getItemCount();
+
+		final Object[] os = new Object[numberOfItems];
 		for(int i = 0; i < numberOfItems; i++){
 			os[i] = validDataComboBox.getItemAt(i);
 		}
 		return os;
 	}
-	
+
 	//override in DefaultCellEditor
-	public Component getTableCellEditorComponent(JTable table,
-												 Object value,
-												 boolean isSelected,
-												 int row,
-												 int column)
-	{	
+	public Component getTableCellEditorComponent(final JTable table,
+												 final Object value,
+												 final boolean isSelected,
+												 final int row,
+												 final int column)
+	{
 		switch(row){
 		case 0:
 			editor = 1;
@@ -215,15 +215,15 @@ class ZoneCellEditor extends
 				txtField.setText(value.toString());
 				return txtField;
 			}
-			
+
 			editor = 2;
 			return validDataComboBox;
 		}
 	}
-	
+
 	//override in DefaultCellEditor
 	public Object getCellEditorValue(){
-		
+
 		switch(editor){
 		case 0:
 			return txtField.getText();
@@ -232,7 +232,7 @@ class ZoneCellEditor extends
 		case 2:
 			return validDataComboBox.getSelectedItem();
 		}
-		
+
 		//default return
 		return super.getCellEditorValue();
 	}

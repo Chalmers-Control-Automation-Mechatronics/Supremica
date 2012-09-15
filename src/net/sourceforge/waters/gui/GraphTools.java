@@ -69,7 +69,7 @@ public class GraphTools {
     final PointGeometrySubject geo = new PointGeometrySubject(pos);
     final LabelGeometrySubject label =
       new LabelGeometrySubject(LabelProxyShape.DEFAULT_OFFSET);
-    return new SimpleNodeSubject(name, null, initial, geo, null, label);
+    return new SimpleNodeSubject(name, null, null, initial, geo, null, label);
   }
 
   /**
@@ -84,7 +84,7 @@ public class GraphTools {
   {
     final String name = findNewGroupNodeName(graph);
     final BoxGeometrySubject geo = new BoxGeometrySubject(rect);
-    return new GroupNodeSubject(name, null, null, geo);
+    return new GroupNodeSubject(name, null, null, null, geo);
   }
 
   /**

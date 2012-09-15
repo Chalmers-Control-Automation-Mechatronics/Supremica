@@ -49,7 +49,7 @@ public class UncontrollableEventDepSets
   public UncontrollableEventDepSets(BDDExtendedAutomata bddAutomata, List<ExtendedAutomaton> members, TIntArrayList caredUncontrollableEventIndexList)
   {
     this.bddExAutomata = bddAutomata;
-    this.manager = bddAutomata.manager;
+    this.manager = bddAutomata.getManager();
     this.members = members;
     this.automatonToBDDAutomatonMap = bddAutomata.automatonToBDDAutomatonMap;
 
@@ -124,7 +124,7 @@ public class UncontrollableEventDepSets
         }
 
         currUnconEventTransitions.andWith(keep);
-        uncontrollableEvents2EnabledStates.put(anUncontrollableEvent, currUnconEventTransitions.exist(bddExAutomata.destStateVariables));
+        uncontrollableEvents2EnabledStates.put(anUncontrollableEvent, currUnconEventTransitions.exist(bddExAutomata.getDestStatesVarSet()));
         return true;
       }
     });

@@ -31,7 +31,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
-import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 
 
@@ -127,8 +127,8 @@ public class CompositionalSICPropertyBuilder
     final Set<EventProxy> allEvents = mModel.getEvents();
     final List<EventProxy> answerEvents = new ArrayList<EventProxy>(0);
     for (final EventProxy event : allEvents) {
-      if (HISCAttributes.getEventType(event.getAttributes()) ==
-          HISCAttributes.EventType.ANSWER) {
+      if (HISCAttributeFactory.getEventType(event.getAttributes()) ==
+          HISCAttributeFactory.EventType.ANSWER) {
         answerEvents.add(event);
       }
     }
@@ -164,7 +164,7 @@ public class CompositionalSICPropertyBuilder
       if (event.getKind() != EventKind.PROPOSITION) {
         newEvents.add(event);
         final Map<String,String> attribs = event.getAttributes();
-        switch (HISCAttributes.getEventType(attribs)) {
+        switch (HISCAttributeFactory.getEventType(attribs)) {
         case REQUEST:
         case ANSWER:
         case LOWDATA:
@@ -188,7 +188,7 @@ public class CompositionalSICPropertyBuilder
     newAutomata.add(testaut);
     for (final AutomatonProxy aut : oldAutomata) {
       final Map<String,String> attribs = aut.getAttributes();
-      if (HISCAttributes.isInterface(attribs)) {
+      if (HISCAttributeFactory.isInterface(attribs)) {
         final AutomatonProxy iaut = createSIC5InterfaceAutomaton(aut, answer);
         newAutomata.add(iaut);
       } else {
@@ -240,7 +240,7 @@ public class CompositionalSICPropertyBuilder
     for (final AutomatonProxy oldAut : oldAutomata) {
       final AutomatonProxy newAut;
       final Map<String,String> attribs = oldAut.getAttributes();
-      if (HISCAttributes.isInterface(attribs)) {
+      if (HISCAttributeFactory.isInterface(attribs)) {
         newAut = createSIC6InterfaceAutomaton(oldAut);
       } else {
         newAut = removePropositions(oldAut, mInputMarking);
@@ -350,7 +350,7 @@ public class CompositionalSICPropertyBuilder
         global.add(event);
       } else {
         final Map<String,String> attribs = event.getAttributes();
-        switch (HISCAttributes.getEventType(attribs)) {
+        switch (HISCAttributeFactory.getEventType(attribs)) {
         case DEFAULT:
           local.add(event);
           global.add(event);
@@ -406,9 +406,9 @@ public class CompositionalSICPropertyBuilder
       transitions.add(trans);
       // The transition which accepts any request event ...
       final Map<String,String> attribs = event.getAttributes();
-      final HISCAttributes.EventType etype =
-        HISCAttributes.getEventType(attribs);
-      if (etype == HISCAttributes.EventType.REQUEST) {
+      final HISCAttributeFactory.EventType etype =
+        HISCAttributeFactory.getEventType(attribs);
+      if (etype == HISCAttributeFactory.EventType.REQUEST) {
         trans = mFactory.createTransitionProxy(initialState, event, alphaState);
         transitions.add(trans);
       }
@@ -458,8 +458,8 @@ public class CompositionalSICPropertyBuilder
         mFactory.createTransitionProxy(initialState, event, initialState);
       transitions.add(trans);
       final Map<String,String> attribs = event.getAttributes();
-      final HISCAttributes.EventType etype =
-        HISCAttributes.getEventType(attribs);
+      final HISCAttributeFactory.EventType etype =
+        HISCAttributeFactory.getEventType(attribs);
       switch (etype) {
       case REQUEST:
         // The transition which accepts any request event ...
@@ -545,9 +545,9 @@ public class CompositionalSICPropertyBuilder
     final List<EventProxy> events = new ArrayList<EventProxy>();
     for (final EventProxy event : allEvents) {
       final Map<String,String> attribs = event.getAttributes();
-      final HISCAttributes.EventType type =
-        HISCAttributes.getEventType(attribs);
-      if (type != HISCAttributes.EventType.DEFAULT) {
+      final HISCAttributeFactory.EventType type =
+        HISCAttributeFactory.getEventType(attribs);
+      if (type != HISCAttributeFactory.EventType.DEFAULT) {
         events.add(event);
         numInterfaceEvents++;
       }

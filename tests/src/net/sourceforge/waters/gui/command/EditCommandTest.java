@@ -59,7 +59,7 @@ public class EditCommandTest extends AbstractCommandTest
     final ModuleProxyCloner cloner = getSubjectCloner();
     final EdgeSubject target = (EdgeSubject) cloner.getClone(edge);
     final LabelBlockSubject block = target.getLabelBlock();
-    final ListSubject<AbstractSubject> list = block.getEventListModifiable();
+    final ListSubject<AbstractSubject> list = block.getEventIdentifierListModifiable();
     final ModuleSubjectFactory factory = getSubjectFactory();
     final IdentifierSubject ident =
       factory.createSimpleIdentifierProxy("change");

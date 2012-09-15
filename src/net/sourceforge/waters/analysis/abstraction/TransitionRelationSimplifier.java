@@ -162,6 +162,15 @@ public interface TransitionRelationSimplifier
   public TRSimplifierStatistics getStatistics();
 
   /**
+   * Stores statistics for in the given list. This method is used to
+   * collect detailed statistics for each individual simplifier invoked by
+   * this simplifier.
+   * @param  list           Statistics records are added to the end of this
+   *                        list, in order of invocation of the simplifiers.
+   */
+  public void collectStatistics(List<TRSimplifierStatistics> list);
+
+  /**
    * Cleans up. This method removes all temporary data and results
    * associated with any previous call to {@link #run()}.
    */

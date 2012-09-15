@@ -25,52 +25,52 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 	------------------
 */
 	private static final long serialVersionUID = 1L;
-	private JDesktopPane desktop;
+	private final JDesktopPane desktop;
 	private JPanel glassPanel;
-	private JPanel settingsPane;
-	private JMenuBar menuBar;
-	private JMenu sessionMenu;
-	private JMenu optionsMenu;
-	private JMenu runMenu;
-	private JMenu encodingMenu;
-	private JMenu dataTypeMenu;
-	private JMenuItem connectItem, disconnectItem, exitItem,
+	private final JPanel settingsPane;
+	private final JMenuBar menuBar;
+	private final JMenu sessionMenu;
+	private final JMenu optionsMenu;
+	private final JMenu runMenu;
+	private final JMenu encodingMenu;
+	private final JMenu dataTypeMenu;
+	private final JMenuItem connectItem, disconnectItem, exitItem,
 							encUTF8Item, encUTF16Item, SOCItem, fileItem,
 								queryItem, linkPItem;
-	private JLabel pathLabel;
-	private JLabel transferTypeLabel;
-	private JLabel encodingLabel;
-	private JLabel projectLabel;
-	private JLabel projectsLabel;
-	private JLabel chkStdLabel;
-	private JLabel standardsLabel;
-	private JLabel messagesLabel;
-	private JScrollPane pListScrollPane;
-	private JScrollPane sListScrollPane;
-	private JScrollPane scrollMPane;
-	private JTextField projectField;
-	private JList pList;
-	private JList sList;
-	private DefaultListModel pListModel;
-	private DefaultListModel sListModel;
-	private JButton pathButton;
-	private JButton useProjectButton;
-	private JButton importPButton;
-	private JButton exportPButton;
-	private JButton deletePButton;
-	private JButton refreshPButton;
-	private JButton importButton;
-	private JButton exportButton;
-	private JButton deleteSButton;
-	private JButton refreshSButton;
-	private JButton clearButton;
+	private final JLabel pathLabel;
+	private final JLabel transferTypeLabel;
+	private final JLabel encodingLabel;
+	private final JLabel projectLabel;
+	private final JLabel projectsLabel;
+	private final JLabel chkStdLabel;
+	private final JLabel standardsLabel;
+	private final JLabel messagesLabel;
+	private final JScrollPane pListScrollPane;
+	private final JScrollPane sListScrollPane;
+	private final JScrollPane scrollMPane;
+	private final JTextField projectField;
+	private final JList<String> pList;
+	private final JList<String> sList;
+	private final DefaultListModel<String> pListModel;
+	private final DefaultListModel<String> sListModel;
+	private final JButton pathButton;
+	private final JButton useProjectButton;
+	private final JButton importPButton;
+	private final JButton exportPButton;
+	private final JButton deletePButton;
+	private final JButton refreshPButton;
+	private final JButton importButton;
+	private final JButton exportButton;
+	private final JButton deleteSButton;
+	private final JButton refreshSButton;
+	private final JButton clearButton;
 	private static JTextArea printArea;
 
 	private final String[] standardsAbbr = { "PR", "VR", "ROP", "EOP", "IL" };
 	private final String[] standardsFull = {"Physical resources (Cell name ID)", "Virtual resources (Cell name ID)",
 			"Relations of Operations (ROP name ID)", "Execution of Operations (EOP name ID)", "Interlocks (IL name ID)"};
-	private JComboBox standardList = null;
-	private String standardString = "Relations of Operations (ROP name ID)";
+	private JComboBox<String> standardList = null;
+	private final String standardString = "Relations of Operations (ROP name ID)";
 
 	private LoginWindow loginWindow = null;
 	private static Connect dbConnect = null;		// Connection setup object
@@ -105,7 +105,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		setLocationRelativeTo(null);
 
 		// Constrains
-		GridBagLayout m = new GridBagLayout();
+		final GridBagLayout m = new GridBagLayout();
 		setLayout(m);
 		GridBagConstraints con;
 
@@ -132,7 +132,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		optionsMenu.setMnemonic(KeyEvent.VK_O);
 
 		dataTypeMenu = new JMenu("Transfer type ");
-		ButtonGroup dataTypeGroup = new ButtonGroup();
+		final ButtonGroup dataTypeGroup = new ButtonGroup();
 		SOCItem = new JRadioButtonMenuItem("To/from SOC", true);
 		fileItem = new JRadioButtonMenuItem("To/from file");
 		SOCItem.addActionListener(this);
@@ -143,7 +143,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		dataTypeMenu.add(fileItem);
 
 		encodingMenu = new JMenu("File encoding ");
-		ButtonGroup encodingGroup = new ButtonGroup();
+		final ButtonGroup encodingGroup = new ButtonGroup();
 		encUTF8Item = new JRadioButtonMenuItem("UTF-8", true);
 		encUTF16Item = new JRadioButtonMenuItem("UTF-16");
 		encUTF8Item.addActionListener(this);
@@ -173,7 +173,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		// ****** Settings panel ******
 
 		// Settings panel
-		GridBagLayout m2 = new GridBagLayout();
+		final GridBagLayout m2 = new GridBagLayout();
 		settingsPane = new JPanel(m2);
 		settingsPane.setPreferredSize(new Dimension(540,30));
 		settingsPane.setMinimumSize(settingsPane.getPreferredSize());
@@ -341,9 +341,9 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		add(projectsLabel);
 
 		// Project list
-		pListModel = new DefaultListModel();
+		pListModel = new DefaultListModel<String>();
 		pListModel.addElement("No projects");
-		pList = new JList(pListModel);
+		pList = new JList<String>(pListModel);
 		pList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pList.setSelectedIndex(0);
 		pList.addListSelectionListener(this);
@@ -388,7 +388,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		// ****** Standards components ******
 
 		// Standard label
-		standardList = new JComboBox(standardsAbbr);
+		standardList = new JComboBox<String>(standardsAbbr);
 		standardList.setSelectedIndex(2);
 		standardList.addActionListener(this);
 		con = new GridBagConstraints();
@@ -452,9 +452,9 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		add(standardsLabel);
 
 		// Standards list
-		sListModel = new DefaultListModel();
+		sListModel = new DefaultListModel<String>();
 		sListModel.addElement("Select a project");
-		sList = new JList(sListModel);
+		sList = new JList<String>(sListModel);
 		sList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		sList.setSelectedIndex(0);
 		sList.addListSelectionListener(this);
@@ -565,12 +565,12 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 	 * Sets the dbConnect object, not an instance method
 	 * @param	dbCon the database connection setup object
 	 */
-	public static void setDBConnection(Connect dbCon) {
+	public static void setDBConnection(final Connect dbCon) {
 		dbConnect = dbCon;
 	}
 
 	// Set Graph Container
-    public void setGraphContainer(SOCGraphContainer graphContainer) {
+    public void setGraphContainer(final SOCGraphContainer graphContainer) {
 		this.graphContainer = graphContainer;
 	}
 
@@ -627,10 +627,10 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 	 * Get standard names
 	 */
 	private ArrayList<String> getStandardNames() {
-		ArrayList<String> standardNames = new ArrayList<String>();
-		int[] indices = sList.getSelectedIndices();
+		final ArrayList<String> standardNames = new ArrayList<String>();
+		final int[] indices = sList.getSelectedIndices();
 		for (int i=0; i<indices.length; i++) {
-			standardNames.add((String)sListModel.getElementAt(indices[i]));
+			standardNames.add(sListModel.getElementAt(indices[i]));
 		}
 		return standardNames;
 	}
@@ -644,8 +644,8 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		if (isConnected()) {
 			setProject();
 			int count = 0;
-			ArrayList<Integer> stdInUse = dbConnect.getStandardsInUse(projectID);
-			ArrayList<String> stdToDisplay = new ArrayList<String>();
+			final ArrayList<Integer> stdInUse = dbConnect.getStandardsInUse(projectID);
+			final ArrayList<String> stdToDisplay = new ArrayList<String>();
 			if (stdInUse.get(0) == 1) {
 				stdToDisplay.add(" PR");
 				count = count + 1;
@@ -712,7 +712,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 				projectID = dbConnect.getProjectID(projectName);
 				ArrayList<String> list = new ArrayList<String>();
 				sListModel.removeAllElements();
-				int index = standardList.getSelectedIndex();
+				final int index = standardList.getSelectedIndex();
 				list = dbConnect.getAllStandards(projectID, index);
 				Collections.sort(list, String.CASE_INSENSITIVE_ORDER);
 				for (int i=0; i<list.size(); i++) {
@@ -730,7 +730,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 	--< Action performed >--
 	------------------------
 */
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(final ActionEvent e) {
 
 		// Connect Item
 		if (e.getSource() == connectItem) {
@@ -788,7 +788,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		// Query Item
 		else if (e.getSource() == queryItem) {
 			if (isConnected()) {
-				int answer = JOptionPane.showConfirmDialog(null,"This command has not yet been defined,\nRun the example query below?\n\nSELECT Machine_ID, Machine_name\nFROM PR_machines\n", "DB query", JOptionPane.YES_NO_OPTION);
+				final int answer = JOptionPane.showConfirmDialog(null,"This command has not yet been defined,\nRun the example query below?\n\nSELECT Machine_ID, Machine_name\nFROM PR_machines\n", "DB query", JOptionPane.YES_NO_OPTION);
 				if (answer == JOptionPane.YES_OPTION) {
 					printArea.append("\nResultSet for example query:\n");
 					dbConnect.sendQuery("select Machine_ID, Machine_name from PR_machines");
@@ -802,16 +802,16 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 		else if (e.getSource() == linkPItem) {
 			if (isConnected()) {
 				if (!projectField.getText().isEmpty()) {
-					int inputValue = JOptionPane.showConfirmDialog(this, "Use current file path to create log-file?", "Output path", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+					final int inputValue = JOptionPane.showConfirmDialog(this, "Use current file path to create log-file?", "Output path", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 					if (inputValue == JOptionPane.OK_OPTION) {
-						String resultSet = dbConnect.linkProject(projectID);
-						File logFile = new File (outputPath  + "\\" + "log_" + projectName + ".txt" );
+						final String resultSet = dbConnect.linkProject(projectID);
+						final File logFile = new File (outputPath  + "\\" + "log_" + projectName + ".txt" );
 						try {
-							Writer w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile)));
+							final Writer w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile)));
 							w.write(resultSet);
 							w.close();
 							printArea.append("\nLog file created: " + logFile.toString());
-						}catch (IOException ioe) {
+						}catch (final IOException ioe) {
 							printArea.append("\nIOException: " + ioe.getMessage());
 						}
 					}
@@ -829,7 +829,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 
 		// Path button
 		else if (e.getSource() == pathButton) {
-			Object inputValue = JOptionPane.showInputDialog(this, "Select output path", "Output path", JOptionPane.INFORMATION_MESSAGE, null, null, outputPath);
+			final Object inputValue = JOptionPane.showInputDialog(this, "Select output path", "Output path", JOptionPane.INFORMATION_MESSAGE, null, null, outputPath);
 			if (inputValue != null) {
 				outputPath = inputValue.toString();
 				pathLabel.setText(outputPath);
@@ -844,9 +844,9 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 					setProject();
 					refreshProjects();
 					setProject();
-					int index = pList.getNextMatch(projectName, 0, Position.Bias.Forward);
+					final int index = pList.getNextMatch(projectName, 0, Position.Bias.Forward);
 					if (index > -1) {
-						if (projectName.equalsIgnoreCase((String)pListModel.get(index))) {
+						if (projectName.equalsIgnoreCase(pListModel.get(index))) {
 							projectID = dbConnect.getProjectID(projectName);
 							pList.setSelectedIndex(index);
 							pList.ensureIndexIsVisible(index);
@@ -868,17 +868,17 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 				}
 				else {
 					if (transferTypeName.equals("XML file")){
-						int inputValue = JOptionPane.showConfirmDialog(this, "Use current file path?", "Output path", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+						final int inputValue = JOptionPane.showConfirmDialog(this, "Use current file path?", "Output path", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 						if (inputValue == JOptionPane.OK_OPTION) {
-							String xmlStr = dbConnect.getProjectXMLAsString(projectName);
+							final String xmlStr = dbConnect.getProjectXMLAsString(projectName);
 							File outputFile = new File(outputPath);
 							outputFile = new File (outputPath  + "\\" + "Project_" + projectName + ".xml" );
 							try {
-								Writer w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), encodingName));
+								final Writer w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), encodingName));
 								w.write(xmlStr);
 								w.close();
 								printArea.append("\nFile created: " + outputFile.toString());
-							}catch (IOException ioe) {
+							}catch (final IOException ioe) {
 								printArea.append("\nIOException: " + ioe.getMessage());
 							}
 						}
@@ -898,12 +898,12 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 			if (isConnected()) {
 				initValues();
 				if (transferTypeName.equals("XML file")) {
-				    JFileChooser fc = new JFileChooser(dir);
+				    final JFileChooser fc = new JFileChooser(dir);
 				    fc.setMultiSelectionEnabled(true);
-				    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+				    final FileNameExtensionFilter filter = new FileNameExtensionFilter(
 				        "XML files", "xml");
 				    fc.setFileFilter(filter);
-				    int returnVal = fc.showOpenDialog(glassPanel);
+				    final int returnVal = fc.showOpenDialog(glassPanel);
 				    if(returnVal == JFileChooser.APPROVE_OPTION) {
 						xmlFiles = fc.getSelectedFiles();
 						if (xmlFiles.length > 0) {
@@ -913,14 +913,14 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 							String xmlStr = "";
 							try {
 								// Set Reader object to selected encoding
-								Reader r = new InputStreamReader(new FileInputStream(xmlFiles[i]), encodingName);
-								Scanner scanner = new Scanner(r);
+								final Reader r = new InputStreamReader(new FileInputStream(xmlFiles[i]), encodingName);
+								final Scanner scanner = new Scanner(r);
 								while (scanner.hasNextLine()){
-									String tempStr = scanner.nextLine();
+									final String tempStr = scanner.nextLine();
 									xmlStr = xmlStr + tempStr.trim();
 								}
 								scanner.close();
-							}catch (IOException ex){
+							}catch (final IOException ex){
 								printArea.append("\nIOException: " + ex.getMessage());
 							}
 							dbConnect.setProjectXMLFromString(xmlStr);
@@ -947,7 +947,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 					printArea.append("\nChoose a project!");
 				}
 				else {
-					int okFlag = JOptionPane.showConfirmDialog(this,"Permanently delete project: " + projectName + "?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+					final int okFlag = JOptionPane.showConfirmDialog(this,"Permanently delete project: " + projectName + "?", "Confirm delete", JOptionPane.YES_NO_OPTION);
 					if (okFlag == JOptionPane.YES_OPTION) {
 						dbConnect.deleteProject(projectID);
 						printArea.append("\nProject deleted..");
@@ -979,11 +979,11 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 			if (isConnected()) {
 				initValues();
 				if (projectID > 0 && !sList.isSelectionEmpty()) {
-					int index = standardList.getSelectedIndex();
-					ArrayList<String> standardNames = getStandardNames();
+					final int index = standardList.getSelectedIndex();
+					final ArrayList<String> standardNames = getStandardNames();
 					if (transferTypeName.equals("SOC object")) {
 						for (int i=0; i<standardNames.size(); i++){
-							Object o = dbConnect.getStandardXMLAsObject(projectID, index, standardNames.get(i));
+							final Object o = dbConnect.getStandardXMLAsObject(projectID, index, standardNames.get(i));
 							if(graphContainer != null){
 								graphContainer.insertResource(o, null);
 							}
@@ -991,19 +991,19 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 						}
 					}
 					else if (transferTypeName.equals("XML file")){
-						int inputValue = JOptionPane.showConfirmDialog(this, "Use current file path?", "Output path", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+						final int inputValue = JOptionPane.showConfirmDialog(this, "Use current file path?", "Output path", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
 						if (inputValue == JOptionPane.OK_OPTION) {
 							for (int i=0; i<standardNames.size(); i++){
-								String xmlStr = dbConnect.getStandardXMLAsString(projectID, index, standardNames.get(i));
+								final String xmlStr = dbConnect.getStandardXMLAsString(projectID, index, standardNames.get(i));
 								File outputFile = new File(outputPath);
 								outputFile.mkdirs();
 								outputFile = new File (outputPath  + "\\" + standardsAbbr[index] + standardNames.get(i) + ".xml" );
 								try {
-									Writer w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), encodingName));
+									final Writer w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), encodingName));
 									w.write(xmlStr);
 									w.close();
 									printArea.append("\nFile created: " + outputFile.toString());
-								} catch (IOException ioe) {
+								} catch (final IOException ioe) {
 									printArea.append("\nIOException: " + ioe.getMessage());
 								}
 							}
@@ -1032,12 +1032,12 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 				}
 				else {
 					if (transferTypeName.equals("XML file")) {
-					    JFileChooser fc = new JFileChooser(dir);
+					    final JFileChooser fc = new JFileChooser(dir);
 					    fc.setMultiSelectionEnabled(true);
-					    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+					    final FileNameExtensionFilter filter = new FileNameExtensionFilter(
 					        "XML files", "xml");
 					    fc.setFileFilter(filter);
-					    int returnVal = fc.showOpenDialog(glassPanel);
+					    final int returnVal = fc.showOpenDialog(glassPanel);
 					    if(returnVal == JFileChooser.APPROVE_OPTION) {
 							xmlFiles = fc.getSelectedFiles();
 							if (xmlFiles.length > 0) {
@@ -1047,17 +1047,17 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 								String xmlStr = "";
 								try {
 									// Set Reader object to selected encoding
-									Reader r = new InputStreamReader(new FileInputStream(xmlFiles[i]), encodingName);
-									Scanner scanner = new Scanner(r);
+									final Reader r = new InputStreamReader(new FileInputStream(xmlFiles[i]), encodingName);
+									final Scanner scanner = new Scanner(r);
 									while (scanner.hasNextLine()){
-										String tempStr = scanner.nextLine();
+										final String tempStr = scanner.nextLine();
 										xmlStr = xmlStr + tempStr.trim();
 									}
 									scanner.close();
-								}catch (IOException ex){
+								}catch (final IOException ex){
 									printArea.append("\nIOException: " + ex.getMessage());
 								}
-								int standardIndex = standardList.getSelectedIndex();
+								final int standardIndex = standardList.getSelectedIndex();
 								dbConnect.setStandardXMLFromString(projectID, standardIndex, xmlStr);
 							}
 						}
@@ -1072,7 +1072,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 								o = ((ResourceCell)o).getFunction();
 							}
 						}
-						int standardIndex = standardList.getSelectedIndex();
+						final int standardIndex = standardList.getSelectedIndex();
 						dbConnect.setStandardXMLFromObject(projectID, standardIndex, o);
 					}
 					setProject();
@@ -1087,9 +1087,9 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 			if (isConnected()) {
 				initValues();
 				if (projectID > 0 && !sList.isSelectionEmpty()) {
-					int index = standardList.getSelectedIndex();
-					ArrayList<String> standardNames = getStandardNames();
-					int okFlag = JOptionPane.showConfirmDialog(this,"Permanently delete selection?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+					final int index = standardList.getSelectedIndex();
+					final ArrayList<String> standardNames = getStandardNames();
+					final int okFlag = JOptionPane.showConfirmDialog(this,"Permanently delete selection?", "Confirm delete", JOptionPane.YES_NO_OPTION);
 					if (okFlag == JOptionPane.YES_OPTION) {
 						for (int i=0; i<standardNames.size(); i++){
 							dbConnect.deleteStandard(projectID, index, standardNames.get(i));
@@ -1117,7 +1117,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 				else {
 					ArrayList<String> list = new ArrayList<String>();
 					sListModel.removeAllElements();
-					int index = standardList.getSelectedIndex();
+					final int index = standardList.getSelectedIndex();
 					list = dbConnect.getAllStandards(projectID, index);
 					Collections.sort(list, String.CASE_INSENSITIVE_ORDER);
 					for (int i=0; i<list.size(); i++) {
@@ -1140,9 +1140,10 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 	--< Value changed >--
 	---------------------
 */
-	public void valueChanged(ListSelectionEvent e) {
-		JList lst = (JList) e.getSource();
-		ListModel dlm = lst.getModel();
+	public void valueChanged(final ListSelectionEvent e) {
+		@SuppressWarnings("unchecked")
+    final JList<Object> lst = (JList<Object>) e.getSource();
+		final ListModel<Object> dlm = lst.getModel();
 		if (lst.getValueIsAdjusting() == true) {
 			if (e.getSource() == pList) {
 				projectField.setText(dlm.getElementAt(lst.getSelectedIndex()).toString());
@@ -1157,7 +1158,7 @@ public class DBInterface extends JFrame implements ActionListener, ListSelection
 	--< Main >--
 	------------
 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run(){
 					new DBInterface();

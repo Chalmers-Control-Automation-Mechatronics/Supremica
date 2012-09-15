@@ -141,7 +141,7 @@ public class EditorReadSpecAction
                         String guard = "";
 
 
-                        final String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
+                        final String currEvent = ep.getLabelBlock().getEventIdentifierList().iterator().next().toString();
 
                         if(event2guard.containsKey(currEvent))
                             currGuards = event2guard.get(currEvent);

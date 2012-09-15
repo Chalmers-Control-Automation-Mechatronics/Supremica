@@ -10,6 +10,7 @@ import javax.swing.JList;
 import org.supremica.external.processeditor.processgraph.NestedCell;
 import org.supremica.external.processeditor.processgraph.NestedGraph;
 import org.supremica.external.processeditor.processgraph.OperationEdge;
+import org.supremica.external.processeditor.processgraph.opcell.AttributePanel;
 import org.supremica.external.processeditor.processgraph.opcell.OperationCell;
 import org.supremica.external.processeditor.xgraph.CellEvent;
 import org.supremica.external.processeditor.xgraph.GraphCell;
@@ -22,61 +23,61 @@ import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 
 
 /**
- * Graphical representation of the objects of the <code>org.xml.ROP</code> 
+ * Graphical representation of the objects of the <code>org.xml.ROP</code>
  * class.
  */
 public class ResourceCell
-	extends	NestedCell 
-{    
+	extends	NestedCell
+{
 	private static final long serialVersionUID = 1L;
 
-	private boolean emptyCell = true;    
+	private boolean emptyCell = true;
 
     public GraphCell initCell = null;
     public GraphCell functionCell = null;
     public GraphCell endCell = null;
 
     private String[] uniqueAttributes = new String[0];
-    private Color[] uniqueAttributesColor = new Color[0];    
-    private int[] uniqueAttributesVisible = new int[0];       
+    private Color[] uniqueAttributesColor = new Color[0];
+    private int[] uniqueAttributesVisible = new int[0];
 
     private File myFile = null;
 
-    private JList selectedList = null;
+    private JList<AttributePanel> selectedList = null;
 
-    private ObjectFactory objectFactory = new ObjectFactory();
+    private final ObjectFactory objectFactory = new ObjectFactory();
 
     /**
      * Creates a new empty instance of the class.
-     * <p>     
+     * <p>
      */
     public ResourceCell() {
     	super();
-    	setLayout(null);	
+    	setLayout(null);
     	cell.addGraphListener(this);
     	cells.addGraphListener(this);
-    }  
+    }
     /**
-     * Creates a new instance of the class that will be associated with the 
+     * Creates a new instance of the class that will be associated with the
      * specified ROP object.
      */
-    public ResourceCell(ROP rop) {	
-	this();	
-	try {	   
-	    //complexFunction = rop;	    	   	    
-	    setFunction(rop);	    
-	    build();	    	    	       	   
+    public ResourceCell(final ROP rop) {
+	this();
+	try {
+	    //complexFunction = rop;
+	    setFunction(rop);
+	    build();
 	    buildBody();
 	    setCompressed(!compressed);
-	    downPack();	    
-	}catch(Exception ex) {
+	    downPack();
+	}catch(final Exception ex) {
 	    //DEBUG
 	    System.out.println("ERROR! while building resourceCell");
 	    //END DEBUG
 	}
 	uniqueAttributes();
-	setAttributeTypeColor();		
-    }        
+	setAttributeTypeColor();
+    }
     /**
      * Rebuilds the contents of this cell's graph container.
      */
@@ -85,51 +86,51 @@ public class ResourceCell
     	//System.out.println("ResourceCell.rebuild()");
     	//END DEBUG
     	try{
-    		Point tmpPos = getPos();
+    		final Point tmpPos = getPos();
     		removeAll();
     		cell = new NestedGraph();
     		cells = new NestedGraph();
-    		build();	   	    
-    		buildBody();		     
+    		build();
+    		buildBody();
     		compressed = !compressed;
     		setCompressed(!compressed);
     		cell.addGraphListener(this);
     		cells.addGraphListener(this);
     		downPack();
-    		setPos(tmpPos);	    	    
-    	}catch(Exception ex) {
+    		setPos(tmpPos);
+    	}catch(final Exception ex) {
     		//DEBUG
     		//System.out.println("ERROR! while rebuilding resourceCell");
     		//END DEBUG
     	}
     	uniqueAttributes();
-    	setAttributeTypeColor();		  
+    	setAttributeTypeColor();
     }
     /**
-     * Builds the contents of this nested cell, based on this resource cell 
+     * Builds the contents of this nested cell, based on this resource cell
      * ROP object.
      */
     public void build() {
     	//DEBUG
     	//System.out.println(this+".NestedCell.build()");
-    	//END DEBUG			
+    	//END DEBUG
     	//??????????????????????????????????
     	//This call was removed 2007-05-24
-    	//buildCompressedCell();		
-    	//??????????????????????????????????	       
+    	//buildCompressedCell();
+    	//??????????????????????????????????
     	String type = "";
     	if(getROP().getType().equals("COP")) {
     		type = "COP";
     	}else if(getROP().getType().equals("ROP")) {
     		type = "DOP";
-    	}       
+    	}
     	initCell = new Initiator(getROP().getMachine(),
-				 	type, 
-				 	getROP().getId());	
-    	((Initiator)initCell).addNestedCellListener(this);	
-    	cells.insert(initCell);	
+				 	type,
+				 	getROP().getId());
+    	((Initiator)initCell).addNestedCellListener(this);
+    	cells.insert(initCell);
     	initCell.setPos(new Point(NestedGraph.marginX, NestedGraph.marginY));
-	            
+
     	endCell = new Initiator("END");
     	((Initiator)endCell).addNestedCellListener(this);
     	cells.insert(endCell);
@@ -137,53 +138,53 @@ public class ResourceCell
     				initCell.getPos().y+
     				initCell.getSize().height+
     				NestedGraph.marginY+
-    				cellStepY));	    			
-    	cells.insert(new OperationEdge(initCell, endCell));	
-    }	
+    				cellStepY));
+    	cells.insert(new OperationEdge(initCell, endCell));
+    }
     /**
      * Builds the contents of this resource cell, based on this resoruce cell
      * ROP object.
      */
-    protected void buildBody() {	
+    protected void buildBody() {
     	//DEBUG
     	//System.out.println("ResourceCell.buildBody()");
     	//END DEBUG
     	if(getROP().getRelation() != null) {
     		try {
-    			cells.removeAllEdges();	    
-    			functionCell = new NestedCell(getROP().getRelation());	    
+    			cells.removeAllEdges();
+    			functionCell = new NestedCell(getROP().getRelation());
     			((NestedCell)functionCell).addNestedCellListener(this);
-    			cells.insert(functionCell);	    
+    			cells.insert(functionCell);
     			functionCell.setPos(new Point(NestedGraph.marginX,
     					initCell.getPos().y+
     					initCell.getSize().height+
     					NestedGraph.marginY+
-    					cellStepY));	    
+    					cellStepY));
     			endCell.setPos(new Point(NestedGraph.marginX,
     					functionCell.getPos().y+
     					functionCell.getSize().height+
     					NestedGraph.marginY+
-    					cellStepY));	    	    
+    					cellStepY));
     			cells.insert(new OperationEdge(initCell, functionCell));
     			cells.insert(new OperationEdge(functionCell, endCell));
-    			adjusteHorizontalPos();	    
+    			adjusteHorizontalPos();
     			emptyCell = false;
-    		}catch(Exception ex) {
+    		}catch(final Exception ex) {
     			System.err.println("ERROR! while buildBody in ResourceCell");
     			ex.printStackTrace();
-    		}	    	
+    		}
     	}else {
-    		emptyCell = true;	    
+    		emptyCell = true;
     	}
     }
-    
+
     /**
-     * Creates a new body for this resource cell, 
+     * Creates a new body for this resource cell,
      * based on the object <code>o</code>.
      *
      * @param o the object that specifies the body
      */
-    public void newBody(Object o) {	
+    public void newBody(final Object o) {
     	//DEBUG
     	//System.out.println("ResourceCell.newBody");
     	//END DEBUG
@@ -191,17 +192,17 @@ public class ResourceCell
     		if(o instanceof NestedCell) {
     			if(getRelation() != null) {
     				getActivityRelationGroup().
-    				add(0, ((NestedCell)o).getFunction());		   
-    			}else {		     
-    				if(((NestedCell)o).getFunction() instanceof Relation) {    
+    				add(0, ((NestedCell)o).getFunction());
+    			}else {
+    				if(((NestedCell)o).getFunction() instanceof Relation) {
     					getROP().setRelation(((NestedCell)o).getRelation());
     				}else if(((NestedCell)o).getActivity() != null) {
     					try {
-    						Relation newRelation = objectFactory.createRelation();
+    						final Relation newRelation = objectFactory.createRelation();
     						newRelation.setType(RelationType.SEQUENCE);
     						newRelation.getActivityRelationGroup().add(((NestedCell)o).getFunction());
-    						getROP().setRelation(newRelation); 
-    					}catch(Exception ex) {}
+    						getROP().setRelation(newRelation);
+    					}catch(final Exception ex) {}
     				}
     			}
     			rebuild();
@@ -211,10 +212,10 @@ public class ResourceCell
     		}else if(o instanceof Relation) {
     			getROP().setRelation((Relation)o);
     			rebuild();
-    		}	    
+    		}
     	}
-	
-    }    
+
+    }
     /**
      * Returns whether this resource cell is empty or not.
      *
@@ -229,7 +230,7 @@ public class ResourceCell
      * <p>
      * Forward this event to its graph container.
      */
-    public void cellPressed(CellEvent cEvent) {
+    public void cellPressed(final CellEvent cEvent) {
 	if(selectedList != null) {
 	    selectedList.clearSelection();
 	    selectedList = null;
@@ -241,69 +242,69 @@ public class ResourceCell
      *
      * @param list the concerned list
      */
-    public void setList(JList list) {
+    public void setList(final JList<AttributePanel> list) {
 	if(selectedList != null) {
 	    if(!selectedList.equals(list)) {
 		selectedList.clearSelection();
 	    }
 	}
 	selectedList = list;
-    }      
+    }
     /**
      * Returns the color of the specified attribute type.
      *
      * @param attributeType the attribute type
      * @return the color of the attribute type
      */
-    public Color getAttributeColor(String attributeType) {
+    public Color getAttributeColor(final String attributeType) {
 	for(int i = 0; i < uniqueAttributes.length; i++) {
 	    if(uniqueAttributes[i].equals(attributeType)) {
 		return uniqueAttributesColor[i];
 	    }
-	}      	
+	}
 	return Color.white;
     }
     /**
      * Updates the internal array <code>uniqueAttributes</code>.
      */
     private void uniqueAttributes() {
-	String[] oldUniqueAttributes = uniqueAttributes;
+	final String[] oldUniqueAttributes = uniqueAttributes;
 	uniqueAttributes = Converter.getUniqueAttributes(getFunction());
-	Color[] oldUniqueAttributesColor = uniqueAttributesColor;
+	final Color[] oldUniqueAttributesColor = uniqueAttributesColor;
 	uniqueAttributesColor = new Color[uniqueAttributes.length];
 	uniqueAttributesVisible = new int[uniqueAttributes.length];
-	for(int i = 0; i < uniqueAttributes.length; i++) {	    
+	for(int i = 0; i < uniqueAttributes.length; i++) {
 	    uniqueAttributesColor[i] = Color.white;
 	    for(int j = 0; j < oldUniqueAttributes.length; j++) {
 		if(uniqueAttributes[i].equals(oldUniqueAttributes[j])) {
 		    uniqueAttributesColor[i] = oldUniqueAttributesColor[j];
 		    break;
 		}
-	    }	 	   	    
+	    }
 	    uniqueAttributesVisible[i] = Converter.isAttributeTypeVisible(getFunction(), uniqueAttributes[i]);
-	}		
+	}
     }
     /**
      * Sets the color of the attribute types.
      */
-    public void setAttributeTypeColor() {	
+    public void setAttributeTypeColor() {
 	if(functionCell != null) {
-	    CellEvent[] opCells = functionCell.getCells();
+	    final CellEvent[] opCells = functionCell.getCells();
 	    for(int i = 0; i < opCells.length; i++) {
 		if(opCells[i].getSource() instanceof OperationCell) {
 		    ((OperationCell)opCells[i].getSource()).setAttributeTypeColor(uniqueAttributes, uniqueAttributesColor);
 		}
 	    }
 	}
-    }   
+    }
     /**
      * Returns the unique attribute types of this resource cell.
      *
      * @return the array with unique attribute types
      */
-    public String[] getUniqueAttributes() {	
+    public String[] getUniqueAttributes() {
 	return uniqueAttributes;
-    }   
+    }
     /**
      * Returns the color of the unique attribute types of this resource cell.
      *
@@ -318,7 +319,7 @@ public class ResourceCell
      * @param type the attribute type
      * @param c the color
      */
-    public void setUniqueAttributesColor(String type, Color c) {
+    public void setUniqueAttributesColor(final String type, final Color c) {
 	for(int i = 0; i < uniqueAttributes.length; i++) {
 	    if(uniqueAttributes[i].equals(type)) {
 		uniqueAttributesColor[i] = c;
@@ -328,9 +329,9 @@ public class ResourceCell
     }
     /**
      * Returns the information whether the unique attribute types are visible.
-     * 
      *
-     * @return the array with the information whether the unique attributes 
+     *
+     * @return the array with the information whether the unique attributes
      * are visible. The information is structured in as follow:
      * <ul>
      * <li>org.xml.Converter.IS_VISIBLE_ERROR</li>
@@ -350,9 +351,9 @@ public class ResourceCell
      * @param visible if <code>true</code> the attributes will
      * be set to visible, otherwise <code>false</code>
      */
-    public void setAttributeTypeVisible(String type, boolean visible) {
+    public void setAttributeTypeVisible(final String type, final boolean visible) {
 	if(functionCell != null) {
-	    CellEvent[] allOperationCells = functionCell.getCells();
+	    final CellEvent[] allOperationCells = functionCell.getCells();
 	    for(int i = 0; i < allOperationCells.length; i++) {
 		if(allOperationCells[i].getSource() instanceof OperationCell) {
 		    ((OperationCell)allOperationCells[i].getSource()).setAttributeTypeVisible(type, visible);
@@ -364,14 +365,14 @@ public class ResourceCell
     /**
      * Sets unique operation name of the specified object.
      * <p>
-     * Sets unique operation name for the specified object if it is 
+     * Sets unique operation name for the specified object if it is
      * of an <code>instance</code> of the <code>org.xml.rop.Activity</code>
      * class.
-     * 
+     *
      * @param o the object to give unique operation name
      * @return the object with unique operation name
      */
-    public Object setUniqueNames(Object o) {
+    public Object setUniqueNames(final Object o) {
 	//DEBUG
 	//System.out.println("ResourceCell.setUniqueNames()");
 	//END DEBUG
@@ -387,16 +388,16 @@ public class ResourceCell
 	    return new ResourceCell((ROP)Converter.clone(getFunction()));
 	}else {
 	    return null;
-	}	 
+	}
     }
     /**
      * Returns a copy of this resource cell.
-     * 
+     *
      * @return the copy
      */
     public NestedCell copy() {
 	return clone();
-    }    
+    }
     /**
      * Creates a outer relation around the body of this resource cell.
      */
@@ -406,13 +407,13 @@ public class ResourceCell
 	//END DEBUG
 	if(getROP() != null) {
 	    try {
-		Relation newElement = objectFactory.createRelation();
+		final Relation newElement = objectFactory.createRelation();
 		newElement.setType(RelationType.SEQUENCE);
 		newElement.
 		    getActivityRelationGroup().
 		    add(getROP().getRelation());
 		newBody(newElement);
-	    }catch(Exception ex) {}
+	    }catch(final Exception ex) {}
 	}
     }
     /**
@@ -427,27 +428,27 @@ public class ResourceCell
 	   getActivityRelationGroup().size() == 1 &&
 	   getActivityRelationGroup().get(0) instanceof Relation) {
 	    newBody(getActivityRelationGroup().get(0));
-	}    
+	}
     }
     /**
      * Adds the <code>newElement</code> object into this resource cell's
      * complex function.
      * <p>
-     * The <code>newElement</code> is inserted next to the 
+     * The <code>newElement</code> is inserted next to the
      * <code>oldElement</code>.
-     * 
+     *
      * @param oldElement the object where to insert the added object next to
      * @param newElement the object to be added
      */
-    public void elementAdd(Object oldElement, Object newElement) {
+    public void elementAdd(final Object oldElement, final Object newElement) {
 	if(getROP() != null) {
 	    try {
-		Relation newRelationElement = objectFactory.createRelation();
+		final Relation newRelationElement = objectFactory.createRelation();
 		newRelationElement.setType(RelationType.SEQUENCE);
 		newRelationElement.getActivityRelationGroup().add(oldElement);
 		newRelationElement.getActivityRelationGroup().add(newElement);
 		newBody(newRelationElement);
-	    }catch(Exception ex) {}
+	    }catch(final Exception ex) {}
 	}
     }
     /**
@@ -456,65 +457,65 @@ public class ResourceCell
      *
      * @param element the object to be deleted
      */
-    public void elementDelete(Object element) {
+    public void elementDelete(final Object element) {
 	//DEBUG
 	//System.out.println("ResourceCell.elementDelete()");
 	//END DEBUG
-	Point tmpPos = getPos();
+	final Point tmpPos = getPos();
 	tmpPos.translate(getSize().width/2, getSize().height/2);
 	ROP newROP = null;
 	try {
 	    newROP = objectFactory.createROP();
-	}catch(Exception ex) {}
+	}catch(final Exception ex) {}
 	    if(getROP() != null) {
 		try {
-		    newROP.setType(getROP().getType());    
-		}catch(Exception ex) {
+		    newROP.setType(getROP().getType());
+		}catch(final Exception ex) {
 		    newROP.setType(ROPType.COP);
 		}
 		try {
 		    newROP.setId(getROP().getId());
-		}catch(Exception ex) {
+		}catch(final Exception ex) {
 		    newROP.setId("0");
 		}
 		try {
 		    newROP.setComment(getROP().getComment());
-		}catch(Exception ex) {}
+		}catch(final Exception ex) {}
 		try {
 		    newROP.setMachine(getROP().getMachine());
-		}catch(Exception ex) {
+		}catch(final Exception ex) {
 		    newROP.setMachine("Machine");
 		}
 	    }else {
 		newROP.setType(ROPType.COP);
 		newROP.setId("0");
 		newROP.setMachine("Machine");
-	    }	
+	    }
 	newBody(newROP);
 	tmpPos.translate(-getSize().width/2, -getSize().height/2);
 	setPos(tmpPos);
     }
     /**
-     * Replaces the <code>oldElement</code> object with 
+     * Replaces the <code>oldElement</code> object with
      * the <code>newElement</code> object in this resource cell's
      * complex function.
      *
      * @param oldElement the object that is to be replaced
      * @param newElement the object that is to replace the old object.
      */
-    public void elementReplace(Object oldElement, Object newElement) {
+    public void elementReplace(final Object oldElement, final Object newElement) {
 	newBody(newElement);
     }
     /**
      * Pastes the object to this resource cell's body.
      */
-    public void paste(Object o) {	
+    public void paste(final Object o) {
 	newBody(o);
-    }    
+    }
     /**
      * Invoked when a mouse button has been released on this cell.
      */
-    public void mouseReleased(MouseEvent e) {	
+    public void mouseReleased(final MouseEvent e) {
 	upPack();
 	cellListener.cellReleased(new CellEvent(this, e));
 	if(e.getClickCount() > 1) {
@@ -530,11 +531,11 @@ public class ResourceCell
     /**
      * Displays the resource info window, which allow the user to edit
      * the resource information.
-     */ 
+     */
     public void resourceInfo() {
-	ResourceCellInfoWindow resourceInfo = 
+	final ResourceCellInfoWindow resourceInfo =
 	    new ResourceCellInfoWindow(getROP());
-	int result =  resourceInfo.showDialog();
+	final int result =  resourceInfo.showDialog();
 	removeSelection();
 	if(result == ResourceCellInfoWindow.APPROVE_OPTION) {
 	    rebuild();
@@ -545,7 +546,7 @@ public class ResourceCell
      *
      * @param file the file
      */
-    public void setFile(File file) {
+    public void setFile(final File file) {
     	myFile = file;
     }
     /**

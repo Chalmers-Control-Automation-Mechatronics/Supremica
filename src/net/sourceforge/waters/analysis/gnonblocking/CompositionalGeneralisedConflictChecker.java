@@ -269,18 +269,16 @@ public class CompositionalGeneralisedConflictChecker
           AutomatonProxy abstractedAut = aut;
           final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
           final Set<EventProxy> localEvents = identifyLocalEvents(autAsList);
-          if (localEvents.size() > 0) {
-            try {
-              abstractedAut = hideAndAbstract(aut, localEvents);
+          try {
+            abstractedAut = hideAndAbstract(aut, localEvents);
+            if (abstractedAut != aut) {
               modified = true;
               modifyingSteps.addAll(mTemporaryModifyingSteps);
-            } catch (final OverflowException exception) {
-              // abstractedAut remains aut ...
             }
-            mTemporaryModifyingSteps.clear();
-          } else {
+          } catch (final OverflowException exception) {
             // abstractedAut remains aut ...
           }
+          mTemporaryModifyingSteps.clear();
           remainingAut.add(abstractedAut);
         }
       }
@@ -340,6 +338,7 @@ public class CompositionalGeneralisedConflictChecker
           }
         }
       }
+      // MarshallingTools.saveModule(model, "model.wmod");
       final ConflictChecker checker =
           new NativeConflictChecker(model, getUsedMarkingProposition(),
               getFactory());
@@ -674,6 +673,14 @@ public class CompositionalGeneralisedConflictChecker
       rttonsRule.setAlphaMarking(alpha);
       rttonsRule.setDefaultMarking(omega);
       mAbstractionRules.add(rttonsRule);
+      /*
+      final CanonizeAbstractionRule canonRule =
+          new CanonizeAbstractionRule(factory, translator,
+                                               mPropositions);
+      canonRule.setAlphaMarking(alpha);
+      canonRule.setOmegaMarking(omega);
+      mAbstractionRules.add(canonRule);
+      */
     }
   }
 
@@ -1586,9 +1593,7 @@ public class CompositionalGeneralisedConflictChecker
   {
     protected double getHeuristicValue(final Candidate candidate)
     {
-      final double localEvents = countCandidatesLocalEvents(candidate);
-      final double totalEvents = countCandidatesTotalEvents(candidate);
-      return localEvents / totalEvents;
+      return countCandidatesLocalEvents(candidate);
     }
   }
 

@@ -316,11 +316,13 @@ abstract class JAXBProductDESElementExporter
     for (final AutomatonProxy aut : sorted) {
       mTraceAutomata.checkUnique(aut);
       final StateProxy state = statemap.get(aut);
-      // check whether automaton contains state
-      final TraceState tracestate = mFactory.createTraceState();
-      tracestate.setAutomaton(aut.getName());
-      tracestate.setState(state.getName());
-      outlist.add(tracestate);
+      if (state != null) {
+        // TODO Check whether automaton contains state
+        final TraceState tracestate = mFactory.createTraceState();
+        tracestate.setAutomaton(aut.getName());
+        tracestate.setState(state.getName());
+        outlist.add(tracestate);
+      }
     }
   }
 

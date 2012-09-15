@@ -12,8 +12,8 @@
                     <IntConstant Value="1"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="4"/>
-                    <IntConstant Value="4"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>

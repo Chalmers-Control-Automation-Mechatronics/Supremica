@@ -20,16 +20,16 @@
         <EventDecl Kind="CONTROLLABLE" Name="recv_ch">
             <RangeList>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="2"/>
-                    <IntConstant Value="4"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="rppl_ch">
             <RangeList>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="2"/>
-                    <IntConstant Value="4"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
@@ -524,9 +524,20 @@
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="4"/>
+                                <Point Y="-15" X="11"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_B_state"/>
+                                    <SimpleIdentifier Name="var_B_state"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="4" X="10"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                     <Edge Target="B_3" Source="B_2">
                         <LabelBlock>

@@ -522,6 +522,7 @@
             <jaxb:property name="Propositions"/>
           </xs:appinfo></xs:annotation>
         </xs:element>
+        <xs:element ref="B:AttributeMap" minOccurs="0"/>
       </xs:sequence>
     </xs:extension>
   </xs:complexContent>

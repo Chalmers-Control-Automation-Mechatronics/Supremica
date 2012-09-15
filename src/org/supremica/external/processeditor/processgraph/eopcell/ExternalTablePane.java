@@ -29,149 +29,149 @@ public class ExternalTablePane
 	private static final long serialVersionUID = 1L;
 
 	private ExternalDataEditor editor = null;
-	private List<JComboBox> comboBoxList = null;
-	
-	public ExternalTablePane(ExternalComponents externalComponents){
+	private List<JComboBox<String>> comboBoxList = null;
+
+	public ExternalTablePane(final ExternalComponents externalComponents){
 		super();
 		setHeader("External components state");
-		
-		comboBoxList = new LinkedList<JComboBox>();
-		
+
+		comboBoxList = new LinkedList<JComboBox<String>>();
+
 		jbTableHeader.addActionListener(this);
 		jbTableHeader.addMouseListener(this);
-		
+
 		table.getModel().setRowEditable(0, false);
-		
-		
+
+
 		if(externalComponents == null){
 			return;
 		}
-		
-		for(ExternalComponent extComp : externalComponents.getExternalComponent()){
+
+		for(final ExternalComponent extComp : externalComponents.getExternalComponent()){
 			addExternalComponent(extComp);
 		}
 	}
-	
+
 	public ExternalComponents getExternalComponents(){
 		return EOPTableExtractor.getExternalComponentsFromTable(table);
 	}
-	
-	public void addExternalComponent(ExternalComponent component){
+
+	public void addExternalComponent(final ExternalComponent component){
 		addExternalComponent(component, null);
 	}
-	
-	public void insertActions(List<Action> actionList){
-		for(Action term : actionList){
+
+	public void insertActions(final List<Action> actionList){
+		for(final Action term : actionList){
 			EOPTableFiller.insertExternalConditionFromActionToTable(term, table);
 		}
-		
+
 		//set only initial state editable
 		for(int i = 2; i < table.getRowCount(); i++){
 			table.getModel().setRowEditable(i, false);
 		}
 	}
-	
-	public void addRow(String rowName){
+
+	public void addRow(final String rowName){
 		super.addRow(rowName);
-		
+
 		if(2 > table.getRowCount()){
 			table.getModel().setRowEditable(table.getRowCount()-1, false);
 		}
 	}
-	
-	public void addRow(int rowIndex, String rowName){
+
+	public void addRow(final int rowIndex, final String rowName){
 		super.addRow(rowIndex, rowName);
 		if(2 > table.getRowCount()){
 			table.getModel().setRowEditable(table.getRowCount()-1, false);
 		}
 	}
-	
+
 	public ExternalComponentValue[] getExternalComponentsInitialValue(){
 		return EOPTableExtractor.getExternalComponentsInitialValueFromTable(table);
 	}
-	
-	public void fillExternalComponentsInitialValue(List<ExternalComponentValue> extCompValList){
+
+	public void fillExternalComponentsInitialValue(final List<ExternalComponentValue> extCompValList){
 		EOPTableFiller.insertExternalConditionFromInitialToTable(extCompValList, table);
 	}
-	
-	public void addExternalComponent(ExternalComponent component, String[] values){
+
+	public void addExternalComponent(final ExternalComponent component, final String[] values){
 		addCol( component.getComponent() );
 		table.setValueAt(component.getMachine(), 0, getColumnCount()-1);
-		
+
 		comboBoxList.add(buildComboBox(values));
 		setUpTypeRow();
 	}
-	
-	private JComboBox buildComboBox(String[] values){
-		JComboBox comboBox = null;
+
+	private JComboBox<String> buildComboBox(final String[] values){
+		JComboBox<String> comboBox = null;
 		if(values != null && values.length > 0){
-			comboBox = new JComboBox();
+			comboBox = new JComboBox<String>();
 			for(int i = 0; i < values.length; i++){
 				comboBox.addItem(values[i]);
 			}
 		}
 		return comboBox;
 	}
-	
+
 	private void setUpTypeRow() {
-		int numberOfColumns = table.getColumnCount();
+		final int numberOfColumns = table.getColumnCount();
 		for(int col = 0; col < numberOfColumns; col++){
 			table.getColumnModel().
 				  getColumn( col ).
 				  	setCellEditor( new InternalCellEditor(comboBoxList.get(col)) );
 		}
 	}
-	
-	public void setCellEditor(int col, String[] values){
+
+	public void setCellEditor(final int col, final String[] values){
 		comboBoxList.set(col, buildComboBox(values));
 		setUpTypeRow();
 	}
-	
-	public void removeExternalComponent(ExternalComponent component){
+
+	public void removeExternalComponent(final ExternalComponent component){
 		if(component == null){
 			return;
 		}
 		comboBoxList.remove(table.removeCol(component.getComponent()));
 		setUpTypeRow();
 	}
-	
+
 	/* --- ActionListener --- */
-	public void actionPerformed(ActionEvent e) {
-        Object o = e.getSource();
+	public void actionPerformed(final ActionEvent e) {
+        final Object o = e.getSource();
         if(o == jbTableHeader){
-        	Point pos =  jbTableHeader.getLocationOnScreen();
-        	
+        	final Point pos =  jbTableHeader.getLocationOnScreen();
+
         	editor = new ExternalDataEditor(this);
         	pos.translate( 0, -editor.getHeight()/2 );
-        	
+
         	if(pos.y < 0){
         		pos.translate( 0, editor.getHeight()/2 );
         	}
-        	
-        	editor.setLocation(pos);     	
+
+        	editor.setLocation(pos);
         	editor.setVisible(true);
-        	
+
 		}else{
         	System.err.println("unknown source " + o);
         }
     }
-	
+
 	/* --- MouseListener --- */
-    public void mouseClicked(MouseEvent e){}
-    public void mouseEntered(MouseEvent e){
+    public void mouseClicked(final MouseEvent e){}
+    public void mouseEntered(final MouseEvent e){
     	if(e.getSource().equals(jbTableHeader)){
     		jbTableHeader.setContentAreaFilled(true);
     		jbTableHeader.setBorderPainted(true);
     	}
     }
-    public void mouseExited(MouseEvent e){
+    public void mouseExited(final MouseEvent e){
     	if(e.getSource().equals(jbTableHeader)){
     		jbTableHeader.setContentAreaFilled(false);
     		jbTableHeader.setBorderPainted(false);
     	}
-    } 
-    public void mousePressed(MouseEvent e){}
-    public void mouseReleased(MouseEvent e){}
+    }
+    public void mousePressed(final MouseEvent e){}
+    public void mouseReleased(final MouseEvent e){}
 }
 
 
@@ -183,10 +183,10 @@ class ExternalCellEditor
     private static final long serialVersionUID = 1L;
 
     private int editor = -1;
-	JComboBox validDataComboBox = null;
+	JComboBox<String> validDataComboBox = null;
 	JTextField txtField = null;
 
-	public ExternalCellEditor( JComboBox dataComboBox ){
+	public ExternalCellEditor( final JComboBox<String> dataComboBox ){
 		super(new JTextField());
 
 		validDataComboBox = dataComboBox;
@@ -200,9 +200,9 @@ class ExternalCellEditor
 			return null;
 		}
 
-		int numberOfItems = validDataComboBox.getItemCount();
+		final int numberOfItems = validDataComboBox.getItemCount();
 
-		Object[] os = new Object[numberOfItems];
+		final Object[] os = new Object[numberOfItems];
 		for(int i = 0; i < numberOfItems; i++){
 			os[i] = validDataComboBox.getItemAt(i);
 		}
@@ -210,12 +210,12 @@ class ExternalCellEditor
 	}
 
 	//override in DefaultCellEditor
-	public Component getTableCellEditorComponent(JTable table,
-													Object value,
-													boolean isSelected,
-													int row,
-													int column)
-	{	
+	public Component getTableCellEditorComponent(final JTable table,
+													final Object value,
+													final boolean isSelected,
+													final int row,
+													final int column)
+	{
 		switch(row){
 		case 0:
 			editor = 1;

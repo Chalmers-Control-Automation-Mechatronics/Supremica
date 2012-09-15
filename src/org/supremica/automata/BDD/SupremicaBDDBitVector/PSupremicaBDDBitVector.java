@@ -7,7 +7,7 @@ import net.sf.javabdd.*;
  *
  * @author Sajed
  */
-public class PSupremicaBDDBitVector extends SupremicaBDDBitVector
+public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 {
 
     public PSupremicaBDDBitVector(final BDDFactory factory, final int bitNum)
@@ -88,6 +88,57 @@ public class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         return val;
     }
 
+
+    public BDD getBDDThatResultsMaxValue()
+    {
+        BDD bit = bitvec[0];
+
+        for(int i = 1 ; i < bitvec.length ; i++)
+        {
+            if(bit.isZero())
+            {
+                bit = bitvec[i];
+                continue;
+            }
+
+            if(bit.satCount() == 1)
+                return bit;
+
+            BDD newBDD = bit.and(bitvec[i]);
+            if(!newBDD.isZero())
+                bit = newBDD.id();
+        }
+
+
+        return bit;
+
+    }
+
+    public BDD equ(final SupremicaBDDBitVector r)
+    {
+//        if (this.bitNum != r.bitNum)
+//            throw new BDDException("equ operator: The length of the left-side vector is not equal to the right-side!");
+
+        BDD p = mFactory.one();
+        for (int n=0 ; n< getLargerLength(r); n++)
+        {
+
+            BDD leftBDD = mFactory.zero();
+            BDD rightBDD = mFactory.zero();
+
+            if(n < this.bitNum)
+                leftBDD = bitvec[n];
+
+            if(n < r.bitNum)
+                rightBDD = r.bitvec[n];
+
+            final BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.biimp);
+            final BDD tmp2 = tmp1.and(p);
+            p = tmp2;
+        }
+        return p;
+    }
+
     public ResultOverflows addConsideringOverflows(final SupremicaBDDBitVector that)
     {
 //        if (bitvec.length != that.bitvec.length)
@@ -96,7 +147,7 @@ public class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         BDD c = mFactory.zero();
         PSupremicaBDDBitVector res = buildSupBDDBitVector(getLargerLength(that));
 
-        for (int n = 0; n < res.bitvec.length; n++)
+        for (int n = 0 ; n < res.bitvec.length ; n++)
         {
 
             BDD leftBDD = mFactory.zero();
@@ -113,10 +164,10 @@ public class PSupremicaBDDBitVector extends SupremicaBDDBitVector
             res.bitvec[n].xorWith(c.id());
 
             /* c = (l[n] & r[n]) | (c & (l[n] | r[n])); */
-            final BDD tmp1 = leftBDD.or(rightBDD);
-            tmp1.andWith(c);
-            final BDD tmp2 = leftBDD.and(rightBDD);
-            tmp2.orWith(tmp1);
+            BDD tmp1 = leftBDD.or(rightBDD);
+            tmp1 = tmp1.and(c);
+            BDD tmp2 = leftBDD.and(rightBDD);
+            tmp2 = tmp2.or(tmp1);
             c = tmp2;
         }
 
@@ -125,6 +176,18 @@ public class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         c.free();
 
         return new ResultOverflows(res,overflow);
+    }
+
+    public PSupremicaBDDBitVector addRemoveOverflows(final SupremicaBDDBitVector that)
+    {
+        ResultOverflows resOvfls = addConsideringOverflows(that);
+        PSupremicaBDDBitVector result = (PSupremicaBDDBitVector)resOvfls.getResult();
+        for(int i = 0; i < result.bitNum; i++)
+        {
+            result.bitvec[i] = result.bitvec[i].and(resOvfls.getOverflows().not());
+        }
+
+        return result;
     }
 
     public ResultOverflows subConsideringOverflows(final SupremicaBDDBitVector that)
@@ -167,7 +230,6 @@ public class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 
         c.free();
 
-        //if carryIn and carrtOut on the high order bit are different an overflow has occured
         return new ResultOverflows(res,overflow);
         //return new ResultOverflows(res,highOrderCarryIn.xor(highOrderCarryOut));
     }
@@ -187,7 +249,7 @@ public class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 //        if (this.bitvec.length != r.bitvec.length)
 //            throw new BDDException("lte operator: The length of the left-side vector is not equal to the right-side!");
 
-        BDD p = thanORequal;
+        BDD p = thanORequal.id();
         for (int n=0 ; n<getLargerLength(r) ; n++)
         {
             /* p = (!l[n] & r[n]) |

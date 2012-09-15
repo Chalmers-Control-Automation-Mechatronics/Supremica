@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.HornerPolynomial;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
@@ -128,7 +129,7 @@ public class SpringEmbedder
    * got geometry associated with them, without making any changes to
    * the graph.
    * @return <CODE>true</CODE> if any is missing geometry.
-   *         In this case, a call to {@link #setUpGeometry()} would
+   *         In this case, a call to {@link #setUpNodeGeometry()} would
    *         change the graph.
    * @throws GeometryAbsentException if the graph has more nodes than
    *         specified by the {@link Config#DOT_MAX_NBR_OF_STATES} setting,
@@ -178,7 +179,7 @@ public class SpringEmbedder
    *         cannot be assigned geometry automatically, and therefore the graph
    *         cannot be rendered when this exception is thrown.
    */
-  public boolean setUpGeometry()
+  public boolean setUpNodeGeometry()
     throws GeometryAbsentException
   {
     checkNumberOfStates();
@@ -216,6 +217,14 @@ public class SpringEmbedder
       }
     }
 
+    return runEmbedder;
+  }
+
+  public boolean setUpEdgeGeometry()
+    throws GeometryAbsentException
+  {
+    checkNumberOfStates();
+    final boolean runEmbedder = false;
     for (final EdgeSubject edge : mEdges) {
       // Fixing some broken models---these adjustments should not
       // be needed, but without them many old files would not be
@@ -402,6 +411,11 @@ public class SpringEmbedder
   private void runToConvergence()
   {
     if (!mStop) {
+      try {
+        setUpEdgeGeometry();
+      } catch (final GeometryAbsentException exception) {
+        throw new WatersRuntimeException(exception);
+      }
       int count = 0;
       double limit = CONVERGENCE_CONST;
       for (int i = 1; i < NUM_PASSES; i++) {

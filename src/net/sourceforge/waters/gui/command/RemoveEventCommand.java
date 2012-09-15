@@ -16,12 +16,12 @@ public class RemoveEventCommand
     {
         mList = group;
         mIdentifier = identifier;
-        mPosition = mList.getEventListModifiable().indexOf(mIdentifier);
+        mPosition = mList.getEventIdentifierListModifiable().indexOf(mIdentifier);
     }
 
     public void execute()
     {
-        mList.getEventListModifiable().remove(mIdentifier);
+        mList.getEventIdentifierListModifiable().remove(mIdentifier);
     }
 
     /**
@@ -30,11 +30,11 @@ public class RemoveEventCommand
     public void undo()
     {
         int pos = mPosition;
-        if (pos > mList.getEventListModifiable().size())
+        if (pos > mList.getEventIdentifierListModifiable().size())
         {
-            pos = mList.getEventListModifiable().size();
+            pos = mList.getEventIdentifierListModifiable().size();
         }
-        mList.getEventListModifiable().add(pos, mIdentifier);
+        mList.getEventIdentifierListModifiable().add(pos, mIdentifier);
     }
 
     public void setUpdatesSelection(final boolean update)

@@ -45,6 +45,7 @@ import javax.swing.tree.TreePath;
 
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.RearrangeTreeCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -71,6 +72,7 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
@@ -80,14 +82,16 @@ import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.IdentifiedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 
 /**
- * The Aliases Tree used to view the constant aliases and the event aliases of
- * a module.
+ * The Tree used to view the constant aliases, event aliases, components and
+ * propositions of a module.
  *
  * @author Carly Hona, Robi Malik
  */
@@ -96,15 +100,18 @@ public abstract class ModuleTree
   implements SelectionOwner, Autoscroll, TreeSelectionListener, FocusListener
 {
 
-  public ModuleTree(final ModuleWindowInterface root,
-                    final WatersPopupActionManager manager)
+  public ModuleTree(final ModuleWindowInterface rootWindow,
+                    final WatersPopupActionManager manager,
+                    final ProxySubject root,
+                    final UndoInterface undo)
   {
+    mRootWindow = rootWindow;
     mRoot = root;
-    mModuleContext = mRoot.getModuleContext();
+    mUndoInterface = undo;
+    mModuleContext = mRootWindow.getModuleContext();
     mPrinter = new PrintVisitor();
     mIsPermanentFocusOwner = true;
-    final ModuleSubject module = mRoot.getModuleSubject();
-    mModel = new ModuleTreeModel(module, getRootList());
+    mModel = new ModuleTreeModel(root, getRootList());
     setModel(mModel);
     final MouseListener handler = new ModuleTreeMouseListener();
     addMouseListener(handler);
@@ -141,14 +148,19 @@ public abstract class ModuleTree
     return (ModuleTreeModel) getModel();
   }
 
-  public ModuleWindowInterface getRoot()
+  public ModuleWindowInterface getRootWindow()
+  {
+    return mRootWindow;
+  }
+
+  public ProxySubject getRoot()
   {
     return mRoot;
   }
 
   public FocusTracker getFocusTracker()
   {
-    return mRoot.getRootWindow().getFocusTracker();
+    return mRootWindow.getRootWindow().getFocusTracker();
   }
 
   private boolean isSourceOfDrag(){
@@ -165,6 +177,10 @@ public abstract class ModuleTree
   abstract DataFlavor getSupportedDataFlavor();
 
   abstract PopupFactory getPopupFactory();
+
+  boolean shouldForceCopy(final DataFlavor flavor, final Transferable transferable){
+    return false;
+  }
 
 
   //#######################################################################
@@ -250,7 +266,7 @@ public abstract class ModuleTree
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
   public UndoInterface getUndoInterface(final Action action)
   {
-    return mRoot.getUndoInterface();
+    return mUndoInterface;
   }
 
   public boolean hasNonEmptySelection()
@@ -507,7 +523,7 @@ public abstract class ModuleTree
   public void activate()
   {
     if (!isFocusOwner()) {
-      mRoot.showPanel(this);
+      mRootWindow.showPanel(this);
       requestFocusInWindow();
     }
   }
@@ -630,6 +646,15 @@ public abstract class ModuleTree
       super.setSelectionInterval(index0, index1);
     } else {
       super.clearSelection();
+    }
+  }
+
+  private void executeCommand(final Command command){
+    if(mUndoInterface == null){
+      command.execute();
+    }
+    else{
+      mUndoInterface.executeCommand(command);
     }
   }
 
@@ -853,12 +878,13 @@ public abstract class ModuleTree
           }
           final RearrangeTreeCommand allMoves =
             new RearrangeTreeCommand(inserts, deletes, ModuleTree.this);
-          mRoot.getUndoInterface().executeCommand(allMoves);
+          executeCommand(allMoves);
         }
       }
       mDropList = null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean canImport(final TransferSupport support)
     {
@@ -896,14 +922,26 @@ public abstract class ModuleTree
         final DataFlavor acceptingFlavor =
           mAcceptTransferableVisitor.getFlavorIfDropAllowed(parent,
                                                             transferable);
-        if (acceptingFlavor == WatersDataFlavor.IDENTIFIER
-            && transferable
-              .isDataFlavorSupported(WatersDataFlavor.EVENT_ALIAS)) {
+        if (acceptingFlavor == null) {
+          return false;
+        }
+        if (shouldForceCopy(acceptingFlavor, transferable)) {
           support.setDropAction(COPY);
         }
-        if (acceptingFlavor != null) {
-          return true;
+        if(parent instanceof NodeSubject){
+          try {
+            final List<Proxy> result = (List<Proxy>) transferable.getTransferData(WatersDataFlavor.IDENTIFIER);
+            final ModuleContext context =  mRootWindow.getModuleContext();
+            if(!context.canDropOnNode(result)){
+              return false;
+            }
+          } catch (final UnsupportedFlavorException exception) {
+            throw new WatersRuntimeException(exception);
+          } catch (final IOException exception) {
+            throw new WatersRuntimeException(exception);
+          }
         }
+        return true;
       }
       return false;
     }
@@ -933,8 +971,9 @@ public abstract class ModuleTree
               getInsertInfo(transferable, flavor, mDropList, parentOfDropLoc,
                             mDropIndex);
             final InsertCommand allCopies =
-              new InsertCommand(inserts, ModuleTree.this, mRoot);
-            mRoot.getUndoInterface().executeCommand(allCopies);
+              new InsertCommand(inserts, ModuleTree.this, mRootWindow);
+            executeCommand(allCopies);
+
           } catch (final IOException exception) {
             throw new WatersRuntimeException(exception);
           } catch (final UnsupportedFlavorException exception) {
@@ -1017,7 +1056,7 @@ public abstract class ModuleTree
       final EventAliasSubject event = (EventAliasSubject) alias;
       final EventListExpressionSubject exp =
         (EventListExpressionSubject) event.getExpression();
-      return modifyList(exp.getEventListModifiable());
+      return modifyList(exp.getEventIdentifierListModifiable());
     }
 
     @SuppressWarnings("unchecked")
@@ -1076,8 +1115,15 @@ public abstract class ModuleTree
       final ParameterBindingSubject event = (ParameterBindingSubject) binding;
       final EventListExpressionSubject exp =
         (EventListExpressionSubject) event.getExpression();
-      return modifyList(exp.getEventListModifiable());
+      return modifyList(exp.getEventIdentifierListModifiable());
     }
+
+    public List<Proxy> visitSimpleNodeProxy(final SimpleNodeProxy node){
+      final SimpleNodeSubject sub = (SimpleNodeSubject)node;
+      final PlainEventListSubject list = sub.getPropositions();
+      return modifyList(list.getEventIdentifierListModifiable());
+    }
+
 
     private Transferable mTransferable;
     private DataFlavor mFlavor;
@@ -1147,7 +1193,7 @@ public abstract class ModuleTree
       final EventAliasSubject event = (EventAliasSubject) alias;
       final ExpressionProxy exp = event.getExpression();
       if (exp instanceof EventListExpressionProxy) {
-        if (!isInList(((EventListExpressionProxy) exp).getEventList())) {
+        if (!isInList(((EventListExpressionProxy) exp).getEventIdentifierList())) {
           return WatersDataFlavor.IDENTIFIER;
         }
       }
@@ -1188,12 +1234,17 @@ public abstract class ModuleTree
       EventListExpressionProxy list;
       if (exp instanceof EventListExpressionProxy) {
         list = (EventListExpressionProxy) exp;
-        if (!isInList(list.getEventList())
+        if (!isInList(list.getEventIdentifierList())
             && !(exp instanceof SimpleExpressionProxy)) {
           return WatersDataFlavor.IDENTIFIER;
         }
       }
       return null;
+    }
+
+    public DataFlavor visitSimpleNodeProxy(final SimpleNodeProxy node){
+
+      return WatersDataFlavor.IDENTIFIER;
     }
 
     private Transferable mTransferable;
@@ -1311,7 +1362,8 @@ public abstract class ModuleTree
   //#########################################################################
   //# Data Members
   private final ModuleTreeModel mModel;
-  private final ModuleWindowInterface mRoot;
+  private final ModuleWindowInterface mRootWindow;
+  private final UndoInterface mUndoInterface;
   private List<Observer> mObservers;
   private final ModuleContext mModuleContext;
   private final PrintVisitor mPrinter;
@@ -1319,6 +1371,7 @@ public abstract class ModuleTree
   private final DoubleClickVisitor mDoubleClickVisitor;
   private final AcceptTransferableVisitor mAcceptTransferableVisitor;
   private final GetListVisitor mListVisitor;
+  private final ProxySubject mRoot;
 
   //#########################################################################
   //# Class Constants

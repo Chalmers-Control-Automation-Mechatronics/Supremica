@@ -5,13 +5,14 @@
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="exch_ch">
             <RangeList>
-                <EnumSetExpression Text="[DATA,FV]">
+                <EnumSetExpression Text="[DATA,FV,:undefined]">
                     <SimpleIdentifier Name="DATA"/>
                     <SimpleIdentifier Name="FV"/>
+                    <SimpleIdentifier Name=":undefined"/>
                 </EnumSetExpression>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
-                    <IntConstant Value="1"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>

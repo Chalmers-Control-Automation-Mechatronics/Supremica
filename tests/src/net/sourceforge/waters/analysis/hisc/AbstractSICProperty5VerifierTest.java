@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
@@ -293,7 +293,7 @@ public abstract class AbstractSICProperty5VerifierTest
 
       // tests that in the end state of the trace all interfaces have the answer
       // in question enabled
-      if (HISCAttributes.isInterface(aut.getAttributes())) {
+      if (HISCAttributeFactory.isInterface(aut.getAttributes())) {
         boolean answerEnabled = false;
         final Collection<TransitionProxy> transitions = aut.getTransitions();
         for (final TransitionProxy transition : transitions) {
@@ -380,8 +380,8 @@ public abstract class AbstractSICProperty5VerifierTest
     for (final EventProxy event : events) {
       if (event != answer) {
         final Map<String,String> attribs = event.getAttributes();
-        if (HISCAttributes.getEventType(attribs) !=
-            HISCAttributes.EventType.DEFAULT) {
+        if (HISCAttributeFactory.getEventType(attribs) !=
+            HISCAttributeFactory.EventType.DEFAULT) {
           disabledevents.add(event);
         }
       }

@@ -342,7 +342,7 @@ public class ProxyShapeProducer
       }
       final int lx = (int) Math.round(x) + 1;
 
-      createListShape(block.getEventList(), lx, y, 0);
+      createListShape(block.getEventIdentifierList(), lx, y, 0);
 
       mHeight += 4;
       mWidth += 3;

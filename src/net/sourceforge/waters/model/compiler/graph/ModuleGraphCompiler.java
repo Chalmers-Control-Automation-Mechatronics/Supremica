@@ -151,7 +151,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     (final EventListExpressionProxy elist)
     throws VisitorException
   {
-    final List<Proxy> list = elist.getEventList();
+    final List<Proxy> list = elist.getEventIdentifierList();
     visitCollection(list);
     return null;
   }

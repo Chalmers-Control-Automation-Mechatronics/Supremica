@@ -173,8 +173,8 @@ class ChildNodeSetSubject
   //# Interface net.sourceforge.waters.subject.base.SetSubject
   public void assignFrom(final Set<? extends NodeSubject> set)
   {
-    throw new UnsupportedOperationException
-      ("Child node set assignment not yet implemented!");
+    mProxySet.retainAll(set);
+    mProxySet.addAll(set);
   }
 
 

@@ -28,7 +28,6 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -52,7 +51,7 @@ public class Canonize
   }
 
   public ListBufferTransitionRelation run(final ProductDESProxyFactory factory)
-    throws OverflowException, AnalysisException
+    throws AnalysisException
   {
     final ListBufferTauLoopRemoval lbtr = new ListBufferTauLoopRemoval(mAutomaton);
     lbtr.run();
@@ -67,7 +66,7 @@ public class Canonize
     //System.out.println("alphas:" + Arrays.toString(alphas.toArray()));
     Determinizer determinizer = new Determinizer(mAutomaton, mEncoding,
                                                  mMarking);
-    determinizer.setNodeLimit(40000);
+    determinizer.setNodeLimit(100000);
     determinizer.run(alphas.toArray());
     //System.out.println("det");
     final ListBufferTransitionRelation lower = determinizer.getAutomaton();
@@ -124,7 +123,7 @@ public class Canonize
     //System.out.println("aut: " + mAutomaton.createAutomaton(factory, mEncoding));
     determinizer = new Determinizer(mAutomaton, mEncoding,
                                     mAlpha);
-    determinizer.setNodeLimit(10000);
+    determinizer.setNodeLimit(100000);
     determinizer.run();
     final ListBufferTransitionRelation upper = determinizer.getAutomaton();
     //System.out.println("upper: " + upper.createAutomaton(factory, mEncoding));
@@ -137,9 +136,10 @@ public class Canonize
     }
     final TObjectIntHashMap<TIntHashSet> statesets = determinizer.getSetStateMap();
     final THashMap<TIntHashSet, TIntArrayList> alphaset = new THashMap<TIntHashSet, TIntArrayList>();
-    final LessMarked lm = new LessMarked(lower, mMarking, new TIntHashSet());
+    final LessMarkedFullCache lm = new LessMarkedFullCache(lower, mMarking, new TIntHashSet());
     final TIntArrayList nonAlphas = new TIntArrayList();
     lower.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    System.out.println("subsumption");
     statesets.forEachEntry(new TObjectIntProcedure<TIntHashSet>(){
       public boolean execute(final TIntHashSet set, final int state) {
         final int[] arr = set.toArray(); //System.out.println(Arrays.toString(alphas.toArray()));
@@ -192,6 +192,8 @@ public class Canonize
         return true;
       }
     });
+    lm.outputstats();
+    System.out.println("finished subsumption");
     final List<int[]> partitions2 = new ArrayList<int[]>();
     if (!nonAlphas.isEmpty()) {partitions2.add(nonAlphas.toNativeArray());}
     alphaset.forEachValue(new TObjectProcedure<TIntArrayList>() {
@@ -254,6 +256,7 @@ public class Canonize
     for (int s = 0; s < lowerstates; s++) {
       final TransitionIterator ti = lower.createSuccessorsReadOnlyIterator(s);
       canon.setReachable(s + upperstates, true);
+      canon.setInitial(s + upperstates, false);
       if (lower.isMarked(s, mMarking)) {
         canon.setMarked(s + upperstates, mMarking, true);
       }
@@ -286,7 +289,7 @@ public class Canonize
       }
     });
     final int[] alphaarr = alphas.toArray();
-    //System.out.println("glue to upper");
+    //Systemc.out.println("glue to upper");
     for (int i = 0; i < alphaarr.length; i++) {
       final int state = alphaarr[i];
       //System.out.println("state: " + state + "lowerstates: " + lowerstates);
@@ -295,6 +298,9 @@ public class Canonize
       //System.out.println((lowerstates + upperstates + state) + " " + (state + upperstates));
       canon.addTransition(lowerstates + upperstates + state, mCont, //EventEncoding.TAU,
                           state + upperstates);
+    }
+    for (int s = 0; s < lowerstates; s++) {
+      canon.setInitial(s + upperstates, false);
     }
     //System.out.println("end canon");
     //System.out.println("canon before: " + canon.createAutomaton(factory, mEncoding));

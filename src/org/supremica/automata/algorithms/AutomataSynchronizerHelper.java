@@ -1033,7 +1033,8 @@ public class AutomataSynchronizerHelper
         }
         */
         final PlainEventListProxy list = mFactory.createPlainEventListProxy(idents);
-        return mFactory.createSimpleNodeProxy(name, list, initial, null, null, null);
+        return mFactory.createSimpleNodeProxy(name, list, null,
+                                              initial, null, null, null);
     }
 
     public SimpleIdentifierProxy importEvent(final EventProxy event)

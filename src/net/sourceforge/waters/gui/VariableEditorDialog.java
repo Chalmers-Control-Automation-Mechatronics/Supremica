@@ -176,7 +176,10 @@ public class VariableEditorDialog
       new ComponentNameInputParser(oldname, context, parser);
     mNameInput = new SimpleExpressionCell(oldname, nameparser);
     mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Enter variable name, e.g., x or v[i]");
+    mNameInput.setToolTipText("Enter variable name, e.g., x or v[i]. "
+                              + "A variable name started by 'clock:' will be "
+                              + "treated as clock, i.e., the value of the variable "
+                              + "will implicitly be increased at locations.");
     mNameInput.setAllowNull(false);
     mTypeLabel = new JLabel("Type:");
     mTypeInput = new SimpleExpressionCell

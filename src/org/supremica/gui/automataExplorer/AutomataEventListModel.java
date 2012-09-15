@@ -56,26 +56,26 @@ import org.supremica.automata.Automata;
 import org.supremica.log.*;
 
 public class AutomataEventListModel
-        extends AbstractListModel
+        extends AbstractListModel<Object>
 {
  	private static final long serialVersionUID = 1L;
 
 	private static Logger logger = LoggerFactory.createLogger(AutomataEventListModel.class);
-    
+
     private int[] currState;
-    
+
     // / private ArrayList currArcs = new ArrayList();
     private int[] events;
     private int eventAmount = 0;
-    private boolean forward;
-    private Automata theAutomata;
+    private final boolean forward;
+    private final Automata theAutomata;
     @SuppressWarnings("unused")
-	private Alphabet theAlphabet;
+	private final Alphabet theAlphabet;
     @SuppressWarnings("unused")
 	private boolean showState = false;
-    private AutomataSynchronizerHelper helper;
-    
-    public AutomataEventListModel(AutomataSynchronizerHelper helper, boolean forward)
+    private final AutomataSynchronizerHelper helper;
+
+    public AutomataEventListModel(final AutomataSynchronizerHelper helper, final boolean forward)
     {
         this.forward = forward;
         this.helper = helper;
@@ -83,23 +83,23 @@ public class AutomataEventListModel
         //this.theAlphabet = helper.getAutomaton().getAlphabet();
         this.theAlphabet = theAutomata.getUnionAlphabet();
     }
-    
-    public void setCurrState(int[] currState)
+
+    public void setCurrState(final int[] currState)
     {
         this.currState = currState;
-        
+
         update();
     }
-    
-    public void setShowStateId(boolean showState)
+
+    public void setShowStateId(final boolean showState)
     {
         this.showState = showState;
     }
-    
+
     public void update()
     {
-        AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
-        
+        final AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
+
         if (forward)
         {
             events = onlineSynchronizer.getOutgoingEvents(currState);
@@ -108,16 +108,16 @@ public class AutomataEventListModel
         {
             events = onlineSynchronizer.getIncomingEvents(currState);
         }
-        
+
         eventAmount = 0;
-        
+
         while (events[eventAmount] != Integer.MAX_VALUE)
         {
             eventAmount++;
         }
-        
+
         fireContentsChanged(this, 0, eventAmount - 1);
-        
+
         /*
          *  Iterator arcIt;
          *  if (forward)
@@ -137,38 +137,38 @@ public class AutomataEventListModel
          *  fireContentsChanged(this, 0, currArcs.size() - 1);
          */
     }
-    
+
     public int getSize()
     {
         return eventAmount;
     }
-    
-    public Object getElementAt(int index)
+
+    public Object getElementAt(final int index)
     {
         org.supremica.automata.LabeledEvent currEvent;
-        
+
         try
         {
             currEvent = helper.getIndexMap().getEventAt(events[index]);
             //currEvent = theAlphabet.getEventWithIndex(events[index]);
         }
-        catch (Exception e)
+        catch (final Exception e)
         {
             logger.error(e);
             //System.err.println("Error: Could not find event in alphabet!\n");
-            
+
             return null;
         }
-        
-        StringBuffer responseString = new StringBuffer();
-        
+
+        final StringBuffer responseString = new StringBuffer();
+
         if (!currEvent.isControllable())
         {
             responseString.append("!");
         }
-        
+
         responseString.append(currEvent.getLabel());
-        
+
                 /*
                  *  if (showState)
                  *  {
@@ -186,14 +186,14 @@ public class AutomataEventListModel
                  */
         return responseString.toString();
     }
-    
-    public int[] getStateAt(int[] currState, int index)
+
+    public int[] getStateAt(final int[] currState, final int index)
     {
         //AutomataOnlineSynchronizer onlineSynchronizer = helper.getCoExecuter();
-        AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
-        
+        final AutomataSynchronizerExecuter onlineSynchronizer = helper.getCoExecuter();
+
         return onlineSynchronizer.doTransition(currState, events[index]);
-        
+
                 /*
                  *  Arc currArc = (Arc)currArcs.get(index);
                  *  State newState;

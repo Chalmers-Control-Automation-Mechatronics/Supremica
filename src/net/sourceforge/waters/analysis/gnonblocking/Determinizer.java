@@ -37,7 +37,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  */
 
 @Deprecated
-class Determinizer
+public class Determinizer
 {
 
   //#########################################################################

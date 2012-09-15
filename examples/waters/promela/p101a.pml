@@ -7,12 +7,15 @@ proctype A()
 	name!msgtype(124);
 	name!msgtype(121)
 }
+
 proctype B()
 {	
-        hidden byte state;
-	name?msgtype(state)
+  hidden byte state;
+  name?msgtype(state)
 }
+
 init
-{	run A();
-        run B()
+{
+  run A();
+  run B()
 }

@@ -20,12 +20,12 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,8 +39,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -54,10 +53,14 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
-import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.gui.util.NonTypingTable;
-import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
+import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
+import org.supremica.automata.BDD.EFA.TimeInvariantAttributeFactory;
+
+import org.supremica.properties.Config;
 
 
 /**
@@ -69,7 +72,7 @@ import net.sourceforge.waters.model.base.Proxy;
  * @author Robi Malik
  */
 
-class AttributesPanel extends RaisedDialogPanel
+class AttributesPanel extends JPanel
 {
 
   //#########################################################################
@@ -83,16 +86,7 @@ class AttributesPanel extends RaisedDialogPanel
 
   AttributesPanel(final Class<? extends Proxy> clazz)
   {
-    mAttributeValues = new TreeMap<String,List<String>>();
-    try {
-      for (final String attrib : HISCAttributes.getApplicableKeys(clazz)) {
-        final List<String> values = HISCAttributes.getApplicableValues(attrib);
-        mAttributeValues.put(attrib, values);
-      }
-    } catch (final NoClassDefFoundError error) {
-      // No attributes --- no problem.
-    }
-
+    mAttributeValues = getAttributeInfo(clazz);
     final DefaultTableModel model = new DefaultTableModel(COLUMNS, 0);
     mTable = new NonTypingTable(model);
     mTable.setTableHeader(null);
@@ -107,9 +101,9 @@ class AttributesPanel extends RaisedDialogPanel
     mTable.setPreferredScrollableViewportSize(prefsize);
     mTable.setRowSelectionAllowed(true);
     mTable.addEscapeAction();
-    final TableCellEditor editor = new AttributeEditor();
-    mTable.setDefaultEditor(Object.class, editor);
-    mTable.setDefaultEditor(String.class, editor);
+    mEditor = new AttributeEditor();
+    mTable.setDefaultEditor(Object.class, mEditor);
+    mTable.setDefaultEditor(String.class, mEditor);
     final ListSelectionModel selmodel = mTable.getSelectionModel();
     selmodel.addListSelectionListener(new ListSelectionListener() {
       public void valueChanged(final ListSelectionEvent event)
@@ -139,18 +133,10 @@ class AttributesPanel extends RaisedDialogPanel
     constraints.insets = INSETS;
     constraints.gridx = 0;
     constraints.gridy = 0;
-    constraints.gridwidth = 1;
-    constraints.weighty = 1.0;
-    // Label
-    constraints.weightx = 0.0;
-    constraints.gridheight = 2;
-    constraints.anchor = GridBagConstraints.NORTHWEST;
-    final JLabel label = new JLabel("Attributes:");
-    layout.setConstraints(label, constraints);
-    add(label);
-    // Table
-    constraints.gridx++;
     constraints.weightx = 1.0;
+    constraints.weighty = 1.0;
+    constraints.gridheight = 4;
+    constraints.anchor = GridBagConstraints.NORTHWEST;
     constraints.fill = GridBagConstraints.BOTH;
     final JScrollPane scrolled = new JScrollPane(mTable);
     final Border border = BorderFactory.createLoweredBevelBorder();
@@ -160,10 +146,14 @@ class AttributesPanel extends RaisedDialogPanel
     // List control buttons
     constraints.gridx++;
     constraints.weightx = 0.0;
+    constraints.weighty = 1.0;
     constraints.gridheight = 1;
+    constraints.anchor = GridBagConstraints.SOUTHWEST;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mAddButton, constraints);
     add(mAddButton);
     constraints.gridy++;
+    constraints.anchor = GridBagConstraints.NORTHWEST;
     layout.setConstraints(mRemoveButton, constraints);
     add(mRemoveButton);
   }
@@ -173,6 +163,8 @@ class AttributesPanel extends RaisedDialogPanel
   //# Simple Access
   Map<String,String> getTableData()
   {
+    mEditor.stopCellEditing();
+    removeEmptyRows();
     final Map<String,String> map = new TreeMap<String,String>();
     final TableModel model = mTable.getModel();
     final int rows = model.getRowCount();
@@ -188,15 +180,26 @@ class AttributesPanel extends RaisedDialogPanel
   {
     final int size = attribs.size();
     final String[][] data = new String[size][2];
-    final int row = 0;
+    int row = 0;
     for (final Map.Entry<String,String> entry : attribs.entrySet()) {
       data[row][0] = entry.getKey();
       data[row][1] = entry.getValue();
+      row++;
     }
     final DefaultTableModel model = (DefaultTableModel) mTable.getModel();
     model.setDataVector(data, COLUMNS);
   }
 
+  void removeEmptyRows(){
+    final DefaultTableModel model = (DefaultTableModel) mTable.getModel();
+    final int rows = model.getRowCount();
+    for(int r = rows-1; r >= 0; r--){
+      final String value = (String) model.getValueAt(r, 0);
+      if(value.equals("")){
+        model.removeRow(r);;
+      }
+    }
+  }
 
   //#########################################################################
   //# Configuration
@@ -367,7 +370,7 @@ class AttributesPanel extends RaisedDialogPanel
       addAttribute();
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
 
@@ -409,27 +412,25 @@ class AttributesPanel extends RaisedDialogPanel
   //# Inner Class AttributeEditor
   private class AttributeEditor
     extends DefaultCellEditor
-    implements FocusListener
   {
 
     //#######################################################################
     //# Constructors
     private AttributeEditor()
     {
-      super(new JComboBox());
-      final JComboBox combo = getComboBox();
+      super(new JComboBox<String>());
+      final JComboBox<String> combo = getComboBox();
       combo.setEditable(true);
-      final JTextField textfield = getTextField();
-      textfield.addFocusListener(this);
     }
 
     //#######################################################################
     //# Overrides for base class javax.swing.DefaultCellEditor
-    public JComboBox getTableCellEditorComponent
+    public JComboBox<String> getTableCellEditorComponent
       (final JTable table, final Object value, final boolean isSelected,
        final int row, final int column)
     {
-      final JComboBox combo = (JComboBox) super.getTableCellEditorComponent
+      @SuppressWarnings("unchecked")
+      final JComboBox<String> combo = (JComboBox<String>) super.getTableCellEditorComponent
                                       (table, value, isSelected, row, column);
       final Collection<String> completions;
       switch (column) {
@@ -446,10 +447,14 @@ class AttributesPanel extends RaisedDialogPanel
           ("Unknown column " + column + " in attribute table!");
       }
       final String text = value.toString();
-      final DefaultComboBoxModel model =
-        completions == null ?
-        new DefaultComboBoxModel() :
-        new DefaultComboBoxModel(completions.toArray());
+      final DefaultComboBoxModel<String> model;
+      if(completions == null){
+        model = new DefaultComboBoxModel<String>();
+      }
+      else{
+        final String[] array = new String[completions.size()];
+        model = new DefaultComboBoxModel<String>(array);
+      }
       model.setSelectedItem(text);
       combo.setModel(model);
       return combo;
@@ -461,50 +466,17 @@ class AttributesPanel extends RaisedDialogPanel
       return textfield.getText();
     }
 
-    //#########################################################################
-    //# Interface java.awt.event.FocusListener
-    /**
-     * Does nothing.
-     */
-    public void focusGained(final FocusEvent event)
-    {
-    }
-
-    /**
-     * Fixes a bug in Swing.
-     * Called when the editor component loses focus,
-     * this handler makes sure that every non-temporary loss of focus
-     * causes editing to stop.
-     */
-    public void focusLost(final FocusEvent event)
-    {
-      if (!event.isTemporary()) {
-        // ???
-        // When the focus is transferred within the table, the opposite
-        // component is mAddButton, which does not have request focus enabled.
-        // When the focus is transferred outside the table, the opposite
-        // component is some editable component with request focus enabled.
-        // Only in the latter case, we need to stop editing in the table.
-        final Component opposite = event.getOppositeComponent();
-        if (opposite instanceof JComponent) {
-          final JComponent jopposite = (JComponent) opposite;
-          if (jopposite.isRequestFocusEnabled()); {
-            stopCellEditing();
-          }
-        }
-      }
-    }
-
     //#######################################################################
     //# Auxiliary Methods
-    private JComboBox getComboBox()
+    @SuppressWarnings("unchecked")
+    private JComboBox<String> getComboBox()
     {
-      return (JComboBox) getComponent();
+      return (JComboBox<String>) getComponent();
     }
 
     private JTextField getTextField()
     {
-      final JComboBox combo = getComboBox();
+      final JComboBox<String> combo = getComboBox();
       final ComboBoxEditor editor = combo.getEditor();
       return (JTextField) editor.getEditorComponent();
     }
@@ -517,9 +489,52 @@ class AttributesPanel extends RaisedDialogPanel
 
 
   //#########################################################################
-  //# Data Members
-  private final Map<String,List<String>> mAttributeValues;
+  //# Attribute Maps
+  private static class AttributeInfo extends TreeMap<String,List<String>>
+  {
+    private static final long serialVersionUID = 1L;
+  }
 
+  private static final List<AttributeFactory>
+    ATTRIBUTE_FACTORIES = new LinkedList<AttributeFactory>();
+  private static final Map<Class<? extends Proxy>,AttributeInfo>
+    ATTRIBUTE_INFO_MAP = new HashMap<Class<? extends Proxy>,AttributeInfo>();
+
+  static {
+    //=======================================================================
+    // Register Attribute Factories
+    if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
+      ATTRIBUTE_FACTORIES.add(HISCAttributeFactory.getInstance());
+    }
+
+    // A condition could be added to check if the model contains any clocks
+    ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());
+    ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());
+    //=======================================================================
+  }
+
+  private static AttributeInfo getAttributeInfo
+    (final Class<? extends Proxy> iface)
+  {
+    AttributeInfo info = ATTRIBUTE_INFO_MAP.get(iface);
+    if (info == null) {
+      info = new AttributeInfo();
+      for (final AttributeFactory factory : ATTRIBUTE_FACTORIES) {
+        for (final String attrib : factory.getApplicableKeys(iface)) {
+          final List<String> values = factory.getApplicableValues(attrib);
+          info.put(attrib, values);
+        }
+      }
+      ATTRIBUTE_INFO_MAP.put(iface, info);
+    }
+    return info;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final AttributeInfo mAttributeValues;
+  private final TableCellEditor mEditor;
   private final NonTypingTable mTable;
   private final JButton mAddButton;
   private final JButton mRemoveButton;
@@ -528,11 +543,14 @@ class AttributesPanel extends RaisedDialogPanel
   private final Action mRemoveAction;
 
 
+
+
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
 
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
+  public static final String LABEL_NAME = "Attributes:";
   private static final String[] COLUMNS = {"Key", "Value"};
   private static final String[] EMPTY_ROW = {"", ""};
 

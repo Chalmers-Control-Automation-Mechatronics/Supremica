@@ -2,8 +2,6 @@
  * A test for the Promela importer in Waters.
  * This checks whether a channel of enumerative type can be combined with
  * multiple senders and recipients.
- * 
- * This one fails with an error
  */
 
 mtype { TRUE, FALSE }

@@ -21,6 +21,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
+import net.sourceforge.waters.gui.renderer.PrintRenderingContext;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
@@ -78,7 +79,7 @@ public class GraphSaveEPSAction
         // JAR URL---no file---no preselection of directory.
       }
       final GraphProxy graph = surface.getDrawnGraph();
-      final ProxyShapeProducer shaper = surface.getShapeProducer();
+      final ProxyShapeProducer shaper = new ProxyShapeProducer(graph, new PrintRenderingContext(surface.getModuleContext()));
       final EPSGraphPrinter printer = new EPSGraphPrinter(graph, shaper, file);
       try {
         printer.print();

@@ -363,6 +363,7 @@ public class ModuleProxyCloner
     final PlainEventListProxy propositions0 = proxy.getPropositions();
     final PlainEventListProxy propositions =
       visitPlainEventListProxy(propositions0);
+    final Map<String,String> attributes = proxy.getAttributes();
     final Collection<NodeProxy> immediateChildNodes0 =
       proxy.getImmediateChildNodes();
     final Collection<NodeProxy> immediateChildNodes =
@@ -372,6 +373,7 @@ public class ModuleProxyCloner
       geometry0 == null ? null : visitBoxGeometryProxy(geometry0);
     return mFactory.createGroupNodeProxy(name,
                                          propositions,
+                                         attributes,
                                          immediateChildNodes,
                                          geometry);
   }
@@ -459,12 +461,14 @@ public class ModuleProxyCloner
     (final LabelBlockProxy proxy)
     throws VisitorException
   {
-    final Collection<Proxy> eventList0 = proxy.getEventList();
-    final Collection<Proxy> eventList = cloneProxyCollection(eventList0);
+    final Collection<Proxy> eventIdentifierList0 =
+      proxy.getEventIdentifierList();
+    final Collection<Proxy> eventIdentifierList =
+      cloneProxyCollection(eventIdentifierList0);
     final LabelGeometryProxy geometry0 = proxy.getGeometry();
     final LabelGeometryProxy geometry =
       geometry0 == null ? null : visitLabelGeometryProxy(geometry0);
-    return mFactory.createLabelBlockProxy(eventList,
+    return mFactory.createLabelBlockProxy(eventIdentifierList,
                                           geometry);
   }
 
@@ -549,9 +553,11 @@ public class ModuleProxyCloner
     (final PlainEventListProxy proxy)
     throws VisitorException
   {
-    final Collection<Proxy> eventList0 = proxy.getEventList();
-    final Collection<Proxy> eventList = cloneProxyCollection(eventList0);
-    return mFactory.createPlainEventListProxy(eventList);
+    final Collection<Proxy> eventIdentifierList0 =
+      proxy.getEventIdentifierList();
+    final Collection<Proxy> eventIdentifierList =
+      cloneProxyCollection(eventIdentifierList0);
+    return mFactory.createPlainEventListProxy(eventIdentifierList);
   }
 
   @Override
@@ -634,6 +640,7 @@ public class ModuleProxyCloner
     final PlainEventListProxy propositions0 = proxy.getPropositions();
     final PlainEventListProxy propositions =
       visitPlainEventListProxy(propositions0);
+    final Map<String,String> attributes = proxy.getAttributes();
     final boolean initial = proxy.isInitial();
     final PointGeometryProxy pointGeometry0 = proxy.getPointGeometry();
     final PointGeometryProxy pointGeometry =
@@ -647,6 +654,7 @@ public class ModuleProxyCloner
       labelGeometry0 == null ? null : visitLabelGeometryProxy(labelGeometry0);
     return mFactory.createSimpleNodeProxy(name,
                                           propositions,
+                                          attributes,
                                           initial,
                                           pointGeometry,
                                           initialArrowGeometry,

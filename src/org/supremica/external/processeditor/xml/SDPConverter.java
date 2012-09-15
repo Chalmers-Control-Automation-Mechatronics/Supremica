@@ -26,8 +26,8 @@ public class SDPConverter {
     public int[] attributeColumns =     {13,18,19,5,4}; //Could be replaced by a 
                                                 //Matrix to support several sheets   
     public List componentList = new List();
-    public DefaultListModel xmlConverterListModel = new DefaultListModel();
-    public JList xmlConverterList = new JList(xmlConverterListModel); 
+    public DefaultListModel<FileConverter> xmlConverterListModel = new DefaultListModel<FileConverter>();
+    public JList<FileConverter> xmlConverterList = new JList<FileConverter>(xmlConverterListModel); 
     public List addedOperations = new List(); 
 
     public ListOfComponentTypes knownItemsList = new ListOfComponentTypes();
@@ -73,10 +73,10 @@ public class SDPConverter {
 		    }else{
 			String component = componentInterpreter(description,resource);
 			xmlConverterListModel.addElement(fc.newInstance());	       
-			((FileConverter)xmlConverterListModel.lastElement()).
+			xmlConverterListModel.lastElement().
 			    newResource(component,resourceID+"" );
 			resourceID++;
-			((FileConverter)xmlConverterListModel.lastElement()).
+			xmlConverterListModel.lastElement().
 			    newRelation("Sequence");		      
 			componentList.add(component);	  
 			createOperation(componentList.getItemCount()-1,
@@ -98,7 +98,7 @@ public class SDPConverter {
 			   (currentRow,seqstepCol)).getString();
 	 String links = ((Cell)worksheet.getCell
 			   (currentRow,linksCol)).getString()+"";	 
-	 ((FileConverter)xmlConverterListModel.get(index)).newOperation(seqStep);
+	 xmlConverterListModel.get(index).newOperation(seqStep);
 	 addedOperations.add(seqStep+"@"+component);
 
 	 String opInfo = seqStep+" ";
@@ -109,11 +109,11 @@ public class SDPConverter {
 		    {
 			opInfo = opInfo+attribute.replace(' ', '_')+"@"+attributeHeaders[i]+" ";
 			if(attributeHeaders[i].toLowerCase().equals("description")) {
-			    ((FileConverter)xmlConverterListModel.get(index)).
+			    xmlConverterListModel.get(index).
 				addDescription(attribute);			    			    
 			}else {
 			    //opInfo = opInfo+attribute+"@"+attributeHeaders[i]+" ";
-			    ((FileConverter)xmlConverterListModel.get(index)).
+			    xmlConverterListModel.get(index).
 				addAttribute(attribute+"@"+attributeHeaders[i]);
 			}
 		    }
@@ -126,7 +126,7 @@ public class SDPConverter {
 	     while(links.length() != 0){				 
 		 if(links.indexOf(";")==-1 && 
 		    !component.equals(getLinksComponent(links))){		         
-		     ((FileConverter)xmlConverterListModel.get(index)).
+		     xmlConverterListModel.get(index).
 			 addPredecessor(links+"@"+(String)getLinksComponent(links));	       
 		     links = "";		   
 		 }
@@ -134,7 +134,7 @@ public class SDPConverter {
 		     String pre = links.substring(0,links.indexOf(";"));		     
 		     links = links.substring(links.indexOf(";")+1);
 		     if(!((String)getLinksComponent(pre)).equals(component))
-		     ((FileConverter)xmlConverterListModel.get(index)).
+		     xmlConverterListModel.get(index).
 			 addPredecessor(pre+"@"+(String)getLinksComponent(pre));   
 		 }
 		 else
@@ -143,7 +143,7 @@ public class SDPConverter {
 	 }else{
 	     System.out.println("NO LINKS FOUND");}
 
-	 ((FileConverter)xmlConverterListModel.get(index)).
+	 xmlConverterListModel.get(index).
 	    addOperation(); 
     } 
     public String getLinksComponent(String links){
@@ -214,9 +214,9 @@ public class SDPConverter {
 	new Loader();
 	for(int index=0;index<componentList.getItemCount();index++)
 	    {		
-		((FileConverter)xmlConverterListModel.get(index)).
+		xmlConverterListModel.get(index).
 		    addRelation();
-		((FileConverter)xmlConverterListModel.get(index)).saveResource(
+		xmlConverterListModel.get(index).saveResource(
 			    new File(file.getParent()+"//"
 				     +componentList.getItem(index)+".xml"));	
 	    }

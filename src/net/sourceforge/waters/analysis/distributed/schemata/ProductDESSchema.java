@@ -6,9 +6,9 @@ import java.io.Serializable;
 
 public class ProductDESSchema implements Serializable
 {
-  ProductDESSchema(String name, 
-		   AutomatonSchema[] automata,
-		   EventSchema[] events)
+  ProductDESSchema(final String name,
+		   final AutomatonSchema[] automata,
+		   final EventSchema[] events)
   {
     mName = name;
     mAutomata = automata;
@@ -20,7 +20,7 @@ public class ProductDESSchema implements Serializable
     return mName;
   }
 
-  public AutomatonSchema getAutomaton(int index)
+  public AutomatonSchema getAutomaton(final int index)
   {
     return mAutomata[index];
   }
@@ -35,7 +35,7 @@ public class ProductDESSchema implements Serializable
     return mAutomata.clone();
   }
 
-  public EventSchema getEvent(int index)
+  public EventSchema getEvent(final int index)
   {
     return mEvents[index];
   }
@@ -45,22 +45,23 @@ public class ProductDESSchema implements Serializable
     return mEvents.length;
   }
 
+  @Override
   public String toString()
   {
-    Formatter fmt = new Formatter();
-
-    fmt.format("Model name: %s\n", mName);
-    fmt.format("Events: %s\n", Arrays.deepToString(mEvents));
-    fmt.format(" - Automata -\n");
-
-    for (AutomatonSchema aut : mAutomata)
-      {
-	fmt.format(aut.toString());
+    final Formatter fmt = new Formatter();
+    try {
+      fmt.format("Model name: %s\n", mName);
+      fmt.format("Events: %s\n", Arrays.deepToString(mEvents));
+      fmt.format(" - Automata -\n");
+      for (final AutomatonSchema aut : mAutomata) {
+        fmt.format(aut.toString());
       }
-
-    return fmt.toString();
+      return fmt.toString();
+    } finally {
+      fmt.close();
+    }
   }
-  
+
   private final String mName;
   private final AutomatonSchema[] mAutomata;
   private final EventSchema[] mEvents;

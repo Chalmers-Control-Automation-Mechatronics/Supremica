@@ -61,9 +61,9 @@ public class IntStateBuffer
                         final StateEncoding stateEnc)
     throws OverflowException
   {
-    this(stateEnc.getNumberOfIncludingExtraStates(),
+    this(stateEnc.getNumberOfStatesIncludingExtra(),
          eventEnc.getNumberOfPropositions());
-    final int numStates = stateEnc.getNumberOfIncludingExtraStates();
+    final int numStates = stateEnc.getNumberOfStatesIncludingExtra();
     final int extraStates = stateEnc.getNumberOfExtraStates();
     for (int state = numStates - extraStates; state < numStates; state++) {
       setReachable(state, false);
@@ -80,14 +80,19 @@ public class IntStateBuffer
     }
     int i = 0;
     for (final StateProxy state : stateEnc.getStates()) {
-      int tags = tags0;
-      if (state.isInitial()) {
-        tags |= TAG_INITIAL;
-      }
-      for (final EventProxy event : state.getPropositions()) {
-        final int code = eventEnc.getEventCode(event);
-        if (code >= 0) {
-          tags |= 1 << code;
+      int tags;
+      if (state == null) {
+        tags = 0;
+      } else {
+        tags = tags0;
+        if (state.isInitial()) {
+          tags |= TAG_INITIAL;
+        }
+        for (final EventProxy event : state.getPropositions()) {
+          final int code = eventEnc.getEventCode(event);
+          if (code >= 0) {
+            tags |= 1 << code;
+          }
         }
       }
       mStateInfo[i++] = tags;
@@ -240,12 +245,21 @@ public class IntStateBuffer
 
   /**
    * Checks whether a state is marked.
+   * This method reports a state as marked if the indicated proposition is
+   * not marked as used (marked by default for proposition not in the
+   * automaton alphabet), or if the state is explicitly marked by the
+   * proposition.
    * @param  state   ID of the state to be tested.
    * @param  prop    ID of the marking proposition to be tested.
    */
   public boolean isMarked(final int state, final int prop)
   {
-    return (mStateInfo[state] & (1 << prop)) != 0;
+    final int code = 1 << prop;
+    if ((mUsedPropositions & code) != 0) {
+      return (mStateInfo[state] & code) != 0;
+    } else {
+      return true;
+    }
   }
 
   /**

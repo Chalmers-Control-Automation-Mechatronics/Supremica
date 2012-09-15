@@ -207,7 +207,7 @@ public class EFAToNuSMV {
         final Collection<String> pred = map(new Function<SimpleNodeProxy, String>() {
             public String f(final SimpleNodeProxy n) {
                 return transitionCondition(sc, n, n,
-                        filterType(SimpleIdentifierProxy.class, n.getPropositions().getEventList()),
+                        filterType(SimpleIdentifierProxy.class, n.getPropositions().getEventIdentifierList()),
                         null);
             }
         }, filterStatesWithPredicates(getStates(sc)));
@@ -221,10 +221,10 @@ public class EFAToNuSMV {
             public Boolean f(final SimpleNodeProxy n) {
                 if(n.getPropositions()==null)
                     return false;
-                else if(n.getPropositions().getEventList() == null)
+                else if(n.getPropositions().getEventIdentifierList() == null)
                     return false;
                 else
-                    return n.getPropositions().getEventList().size() > 0;
+                    return n.getPropositions().getEventIdentifierList().size() > 0;
             }
         }, nodes);
     }
@@ -249,7 +249,7 @@ public class EFAToNuSMV {
     private Collection<SimpleIdentifierProxy> getEvents(final SimpleComponentProxy sc){
         return unlines(map(new Function<EdgeProxy, Collection<SimpleIdentifierProxy>>() {
             public Collection<SimpleIdentifierProxy> f(final EdgeProxy value) {
-                return filterType(SimpleIdentifierProxy.class, value.getLabelBlock().getEventList());
+                return filterType(SimpleIdentifierProxy.class, value.getLabelBlock().getEventIdentifierList());
             }
         }, sc.getGraph().getEdges()));
     }
@@ -297,7 +297,7 @@ public class EFAToNuSMV {
     }
 
     private Collection<SimpleIdentifierProxy> getEvents(final EdgeProxy edge){
-        return filterType(SimpleIdentifierProxy.class, edge.getLabelBlock().getEventList());
+        return filterType(SimpleIdentifierProxy.class, edge.getLabelBlock().getEventIdentifierList());
     }
 
     private String disjunctionOfEvents(final Collection<SimpleIdentifierProxy> events){
@@ -442,7 +442,7 @@ public class EFAToNuSMV {
     private Collection<SimpleIdentifierProxy> getPropositions(final SimpleComponentProxy sc){
         final Collection<SimpleIdentifierProxy> res  = new ArrayList<SimpleIdentifierProxy>();
         for(final NodeProxy n: sc.getGraph().getNodes()){
-            res.addAll(filterType(SimpleIdentifierProxy.class, n.getPropositions().getEventList()));
+            res.addAll(filterType(SimpleIdentifierProxy.class, n.getPropositions().getEventIdentifierList()));
         }
         return res;
     }

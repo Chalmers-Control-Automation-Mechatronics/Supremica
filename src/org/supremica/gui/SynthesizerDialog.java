@@ -78,7 +78,7 @@ class SynthesizerDialogStandardPanel
     private final NonblockNote nbNote;
 
     static class AlgorithmSelector
-        extends JComboBox
+        extends JComboBox<SynthesisAlgorithm>
     {
         private static final long serialVersionUID = 1L;
 
@@ -87,10 +87,10 @@ class SynthesizerDialogStandardPanel
             super();
         }
 
-        private AlgorithmSelector(final Object[] array)
+       /* private AlgorithmSelector(final Object[] array)
         {
             super(array);
-        }
+        }*/
 
         private AlgorithmSelector(final SynthesisAlgorithm algo)
         {
@@ -134,7 +134,7 @@ class SynthesizerDialogStandardPanel
     }
 
     static class SynthesisSelector
-        extends JComboBox
+        extends JComboBox<SynthesisType>
     {
         private static final long serialVersionUID = 1L;
 

@@ -89,7 +89,7 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- nondeterministic
-  public void testNondeterministicCombiniations() throws Exception
+  public void testNondeterministicCombinations() throws Exception
   {
     final String group = "tests";
     final String dir = "nondeterministic";
@@ -252,6 +252,14 @@ public abstract class AbstractStandardConflictCheckerTest
     final String dir = "nasty";
     final String name = "empty_spec.wmod";
     runModelVerifier(group, dir, name, true);
+  }
+
+  public void testFTechnikConflict() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "ftechnik_conflict.wmod";
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testJpt10Counter() throws Exception

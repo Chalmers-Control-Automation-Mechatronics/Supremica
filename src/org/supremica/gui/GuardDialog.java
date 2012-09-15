@@ -29,15 +29,15 @@ class GuardDialogStandardPanel
 	extends GuardPanel
 {
 	private static final long serialVersionUID = 1L;
-    private JRadioButton fromAllowedStatesButton;
-    private JRadioButton fromForbiddenStatesButton;
-    private JRadioButton optimalButton;
-    private JComboBox eventList;
+    private final JRadioButton fromAllowedStatesButton;
+    private final JRadioButton fromForbiddenStatesButton;
+    private final JRadioButton optimalButton;
+    private final JComboBox<Object> eventList;
 //	private JTextField eventField;
 
-	public GuardDialogStandardPanel(Vector<?> events)
+	public GuardDialogStandardPanel(final Vector<Object> events)
 	{
-		Box standardBox = Box.createVerticalBox();
+		final Box standardBox = Box.createVerticalBox();
 
 		fromAllowedStatesButton = new JRadioButton("From allowed states");
 		fromAllowedStatesButton.setToolTipText("Generate the guard from the Allowed state set");
@@ -48,21 +48,21 @@ class GuardDialogStandardPanel
         optimalButton = new JRadioButton("Optimal solution");
 		optimalButton.setToolTipText("Generate the guard from the state set that yields the best result");
 
-		JLabel event = new JLabel("Events");
+		final JLabel event = new JLabel("Events");
 //		eventField = new JTextField(15);
 //		eventField.setToolTipText("The name of the desired event");
 
-        ButtonGroup group = new ButtonGroup();
+        final ButtonGroup group = new ButtonGroup();
         group.add(fromAllowedStatesButton);
         group.add(fromForbiddenStatesButton);
         group.add(optimalButton);
 
-        JPanel expressionTypePanel = new JPanel();
+        final JPanel expressionTypePanel = new JPanel();
         expressionTypePanel.add(fromAllowedStatesButton);
         expressionTypePanel.add(fromForbiddenStatesButton);
         expressionTypePanel.add(optimalButton);
 
-        eventList = new JComboBox(events);
+        eventList = new JComboBox<Object>(events);
 
         standardBox.add(expressionTypePanel);
 		standardBox.add(event);
@@ -72,7 +72,7 @@ class GuardDialogStandardPanel
 		this.add(standardBox);
 	}
 
-	public void update(GuardOptions guardOptions)
+	public void update(final GuardOptions guardOptions)
 	{
         if(guardOptions.getExpressionType() == 0)
         {
@@ -96,7 +96,7 @@ class GuardDialogStandardPanel
 //        eventField.setText(guardOptions.getEvent());
 	}
 
-	public void regain(GuardOptions guardOptions)
+	public void regain(final GuardOptions guardOptions)
 	{
         if(fromForbiddenStatesButton.isSelected())
         {
@@ -122,15 +122,15 @@ class GuardDialogStandardPanel
 public class GuardDialog
 	implements ActionListener
 {
-	private JButton okButton;
-	private JButton cancelButton;
+	private final JButton okButton;
+	private final JButton cancelButton;
 	GuardDialogStandardPanel standardPanel;
-        private GuardOptions guardOptions;
-	private JDialog dialog;
-	private Frame parentFrame;
+        private final GuardOptions guardOptions;
+	private final JDialog dialog;
+	private final Frame parentFrame;
 
 
-	public GuardDialog(Frame parentFrame, GuardOptions guardOptions, Vector<?> events)
+	public GuardDialog(final Frame parentFrame, final GuardOptions guardOptions, final Vector<Object> events)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.parentFrame = parentFrame;
@@ -139,16 +139,16 @@ public class GuardDialog
 		dialog.setTitle("Guard options");
 		dialog.setSize(new Dimension(400, 200));
 
-		Container contentPane = dialog.getContentPane();
+		final Container contentPane = dialog.getContentPane();
 
 		standardPanel = new GuardDialogStandardPanel(events);
 
-		JTabbedPane tabbedPane = new JTabbedPane();
+		final JTabbedPane tabbedPane = new JTabbedPane();
 
 		tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
 
 		// buttonPanel
-		JPanel buttonPanel = new JPanel();
+		final JPanel buttonPanel = new JPanel();
 
 		okButton = addButton(buttonPanel, "OK");
 		cancelButton = addButton(buttonPanel, "Cancel");
@@ -157,7 +157,7 @@ public class GuardDialog
 		contentPane.add("South", buttonPanel);
 		Utility.setDefaultButton(dialog, okButton);
 
-		Dimension dim = dialog.getMinimumSize();
+		final Dimension dim = dialog.getMinimumSize();
 
 		dialog.setLocation(Utility.getPosForCenter(dim));
 		dialog.setResizable(false);
@@ -170,9 +170,9 @@ public class GuardDialog
 		standardPanel.update(guardOptions);
 	}
 
-	private JButton addButton(Container container, String name)
+	private JButton addButton(final Container container, final String name)
 	{
-		JButton button = new JButton(name);
+		final JButton button = new JButton(name);
 
 		button.addActionListener(this);
 		container.add(button);
@@ -185,9 +185,9 @@ public class GuardDialog
 		dialog.setVisible(true);
 	}
 
-	public void actionPerformed(ActionEvent event)
+	public void actionPerformed(final ActionEvent event)
 	{
-		Object source = event.getSource();
+		final Object source = event.getSource();
 
 		if (source == okButton)
 		{

@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.despot
-//# CLASS:   HISCAttributes
+//# PACKAGE: net.sourceforge.waters.analysis.hisc
+//# CLASS:   HISCAttributeFactory
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -62,21 +63,72 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
  *     in attribute maps.</LI>
  * </UL>
  *
- * <P>This class contains only static methods and constants.</P>
+ * <P>This class also implements the {@link AttributeFactory} interface for
+ * use with GUI classes.</P>
  *
  * @author Robi Malik
  */
 
-public class HISCAttributes
+public class HISCAttributeFactory implements AttributeFactory
 {
 
   //#########################################################################
-  //# Constructor
-  /**
-   * Dummy constructor to prevent instantiation of class.
-   */
-  private HISCAttributes()
+  //# Singleton Pattern
+  public static HISCAttributeFactory getInstance()
   {
+    return SingletonHolder.INSTANCE;
+  }
+
+  private HISCAttributeFactory()
+  {
+  }
+
+  private static class SingletonHolder {
+    private static final HISCAttributeFactory INSTANCE =
+      new HISCAttributeFactory();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.AttributeFactory
+  /**
+   * Returns a list of HISC attribute names that can be used for an item
+   * of the given type. This can be used by the GUI to provide suggestions
+   * to the user when editing attribute lists.
+   * @param  clazz  A proxy class or interface for which attributes are sought.
+   * @return The attribute names for objects of this type, in any order.
+   *         If no attributes are applicable, an empty collection is returned.
+   */
+  public Collection<String> getApplicableKeys
+    (final Class<? extends Proxy> clazz)
+  {
+    if (clazz.isAssignableFrom(EventDeclProxy.class) ||
+        clazz.isAssignableFrom(EventProxy.class)) {
+      return ATTRIBUTES_FOR_EVENT;
+    } else if (clazz.isAssignableFrom(SimpleComponentProxy.class) ||
+               clazz.isAssignableFrom(AutomatonProxy.class)) {
+      return ATTRIBUTES_FOR_AUTOMATON;
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  /**
+   * Returns a list of HISC attribute values that can be used for an attribute
+   * with the given name. This can be used by the GUI to provide suggestions
+   * to the user when editing attribute lists.
+   * @param  attrib  The name of the attribute to be given a value.
+   * @return List of attribute value strings in the order suggested to the
+   *         user. If the attribute takes no value, an empty list is returned.
+   */
+  public List<String> getApplicableValues(final String attrib)
+  {
+    final List<String> values = ATTRIBUTE_VALUES.get(attrib);
+    if (values == null) {
+      return Collections.emptyList();
+    } else {
+      return values;
+    }
   }
 
 
@@ -133,46 +185,6 @@ public class HISCAttributes
       attribs.remove(EVENTTYPE_KEY);
     } else {
       attribs.put(EVENTTYPE_KEY, type.toString());
-    }
-  }
-
-  /**
-   * Returns a list of HISC attribute names that can be used for an item
-   * of the given type. This can be used by the GUI to provide suggestions
-   * to the user when editing attribute lists.
-   * @param  clazz  A proxy class or interface for which attributes are sought.
-   * @return The attribute names for objects of this type, in any order.
-   *         If no attributes are applicable, an empty collection is returned.
-   */
-  public static Collection<String> getApplicableKeys
-    (final Class<? extends Proxy> clazz)
-  {
-    if (clazz.isAssignableFrom(EventDeclProxy.class) ||
-        clazz.isAssignableFrom(EventProxy.class)) {
-      return ATTRIBUTES_FOR_EVENT;
-    } else if (clazz.isAssignableFrom(SimpleComponentProxy.class) ||
-               clazz .isAssignableFrom(AutomatonProxy.class)) {
-      return ATTRIBUTES_FOR_AUTOMATON;
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  /**
-   * Returns a list of HISC attribute values that can be used for an attribute
-   * with the given name. This can be used by the GUI to provide suggestions
-   * to the user when editing attribute lists.
-   * @param  attrib  The name of the attribute to be given a value.
-   * @return List of attribute value strings in the order suggested to the
-   *         user. If the attribute takes no value, an empty list is returned.
-   */
-  public static List<String> getApplicableValues(final String attrib)
-  {
-    final List<String> values = ATTRIBUTE_VALUES.get(attrib);
-    if (values == null) {
-      return Collections.emptyList();
-    } else {
-      return values;
     }
   }
 

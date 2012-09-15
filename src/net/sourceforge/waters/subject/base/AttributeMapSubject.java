@@ -87,9 +87,12 @@ public final class AttributeMapSubject
    */
   public void assignFrom(final Map<String,String> map)
   {
-    for (final String key : keySet()) {
+    final Iterator<Map.Entry<String,String>> iter = entrySet().iterator();
+    while (iter.hasNext()) {
+      final Map.Entry<String,String> entry = iter.next();
+      final String key = entry.getKey();
       if (!map.containsKey(key)) {
-        remove(key);
+        iter.remove();
       }
     }
     for (final Map.Entry<String,String> entry : map.entrySet()) {

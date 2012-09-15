@@ -1,66 +1,48 @@
-
 package org.supremica.automata.BDD.EFA;
 
 /**
  *
  * @author Sajed Miremadi, Zhennan Fei
  */
-
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntObjectHashMap;
-
-import java.util.HashSet;
+import gnu.trove.*;
 import java.util.List;
-import java.util.Map;
-
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDFactory;
-import net.sf.javabdd.BDDPairing;
-import net.sf.javabdd.BDDVarSet;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.IntConstantProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
-
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import org.supremica.automata.BDD.BDDLibraryType;
-import org.supremica.automata.BDD.SupremicaBDDBitVector.PSupremicaBDDBitVector;
-import org.supremica.automata.BDD.SupremicaBDDBitVector.ResultOverflows;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
-import org.supremica.automata.BDD.SupremicaBDDBitVector.TCSupremicaBDDBitVector;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.supremica.automata.FlowerEFABuilder;
 import org.supremica.properties.Config;
 
+public class BDDExtendedManager extends BDDAbstractManager {
 
-public class BDDExtendedManager
-{
-    private static Logger logger = LoggerFactory.createLogger(BDDExtendedManager.class);
+    //Variabes used for RAS models
+    BDD globalLargerBDD = null;
+    //The BDD representing the forward transition relation, where the dest variables are removed.
+    BDD frwdTransEvents = null;
+    //The BDD representing the backward transition relation
+    BDD bckwdTransEvents = null;
+    BDD feasibleSourceStates = null;
+    BDD feasibleDestStates = null;
+    BDD unreachableStates = null;
 
-    private BDDFactory factory;
-
-//    private BDDDomain constantDomain;
-    private Map<String, Integer> variableStringToIndexMap;
-
-    BDDExtendedAutomata bddExAutomata;
-
-    public BDDExtendedManager()
-    {
+    public BDDExtendedManager() {
         this(BDDLibraryType.fromDescription(Config.BDD2_BDDLIBRARY.getAsString()));
     }
 
-    public BDDExtendedManager(final BDDLibraryType bddpackage)
-    {
+    public BDDExtendedManager(final BDDLibraryType bddpackage) {
         this(bddpackage, Config.BDD2_INITIALNODETABLESIZE.get(), Config.BDD2_CACHESIZE.get());
     }
 
-    public BDDExtendedManager(final BDDLibraryType bddpackage, final int nodenum, final int cachesize)
-    {
-        if (factory == null)
-        {
+    public BDDExtendedManager(final BDDLibraryType bddpackage, final int nodenum, final int cachesize) {
+        if (factory == null) {
             factory = BDDFactory.init(bddpackage.getLibraryname(), nodenum, cachesize);
             factory.setMaxIncrease(Config.BDD2_MAXINCREASENODES.get());
             factory.setIncreaseFactor(Config.BDD2_INCREASEFACTOR.get());
@@ -68,660 +50,216 @@ public class BDDExtendedManager
         }
     }
 
-    public SupremicaBDDBitVector createSupremicaBDDBitVector(final int P_TC, final BDDFactory mFactory, final int bitnum)
-    {
-        if(P_TC == 0)
-            return new PSupremicaBDDBitVector(mFactory, bitnum);
-        else if (P_TC == 1)
-            return new TCSupremicaBDDBitVector(mFactory, bitnum);
+    /** Return a set of initial uncontrollable states. */
+    public BDD getInitiallyUncontrollableStates() {
+        final BDDMonolithicEdges edges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
 
-        throw new IllegalArgumentException("BDDBitVector type not defined!");
-    }
-
-    public SupremicaBDDBitVector createSupremicaBDDBitVector(final int P_TC, final BDDFactory mFactory, final int bitnum, final boolean b)
-    {
-        if(P_TC == 0)
-            return new PSupremicaBDDBitVector(mFactory, bitnum, b);
-        else if (P_TC == 1)
-            return new TCSupremicaBDDBitVector(mFactory, bitnum, b);
-
-        throw new IllegalArgumentException("BDDBitVector type not defined!");
-    }
-
-    public SupremicaBDDBitVector createSupremicaBDDBitVector(final int P_TC, final BDDFactory mFactory, final int bitnum, final long val)
-    {
-        if(P_TC == 0)
-            return new PSupremicaBDDBitVector(mFactory, bitnum, val);
-        else if (P_TC == 1)
-            return new TCSupremicaBDDBitVector(mFactory, bitnum, val);
-
-        throw new IllegalArgumentException("BDDBitVector type not defined!");
-    }
-
-    public SupremicaBDDBitVector createSupremicaBDDBitVector(final int P_TC, final BDDFactory mFactory, final BDDDomain domain)
-    {
-        if(P_TC == 0)
-            return new PSupremicaBDDBitVector(mFactory, domain);
-        else if (P_TC == 1)
-            return new TCSupremicaBDDBitVector(mFactory, domain);
-
-        throw new IllegalArgumentException("BDDBitVector type not defined!");
-    }
-
-    public void setBDDExAutomata(final BDDExtendedAutomata bddExAutomata)
-    {
-        this.bddExAutomata = bddExAutomata;
-    }
-
-    public BDDFactory getFactory()
-    {
-        return factory;
-    }
-
-    public void done()
-    {
-        if (factory != null)
-        {
-            factory.done();
-            factory = null;
-        }
-    }
-
-    public BDD getZeroBDD()
-    {
-        return factory.zero();
-    }
-
-    public BDD getOneBDD()
-    {
-        return factory.one();
-    }
-
-    public BDDDomain createDomain(final int size)
-    {
-        return factory.extDomain(size);
-    }
-
-    public void partialReverseVarOrdering(final int[] varOrdering)
-    {
-        final int[] updatedVarOrdering = factory.getVarOrder();
-        for(int i = 0; i<varOrdering.length; i++)
-        {
-            updatedVarOrdering[varOrdering[i]] = varOrdering[varOrdering.length-1-i];
-        }
-
-        factory.setVarOrder(updatedVarOrdering);
-    }
-
-    public void setVariableStringToIndexMap(final Map<String, Integer> v)
-    {
-        variableStringToIndexMap = v;
-    }
-
-    public BDDVarSet createEmptyVarSet()
-    {
-        return factory.emptySet();
-    }
-
-    public BDD createBDD(final int index, final BDDDomain domain)
-    {
-        return factory.buildCube(index, domain.vars());
-    }
-    public BDDPairing makePairing(final BDDDomain[] source, final BDDDomain[] dest)
-    {
-        final BDDPairing pairing = factory.makePair();
-        pairing.set(source, dest);
-        return pairing;
-    }
-
-    public BDDPairing makePairing(final BDDDomain source, final BDDDomain dest)
-    {
-        return factory.makePair(source, dest);
-    }
-
-    boolean isOpEqRel(final BinaryOperator op)
-    {
-        final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
-        if(op.equals(cot.getEqualsOperator()) || op.equals(cot.getGreaterEqualsOperator()) || op.equals(cot.getLessEqualsOperator())
-                || op.equals(cot.getGreaterThanOperator()) || op.equals(cot.getLessThanOperator()) || op.equals(cot.getNotEqualsOperator()))
-            return true;
-        else
-            return false;
-    }
-
-    boolean isOpArith(final BinaryOperator op)
-    {
-        final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
-        if(op.equals(cot.getPlusOperator()) || op.equals(cot.getMinusOperator()) || op.equals(cot.getTimesOperator())
-                || op.equals(cot.getDivideOperator()) || op.equals(cot.getModuloOperator()))
-            return true;
-        else
-            return false;
-    }
-
-    public BDD guard2BDD(final SimpleExpressionProxy expr)
-    {
-        final ResultOverflows guardBDD = expr2BDDBitVec(expr, true);
-        return guardBDD.getResult().getBit(0).and(guardBDD.getOverflows().not());
-    }
-
-    public BDD action2BDD(final BinaryExpressionProxy expr)
-    {
-        final String leftVarName = ((SimpleIdentifierProxy)expr.getLeft()).getName();
-        final SupremicaBDDBitVector leftSide = bddExAutomata.BDDBitVecTargetVarsMap.get(leftVarName);
-        ResultOverflows rightSide = expr2BDDBitVec(expr.getRight(),false);
-
-        BDD overflow = getZeroBDD();
-        final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
-        if(expr.getOperator().equals(cot.getIncrementOperator()))
-        {
-            overflow = rightSide.getOverflows().id();
-            rightSide = bddExAutomata.BDDBitVecSourceVarsMap.get(leftVarName).addConsideringOverflows(rightSide.getResult());
-        }
-
-        if(expr.getOperator().equals(cot.getDecrementOperator()))
-        {
-            overflow = rightSide.getOverflows().id();
-            rightSide = bddExAutomata.BDDBitVecSourceVarsMap.get(leftVarName).subConsideringOverflows(rightSide.getResult());
-        }
-
-//        (rightSide.getOverflows().or(overflow)).printDot();
-        return leftSide.equ(rightSide.getResult()).and((rightSide.getOverflows().or(overflow)).not());
-    }
-
-    ResultOverflows expr2BDDBitVec(final SimpleExpressionProxy expr, final boolean guardAction)
-    {
-        if(expr instanceof UnaryExpressionProxy)
-        {
-            final UnaryExpressionProxy unExpr = (UnaryExpressionProxy)expr;
-            if(unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getNotOperator()))
-            {
-                final ResultOverflows ro = expr2BDDBitVec(unExpr.getSubTerm(),true);
-                final SupremicaBDDBitVector tmp = ro.getResult().copy();
-                tmp.setBit(0, tmp.getBit(0).not());
-                return new ResultOverflows(tmp,ro.getOverflows());
-            }
-            else if(((UnaryExpressionProxy)expr).getOperator().equals(CompilerOperatorTable.getInstance().getUnaryMinusOperator()))
-            {
-                final ResultOverflows ro = expr2BDDBitVec(unExpr.getSubTerm(),true);
-                return new ResultOverflows(((TCSupremicaBDDBitVector)ro.getResult()).toTwosComplement(),ro.getOverflows());
-            }
-            else
-            {
-                throw new IllegalArgumentException("Type of operator not known!");
-            }
-        }
-        else if(expr instanceof BinaryExpressionProxy)
-        {
-            final BinaryExpressionProxy bexpr = (BinaryExpressionProxy)expr;
-            if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getAndOperator()))
-            {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),true);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),true);
-                final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
-                final SupremicaBDDBitVector rightGuard = roRight.getResult();
-                tmp.setBit(0, tmp.getBit(0).and(rightGuard.getBit(0)));
-                return new ResultOverflows(tmp,roLeft.getOverflows().or(roRight.getOverflows()));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getOrOperator()))
-            {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),true);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),true);
-                final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
-                final SupremicaBDDBitVector rightGuard = roRight.getResult();
-                tmp.setBit(0, tmp.getBit(0).or(rightGuard.getBit(0)));
-                return new ResultOverflows(tmp,roLeft.getOverflows().or(roRight.getOverflows()));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getModuloOperator()))
-            {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),false);
-                final SupremicaBDDBitVector v2 = roRight.getResult();
-                if(v2.isConst())
-                    return new ResultOverflows(roLeft.getResult().divmod(v2.val(), false),roLeft.getOverflows().or(roRight.getOverflows()));
-                else
-                    throw new IllegalArgumentException("Divisor is not constant");
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getMinusOperator()))
-            {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),false);
-                final ResultOverflows ro = roLeft.getResult().subConsideringOverflows(roRight.getResult());
-                return new ResultOverflows(ro.getResult(), ro.getOverflows().or(roLeft.getOverflows().or(roRight.getOverflows())));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getPlusOperator()))
-            {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),false);
-                final ResultOverflows ro = roLeft.getResult().addConsideringOverflows(roRight.getResult());
-                return new ResultOverflows(ro.getResult(), ro.getOverflows().or(roLeft.getOverflows().or(roRight.getOverflows())));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getEqualsOperator()))
-            {
-                SupremicaBDDBitVector tmp = null;
-                BDD leftOverflows = getZeroBDD();
-                BDD rightOverflows = getZeroBDD();
-                if(bexpr.getLeft().toString().contains(bddExAutomata.locaVarSuffix))
-                {
-                    final String leftString = bexpr.getLeft().toString();
-                    final String locName = bexpr.getRight().toString();
-                    final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.locaVarSuffix));
-                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.getSourceLocationDomain(autName));
-                    final BDD locBDD = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
-                            bddExAutomata.getSourceLocationDomain(autName));
-                    tmp.setBit(0, locBDD);
-                }
-                else
-                {
-                    final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),false);
-                    final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),false);
-                    tmp = roLeft.getResult().copy();
-                    tmp.setBit(0, tmp.equ(roRight.getResult()));
-                    leftOverflows = roLeft.getOverflows();
-                    rightOverflows = roRight.getOverflows();
-                }
-                return new ResultOverflows(tmp, leftOverflows.or(rightOverflows));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getNotEqualsOperator()))
-            {
-                SupremicaBDDBitVector tmp = null;
-                BDD leftOverflows = getZeroBDD();
-                BDD rightOverflows = getZeroBDD();
-                if(bexpr.getLeft().toString().contains(bddExAutomata.locaVarSuffix))
-                {
-                    final String leftString = bexpr.getLeft().toString();
-                    final String locName = bexpr.getRight().toString();
-                    final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.locaVarSuffix));
-                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.getSourceLocationDomain(autName));
-                    final BDD locBDD = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
-                            bddExAutomata.getSourceLocationDomain(autName)).not();
-                    tmp.setBit(0, locBDD);
-                }
-                else
-                {
-                    final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),false);
-                    final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),false);
-                    tmp = roLeft.getResult().copy();
-                    tmp.setBit(0, tmp.neq(roRight.getResult()));
-                    leftOverflows = roLeft.getOverflows();
-                    rightOverflows = roRight.getOverflows();
-                }
-                return new ResultOverflows(tmp, leftOverflows.or(rightOverflows));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getGreaterThanOperator()))
-            {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),false);
-                final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
-                tmp.setBit(0, tmp.gth(roRight.getResult()));
-                return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getGreaterEqualsOperator()))
-            {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),false);
-                final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
-                tmp.setBit(0, tmp.gte(roRight.getResult()));
-                return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getLessThanOperator()))
-            {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),false);
-                final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
-                tmp.setBit(0, tmp.lth(roRight.getResult()));
-                return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getLessEqualsOperator()))
-            {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(),false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(),false);
-                final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
-                tmp.setBit(0, tmp.lte(roRight.getResult()));
-                return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
-            }
-            else if(bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getDivideOperator()))
-            {
-                final SupremicaBDDBitVector v2 = expr2BDDBitVec(bexpr.getRight(),false).getResult().copy();
-                if(v2.isConst())
-                    return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(),false).getResult().divmod(v2.val(), true),getZeroBDD());
-                else
-                    throw new IllegalArgumentException("Divisor is not constant");
-            }
-            else
-            {
-                throw new IllegalArgumentException("Binary operator is not known!");
-            }
-        //I have added the other operators to SupremicaBDDBitVector... they should be verified though.
-        //Currently, I don't have time to do that... maybe in the future (BTW it is not too much work).
-
-        }
-        else if(expr instanceof SimpleIdentifierProxy)
-        {
-            return new ResultOverflows(bddExAutomata.BDDBitVecSourceVarsMap.get(((SimpleIdentifierProxy)expr).getName()),getZeroBDD());
-        }
-        else if(expr instanceof IntConstantProxy)
-        {
-            if(guardAction)
-            {
-                SupremicaBDDBitVector tmp = null;
-//                if(constantDomain ==null)
-                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.BDDBitVectoryType+1,0).copy();
-//                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.constantDomain.varNum(),0).copy();
-//                else
-//                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, constantDomain.varNum(),0).copy();
-
-                if(((IntConstantProxy)expr).getValue()==0)
-                    tmp.setBit(0, getZeroBDD());
-                else
-                    tmp.setBit(0, getOneBDD());
-
-                return new ResultOverflows(tmp, getZeroBDD());
-            }
-            else
-            {
-                final Integer index = bddExAutomata.getIndexMap().getIndexOfVal(expr.toString());
-                if(index != null)
-                {
-//                    return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.constantDomain.varNum(),index),getZeroBDD());
-                  return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory,
-                          bddExAutomata.BDDBitVectoryType+createDomain(Math.abs(index.intValue())+1).varNum(), index), getZeroBDD());
-                }
-                else
-                {
-                    logger.error(expr.toString()+" is out of the bounds. The value will be set to 0!");
-                    return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.BDDBitVectoryType+1,0),getZeroBDD());
-                }
-            }
-        }
-
-        throw new IllegalArgumentException("Type of expression not known!");
-    }
-
-    public void addLocation(final BDD bdd, final int locationIndex,  final BDDDomain domain)
-    {
-        final BDD newLocationBDD = factory.buildCube(locationIndex, domain.vars());
-        bdd.orWith(newLocationBDD);
-    }
-
-    public void addEdge(final BDD bdd, final BDD[] transWhereVisUpdated, final BDD[] transAndNextValsForV, final int sourceLocationIndex,
-            final BDDDomain sourceDomain, final int destLocationIndex, final BDDDomain destDomain, final int eventIndex, final BDDDomain eventDomain,
-            final List<SimpleExpressionProxy> guards, final List<BinaryExpressionProxy> actions)
-    {
-        BDD sourceBDD = getOneBDD();
-        BDD destBDD = getOneBDD();
-
-        // Create a BDD representing the source location
-        sourceBDD = factory.buildCube(sourceLocationIndex, sourceDomain.vars());
-
-        // Create a BDD representing the dest location
-        destBDD = factory.buildCube(destLocationIndex, destDomain.vars());
-
-        // Create a BDD representing the event
-        final BDD eventBDD = factory.buildCube(eventIndex, eventDomain.vars());
-
-        // Add source and dest state
-        sourceBDD = sourceBDD.and(destBDD);
-
-        // Add event to source and dest state
-        sourceBDD = sourceBDD.and(eventBDD);
-
-        BDD guardBDD = factory.one();
-        if(guards != null && guards.size() > 0)
-        {
-            //Only the first guard should be considered. If there are more, it will just affect the GUI.
-            guardBDD = guard2BDD(guards.get(0));
-//            guardBDD.printDot();
-        }
-        //Add guard to event and source and dest state
-        sourceBDD = sourceBDD.and(guardBDD);
-
-        final HashSet<String> updatedVars = new HashSet<String>();
-        BDD actionBDD = factory.one();
-        if(actions !=null)
-        {
-            for(final SimpleExpressionProxy a:actions)
-            {
-                final BinaryExpressionProxy bep = (BinaryExpressionProxy)a;
-                updatedVars.add(((SimpleIdentifierProxy)bep.getLeft()).getName());
-
-                final BDD currActionBDD = action2BDD(bep);
-//                currActionBDD.printDot();
-                actionBDD = actionBDD.and(currActionBDD);
-            }
-        }
-//        actionBDD.printDot();
-
-        for(final String var:updatedVars)
-        {
-            transWhereVisUpdated[variableStringToIndexMap.get(var)] = transWhereVisUpdated[variableStringToIndexMap.get(var)].or(sourceBDD);
-            transAndNextValsForV[variableStringToIndexMap.get(var)] = transAndNextValsForV[variableStringToIndexMap.get(var)].or(sourceBDD.and(actionBDD));
-        }
-
-
-        // Add the transition to the set of existing transitions
-        bdd.orWith(sourceBDD);
-    }
-
-    private int getMin(final int[] array)
-    {
-        int min = Integer.MAX_VALUE;
-        for(int i = 0; i < array.length; i++)
-        {
-            if(array[i] < min)
-                min = array[i];
-        }
-
-        return min;
-    }
-
-
-    /*
-        We assume the the most significant bit is at the top of the variable ordering.
-        'bdd' represents the values for one single clock.
-     */
-    public int getMinimalValue(final BDD bdd)
-    {
-        int minValue = 0;
-
-        final String nameOfClock = bddExAutomata.getAutVarName(bdd.var());
-        final int minBDDVarContent =  getMin(bddExAutomata.getSourceVariableDomain(nameOfClock).vars());
-
-        BDD iterateBDD = bdd.id();
-        while(!iterateBDD.isOne())
-        {
-            final BDD lowChild = iterateBDD.low();
-            BDD nextIterateBDD = lowChild.id();
-
-            if(lowChild.isZero())
-            {
-                minValue = minValue + (int)Math.pow(2, iterateBDD.var() - minBDDVarContent);
-                nextIterateBDD = iterateBDD.high().id();
-            }
-
-            iterateBDD = nextIterateBDD.id();
-        }
-
-        return minValue;
-    }
-
-    public BDD getInitiallyUncontrollableStates()
-    {
-        final BDDMonolithicEdges edges = ((BDDMonolithicEdges)bddExAutomata.getBDDEdges());
-
-        if(bddExAutomata.orgExAutomata.modelHasNoPlants() || bddExAutomata.orgExAutomata.modelHasNoSpecs())
-        {
+        if (bddExAutomata.orgExAutomata.modelHasNoPlants()
+                || bddExAutomata.orgExAutomata.modelHasNoSpecs()) {
             return getZeroBDD();
-        }
-        else
-        {
-        final BDD t1 = bddExAutomata.getReachableStates().and(edges.getPlantMonolithicUncontrollableEdgesForwardBDD());
-        final BDD t2 = edges.getSpecMonolithicUncontrollableEdgesForwardBDD().and(t1).exist(bddExAutomata.getDestStatesVarSet());
-        return t1.and(t2.not()).exist(bddExAutomata.getDestStatesVarSet()).exist(bddExAutomata.getEventVarSet());
+        } else {
+            final BDD t1 = bddExAutomata.getReachableStates().and(edges.getPlantMonolithicUncontrollableEdgesForwardBDD());
+            final BDD t2 = edges.getSpecMonolithicUncontrollableEdgesForwardBDD().and(t1).exist(bddExAutomata.getDestStatesVarSet());
+            return t1.and(t2.not()).exist(bddExAutomata.getDestStatesVarSet()).exist(bddExAutomata.getEventVarSet());
         }
 
     }
 
-    public BDD uncontrollableBackward(final BDD forbidden)
-    {
-        final BDD t_u = ((BDDMonolithicEdges)bddExAutomata.getBDDEdges()).getMonolithicUncontrollableEdgesBackwardBDD();
+    public BDD uncontrollableBackward(final BDD forbidden) {
+        System.err.println("UncontrollableBackward entered.");
+        final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
+        final BDD t_u = bddEdges.getMonolithicUncontrollableEdgesBackwardBDD();
+        final BDD backwardTime = bddEdges.getBackwardClocksWithTheSameRate();
+        final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();
 
+//        System.out.println("forbidden");
+//        forbidden.printDot();
         BDD Qk = null;
+        BDD newUCstates = null;
+        BDD newCstates = null;
         BDD Qkn = forbidden.id();
-        do
-        {
-            Qk = Qkn.id();
-            Qkn = Qk.or(image_preImage(Qk,t_u));
-        }while (!Qkn.equals(Qk));
+        if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
+            Qkn = timeEvolSource(Qkn, backwardTime);
+            newCstates = Qkn.and(bddEdges.getMonolithicForcibleEdgesForwardBDD().exist(bddExAutomata.getDestStatesVarSet()));
+            newCstates = timeEvolSource(newCstates, backwardTime);
+            Qkn = Qkn.and(newCstates.not());
+            Qkn = timeEvolSource(Qkn, forwardTime);
 
+//        System.out.println("Qknnnnnnn: "+(Qkn.isOne()?"one":""));
+//        Qkn.printDot();
+
+            Qkn = Qkn.or(forbidden);
+            bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(Qkn);
+        }
+
+        do {
+//            System.out.println("UBackward: "+iteration++);
+            Qk = Qkn.id();
+            newUCstates = image_preImage(Qk, t_u);
+            Qkn = Qk.or(newUCstates); 
+            BDD ucDueToTime = getZeroBDD();
+            if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
+                ucDueToTime = timeEvolSource(newUCstates, backwardTime).and(newUCstates.not());
+                newCstates = ucDueToTime.and(bddEdges.getMonolithicForcibleEdgesForwardBDD().exist(bddExAutomata.getDestStatesVarSet()));
+                newCstates = timeEvolSource(newCstates, backwardTime);
+                ucDueToTime = ucDueToTime.and(newCstates.not());
+                ucDueToTime = timeEvolSource(ucDueToTime, forwardTime);
+                bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(ucDueToTime);
+            }
+            Qkn = Qkn.or(ucDueToTime);
+        } while (!Qkn.equals(Qk));
+
+        System.err.println("UncontrollableBackward exited.");
         return Qkn;
     }
 
-    public BDD restrictedBackward(final BDD forbidden)
-    {
-        final BDD delta_all = ((BDDMonolithicEdges)bddExAutomata.getBDDEdges()).getMonolithicEdgesBackwardBDD();
+    public BDD restrictedBackward(final BDD markedStates, final BDD forbidden) {
+        System.err.println("RestrictedBackward entered.");
+        final BDD delta_all = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesBackwardBDD();
+        final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getBackwardClocksWithTheSameRate();
 
-        BDD Qkn = bddExAutomata.getMarkedStates().and(forbidden.not()).and(bddExAutomata.getReachableStates());
+        BDD Qkn = markedStates.and(forbidden.not());
         BDD Qk = null;
         BDD Qm = null;
-/*
+        /*
         FileWriter fstream = null;
         try
         {
-            fstream = new FileWriter("C:/Users/sajed/Documents/My Dropbox/Documents/Papers/Supremica_Models/FisherThompson/BDDstatistics_RB.txt");
- //           fstream = new FileWriter("/Users/sajed/Dropbox/Documents/Papers/Supremica_Models/FisherThompson/BDDstatistics_RB.txt");
+        fstream = new FileWriter("C:/Users/sajed/Documents/My Dropbox/Documents/Papers/Supremica_Models/FisherThompson/BDDstatistics_RB.txt");
+        //           fstream = new FileWriter("/Users/sajed/Dropbox/Documents/Papers/Supremica_Models/FisherThompson/BDDstatistics_RB.txt");
 
         } catch (final Exception e){}
         final BufferedWriter out = new BufferedWriter(fstream);
+         */
 
-        int iteration = 1;
-*/
-        do
-        {
-//            System.err.println("RBackward "+iteration+ "\t" + Qkn.nodeCount());
+        do {
+//            System.out.println("RBackward "+iteration++);
 /*            try
             {
-                out.write((iteration++) + "\t" + Qkn.nodeCount());
-                out.newLine();
-                out.close();
+            out.write((iteration++) + "\t" + Qkn.nodeCount());
+            out.newLine();
+            out.close();
             } catch (final Exception e){}
-*/
+             */
             Qk = Qkn.id();
-            Qm = image_preImage(Qk,delta_all);
-/*
-            BDD clockBDD = Qm.exist(bddExAutomata.sourceLocationVariables);
-            String nameOfClock = bddExAutomata.getAutVarName(clockBDD.var());
+            Qm = image_preImage(Qk, delta_all, clocks).and(bddExAutomata.getReachableStates());
 
-            int minClockValue = getMinimalValue(clockBDD);
-            SupremicaBDDBitVector minClockValueBDDVec = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory,
-                    bddExAutomata.getSourceVariableDomain(nameOfClock).size().intValue(),minClockValue);
-            SupremicaBDDBitVector clockBDDVec = bddExAutomata.getBDDBitVecSource(nameOfClock);
+//            BDD clockBDD = Qm.exist(bddExAutomata.sourceLocationVarSet);
+//            String nameOfClock = bddExAutomata.getAutVarName(clockBDD.var());
+//
+//            int minClockValue = getMinimalValue(clockBDD);
+//            SupremicaBDDBitVector minClockValueBDDVec = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory,
+//                    bddExAutomata.getSourceVariableDomain(nameOfClock).size().intValue(),minClockValue);
+//            SupremicaBDDBitVector clockBDDVec = bddExAutomata.getBDDBitVecSource(nameOfClock);
+//
+//            BDD extendedClockBDD = clockBDDVec.lth(minClockValueBDDVec);
+//            Qm = Qm.or(extendedClockBDD);
 
-            BDD extendedClockBDD = clockBDDVec.lth(minClockValueBDDVec);
-            Qm = Qm.or(extendedClockBDD);
-*/
 
-            Qkn = ((Qk.or(Qm)).and(forbidden.not())).and(bddExAutomata.getReachableStates());
+            Qkn = ((Qk.or(Qm)).and(forbidden.not()));
+            //           iteration++;
         } while (!Qkn.equals(Qk));
 
-//        try{out.close();}catch (final Exception e){}
+//        System.err.println("number of iterations in restrictedBackward: "+iteration);
 
+//        try{out.close();}catch (final Exception e){}
+        System.err.println("RestrictedBackward exited.");
 
         return Qkn;
     }
 
-    public BDD restrictedForward(final BDD forbidden)
-    {
-        final BDD delta_all = ((BDDMonolithicEdges)bddExAutomata.getBDDEdges()).getMonolithicEdgesForwardBDD();
+    public BDD restrictedForward(final BDD initialStates, final BDD forbidden) {
+        System.err.println("RestrictedForward entered.");
+        final BDD trans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesForwardBDD();
+        final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getForwardClocksWithTheSameRate();
 
-//        System.err.println(delta_all.support().toString());
+//        System.out.println("restrictedForward");
 
-        BDD Qkn = bddExAutomata.getInitialState().and(forbidden.not());
+        BDD Qkn = initialStates.and(forbidden.not());
         BDD Qk = null;
         BDD Qm = null;
 
 
- /*       FileWriter fstream = null;
-        try
-        {
-            fstream = new FileWriter("C:/Users/sajed/Documents/My Dropbox/Documents/Papers/Supremica_Models/FisherThompson/BDDstatistics_RF.txt");
-//            fstream = new FileWriter("/Users/sajed/Dropbox/Documents/Papers/Supremica_Models/FisherThompson/BDDstatistics_RF.txt");
-        } catch (final Exception e){}
-        BufferedWriter out = new BufferedWriter(fstream);
+//        FileWriter fstream = null;
+//        try
+//        {
+//            fstream = new FileWriter("/Users/sajed/Desktop/fxdPoint.txt");
+//        } catch (final Exception e){}
+//        out = new BufferedWriter(fstream);
 
-        int iteration = 1;
-*/
-        do
-        {
-//            System.err.println("RForward "+iteration + "\t" + Qkn.nodeCount());
-/*            try
-            {
-                out.write((iteration++) + "\t" + Qkn.nodeCount());
-                out.newLine();
-            } catch (final Exception e){}
-*/
+        do {
+//            System.err.println("RForward "+(iteration++) + "\t" + Qkn.nodeCount());
+
+//            try
+//            {
+//                out.write((iteration++) + "\t" + Qkn.nodeCount());
+//                out.newLine();
+//            } catch (final Exception e){}
+//
+//            try
+//            {
+//                out.write((iteration++) + "\t");
+//            } catch (final Exception e){}
+
             Qk = Qkn.id();
-            Qm = image_preImage(Qk,delta_all);
-/*
-            bddExAutomata.sourceLocationDomains[0].domain().printDot();
-            BDD clockBDD = Qm.exist(bddExAutomata.sourceLocationVariables);
-            String nameOfClock = bddExAutomata.getAutVarName(clockBDD.var());
+            Qm = image_preImage(Qk, trans, clocks);
 
-            int minClockValue = getMinimalValue(clockBDD);
-            SupremicaBDDBitVector minClockValueBDDVec = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory,
-                    bddExAutomata.getSourceVariableDomain(nameOfClock).size().intValue(),minClockValue);
-            SupremicaBDDBitVector clockBDDVec = bddExAutomata.getBDDBitVecSource(nameOfClock);
-
-            BDD extendedClockBDD = clockBDDVec.gte(minClockValueBDDVec);
-            Qm = Qm.or(extendedClockBDD);
-*/
+//            BDD clockBDD = Qm.exist(bddExAutomata.sourceLocationVarSet);
+//            String nameOfClock = bddExAutomata.getAutVarName(clockBDD.var());
+//
+//            int minClockValue = getMinimalValue(clockBDD);
+//            SupremicaBDDBitVector minClockValueBDDVec = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory,
+//                    bddExAutomata.getSourceVariableDomain(nameOfClock).size().intValue(),minClockValue);
+//            SupremicaBDDBitVector clockBDDVec = bddExAutomata.getBDDBitVecSource(nameOfClock);
+//
+//            BDD extendedClockBDD = clockBDDVec.gte(minClockValueBDDVec);
+//            Qm = Qm.or(extendedClockBDD);
+//            iteration++;
             Qkn = (Qk.or(Qm)).and(forbidden.not());
+
         } while (!Qkn.equals(Qk));
 
-//        try{out.close();}catch (final Exception e){}
+//        System.err.println("number of iterations in restrictedForward: "+iteration);
+
+        System.err.println("RestrictedForward exited.");
         return Qkn;
     }
 
-    public BDD nonblockingControllable(final BDD forbidden, final boolean reachable)
-    {
+    public BDD nonblockingControllable(final BDD forbidden, final boolean reachable) {
+        System.err.println("NonblockingControllable entered.");
+        final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getForwardClocksWithTheSameRate();
+
         BDD Qkn = forbidden;
-
         BDD Qk = null;
-
         BDD Q1 = null;
         BDD Q2 = null;
 
-        do
-        {
+        do {
+//            System.out.println("nbc: "+(iteration++));
             Qk = Qkn.id();
-            Q1 = restrictedBackward(Qk);
-            Q2 = uncontrollableBackward(Q1.not());
+            Q1 = restrictedBackward(bddExAutomata.getMarkedStates(), Qk);
+            BDD forbiddenStates = Q1.not().and(bddExAutomata.getReachableStates());
+            if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
+                forbiddenStates = bddExAutomata.fitIntoClockDomains(forbiddenStates).and(
+                    (timeEvolSource(bddExAutomata.getMarkedStates(), clocks)).not());
+            }
+            Q2 = uncontrollableBackward(forbiddenStates);
+//            Q2 =  Q2.and((timeEvolSource(bddExAutomata.getMarkedStates(),clocks)).not());
             Qkn = Qk.or(Q2);
-        }while((!Qkn.equals(Qk)));
+        } while ((!Qkn.equals(Qk)));
 
-        if(reachable)
-            return restrictedForward(Qkn);
-        else
+        System.err.println("NonblockingControllable exited.");
+
+        if (reachable) {
+            return restrictedForward(bddExAutomata.getInitialState(), Qkn);
+        } else {
             return Qkn.not();
+        }
     }
 
-    public BDD image_preImage(final BDD states, final BDD transitions)
-    {
-        BDD nextStates = null;
+    BDD getDisjunctiveInitiallyUncontrollableStates() {
 
-        nextStates = (transitions.and(states)).exist(bddExAutomata.getSourceStatesVarSet());
-//        nextStates = (transitions.and(states)).exist(bddExAutomata.getSourceStatesVarSet());
-        nextStates.replaceWith(bddExAutomata.getDest2SourceLocationPairing());
-        nextStates.replaceWith(bddExAutomata.getDest2SourceVariablePairing());
-
-        return nextStates;
-    }
-
-     /** Return a set of initial uncontrollable states. */
-    BDD getDisjunctiveInitiallyUncontrollableStates()
-    {
-
-        if (bddExAutomata.plants.isEmpty() || bddExAutomata.specs.isEmpty()) {
+        if (bddExAutomata.plants.isEmpty() && bddExAutomata.specs.isEmpty()) {
             return getZeroBDD();
         } else {
 
@@ -746,8 +284,7 @@ public class BDDExtendedManager
         }
     }
 
-    BDD disjunctiveNonblockingControllable(final BDD forbiddenStates, final boolean reachable)
-    {
+    BDD disjunctiveNonblockingControllable(final BDD forbiddenStates, final boolean reachable) {
 
         BDD previousForbidenStates = null;
         BDD tmpCoreachableStates = null;
@@ -760,9 +297,7 @@ public class BDDExtendedManager
             if (flag && currentForbidenStates.equals(previousForbidenStates)) {
                 break;
             } else {
-                tmpCoreachableStates = bddExAutomata.getDepSets()
-                        .reachableBackwardRestrictedWorkSetAlgorithm(bddExAutomata.getMarkedStates(), currentForbidenStates, bddExAutomata.getReachableStates());
-                        //.backwardRestrictedWorkSetAlgorithm(bddExAutomata.getMarkedStates(), currentForbidenStates);
+                tmpCoreachableStates = bddExAutomata.getDepSets().backwardRestrictedWorkSetAlgorithm(bddExAutomata.getMarkedStates(), currentForbidenStates);
                 currentForbidenStates = tmpCoreachableStates.not();
                 flag = true;
             }
@@ -776,5 +311,192 @@ public class BDDExtendedManager
             nonblockingControllableStates = currentForbidenStates.not();
         }
         return nonblockingControllableStates;
+    }
+
+    /* Implementeation for Resource Allocation Systems*/
+    /** Computation of unsafe states including all minimal unsafe states.
+     *
+     * @return
+     */
+    public BDD computeUnsafeStates() {
+        frwdTransEvents = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesForwardWithEventsBDD();
+        frwdTransEvents = frwdTransEvents.exist(bddExAutomata.getSourceLocationVarSet().union(bddExAutomata.getDestLocationVarSet()));
+        frwdTransEvents = frwdTransEvents.and(bddExAutomata.loadEventsBDD.not());
+        frwdTransEvents = frwdTransEvents.exist(bddExAutomata.getDestStatesVarSet());
+
+        bckwdTransEvents = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesBackwardWithEventsBDD();
+        /*The following exist operator can be avoided by only doing exist once on
+         * the forward transition relation and then construct the backward transition relation.
+         */
+        bckwdTransEvents = bckwdTransEvents.exist(bddExAutomata.getSourceLocationVarSet().union(bddExAutomata.getDestLocationVarSet()));
+
+        //Remove the load transitions
+        bckwdTransEvents = bckwdTransEvents.and(bddExAutomata.loadEventsBDD.not());
+
+        System.err.println("Computing the feasible states...");
+        frwdTransEvents = frwdTransEvents.and(getFeasibleSourceStates());
+        System.err.println("Done.");
+
+        bckwdTransEvents = bckwdTransEvents.and(getFeasibleSourceStates()).and(getFeasibleDestStates());
+
+
+        BDD tauTrans = getZeroBDD();
+        BDD sigmaTrans = frwdTransEvents.id();
+        System.err.println("Computing the deadlock states...");
+        BDD unsafeStates = getMinimalDeadlocks();
+        System.err.println("Done.");
+
+
+        BDD upUnsafeStates = unsafeStates.id();
+        do {
+//            System.err.println("computeUnsafeStates: "+(i++));
+            final BDD[] elements = computeElements(upUnsafeStates);
+            upUnsafeStates = elements[0].id();
+
+//            System.err.println("Performing the larger operator...");
+            final BDD newTauTrans = elements[1].or(getLarger(sigmaTrans.and(elements[1].not()), elements[1])).and(getFeasibleSourceStates());
+//            System.err.println("Done.");
+            sigmaTrans = sigmaTrans.and(newTauTrans.not());
+            tauTrans = tauTrans.or(newTauTrans);
+//            upUnsafeStates = upUnsafeStates.or(extractNewUnsafeStates(tauTrans.and(
+//                    newTauTrans.exist(bddExAutomata.getEventVarSet()).not())));
+            upUnsafeStates = upUnsafeStates.or(extractNewUnsafeStates(tauTrans));
+
+            unsafeStates = unsafeStates.or(upUnsafeStates);
+        } while (!upUnsafeStates.isZero());
+
+        return unsafeStates;
+    }
+
+    /**
+     *
+     * @param unsafeStates
+     * @return The new inevitable states and $\tau$Trans
+     */
+    private BDD[] computeElements(final BDD unsafeStates) {
+        final BDD[] elements = new BDD[2];
+        BDD upUnsafeStates = unsafeStates.id();
+        BDD inevitableStates = getZeroBDD();
+        BDD tauTrans = getZeroBDD();
+        do {
+//            System.err.println("computeElements: "+(i++));
+            final BDD tauSuperBckwdTrans = upUnsafeStates.and(bckwdTransEvents);
+            final BDD tauSuperFrwdTrans = tauSuperBckwdTrans.exist(bddExAutomata.getSourceStatesVarSet()).replace(
+                    bddExAutomata.getDestToSourceVariablePairing());
+            final BDD boundaryOtherStates = frwdTransEvents.and(tauSuperFrwdTrans.not()).exist(bddExAutomata.getEventVarSet());
+//            upUnsafeStates = (tauSuperFrwdTrans.and(boundaryOtherStates.not())).exist(bddExAutomata.getEventVarSet());
+            upUnsafeStates = (tauSuperFrwdTrans.exist(bddExAutomata.getEventVarSet()).and(boundaryOtherStates.not())).and(getFeasibleSourceStates());
+            inevitableStates = inevitableStates.or(upUnsafeStates);
+            tauTrans = tauTrans.or(boundaryOtherStates.and(tauSuperFrwdTrans));
+        } while (!upUnsafeStates.isZero());
+
+        elements[0] = inevitableStates;
+        elements[1] = tauTrans;
+
+        return elements;
+    }
+
+    /**
+     *
+     * @param trans
+     * @return The new found unsafe states
+     */
+    private BDD extractNewUnsafeStates(final BDD trans) {
+        return (trans.exist(bddExAutomata.getEventVarSet()).and(
+                frwdTransEvents.and(trans.not()).exist(bddExAutomata.getEventVarSet()).not()));
+    }
+
+    private BDD getLarger(final BDD trans1, final BDD trans2) {
+        final BDD tmpTrans1 = trans1.replace(bddExAutomata.sourceToTempVariablePairing);
+        final BDD pairs = trans2.and(tmpTrans1);
+
+        final BDD larger = (pairs.and(getGlobalLargerBDD()).exist(bddExAutomata.getSourceStatesVarSet()));
+        return larger.replace(bddExAutomata.tempToSourceVariablePairing);
+    }
+
+    private BDD getGlobalLargerBDD() {
+        if (globalLargerBDD == null) {
+            BDD equalsBDD = getOneBDD();
+            globalLargerBDD = getOneBDD();
+            final List<VariableComponentProxy> stageVars = bddExAutomata.orgExAutomata.getStageVars();
+            for (final VariableComponentProxy stage : stageVars) {
+                final int stageIndex = bddExAutomata.theIndexMap.getVariableIndex(stage);
+                final int stageDomain = bddExAutomata.orgExAutomata.getVarDomain(stage.getName());
+                final BDDDomain stageSourceDomain = bddExAutomata.sourceVarDomains[stageIndex];
+                final BDDDomain stageTempDomain = bddExAutomata.tempVarDomains[stageIndex];
+                final SupremicaBDDBitVector stageBDDBitVectorSource = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
+                        bddExAutomata.orgExAutomata.getMinValueofVar(stage.getName()) < 0,
+                        stageSourceDomain);
+                final SupremicaBDDBitVector stageBDDBitVectorTemp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
+                        bddExAutomata.orgExAutomata.getMinValueofVar(stage.getName()) < 0,
+                        stageTempDomain);
+                BDD stageLargerBDD = getZeroBDD();
+                for (int j = 0; j < stageDomain; j++) {
+                    final BDD jSource = createBDD(j, bddExAutomata.getSourceVariableDomain(stageIndex));
+                    final SupremicaBDDBitVector vector_j = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, stageTempDomain.varNum(), j);
+                    final BDD greaterThanJBDD = stageBDDBitVectorTemp.gte(vector_j);
+                    stageLargerBDD = stageLargerBDD.or(jSource.and(greaterThanJBDD));
+                }
+                equalsBDD = equalsBDD.and(stageBDDBitVectorSource.equ(stageBDDBitVectorTemp));
+                globalLargerBDD = globalLargerBDD.and(stageLargerBDD);
+            }
+
+            globalLargerBDD = globalLargerBDD.and(equalsBDD.not());
+        }
+
+        return globalLargerBDD;
+    }
+
+    private BDD getMinimalDeadlocks() {
+        final BDD feasibleTrans = frwdTransEvents.and(getFeasibleSourceStates());
+        final BDD feasSourceStates = feasibleTrans.exist(bddExAutomata.getEventVarSet());
+        BDD deadlocks = getFeasibleSourceStates().and(feasSourceStates.not());
+        deadlocks = deadlocks.and(bddExAutomata.getInitialState().exist(bddExAutomata.getSourceLocationVarSet()).not());
+//       BDD forward = ((BDDMonolithicEdges)bddExAutomata.getBDDEdges()).getMonolithicEdgesForwardWithEventsBDD();
+//       forward.exist(bddExAutomata.getEventVarSet()).exist(
+//                                bddExAutomata.getDestStatesVarSet()).exist(
+//                                    bddExAutomata.getSourceLocationVarSet()).printDot();
+        //      deadlocks.printDot();
+//       getLarger(deadlocks.id(), deadlocks.id()).printDot();
+
+        return deadlocks.and(getLarger(deadlocks.id(), deadlocks.id()).not());
+    }
+
+    private BDD getFeasibleSourceStates() {
+        if (feasibleSourceStates == null) {
+            final ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
+
+            SimpleExpressionSubject feasibleEquation = null;
+            try {
+                feasibleEquation = (SimpleExpressionSubject) (parser.parse(FlowerEFABuilder.feasibleEquation, Operator.TYPE_BOOLEAN));
+            } catch (final ParseException pe) {
+                System.err.println(pe);
+            }
+
+
+            feasibleSourceStates = guard2BDD(feasibleEquation);
+
+            return feasibleSourceStates;
+        }
+
+        return feasibleSourceStates;
+
+    }
+
+    BDD getFeasibleDestStates() {
+        if (feasibleDestStates == null) {
+            feasibleDestStates = getFeasibleSourceStates().replace(bddExAutomata.getSourceToDestVariablePairing());
+            return feasibleDestStates;
+        }
+
+        return feasibleDestStates;
+    }
+
+    BDD getInitialUnreachableStates(final BDD localBckwdTransEvents) {
+        final BDD notInitialFeasibleStates = getFeasibleSourceStates().and(localBckwdTransEvents);
+        final BDD initialFeasibleStates = getFeasibleSourceStates().and(notInitialFeasibleStates.exist(
+                bddExAutomata.getEventVarSet()).exist(
+                bddExAutomata.getDestStatesVarSet()).not());
+        return initialFeasibleStates.and(bddExAutomata.getInitialState().exist(bddExAutomata.getSourceLocationVarSet()).not());
     }
 }

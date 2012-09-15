@@ -112,16 +112,44 @@ public class LimitedCertainConflictsTRSimplifier
 
   //#########################################################################
   //# Specific Access
-  public boolean hasRemovedTransitions()
+  /**
+   * Returns whether the last run has removed transitions from coreachable
+   * states. If this returns <CODE>false</CODE>, the result may be treated
+   * as the merging of blocking states, which allows for simple trace
+   * expansion. Otherwise proper certain conflicts trace expansion using
+   * {@link LimitedCertainConflictsTraceExpander} is necessary.
+   */
+  public boolean hasCertainConflictTransitions()
   {
-    return mHasRemovedTransitions;
+    return mHasCertainConflictTransitions;
   }
 
+  /**
+   * Returns the maximum level assigned to any state during the last run.
+   * @see #getLevel(int) getLevel()
+   */
   public int getMaxLevel()
   {
     return mMaxLevel;
   }
 
+  /**
+   * Returns the level of certain conflicts for the given state.
+   * After completion of the algorithm, each state is assigned a level
+   * as follows.
+   * <UL>
+   * <LI>States with level COREACHABLE = -1 are not states of certain
+   *     conflicts.</LI>
+   * <LI>States with level BLOCKING = 0 are blocking states.</LI>
+   * <LI>States with a positive odd level can reach a state of the
+   *     lower level using local transitions.</LI>
+   * <LI>States with a positive even level can reach a state of a
+   *     lower level using shared transitions, but not using only local
+   *     transitions.</LI>
+   * </UL>
+   * @param  state    State code of the state to be checked.
+   * @return The level of certain conflicts for this state.
+   */
   public int getLevel(final int state)
   {
     return mStateInfo[state];
@@ -137,6 +165,7 @@ public class LimitedCertainConflictsTRSimplifier
     super.setUp();
     mStateInfo = null;
     mHasRemovedTransitions = false;
+    mHasCertainConflictTransitions = false;
   }
 
   @Override
@@ -156,6 +185,7 @@ public class LimitedCertainConflictsTRSimplifier
     if (numCoreachable == numReachable) {
       return false;
     }
+    mMaxLevel = BLOCKING;
     final int tauID = EventEncoding.TAU;
     final int numStates = rel.getNumberOfStates();
     final int shift = AutomatonTools.log2(numStates);
@@ -191,7 +221,8 @@ public class LimitedCertainConflictsTRSimplifier
             }
           }
           if (!victims.isEmpty()) {
-            mHasRemovedTransitions = modified = true;
+            mHasRemovedTransitions = mHasCertainConflictTransitions =
+              modified = true;
             for (int index = 0; index < victims.size(); index++) {
               final int victim = victims.get(index);
               rel.removeOutgoingTransitions(victim);
@@ -235,6 +266,20 @@ public class LimitedCertainConflictsTRSimplifier
               final int victim = victims.get(index);
               final int event = (victim & ~root) >>> shift;
               final int pred = victim & mask;
+              if (!mHasCertainConflictTransitions && mStateInfo[pred] < 0) {
+                // We have certain conflict transitions if we are deleting a
+                // transition from a coreachable state to another coreachable
+                // state.
+                assert level == 0;
+                succIter.reset(pred, event);
+                while (succIter.advance()) {
+                  final int target = succIter.getCurrentTargetState();
+                  if (mStateInfo[target] < 0) {
+                    mHasCertainConflictTransitions = true;
+                    break;
+                  }
+                }
+              }
               rel.removeOutgoingTransitions(pred, event);
               if ((victim & root) != 0) {
                 rel.addTransition(pred, event, state);
@@ -380,16 +425,17 @@ public class LimitedCertainConflictsTRSimplifier
   //#########################################################################
   //# Trace Computation Support
   /**
-   * Creates a test automaton to check whether certain conflicts states of
-   * the given level can be reached. States of certain conflicts are flagged
-   * using selfloops of the given event <CODE>prop</CODE>, which can be tested
-   * for using language inclusion check.
+   * Creates a test automaton to check whether certain conflict states of
+   * the given or a lower level can be reached. States of certain conflicts
+   * of levels to be checked are flagged using selfloops of the given event
+   * <CODE>prop</CODE>, so their reachability can be tested using a language
+   * inclusion check.
    */
   public AutomatonProxy createTestAutomaton
     (final ProductDESProxyFactory factory,
      final EventEncoding eventEnc,
      final StateEncoding stateEnc,
-     final int init,
+     final int initCode,
      final EventProxy prop,
      final int level)
   {
@@ -409,9 +455,9 @@ public class LimitedCertainConflictsTRSimplifier
     int numReachable = 0;
     int numCritical = 0;
     for (int state = 0; state < numStates; state++) {
-      if (isTestState(state, level)) {
+      if (rel.isReachable(state)) {
         numReachable++;
-        if (mStateInfo[state] == level) {
+        if (mStateInfo[state] <= level) {
           numCritical++;
         }
       }
@@ -423,11 +469,14 @@ public class LimitedCertainConflictsTRSimplifier
       new ArrayList<TransitionProxy>(numTrans + numCritical);
     int code = 0;
     for (int state = 0; state < numStates; state++) {
-      if (isTestState(state, level)) {
-        final StateProxy memstate = new MemStateProxy(code++, state == init);
+      if (rel.isReachable(state)) {
+        final boolean init =
+          initCode >= 0 ? state == initCode : rel.isInitial(state);
+        final StateProxy memstate = new MemStateProxy(code++, init);
         states[state] = memstate;
         reachable.add(memstate);
-        if (mStateInfo[state] == level) {
+        final int info = mStateInfo[state];
+        if (info != COREACHABLE && info <= level) {
           final TransitionProxy trans =
             factory.createTransitionProxy(memstate, prop, memstate);
           transitions.add(trans);
@@ -438,8 +487,8 @@ public class LimitedCertainConflictsTRSimplifier
     final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
     while (iter.advance()) {
       final int s = iter.getCurrentSourceState();
-      final int t = iter.getCurrentTargetState();
-      if (isTestState(s, level) && isTestState(t, level)) {
+      if (rel.isReachable(s)) {
+        final int t = iter.getCurrentTargetState();
         final StateProxy source = states[s];
         final int e = iter.getCurrentEvent();
         final EventProxy event = eventEnc.getProperEvent(e);
@@ -537,16 +586,11 @@ public class LimitedCertainConflictsTRSimplifier
     return coreachable;
   }
 
-  private boolean isTestState(final int state, final int level)
-  {
-    final int status = mStateInfo[state];
-    return status == COREACHABLE || status >= level;
-  }
-
 
   //#########################################################################
   //# Data Members
   private boolean mHasRemovedTransitions;
+  private boolean mHasCertainConflictTransitions;
 
   private int mMaxLevel;
   private int[] mStateInfo;
