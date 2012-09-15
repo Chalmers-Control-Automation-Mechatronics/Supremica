@@ -2,6 +2,7 @@
 package org.supremica.automata.algorithms.TransitionProjection;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
@@ -255,8 +256,8 @@ public class ExtendedAutomataIndexForm {
                         
             for(final EdgeProxy tran : currAutomaton.getTransitions()){
                 final int indexSource = indexMap.getLocationIndex(automatonIndex, tran.getSource());
-                for(final Proxy event : tran.getLabelBlock().getEventList()){
-                    final EventDeclProxy currEvent = currAutomaton.getEvent(((SimpleIdentifierSubject)event).getName());
+                for(Iterator<Proxy> itr=tran.getLabelBlock().getEventIdentifierList().iterator();itr.hasNext();){
+                    final EventDeclProxy currEvent = currAutomaton.getEvent(((SimpleIdentifierSubject)itr.next()).getName());
                     final int indexEvent = indexMap.getEventIndex(currEvent);
                     try{
                         final List<SimpleExpressionProxy> guards = tran.getGuardActionBlock().getGuards();
@@ -330,9 +331,9 @@ public class ExtendedAutomataIndexForm {
                 for(final EdgeProxy currArc : currAutomaton.getLocationToOutgoingEdgesMap().get(currState))
                 {
                     
-                    for(final Proxy e : currArc.getLabelBlock().getEventList()){
+                    for(Iterator<Proxy> itrEvent = currArc.getLabelBlock().getEventIdentifierList().iterator();itrEvent.hasNext();){
                         // Get the event from the automaton
-                        final EventDeclProxy currEvent = currAutomaton.getEvent(((SimpleIdentifierSubject)e).getName());
+                        final EventDeclProxy currEvent = currAutomaton.getEvent(((SimpleIdentifierSubject)itrEvent.next()).getName());
 //                        EventDeclProxy currEvent = theAutomata.eventIdToProxy(((SimpleIdentifierSubject)e).getName());
                         final int currEventIndex = indexMap.getEventIndex(currEvent);
 
@@ -451,9 +452,9 @@ public class ExtendedAutomataIndexForm {
                 final ArrayList<EdgeSubject> incommingArcs = currAutomaton.getLocationToIngoingEdgesMap().get(currState);
                 for(final EdgeProxy currArc : incommingArcs)
                 {
-                    for(final Proxy e : currArc.getLabelBlock().getEventList()){
+                    for(Iterator<Proxy> itr=currArc.getLabelBlock().getEventIdentifierList().iterator();itr.hasNext();){
                         // Get the event from the automaton
-                        final EventDeclProxy currEvent = theAutomata.eventIdToProxy(((SimpleIdentifierSubject)e).getName());
+                        final EventDeclProxy currEvent = theAutomata.eventIdToProxy(((SimpleIdentifierSubject)itr.next()).getName());
                         final int currEventIndex = indexMap.getEventIndex(currEvent);
 
                         sortedEventIndices.add(currEventIndex);
