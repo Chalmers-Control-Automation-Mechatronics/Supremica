@@ -68,11 +68,13 @@ import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.util.Args;
 
 public class ExtendedAutomaton {
 
     private boolean allAcceptingStates = false;
-
     private String name;
     private final ExtendedAutomata automata;
     private final ModuleSubjectFactory factory;
@@ -98,7 +100,7 @@ public class ExtendedAutomaton {
     private final Set<VariableComponentProxy> usedTargetVariables;
     private final HashSet<SimpleExpressionProxy> allGuards;
     private final HashSet<BinaryExpressionProxy> allActions;
-
+    private final Logger logger = LoggerFactory.createLogger(ExtendedAutomaton.class);
 
     @Deprecated
     public ExtendedAutomaton(final String name, final ExtendedAutomata automata, final boolean acceptingStates)
@@ -215,10 +217,12 @@ public class ExtendedAutomaton {
                 if(!eventIdToProxyMap.containsKey(eventName)){
                     eventIdToProxyMap.put(eventName, e);
                     alphabet.add(e);
-                    if(e.getKind() == EventKind.CONTROLLABLE)
+                    if(e.getKind() == EventKind.CONTROLLABLE) {
                         controllableAlphabet.add(e);
-                    else if(e.getKind() == EventKind.UNCONTROLLABLE)
+                    }
+                    else if(e.getKind() == EventKind.UNCONTROLLABLE) {
                         uncontrollableAlphabet.add(e);
+                    }
                 }
             }
         }
@@ -271,10 +275,12 @@ public class ExtendedAutomaton {
                 if(!eventIdToProxyMap.containsKey(eventName)){
                     eventIdToProxyMap.put(eventName, e);
                     alphabet.add(e);
-                    if(e.getKind() == EventKind.CONTROLLABLE)
+                    if(e.getKind() == EventKind.CONTROLLABLE) {
                         controllableAlphabet.add(e);
-                    else if(e.getKind() == EventKind.UNCONTROLLABLE)
+                    }
+                    else if(e.getKind() == EventKind.UNCONTROLLABLE) {
                         uncontrollableAlphabet.add(e);
+                    }
                 }
 
                 locationToOutgoingEventsMap.get(edge.getSource()).add(e.getName());
@@ -475,10 +481,12 @@ public class ExtendedAutomaton {
     public NodeProxy addState(final String name)
     {
         NodeProxy state;
-        if (allAcceptingStates)
+        if (allAcceptingStates) {
             state = addState(name, true, false, false);
-        else
+        }
+        else {
             state =  addState(name, false, false, false);
+        }
 
         return state;
     }
@@ -504,12 +512,15 @@ public class ExtendedAutomaton {
             nodes.add(node);
             nameToLocationMap.put(name, node);
 
-            if(accepting)
+            if(accepting) {
                 acceptedLocations.add(node);
-            if(forbidden)
+            }
+            if(forbidden) {
                 forbiddenLocations.add(node);
-            if(initial)
+            }
+            if(initial) {
                 initialLocations.add(node);
+            }
         }
 
         return node;
@@ -552,10 +563,12 @@ public class ExtendedAutomaton {
         if(eventIdToProxyMap.get(event.getName()) == null){
             eventIdToProxyMap.put(event.getName(), event);
             alphabet.add(event);
-            if(event.getKind() == EventKind.CONTROLLABLE)
+            if(event.getKind() == EventKind.CONTROLLABLE) {
                 controllableAlphabet.add(event);
-            else if(event.getKind() == EventKind.UNCONTROLLABLE)
+            }
+            else if(event.getKind() == EventKind.UNCONTROLLABLE) {
                 uncontrollableAlphabet.add(event);
+            }
             return true;
         }
         return false;
@@ -580,14 +593,12 @@ public class ExtendedAutomaton {
         NodeProxy fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(source);
         if (fromNode == null)
         {
-                System.out.println("ExtendedAutomaton.addTransition(): From node " + source + " does not exist and therefore, creating one!");
                 fromNode = addState(source);
         }
 
         NodeProxy toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(target);
         if (toNode == null)
         {
-                System.out.println("ExtendedAutomaton.addTransition(): To node " + target + " does not exist and therefore, creating one!");
                 toNode = addState(target);
         }
 
@@ -602,7 +613,6 @@ public class ExtendedAutomaton {
                 remainingEvents = remainingEvents.substring(remainingEvents.indexOf(";") + 1);
                 EventDeclProxy event = eventIdToProxyMap.get(curEvent);
                 if (event == null){
-                    System.out.println("ExtendedAutomaton.addTransition(): Event " + curEvent + " does not exist and therefore, creating one controllable!");
                     event = addEvent(curEvent, EventKind.CONTROLLABLE.name(), true);
                 }
                 events.add(factory.createSimpleIdentifierProxy(event.getName()));
@@ -611,7 +621,6 @@ public class ExtendedAutomaton {
         } else {
             EventDeclProxy event = eventIdToProxyMap.get(label.trim());
             if (event == null){
-                System.out.println("ExtendedAutomaton.addTransition(): Event " + label.trim() + " does not exist and therefore, creating one controllable!");
                 event = addEvent(label.trim(), EventKind.CONTROLLABLE.name(), true);
             }
             events.add(factory.createSimpleIdentifierProxy(event.getName()));
@@ -632,13 +641,12 @@ public class ExtendedAutomaton {
         }
         catch (final ParseException exc)
         {
-                System.out.println("ExtendedAutomaton.addTransition(): Syntax error in guard!");
-                System.out.println("\t automaton: " + name);
-                System.out.print("\t from: " + source);
-                System.out.println(" to: " + target);
-                System.out.println("\t label: " + label);
-                System.out.println("\t guard: " + guardIn);
-                System.out.println("\t action: " + actionIn);
+                logger.debug("ExtendedAutomaton.addTransition(): Syntax error in guard!");
+                logger.debug("\t automaton: " + name);
+                logger.debug("\t from: " + source);
+                logger.debug(" to: " + target);
+                logger.debug("\t label: " + label);
+                logger.debug("\t guard: " + guardIn);
                 return;
         }
         // Get actions ...
@@ -664,24 +672,22 @@ public class ExtendedAutomaton {
                                 }
                                 catch (final ParseException exception)
                                 {
-                                        System.out.println("ExtendedAutomaton.addTransition(): Syntax error in action!");
-                                        System.out.println("\t automaton: " + name);
-                                        System.out.print("\t from: " + source);
-                                        System.out.println(" to: " + target);
-                                        System.out.println("\t label: " + label);
-                                        System.out.println("\t guard: " + guardIn);
-                                        System.out.println("\t action: " + actionIn);
+                                        logger.debug("ExtendedAutomaton.addTransition(): Syntax error in action!");
+                                        logger.debug("\t automaton: " + name);
+                                        logger.debug("\t from: " + source);
+                                        logger.debug(" to: " + target);
+                                        logger.debug("\t label: " + label);
+                                        logger.debug("\t guard: " + guardIn);
                                         return;
                                 }
                                 catch (final TypeMismatchException exception)
                                 {
-                                        System.out.println("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
-                                        System.out.println("\t automaton: " + name);
-                                        System.out.print("\t from: " + source);
-                                        System.out.println(" to: " + target);
-                                        System.out.println("\t label: " + label);
-                                        System.out.println("\t guard: " + guardIn);
-                                        System.out.println("\t action: " + actionIn);
+                                        logger.debug("ExtendedAutomaton.addTransition(): Type mismatch error in action!");
+                                        logger.debug("\t automaton: " + name);
+                                        logger.debug("\t from: " + source);
+                                        logger.debug(" to: " + target);
+                                        logger.debug("\t label: " + label);
+                                        logger.debug("\t guard: " + guardIn);
                                         return;
                                 }
                         }
@@ -746,8 +752,9 @@ public class ExtendedAutomaton {
      * or <code>Null</code> if it is deterministic.
      */
     public NondeterministicEFAException isNondeterministic(){
-        if(initialLocations.size() > 1)
+        if(initialLocations.size() > 1) {
             return new NondeterministicEFAException(this);
+        }
 
         for(final NodeProxy node : locationToOutgoingEdgesMap.keySet()){
             final HashSet<EventDeclProxy> events = new HashSet<EventDeclProxy>();
@@ -756,10 +763,14 @@ public class ExtendedAutomaton {
                     final EventDeclProxy e = getEvent(event);
                     final boolean added = events.add(e);
                     if(!added){
-                        SimpleExpressionProxy guard = null;
-                        try{guard = tran.getGuardActionBlock().getGuards().get(0);} catch (final Exception exp){}
-                        if(guard == null)
-                            return new NondeterministicEFAException(this, node, e);
+                        /**
+                         * ToDo: One can check that no two guard of outgoing transitions with the same label
+                         * will be evaluated to true so for sure it is deterministic, e.g., g1:x==1 of 
+                         * transition 1 and g2:x==2 of transition 2 will never evaluate true at the same time
+                         * but for g1:x==1 and g2:y==1 we cannot say so.
+                         * /Mohammad Reza
+                        **/       
+                        return new NondeterministicEFAException(this, node, e);
                     }
                 }
             }
@@ -778,6 +789,8 @@ public class ExtendedAutomaton {
     }
 
     public static Collection<? extends Proxy> setUnion(final Collection<? extends Proxy> x, final Collection<? extends Proxy> y){
+        Args.checkForNull(x);
+        Args.checkForNull(y);
         final Collection<Proxy> result = new HashSet<Proxy>();
         result.addAll(x);
         result.addAll(y);
@@ -785,17 +798,29 @@ public class ExtendedAutomaton {
     }
 
     public static Collection<? extends Proxy> setIntersection(final Collection<? extends Proxy> x, final Collection<? extends Proxy> y){
+        if(x==null || y==null || x.isEmpty() || y.isEmpty()) {
+            return new HashSet<Proxy>();
+        }
+
         final Collection<Proxy> result = new HashSet<Proxy>(x);
         result.retainAll(y);
         return result;
     }
 
     public static Collection<? extends Proxy> setMinus(final Collection<? extends Proxy> x, final Collection<? extends Proxy> y){
+        if(x == null || x.isEmpty()) {
+            return new HashSet<Proxy>();
+        }
+        else if(y == null || y.isEmpty()) {
+            return new HashSet<Proxy>(x);
+        }
+
         final Collection<Proxy> result = new HashSet<Proxy>();
-        for (final Proxy n:x)
-            if(!y.contains(n))
+        for (final Proxy n:x) {
+            if (!y.contains(n)) {
                 result.add(n);
+            }
+        }
         return result;
     }
-
 }

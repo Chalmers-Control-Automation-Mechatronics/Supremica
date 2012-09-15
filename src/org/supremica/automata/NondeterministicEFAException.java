@@ -54,7 +54,7 @@ public class NondeterministicEFAException extends InvalidModelException {
   {
     super("Multiple transitions labelled '" + event.getName() +
           "' originating from state '" + state.getName() +
-          "' in EFA '" + efa.getName() + "'!");
+          "' in EFA '" + efa.getName() + "'! This EFA might be nondeterministic.");
   }
 
 

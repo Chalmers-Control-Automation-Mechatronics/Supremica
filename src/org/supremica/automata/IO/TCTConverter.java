@@ -17,7 +17,8 @@ import org.supremica.automata.ExtendedAutomaton;
 
 
 /**
- * TCTConverter class to import TCT binary files.
+ * TCTConverter class converts a TCT binary file (.DEC) to 
+ * its equivalent Supremica extended finite automata model.
  *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
  * @version %I%, %G%
@@ -30,6 +31,12 @@ public class TCTConverter {
     private HashSet<Integer[]> transitions;
     private HashSet<Integer> states;
     private final URI uri;
+    private final String TCT_SIGNATURE = "Z8^0L;1";
+    private final int TCT_ENDIAN = 0xFF00AA55;
+    private final int INTEGER_SIZE = 4;
+    private final int SHORT_SIZE = 2;
+    private final Integer UNOBSERVABLE_VALUE = 1000;
+    private final int TCT_INITIAL_STATE = 0;
 
     public TCTConverter(final URI uri){
         this.uri = uri;
@@ -56,31 +63,35 @@ public class TCTConverter {
         b = new byte[7];
         reader.read(b);
         str = new String(b);
-        if(!str.trim().equals("Z8^0L;1"))
+        if(!str.trim().equals(TCT_SIGNATURE)) {
             throw new IOException("Wrong signature!\n");
+        }
 
         final int endian = readLEInt(reader);
-        if(endian != 0xFF00AA55){
+        if(endian != TCT_ENDIAN){
             throw new IOException("Wrong endian!\n");
         }
 
         final int[] block = new int[2];
 	block[0] = readLEInt(reader); //Read block type and size.
         block[1] = readLEInt(reader);
-	if(block[0]== 1)
+	if(block[0]== 1) {
             throw new IOException("Wrong block type!\n");
+        }
 
         final int nbrStates = readLEInt(reader);
 
-	if(readLEInt(reader) != 0)
+	if(readLEInt(reader) != 0) {
             throw new IOException("Initial state not 0!\n");
+        }
 
         markedStates = new HashSet<Integer>(nbrStates);
 	while(true)
 	{
             final long markedState = readLEInt(reader);
-            if(markedState == -1L)
+            if(markedState == -1L) {
                 break;
+            }
             markedStates.add((int)markedState);
 	}
 
@@ -96,8 +107,9 @@ public class TCTConverter {
 	while(true)
 	{
             final long exit = readLEInt(reader); //The exit state of one transition
-            if(exit == -1L)
+            if(exit == -1L) {
                 break;
+            }
             states.add((int)exit);
             final short nt = readLEShort(reader);
             transNo += nt;
@@ -119,8 +131,9 @@ public class TCTConverter {
             }
 	}
 
-        if(transNo != transitions.size())
+        if(transNo != transitions.size()) {
             throw new IOException("Wrong number of transitions!/n");
+        }
 
     }
 
@@ -132,7 +145,7 @@ public class TCTConverter {
 
         for(final Integer st : states){
             final String stName = Integer.toString(st);
-            final boolean isInitial = (st == 0)?true:false;
+            final boolean isInitial = (st == TCT_INITIAL_STATE)?true:false;
             final boolean isMarked = markedStates.contains(st);
             des.addState(stName, isMarked, isInitial, false);
         }
@@ -140,11 +153,13 @@ public class TCTConverter {
         EventKind kind;
         boolean isObservable;
         for(final Integer e : alphabet){
-            isObservable = (e == 1000)?false:true;
-            if(!isObservable)
+            isObservable = (e == UNOBSERVABLE_VALUE)?false:true;
+            if(!isObservable) {
                 kind = EventKind.CONTROLLABLE;
-            else
+            }
+            else {
                 kind = (e%2 != 0)?EventKind.CONTROLLABLE:EventKind.UNCONTROLLABLE;
+            }
 
             des.addEvent(Integer.toString(e), kind.value(), isObservable);
         }
@@ -156,13 +171,13 @@ public class TCTConverter {
     }
 
     private int readLEInt(final DataInputStream reader) throws IOException{
-        final byte[] b = new byte[4];
+        final byte[] b = new byte[INTEGER_SIZE];
         reader.read(b);
         return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
     private short readLEShort(final DataInputStream reader) throws IOException{
-        final byte[] b = new byte[2];
+        final byte[] b = new byte[SHORT_SIZE];
         reader.read(b);
         return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getShort();
     }
