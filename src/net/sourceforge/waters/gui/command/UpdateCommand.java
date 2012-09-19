@@ -119,13 +119,13 @@ public class UpdateCommand
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command
+  @Override
   public void execute()
   {
     final List<? extends Proxy> visible;
-    if(mAdded.isEmpty()){
+    if (mAdded.isEmpty()) {
       visible = mModified;
-    }
-    else{
+    } else {
       visible = mAdded;
     }
     if (!mUpdatesSelection) {
@@ -135,7 +135,7 @@ public class UpdateCommand
     } else if (!mHasBeenExecuted) {
       mPanel.removeFromSelection(mRemoved);
       super.execute();
-      if(!mAdded.isEmpty()){
+      if (!mAdded.isEmpty()) {
         mPanel.replaceSelection(mAdded);
       }
       mHasBeenExecuted = true;
@@ -151,12 +151,15 @@ public class UpdateCommand
     mPanel.activate();
   }
 
+  @Override
   public void undo()
   {
-    final int size = mModified.size() + mRemoved.size();
-    final List<Proxy> visible = new ArrayList<Proxy>(size);
-    visible.addAll(mModified);
-    visible.addAll(mRemoved);
+    final List<? extends Proxy> visible;
+    if (mRemoved.isEmpty()) {
+      visible = mModified;
+    } else {
+      visible = mRemoved;
+    }
     if (!mUpdatesSelection) {
       mPanel.removeFromSelection(mAdded);
       super.undo();
@@ -173,7 +176,8 @@ public class UpdateCommand
   }
 
   @Override
-  public void setUpdatesSelection(final boolean update){
+  public void setUpdatesSelection(final boolean update)
+  {
     super.setUpdatesSelection(update);
     mUpdatesSelection = false;
   }

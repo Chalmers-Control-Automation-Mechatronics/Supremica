@@ -16,6 +16,7 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.subject.base.ProxySubject;
 
 
 /**
@@ -140,7 +141,7 @@ public class DeleteCommand
     final SelectionOwner panel = getPanel();
     panel.insertItems(mDeletes);
     if (getUpdatesSelection()) {
-      final List<Proxy> selection = getSelectionAfterInsert(mDeletes);
+      final List<ProxySubject> selection = getSelectionAfterInsert(mDeletes);
       panel.replaceSelection(selection);
       panel.scrollToVisible(selection);
       panel.activate();

@@ -22,6 +22,7 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
@@ -124,7 +125,7 @@ public abstract class AbstractEditCommand
     mUpdatesSelection = updatesSelection;
   }
 
-  public List<InsertInfo> getInserts()
+  public List<ProxySubject> getSelectionAfterInsert()
   {
     return Collections.emptyList();
   }
@@ -145,11 +146,11 @@ public abstract class AbstractEditCommand
 
   //#########################################################################
   //# Auxiliary Methods
-  List<Proxy> getSelectionAfterInsert(final List<InsertInfo> inserts)
+  List<ProxySubject> getSelectionAfterInsert(final List<InsertInfo> inserts)
   {
     final int size = inserts.size();
     final Set<Proxy> set = new THashSet<Proxy>(size);
-    final List<Proxy> result = new ArrayList<Proxy>(size);
+    final List<ProxySubject> result = new ArrayList<ProxySubject>(size);
     boolean newLabelBlock = true;
     LabelBlockSubject block = null;
     for (final InsertInfo insert : inserts) {
@@ -168,11 +169,12 @@ public abstract class AbstractEditCommand
       }
       final Proxy ancestor = mPanel.getSelectableAncestor(proxy);
       if (ancestor != null && set.add(ancestor)) {
-        result.add(ancestor);
+        final ProxySubject ancestorSubject = (ProxySubject) ancestor;
+        result.add(ancestorSubject);
       }
     }
     if (newLabelBlock) {
-      return Collections.singletonList((Proxy) block);
+      return Collections.singletonList((ProxySubject) block);
     }
     return result;
   }

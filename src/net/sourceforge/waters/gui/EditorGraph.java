@@ -240,7 +240,6 @@ class EditorGraph
                               final boolean selecting)
   {
     final List<ProxySubject> modified = new LinkedList<ProxySubject>();
-    final List<ProxySubject> added = new LinkedList<ProxySubject>();
     final List<ProxySubject> removed = new LinkedList<ProxySubject>();
     int minpass = Integer.MAX_VALUE;
     int maxpass = Integer.MIN_VALUE;
@@ -249,6 +248,8 @@ class EditorGraph
       final ProxySubject original = record.createOriginal();
       switch (record.getChangeKind()) {
       case ModelChangeEvent.ITEM_ADDED:
+        // Can't use objects from the secondary graph,
+        // they will be duplicated when creating an InsertCommand ...
         count ++;
         break;
       case ModelChangeEvent.ITEM_REMOVED:
@@ -279,6 +280,7 @@ class EditorGraph
     if (count == 0) {
       return null;
     }
+    final List<ProxySubject> added = new LinkedList<ProxySubject>();
     final List<AbstractEditCommand> commands =
       new ArrayList<AbstractEditCommand>(count);
     for (int pass = minpass; pass <= maxpass; pass++) {
@@ -287,10 +289,8 @@ class EditorGraph
         if (cmd != null) {
           cmd.setUpdatesSelection(false);
           commands.add(cmd);
-          for (final InsertInfo info : cmd.getInserts()){
-            final ProxySubject proxy = (ProxySubject) info.getProxy();
-            added.add(proxy);
-          }
+          final List<ProxySubject> created = cmd.getSelectionAfterInsert();
+          added.addAll(created);
         }
       }
     }
