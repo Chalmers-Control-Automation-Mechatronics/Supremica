@@ -445,10 +445,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         if(eventIdToProxyMap.get(event.getName()) == null){
             module.getEventDeclListModifiable().add((EventDeclSubject)event);
             eventIdToProxyMap.put(event.getName(), event);
-            if(event.getKind() == EventKind.CONTROLLABLE)
+            if(event.getKind() == EventKind.CONTROLLABLE) {
                 controllableAlphabet.add(event);
-            else if(event.getKind() == EventKind.UNCONTROLLABLE)
+            }
+            else if(event.getKind() == EventKind.UNCONTROLLABLE) {
                 uncontrollableAlphabet.add(event);
+            }
             return true;
         }
         return false;
@@ -486,7 +488,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         return event;
     }
 
-    public final Set<VariableComponentProxy> extractVariablesFromExpr(final SimpleExpressionProxy expr)
+    public Set<VariableComponentProxy> extractVariablesFromExpr(final SimpleExpressionProxy expr)
     {
         final Set<VariableComponentProxy> vars = new HashSet<VariableComponentProxy>();
         for(final Proxy proxy:module.getComponentList())
@@ -494,8 +496,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             if(proxy instanceof VariableComponentProxy)
             {
                 final VariableComponentProxy var = (VariableComponentProxy)proxy;
-                if(expr.toString().contains(var.getName()))
+                if(expr.toString().contains(var.getName())) {
                     vars.add(var);
+                }
             }
         }
         return vars;
@@ -524,8 +527,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 }
             }
         }
-        if(!exAutomaton.getMarkedLocations().isEmpty())
+        if(!exAutomaton.getMarkedLocations().isEmpty()) {
             addEvent(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION.value());
+        }
     }
 
     public ExtendedAutomaton getExtendedAutomaton(final String name){
