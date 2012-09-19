@@ -121,13 +121,23 @@ public class UpdateCommand
   //# Interface net.sourceforge.waters.gui.command.Command
   public void execute()
   {
-    final int size = mModified.size() + mAdded.size();
-    final List<Proxy> visible = new ArrayList<Proxy>(size);
-    visible.addAll(mModified);
-    visible.addAll(mAdded);
-    if (!mUpdatesSelection || !mHasBeenExecuted) {
+    final List<? extends Proxy> visible;
+    if(mAdded.isEmpty()){
+      visible = mModified;
+    }
+    else{
+      visible = mAdded;
+    }
+    if (!mUpdatesSelection) {
       mPanel.removeFromSelection(mRemoved);
       super.execute();
+      mHasBeenExecuted = true;
+    } else if (!mHasBeenExecuted) {
+      mPanel.removeFromSelection(mRemoved);
+      super.execute();
+      if(!mAdded.isEmpty()){
+        mPanel.replaceSelection(mAdded);
+      }
       mHasBeenExecuted = true;
     } else if (mRemoved.isEmpty()) {
       super.execute();

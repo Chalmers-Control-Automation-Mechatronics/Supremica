@@ -244,21 +244,25 @@ class EditorGraph
     final List<ProxySubject> removed = new LinkedList<ProxySubject>();
     int minpass = Integer.MAX_VALUE;
     int maxpass = Integer.MIN_VALUE;
+    int count = 0;
     for (final ChangeRecord record : mFakeMap.values()) {
       final ProxySubject original = record.createOriginal();
       switch (record.getChangeKind()) {
       case ModelChangeEvent.ITEM_ADDED:
-        added.add(original);
+        count ++;
         break;
       case ModelChangeEvent.ITEM_REMOVED:
+        count ++;
         removed.add(original);
         break;
       case ModelChangeEvent.STATE_CHANGED:
       case ModelChangeEvent.GEOMETRY_CHANGED:
+        count ++;
         modified.add(original);
         break;
       default:
         if (record.hasImplicitChanges()) {
+          count ++;
           modified.add(original);
         }
         break;
@@ -272,18 +276,21 @@ class EditorGraph
         maxpass = maxpass1;
       }
     }
-    final int size = modified.size() + added.size() + removed.size();
-    if (size == 0) {
+    if (count == 0) {
       return null;
     }
     final List<AbstractEditCommand> commands =
-      new ArrayList<AbstractEditCommand>(size);
+      new ArrayList<AbstractEditCommand>(count);
     for (int pass = minpass; pass <= maxpass; pass++) {
       for (final ChangeRecord record : mFakeMap.values()) {
         final AbstractEditCommand cmd = record.getUpdateCommand(surface, pass);
         if (cmd != null) {
           cmd.setUpdatesSelection(false);
           commands.add(cmd);
+          for (final InsertInfo info : cmd.getInserts()){
+            final ProxySubject proxy = (ProxySubject) info.getProxy();
+            added.add(proxy);
+          }
         }
       }
     }
@@ -1502,6 +1509,10 @@ class EditorGraph
         final GuardActionBlockSubject gablock = fake.getGuardActionBlock();
         final EdgeSubject edge = GraphTools.getCreatedEdge
           (mGraph, asource, atarget, start, end, lblock, gablock);
+        final SplineGeometrySubject spline = fake.getGeometry();
+        if(spline != null){
+          edge.setGeometry(spline.clone());
+        }
         setOriginal(edge);
         return edge;
       }

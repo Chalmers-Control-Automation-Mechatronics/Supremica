@@ -167,6 +167,15 @@ public class InsertCommand
 
 
   //#########################################################################
+  //# Simple Access
+  @Override
+  public List<InsertInfo> getInserts()
+  {
+    return mInserts;
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private static List<InsertInfo> getInserts(final Proxy proxy,
                                              final SelectionOwner panel)

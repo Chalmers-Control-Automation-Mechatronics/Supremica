@@ -124,6 +124,11 @@ public abstract class AbstractEditCommand
     mUpdatesSelection = updatesSelection;
   }
 
+  public List<InsertInfo> getInserts()
+  {
+    return Collections.emptyList();
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command

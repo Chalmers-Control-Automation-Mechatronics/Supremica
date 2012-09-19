@@ -133,6 +133,8 @@ import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.supremica.properties.Config;
 
@@ -3732,8 +3734,85 @@ public class GraphEditorPanel
           replaceSelection(mSource);
         }
       } else {
+        //make overlapping straight edges automatically spread apart
+        final List<EdgeSubject> edges =
+          getSecondaryGraph().getEdgesModifiable();
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(false);
+        boolean changeSpline = false;
+        boolean sameDirection = false;
+        if (!GeometryTools.isSelfloop(mCopiedEdge)) {
+          for (final EdgeSubject edge : edges) {
+            if ((edge.getSource() == mCopiedEdge.getTarget() &&
+                 edge.getTarget() == mCopiedEdge.getSource() ||
+                 edge.getSource() == mCopiedEdge.getSource() &&
+                 edge.getTarget() == mCopiedEdge.getTarget() &&
+                 edge != mCopiedEdge) &&
+                edge.getGeometry() == null) {
+
+              if(eq.equals(edge.getSource(), mCopiedEdge.getSource())){
+                if(edge.getSource() instanceof GroupNodeSubject){
+                  break;
+                }
+                sameDirection = true;
+              }
+
+              final Point2D mid = getNewMidPointOfEdge(edge, false);
+              edge.setGeometry(new SplineGeometrySubject(Collections
+                .singletonList(mid), SplineKind.INTERPOLATING));
+              changeSpline = true;
+            }
+          }
+          if (changeSpline) {
+            final Point2D mid = getNewMidPointOfEdge(mCopiedEdge, sameDirection);
+            mCopiedEdge.setGeometry(new SplineGeometrySubject(Collections
+              .singletonList(mid), SplineKind.INTERPOLATING));
+          }
+        }
         super.commitSecondaryGraph();
       }
+    }
+
+    /**
+     *Used to change the midpoint to 1 grid position perpendicularly
+     **/
+    private Point2D getNewMidPointOfEdge(final EdgeSubject edge, final boolean sameDirection){
+      final Point2D p1 = GeometryTools.getStartPoint(edge);
+      final Point2D p2 = GeometryTools.getEndPoint(edge);
+      final double dx = Math.abs(p2.getX() - p1.getX());
+      final double dy = Math.abs(p2.getY() - p1.getY());
+      final double perp = Math.pow(dx*dx + dy*dy, 0.5);
+      final int gridSize = Config.GUI_EDITOR_GRID_SIZE.get();
+      double newX = (dy / perp) * gridSize;
+      double newY = (dx / perp) * gridSize;
+
+      //make sure the arrows follow clockwise unless they go in same direction
+      if(p1.getX() == p2.getX() && p1.getY() > p2.getY()){
+        newX = -newX;
+      }
+      else if(p1.getY() == p2.getY() && p1.getX() < p2.getX()){
+        newY = -newY;
+      }
+      else if(p1.getX() < p2.getX()){
+        if(p1.getY() > p2.getY()){
+          newX = -newX;
+        }
+        newY = -newY;
+      }
+      else if(p1.getX() > p2.getX() && p1.getY() > p2.getY()){
+        newX = -newX;
+      }
+      if(sameDirection){
+        if(p1.getY() != p2.getY()){
+          newX = -newX;
+        }
+        if(p1.getX() != p2.getX()){
+          newY = -newY;
+        }
+      }
+
+      final Point2D mid = GeometryTools.getMidPoint(p1, p2);
+      return new Point2D.Double(mid.getX() + newX, mid.getY() + newY);
     }
 
     //#######################################################################
