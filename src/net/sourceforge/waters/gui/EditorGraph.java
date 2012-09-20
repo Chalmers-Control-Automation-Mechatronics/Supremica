@@ -1886,6 +1886,9 @@ class EditorGraph
       final LabelGeometrySubject fsubject = (LabelGeometrySubject) fake;
       final SimpleNodeSubject fnode = (SimpleNodeSubject) fsubject.getParent();
       final SimpleNodeSubject onode = (SimpleNodeSubject) getOriginal(fnode);
+      if(onode == null){
+
+      }
       return onode.getLabelGeometry();
     }
   }

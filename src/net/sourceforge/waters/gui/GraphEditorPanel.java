@@ -1305,12 +1305,12 @@ public class GraphEditorPanel
    * active, i.e., can be selected by a click at the given position
    * in the current context.
    */
-  private Collection<ProxySubject> getFocusableObjectsAtPosition
+  private Collection<Proxy> getFocusableObjectsAtPosition
     (final Point point)
   {
-    final Collection<ProxySubject> collection = new LinkedList<ProxySubject>();
-    final GraphSubject graph = getGraph();
-    for (final NodeSubject node : graph.getNodesModifiable()) {
+    final Collection<Proxy> collection = new LinkedList<Proxy>();
+    final GraphProxy graph = getDrawnGraph();
+    for (final NodeProxy node : graph.getNodes()) {
       collectFocusableObjectAtPosition(node, point, collection);
       if (node instanceof SimpleNodeSubject) {
         final SimpleNodeSubject simple = (SimpleNodeSubject) node;
@@ -1318,12 +1318,12 @@ public class GraphEditorPanel
         collectFocusableObjectAtPosition(geo, point, collection);
       }
     }
-    for (final EdgeSubject edge : graph.getEdgesModifiable()) {
+    for (final EdgeProxy edge : graph.getEdges()) {
       collectFocusableObjectAtPosition(edge, point, collection);
-      final LabelBlockSubject block = edge.getLabelBlock();
-      final ListSubject<AbstractSubject> events = block.getEventIdentifierListModifiable();
-      final Collection<ProxySubject> collection2 = new LinkedList<ProxySubject>();
-      for(final AbstractSubject sub : events){
+      final LabelBlockProxy block = edge.getLabelBlock();
+      final List<Proxy> events = block.getEventIdentifierList();
+      final Collection<Proxy> collection2 = new LinkedList<Proxy>();
+      for(final Proxy sub : events){
         collectFocusableObjectAtPosition(sub, point, collection2);
         if(sub instanceof ForeachSubject){
           final ForeachSubject foreach = (ForeachSubject)sub;
@@ -1335,7 +1335,7 @@ public class GraphEditorPanel
       if(!collection2.isEmpty() || isSelected(block) || mInternalDragAction instanceof InternalDragActionDND){
         collectFocusableObjectAtPosition(block, point, collection);
       }
-      final GuardActionBlockSubject ga = edge.getGuardActionBlock();
+      final GuardActionBlockProxy ga = edge.getGuardActionBlock();
       collectFocusableObjectAtPosition(ga, point, collection);
     }
     collectFocusableObjectAtPosition
@@ -1345,7 +1345,7 @@ public class GraphEditorPanel
 
   private void iterateForeach(final ForeachSubject foreach,
                               final Point point,
-                              final Collection<ProxySubject> collection){
+                              final Collection<Proxy> collection){
     for(final ProxySubject sub : foreach.getBodyModifiable()){
       collectFocusableObjectAtPosition(sub, point, collection);
       if(sub instanceof ForeachSubject){
@@ -1357,9 +1357,9 @@ public class GraphEditorPanel
   }
 
   private void collectFocusableObjectAtPosition
-    (final ProxySubject item,
+    (final Proxy item,
      final Point point,
-     final Collection<ProxySubject> collection)
+     final Collection<Proxy> collection)
   {
     if (item == null || getHighlightPriority(item) < 0) {
       return;
@@ -1376,7 +1376,7 @@ public class GraphEditorPanel
     collection.add(item);
   }
 
-  private int getHighlightPriority(final ProxySubject item)
+  private int getHighlightPriority(final Proxy item)
   {
     if (mInternalDragAction == null) {
       return mController.getHighlightPriority(item);
@@ -1620,7 +1620,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting and Selecting
-    int getHighlightPriority(final ProxySubject item)
+    int getHighlightPriority(final Proxy item)
     {
       return -1;
     }
@@ -1646,20 +1646,21 @@ public class GraphEditorPanel
      */
     void updateHighlighting()
     {
-      final ProxySubject object;
+      final Proxy object;
       if (mCurrentPoint == null) {
         object = null;
       } else {
-        final Collection<ProxySubject> objects =
+        final Collection<Proxy> objects =
           getFocusableObjectsAtPosition(mCurrentPoint);
         if (objects.isEmpty()) {
           object = null;
         } else {
-          object = Collections.max(objects, mComparator);
+          final Proxy max = Collections.max(objects, mComparator);
+          object = getOriginal(max);
         }
       }
       if (object != mFocusedObject) {
-        mFocusedObject = object;
+        mFocusedObject = (ProxySubject) object;
         repaint();
       }
     }
@@ -2011,20 +2012,20 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
-    int getHighlightPriority(final ProxySubject item)
+    int getHighlightPriority(final Proxy item)
     {
-      if (item instanceof LabelGeometrySubject) {
+      if (item instanceof LabelGeometryProxy) {
         return 6;
-      } else if (item instanceof SimpleNodeSubject) {
+      } else if (item instanceof SimpleNodeProxy) {
         return 5;
-      } else if (item instanceof EdgeSubject) {
+      } else if (item instanceof EdgeProxy) {
         return 4;
-      } else if (item instanceof LabelBlockSubject ||
-                 item instanceof GuardActionBlockSubject) {
+      } else if (item instanceof LabelBlockProxy ||
+                 item instanceof GuardActionBlockProxy) {
         return 3;
-      } else if (item instanceof GroupNodeSubject) {
+      } else if (item instanceof GroupNodeProxy) {
         return 2;
-      } else if (item instanceof IdentifierSubject || item instanceof ForeachSubject) {
+      } else if (item instanceof IdentifierProxy || item instanceof ForeachProxy) {
         return 1;
       }else {
         return -1;
@@ -2117,11 +2118,11 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
-    int getHighlightPriority(final ProxySubject item)
+    int getHighlightPriority(final Proxy item)
     {
-      if (item instanceof LabelGeometrySubject) {
+      if (item instanceof LabelGeometryProxy) {
         return 2;
-      } if (item instanceof SimpleNodeSubject) {
+      } if (item instanceof SimpleNodeProxy) {
         return 1;
       } else {
         return -1;
@@ -2241,9 +2242,9 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
-    int getHighlightPriority(final ProxySubject item)
+    int getHighlightPriority(final Proxy item)
     {
-      if (item instanceof GroupNodeSubject) {
+      if (item instanceof GroupNodeProxy) {
         return 1;
       } else {
         return -1;
@@ -2303,18 +2304,18 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
-    int getHighlightPriority(final ProxySubject item)
+    int getHighlightPriority(final Proxy item)
     {
-      if (item instanceof SimpleNodeSubject) {
+      if (item instanceof SimpleNodeProxy) {
         return 5;
-      } else if (item instanceof GroupNodeSubject) {
+      } else if (item instanceof GroupNodeProxy) {
         return 4;
-      } else if (item instanceof EdgeSubject) {
+      } else if (item instanceof EdgeProxy) {
         return 3;
-      } else if (item instanceof LabelBlockSubject ||
-                 item instanceof GuardActionBlockSubject) {
+      } else if (item instanceof LabelBlockProxy ||
+                 item instanceof GuardActionBlockProxy) {
         return 2;
-      } else if (item instanceof IdentifierSubject || item instanceof ForeachSubject) {
+      } else if (item instanceof IdentifierSubject || item instanceof ForeachProxy) {
         return 1;
       }else {
         return -1;
@@ -2567,7 +2568,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
-    int getHighlightPriority(final ProxySubject item)
+    int getHighlightPriority(final Proxy item)
     {
       return -1;
     }
@@ -3134,12 +3135,12 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
-    int getHighlightPriority(final ProxySubject item)
+    int getHighlightPriority(final Proxy item)
     {
-      if (item instanceof EdgeSubject ||
-          item instanceof LabelBlockSubject) {
+      if (item instanceof EdgeProxy ||
+          item instanceof LabelBlockProxy) {
         return 2;
-      } else if (item instanceof SimpleNodeSubject) {
+      } else if (item instanceof SimpleNodeProxy) {
         return 1;
       } else {
         return -1;
@@ -3817,12 +3818,12 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
-    int getHighlightPriority(final ProxySubject item)
+    int getHighlightPriority(final Proxy item)
     {
       final int prio;
-      if (item instanceof SimpleNodeSubject) {
+      if (item instanceof SimpleNodeProxy) {
         prio = 2;
-      } else if (item instanceof GroupNodeSubject &&
+      } else if (item instanceof GroupNodeProxy &&
                  (mIsSource || !getGraph().isDeterministic())) {
         prio = 1;
       } else {
@@ -4062,8 +4063,8 @@ public class GraphEditorPanel
     //# Data Members
     private final Set<Class<? extends Proxy>> mMovedTypes;
     // TODO Compiler bug? Why can't the following two be final???
-    private Collection<ProxySubject> mMovedObjects = null;
-    private Map<EdgeProxy,MovingEdge> mEdgeMap = null;
+    private final Collection<ProxySubject> mMovedObjects;
+    private final Map<EdgeProxy,MovingEdge> mEdgeMap;
     private int mDeltaX;
     private int mDeltaY;
     private boolean mMoveAlongHalfWay;
@@ -4150,15 +4151,15 @@ public class GraphEditorPanel
   //#########################################################################
   //# Inner Class HighlightComparator
   private class HighlightComparator
-    implements Comparator<ProxySubject>
+    implements Comparator<Proxy>
   {
 
     //#######################################################################
     //# Interface java.util.Comparator
-    public int compare(final ProxySubject item1, final ProxySubject item2)
+    public int compare(final Proxy item1, final Proxy item2)
     {
-      final boolean sel1 = isRenderedSelected(item1);
-      final boolean sel2 = isRenderedSelected(item2);
+      final boolean sel1 = isRenderedSelected((ProxySubject) item1);
+      final boolean sel2 = isRenderedSelected((ProxySubject) item2);
       if (sel1 && !sel2) {
         return 1;
       } else if (!sel1 && sel2) {
