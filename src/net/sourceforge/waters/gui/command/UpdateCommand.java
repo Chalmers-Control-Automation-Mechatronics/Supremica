@@ -86,15 +86,36 @@ public class UpdateCommand
     mPanel = panel;
     mUpdatesSelection = updatesSelection;
     mHasBeenExecuted = false;
+    String named;
+    String suffix;
     if (name == null) {
-      final int size = modified.size() + added.size() + removed.size();
-      final List<Proxy> all = new ArrayList<Proxy>(size);
-      all.addAll(modified);
-      all.addAll(added);
-      all.addAll(removed);
-      final String named = ProxyNamer.getCollectionClassName(all);
-      final String suffix =
-        added.isEmpty() && removed.isEmpty() ? "Movement" : "Rearrangement";
+      if(added.isEmpty()){
+        if(removed.isEmpty()){
+          suffix = "Movement";
+          named = ProxyNamer.getCollectionClassName(modified);
+        }
+        else{
+          suffix = "Removal";
+          named = ProxyNamer.getCollectionClassName(removed);
+        }
+      }
+      else{
+        if(removed.isEmpty()){
+          suffix = "Creation";
+          named = ProxyNamer.getCollectionClassName(added);
+        }
+        else{
+          suffix = "Rearrangement";
+          final int size = modified.size() + added.size() + removed.size();
+          final List<Proxy> all = new ArrayList<Proxy>(size);
+          all.addAll(modified);
+          all.addAll(added);
+          all.addAll(removed);
+          named = ProxyNamer.getCollectionClassName(all);
+        }
+      }
+
+
       if (named != null) {
         setName(named + ' ' + suffix);
       } else {

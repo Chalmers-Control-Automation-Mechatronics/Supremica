@@ -3734,6 +3734,13 @@ public class GraphEditorPanel
           replaceSelection(mSource);
         }
       } else {
+        final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+        if(mAnchor ==  null &&
+          eq.equals(mOrigEdge.getSource(), mCopiedEdge.getSource()) &&
+          eq.equals(mOrigEdge.getTarget(), mCopiedEdge.getTarget())){
+          //dont create a bogus command
+          return;
+        }
         if (!GeometryTools.isSelfloop(mCopiedEdge) &&
             mCopiedEdge.getSource() instanceof SimpleNodeSubject &&
             mCopiedEdge.getTarget() instanceof SimpleNodeSubject) {
