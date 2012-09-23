@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -26,8 +27,12 @@ import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -90,6 +95,7 @@ public final class GuardActionBlockSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public GuardActionBlockSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -97,37 +103,58 @@ public final class GuardActionBlockSubject
     return (GuardActionBlockSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final GuardActionBlockSubject downcast =
-        (GuardActionBlockSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ListSubject<SimpleExpressionSubject> guards =
-        downcast.getGuardsModifiable();
-      mGuards.assignFrom(guards);
-      final ListSubject<BinaryExpressionSubject> actions =
-        downcast.getActionsModifiable();
-      mActions.assignFrom(actions);
-      final LabelGeometrySubject geometry = downcast.getGeometry();
-      if (mGeometry == geometry) {
-        // nothing
-      } else if (mGeometry == null) {
-        mGeometry = geometry.clone();
-        mGeometry.setParent(this);
-        fireGeometryChanged(mGeometry);
-      } else if (geometry == null) {
-        mGeometry.setParent(null);
-        mGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mGeometry.assignFrom(geometry);
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 0) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 3:
+        if (mGeometry != null) {
+          mGeometry.setParent(null);
+        }
+        mGeometry = (LabelGeometrySubject) newValue;
+        if (mGeometry != null) {
+          mGeometry.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final GuardActionBlockSubject downcast =
+      (GuardActionBlockSubject) newState;
+    final UndoInfo step1 = mGuards.createUndoInfo(downcast.mGuards);
+    if (step1 != null) {
+      info.add(step1);
+    }
+    final UndoInfo step2 = mActions.createUndoInfo(downcast.mActions);
+    if (step2 != null) {
+      info.add(step2);
+    }
+    final boolean null3a = mGeometry == null;
+    final boolean null3b = downcast.mGeometry == null;
+    if (null3a != null3b) {
+      final LabelGeometrySubject clone3 =
+        ProxyTools.clone(downcast.mGeometry);
+      final UndoInfo step3 = new ReplacementUndoInfo(3, mGeometry, clone3);
+      info.add(step3);
+    } else if (!null3a) {
+      final UndoInfo step3 = mGeometry.createUndoInfo(downcast.mGeometry);
+      if (step3 != null) {
+        info.add(step3);
+      }
+    }
   }
 
 

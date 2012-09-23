@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.List;
 
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
 import net.sourceforge.waters.model.base.Proxy;
@@ -196,6 +198,21 @@ public abstract class AbstractWatersTest
         diagnostics = msg + " (See " + mLogFile + " for details.)";
       }
       fail(diagnostics);
+    }
+  }
+
+  protected void assertProxyListEquals(final AbstractEqualityVisitor eq,
+                                       final String msg,
+                                       final List<? extends Proxy> list,
+                                       final List<? extends Proxy> expected)
+  {
+    assertEquals("Unexpected list length!", expected.size(), list.size());
+    final Iterator<? extends Proxy> iter1 = list.iterator();
+    final Iterator<? extends Proxy> iter2 = expected.iterator();
+    while (iter1.hasNext()) {
+      final Proxy proxy1 = iter1.next();
+      final Proxy proxy2 = iter2.next();
+      assertProxyEquals(eq, msg, proxy1, proxy2);
     }
   }
 

@@ -16,7 +16,11 @@ import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -48,6 +52,7 @@ public abstract class AliasSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public AliasSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -55,23 +60,41 @@ public abstract class AliasSubject
     return (AliasSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final AliasSubject downcast = (AliasSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ExpressionSubject expression = downcast.getExpression();
-      if (mExpression.getClass() != expression.getClass()) {
-        mExpression.setParent(null);
-        mExpression = expression.clone();
-        mExpression.setParent(this);
-        change = true;
-      } else {
-        mExpression.assignFrom(expression);
-      }
-      return change;
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
     } else {
-      return false;
+      switch (index) {
+      case 2:
+        mExpression.setParent(null);
+        mExpression = (ExpressionSubject) newValue;
+        mExpression.setParent(this);
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
+      }
+    }
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final AliasSubject downcast = (AliasSubject) newState;
+    if (mExpression.getClass() == downcast.mExpression.getClass()) {
+      final UndoInfo step2 = mExpression.createUndoInfo(downcast.mExpression);
+      if (step2 != null) {
+        info.add(step2);
+      }
+    } else {
+      final ExpressionSubject clone2 = downcast.mExpression.clone();
+      final UndoInfo step2 = new ReplacementUndoInfo(2, mExpression, clone2);
+      info.add(step2);
     }
   }
 

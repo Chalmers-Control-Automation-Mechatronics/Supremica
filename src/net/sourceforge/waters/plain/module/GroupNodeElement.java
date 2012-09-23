@@ -85,6 +85,7 @@ public final class GroupNodeElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public GroupNodeElement clone()
   {
     return (GroupNodeElement) super.clone();

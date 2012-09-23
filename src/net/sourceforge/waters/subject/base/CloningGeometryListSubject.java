@@ -14,9 +14,9 @@ import java.lang.reflect.Method;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
@@ -100,7 +100,8 @@ public class CloningGeometryListSubject<E extends Cloneable>
   {
     final E cloned = cloneElement(element);
     mList.add(index, cloned);
-    fireGeometryChange();
+    final ModelChangeEvent event = createGeometryChanged();
+    event.fire();
   }
 
   public E get(final int index)
@@ -112,7 +113,8 @@ public class CloningGeometryListSubject<E extends Cloneable>
   public E remove(final int index)
   {
     final E element = mList.remove(index);
-    fireGeometryChange();
+    final ModelChangeEvent event = createGeometryChanged();
+    event.fire();
     return element;
   }
 
@@ -122,7 +124,8 @@ public class CloningGeometryListSubject<E extends Cloneable>
     if (!old.equals(element)) {
       final E cloned = cloneElement(element);
       mList.set(index, cloned);
-      fireGeometryChange();
+      final ModelChangeEvent event = createGeometryChanged();
+      event.fire();
     }
     return old;
   }
@@ -188,82 +191,108 @@ public class CloningGeometryListSubject<E extends Cloneable>
     return mObservers;
   }
 
-  public void fireModelChanged(final ModelChangeEvent event)
-  {
-    SubjectTools.fireModelChanged(this, event);
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SimpleListSubject
-  public void assignFrom(final List<? extends E> list)
+  public UndoInfo createUndoInfo(final List<? extends E> newList)
   {
-    final int oldsize = size();
-    final int newsize = list.size();
-    final boolean[] used = new boolean[oldsize];
-    final List<E> newlist = new ArrayList<E>(newsize);
-    boolean useall = true;
-    int i;
-    for (i = 0; i < newsize; i++) {
-      newlist.add(null);
+    if (equals(newList)) {
+      return null;
     }
-    for (i = 0; i < oldsize; i++) {
-      used[i] = false;
-    }
-    // First try to find list positions that change neither in contents
-    // nor in position. These are transferred directly into the new list
-    // and do not cause any change notification.
-    i = 0;
-    final Iterator<? extends E> olditer = mList.iterator();
-    for (final E newitem : list) {
-      if (olditer.hasNext()) {
-        final E olditem = olditer.next();
-        if (newitem.equals(olditem)) {
-          newlist.set(i, olditem);
-          used[i] = true;
-        } else {
-          useall = false;
-        }
-        i++;
-      } else {
-        break;
-      }
-    }
-    final boolean change;
-    if (useall) {
-      // We have filled all places. But there may still be a change if
-      // the list has shrunk.
-      change = newsize != oldsize;
+
+    // Longest Common Subsequence Algorithm
+    // http://en.wikipedia.org/wiki/Longest_common_subsequence_problem
+    final int len1 = size();
+    final int len2 = newList.size();
+    final int[][] lcsLength = new int[len1 + 1][len2 + 1];
+    final ListIterator<? extends E> iter1 = listIterator();
+    int i1 = 0;
+    ListIterator<? extends E> iter2 = null;
+    int i2 = 0;
+    if (len1 == 0) {
+      i2 = len2;
+      iter2 = newList.listIterator(len2);
     } else {
-      // We could not yet fill all places. Visit again and try to move
-      // items found in different positions in the new list. If no identical
-      // item can be found, use a clone of the item in the new list.
-      change = true;
-      i = 0;
-      for (final E newitem : list) {
-        if (newlist.get(i) == null) {
-          int j = 0;
-          for (final E olditem : this) {
-            if (!used[j] && newitem.equals(olditem)) {
-              newlist.set(i, olditem);
-              used[j] = true;
-              break;
-            }
-            j++;
-          }
-          if (j == oldsize) {
-            // Not found---must clone and add ...
-            final E item = cloneElement(newitem);
-            newlist.set(i, item);
+      while (iter1.hasNext()) {
+        final E item1 = iter1.next();
+        i1++;
+        i2 = 0;
+        iter2 = newList.listIterator();
+        while (iter2.hasNext()) {
+          final E item2 = iter2.next();
+          i2++;
+          if (item1.equals(item2)) {
+            lcsLength[i1][i2] = lcsLength[i1 - 1][i2 - 1] + 1;
+          } else if (lcsLength[i1][i2 - 1] < lcsLength[i1 - 1][i2]) {
+            lcsLength[i1][i2] = lcsLength[i1 - 1][i2];
+          } else {
+            lcsLength[i1][i2] = lcsLength[i1][i2 - 1];
           }
         }
-        i++;
       }
     }
-    if (change) {
-      mList = newlist;
-      fireGeometryChange();
+
+    final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
+    int numInserts = newList.size() - lcsLength[len1][len2];
+    final List<UndoInfo> insertions = new ArrayList<UndoInfo>(numInserts);
+    while (i1 > 0 || i2 > 0) {
+      final int len = lcsLength[i1][i2];
+      if (i1 > 0 && i2 > 0 && lcsLength[i1 - 1][i2 - 1] == len) {
+        i1--;
+        i2--;
+        final E item1 = iter1.previous();
+        final E item2 = iter2.previous();
+        final E cloned = cloneElement(item2);
+        final UndoInfo replace = new ReplacementUndoInfo(i1, item1, cloned);
+        info.add(replace);
+      } else if (i2 > 0 && (i1 == 0 || lcsLength[i1][i2 - 1] == len)) {
+        i2--;
+        final E item2 = iter2.previous();
+        final E cloned = cloneElement(item2);
+        final UndoInfo insert = new ReplacementUndoInfo(i2, null, cloned);
+        insertions.add(insert);
+      } else if (i1 > 0 && (i2 == 0 || lcsLength[i1 - 1][i2] == len)) {
+        i1--;
+        final E item1 = iter1.previous();
+        final UndoInfo remove = new ReplacementUndoInfo(i1, item1, null);
+        info.add(remove);
+      } else {
+        i1--;
+        i2--;
+        iter1.previous();
+        iter2.previous();
+      }
     }
+
+    numInserts = insertions.size();
+    final ListIterator<UndoInfo> iter = insertions.listIterator(numInserts);
+    while (iter.hasPrevious()) {
+      final UndoInfo insert = iter.previous();
+      info.add(insert);
+    }
+    return info;
+  }
+
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    if (oldValue == null) {
+      @SuppressWarnings("unchecked")
+      final Class<E> clazz = (Class<E>) newValue.getClass();
+      final E element = clazz.cast(newValue);
+      final E cloned = cloneElement(element);
+      mList.add(index, clazz.cast(cloned));
+    } else if (newValue == null) {
+      mList.remove(index);
+    } else {
+      @SuppressWarnings("unchecked")
+      final Class<E> clazz = (Class<E>) newValue.getClass();
+      final E element = clazz.cast(newValue);
+      final E cloned = cloneElement(element);
+      mList.set(index, clazz.cast(cloned));
+    }
+    return createGeometryChanged();
   }
 
 
@@ -307,17 +336,15 @@ public class CloningGeometryListSubject<E extends Cloneable>
     return mLastCloneMethod;
   }
 
-  private void fireGeometryChange()
+  private ModelChangeEvent createGeometryChanged()
   {
     //TODO mParent.getParent() can be null ??
     Subject source = mParent != null ? mParent.getParent() : this;
     if(mParent != null && mParent.getParent() == null){
       source = this;
     }
-    final ModelChangeEvent event =
-      ModelChangeEvent.createGeometryChanged(source,
-                                             (GeometrySubject) mParent);
-    fireModelChanged(event);
+    return ModelChangeEvent.createGeometryChanged(source,
+                                                  (GeometrySubject) mParent);
   }
 
 

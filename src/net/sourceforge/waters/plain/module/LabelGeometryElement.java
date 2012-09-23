@@ -63,6 +63,7 @@ public final class LabelGeometryElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public LabelGeometryElement clone()
   {
     return (LabelGeometryElement) super.clone();

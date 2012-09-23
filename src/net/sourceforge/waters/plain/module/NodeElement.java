@@ -77,6 +77,7 @@ public abstract class NodeElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public NodeElement clone()
   {
     return (NodeElement) super.clone();

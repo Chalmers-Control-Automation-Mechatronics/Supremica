@@ -17,7 +17,11 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -60,6 +64,7 @@ public final class IntConstantSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public IntConstantSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -67,21 +72,35 @@ public final class IntConstantSubject
     return (IntConstantSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final IntConstantSubject downcast = (IntConstantSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final int value = downcast.getValue();
-      if (mValue != value) {
-        mValue = value;
-        change = true;
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
+        mValue = (Integer) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final IntConstantSubject downcast = (IntConstantSubject) newState;
+    if (mValue != downcast.mValue) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mValue, downcast.mValue);
+      info.add(step2);
+    }
   }
 
 

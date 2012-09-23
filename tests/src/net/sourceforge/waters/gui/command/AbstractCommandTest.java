@@ -33,7 +33,6 @@ import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -41,8 +40,10 @@ import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
@@ -252,21 +253,52 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
     return null;
   }
 
-  protected SimpleNodeSubject findSimpleNode(final GraphEditorPanel panel,
-                                             final String name)
+  protected NodeSubject findNode(final GraphEditorPanel panel,
+                                 final String name)
   {
     final GraphSubject graph = panel.getGraph();
-    for (final NodeProxy node : graph.getNodes()) {
-      if (node.getName().equals(name) &&
-          node instanceof SimpleNodeProxy) {
-        return (SimpleNodeSubject) node;
+    for (final NodeSubject node : graph.getNodesModifiable()) {
+      if (node.getName().equals(name)) {
+        return node;
       }
     }
     final SimpleComponentSubject comp =
       (SimpleComponentSubject) graph.getParent();
     fail("Graph '" + comp.getName() +
-         "' does not contain a simple node called '" + name + "'!");
+         "' does not contain a node called '" + name + "'!");
     return null;
+  }
+
+  protected SimpleNodeSubject findSimpleNode(final GraphEditorPanel panel,
+                                             final String name)
+  {
+    final NodeSubject node = findNode(panel, name);
+    if (node instanceof SimpleNodeSubject) {
+      return (SimpleNodeSubject) node;
+    } else {
+      final GraphSubject graph = panel.getGraph();
+      final SimpleComponentSubject comp =
+        (SimpleComponentSubject) graph.getParent();
+      fail("Node '" + name + "' in graph '" + comp.getName() +
+         "' is not a simple node!");
+      return null;
+    }
+  }
+
+  protected GroupNodeSubject findGroupNode(final GraphEditorPanel panel,
+                                           final String name)
+  {
+    final NodeSubject node = findNode(panel, name);
+    if (node instanceof GroupNodeSubject) {
+      return (GroupNodeSubject) node;
+    } else {
+      final GraphSubject graph = panel.getGraph();
+      final SimpleComponentSubject comp =
+        (SimpleComponentSubject) graph.getParent();
+      fail("Node '" + name + "' in graph '" + comp.getName() +
+         "' is not a group node!");
+      return null;
+    }
   }
 
 

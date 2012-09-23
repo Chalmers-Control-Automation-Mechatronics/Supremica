@@ -33,7 +33,7 @@ import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
-import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -279,13 +279,23 @@ class NodeSetSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
-  public void assignFrom(final Set<? extends NodeSubject> set)
+  public UndoInfo createUndoInfo(final Set<? extends NodeSubject> newState)
   {
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
-    if (!eq.isEqualSet(this, set)) {
+    if (eq.isEqualSet(this, newState)) {
+      return null;
+    } else {
       throw new UnsupportedOperationException
         ("Node set assignment not yet implemented!");
     }
+  }
+
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    throw new UnsupportedOperationException
+      ("Node set assignment not yet implemented!");
   }
 
 
@@ -343,11 +353,6 @@ class NodeSetSubject
   public Collection<ModelObserver> getModelObservers()
   {
     return mObservers;
-  }
-
-  public void fireModelChanged(final ModelChangeEvent event)
-  {
-    SubjectTools.fireModelChanged(this, event);
   }
 
 
@@ -429,7 +434,7 @@ class NodeSetSubject
     node.setParent(this);
     final ModelChangeEvent event =
       ModelChangeEvent.createItemAdded(this, node);
-    node.fireModelChanged(event);
+    event.fire();
   }
 
   private void completeRemove(final NodeSubject node)
@@ -439,8 +444,7 @@ class NodeSetSubject
     node.setParent(null);
     final ModelChangeEvent event =
       ModelChangeEvent.createItemRemoved(this, node);
-    node.fireModelChanged(event);
-    fireModelChanged(event);
+    event.fire();
   }
 
 

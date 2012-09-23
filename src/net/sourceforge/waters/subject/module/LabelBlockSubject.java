@@ -15,13 +15,18 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -68,6 +73,7 @@ public final class LabelBlockSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public LabelBlockSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -75,30 +81,49 @@ public final class LabelBlockSubject
     return (LabelBlockSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final LabelBlockSubject downcast = (LabelBlockSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final LabelGeometrySubject geometry = downcast.getGeometry();
-      if (mGeometry == geometry) {
-        // nothing
-      } else if (mGeometry == null) {
-        mGeometry = geometry.clone();
-        mGeometry.setParent(this);
-        fireGeometryChanged(mGeometry);
-      } else if (geometry == null) {
-        mGeometry.setParent(null);
-        mGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mGeometry.assignFrom(geometry);
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
+        if (mGeometry != null) {
+          mGeometry.setParent(null);
+        }
+        mGeometry = (LabelGeometrySubject) newValue;
+        if (mGeometry != null) {
+          mGeometry.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final LabelBlockSubject downcast = (LabelBlockSubject) newState;
+    final boolean null2a = mGeometry == null;
+    final boolean null2b = downcast.mGeometry == null;
+    if (null2a != null2b) {
+      final LabelGeometrySubject clone2 =
+        ProxyTools.clone(downcast.mGeometry);
+      final UndoInfo step2 = new ReplacementUndoInfo(2, mGeometry, clone2);
+      info.add(step2);
+    } else if (!null2a) {
+      final UndoInfo step2 = mGeometry.createUndoInfo(downcast.mGeometry);
+      if (step2 != null) {
+        info.add(step2);
+      }
+    }
   }
 
 

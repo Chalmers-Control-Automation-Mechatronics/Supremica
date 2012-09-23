@@ -35,15 +35,16 @@ public interface ProxySubject
    */
   public ProxySubject clone();
 
+
   /**
-   * Assigns the contents of another subject to this subject. This method
-   * ensures that the contents of this subject are equal to the contents of the
-   * given subject according to the contents. Items already contained in this
-   * subject are reused if possible, and may be changed in position as needed.
-   * Items not contained are cloned from the given subject. The method tries to
-   * produce as few model change notifications as possible.
-   * @param partner  The subject to be copied from.
+   * Creates assignment instructions to replaces the contents of this list
+   * by the contents of another list. This method attempts to produce a
+   * minimal sequence of deletions and insertions to convert this set
+   * to the given new set.
+   * @param  newSet   The list containing the data after the intended
+   *                  assignment.
+   * @return Undo information containing a minimal assignment sequence.
    */
-  public boolean assignFrom(ProxySubject partner);
+  public UndoInfo createUndoInfo(ProxySubject newState);
 
 }

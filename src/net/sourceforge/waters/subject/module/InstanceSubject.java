@@ -25,7 +25,11 @@ import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.subject.base.IndexedArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -80,6 +84,7 @@ public final class InstanceSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public InstanceSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -87,24 +92,39 @@ public final class InstanceSubject
     return (InstanceSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final InstanceSubject downcast = (InstanceSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final String moduleName = downcast.getModuleName();
-      if (mModuleName != moduleName) {
-        mModuleName = moduleName;
-        change = true;
-      }
-      final IndexedListSubject<ParameterBindingSubject> bindingList =
-        downcast.getBindingListModifiable();
-      mBindingList.assignFrom(bindingList);
-      if (change) {
-        fireStateChanged();
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
+        mModuleName = (String) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final InstanceSubject downcast = (InstanceSubject) newState;
+    if (!mModuleName.equals(downcast.mModuleName)) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mModuleName, downcast.mModuleName);
+      info.add(step2);
+    }
+    final UndoInfo step3 = mBindingList.createUndoInfo(downcast.mBindingList);
+    if (step3 != null) {
+      info.add(step3);
+    }
   }
 
 

@@ -72,6 +72,7 @@ public final class BinaryExpressionElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public BinaryExpressionElement clone()
   {
     return (BinaryExpressionElement) super.clone();

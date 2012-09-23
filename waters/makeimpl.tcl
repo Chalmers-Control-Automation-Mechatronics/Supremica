@@ -148,6 +148,7 @@ proc Java_ExtractFileInfo {srcname importMapName} {
           set parent [lindex $parents 0]
           set interfaces [lrange $parents 1 end]
           set comment ""
+          set nextid 0
           set inclass 1
         } else {
           set line ""
@@ -190,8 +191,9 @@ proc Java_ExtractFileInfo {srcname importMapName} {
             } else {
               set refstatus "owned"
             }
-            set attrib [Java_AttribCreate $type $name $eqstatus $refstatus \
-                            $dftvalue $comment]
+            incr nextid
+            set attrib [Java_AttribCreate $type $name $nextid $eqstatus \
+                            $refstatus $dftvalue $comment]
             lappend attribs $attrib
             set dftvalue ""
             set comment ""
@@ -257,13 +259,13 @@ proc Java_ExtractHeader {instream line sep} {
 proc Java_InitClassMap {classMapName} {
   upvar $classMapName classMap
   set attribName \
-      [Java_AttribCreate "String" "Name" "required" "owned" "" "name"]
-  set attribLocation \
-      [Java_AttribCreate "URI" "Location" "ignored" "owned" "" \
-           "file system location"]
+      [Java_AttribCreate "String" "Name" 1 "required" "owned" "" "name"]
   set attribComment \
-      [Java_AttribCreate "String" "Comment" "optional" "owned" "null" \
+      [Java_AttribCreate "String" "Comment" 1 "optional" "owned" "null" \
            "comment"]
+  set attribLocation \
+      [Java_AttribCreate "URI" "Location" 2 "ignored" "owned" "" \
+           "file system location"]
   set classMap(Proxy) \
       [Java_ClassCreateAbstract "Proxy" "proxy" "" "" ""]
   set classMap(GeometryProxy) \
@@ -436,7 +438,7 @@ proc Java_AddGeometryInformation {classMapName interfacename} {
   set attribs [Java_ClassGetAttributes $classinfo]
   foreach attrib $attribs {
     set type [Java_AttribGetDeclaredType $attrib ""]
-    set eqstatus [Java_AttribGetEqualityStatus $attrib ""]
+    set eqstatus [Java_AttribGetEqualityStatus $attrib]
     if {[string compare $eqstatus "geometry"] == 0} {
       set geo 2
     } else {
@@ -492,9 +494,11 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
   # Extract Superclass Attributes
   set allattribs $attribs
   set current $superinterfacename
+  set numsuperattribus 0
   while {[string length $current] > 0} {
     set currentinfo $classMap($current)
     set currentattribs [Java_ClassGetAttributes $currentinfo]
+    incr numsuperattribus [llength $currentattribs]
     set allattribs [concat $currentattribs $allattribs]
     set current [Java_ClassGetParent $currentinfo]
   }
@@ -600,8 +604,8 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
       set decltype [Java_AttribGetDeclaredType $attrib $impl]
       set impltype [Java_AttribGetImplementationType $attrib $impl classMap]
       set transformer [Java_AttribGetCollectionTransformerName $attrib $impl]
-      set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-      set refstatus [Java_AttribGetRefStatus $attrib $impl]
+      set eqstatus [Java_AttribGetEqualityStatus $attrib]
+      set refstatus [Java_AttribGetRefStatus $attrib]
       if {[string compare $transformer ""] == 0} {
         set membertype [Java_AttribGetMemberType $attrib $impl classMap]
         set dftvalue [Java_AttribGetDefaultValue $attrib $impl]
@@ -743,12 +747,13 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
   ############################################################################
   # Cloning
     set needassign [expr [string compare $impl "subject"] == 0 && \
-                        (!$abstract || $numattribs > 0)]
+                         $numattribs > 0]
     if {$needassign} {
       Java_GenerateSeparatorComment $stream $umap "Cloning and Assigning"
     } else {
       Java_GenerateSeparatorComment $stream $umap "Cloning"
     }
+    Java_WriteLn $stream $umap "  @Override"
     Java_WriteLn $stream $umap "  public $classname clone()"
     Java_WriteLn $stream $umap "  \{"
     if {[string compare $impl "plain"] == 0 || $numattribs == 0} {
@@ -768,136 +773,208 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
   ############################################################################
   # Assigning
     if {$needassign} {
-      Java_WriteLn $stream $umap \
-          "  public boolean assignFrom(final ProxySubject partner)"
-      Java_WriteLn $stream $umap "  \{"
-      Java_WriteLn $stream $umap "    if (this != partner) \{"
-      if {[llength $attribs] > 0} {
-        Java_WriteLn $stream $umap \
-            "      final $classname downcast = ($classname) partner;"
-      }
-      Java_WriteLn $stream $umap \
-          "      boolean change = super.assignFrom(partner);"
+      set literal 0
       foreach attrib $attribs {
+        set type [Java_AttribGetDeclaredType $attrib $impl]
+        if {![Java_IsCollectionType $type]} {
+          set literal 1
+          break
+        }
+      }
+      if {$literal} {
+        Java_WriteLn $stream $umap "  @Override"
+        Java_WriteLn $stream $umap \
+            "  public ModelChangeEvent assignMember(final int index,"
+        Java_WriteLn $stream $umap \
+            "                                       final Object oldValue,"
+        Java_WriteLn $stream $umap \
+            "                                       final Object newValue)"
+        Java_WriteLn $stream $umap "  \{"
+        Java_WriteLn $stream $umap "    if (index <= $numsuperattribs) \{"
+        Java_WriteLn $stream $umap \
+            "      return super.assignMember(index, oldValue, newValue);"
+        Java_WriteLn $stream $umap "    \} else \{"
+        Java_WriteLn $stream $umap "      switch (index) \{"
+        foreach attrib $attribs {
+          set decltype [Java_AttribGetDeclaredType $attrib $impl]
+          if {[Java_IsCollectionType $decltype]} {
+            continue
+          }
+          set id [Java_AttribGetId $attrib]
+          incr id $numsuperattribs
+          set type [Java_AttribGetMemberType $attrib $impl classMap]
+          set casttype [Java_GetObjectAssignableType $type]
+          set membername [Java_AttribGetMemberName $attrib $impl]
+          set eqstatus [Java_AttribGetEqualityStatus $attrib]
+          set refstatus [Java_AttribGetRefStatus $attrib]
+          set doparent [expr \
+                            [regexp {Proxy$} $decltype all] && \
+                            [string compare $refstatus "owned"] == 0]
+          Java_WriteLn $stream $umap "      case $id:"
+          if {$doparent} {
+            if {[string compare $eqstatus "required"] == 0} {
+              Java_WriteLn $stream $umap "        $membername.setParent(null);"
+            } else {
+              Java_WriteLn $stream $umap "        if ($membername != null) \{"
+              Java_WriteLn $stream $umap \
+                  "          $membername.setParent(null);"
+              Java_WriteLn $stream $umap "        \}"
+            }
+          }
+          Java_WriteLn $stream $umap \
+              "        $membername = ($casttype) newValue;"
+          if {$doparent} {
+            if {[string compare $eqstatus "required"] == 0} {
+              Java_WriteLn $stream $umap "        $membername.setParent(this);"
+            } else {
+              Java_WriteLn $stream $umap "        if ($membername != null) \{"
+              Java_WriteLn $stream $umap \
+                  "          $membername.setParent(this);"
+              Java_WriteLn $stream $umap "        \}"
+            }
+          }
+          if {[string compare $eqstatus "geometry"] == 0 ||
+              [regexp {Geometry} $classname all]} {
+            Java_WriteLn $stream $umap \
+                "        return ModelChangeEvent.createGeometryChanged(this, newValue);"
+          } else {
+            Java_WriteLn $stream $umap \
+                "        return ModelChangeEvent.createStateChanged(this);"
+          }
+        }
+        Java_WriteLn $stream $umap "      default:"
+        Java_WriteLn $stream $umap "        return null;"
+        Java_WriteLn $stream $umap "      \}"
+        Java_WriteLn $stream $umap "    \}"
+        Java_WriteLn $stream $umap "  \}"
+        Java_WriteLn $stream $umap ""
+      }
+
+      Java_WriteLn $stream $umap "  @Override"
+      Java_WriteLn $stream $umap \
+          "  protected void collectUndoInfo(final ProxySubject newState,"
+      Java_WriteLn $stream $umap \
+          "                                 final RecursiveUndoInfo info)"
+      Java_WriteLn $stream $umap "  \{"
+      Java_WriteLn $stream $umap "    super.collectUndoInfo(newState, info);"
+      Java_WriteLn $stream $umap \
+          "    final $classname downcast = ($classname) newState;"
+      foreach attrib $attribs {
+        set id [Java_AttribGetId $attrib]
+        incr id $numsuperattribs
         set decltype [Java_AttribGetDeclaredType $attrib $impl]
         set type [Java_AttribGetMemberType $attrib $impl classMap]
         set membername [Java_AttribGetMemberName $attrib $impl]
-        set paramname [Java_AttribGetParameterName $attrib $impl]
-        set gettername [Java_AttribGetGetterName $attrib $impl]
-        set refstatus [Java_AttribGetRefStatus $attrib $impl]
-        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-        set iscollection [Java_IsCollectionType $decltype]
-        if {$iscollection} {
-          set gettername "${gettername}Modifiable"
-        }
-        Java_WriteLn $stream $umap \
-            "      final $type $paramname = downcast.${gettername}();"
-        if {$iscollection && [string compare $eqstatus "required"] == 0} {
+        set eqstatus [Java_AttribGetEqualityStatus $attrib]
+        if {[regexp {^[a-z]} $decltype all]} {
           Java_WriteLn $stream $umap \
-              "      $membername.assignFrom($paramname);"
-        } elseif {[regexp {2D$} $type all]} {
+              "    if ($membername != downcast.$membername) \{"
           Java_WriteLn $stream $umap \
-              "      if (!$membername.equals($paramname)) \{"
-          Java_WriteLn $stream $umap \
-              "        $membername = ($type) $paramname.clone();"
-          Java_WriteLn $stream $umap "        change = true;"
-          Java_WriteLn $stream $umap "      \}"
-        } elseif {!$iscollection && ![info exists classMap($decltype)] ||
-                  [string compare $refstatus "ref"] == 0} {
-          Java_WriteLn $stream $umap "      if ($membername != $paramname) \{"
-          Java_WriteLn $stream $umap "        $membername = $paramname;"
-          if {[string compare $eqstatus "geometry"] == 0} {
-            Java_WriteLn $stream $umap \
-                "        fireGeometryChanged($membername);";
+              "      final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, downcast.$membername);"
+          Java_WriteLn $stream $umap "      info.add(step$id);"
+          Java_WriteLn $stream $umap "    \}"
+        } elseif {[Java_IsCollectionType $decltype]} {
+          if {[string compare $eqstatus "required"] == 0} {
+            Java_WriteLn $stream $umap "    final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+            Java_WriteLn $stream $umap "    if (step$id != null) \{"
+            Java_WriteLn $stream $umap "      info.add(step$id);"
+            Java_WriteLn $stream $umap "    \}"
           } else {
-            Java_WriteLn $stream $umap "        change = true;"
+            puts stderr "ERROR: optional collection $membername in $classname!"
+            exit 1
           }
-          Java_WriteLn $stream $umap "      \}"
+        } elseif {[regexp {Proxy$} $decltype all]} {
+          set refstatus [Java_AttribGetRefStatus $attrib]
+          if {[string compare $refstatus "ref"] == 0} {
+            Java_WriteLn $stream $umap \
+                "    if ($membername != downcast.$membername) \{"
+            Java_WriteLn $stream $umap \
+                "      final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, downcast.$membername);"
+            Java_WriteLn $stream $umap "      info.add(step$id);"
+            Java_WriteLn $stream $umap "    \}"
+          } elseif {[Java_ClassIsAbstract $classMap($decltype)]} {
+            if {[string compare $eqstatus "required"] == 0} {
+              Java_WriteLn $stream $umap \
+                  "    if ($membername.getClass() == downcast.$membername.getClass()) \{"
+              Java_WriteLn $stream $umap \
+                  "      final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+              Java_WriteLn $stream $umap "      if (step$id != null) \{"
+              Java_WriteLn $stream $umap "        info.add(step$id);"
+              Java_WriteLn $stream $umap "      \}"
+              Java_WriteLn $stream $umap "    \} else \{"
+              Java_WriteLn $stream $umap \
+                  "      final $type clone$id = downcast.$membername.clone();"
+              Java_WriteLn $stream $umap \
+                  "      final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, clone$id);"
+              Java_WriteLn $stream $umap "      info.add(step$id);"
+              Java_WriteLn $stream $umap "    \}"
+            } else {
+              Java_WriteLn $stream $umap \
+                  "    final boolean null${id}a = $membername == null;"
+              Java_WriteLn $stream $umap \
+                  "    final boolean null${id}b = downcast.$membername == null;"
+              Java_WriteLn $stream $umap \
+                  "    if (null${id}a != null${id}b ||"
+              Java_WriteLn $stream $umap \
+                  "        !null${id}a && $membername.getClass() != downcast.$membername.getClass()) \{"
+              Java_WriteLn $stream $umap \
+                  "      final $type clone$id = ProxyTools.clone(downcast.$membername);"
+              Java_WriteLn $stream $umap \
+                  "      final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, clone$id);"
+              Java_WriteLn $stream $umap "      info.add(step$id);"
+              Java_WriteLn $stream $umap "    \} else if (!null${id}a) \{"
+              Java_WriteLn $stream $umap \
+                  "      final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+              Java_WriteLn $stream $umap "      if (step$id != null) \{"
+              Java_WriteLn $stream $umap "        info.add(step$id);"
+              Java_WriteLn $stream $umap "      \}"
+              Java_WriteLn $stream $umap "    \}"
+            }
+          } else {
+            if {[string compare $eqstatus "required"] == 0} {
+              Java_WriteLn $stream $umap \
+                  "    final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+              Java_WriteLn $stream $umap "    if (step$id != null) \{"
+              Java_WriteLn $stream $umap "      info.add(step$id);"
+              Java_WriteLn $stream $umap "    \}"
+            } else {
+              Java_WriteLn $stream $umap \
+                  "    final boolean null${id}a = $membername == null;"
+              Java_WriteLn $stream $umap \
+                  "    final boolean null${id}b = downcast.$membername == null;"
+              Java_WriteLn $stream $umap \
+                  "    if (null${id}a != null${id}b) \{"
+              Java_WriteLn $stream $umap \
+                  "      final $type clone$id = ProxyTools.clone(downcast.$membername);"
+              Java_WriteLn $stream $umap \
+                  "      final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, clone$id);"
+              Java_WriteLn $stream $umap "      info.add(step$id);"
+              Java_WriteLn $stream $umap "    \} else if (!null${id}a) \{"
+              Java_WriteLn $stream $umap \
+                  "      final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+              Java_WriteLn $stream $umap "      if (step$id != null) \{"
+              Java_WriteLn $stream $umap "        info.add(step$id);"
+              Java_WriteLn $stream $umap "      \}"
+              Java_WriteLn $stream $umap "    \}"
+            }
+          }   
         } else {
           if {[string compare $eqstatus "required"] == 0} {
-            set closer ""
+            Java_WriteLn $stream $umap \
+                "    if (!$membername.equals(downcast.$membername)) \{"
           } else {
             Java_WriteLn $stream $umap \
-                "      if ($membername == $paramname) \{"
-            Java_WriteLn $stream $umap \
-                "        // nothing"
-            Java_WriteLn $stream $umap \
-                "      \} else if ($membername == null) \{"
-            if {$iscollection} {
-              Java_WriteLn $stream $umap \
-                  "        $membername = new ${type}($paramname);"
-            } else {
-              Java_WriteLn $stream $umap \
-                  "        $membername = $paramname.clone();"
-            }
-            Java_WriteLn $stream $umap \
-                "        $membername.setParent(this);"
-            if {[string compare $eqstatus "geometry"] == 0} {
-              Java_WriteLn $stream $umap \
-                  "        fireGeometryChanged($membername);";
-            } else {
-              Java_WriteLn $stream $umap "        change = true;"
-            }
-            Java_WriteLn $stream $umap \
-                "      \} else if ($paramname == null) \{"
-            Java_WriteLn $stream $umap \
-                "        $membername.setParent(null);"
-            Java_WriteLn $stream $umap \
-                "        $membername = null;"
-            if {[string compare $eqstatus "geometry"] == 0} {
-              Java_WriteLn $stream $umap "        fireGeometryChanged(null);";
-            } else {
-              Java_WriteLn $stream $umap "        change = true;"
-            }
-            set closer "\} else "
+                "    if (!ProxyTools.equals($membername, downcast.$membername)) \{"
           }
-          if {!$iscollection && [Java_ClassIsAbstract $classMap($decltype)]} {
-            set test "$membername.getClass() != $paramname.getClass()"
-            Java_WriteLn $stream $umap \
-                "      ${closer}if ($test) \{"
-            Java_WriteLn $stream $umap \
-                "        $membername.setParent(null);"
-            Java_WriteLn $stream $umap \
-                "        $membername = $paramname.clone();"
-            Java_WriteLn $stream $umap \
-                "        $membername.setParent(this);"
-            if {[string compare $eqstatus "geometry"] == 0} {
-              Java_WriteLn $stream $umap \
-                  "        fireGeometryChanged($membername);";
-            } else {
-              Java_WriteLn $stream $umap "        change = true;"
-            }
-            set closer "\} else "
-          }
-          if {[string compare $closer ""] == 0} {
-            Java_WriteLn $stream $umap \
-                "      $membername.assignFrom($paramname);"
-          } else {
-            Java_WriteLn $stream $umap \
-                "      \} else \{"
-            Java_WriteLn $stream $umap \
-                "        $membername.assignFrom($paramname);"
-            Java_WriteLn $stream $umap \
-                "      \}"
-          }
+          Java_WriteLn $stream $umap \
+              "      final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, downcast.$membername);"
+          Java_WriteLn $stream $umap "      info.add(step$id);"
+          Java_WriteLn $stream $umap "    \}"
         }
-      }
-      if {$abstract} {
-        Java_WriteLn $stream $umap "      return change;"
-        Java_WriteLn $stream $umap "    \} else \{"
-        Java_WriteLn $stream $umap "      return false;"
-        Java_WriteLn $stream $umap "    \}"
-      } else {
-        Java_WriteLn $stream $umap "      if (change) \{"
-        Java_WriteLn $stream $umap "        fireStateChanged();"
-        Java_WriteLn $stream $umap "      \}"
-        Java_WriteLn $stream $umap "    \}"
-        Java_WriteLn $stream $umap "    return false;"
       }
       Java_WriteLn $stream $umap "  \}"
       Java_WriteLn $stream $umap ""
     }
-
 
   ############################################################################
   # Comparing
@@ -943,7 +1020,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
         set membername [Java_AttribGetMemberName $attrib $impl]
         set caster [Java_AttribGetCastTransformerName $attrib $impl]
         set transformer [Java_AttribGetCollectionTransformerName $attrib $impl]
-        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+        set eqstatus [Java_AttribGetEqualityStatus $attrib]
         Java_WriteLn $stream $umap "  public $type ${gettername}()"
         Java_WriteLn $stream $umap "  \{"
         if {[regexp {2D$} $type all]} {
@@ -1005,7 +1082,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
       foreach attrib $attribs {
         set decltype [Java_AttribGetDeclaredType $attrib $impl]
         set membername [Java_AttribGetMemberName $attrib $impl]
-        set comment [Java_AttribGetComment $attrib $impl]
+        set comment [Java_AttribGetComment $attrib]
         regexp {^Gets the [^\.]+\.} $comment getcomment
         if {[Java_IsCollectionType $decltype]} {
           if {[info exists getcomment]} {
@@ -1027,8 +1104,8 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           set settername [Java_AttribGetSetterName $attrib $impl]
           set paramname [Java_AttribGetParameterName $attrib $impl]
           set paramtype [Java_GetImplClassName $decltype $impl]
-          set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-          set refstatus [Java_AttribGetRefStatus $attrib $impl]
+          set eqstatus [Java_AttribGetEqualityStatus $attrib]
+          set refstatus [Java_AttribGetRefStatus $attrib]
           set notref [string compare $refstatus "ref"]
           set subject [regexp {Subject$} $paramtype all]
           set setparent [expr $notref && $subject]
@@ -1483,7 +1560,7 @@ proc Java_GenerateVisitor {subpack prefix destname classnames
             set paramname [Java_AttribGetParameterName $attrib ""]
             set gettername [Java_AttribGetGetterName $attrib ""]
             if {[regexp {Proxy$} $decltype all]} {
-              set eqstatus [Java_AttribGetEqualityStatus $attrib ""]
+              set eqstatus [Java_AttribGetEqualityStatus $attrib]
               Java_WriteLn $stream $umap \
                   "    final $decltype $paramname = proxy.${gettername}();"
               if {[string compare $eqstatus "optional"] == 0} {
@@ -1800,7 +1877,7 @@ proc Java_GenerateCloningMethodBody {stream classMapName useMapName
         lappend args "null"
         continue
       }
-      set refstatus [Java_AttribGetRefStatus $attrib $impl]
+      set refstatus [Java_AttribGetRefStatus $attrib]
       set paramname [Java_AttribGetParameterName $attrib $impl]
       set gettername [Java_AttribGetGetterName $attrib $impl]
       set iscoll [Java_IsCollectionType $decltype]
@@ -1829,7 +1906,7 @@ proc Java_GenerateCloningMethodBody {stream classMapName useMapName
         Java_WriteLn $stream $umap \
             "$ind    final $decltype $paramname = proxy.${gettername}();"
       } else {
-        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+        set eqstatus [Java_AttribGetEqualityStatus $attrib]
         set paramname0 "${paramname}0"
         Java_WriteLn $stream $umap \
             "$ind    final $decltype $paramname0 = proxy.${gettername}();"
@@ -1980,7 +2057,7 @@ proc Java_GenerateHashCodeVisitor {subpack prefix destname classnames
       set nongeoattribs ""
       set geoattribs ""
       foreach attrib $attribs {
-        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+        set eqstatus [Java_AttribGetEqualityStatus $attrib]
         if {[string compare $eqstatus "ignored"] == 0} {
           continue
         } elseif {$geo != 3 &&
@@ -2013,7 +2090,7 @@ proc Java_GenerateHashCodeVisitor {subpack prefix destname classnames
             set varname [Java_AttribGetParameterName $attrib $impl]
             set type [Java_AttribGetDeclaredType $attrib $impl]
             set getter [Java_AttribGetGetterName $attrib $impl]
-            set refstatus [Java_AttribGetRefStatus $attrib $impl]
+            set refstatus [Java_AttribGetRefStatus $attrib]
             Java_WriteLn $stream $umap \
                 "${indent}final $type $varname = proxy.${getter}();"
             Java_WriteLn $stream $umap "${indent}result *= 5;"
@@ -2256,7 +2333,7 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
       set nongeoattribs ""
       set geoattribs ""
       foreach attrib $attribs {
-        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+        set eqstatus [Java_AttribGetEqualityStatus $attrib]
         if {[string compare $eqstatus "ignored"] == 0} {
           continue
         } elseif {$geo != 3 &&
@@ -2293,8 +2370,8 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
             set name [Java_AttribGetEnglishDescription $attrib $impl]
             set type [Java_AttribGetDeclaredType $attrib $impl]
             set getter [Java_AttribGetGetterName $attrib $impl]
-            set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-            set refstatus [Java_AttribGetRefStatus $attrib $impl]
+            set eqstatus [Java_AttribGetEqualityStatus $attrib]
+            set refstatus [Java_AttribGetRefStatus $attrib]
             Java_WriteLn $stream $umap \
                 "${indent}final $type ${varname}1 = proxy.${getter}();"
             Java_WriteLn $stream $umap \
@@ -2702,8 +2779,8 @@ proc Java_ClassGetSpecials {classinfo} {
 # Attributes Structure
 ##############################################################################
 
-proc Java_AttribCreate {type name eqstatus refstatus dftvalue comment} {
-  return [list $type $name $eqstatus $refstatus $dftvalue $comment]
+proc Java_AttribCreate {type name id eqstatus refstatus dftvalue comment} {
+  return [list $type $name $id $eqstatus $refstatus $dftvalue $comment]
 }
 
 proc Java_AttribSetType {attrib type} {
@@ -2714,30 +2791,77 @@ proc Java_AttribSetName {attrib name} {
   return [lreplace $attrib 1 1 $name]
 }
 
+proc Java_AttribSetId {attrib id} {
+  return [lreplace $attrib 2 2 $id]
+}
+
 proc Java_AttribSetEqualityStatus {attrib eqstatus} {
-  return [lreplace $attrib 2 2 $eqstatus]
+  return [lreplace $attrib 3 3 $eqstatus]
 }
 
 proc Java_AttribSetRefStatus {attrib refstatus} {
-  return [lreplace $attrib 3 3 $refstatus]
+  return [lreplace $attrib 4 4 $refstatus]
 }
 
 proc Java_AttribSetDefaultValue {attrib dftvalue} {
-  return [lreplace $attrib 4 4 $dftvalue]
+  return [lreplace $attrib 5 5 $dftvalue]
 }
 
 proc Java_AttribSetComment {attrib comment} {
-  return [lreplace $attrib 5 5 $comment]
+  return [lreplace $attrib 6 6 $comment]
 }
 
-proc Java_AttribGetName {attrib impl} {
+proc Java_AttribGetType {attrib} {
+  set type [lindex $attrib 0]
+  return $type
+}
+
+proc Java_AttribGetName {attrib} {
   set name [lindex $attrib 1]
   return $name
 }
 
+proc Java_AttribGetId {attrib} {
+  set id [lindex $attrib 2]
+  return $id
+}
+
+proc Java_AttribGetEqualityStatus {attrib} {
+  set eqstatus [lindex $attrib 3]
+  return $eqstatus
+}
+
+proc Java_AttribGetRefStatus {attrib} {
+  set refstatus [lindex $attrib 4]
+  return $refstatus
+}
+
+proc Java_AttribGetDefaultValue {attrib impl} {
+  set dftvalue [lindex $attrib 5]
+  set emptytype [Java_AttribGetEmptyCollectionType $attrib $impl]
+  set eqstatus [Java_AttribGetEqualityStatus $attrib]
+  if {[string compare $dftvalue "none"] == 0} {
+    return ""
+  } elseif {[string compare $dftvalue ""] != 0} {
+    return $dftvalue
+  } elseif {[string compare $eqstatus "geometry"] == 0} {
+    return "null"
+  } elseif {[Java_IsCollectionType $emptytype]} {
+    return "null"
+  } else {
+    return ""
+  }
+}
+
+proc Java_AttribGetComment {attrib} {
+  set comment [lindex $attrib 6]
+  return $comment
+}
+
+
 proc Java_AttribGetGetterName {attrib impl} {
-  set type [lindex $attrib 0]
-  set name [Java_AttribGetName $attrib $impl]
+  set type [Java_AttribGetType $attrib]
+  set name [Java_AttribGetName $attrib]
   if {[string compare $type "boolean"] == 0} {
     return "is$name"
   } else {
@@ -2746,8 +2870,8 @@ proc Java_AttribGetGetterName {attrib impl} {
 }
 
 proc Java_AttribGetMemberName {attrib impl} {
-  set type [lindex $attrib 0]
-  set name [Java_AttribGetName $attrib $impl]
+  set type [Java_AttribGetType $attrib]
+  set name [Java_AttribGetName $attrib]
   if {[string compare $type "boolean"] == 0} {
     return "mIs$name"
   } else {
@@ -2756,7 +2880,7 @@ proc Java_AttribGetMemberName {attrib impl} {
 }
 
 proc Java_AttribGetParameterName {attrib impl} {
-  set name [Java_AttribGetName $attrib $impl]
+  set name [Java_AttribGetName $attrib]
   set initial [string index $name 0]
   set initial [string tolower $initial]
   set rest [string range $name 1 end]
@@ -2764,12 +2888,12 @@ proc Java_AttribGetParameterName {attrib impl} {
 }
 
 proc Java_AttribGetSetterName {attrib impl} {
-  set name [Java_AttribGetName $attrib $impl]
+  set name [Java_AttribGetName $attrib]
   return "set$name"
 }
 
 proc Java_AttribGetDeclaredType {attrib impl} {
-  set type [lindex $attrib 0]
+  set type [Java_AttribGetType $attrib]
   if {[regexp {^NodeSet} $type all]} {
     return "Set<NodeProxy>"
   } else {
@@ -2794,7 +2918,7 @@ proc Java_AttribGetConstructorArgumentType {attrib impl} {
 }
 
 proc Java_AttribGetImplementationType {attrib impl classMapName} {
-  set type [lindex $attrib 0]
+  set type [Java_AttribGetType $attrib]
   if {[regexp {^Collection<(.*Proxy)>$} $type all elemtype] ||
       [regexp {^List<(.*Proxy)>$} $type all elemtype]} {
     if {[string compare $impl "plain"] == 0} {
@@ -2812,7 +2936,7 @@ proc Java_AttribGetImplementationType {attrib impl classMapName} {
     if {[string compare $impl "plain"] == 0} {
       return "ImmutableOrderedSet<$elemtype>"
     } else {
-      set refstatus [Java_AttribGetRefStatus $attrib $impl]
+      set refstatus [Java_AttribGetRefStatus $attrib]
       set suffix [Java_GetImplObjectName $impl]
       regsub {Proxy$} $elemtype $suffix elemtype
       if {[string compare $refstatus "ref"] == 0 &&
@@ -2909,33 +3033,6 @@ proc Java_AttribGetCastTransformerName {attrib impl} {
   }
 }
 
-proc Java_AttribGetEqualityStatus {attrib impl} {
-  set eqstatus [lindex $attrib 2]
-  return $eqstatus
-}
-
-proc Java_AttribGetRefStatus {attrib impl} {
-  set refstatus [lindex $attrib 3]
-  return $refstatus
-}
-
-proc Java_AttribGetDefaultValue {attrib impl} {
-  set dftvalue [lindex $attrib 4]
-  set emptytype [Java_AttribGetEmptyCollectionType $attrib $impl]
-  set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-  if {[string compare $dftvalue "none"] == 0} {
-    return ""
-  } elseif {[string compare $dftvalue ""] != 0} {
-    return $dftvalue
-  } elseif {[string compare $eqstatus "geometry"] == 0} {
-    return "null"
-  } elseif {[Java_IsCollectionType $emptytype]} {
-    return "null"
-  } else {
-    return ""
-  }
-}
-
 proc Java_AttribGetEmptyCollectionsCall {attrib impl} {
   set emptytype [Java_AttribGetEmptyCollectionType $attrib $impl]
   if {[Java_IsCollectionType $emptytype] &&
@@ -2953,14 +3050,9 @@ proc Java_AttribGetEmptyCollectionType {attrib impl} {
   return $decltype
 }
 
-proc Java_AttribGetComment {attrib impl} {
-  set comment [lindex $attrib 5]
-  return $comment
-}
-
 proc Java_AttribGetEnglishDescription {attrib impl} {
-  set name [Java_AttribGetName $attrib $impl]
-  set comment [Java_AttribGetComment $attrib $impl]
+  set name [Java_AttribGetName $attrib]
+  set comment [Java_AttribGetComment $attrib]
   if {[regexp {^Gets the ([a-z]+( [a-z]+)*) [a-z]+ this} $comment all descr]} {
     return $descr
   } else {
@@ -2969,7 +3061,7 @@ proc Java_AttribGetEnglishDescription {attrib impl} {
 }
 
 proc Java_AttribGetEachComment {attrib impl} {
-  set comment [Java_AttribGetComment $attrib $impl]
+  set comment [Java_AttribGetComment $attrib]
   set needle "Each element is"
   set start [string first $needle $comment]
   if {$start >= 0} {
@@ -3026,6 +3118,23 @@ proc Java_IsCollectionType {type} {
     return 1
   } else {
     return 0
+  }
+}
+
+proc Java_GetObjectAssignableType {type} {
+  if {[regexp {^[a-z]} $type all]} {
+    if {[string compare $type "int"] == 0} {
+      return "Integer"
+    } elseif {[string compare $type "boolean"] == 0} {
+      return "Boolean"
+    } elseif {[string compare $type "double"] == 0} {
+      return "Double"
+    } else {
+      puts stderr "ERROR: Unknown primitive type $type!"
+      exit 1
+    }
+  } else {
+    return $type
   }
 }
 
@@ -3145,7 +3254,7 @@ proc Java_WriteConstructorComment {stream umap impl methodkind
     if {!$withdft || [string compare $dftvalue ""] == 0} {
       set name [Java_AttribGetParameterName $attrib $impl]
       set descr [Java_AttribGetEnglishDescription $attrib $impl]
-      set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+      set eqstatus [Java_AttribGetEqualityStatus $attrib]
       set transformer [Java_AttribGetCollectionTransformerName $attrib $impl]
       Java_Write $stream $umap \
           "   * @param $name The $descr of the new $short"
@@ -3220,7 +3329,7 @@ proc Java_WriteLn {stream useMapName line} {
 proc Java_RecordString {useMapName line} {
   upvar $useMapName useMap
   regsub -all "\{@link \[^\}\.\]*\.\[^\}\]*\}" $line "" line
-  set words [split $line "{}<>();,. "]
+  set words [split $line "{}<>();,.! "]
   foreach word $words {
     if {[regexp {^[A-Z][A-Za-z0-9]+$} $word all]} {
       set useMap($word) 1

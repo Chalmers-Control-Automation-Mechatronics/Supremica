@@ -76,13 +76,49 @@ public abstract class DocumentSubject
 
 
   //#########################################################################
-  //# Cloning
+  //# Cloning and Assigning
+  @Override
   public DocumentSubject clone()
   {
     final DocumentSubject cloned = (DocumentSubject) super.clone();
     cloned.mComment = mComment;
     cloned.mLocation = null;
     return cloned;
+  }
+
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    switch (index) {
+    case 2:
+      mComment = (String) newValue;
+      return ModelChangeEvent.createStateChanged(this);
+    case 3:
+      mLocation = (URI) newValue;
+      return ModelChangeEvent.createStateChanged(this);
+    default:
+      return null;
+    }
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final DocumentSubject doc = (DocumentSubject) newState;
+    if (!ProxyTools.equals(mComment, doc.getComment())) {
+      final UndoInfo step =
+        new ReplacementUndoInfo(2, mComment, doc.getComment());
+      info.add(step);
+    }
+    if (!ProxyTools.equals(mLocation, doc.getLocation())) {
+      final UndoInfo step =
+        new ReplacementUndoInfo(3, mLocation, doc.getLocation());
+      info.add(step);
+    }
   }
 
 
@@ -102,7 +138,7 @@ public abstract class DocumentSubject
     if (!ProxyTools.equals(mComment, comment)) {
       mComment = comment;
       final ModelChangeEvent event = ModelChangeEvent.createStateChanged(this);
-      fireModelChanged(event);
+      event.fire();
     }
   }
 

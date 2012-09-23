@@ -91,6 +91,7 @@ public final class GraphElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public GraphElement clone()
   {
     return (GraphElement) super.clone();

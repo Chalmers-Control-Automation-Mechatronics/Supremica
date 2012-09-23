@@ -11,6 +11,7 @@ package net.sourceforge.waters.subject.base;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 
@@ -91,7 +92,7 @@ public abstract class AbstractSubject
     if (parent != null && mParent != null) {
       final StringBuffer buffer = new StringBuffer();
       buffer.append("Trying to redefine parent of ");
-      buffer.append(getShortClassName());
+      buffer.append(ProxyTools.getShortClassName(this));
       if (this instanceof NamedProxy) {
         final NamedProxy named = (NamedProxy) this;
         buffer.append(" '");
@@ -103,32 +104,39 @@ public abstract class AbstractSubject
     }
   }
 
-  public void fireModelChanged(final ModelChangeEvent event)
+  public UndoInfo createUndoInfo(final ProxySubject newState)
   {
-    if (mParent != null) {
-      mParent.fireModelChanged(event);
+    final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
+    collectUndoInfo(newState, info);
+    if (info.isEmpty()) {
+      return null;
+    } else {
+      return info;
     }
+  }
+
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    return null;
+  }
+
+
+  //#########################################################################
+  //# Assignment
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
   }
 
 
   //#########################################################################
   //# Printing
+  @Override
   public String toString()
   {
     return ProxyPrinter.getPrintString(this);
-  }
-
-  public String getShortClassName()
-  {
-    return getShortClassName(this);
-  }
-
-  public static String getShortClassName(final Object object)
-  {
-    final Class<?> clazz = object.getClass();
-    final String fullclazzname = clazz.getName();
-    final int dotpos = fullclazzname.lastIndexOf('.');
-    return fullclazzname.substring(dotpos + 1);
   }
 
 

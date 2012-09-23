@@ -49,6 +49,7 @@ public final class VariableMarkingElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public VariableMarkingElement clone()
   {
     return (VariableMarkingElement) super.clone();

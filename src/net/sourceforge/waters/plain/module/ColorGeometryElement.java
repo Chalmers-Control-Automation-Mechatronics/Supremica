@@ -67,6 +67,7 @@ public final class ColorGeometryElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public ColorGeometryElement clone()
   {
     return (ColorGeometryElement) super.clone();

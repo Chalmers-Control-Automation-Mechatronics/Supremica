@@ -41,6 +41,7 @@ public abstract class ComponentElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public ComponentElement clone()
   {
     return (ComponentElement) super.clone();

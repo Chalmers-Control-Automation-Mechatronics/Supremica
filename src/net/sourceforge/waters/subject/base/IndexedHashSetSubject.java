@@ -9,12 +9,12 @@
 
 package net.sourceforge.waters.subject.base;
 
+import gnu.trove.THashSet;
+
 import java.util.AbstractSet;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +25,6 @@ import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 
 
 /**
@@ -287,33 +286,59 @@ public class IndexedHashSetSubject<P extends NamedSubject>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
-  public void assignFrom(final Set<? extends P> set)
+  public UndoInfo createUndoInfo(final Set<? extends P> newSet)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
-    final int oldsize = size();
-    final int newsize = set.size();
-    final Collection<P> added = new ArrayList<P>(newsize);
-    final Collection<P> kept = new ArrayList<P>(oldsize);
-    final Set<String> names = new HashSet<String>(newsize);
-    for (final P newproxy : set) {
-      final String name = newproxy.getName();
-      if (names.contains(name)) {
+    final int newsize = newSet.size();
+    final Set<String> names = new THashSet<String>(newsize);
+    final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
+    for (final P newProxy : newSet) {
+      final String name = newProxy.getName();
+      if (!names.add(name)) {
         throw createDuplicateName(name);
       }
-      names.add(name);
       final P present = mProxyMap.get(name);
-      if (present == null || !eq.equals(present, newproxy)) {
-        final P copy = ProxyTools.clone(newproxy);
-        added.add(copy);
+      if (present == null) {
+        final P copy = ProxyTools.clone(newProxy);
+        final UndoInfo add = new ReplacementUndoInfo(null, copy);
+        info.add(add);
+      } else if (present.getClass() == newProxy.getClass()) {
+        final UndoInfo modify = present.createUndoInfo(newProxy);
+        if (modify != null) {
+          info.add(modify);
+        }
       } else {
-        kept.add(present);
+        final P copy = ProxyTools.clone(newProxy);
+        final UndoInfo repl = new ReplacementUndoInfo(present, copy);
+        info.add(repl);
       }
     }
-    retainAll(kept);
-    for (final P newproxy : added) {
-      final String name = newproxy.getName();
-      commitAdd(name, newproxy);
+    for (final P oldProxy : this) {
+      final String name = oldProxy.getName();
+      if (!names.contains(name)) {
+        final UndoInfo remove = new ReplacementUndoInfo(oldProxy, null);
+        info.add(remove);
+      }
     }
+    if (info.isEmpty()) {
+      return null;
+    } else {
+      return info;
+    }
+  }
+
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    if (oldValue != null) {
+      remove(oldValue);
+    }
+    if (newValue != null) {
+      @SuppressWarnings("unchecked")
+      final Class<P> clazz = (Class<P>) newValue.getClass();
+      add(clazz.cast(newValue));
+    }
+    return null;
   }
 
 
@@ -371,11 +396,6 @@ public class IndexedHashSetSubject<P extends NamedSubject>
   public Collection<ModelObserver> getModelObservers()
   {
     return mObservers;
-  }
-
-  public void fireModelChanged(final ModelChangeEvent event)
-  {
-    SubjectTools.fireModelChanged(this, event);
   }
 
 
@@ -455,7 +475,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
   {
     final ModelChangeEvent event =
       ModelChangeEvent.createItemAdded(this, proxy);
-    fireModelChanged(event);
+    event.fire();
   }
 
   private void afterRemove(final P proxy)
@@ -463,7 +483,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
     proxy.setParent(null);
     final ModelChangeEvent event =
       ModelChangeEvent.createItemRemoved(this, proxy);
-    fireModelChanged(event);
+    event.fire();
   }
 
 

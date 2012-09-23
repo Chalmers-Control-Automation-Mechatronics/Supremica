@@ -23,6 +23,8 @@ import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -67,6 +69,7 @@ public abstract class EventListExpressionSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public EventListExpressionSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -74,18 +77,17 @@ public abstract class EventListExpressionSubject
     return (EventListExpressionSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
   {
-    if (this != partner) {
-      final EventListExpressionSubject downcast =
-        (EventListExpressionSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ListSubject<AbstractSubject> eventIdentifierList =
-        downcast.getEventIdentifierListModifiable();
-      mEventIdentifierList.assignFrom(eventIdentifierList);
-      return change;
-    } else {
-      return false;
+    super.collectUndoInfo(newState, info);
+    final EventListExpressionSubject downcast =
+      (EventListExpressionSubject) newState;
+    final UndoInfo step1 =
+      mEventIdentifierList.createUndoInfo(downcast.mEventIdentifierList);
+    if (step1 != null) {
+      info.add(step1);
     }
   }
 

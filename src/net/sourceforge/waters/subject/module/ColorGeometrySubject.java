@@ -25,7 +25,9 @@ import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.NotCloningGeometrySetSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.SimpleSetSubject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -68,6 +70,7 @@ public final class ColorGeometrySubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public ColorGeometrySubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -75,19 +78,16 @@ public final class ColorGeometrySubject
     return (ColorGeometrySubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
   {
-    if (this != partner) {
-      final ColorGeometrySubject downcast = (ColorGeometrySubject) partner;
-      boolean change = super.assignFrom(partner);
-      final SimpleSetSubject<Color> colorSet =
-        downcast.getColorSetModifiable();
-      mColorSet.assignFrom(colorSet);
-      if (change) {
-        fireStateChanged();
-      }
+    super.collectUndoInfo(newState, info);
+    final ColorGeometrySubject downcast = (ColorGeometrySubject) newState;
+    final UndoInfo step1 = mColorSet.createUndoInfo(downcast.mColorSet);
+    if (step1 != null) {
+      info.add(step1);
     }
-    return false;
   }
 
 

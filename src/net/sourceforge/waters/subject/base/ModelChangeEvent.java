@@ -9,7 +9,13 @@
 
 package net.sourceforge.waters.subject.base;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.EventObject;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
+import net.sourceforge.waters.model.base.ProxyTools;
 
 
 /**
@@ -137,7 +143,7 @@ public class ModelChangeEvent extends EventObject
 
   /**
    * Creates an <CODE>GEOMETRY_CHANGED</CODE> notification.
-   * @param  item         The item that has been renamed.
+   * @param  item         The item that has been modified.
    * @param  geo          The value of the affected geometry after the change.
    * @return A model change event that has the item as source
    *         and the new geometry information as value.
@@ -145,7 +151,11 @@ public class ModelChangeEvent extends EventObject
   public static ModelChangeEvent createGeometryChanged
     (final Subject item, final Object geo)
   {
-    return new ModelChangeEvent(item, GEOMETRY_CHANGED, geo);
+    if (item instanceof GeometrySubject && item.getParent() != null) {
+      return new ModelChangeEvent(item.getParent(), GEOMETRY_CHANGED, item);
+    } else {
+      return new ModelChangeEvent(item, GEOMETRY_CHANGED, geo);
+    }
   }
 
 
@@ -202,6 +212,7 @@ public class ModelChangeEvent extends EventObject
    * The source generally identifies the object that was directly modified
    * by the change.
    */
+  @Override
   public Subject getSource()
   {
     return (Subject) super.getSource();
@@ -243,6 +254,101 @@ public class ModelChangeEvent extends EventObject
   public int getIndex()
   {
     return mIndex;
+  }
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  @Override
+  public boolean equals(final Object other)
+  {
+    if (other.getClass() == getClass()) {
+      final ModelChangeEvent event = (ModelChangeEvent) other;
+      return
+        getSource() == event.getSource() &&
+        getKind() == event.getKind() &&
+        ProxyTools.equals(getValue(), event.getValue()) &&
+        getIndex() == event.getIndex();
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int result = getSource().hashCode();
+    result *= 5;
+    result += getKind();
+    result *= 5;
+    if (getValue() != null) {
+      result += getValue().hashCode();
+    }
+    result *= 5;
+    result += getIndex();
+    return result;
+  }
+
+
+  //#########################################################################
+  //# Notification
+  /**
+   * Sends this event to all observers registered on its source or the
+   * parents of its source. This method first collects all registered
+   * observers in a queue, in order to call them in the order defined by
+   * their priority.
+   * @see ModelObserver
+   */
+  public void fire()
+  {
+    switch (mKind) {
+    case NO_CHANGE:
+      break;
+    case ITEM_ADDED:
+    case ITEM_REMOVED:
+    case NAME_CHANGED:
+    case STATE_CHANGED:
+    case GEOMETRY_CHANGED:
+      final Queue<ModelObserver> recipients =
+        new PriorityQueue<ModelObserver>(7, ModelObserverComparator.INSTANCE);
+      for (Subject current = getSource();
+        current != null;
+        current = current.getParent()) {
+        final Collection<ModelObserver> list = current.getModelObservers();
+        if (list != null) {
+          for (final ModelObserver observer : current.getModelObservers()) {
+            recipients.add(observer);
+          }
+        }
+      }
+      while (!recipients.isEmpty()) {
+        final ModelObserver observer = recipients.remove();
+        observer.modelChanged(this);
+      }
+      break;
+    default:
+      throw new UnsupportedOperationException
+        ("Unknown event kind " + mKind + "!");
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class ModelObserverComparator
+  private static class ModelObserverComparator
+    implements Comparator<ModelObserver>
+  {
+    //#######################################################################
+    //# Interface java.util.Comparator
+    public int compare(final ModelObserver obs1, final ModelObserver obs2)
+    {
+      return obs1.getModelObserverPriority() - obs2.getModelObserverPriority();
+    }
+
+    //#######################################################################
+    //# Singleton Pattern
+    private static final ModelObserverComparator INSTANCE =
+      new ModelObserverComparator();
   }
 
 

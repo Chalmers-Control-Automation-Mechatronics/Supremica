@@ -26,14 +26,14 @@ public interface SetSubject<P extends ProxySubject>
   //#########################################################################
   //# Cloning and Assigning
   /**
-   * Assigns the contents of another set to this set.
-   * This method ensures that the contents of this set are equal to the
-   * contents of the given set according to their contents.
-   * Items already contained in this set are reused. Items not contained
-   * are cloned from the given set. The method produces as few model change
-   * notifications as possible.
-   * @param  set   The set to be copied from.
+   * Creates assignment instructions to replaces the contents of this set
+   * by the contents of another set. This method attempts to produce a
+   * minimal sequence of deletions and insertions to convert this set
+   * to the given new set.
+   * @param  newSet   The set containing the data after the intended
+   *                  assignment.
+   * @return Undo information containing a minimal assignment sequence.
    */
-  public void assignFrom(final Set<? extends P> set);
+  public UndoInfo createUndoInfo(final Set<? extends P> newSet);
 
 }

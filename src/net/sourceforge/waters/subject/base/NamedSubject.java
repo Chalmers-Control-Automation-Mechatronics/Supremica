@@ -53,20 +53,36 @@ public abstract class NamedSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public NamedSubject clone()
   {
     return (NamedSubject) super.clone();
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final boolean changed = super.assignFrom(partner);
-      final NamedProxy named = (NamedSubject) partner;
-      setName(named.getName());
-      return changed;
-    } else {
-      return false;
+    switch (index) {
+    case 1:
+      final String oldName = mName;
+      mName = (String) newValue;
+      return ModelChangeEvent.createNameChanged(this, oldName);
+    default:
+      return null;
+    }
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final NamedSubject named = (NamedSubject) newState;
+    if (!named.getName().equals(mName)) {
+      final UndoInfo step = new ReplacementUndoInfo(1, mName, named.getName());
+      info.add(step);
     }
   }
 
@@ -112,7 +128,7 @@ public abstract class NamedSubject
       final ModelChangeEvent event =
         ModelChangeEvent.createNameChanged(this, mName);
       mName = name;
-      fireModelChanged(event);
+      event.fire();
     }
   }
 

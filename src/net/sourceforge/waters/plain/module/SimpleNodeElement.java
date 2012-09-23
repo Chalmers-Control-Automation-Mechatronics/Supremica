@@ -89,6 +89,7 @@ public final class SimpleNodeElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public SimpleNodeElement clone()
   {
     return (SimpleNodeElement) super.clone();

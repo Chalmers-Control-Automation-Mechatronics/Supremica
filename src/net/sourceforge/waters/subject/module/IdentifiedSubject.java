@@ -16,7 +16,11 @@ import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.base.AbstractNamedSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -45,6 +49,7 @@ public abstract class IdentifiedSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public IdentifiedSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -52,23 +57,41 @@ public abstract class IdentifiedSubject
     return (IdentifiedSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final IdentifiedSubject downcast = (IdentifiedSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final IdentifierSubject identifier = downcast.getIdentifier();
-      if (mIdentifier.getClass() != identifier.getClass()) {
-        mIdentifier.setParent(null);
-        mIdentifier = identifier.clone();
-        mIdentifier.setParent(this);
-        change = true;
-      } else {
-        mIdentifier.assignFrom(identifier);
-      }
-      return change;
+    if (index <= 0) {
+      return super.assignMember(index, oldValue, newValue);
     } else {
-      return false;
+      switch (index) {
+      case 1:
+        mIdentifier.setParent(null);
+        mIdentifier = (IdentifierSubject) newValue;
+        mIdentifier.setParent(this);
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
+      }
+    }
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final IdentifiedSubject downcast = (IdentifiedSubject) newState;
+    if (mIdentifier.getClass() == downcast.mIdentifier.getClass()) {
+      final UndoInfo step1 = mIdentifier.createUndoInfo(downcast.mIdentifier);
+      if (step1 != null) {
+        info.add(step1);
+      }
+    } else {
+      final IdentifierSubject clone1 = downcast.mIdentifier.clone();
+      final UndoInfo step1 = new ReplacementUndoInfo(1, mIdentifier, clone1);
+      info.add(step1);
     }
   }
 

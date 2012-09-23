@@ -1920,7 +1920,6 @@ public class GraphEditorPanel
       if (mInternalDragAction != null) {
         final Point point = event.getPoint();
         mInternalDragAction.commitDrag(point);
-
         mInternalDragAction = null;
         fireSelectionChanged();
         final Rectangle rect = getVisibleRect();
@@ -2807,7 +2806,7 @@ public class GraphEditorPanel
           replaceSelection(mFocusedObject);
         }
       } else if (!isSelected(mFocusedObject)) {
-          addToSelection(mFocusedObject);
+        addToSelection(mFocusedObject);
       }
       mShouldCommit = true;
       Point2D snap = null;
@@ -2830,24 +2829,23 @@ public class GraphEditorPanel
     }
 
     @Override
-    void modifiersChanged(final int key, final boolean pressed){
+    void modifiersChanged(final int key, final boolean pressed)
+    {
       final Point start = getDragStart();
       int dx;
       int dy;
-      if(key == KeyEvent.VK_CONTROL){
-        if(pressed || !shouldSnapToGrid()){
+      if (key == KeyEvent.VK_CONTROL) {
+        if (pressed || !shouldSnapToGrid()) {
           final Point next = nextPoint(start, mCurrentPoint);
           dx = next.x;
           dy = next.y;
+        } else {
+          final Point next = nextSnappedPoint(start, mCurrentPoint);
+          setDragCurrent(mCurrentPoint, next);
+          dx = getDragCurrentOnGrid().x - start.x;
+          dy = getDragCurrentOnGrid().y - start.y;
         }
-        else{
-            final Point next = nextSnappedPoint(start, mCurrentPoint);
-            setDragCurrent(mCurrentPoint, next);
-            dx = getDragCurrentOnGrid().x - start.x;
-            dy = getDragCurrentOnGrid().y - start.y;
-        }
-      }
-      else {
+      } else {
         if (shouldSnapToGrid()) {
           final Point next = nextSnappedPoint(start, mCurrentPoint);
           setDragCurrent(mCurrentPoint, next);
@@ -2894,15 +2892,16 @@ public class GraphEditorPanel
       return snapped;
     }
 
-    private void move(final boolean directional, int x, int y){
+    private void move(final boolean directional, int x, int y)
+    {
       boolean edgeMove = false;
-      if(mMoveVisitor.mMovedObjects.size() == 1){
-        final Iterator<ProxySubject> iter = mMoveVisitor.mMovedObjects.iterator();
-        if(iter.next() instanceof EdgeSubject){
+      if (mMoveVisitor.mMovedObjects.size() == 1) {
+        final Iterator<ProxySubject> iter =
+          mMoveVisitor.mMovedObjects.iterator();
+        if (iter.next() instanceof EdgeSubject) {
           edgeMove = true;
         }
       }
-
       if (directional && !edgeMove) {
         if (Math.abs(x) < Math.abs(y)) {
           x = 0;

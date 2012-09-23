@@ -57,6 +57,7 @@ public final class PlainEventListElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public PlainEventListElement clone()
   {
     return (PlainEventListElement) super.clone();

@@ -19,7 +19,6 @@ import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.subject.base.ProxySubject;
 
 
 /**
@@ -57,21 +56,11 @@ public final class PlainEventListSubject
 
 
   //#########################################################################
-  //# Cloning and Assigning
+  //# Cloning
+  @Override
   public PlainEventListSubject clone()
   {
     return (PlainEventListSubject) super.clone();
-  }
-
-  public boolean assignFrom(final ProxySubject partner)
-  {
-    if (this != partner) {
-      boolean change = super.assignFrom(partner);
-      if (change) {
-        fireStateChanged();
-      }
-    }
-    return false;
   }
 
 

@@ -46,6 +46,7 @@ public final class BoxGeometryElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public BoxGeometryElement clone()
   {
     return (BoxGeometryElement) super.clone();

@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -27,8 +28,12 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -95,6 +100,7 @@ public final class GraphSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public GraphSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -102,40 +108,67 @@ public final class GraphSubject
     return (GraphSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final GraphSubject downcast = (GraphSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final boolean deterministic = downcast.isDeterministic();
-      if (mIsDeterministic != deterministic) {
-        mIsDeterministic = deterministic;
-        change = true;
-      }
-      final LabelBlockSubject blockedEvents = downcast.getBlockedEvents();
-      if (mBlockedEvents == blockedEvents) {
-        // nothing
-      } else if (mBlockedEvents == null) {
-        mBlockedEvents = blockedEvents.clone();
-        mBlockedEvents.setParent(this);
-        change = true;
-      } else if (blockedEvents == null) {
-        mBlockedEvents.setParent(null);
-        mBlockedEvents = null;
-        change = true;
-      } else {
-        mBlockedEvents.assignFrom(blockedEvents);
-      }
-      final IndexedSetSubject<NodeSubject> nodes =
-        downcast.getNodesModifiable();
-      mNodes.assignFrom(nodes);
-      final ListSubject<EdgeSubject> edges = downcast.getEdgesModifiable();
-      mEdges.assignFrom(edges);
-      if (change) {
-        fireStateChanged();
+    if (index <= 0) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 1:
+        mIsDeterministic = (Boolean) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 2:
+        if (mBlockedEvents != null) {
+          mBlockedEvents.setParent(null);
+        }
+        mBlockedEvents = (LabelBlockSubject) newValue;
+        if (mBlockedEvents != null) {
+          mBlockedEvents.setParent(this);
+        }
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final GraphSubject downcast = (GraphSubject) newState;
+    if (mIsDeterministic != downcast.mIsDeterministic) {
+      final UndoInfo step1 =
+        new ReplacementUndoInfo(1, mIsDeterministic, downcast.mIsDeterministic);
+      info.add(step1);
+    }
+    final boolean null2a = mBlockedEvents == null;
+    final boolean null2b = downcast.mBlockedEvents == null;
+    if (null2a != null2b) {
+      final LabelBlockSubject clone2 =
+        ProxyTools.clone(downcast.mBlockedEvents);
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mBlockedEvents, clone2);
+      info.add(step2);
+    } else if (!null2a) {
+      final UndoInfo step2 =
+        mBlockedEvents.createUndoInfo(downcast.mBlockedEvents);
+      if (step2 != null) {
+        info.add(step2);
+      }
+    }
+    final UndoInfo step3 = mNodes.createUndoInfo(downcast.mNodes);
+    if (step3 != null) {
+      info.add(step3);
+    }
+    final UndoInfo step4 = mEdges.createUndoInfo(downcast.mEdges);
+    if (step4 != null) {
+      info.add(step4);
+    }
   }
 
 

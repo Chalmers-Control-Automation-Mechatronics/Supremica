@@ -41,6 +41,7 @@ public abstract class ComponentSubject
 
   //#########################################################################
   //# Cloning
+  @Override
   public ComponentSubject clone()
   {
     return (ComponentSubject) super.clone();

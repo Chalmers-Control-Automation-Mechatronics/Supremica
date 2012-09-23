@@ -66,6 +66,7 @@ public final class UnaryExpressionElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public UnaryExpressionElement clone()
   {
     return (UnaryExpressionElement) super.clone();

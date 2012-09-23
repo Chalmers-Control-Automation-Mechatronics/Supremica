@@ -20,9 +20,8 @@ package net.sourceforge.waters.subject.base;
 public interface UndoInfo
 {
 
-  public enum Mode {
-    UNDO,
-    REDO
-  }
+  public ModelChangeEvent redo(Subject parent);
+
+  public ModelChangeEvent undo(Subject parent);
 
 }

@@ -285,17 +285,18 @@ public class NodeEditorDialog
             .getClone(node.getInitialArrowGeometry());
         final LabelGeometryProxy labelGeometry =
           (LabelGeometryProxy) cloner.getClone(node.getLabelGeometry());
-        template = new SimpleNodeSubject(name, propositions, attribs,
+        template =
+          new SimpleNodeSubject(name, propositions, attribs,
                                 node.isInitial(), pointGeometry,
                                 initialArrowGeometry, labelGeometry);
       } else if (mNode instanceof GroupNodeSubject) {
         final GroupNodeSubject groupNode = (GroupNodeSubject) mNode;
         final Collection<? extends NodeProxy> immediateChildNodes =
-          cloner.getClonedList(groupNode.getImmediateChildNodesModifiable());
+          groupNode.getImmediateChildNodesModifiable();
         final BoxGeometryProxy geometry =
           (BoxGeometryProxy) cloner.getClone(groupNode.getGeometry());
         template = new GroupNodeSubject(name, propositions, attribs,
-                               immediateChildNodes, geometry);
+                                        immediateChildNodes, geometry);
       }
 
       if (!eq.equals(mNode, template)) {

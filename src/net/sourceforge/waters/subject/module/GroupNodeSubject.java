@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -25,9 +26,13 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.SetSubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -91,6 +96,7 @@ public final class GroupNodeSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public GroupNodeSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -98,33 +104,53 @@ public final class GroupNodeSubject
     return (GroupNodeSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final GroupNodeSubject downcast = (GroupNodeSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final SetSubject<NodeSubject> immediateChildNodes =
-        downcast.getImmediateChildNodesModifiable();
-      mImmediateChildNodes.assignFrom(immediateChildNodes);
-      final BoxGeometrySubject geometry = downcast.getGeometry();
-      if (mGeometry == geometry) {
-        // nothing
-      } else if (mGeometry == null) {
-        mGeometry = geometry.clone();
-        mGeometry.setParent(this);
-        fireGeometryChanged(mGeometry);
-      } else if (geometry == null) {
-        mGeometry.setParent(null);
-        mGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mGeometry.assignFrom(geometry);
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 3) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 4:
+        if (mGeometry != null) {
+          mGeometry.setParent(null);
+        }
+        mGeometry = (BoxGeometrySubject) newValue;
+        if (mGeometry != null) {
+          mGeometry.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final GroupNodeSubject downcast = (GroupNodeSubject) newState;
+    final UndoInfo step5 =
+      mImmediateChildNodes.createUndoInfo(downcast.mImmediateChildNodes);
+    if (step5 != null) {
+      info.add(step5);
+    }
+    final boolean null4a = mGeometry == null;
+    final boolean null4b = downcast.mGeometry == null;
+    if (null4a != null4b) {
+      final BoxGeometrySubject clone4 = ProxyTools.clone(downcast.mGeometry);
+      final UndoInfo step4 = new ReplacementUndoInfo(4, mGeometry, clone4);
+      info.add(step4);
+    } else if (!null4a) {
+      final UndoInfo step4 = mGeometry.createUndoInfo(downcast.mGeometry);
+      if (step4 != null) {
+        info.add(step4);
+      }
+    }
   }
 
 

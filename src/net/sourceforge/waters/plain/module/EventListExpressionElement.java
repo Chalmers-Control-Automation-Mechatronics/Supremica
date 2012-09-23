@@ -64,6 +64,7 @@ public abstract class EventListExpressionElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public EventListExpressionElement clone()
   {
     return (EventListExpressionElement) super.clone();

@@ -58,6 +58,7 @@ public final class IntConstantElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public IntConstantElement clone()
   {
     return (IntConstantElement) super.clone();

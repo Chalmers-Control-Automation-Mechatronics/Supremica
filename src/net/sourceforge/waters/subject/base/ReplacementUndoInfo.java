@@ -26,58 +26,65 @@ public class ReplacementUndoInfo implements UndoInfo
 
   //#########################################################################
   //# Constructors
-  public ReplacementUndoInfo(final Object oldValue, final Object newValue)
+  public ReplacementUndoInfo(final Object oldValue,
+                             final Object newValue)
   {
+    this(-1, oldValue, newValue);
+  }
+
+  public ReplacementUndoInfo(final int index,
+                             final Object oldValue,
+                             final Object newValue)
+  {
+    mIndex = index;
     mOldValue = oldValue;
     mNewValue = newValue;
   }
 
-  public ReplacementUndoInfo(final int oldValue, final int newValue)
+  public ReplacementUndoInfo(final int index,
+                             final int oldValue,
+                             final int newValue)
   {
+    mIndex = index;
     mOldValue = oldValue;
     mNewValue = newValue;
   }
 
-  public ReplacementUndoInfo(final boolean oldValue, final boolean newValue)
+  public ReplacementUndoInfo(final int index,
+                             final boolean oldValue,
+                             final boolean newValue)
   {
+    mIndex = index;
     mOldValue = oldValue;
     mNewValue = newValue;
   }
 
-  public ReplacementUndoInfo(final double oldValue, final double newValue)
+  public ReplacementUndoInfo(final int index,
+                             final double oldValue,
+                             final double newValue)
   {
+    mIndex = index;
     mOldValue = oldValue;
     mNewValue = newValue;
   }
 
 
   //#########################################################################
-  //# Simple Access
-  public Object getValue(final UndoInfo.Mode mode)
+  //# Interface net.sourceforge.waters.subject.base.UndoInfo
+  public ModelChangeEvent redo(final Subject parent)
   {
-    switch (mode) {
-    case UNDO:
-      return mOldValue;
-    case REDO:
-      return mNewValue;
-    default:
-      throw new IllegalArgumentException("Unknown undo mode " + mode + "!");
-    }
+    return parent.assignMember(mIndex, mOldValue, mNewValue);
   }
 
-  public Object getOldValue()
+  public ModelChangeEvent undo(final Subject parent)
   {
-    return mOldValue;
-  }
-
-  public Object getNewValue()
-  {
-    return mNewValue;
+    return parent.assignMember(mIndex, mNewValue, mOldValue);
   }
 
 
   //#########################################################################
   //# Data Members
+  private final int mIndex;
   private final Object mOldValue;
   private final Object mNewValue;
 

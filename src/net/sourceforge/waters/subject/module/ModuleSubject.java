@@ -30,6 +30,8 @@ import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.DocumentSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -122,6 +124,7 @@ public final class ModuleSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public ModuleSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -129,28 +132,32 @@ public final class ModuleSubject
     return (ModuleSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
   {
-    if (this != partner) {
-      final ModuleSubject downcast = (ModuleSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ListSubject<ConstantAliasSubject> constantAliasList =
-        downcast.getConstantAliasListModifiable();
-      mConstantAliasList.assignFrom(constantAliasList);
-      final ListSubject<EventDeclSubject> eventDeclList =
-        downcast.getEventDeclListModifiable();
-      mEventDeclList.assignFrom(eventDeclList);
-      final ListSubject<AbstractSubject> eventAliasList =
-        downcast.getEventAliasListModifiable();
-      mEventAliasList.assignFrom(eventAliasList);
-      final ListSubject<AbstractSubject> componentList =
-        downcast.getComponentListModifiable();
-      mComponentList.assignFrom(componentList);
-      if (change) {
-        fireStateChanged();
-      }
+    super.collectUndoInfo(newState, info);
+    final ModuleSubject downcast = (ModuleSubject) newState;
+    final UndoInfo step4 =
+      mConstantAliasList.createUndoInfo(downcast.mConstantAliasList);
+    if (step4 != null) {
+      info.add(step4);
     }
-    return false;
+    final UndoInfo step5 =
+      mEventDeclList.createUndoInfo(downcast.mEventDeclList);
+    if (step5 != null) {
+      info.add(step5);
+    }
+    final UndoInfo step6 =
+      mEventAliasList.createUndoInfo(downcast.mEventAliasList);
+    if (step6 != null) {
+      info.add(step6);
+    }
+    final UndoInfo step7 =
+      mComponentList.createUndoInfo(downcast.mComponentList);
+    if (step7 != null) {
+      info.add(step7);
+    }
   }
 
 

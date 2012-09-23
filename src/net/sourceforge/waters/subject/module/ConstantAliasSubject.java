@@ -19,7 +19,11 @@ import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
@@ -69,6 +73,7 @@ public final class ConstantAliasSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public ConstantAliasSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -76,21 +81,35 @@ public final class ConstantAliasSubject
     return (ConstantAliasSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final ConstantAliasSubject downcast = (ConstantAliasSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ScopeKind scope = downcast.getScope();
-      if (mScope != scope) {
-        mScope = scope;
-        change = true;
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 2) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 3:
+        mScope = (ScopeKind) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final ConstantAliasSubject downcast = (ConstantAliasSubject) newState;
+    if (!mScope.equals(downcast.mScope)) {
+      final UndoInfo step3 =
+        new ReplacementUndoInfo(3, mScope, downcast.mScope);
+      info.add(step3);
+    }
   }
 
 

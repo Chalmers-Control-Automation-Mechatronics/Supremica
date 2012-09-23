@@ -63,6 +63,7 @@ public final class LabelBlockElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public LabelBlockElement clone()
   {
     return (LabelBlockElement) super.clone();

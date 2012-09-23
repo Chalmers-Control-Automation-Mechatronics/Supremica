@@ -12,14 +12,11 @@ package net.sourceforge.waters.subject.base;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Set;
-
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
@@ -368,96 +365,117 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     return mObservers;
   }
 
-  public void fireModelChanged(final ModelChangeEvent event)
-  {
-    SubjectTools.fireModelChanged(this, event);
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ListSubject
-  public void assignFrom(final List<? extends P> list)
+  public UndoInfo createUndoInfo(final List<? extends P> newList)
   {
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
-    final int oldsize = size();
-    final int newsize = list.size();
-    final boolean[] used = new boolean[oldsize];
-    final Collection<P> added = new ArrayList<P>(newsize);
-    final Collection<P> removed = new ArrayList<P>(oldsize);
-    final Collection<P> moved = new ArrayList<P>(oldsize);
-    final Set<String> names = new HashSet<String>(newsize);
-    final List<P> newlist = new ArrayList<P>(newsize);
-    int i;
-    for (i = 0; i < newsize; i++) {
-      newlist.add(null);
+    if (eq.isEqualList(this, newList)) {
+      return null;
     }
-    for (i = 0; i < oldsize; i++) {
-      used[i] = false;
-    }
-    i = 0;
-    final Iterator<? extends P> iter = iterator();
-    for (final P newproxy : list) {
-      final String name = newproxy.getName();
-      if (names.contains(name)) {
-        throw createDuplicateName(name);
-      }
-      names.add(name);
-      if (iter.hasNext()) {
-        final P oldproxy = iter.next();
-        if (eq.equals(newproxy, oldproxy)) {
-          newlist.set(i, oldproxy);
-          used[i] = true;
-        }
-        i++;
-      } else {
-        break;
-      }
-    }
-    i = 0;
-    for (final P newproxy : list) {
-      if (newlist.get(i) == null) {
-        final String name = newproxy.getName();
-        if (containsName(name)) {
-          int j = 0;
-          for (final P oldproxy : this) {
-            if (!used[j] && eq.equals(newproxy, oldproxy)) {
-              newlist.set(i, oldproxy);
-              used[j] = true;
-              moved.add(oldproxy);
-              break;
-            }
-            j++;
+
+    // Longest Common Subsequence Algorithm
+    // http://en.wikipedia.org/wiki/Longest_common_subsequence_problem
+    final int len1 = size();
+    final int len2 = newList.size();
+    final int[][] lcsLength = new int[len1 + 1][len2 + 1];
+    final ListIterator<? extends P> iter1 = listIterator();
+    int i1 = 0;
+    ListIterator<? extends P> iter2 = null;
+    int i2 = 0;
+    if (len1 == 0) {
+      i2 = len2;
+      iter2 = newList.listIterator(len2);
+    } else {
+      while (iter1.hasNext()) {
+        final P proxy1 = iter1.next();
+        final String name1 = proxy1.getName();
+        i1++;
+        i2 = 0;
+        iter2 = newList.listIterator();
+        while (iter2.hasNext()) {
+          final P proxy2 = iter2.next();
+          final String name2 = proxy2.getName();
+          i2++;
+          if (name1.equals(name2)) {
+            lcsLength[i1][i2] = lcsLength[i1 - 1][i2 - 1] + 1;
+          } else if (lcsLength[i1][i2 - 1] < lcsLength[i1 - 1][i2]) {
+            lcsLength[i1][i2] = lcsLength[i1 - 1][i2];
+          } else {
+            lcsLength[i1][i2] = lcsLength[i1][i2 - 1];
           }
         }
-        if (newlist.get(i) == null) {
-          // not found --- must clone and add.
-          final P proxy = ProxyTools.clone(newproxy);
-          newlist.set(i, proxy);
-          added.add(proxy);
-          beforeAdd(proxy);
-          mProxyMap.put(name, proxy);
+      }
+    }
+
+    final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
+    int numInserts = newList.size() - lcsLength[len1][len2];
+    final List<UndoInfo> insertions = new ArrayList<UndoInfo>(numInserts);
+    while (i1 > 0 || i2 > 0) {
+      final int len = lcsLength[i1][i2];
+      if (i1 > 0 && i2 > 0 && lcsLength[i1 - 1][i2 - 1] == len) {
+        i1--;
+        i2--;
+        final P proxy1 = iter1.previous();
+        final P proxy2 = iter2.previous();
+        final P cloned = ProxyTools.clone(proxy2);
+        final UndoInfo replace = new ReplacementUndoInfo(i1, proxy1, cloned);
+        info.add(replace);
+      } else if (i2 > 0 && (i1 == 0 || lcsLength[i1][i2 - 1] == len)) {
+        i2--;
+        final P proxy2 = iter2.previous();
+        final P cloned = ProxyTools.clone(proxy2);
+        final UndoInfo insert = new ReplacementUndoInfo(i2, null, cloned);
+        insertions.add(insert);
+      } else if (i1 > 0 && (i2 == 0 || lcsLength[i1 - 1][i2] == len)) {
+        i1--;
+        final P proxy1 = iter1.previous();
+        final UndoInfo remove = new ReplacementUndoInfo(i1, proxy1, null);
+        info.add(remove);
+      } else {
+        i1--;
+        i2--;
+        final P proxy1 = iter1.previous();
+        final P proxy2 = iter2.previous();
+        if (proxy1.getClass() != proxy2.getClass()) {
+          final P cloned = ProxyTools.clone(proxy2);
+          final UndoInfo replace = new ReplacementUndoInfo(i1, proxy1, cloned);
+          info.add(replace);
+        } else {
+          final UndoInfo modify = proxy1.createUndoInfo(proxy2);
+          if (modify != null) {
+            info.add(modify);
+          }
         }
       }
-      i++;
     }
-    i = 0;
-    for (final P oldproxy : this) {
-      if (!used[i++]) {
-        final String name = oldproxy.getName();
-        removed.add(oldproxy);
-        mProxyMap.remove(name);
-      }
+
+    numInserts = insertions.size();
+    final ListIterator<UndoInfo> iter = insertions.listIterator(numInserts);
+    while (iter.hasPrevious()) {
+      final UndoInfo insert = iter.previous();
+      info.add(insert);
     }
-    mProxyList = newlist;
-    for (final P oldproxy : removed) {
-      afterRemove(oldproxy, -1);
+    return info;
+  }
+
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    if (oldValue == null) {
+      @SuppressWarnings("unchecked")
+      final Class<P> clazz = (Class<P>) newValue.getClass();
+      add(index, clazz.cast(newValue));
+    } else if (newValue == null) {
+      remove(index);
+    } else {
+      @SuppressWarnings("unchecked")
+      final Class<P> clazz = (Class<P>) newValue.getClass();
+      set(index, clazz.cast(newValue));
     }
-    for (final P oldproxy : moved) {
-      afterMove(oldproxy);
-    }
-    for (final P newproxy : added) {
-      afterAdd(newproxy, -1);
-    }
+    return null;
   }
 
 
@@ -551,7 +569,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
   {
     final ModelChangeEvent event =
       ModelChangeEvent.createItemAdded(this, proxy, index);
-    fireModelChanged(event);
+    event.fire();
   }
 
   private void afterRemove(final P proxy, final int index)
@@ -559,17 +577,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     proxy.setParent(null);
     final ModelChangeEvent event =
       ModelChangeEvent.createItemRemoved(this, proxy, index);
-    fireModelChanged(event);
-  }
-
-  private void afterMove(final P proxy)
-  {
-    final ModelChangeEvent event1 =
-      ModelChangeEvent.createItemRemoved(this, proxy);
-    fireModelChanged(event1);
-    final ModelChangeEvent event2 =
-      ModelChangeEvent.createItemAdded(this, proxy);
-    fireModelChanged(event2);
+    event.fire();
   }
 
 

@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.subject.base;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 
 /**
@@ -20,15 +20,14 @@ import java.util.List;
  * this operation is represented by a sequence of assignments to its
  * members, stored in a RecursiveUndoInfo object. Each entry is an
  * {@link UndoInfo} containing further information how to modify the
- * corresponding member. <CODE>null</CODE> entries are possible, indicating
- * that a member should be left unchanged. The exact interpretation of the
- * contents of the list depends on the type of the subject being modified.
+ * corresponding member. The exact interpretation of the contents of the
+ * list depends on the type of the subject being modified.
  *
  * @author Robi Malik
  */
 
 public class RecursiveUndoInfo
-  implements UndoInfo, Iterable<UndoInfo>
+  implements UndoInfo
 {
 
   //#########################################################################
@@ -46,10 +45,38 @@ public class RecursiveUndoInfo
 
 
   //#########################################################################
-  //# Interface java.lang.Iterable<UndoInfo>
-  public Iterator<UndoInfo> iterator()
+  //# Interface net.sourceforge.waters.subject.base.UndoInfo
+  public ModelChangeEvent redo(final Subject parent)
   {
-    return mChildren.iterator();
+    final List<ModelChangeEvent> events = new LinkedList<ModelChangeEvent>();
+    for (final UndoInfo child : mChildren) {
+      final ModelChangeEvent event = child.redo(mSubject);
+      if (event != null && !events.contains(event)) {
+        events.add(event);
+      }
+    }
+    for (final ModelChangeEvent event : events) {
+      event.fire();
+    }
+    return null;
+  }
+
+  public ModelChangeEvent undo(final Subject parent)
+  {
+    final List<ModelChangeEvent> events = new LinkedList<ModelChangeEvent>();
+    final int end = mChildren.size();
+    final ListIterator<UndoInfo> iter = mChildren.listIterator(end);
+    while (iter.hasPrevious()) {
+      final UndoInfo child = iter.previous();
+      final ModelChangeEvent event = child.undo(mSubject);
+      if (event != null && !events.contains(event)) {
+        events.add(event);
+      }
+    }
+    for (final ModelChangeEvent event : events) {
+      event.fire();
+    }
+    return null;
   }
 
 
@@ -69,6 +96,15 @@ public class RecursiveUndoInfo
   public void add(final UndoInfo child)
   {
     mChildren.add(child);
+  }
+
+  /**
+   * Tests whether this assignment sequence contains any assignments,
+   * i.e., whether applying it will change the subject.
+   */
+  public boolean isEmpty()
+  {
+    return mChildren.isEmpty();
   }
 
 

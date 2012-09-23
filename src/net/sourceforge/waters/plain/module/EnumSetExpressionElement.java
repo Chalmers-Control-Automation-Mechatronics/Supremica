@@ -71,6 +71,7 @@ public final class EnumSetExpressionElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public EnumSetExpressionElement clone()
   {
     return (EnumSetExpressionElement) super.clone();

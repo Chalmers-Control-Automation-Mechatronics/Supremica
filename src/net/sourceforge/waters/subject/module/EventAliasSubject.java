@@ -18,7 +18,6 @@ import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
-import net.sourceforge.waters.subject.base.ProxySubject;
 
 
 /**
@@ -47,21 +46,11 @@ public final class EventAliasSubject
 
 
   //#########################################################################
-  //# Cloning and Assigning
+  //# Cloning
+  @Override
   public EventAliasSubject clone()
   {
     return (EventAliasSubject) super.clone();
-  }
-
-  public boolean assignFrom(final ProxySubject partner)
-  {
-    if (this != partner) {
-      boolean change = super.assignFrom(partner);
-      if (change) {
-        fireStateChanged();
-      }
-    }
-    return false;
   }
 
 

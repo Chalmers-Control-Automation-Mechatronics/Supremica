@@ -42,6 +42,7 @@ public abstract class IdentifiedElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public IdentifiedElement clone()
   {
     return (IdentifiedElement) super.clone();

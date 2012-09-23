@@ -46,6 +46,7 @@ public final class PointGeometryElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public PointGeometryElement clone()
   {
     return (PointGeometryElement) super.clone();

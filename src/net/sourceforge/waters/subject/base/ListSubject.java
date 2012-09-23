@@ -28,14 +28,14 @@ public interface ListSubject<P extends ProxySubject>
   public ListSubject<P> clone();
 
   /**
-   * Assigns the contents of another list to this list.
-   * This method ensures that the contents of this list are equal to the
-   * contents of the given list according to their contents, in the given order.
-   * Items already contained in this list are reused, and changed in position as
-   * needed. Items not contained are cloned from the given list. The method
-   * produces as few model change notifications as possible.
-   * @param list  The list to be copied from.
+   * Creates assignment instructions to replaces the contents of this list
+   * by the contents of another list. This method attempts to produce a
+   * minimal sequence of deletions and insertions to convert this set
+   * to the given new set.
+   * @param  newSet   The list containing the data after the intended
+   *                  assignment.
+   * @return Undo information containing a minimal assignment sequence.
    */
-  public void assignFrom(final List<? extends P> list);
+  public UndoInfo createUndoInfo(final List<? extends P> newList);
 
 }

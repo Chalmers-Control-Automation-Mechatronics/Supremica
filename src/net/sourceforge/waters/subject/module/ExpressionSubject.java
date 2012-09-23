@@ -39,6 +39,7 @@ public abstract class ExpressionSubject
 
   //#########################################################################
   //# Cloning
+  @Override
   public ExpressionSubject clone()
   {
     return (ExpressionSubject) super.clone();

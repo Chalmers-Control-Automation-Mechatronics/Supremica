@@ -24,8 +24,12 @@ import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.subject.base.CloningGeometryListSubject;
 import net.sourceforge.waters.subject.base.GeometrySubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.SimpleListSubject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 import net.sourceforge.waters.xsd.module.SplineKind;
 
@@ -75,6 +79,7 @@ public final class SplineGeometrySubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public SplineGeometrySubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -82,24 +87,39 @@ public final class SplineGeometrySubject
     return (SplineGeometrySubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final SplineGeometrySubject downcast = (SplineGeometrySubject) partner;
-      boolean change = super.assignFrom(partner);
-      final SimpleListSubject<Point2D> points =
-        downcast.getPointsModifiable();
-      mPoints.assignFrom(points);
-      final SplineKind kind = downcast.getKind();
-      if (mKind != kind) {
-        mKind = kind;
-        change = true;
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 0) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
+        mKind = (SplineKind) newValue;
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info)
+  {
+    super.collectUndoInfo(newState, info);
+    final SplineGeometrySubject downcast = (SplineGeometrySubject) newState;
+    final UndoInfo step1 = mPoints.createUndoInfo(downcast.mPoints);
+    if (step1 != null) {
+      info.add(step1);
+    }
+    if (!mKind.equals(downcast.mKind)) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mKind, downcast.mKind);
+      info.add(step2);
+    }
   }
 
 

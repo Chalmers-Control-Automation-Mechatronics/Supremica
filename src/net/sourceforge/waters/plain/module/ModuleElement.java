@@ -122,6 +122,7 @@ public final class ModuleElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public ModuleElement clone()
   {
     return (ModuleElement) super.clone();

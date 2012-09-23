@@ -85,6 +85,7 @@ public final class SimpleComponentElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public SimpleComponentElement clone()
   {
     return (SimpleComponentElement) super.clone();
