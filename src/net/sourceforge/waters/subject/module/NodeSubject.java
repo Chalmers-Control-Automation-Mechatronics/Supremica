@@ -14,6 +14,7 @@ package net.sourceforge.waters.subject.module;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -23,6 +24,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -111,16 +113,18 @@ public abstract class NodeSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final NodeSubject downcast = (NodeSubject) newState;
     final UndoInfo step2 =
-      mPropositions.createUndoInfo(downcast.mPropositions);
+      mPropositions.createUndoInfo(downcast.mPropositions, boundary);
     if (step2 != null) {
       info.add(step2);
     }
-    final UndoInfo step4 = mAttributes.createUndoInfo(downcast.mAttributes);
+    final UndoInfo step4 =
+      mAttributes.createUndoInfo(downcast.mAttributes, boundary);
     if (step4 != null) {
       info.add(step4);
     }

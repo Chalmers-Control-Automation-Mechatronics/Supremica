@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -154,8 +155,12 @@ public class ArrayListSubject<P extends ProxySubject>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ListSubject
-  public UndoInfo createUndoInfo(final List<? extends P> newList)
+  public UndoInfo createUndoInfo(final List<? extends P> newList,
+                                 final Set<? extends Subject> boundary)
   {
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
     if (eq.isEqualList(this, newList)) {
       return null;

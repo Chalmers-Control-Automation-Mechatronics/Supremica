@@ -14,6 +14,7 @@ package net.sourceforge.waters.subject.module;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -27,6 +28,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -123,20 +125,22 @@ public final class SimpleComponentSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final SimpleComponentSubject downcast = (SimpleComponentSubject) newState;
     if (!mKind.equals(downcast.mKind)) {
       final UndoInfo step2 =
         new ReplacementUndoInfo(2, mKind, downcast.mKind);
       info.add(step2);
     }
-    final UndoInfo step3 = mGraph.createUndoInfo(downcast.mGraph);
+    final UndoInfo step3 = mGraph.createUndoInfo(downcast.mGraph, boundary);
     if (step3 != null) {
       info.add(step3);
     }
-    final UndoInfo step4 = mAttributes.createUndoInfo(downcast.mAttributes);
+    final UndoInfo step4 =
+      mAttributes.createUndoInfo(downcast.mAttributes, boundary);
     if (step4 != null) {
       info.add(step4);
     }

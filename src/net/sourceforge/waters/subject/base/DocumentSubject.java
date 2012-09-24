@@ -13,6 +13,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -105,9 +106,10 @@ public abstract class DocumentSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final DocumentSubject doc = (DocumentSubject) newState;
     if (!ProxyTools.equals(mComment, doc.getComment())) {
       final UndoInfo step =

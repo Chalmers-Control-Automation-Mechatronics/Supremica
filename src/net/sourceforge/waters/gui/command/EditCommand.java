@@ -94,9 +94,26 @@ public class EditCommand
                      final SelectionOwner panel,
                      final String name)
   {
+    this(subject, subject.createUndoInfo(newState, null), panel, name);
+  }
+
+  /**
+   * Creates a new edit command.
+   * @param  subject   The subject affected by this command.
+   * @param  info      Undo information containing assignment instructions.
+   * @param  panel     The panel that contains the item and controls the
+   *                   selection, or <CODE>null</CODE> if the selection
+   *                   should remain unchanged.
+   * @param  name      The description of the command.
+   */
+  public EditCommand(final ProxySubject subject,
+                     final UndoInfo info,
+                     final SelectionOwner panel,
+                     final String name)
+  {
     super(panel, name, panel != null);
     mSubject = subject;
-    mUndoInfo = subject.createUndoInfo(newState);
+    mUndoInfo = info;
     if (name == null) {
       final String newname = ProxyNamer.getItemClassName(subject) + " Edit";
       setName(newname);

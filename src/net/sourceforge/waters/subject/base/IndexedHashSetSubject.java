@@ -286,8 +286,12 @@ public class IndexedHashSetSubject<P extends NamedSubject>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
-  public UndoInfo createUndoInfo(final Set<? extends P> newSet)
+  public UndoInfo createUndoInfo(final Set<? extends P> newSet,
+                                 final Set<? extends Subject> boundary)
   {
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
     final int newsize = newSet.size();
     final Set<String> names = new THashSet<String>(newsize);
     final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
@@ -302,7 +306,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
         final UndoInfo add = new ReplacementUndoInfo(null, copy);
         info.add(add);
       } else if (present.getClass() == newProxy.getClass()) {
-        final UndoInfo modify = present.createUndoInfo(newProxy);
+        final UndoInfo modify = present.createUndoInfo(newProxy, boundary);
         if (modify != null) {
           info.add(modify);
         }

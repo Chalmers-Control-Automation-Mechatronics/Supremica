@@ -130,23 +130,28 @@ public final class GroupNodeSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final GroupNodeSubject downcast = (GroupNodeSubject) newState;
     final UndoInfo step5 =
-      mImmediateChildNodes.createUndoInfo(downcast.mImmediateChildNodes);
+      mImmediateChildNodes.createUndoInfo(downcast.mImmediateChildNodes, boundary);
     if (step5 != null) {
       info.add(step5);
     }
     final boolean null4a = mGeometry == null;
     final boolean null4b = downcast.mGeometry == null;
     if (null4a != null4b) {
-      final BoxGeometrySubject clone4 = ProxyTools.clone(downcast.mGeometry);
-      final UndoInfo step4 = new ReplacementUndoInfo(4, mGeometry, clone4);
-      info.add(step4);
+      if (boundary ==  null || !boundary.contains(mGeometry)) {
+        final BoxGeometrySubject clone4 =
+          ProxyTools.clone(downcast.mGeometry);
+        final UndoInfo step4 = new ReplacementUndoInfo(4, mGeometry, clone4);
+        info.add(step4);
+      }
     } else if (!null4a) {
-      final UndoInfo step4 = mGeometry.createUndoInfo(downcast.mGeometry);
+      final UndoInfo step4 =
+        mGeometry.createUndoInfo(downcast.mGeometry, boundary);
       if (step4 != null) {
         info.add(step4);
       }

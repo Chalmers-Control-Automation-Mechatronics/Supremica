@@ -12,6 +12,8 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -28,6 +30,7 @@ import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -185,9 +188,10 @@ public final class EdgeSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final EdgeSubject downcast = (EdgeSubject) newState;
     if (mSource != downcast.mSource) {
       final UndoInfo step1 =
@@ -199,21 +203,24 @@ public final class EdgeSubject
         new ReplacementUndoInfo(2, mTarget, downcast.mTarget);
       info.add(step2);
     }
-    final UndoInfo step3 = mLabelBlock.createUndoInfo(downcast.mLabelBlock);
+    final UndoInfo step3 =
+      mLabelBlock.createUndoInfo(downcast.mLabelBlock, boundary);
     if (step3 != null) {
       info.add(step3);
     }
     final boolean null4a = mGuardActionBlock == null;
     final boolean null4b = downcast.mGuardActionBlock == null;
     if (null4a != null4b) {
-      final GuardActionBlockSubject clone4 =
-        ProxyTools.clone(downcast.mGuardActionBlock);
-      final UndoInfo step4 =
-        new ReplacementUndoInfo(4, mGuardActionBlock, clone4);
-      info.add(step4);
+      if (boundary ==  null || !boundary.contains(mGuardActionBlock)) {
+        final GuardActionBlockSubject clone4 =
+          ProxyTools.clone(downcast.mGuardActionBlock);
+        final UndoInfo step4 =
+          new ReplacementUndoInfo(4, mGuardActionBlock, clone4);
+        info.add(step4);
+      }
     } else if (!null4a) {
       final UndoInfo step4 =
-        mGuardActionBlock.createUndoInfo(downcast.mGuardActionBlock);
+        mGuardActionBlock.createUndoInfo(downcast.mGuardActionBlock, boundary);
       if (step4 != null) {
         info.add(step4);
       }
@@ -221,12 +228,15 @@ public final class EdgeSubject
     final boolean null5a = mGeometry == null;
     final boolean null5b = downcast.mGeometry == null;
     if (null5a != null5b) {
-      final SplineGeometrySubject clone5 =
-        ProxyTools.clone(downcast.mGeometry);
-      final UndoInfo step5 = new ReplacementUndoInfo(5, mGeometry, clone5);
-      info.add(step5);
+      if (boundary ==  null || !boundary.contains(mGeometry)) {
+        final SplineGeometrySubject clone5 =
+          ProxyTools.clone(downcast.mGeometry);
+        final UndoInfo step5 = new ReplacementUndoInfo(5, mGeometry, clone5);
+        info.add(step5);
+      }
     } else if (!null5a) {
-      final UndoInfo step5 = mGeometry.createUndoInfo(downcast.mGeometry);
+      final UndoInfo step5 =
+        mGeometry.createUndoInfo(downcast.mGeometry, boundary);
       if (step5 != null) {
         info.add(step5);
       }
@@ -234,12 +244,16 @@ public final class EdgeSubject
     final boolean null6a = mStartPoint == null;
     final boolean null6b = downcast.mStartPoint == null;
     if (null6a != null6b) {
-      final PointGeometrySubject clone6 =
-        ProxyTools.clone(downcast.mStartPoint);
-      final UndoInfo step6 = new ReplacementUndoInfo(6, mStartPoint, clone6);
-      info.add(step6);
+      if (boundary ==  null || !boundary.contains(mStartPoint)) {
+        final PointGeometrySubject clone6 =
+          ProxyTools.clone(downcast.mStartPoint);
+        final UndoInfo step6 =
+          new ReplacementUndoInfo(6, mStartPoint, clone6);
+        info.add(step6);
+      }
     } else if (!null6a) {
-      final UndoInfo step6 = mStartPoint.createUndoInfo(downcast.mStartPoint);
+      final UndoInfo step6 =
+        mStartPoint.createUndoInfo(downcast.mStartPoint, boundary);
       if (step6 != null) {
         info.add(step6);
       }
@@ -247,12 +261,15 @@ public final class EdgeSubject
     final boolean null7a = mEndPoint == null;
     final boolean null7b = downcast.mEndPoint == null;
     if (null7a != null7b) {
-      final PointGeometrySubject clone7 =
-        ProxyTools.clone(downcast.mEndPoint);
-      final UndoInfo step7 = new ReplacementUndoInfo(7, mEndPoint, clone7);
-      info.add(step7);
+      if (boundary ==  null || !boundary.contains(mEndPoint)) {
+        final PointGeometrySubject clone7 =
+          ProxyTools.clone(downcast.mEndPoint);
+        final UndoInfo step7 = new ReplacementUndoInfo(7, mEndPoint, clone7);
+        info.add(step7);
+      }
     } else if (!null7a) {
-      final UndoInfo step7 = mEndPoint.createUndoInfo(downcast.mEndPoint);
+      final UndoInfo step7 =
+        mEndPoint.createUndoInfo(downcast.mEndPoint, boundary);
       if (step7 != null) {
         info.add(step7);
       }

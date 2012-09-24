@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -30,6 +31,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -137,13 +139,14 @@ public final class VariableComponentSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final VariableComponentSubject downcast =
       (VariableComponentSubject) newState;
     if (mType.getClass() == downcast.mType.getClass()) {
-      final UndoInfo step2 = mType.createUndoInfo(downcast.mType);
+      final UndoInfo step2 = mType.createUndoInfo(downcast.mType, boundary);
       if (step2 != null) {
         info.add(step2);
       }
@@ -159,7 +162,7 @@ public final class VariableComponentSubject
     }
     if (mInitialStatePredicate.getClass() == downcast.mInitialStatePredicate.getClass()) {
       final UndoInfo step4 =
-        mInitialStatePredicate.createUndoInfo(downcast.mInitialStatePredicate);
+        mInitialStatePredicate.createUndoInfo(downcast.mInitialStatePredicate, boundary);
       if (step4 != null) {
         info.add(step4);
       }
@@ -171,7 +174,7 @@ public final class VariableComponentSubject
       info.add(step4);
     }
     final UndoInfo step5 =
-      mVariableMarkings.createUndoInfo(downcast.mVariableMarkings);
+      mVariableMarkings.createUndoInfo(downcast.mVariableMarkings, boundary);
     if (step5 != null) {
       info.add(step5);
     }

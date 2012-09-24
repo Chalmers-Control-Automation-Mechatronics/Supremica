@@ -44,7 +44,7 @@ public class ArrayListSubjectTest extends AbstractWatersTest
     final String[] array = {"A", "G", "C", "A", "T"};
     final ArrayListSubject<SimpleIdentifierSubject> list =
       createListSubject(array);
-    final UndoInfo undo = list.createUndoInfo(list);
+    final UndoInfo undo = list.createUndoInfo(list, null);
     assertNull("Got non-null assignment for unchanged lists!", undo);
   }
 
@@ -115,7 +115,7 @@ public class ArrayListSubjectTest extends AbstractWatersTest
       new ArrayList<SimpleIdentifierSubject>(oldList);
     final ArrayListSubject<SimpleIdentifierSubject> newList =
       createListSubject(newArray);
-    final UndoInfo undo = oldList.createUndoInfo(newList);
+    final UndoInfo undo = oldList.createUndoInfo(newList, null);
     undo.redo(oldList);
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true, true);
     assertProxyListEquals(eq, "Unexpected list contents after assignment!",

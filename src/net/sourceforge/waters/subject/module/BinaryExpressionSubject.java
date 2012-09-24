@@ -12,6 +12,8 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -23,6 +25,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -118,9 +121,10 @@ public final class BinaryExpressionSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final BinaryExpressionSubject downcast =
       (BinaryExpressionSubject) newState;
     if (!mOperator.equals(downcast.mOperator)) {
@@ -129,7 +133,7 @@ public final class BinaryExpressionSubject
       info.add(step2);
     }
     if (mLeft.getClass() == downcast.mLeft.getClass()) {
-      final UndoInfo step3 = mLeft.createUndoInfo(downcast.mLeft);
+      final UndoInfo step3 = mLeft.createUndoInfo(downcast.mLeft, boundary);
       if (step3 != null) {
         info.add(step3);
       }
@@ -139,7 +143,7 @@ public final class BinaryExpressionSubject
       info.add(step3);
     }
     if (mRight.getClass() == downcast.mRight.getClass()) {
-      final UndoInfo step4 = mRight.createUndoInfo(downcast.mRight);
+      final UndoInfo step4 = mRight.createUndoInfo(downcast.mRight, boundary);
       if (step4 != null) {
         info.add(step4);
       }

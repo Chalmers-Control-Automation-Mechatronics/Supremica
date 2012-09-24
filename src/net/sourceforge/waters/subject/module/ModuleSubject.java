@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -31,6 +32,7 @@ import net.sourceforge.waters.subject.base.DocumentSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -134,27 +136,28 @@ public final class ModuleSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final ModuleSubject downcast = (ModuleSubject) newState;
     final UndoInfo step4 =
-      mConstantAliasList.createUndoInfo(downcast.mConstantAliasList);
+      mConstantAliasList.createUndoInfo(downcast.mConstantAliasList, boundary);
     if (step4 != null) {
       info.add(step4);
     }
     final UndoInfo step5 =
-      mEventDeclList.createUndoInfo(downcast.mEventDeclList);
+      mEventDeclList.createUndoInfo(downcast.mEventDeclList, boundary);
     if (step5 != null) {
       info.add(step5);
     }
     final UndoInfo step6 =
-      mEventAliasList.createUndoInfo(downcast.mEventAliasList);
+      mEventAliasList.createUndoInfo(downcast.mEventAliasList, boundary);
     if (step6 != null) {
       info.add(step6);
     }
     final UndoInfo step7 =
-      mComponentList.createUndoInfo(downcast.mComponentList);
+      mComponentList.createUndoInfo(downcast.mComponentList, boundary);
     if (step7 != null) {
       info.add(step7);
     }

@@ -12,6 +12,8 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -24,6 +26,7 @@ import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -92,13 +95,14 @@ public final class VariableMarkingSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final VariableMarkingSubject downcast = (VariableMarkingSubject) newState;
     if (mProposition.getClass() == downcast.mProposition.getClass()) {
       final UndoInfo step1 =
-        mProposition.createUndoInfo(downcast.mProposition);
+        mProposition.createUndoInfo(downcast.mProposition, boundary);
       if (step1 != null) {
         info.add(step1);
       }
@@ -108,7 +112,8 @@ public final class VariableMarkingSubject
       info.add(step1);
     }
     if (mPredicate.getClass() == downcast.mPredicate.getClass()) {
-      final UndoInfo step2 = mPredicate.createUndoInfo(downcast.mPredicate);
+      final UndoInfo step2 =
+        mPredicate.createUndoInfo(downcast.mPredicate, boundary);
       if (step2 != null) {
         info.add(step2);
       }

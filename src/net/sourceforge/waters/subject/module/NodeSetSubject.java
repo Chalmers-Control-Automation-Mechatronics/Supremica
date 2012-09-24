@@ -279,8 +279,12 @@ class NodeSetSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
-  public UndoInfo createUndoInfo(final Set<? extends NodeSubject> newState)
+  public UndoInfo createUndoInfo(final Set<? extends NodeSubject> newState,
+                                 final Set<? extends Subject> boundary)
   {
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
     if (eq.isEqualSet(this, newState)) {
       return null;

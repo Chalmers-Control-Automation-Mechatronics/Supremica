@@ -30,6 +30,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -160,9 +161,10 @@ public final class SimpleNodeSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final SimpleNodeSubject downcast = (SimpleNodeSubject) newState;
     if (mIsInitial != downcast.mIsInitial) {
       final UndoInfo step4 =
@@ -172,14 +174,16 @@ public final class SimpleNodeSubject
     final boolean null5a = mPointGeometry == null;
     final boolean null5b = downcast.mPointGeometry == null;
     if (null5a != null5b) {
-      final PointGeometrySubject clone5 =
-        ProxyTools.clone(downcast.mPointGeometry);
-      final UndoInfo step5 =
-        new ReplacementUndoInfo(5, mPointGeometry, clone5);
-      info.add(step5);
+      if (boundary ==  null || !boundary.contains(mPointGeometry)) {
+        final PointGeometrySubject clone5 =
+          ProxyTools.clone(downcast.mPointGeometry);
+        final UndoInfo step5 =
+          new ReplacementUndoInfo(5, mPointGeometry, clone5);
+        info.add(step5);
+      }
     } else if (!null5a) {
       final UndoInfo step5 =
-        mPointGeometry.createUndoInfo(downcast.mPointGeometry);
+        mPointGeometry.createUndoInfo(downcast.mPointGeometry, boundary);
       if (step5 != null) {
         info.add(step5);
       }
@@ -187,14 +191,16 @@ public final class SimpleNodeSubject
     final boolean null6a = mInitialArrowGeometry == null;
     final boolean null6b = downcast.mInitialArrowGeometry == null;
     if (null6a != null6b) {
-      final PointGeometrySubject clone6 =
-        ProxyTools.clone(downcast.mInitialArrowGeometry);
-      final UndoInfo step6 =
-        new ReplacementUndoInfo(6, mInitialArrowGeometry, clone6);
-      info.add(step6);
+      if (boundary ==  null || !boundary.contains(mInitialArrowGeometry)) {
+        final PointGeometrySubject clone6 =
+          ProxyTools.clone(downcast.mInitialArrowGeometry);
+        final UndoInfo step6 =
+          new ReplacementUndoInfo(6, mInitialArrowGeometry, clone6);
+        info.add(step6);
+      }
     } else if (!null6a) {
       final UndoInfo step6 =
-        mInitialArrowGeometry.createUndoInfo(downcast.mInitialArrowGeometry);
+        mInitialArrowGeometry.createUndoInfo(downcast.mInitialArrowGeometry, boundary);
       if (step6 != null) {
         info.add(step6);
       }
@@ -202,14 +208,16 @@ public final class SimpleNodeSubject
     final boolean null7a = mLabelGeometry == null;
     final boolean null7b = downcast.mLabelGeometry == null;
     if (null7a != null7b) {
-      final LabelGeometrySubject clone7 =
-        ProxyTools.clone(downcast.mLabelGeometry);
-      final UndoInfo step7 =
-        new ReplacementUndoInfo(7, mLabelGeometry, clone7);
-      info.add(step7);
+      if (boundary ==  null || !boundary.contains(mLabelGeometry)) {
+        final LabelGeometrySubject clone7 =
+          ProxyTools.clone(downcast.mLabelGeometry);
+        final UndoInfo step7 =
+          new ReplacementUndoInfo(7, mLabelGeometry, clone7);
+        info.add(step7);
+      }
     } else if (!null7a) {
       final UndoInfo step7 =
-        mLabelGeometry.createUndoInfo(downcast.mLabelGeometry);
+        mLabelGeometry.createUndoInfo(downcast.mLabelGeometry, boundary);
       if (step7 != null) {
         info.add(step7);
       }

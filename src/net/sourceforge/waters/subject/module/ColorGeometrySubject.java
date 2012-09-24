@@ -27,6 +27,7 @@ import net.sourceforge.waters.subject.base.NotCloningGeometrySetSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.SimpleSetSubject;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -80,11 +81,13 @@ public final class ColorGeometrySubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final ColorGeometrySubject downcast = (ColorGeometrySubject) newState;
-    final UndoInfo step1 = mColorSet.createUndoInfo(downcast.mColorSet);
+    final UndoInfo step1 =
+      mColorSet.createUndoInfo(downcast.mColorSet, boundary);
     if (step1 != null) {
       info.add(step1);
     }

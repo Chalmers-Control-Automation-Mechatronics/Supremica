@@ -13,6 +13,7 @@
 package net.sourceforge.waters.subject.module;
 
 import java.util.Collection;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -26,6 +27,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -107,19 +109,23 @@ public final class LabelBlockSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final LabelBlockSubject downcast = (LabelBlockSubject) newState;
     final boolean null2a = mGeometry == null;
     final boolean null2b = downcast.mGeometry == null;
     if (null2a != null2b) {
-      final LabelGeometrySubject clone2 =
-        ProxyTools.clone(downcast.mGeometry);
-      final UndoInfo step2 = new ReplacementUndoInfo(2, mGeometry, clone2);
-      info.add(step2);
+      if (boundary ==  null || !boundary.contains(mGeometry)) {
+        final LabelGeometrySubject clone2 =
+          ProxyTools.clone(downcast.mGeometry);
+        final UndoInfo step2 = new ReplacementUndoInfo(2, mGeometry, clone2);
+        info.add(step2);
+      }
     } else if (!null2a) {
-      final UndoInfo step2 = mGeometry.createUndoInfo(downcast.mGeometry);
+      final UndoInfo step2 =
+        mGeometry.createUndoInfo(downcast.mGeometry, boundary);
       if (step2 != null) {
         info.add(step2);
       }

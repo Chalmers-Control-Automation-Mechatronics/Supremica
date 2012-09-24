@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -26,6 +27,7 @@ import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -85,12 +87,13 @@ public final class EnumSetExpressionSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final EnumSetExpressionSubject downcast =
       (EnumSetExpressionSubject) newState;
-    final UndoInfo step2 = mItems.createUndoInfo(downcast.mItems);
+    final UndoInfo step2 = mItems.createUndoInfo(downcast.mItems, boundary);
     if (step2 != null) {
       info.add(step2);
     }

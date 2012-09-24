@@ -2050,9 +2050,9 @@ public class GraphEditorPanel
           final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
           EditorEditEdgeDialog.showDialog(edge, mRoot);
         }
-        else if(mFocusedObject instanceof NodeSubject){
-          final NodeSubject node = (NodeSubject)mFocusedObject;
-          NodeEditorDialog.showDialog(node, mRoot);
+        else if (mFocusedObject instanceof NodeSubject) {
+          final NodeSubject node = (NodeSubject) mFocusedObject;
+          NodeEditorDialog.showDialog(GraphEditorPanel.this, node);
         }
       }
     }
@@ -2189,10 +2189,9 @@ public class GraphEditorPanel
             final SimpleNodeSubject node =
             (SimpleNodeSubject) mFocusedObject.getParent();
             editStateName(node);
-          }
-          else if(mFocusedObject instanceof SimpleNodeSubject){
+          } else if (mFocusedObject instanceof SimpleNodeSubject) {
             final SimpleNodeSubject node = (SimpleNodeSubject)mFocusedObject;
-            NodeEditorDialog.showDialog(node, mRoot);
+            NodeEditorDialog.showDialog(GraphEditorPanel.this, node);
           }
         } else {
           mLastNodeCommand = null;
@@ -2258,11 +2257,10 @@ public class GraphEditorPanel
       //double clicks
       if (event.getButton() == MouseEvent.BUTTON1 &&
           event.getClickCount() == 2 &&
-          mFocusedObject != null) {
-         if(mFocusedObject instanceof GroupNodeSubject){
-          final GroupNodeSubject node = (GroupNodeSubject)mFocusedObject;
-          NodeEditorDialog.showDialog(node, mRoot);
-        }
+          mFocusedObject != null &&
+          mFocusedObject instanceof GroupNodeSubject) {
+        final GroupNodeSubject node = (GroupNodeSubject) mFocusedObject;
+        NodeEditorDialog.showDialog(GraphEditorPanel.this, node);
       }
     }
 

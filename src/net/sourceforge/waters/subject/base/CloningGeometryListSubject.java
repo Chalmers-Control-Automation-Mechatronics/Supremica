@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
@@ -194,9 +195,10 @@ public class CloningGeometryListSubject<E extends Cloneable>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SimpleListSubject
-  public UndoInfo createUndoInfo(final List<? extends E> newList)
+  public UndoInfo createUndoInfo(final List<? extends E> newList,
+                                 final Set<? extends Subject> boundary)
   {
-    if (equals(newList)) {
+    if (boundary != null && boundary.contains(this) || equals(newList)) {
       return null;
     }
 

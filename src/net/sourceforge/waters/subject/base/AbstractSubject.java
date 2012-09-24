@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.subject.base;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -104,10 +106,14 @@ public abstract class AbstractSubject
     }
   }
 
-  public UndoInfo createUndoInfo(final ProxySubject newState)
+  public UndoInfo createUndoInfo(final ProxySubject newState,
+                                 final Set<? extends Subject> boundary)
   {
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
     final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
-    collectUndoInfo(newState, info);
+    collectUndoInfo(newState, info, boundary);
     if (info.isEmpty()) {
       return null;
     } else {
@@ -126,7 +132,8 @@ public abstract class AbstractSubject
   //#########################################################################
   //# Assignment
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
   }
 

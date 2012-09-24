@@ -33,6 +33,7 @@ import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -137,9 +138,10 @@ public final class GraphSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final GraphSubject downcast = (GraphSubject) newState;
     if (mIsDeterministic != downcast.mIsDeterministic) {
       final UndoInfo step1 =
@@ -149,23 +151,25 @@ public final class GraphSubject
     final boolean null2a = mBlockedEvents == null;
     final boolean null2b = downcast.mBlockedEvents == null;
     if (null2a != null2b) {
-      final LabelBlockSubject clone2 =
-        ProxyTools.clone(downcast.mBlockedEvents);
-      final UndoInfo step2 =
-        new ReplacementUndoInfo(2, mBlockedEvents, clone2);
-      info.add(step2);
+      if (boundary ==  null || !boundary.contains(mBlockedEvents)) {
+        final LabelBlockSubject clone2 =
+          ProxyTools.clone(downcast.mBlockedEvents);
+        final UndoInfo step2 =
+          new ReplacementUndoInfo(2, mBlockedEvents, clone2);
+        info.add(step2);
+      }
     } else if (!null2a) {
       final UndoInfo step2 =
-        mBlockedEvents.createUndoInfo(downcast.mBlockedEvents);
+        mBlockedEvents.createUndoInfo(downcast.mBlockedEvents, boundary);
       if (step2 != null) {
         info.add(step2);
       }
     }
-    final UndoInfo step3 = mNodes.createUndoInfo(downcast.mNodes);
+    final UndoInfo step3 = mNodes.createUndoInfo(downcast.mNodes, boundary);
     if (step3 != null) {
       info.add(step3);
     }
-    final UndoInfo step4 = mEdges.createUndoInfo(downcast.mEdges);
+    final UndoInfo step4 = mEdges.createUndoInfo(downcast.mEdges, boundary);
     if (step4 != null) {
       info.add(step4);
     }

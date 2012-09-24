@@ -102,7 +102,7 @@ public class MoveCommand
   {
     super(panel, name, panel != null);
     mSubject = subject;
-    mUndoInfo = subject.createUndoInfo(newState);
+    mUndoInfo = subject.createUndoInfo(newState, null);
     if (name == null) {
       final ProxySubject parent = (ProxySubject) subject.getParent();
       final String newname = ProxyNamer.getItemClassName(parent) + " Movement";

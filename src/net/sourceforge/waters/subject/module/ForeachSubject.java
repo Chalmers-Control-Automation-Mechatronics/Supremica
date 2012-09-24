@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -32,6 +33,7 @@ import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -135,12 +137,13 @@ public final class ForeachSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final ForeachSubject downcast = (ForeachSubject) newState;
     if (mRange.getClass() == downcast.mRange.getClass()) {
-      final UndoInfo step2 = mRange.createUndoInfo(downcast.mRange);
+      final UndoInfo step2 = mRange.createUndoInfo(downcast.mRange, boundary);
       if (step2 != null) {
         info.add(step2);
       }
@@ -153,17 +156,19 @@ public final class ForeachSubject
     final boolean null3b = downcast.mGuard == null;
     if (null3a != null3b ||
         !null3a && mGuard.getClass() != downcast.mGuard.getClass()) {
-      final SimpleExpressionSubject clone3 =
-        ProxyTools.clone(downcast.mGuard);
-      final UndoInfo step3 = new ReplacementUndoInfo(3, mGuard, clone3);
-      info.add(step3);
+      if (boundary ==  null || !boundary.contains(mGuard)) {
+        final SimpleExpressionSubject clone3 =
+          ProxyTools.clone(downcast.mGuard);
+        final UndoInfo step3 = new ReplacementUndoInfo(3, mGuard, clone3);
+        info.add(step3);
+      }
     } else if (!null3a) {
-      final UndoInfo step3 = mGuard.createUndoInfo(downcast.mGuard);
+      final UndoInfo step3 = mGuard.createUndoInfo(downcast.mGuard, boundary);
       if (step3 != null) {
         info.add(step3);
       }
     }
-    final UndoInfo step4 = mBody.createUndoInfo(downcast.mBody);
+    final UndoInfo step4 = mBody.createUndoInfo(downcast.mBody, boundary);
     if (step4 != null) {
       info.add(step4);
     }

@@ -10,6 +10,8 @@
 
 package net.sourceforge.waters.gui;
 
+import gnu.trove.THashSet;
+
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -44,10 +47,12 @@ import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -340,9 +345,9 @@ public class SimpleComponentEditorDialog
       }
       final boolean deterministic = mDeterministicButton.isSelected();
       final Map<String,String> attribs = mAttributesPanel.getTableData();
+      final GraphSubject graph =
+        new GraphSubject(deterministic, null, null, null);
       if (mComponent == null) {
-        final GraphSubject graph =
-          new GraphSubject(deterministic, null, null, null);
         final SimpleComponentSubject template =
           new SimpleComponentSubject(ident, kind, graph, attribs);
         final SelectionOwner panel = mRoot.getComponentsPanel();
@@ -352,15 +357,22 @@ public class SimpleComponentEditorDialog
         mComponent = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(true);
-        final GraphSubject graph = mComponent.getGraph().clone();
         graph.setDeterministic(deterministic);
         final SimpleComponentSubject template =
           new SimpleComponentSubject(ident, kind, graph, attribs);
-        if (!eq.equals(mComponent, template)) {
+        final Set<Subject> boundary = new THashSet<Subject>(3);
+        final LabelBlockSubject blocked =
+          mComponent.getGraph().getBlockedEvents();
+        if (blocked != null) {
+          boundary.add(blocked);
+        }
+        boundary.add(mComponent.getGraph().getNodesModifiable());
+        boundary.add(mComponent.getGraph().getEdgesModifiable());
+        final UndoInfo info = mComponent.createUndoInfo(template, boundary);
+        if (info != null) {
           final SelectionOwner panel = mRoot.getComponentsPanel();
-          final Command command = new EditCommand(mComponent, template, panel);
+          final Command command =
+            new EditCommand(mComponent, info, panel, null);
           mRoot.getUndoInterface().executeCommand(command);
         }
       }

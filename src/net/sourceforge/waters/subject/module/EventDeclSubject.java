@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -33,6 +34,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -162,9 +164,10 @@ public final class EventDeclSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final EventDeclSubject downcast = (EventDeclSubject) newState;
     if (!mKind.equals(downcast.mKind)) {
       final UndoInfo step2 =
@@ -181,26 +184,29 @@ public final class EventDeclSubject
         new ReplacementUndoInfo(4, mScope, downcast.mScope);
       info.add(step4);
     }
-    final UndoInfo step5 = mRanges.createUndoInfo(downcast.mRanges);
+    final UndoInfo step5 = mRanges.createUndoInfo(downcast.mRanges, boundary);
     if (step5 != null) {
       info.add(step5);
     }
     final boolean null6a = mColorGeometry == null;
     final boolean null6b = downcast.mColorGeometry == null;
     if (null6a != null6b) {
-      final ColorGeometrySubject clone6 =
-        ProxyTools.clone(downcast.mColorGeometry);
-      final UndoInfo step6 =
-        new ReplacementUndoInfo(6, mColorGeometry, clone6);
-      info.add(step6);
+      if (boundary ==  null || !boundary.contains(mColorGeometry)) {
+        final ColorGeometrySubject clone6 =
+          ProxyTools.clone(downcast.mColorGeometry);
+        final UndoInfo step6 =
+          new ReplacementUndoInfo(6, mColorGeometry, clone6);
+        info.add(step6);
+      }
     } else if (!null6a) {
       final UndoInfo step6 =
-        mColorGeometry.createUndoInfo(downcast.mColorGeometry);
+        mColorGeometry.createUndoInfo(downcast.mColorGeometry, boundary);
       if (step6 != null) {
         info.add(step6);
       }
     }
-    final UndoInfo step7 = mAttributes.createUndoInfo(downcast.mAttributes);
+    final UndoInfo step7 =
+      mAttributes.createUndoInfo(downcast.mAttributes, boundary);
     if (step7 != null) {
       info.add(step7);
     }

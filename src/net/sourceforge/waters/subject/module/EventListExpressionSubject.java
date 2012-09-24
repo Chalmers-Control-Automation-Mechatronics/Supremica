@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -24,6 +25,7 @@ import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -79,13 +81,14 @@ public abstract class EventListExpressionSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final EventListExpressionSubject downcast =
       (EventListExpressionSubject) newState;
     final UndoInfo step1 =
-      mEventIdentifierList.createUndoInfo(downcast.mEventIdentifierList);
+      mEventIdentifierList.createUndoInfo(downcast.mEventIdentifierList, boundary);
     if (step1 != null) {
       info.add(step1);
     }

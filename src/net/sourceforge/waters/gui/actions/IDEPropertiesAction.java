@@ -19,6 +19,7 @@ import net.sourceforge.waters.gui.EditorEditEdgeDialog;
 import net.sourceforge.waters.gui.EventAliasEditorDialog;
 import net.sourceforge.waters.gui.EventDeclEditorDialog;
 import net.sourceforge.waters.gui.ForeachEditorDialog;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.InstanceEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.ParameterBindingEditorDialog;
@@ -257,13 +258,17 @@ public class IDEPropertiesAction
       return true;
     }
 
-    public Boolean visitNodeProxy
-      (final NodeProxy comp)
+    public Boolean visitNodeProxy(final NodeProxy node)
     {
       if (mDoEdit) {
-        final ModuleWindowInterface root = getActiveModuleWindowInterface();
-        final NodeSubject subject = (NodeSubject) comp;
-        new NodeEditorDialog(root, subject);
+        final IDE ide = getIDE();
+        final SelectionOwner panel =
+          ide.getFocusTracker().getWatersSelectionOwner();
+        if (panel instanceof GraphEditorPanel) {
+          final ModuleWindowInterface root = getActiveModuleWindowInterface();
+          final NodeSubject subject = (NodeSubject) node;
+          new NodeEditorDialog(root, panel, subject);
+        }
       }
       return true;
     }

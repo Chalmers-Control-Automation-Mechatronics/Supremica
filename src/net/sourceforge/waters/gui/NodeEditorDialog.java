@@ -10,14 +10,16 @@
 
 package net.sourceforge.waters.gui;
 
+import gnu.trove.THashSet;
+
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -29,18 +31,20 @@ import javax.swing.JRootPane;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.language.ProxyNamer;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.BoxGeometryProxy;
-import net.sourceforge.waters.model.module.LabelGeometryProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.subject.base.SetSubject;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
+import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -55,17 +59,15 @@ public class NodeEditorDialog
 
   //#########################################################################
   //# Constructors
-  public NodeEditorDialog(final ModuleWindowInterface root)
-  {
-    this(root, null);
-  }
-
   public NodeEditorDialog(final ModuleWindowInterface root,
-                                     final NodeSubject node)
+                          final SelectionOwner panel,
+                          final NodeSubject node)
   {
     super(root.getRootWindow());
-    setTitle("Editing " + ProxyNamer.getItemClassName(node) + " '" + node.getName() + "'");
+    setTitle("Editing " + ProxyNamer.getItemClassName(node) + " '" +
+             node.getName() + "'");
     mRoot = root;
+    mPanel = panel;
     mNode = node;
     createComponents();
     layoutComponents();
@@ -75,19 +77,14 @@ public class NodeEditorDialog
     setMinimumSize(getSize());
   }
 
-//#########################################################################
+  //#########################################################################
   //# Static Invocation
-  public static void showDialog(final NodeSubject node,
-                                final EditorWindowInterface root)
+  public static void showDialog(final GraphEditorPanel panel,
+                                final NodeSubject node)
   {
-    final ModuleWindowInterface rroot = root.getModuleWindowInterface();
-    new NodeEditorDialog(rroot, node);
-  }
-
-  public static void showDialog(final NodeSubject node,
-                                final ModuleWindowInterface root)
-  {
-    new NodeEditorDialog(root, node);
+    final ModuleWindowInterface root =
+      panel.getEditorInterface().getModuleWindowInterface();
+    new NodeEditorDialog(root, panel, node);
   }
 
 
@@ -268,42 +265,47 @@ public class NodeEditorDialog
         throw new WatersRuntimeException(exception);
       }
       final Map<String,String> attribs = mAttributesPanel.getTableData();
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(true);
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
       NodeSubject template = null;
       final PlainEventListProxy propositions =
         (PlainEventListProxy) cloner.getClone(mPropostionsPanel.getPropositions());
       final String name = mNameInput.getText();
+      final Set<Subject> boundary = new THashSet<Subject>(5);
       if (mNode instanceof SimpleNodeSubject) {
         final SimpleNodeSubject node = (SimpleNodeSubject) mNode;
-        final PointGeometryProxy pointGeometry =
-          (PointGeometryProxy) cloner.getClone(node.getPointGeometry());
-        final PointGeometryProxy initialArrowGeometry =
-          (PointGeometryProxy) cloner
-            .getClone(node.getInitialArrowGeometry());
-        final LabelGeometryProxy labelGeometry =
-          (LabelGeometryProxy) cloner.getClone(node.getLabelGeometry());
         template =
           new SimpleNodeSubject(name, propositions, attribs,
-                                node.isInitial(), pointGeometry,
-                                initialArrowGeometry, labelGeometry);
+                                node.isInitial(), null, null, null);
+        addToBoundary(boundary, node.getPointGeometry());
+        addToBoundary(boundary, node.getInitialArrowGeometry());
+        addToBoundary(boundary, node.getLabelGeometry());
       } else if (mNode instanceof GroupNodeSubject) {
         final GroupNodeSubject groupNode = (GroupNodeSubject) mNode;
-        final Collection<? extends NodeProxy> immediateChildNodes =
-          groupNode.getImmediateChildNodesModifiable();
-        final BoxGeometryProxy geometry =
-          (BoxGeometryProxy) cloner.getClone(groupNode.getGeometry());
         template = new GroupNodeSubject(name, propositions, attribs,
-                                        immediateChildNodes, geometry);
+                                        null, null);
+        final SetSubject<NodeSubject> immediateChildNodes =
+          groupNode.getImmediateChildNodesModifiable();
+        addToBoundary(boundary, immediateChildNodes);
+        final BoxGeometrySubject geometry = groupNode.getGeometry();
+        addToBoundary(boundary, geometry);
+      } else {
+        throw new IllegalStateException
+          ("Unknown node class " + ProxyTools.getShortClassName(mNode));
       }
-
-      if (!eq.equals(mNode, template)) {
-        final Command command = new EditCommand(mNode, template, null);
+      final UndoInfo info = mNode.createUndoInfo(template, boundary);
+      if (info != null) {
+        final Command command = new EditCommand(mNode, info, mPanel, null);
         mRoot.getUndoInterface().executeCommand(command);
       }
       dispose();
+    }
+  }
+
+  private void addToBoundary(final Set<Subject> boundary, final Subject subject)
+  {
+    if (subject != null) {
+      boundary.add(subject);
     }
   }
 
@@ -383,8 +385,9 @@ public class NodeEditorDialog
 
   //#########################################################################
   //# Data Members
-  // Dialog state
+  // Environment
   private final ModuleWindowInterface mRoot;
+  private final SelectionOwner mPanel;
 
   // Swing components
   private JPanel mMainPanel;
@@ -396,6 +399,7 @@ public class NodeEditorDialog
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
+  // Dialog state
   private final NodeSubject mNode;
 
   //#########################################################################

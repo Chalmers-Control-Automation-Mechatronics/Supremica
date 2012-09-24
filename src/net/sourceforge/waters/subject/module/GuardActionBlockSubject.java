@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -32,6 +33,7 @@ import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -129,28 +131,33 @@ public final class GuardActionBlockSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final GuardActionBlockSubject downcast =
       (GuardActionBlockSubject) newState;
-    final UndoInfo step1 = mGuards.createUndoInfo(downcast.mGuards);
+    final UndoInfo step1 = mGuards.createUndoInfo(downcast.mGuards, boundary);
     if (step1 != null) {
       info.add(step1);
     }
-    final UndoInfo step2 = mActions.createUndoInfo(downcast.mActions);
+    final UndoInfo step2 =
+      mActions.createUndoInfo(downcast.mActions, boundary);
     if (step2 != null) {
       info.add(step2);
     }
     final boolean null3a = mGeometry == null;
     final boolean null3b = downcast.mGeometry == null;
     if (null3a != null3b) {
-      final LabelGeometrySubject clone3 =
-        ProxyTools.clone(downcast.mGeometry);
-      final UndoInfo step3 = new ReplacementUndoInfo(3, mGeometry, clone3);
-      info.add(step3);
+      if (boundary ==  null || !boundary.contains(mGeometry)) {
+        final LabelGeometrySubject clone3 =
+          ProxyTools.clone(downcast.mGeometry);
+        final UndoInfo step3 = new ReplacementUndoInfo(3, mGeometry, clone3);
+        info.add(step3);
+      }
     } else if (!null3a) {
-      final UndoInfo step3 = mGeometry.createUndoInfo(downcast.mGeometry);
+      final UndoInfo step3 =
+        mGeometry.createUndoInfo(downcast.mGeometry, boundary);
       if (step3 != null) {
         info.add(step3);
       }

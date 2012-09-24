@@ -13,6 +13,7 @@
 package net.sourceforge.waters.subject.module;
 
 import java.awt.geom.Point2D;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -24,6 +25,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 import net.sourceforge.waters.xsd.module.AnchorPosition;
@@ -100,9 +102,10 @@ public final class LabelGeometrySubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final LabelGeometrySubject downcast = (LabelGeometrySubject) newState;
     if (!mOffset.equals(downcast.mOffset)) {
       final UndoInfo step1 =

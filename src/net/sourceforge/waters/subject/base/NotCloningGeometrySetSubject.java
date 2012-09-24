@@ -184,8 +184,12 @@ public class NotCloningGeometrySetSubject<E>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SimpleSetSubject
-  public UndoInfo createUndoInfo(final Set<? extends E> newSet)
+  public UndoInfo createUndoInfo(final Set<? extends E> newSet,
+                                 final Set<? extends Subject> boundary)
   {
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
     final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
     for (final E oldItem : this) {
       if (!newSet.contains(oldItem)) {

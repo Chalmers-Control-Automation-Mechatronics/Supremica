@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -28,6 +29,7 @@ import net.sourceforge.waters.subject.base.IndexedArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -96,11 +98,13 @@ public final class ModuleSequenceSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final ModuleSequenceSubject downcast = (ModuleSequenceSubject) newState;
-    final UndoInfo step4 = mModules.createUndoInfo(downcast.mModules);
+    final UndoInfo step4 =
+      mModules.createUndoInfo(downcast.mModules, boundary);
     if (step4 != null) {
       info.add(step4);
     }

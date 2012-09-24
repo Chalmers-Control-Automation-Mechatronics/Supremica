@@ -12,6 +12,8 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
@@ -23,6 +25,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -106,9 +109,10 @@ public final class UnaryExpressionSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final UnaryExpressionSubject downcast = (UnaryExpressionSubject) newState;
     if (!mOperator.equals(downcast.mOperator)) {
       final UndoInfo step2 =
@@ -116,7 +120,8 @@ public final class UnaryExpressionSubject
       info.add(step2);
     }
     if (mSubTerm.getClass() == downcast.mSubTerm.getClass()) {
-      final UndoInfo step3 = mSubTerm.createUndoInfo(downcast.mSubTerm);
+      final UndoInfo step3 =
+        mSubTerm.createUndoInfo(downcast.mSubTerm, boundary);
       if (step3 != null) {
         info.add(step3);
       }

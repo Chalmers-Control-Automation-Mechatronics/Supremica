@@ -12,6 +12,8 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -20,6 +22,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -82,12 +85,14 @@ public abstract class AliasSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final AliasSubject downcast = (AliasSubject) newState;
     if (mExpression.getClass() == downcast.mExpression.getClass()) {
-      final UndoInfo step2 = mExpression.createUndoInfo(downcast.mExpression);
+      final UndoInfo step2 =
+        mExpression.createUndoInfo(downcast.mExpression, boundary);
       if (step2 != null) {
         info.add(step2);
       }

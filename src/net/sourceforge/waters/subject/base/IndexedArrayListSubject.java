@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
@@ -368,8 +370,12 @@ public class IndexedArrayListSubject<P extends NamedSubject>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ListSubject
-  public UndoInfo createUndoInfo(final List<? extends P> newList)
+  public UndoInfo createUndoInfo(final List<? extends P> newList,
+                                 final Set<? extends Subject> boundary)
   {
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
     if (eq.isEqualList(this, newList)) {
       return null;
@@ -443,7 +449,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
           final UndoInfo replace = new ReplacementUndoInfo(i1, proxy1, cloned);
           info.add(replace);
         } else {
-          final UndoInfo modify = proxy1.createUndoInfo(proxy2);
+          final UndoInfo modify = proxy1.createUndoInfo(proxy2, boundary);
           if (modify != null) {
             info.add(modify);
           }

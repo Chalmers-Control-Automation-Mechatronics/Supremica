@@ -854,9 +854,11 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
       Java_WriteLn $stream $umap \
           "  protected void collectUndoInfo(final ProxySubject newState,"
       Java_WriteLn $stream $umap \
-          "                                 final RecursiveUndoInfo info)"
+          "                                 final RecursiveUndoInfo info,"
+      Java_WriteLn $stream $umap \
+          "                                 final Set<? extends Subject> boundary)"
       Java_WriteLn $stream $umap "  \{"
-      Java_WriteLn $stream $umap "    super.collectUndoInfo(newState, info);"
+      Java_WriteLn $stream $umap "    super.collectUndoInfo(newState, info, boundary);"
       Java_WriteLn $stream $umap \
           "    final $classname downcast = ($classname) newState;"
       foreach attrib $attribs {
@@ -875,7 +877,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           Java_WriteLn $stream $umap "    \}"
         } elseif {[Java_IsCollectionType $decltype]} {
           if {[string compare $eqstatus "required"] == 0} {
-            Java_WriteLn $stream $umap "    final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+            Java_WriteLn $stream $umap "    final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername, boundary);"
             Java_WriteLn $stream $umap "    if (step$id != null) \{"
             Java_WriteLn $stream $umap "      info.add(step$id);"
             Java_WriteLn $stream $umap "    \}"
@@ -897,7 +899,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
               Java_WriteLn $stream $umap \
                   "    if ($membername.getClass() == downcast.$membername.getClass()) \{"
               Java_WriteLn $stream $umap \
-                  "      final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+                  "      final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername, boundary);"
               Java_WriteLn $stream $umap "      if (step$id != null) \{"
               Java_WriteLn $stream $umap "        info.add(step$id);"
               Java_WriteLn $stream $umap "      \}"
@@ -918,13 +920,16 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
               Java_WriteLn $stream $umap \
                   "        !null${id}a && $membername.getClass() != downcast.$membername.getClass()) \{"
               Java_WriteLn $stream $umap \
-                  "      final $type clone$id = ProxyTools.clone(downcast.$membername);"
+                  "      if (boundary ==  null || !boundary.contains($membername)) \{"
               Java_WriteLn $stream $umap \
-                  "      final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, clone$id);"
-              Java_WriteLn $stream $umap "      info.add(step$id);"
+                  "        final $type clone$id = ProxyTools.clone(downcast.$membername);"
+              Java_WriteLn $stream $umap \
+                  "        final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, clone$id);"
+              Java_WriteLn $stream $umap "        info.add(step$id);"
+              Java_WriteLn $stream $umap "      \}"
               Java_WriteLn $stream $umap "    \} else if (!null${id}a) \{"
               Java_WriteLn $stream $umap \
-                  "      final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+                  "      final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername, boundary);"
               Java_WriteLn $stream $umap "      if (step$id != null) \{"
               Java_WriteLn $stream $umap "        info.add(step$id);"
               Java_WriteLn $stream $umap "      \}"
@@ -933,7 +938,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           } else {
             if {[string compare $eqstatus "required"] == 0} {
               Java_WriteLn $stream $umap \
-                  "    final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+                  "    final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername, boundary);"
               Java_WriteLn $stream $umap "    if (step$id != null) \{"
               Java_WriteLn $stream $umap "      info.add(step$id);"
               Java_WriteLn $stream $umap "    \}"
@@ -945,13 +950,16 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
               Java_WriteLn $stream $umap \
                   "    if (null${id}a != null${id}b) \{"
               Java_WriteLn $stream $umap \
-                  "      final $type clone$id = ProxyTools.clone(downcast.$membername);"
+                  "      if (boundary ==  null || !boundary.contains($membername)) \{"
               Java_WriteLn $stream $umap \
-                  "      final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, clone$id);"
-              Java_WriteLn $stream $umap "      info.add(step$id);"
+                  "        final $type clone$id = ProxyTools.clone(downcast.$membername);"
+              Java_WriteLn $stream $umap \
+                  "        final UndoInfo step$id = new ReplacementUndoInfo($id, $membername, clone$id);"
+              Java_WriteLn $stream $umap "        info.add(step$id);"
+              Java_WriteLn $stream $umap "      \}"
               Java_WriteLn $stream $umap "    \} else if (!null${id}a) \{"
               Java_WriteLn $stream $umap \
-                  "      final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername);"
+                  "      final UndoInfo step$id = $membername.createUndoInfo(downcast.$membername, boundary);"
               Java_WriteLn $stream $umap "      if (step$id != null) \{"
               Java_WriteLn $stream $umap "        info.add(step$id);"
               Java_WriteLn $stream $umap "      \}"

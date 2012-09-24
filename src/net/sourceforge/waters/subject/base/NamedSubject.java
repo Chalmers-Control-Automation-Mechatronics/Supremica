@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.subject.base;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.IndexedCollection;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
@@ -76,9 +78,10 @@ public abstract class NamedSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final NamedSubject named = (NamedSubject) newState;
     if (!named.getName().equals(mName)) {
       final UndoInfo step = new ReplacementUndoInfo(1, mName, named.getName());

@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -28,6 +29,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 
@@ -111,9 +113,10 @@ public final class IndexedIdentifierSubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final IndexedIdentifierSubject downcast =
       (IndexedIdentifierSubject) newState;
     if (!mName.equals(downcast.mName)) {
@@ -121,7 +124,8 @@ public final class IndexedIdentifierSubject
         new ReplacementUndoInfo(2, mName, downcast.mName);
       info.add(step2);
     }
-    final UndoInfo step3 = mIndexes.createUndoInfo(downcast.mIndexes);
+    final UndoInfo step3 =
+      mIndexes.createUndoInfo(downcast.mIndexes, boundary);
     if (step3 != null) {
       info.add(step3);
     }

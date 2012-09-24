@@ -174,8 +174,12 @@ class ChildNodeSetSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
-  public UndoInfo createUndoInfo(final Set<? extends NodeSubject> newSet)
+  public UndoInfo createUndoInfo(final Set<? extends NodeSubject> newSet,
+                                 final Set<? extends Subject> boundary)
   {
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
     final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
     for (final NodeSubject oldNode : this) {
       if (!newSet.contains(oldNode)) {

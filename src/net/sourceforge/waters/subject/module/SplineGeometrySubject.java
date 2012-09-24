@@ -16,6 +16,7 @@ import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -29,6 +30,7 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.SimpleListSubject;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
 
 import net.sourceforge.waters.xsd.module.SplineKind;
@@ -107,11 +109,12 @@ public final class SplineGeometrySubject
 
   @Override
   protected void collectUndoInfo(final ProxySubject newState,
-                                 final RecursiveUndoInfo info)
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    super.collectUndoInfo(newState, info);
+    super.collectUndoInfo(newState, info, boundary);
     final SplineGeometrySubject downcast = (SplineGeometrySubject) newState;
-    final UndoInfo step1 = mPoints.createUndoInfo(downcast.mPoints);
+    final UndoInfo step1 = mPoints.createUndoInfo(downcast.mPoints, boundary);
     if (step1 != null) {
       info.add(step1);
     }

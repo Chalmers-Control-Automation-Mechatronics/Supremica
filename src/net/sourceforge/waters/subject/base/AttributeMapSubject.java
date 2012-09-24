@@ -78,8 +78,12 @@ public final class AttributeMapSubject
     return new AttributeMapSubject(this);
   }
 
-  public UndoInfo createUndoInfo(final Map<String,String> newMap)
+  public UndoInfo createUndoInfo(final Map<String,String> newMap,
+                                 final Set<? extends Subject> boundary)
   {
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
     final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
     for (final Map.Entry<String,String> oldEntry : entrySet()) {
       final String oldKey = oldEntry.getKey();
