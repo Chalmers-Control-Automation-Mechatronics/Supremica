@@ -52,6 +52,8 @@ public class FlowerEFABuilder {
             throws IOException
     {
         this.module = module;
+        // TODO Close this file!!!
+        @SuppressWarnings("resource")
         final BufferedReader br = new BufferedReader(new FileReader(rasFile));
         nbrOfJobs = Integer.parseInt(br.readLine());
         nbrOfTransitionsForJob = new int[nbrOfJobs];
