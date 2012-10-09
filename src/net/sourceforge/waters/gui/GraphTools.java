@@ -40,6 +40,7 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**
@@ -149,6 +150,60 @@ public class GraphTools {
                                              labelClone, gaClone, null,
                                              startGeo, endGeo);
     GeometryTools.createDefaultGeometry(edge);
+
+
+    Point2D newPoint = GeometryTools.getTurningPoint1(edge);
+    final List<EdgeSubject> edges = graph.getEdgesModifiable();
+    final List<EdgeSubject> selfLoops = new ArrayList<EdgeSubject>();
+    for (final EdgeSubject e : edges) {
+      if ((e.getSource() == edge.getSource() && e
+        .getTarget() == edge.getTarget()) && e != edge) {
+        selfLoops.add(e);
+      }
+    }
+
+    final Point2D centrePoint = GeometryTools.getEndPoint(edge);
+    final double dist =
+      Point2D.distance(centrePoint.getX(), centrePoint.getY(),
+                       newPoint.getX(), newPoint.getY());
+    int count = 0;
+    boolean found = false;
+    double degreesFrom = -45;
+    double degreesTo = 90;
+    double degreesPrev = -45;
+    int i = 8;
+    while (!found) {
+      found = true;
+      for (final EdgeSubject e : selfLoops) {
+        final Point2D edgePoint = GeometryTools.getTurningPoint1(e);
+        if (Math.abs(edgePoint.getX() - newPoint.getX()) < 1
+            && Math.abs(edgePoint.getY() - newPoint.getY()) < 1) {
+          count++;
+          if (count == 4) {
+            degreesFrom = -90;
+          }
+          if(count == i){
+            i *= 2;
+            degreesPrev /= 2;
+            degreesFrom -= degreesPrev;
+            degreesTo /= 2;
+          }
+          degreesFrom += degreesTo;
+          final double radians = Math.toRadians(degreesFrom);
+          final double x =
+            centrePoint.getX() + dist * Math.cos(radians);
+          final double y =
+            centrePoint.getY() + dist * Math.sin(radians);
+          newPoint = new Point2D.Double(x, y);
+          GeometryTools.setSpecifiedMidPoint(edge, newPoint,
+                                             SplineKind.INTERPOLATING);
+          found = false;
+          break;
+        }
+      }
+    }
+
+
     return edge;
   }
 

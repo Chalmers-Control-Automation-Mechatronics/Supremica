@@ -2775,25 +2775,11 @@ public class GraphEditorPanel
     {
       if (item != null && mController.canBeSelected(item)) {
         final ProxyShape shape = getShapeProducer().getShape(item);
-        if(item instanceof EdgeSubject){
-          final EdgeSubject edge = (EdgeSubject)item;
-          if (shape != null &&
-            dragrect.contains(includeEdge(edge))) {
-            selection.add(item);
-          }
-        }
-        else if (shape != null &&
-            dragrect.contains(shape.getShape().getBounds())) {
+        if (shape != null &&
+            dragrect.contains(shape.getBounds2D())) {
           selection.add(item);
         }
       }
-    }
-
-    private Rectangle2D includeEdge(final EdgeSubject edge){
-      return GeometryTools.getQuadraticBoundingBox(
-                              GeometryTools.getStartPoint(edge),
-                              GeometryTools.getSingleBezierControlPoint(edge),
-                              GeometryTools.getEndPoint(edge));
     }
 
     //#######################################################################
@@ -3657,7 +3643,6 @@ public class GraphEditorPanel
       mIsSource = false;
       mOrigEdge = null;
       mCanCreateSelfloop = false;
-      replaceSelection(mFocusedObject);
       mFocusedObject = null;
     }
 
@@ -3673,7 +3658,6 @@ public class GraphEditorPanel
       mAnchor = null;
       mOrigEdge = (EdgeSubject) mFocusedObject;
       mCanCreateSelfloop = true;
-      replaceSelection(mFocusedObject);
       switch (handle.getType()) {
       case SOURCE:
         mIsSource = true;
@@ -3782,60 +3766,6 @@ public class GraphEditorPanel
             }
           }
          }
-        } else {
-          //if it is a selfloop then change its midpoint if its on others by default
-          Point2D newPoint = GeometryTools.getTurningPoint1(mCopiedEdge);
-          final List<EdgeSubject> edges =
-            getSecondaryGraph().getEdgesModifiable();
-          final List<EdgeSubject> selfLoops = new ArrayList<EdgeSubject>();
-          for (final EdgeSubject edge : edges) {
-            if ((edge.getSource() == mCopiedEdge.getSource() && edge
-              .getTarget() == mCopiedEdge.getTarget()) && edge != mCopiedEdge) {
-              selfLoops.add(edge);
-            }
-          }
-
-          final Point2D centrePoint = mCopiedEdge.getEndPoint().getPoint();
-          final double dist =
-            Point2D.distance(centrePoint.getX(), centrePoint.getY(),
-                             newPoint.getX(), newPoint.getY());
-          int count = 0;
-          boolean found = false;
-          double degreesFrom = -45;
-          double degreesTo = 90;
-          double degreesPrev = -45;
-          int i = 8;
-          while (!found) {
-            found = true;
-            for (final EdgeSubject edge : selfLoops) {
-              final Point2D edgePoint = GeometryTools.getTurningPoint1(edge);
-              if (Math.abs(edgePoint.getX() - newPoint.getX()) < 1
-                  && Math.abs(edgePoint.getY() - newPoint.getY()) < 1) {
-                count++;
-                if (count == 4) {
-                  degreesFrom = -90;
-                }
-                if(count == i){
-                  i *= 2;
-                  degreesPrev /= 2;
-                  degreesFrom -= degreesPrev;
-                  degreesTo /= 2;
-                }
-                degreesFrom += degreesTo;
-                final double radians = Math.toRadians(degreesFrom);
-                final double x =
-                  centrePoint.getX() + dist * Math.cos(radians);
-                final double y =
-                  centrePoint.getY() + dist * Math.sin(radians);
-                newPoint = new Point2D.Double(x, y);
-                GeometryTools.setSpecifiedMidPoint(mCopiedEdge, newPoint,
-                                                   SplineKind.INTERPOLATING);
-                found = false;
-                break;
-              }
-            }
-          }
-
         }
         super.commitSecondaryGraph();
       }
