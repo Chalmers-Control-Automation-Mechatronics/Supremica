@@ -1119,6 +1119,7 @@ public class GraphEditorPanel
   private void fireSelectionChanged()
   {
     mLastCommand = null;
+    mDisplacement = null;
     if (mInternalDragAction == null) {
       final EditorChangedEvent event = new SelectionChangedEvent(this);
       fireEditorChangedEvent(event);
@@ -2774,11 +2775,25 @@ public class GraphEditorPanel
     {
       if (item != null && mController.canBeSelected(item)) {
         final ProxyShape shape = getShapeProducer().getShape(item);
-        if (shape != null &&
+        if(item instanceof EdgeSubject){
+          final EdgeSubject edge = (EdgeSubject)item;
+          if (shape != null &&
+            dragrect.contains(includeEdge(edge))) {
+            selection.add(item);
+          }
+        }
+        else if (shape != null &&
             dragrect.contains(shape.getShape().getBounds())) {
           selection.add(item);
         }
       }
+    }
+
+    private Rectangle2D includeEdge(final EdgeSubject edge){
+      return GeometryTools.getQuadraticBoundingBox(
+                              GeometryTools.getStartPoint(edge),
+                              GeometryTools.getSingleBezierControlPoint(edge),
+                              GeometryTools.getEndPoint(edge));
     }
 
     //#######################################################################
@@ -3732,26 +3747,28 @@ public class GraphEditorPanel
           replaceSelection(mSource);
         }
       } else {
-        final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-        if(mAnchor ==  null &&
-          eq.equals(mOrigEdge.getSource(), mCopiedEdge.getSource()) &&
-          eq.equals(mOrigEdge.getTarget(), mCopiedEdge.getTarget())){
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(false);
+        if (mAnchor == null
+            && eq.equals(mOrigEdge.getSource(), mCopiedEdge.getSource())
+            && eq.equals(mOrigEdge.getTarget(), mCopiedEdge.getTarget()) ||
+            mCopiedEdge == null) {
           //dont create a bogus command
           return;
         }
-        if (!GeometryTools.isSelfloop(mCopiedEdge) &&
-            mCopiedEdge.getSource() instanceof SimpleNodeSubject &&
-            mCopiedEdge.getTarget() instanceof SimpleNodeSubject) {
+        if (!GeometryTools.isSelfloop(mCopiedEdge)){
+          if( mCopiedEdge.getSource() instanceof SimpleNodeSubject
+            && mCopiedEdge.getTarget() instanceof SimpleNodeSubject) {
           // Make overlapping straight edges automatically spread apart ...
           final List<EdgeSubject> edges =
             getSecondaryGraph().getEdgesModifiable();
           for (final EdgeSubject edge : edges) {
-            if ((edge.getSource() == mCopiedEdge.getTarget() &&
-                 edge.getTarget() == mCopiedEdge.getSource() ||
-                 edge.getSource() == mCopiedEdge.getSource() &&
-                 edge.getTarget() == mCopiedEdge.getTarget() &&
-                 edge != mCopiedEdge) &&
-                edge.getGeometry() == null) {
+            if ((edge.getSource() == mCopiedEdge.getTarget()
+                 && edge.getTarget() == mCopiedEdge.getSource() || edge
+              .getSource() == mCopiedEdge.getSource()
+                              && edge.getTarget() == mCopiedEdge.getTarget()
+                              && edge != mCopiedEdge)
+                && edge.getGeometry() == null) {
               final Point2D mid1 = getNewMidPointOfEdge(edge, false);
               GeometryTools.setSpecifiedMidPoint(edge, mid1,
                                                  SplineKind.INTERPOLATING);
@@ -3764,6 +3781,61 @@ public class GraphEditorPanel
               break;
             }
           }
+         }
+        } else {
+          //if it is a selfloop then change its midpoint if its on others by default
+          Point2D newPoint = GeometryTools.getTurningPoint1(mCopiedEdge);
+          final List<EdgeSubject> edges =
+            getSecondaryGraph().getEdgesModifiable();
+          final List<EdgeSubject> selfLoops = new ArrayList<EdgeSubject>();
+          for (final EdgeSubject edge : edges) {
+            if ((edge.getSource() == mCopiedEdge.getSource() && edge
+              .getTarget() == mCopiedEdge.getTarget()) && edge != mCopiedEdge) {
+              selfLoops.add(edge);
+            }
+          }
+
+          final Point2D centrePoint = mCopiedEdge.getEndPoint().getPoint();
+          final double dist =
+            Point2D.distance(centrePoint.getX(), centrePoint.getY(),
+                             newPoint.getX(), newPoint.getY());
+          int count = 0;
+          boolean found = false;
+          double degreesFrom = -45;
+          double degreesTo = 90;
+          double degreesPrev = -45;
+          int i = 8;
+          while (!found) {
+            found = true;
+            for (final EdgeSubject edge : selfLoops) {
+              final Point2D edgePoint = GeometryTools.getTurningPoint1(edge);
+              if (Math.abs(edgePoint.getX() - newPoint.getX()) < 1
+                  && Math.abs(edgePoint.getY() - newPoint.getY()) < 1) {
+                count++;
+                if (count == 4) {
+                  degreesFrom = -90;
+                }
+                if(count == i){
+                  i *= 2;
+                  degreesPrev /= 2;
+                  degreesFrom -= degreesPrev;
+                  degreesTo /= 2;
+                }
+                degreesFrom += degreesTo;
+                final double radians = Math.toRadians(degreesFrom);
+                final double x =
+                  centrePoint.getX() + dist * Math.cos(radians);
+                final double y =
+                  centrePoint.getY() + dist * Math.sin(radians);
+                newPoint = new Point2D.Double(x, y);
+                GeometryTools.setSpecifiedMidPoint(mCopiedEdge, newPoint,
+                                                   SplineKind.INTERPOLATING);
+                found = false;
+                break;
+              }
+            }
+          }
+
         }
         super.commitSecondaryGraph();
       }
@@ -4059,7 +4131,6 @@ public class GraphEditorPanel
     //#######################################################################
     //# Data Members
     private final Set<Class<? extends Proxy>> mMovedTypes;
-    // TODO Compiler bug? Why can't the following two be final???
     private final Collection<ProxySubject> mMovedObjects;
     private final Map<EdgeProxy,MovingEdge> mEdgeMap;
     private int mDeltaX;
@@ -4200,12 +4271,35 @@ public class GraphEditorPanel
         keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT;
       if (isAGeometryMove() && (up || down || left || right)) {
         e.consume();
-        mMoveVisitor = new MoveVisitor();
-        createSecondaryGraph();
         final int x = left ? -1 : right ? 1 : 0;
         final int y = up ? -1 : down ? 1 : 0;
-        mMoveVisitor.moveAll(x, y, false, null);
-        commitGraph(null, true, true);
+        mMoveVisitor = new MoveVisitor();
+        final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
+        final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+        //have to clone the graph because the undo changes the original graph
+        final GraphSubject g0 = (GraphSubject) cloner.getClone(getGraph());
+        final UndoInterface undoInterface = mRoot.getUndoInterface();
+
+        if(mDisplacement == null){
+          mDisplacement = new Point2D.Double(x, y);
+        }
+        else if(mLastCommand != null && mLastCommand == undoInterface.getLastCommand()){
+          mLastCommand.setUpdatesSelection(false);
+          undoInterface.undo();
+          undoInterface.removeLastCommand();
+          mDisplacement.setLocation(x+mDisplacement.getX(),
+                                            y+mDisplacement.getY());
+        }
+        createSecondaryGraph();
+        mMoveVisitor.moveAll((int)mDisplacement.getX(),
+                             (int)mDisplacement.getY(), false, null);
+        while(eq.equals(g0, getSecondaryGraph())){
+          mDisplacement.setLocation(x+mDisplacement.getX(),
+                                            y+mDisplacement.getY());
+          mMoveVisitor.moveAll((int)mDisplacement.getX(),
+                               (int)mDisplacement.getY(), false, null);
+        }
+        commitGraph(null, true, true, x, y);
         mMoveVisitor = null;
         clearSecondaryGraph();
       } else if (up || down) {
@@ -4244,7 +4338,8 @@ public class GraphEditorPanel
 
     private void commitGraph(final String description,
                              final boolean selecting,
-                             final boolean undoable){
+                             final boolean undoable,
+                             final int x, final int y){
       final EditorGraph graph = getSecondaryGraph();
       if (graph != null) {
         final UndoInterface undoInterface = mRoot.getUndoInterface();
@@ -4254,7 +4349,6 @@ public class GraphEditorPanel
             undoInterface.undo();
             undoInterface.removeLastCommand();
           }
-
         final Command cmd =
           graph.createUpdateCommand(GraphEditorPanel.this, description, selecting);
         mLastCommand = cmd;
@@ -5280,6 +5374,7 @@ public class GraphEditorPanel
   private List<Observer> mObservers;
 
   private Command mLastCommand = null;
+  Point2D mDisplacement = null;
 
   //#########################################################################
   //# Class Constants

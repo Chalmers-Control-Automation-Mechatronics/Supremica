@@ -95,13 +95,13 @@ public class UpdateCommand
           named = ProxyNamer.getCollectionClassName(modified);
         }
         else{
-          suffix = "Removal";
+          suffix = "Deletion";
           named = ProxyNamer.getCollectionClassName(removed);
         }
       }
       else{
         if(removed.isEmpty()){
-          suffix = "Creation";
+          suffix = "Insertion";
           named = ProxyNamer.getCollectionClassName(added);
         }
         else{
