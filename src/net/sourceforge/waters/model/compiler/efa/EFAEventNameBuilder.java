@@ -108,8 +108,8 @@ class EFAEventNameBuilder {
     final StringBuffer buffer = writer.getBuffer();
     if (buffer.length() > 0) {
       buffer.append('}');
-    }
-    return buffer.toString();
+  }
+  return buffer.toString();
   }
 
   void clear()

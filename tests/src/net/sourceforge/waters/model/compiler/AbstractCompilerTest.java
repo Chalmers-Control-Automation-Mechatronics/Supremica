@@ -409,6 +409,12 @@ public abstract class AbstractCompilerTest
     compile("tests", "nasty", "profisafe_islave_pfork");
   }
 
+  public void testCompile_sahar()
+    throws IOException, WatersException
+  {
+    compile("efa", "sahar");
+  }
+
   public void testCompile_sensoractuator1()
     throws IOException, WatersException
   {

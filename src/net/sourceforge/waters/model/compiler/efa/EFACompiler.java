@@ -212,7 +212,6 @@ public class EFACompiler
             record.getTransitionRelation();
           //System.err.println(edecl.getEventDecl().getName() + " > " + rel);
           final EFAEvent event = new EFAEvent(edecl, rel);
-          edecl.addEvent(event);
           for (final Proxy location : record.getSourceLocations()) {
             Collection<EFAEvent> collection = mEFAEventMap.get(location);
             if (collection == null) {
@@ -221,11 +220,14 @@ public class EFACompiler
             }
             collection.add(event);
           }
-          for (final EFAVariable var : rel.getVariables()) {
-            var.addEvent(event);
+          if (!rel.isEmpty()) {
+            edecl.addEvent(event);
+            for (final EFAVariable var : rel.getVariables()) {
+              var.addEvent(event);
+            }
+            final ConstraintList formula = rel.getFormula();
+            namer.addGuard(formula);
           }
-          final ConstraintList formula = rel.getFormula();
-          namer.addGuard(formula);
         }
         mTransitionRelationBuilder.clearEventRecords();
         for (final EFAEvent event : edecl.getEvents()) {
@@ -271,7 +273,7 @@ public class EFACompiler
         final ConstraintList guard = part.getGuard();
         propagator.addConstraints(guard);
         propagator.propagate();
-        if (!propagator.isUnsatisfiable()) {
+       // if (!propagator.isUnsatisfiable()) {
           parts.add(part);
           if (!guard.isTrue()) {
             locations.addAll(part.getSourceLocations());
@@ -282,7 +284,7 @@ public class EFACompiler
           for (int i = locations.size() - 1; i >= numlocs; i--) {
             locations.remove(i);
           }
-        }
+       // }
       }
     } else {
       splitEventPartition(edecl, parent, locations);
@@ -294,6 +296,10 @@ public class EFACompiler
                                    final Collection<Proxy> locations)
     throws EvalException
   {
+    if (parent.isUnsatisfiable()) {
+      createEvent(edecl, parent, locations);
+      return;
+    }
     final ConstraintList guard = parent.getAllConstraints();
     //System.err.println(guard);
     final VariableContext context = parent.getContext();
@@ -791,7 +797,7 @@ public class EFACompiler
           mEFAEventMap.get(mCurrentComponent);
         if (events != null) {
           for (final EFAEvent event : events) {
-            if (!mEFAAlphabet.contains(event)) {
+            if (!mEFAAlphabet.contains(event) && !event.isBlocked()) {
               final IdentifierProxy ident = event.createIdentifier(mFactory);
               mLabelList.add(ident);
             }
@@ -846,7 +852,9 @@ public class EFACompiler
         events = edecl.getEvents();
       }
       for (final EFAEvent event : events) {
-        if (mInBlockedEventsList) {
+        if (event.isBlocked()) {
+          continue;
+        } else if (mInBlockedEventsList) {
           if (mEFAAlphabet.add(event)) {
             final IdentifierProxy subident = event.createIdentifier(mFactory);
             mLabelList.add(subident);

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="sahar" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A test for EFA compilation.
+This test involves a guard that is always false because of a constant out of range.</ns2:Comment>
+<EventList>
+<Event Kind="PROPOSITION" Name=":accepting"/>
+<Event Kind="CONTROLLABLE" Name="a"/>
+<Event Kind="CONTROLLABLE" Name="d"/>
+<Event Kind="CONTROLLABLE" Name="e"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="G">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="a"/>
+<EventRef Name="d"/>
+<EventRef Name="e"/>
+</EventRefList>
+<StateList>
+<State Name="q1"/>
+<State Name="q3">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="q2"/>
+<State Initial="true" Name="q0"/>
+</StateList>
+<TransitionList>
+<Transition Event="d" Source="q0" Target="q2"/>
+<Transition Event="e" Source="q0" Target="q1"/>
+<Transition Event="a" Source="q1" Target="q3"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="x">
+<EventRefList>
+<EventRef Name="a"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Event="a" Source="0" Target="1"/>
+<Transition Event="a" Source="1" Target="2"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
