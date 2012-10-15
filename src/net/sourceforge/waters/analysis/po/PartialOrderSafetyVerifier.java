@@ -25,6 +25,7 @@ import net.sourceforge.waters.analysis.monolithic.StateTuple;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.InvalidModelException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -112,8 +113,7 @@ public class PartialOrderSafetyVerifier
       mNumPlants = 0;
       mStateTupleSize = 0;
 
-      final Collection<AutomatonProxy> automata =
-        new LinkedList<AutomatonProxy>();
+      final Collection<AutomatonProxy> automata = new LinkedList<AutomatonProxy>();
       for (final AutomatonProxy aut : model.getAutomata()) {
         final ComponentKind kind = translator.getComponentKind(aut);
         if (kind != null) {
@@ -245,6 +245,70 @@ public class PartialOrderSafetyVerifier
         return setFailedResult(counterexample);
       }
 
+      List<AutomatonProxy> firstAutomata;
+      List<AutomatonProxy> sharingAutomata;
+      int eventIndex1;
+      int eventIndex2;
+
+      mEventDependencyMap = new byte[mEventCodingList.size()][mEventCodingList.size()];
+
+      for (final EventProxy ep1 : mEventCodingList){
+        eventIndex1 = mEventCodingList.indexOf(ep1);
+        firstAutomata = automataContainingEvent(ep1,automata);
+        for (final EventProxy ep2 : mEventCodingList){
+          eventIndex2 = mEventCodingList.indexOf(ep2);
+          if (eventIndex2 > eventIndex1){
+            boolean commuting = true;
+            sharingAutomata = automataContainingEvent(ep2,automata);
+            sharingAutomata.retainAll(firstAutomata);
+
+            for (final AutomatonProxy ap: sharingAutomata){
+
+              stateSet = ap.getStates();
+              // Encoding states to binary values
+              final List<StateProxy> codes = new ArrayList<StateProxy>(stateSet);
+
+              boolean exclusive = true;
+              int[][] transitionMap = new int[stateSet.size()][mNumEvents];
+
+              final int index = indexOfAutomaton(ap, mAutomata);
+              if (index >= 0) {
+                if (translator.getComponentKind(ap) == ComponentKind.PLANT) {
+                  transitionMap = mPlantTransitionMap.get(index);
+                } else if (translator.getComponentKind(ap) == ComponentKind.SPEC) {
+                  transitionMap =
+                    mSpecTransitionMap.get(index - mNumPlants);
+                }
+              } else {
+                throw new InvalidModelException("Cannot find automaton "
+                                                + ap.getName());
+              }
+
+              for (final StateProxy source: codes){
+                int targetIndex1;
+                int targetIndex2;
+                final int sourceIndex = codes.indexOf(source);
+
+                if ((targetIndex1 = transitionMap[sourceIndex][eventIndex1]) > -1 &&
+                    (targetIndex2 = transitionMap[sourceIndex][eventIndex2]) > -1){
+                  commuting = transitionMap[targetIndex1][eventIndex2] == transitionMap[targetIndex2][eventIndex1];
+                  exclusive = false;
+                }
+              }
+              if (exclusive){
+                mEventDependencyMap[eventIndex1][eventIndex2] = EXCLUSIVE;
+                break;
+              }
+            }
+            if (commuting){
+              if (mEventDependencyMap[eventIndex1][eventIndex2] != EXCLUSIVE){
+                mEventDependencyMap[eventIndex1][eventIndex2] = COMMUTING;
+              }
+            }
+          }
+        }
+      }
+
       // Set the mCodePosition list
       for (i = 0; i < mNumAutomata; i++) {
         codeLength += mBitLengthList[i];
@@ -275,6 +339,28 @@ public class PartialOrderSafetyVerifier
     } finally {
       tearDown();
     }
+  }
+
+  private int indexOfAutomaton(final AutomatonProxy ap, final AutomatonProxy[] automata)
+  {
+    for (int i = 0; i < automata.length; i++){
+      if (automata[i] == ap){
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private List<AutomatonProxy> automataContainingEvent(final EventProxy ep, final Collection<AutomatonProxy> automata){
+   final List<AutomatonProxy> containingAutomata = new ArrayList<AutomatonProxy>();
+
+    for (final AutomatonProxy ap: automata){
+      if (ap.getStates().contains(ep)){
+        containingAutomata.add(ap);
+      }
+    }
+
+    return containingAutomata;
   }
 
 
@@ -601,6 +687,18 @@ public class PartialOrderSafetyVerifier
 
   //#########################################################################
   //# Data Members
+
+  // Ample conditions
+  private byte[][] mEventDependencyMap;
+  @SuppressWarnings("unused")
+  private int[] mStutterEvents;
+
+  //Dependency constants
+  @SuppressWarnings("unused")
+  private static final byte NONCOMMUTING = 0;
+  private static final byte COMMUTING = 1;
+  private static final byte EXCLUSIVE = 2;
+
   // Transition map
   private List<int[][]> mPlantTransitionMap;
   private List<int[][]> mSpecTransitionMap;
