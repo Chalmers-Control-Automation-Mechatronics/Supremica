@@ -252,56 +252,76 @@ public class PartialOrderSafetyVerifier
 
       mEventDependencyMap = new byte[mEventCodingList.size()][mEventCodingList.size()];
 
-      for (final EventProxy ep1 : mEventCodingList){
+      for (final EventProxy ep1 : mEventCodingList) {
         eventIndex1 = mEventCodingList.indexOf(ep1);
-        firstAutomata = automataContainingEvent(ep1,automata);
-        for (final EventProxy ep2 : mEventCodingList){
+        firstAutomata = automataContainingEvent(ep1, automata);
+        //consider every possible pairs of events in the model by looping through events twice
+        for (final EventProxy ep2 : mEventCodingList) {
           eventIndex2 = mEventCodingList.indexOf(ep2);
-          if (eventIndex2 > eventIndex1){
+          //ordering has no effect on dependency so only check events one way
+          if (eventIndex2 > eventIndex1) {
             boolean commuting = true;
-            sharingAutomata = automataContainingEvent(ep2,automata);
+            sharingAutomata = automataContainingEvent(ep2, automata);
+
+            //compute the list of all automata that contain both of the events currently being considered
             sharingAutomata.retainAll(firstAutomata);
 
-            for (final AutomatonProxy ap: sharingAutomata){
-
+            for (final AutomatonProxy ap : sharingAutomata) {
               stateSet = ap.getStates();
               // Encoding states to binary values
-              final List<StateProxy> codes = new ArrayList<StateProxy>(stateSet);
+              final List<StateProxy> codes =
+                new ArrayList<StateProxy>(stateSet);
 
+              //the two events can either be exclusive or not in any automata
               boolean exclusive = true;
               int[][] transitionMap = new int[stateSet.size()][mNumEvents];
 
+              //get the appropriate transition map for the automata currently being considered
               final int index = indexOfAutomaton(ap, mAutomata);
               if (index >= 0) {
+                //transition maps are stored in different lists depending on the kind of the automata
                 if (translator.getComponentKind(ap) == ComponentKind.PLANT) {
                   transitionMap = mPlantTransitionMap.get(index);
                 } else if (translator.getComponentKind(ap) == ComponentKind.SPEC) {
-                  transitionMap =
-                    mSpecTransitionMap.get(index - mNumPlants);
+                  //specification automata begin to be indexed after all of the plants in the list of automata
+                  transitionMap = mSpecTransitionMap.get(index - mNumPlants);
                 }
               } else {
                 throw new InvalidModelException("Cannot find automaton "
                                                 + ap.getName());
               }
 
-              for (final StateProxy source: codes){
+              //check ever state in the current automaton and check commutativity and exclusivity
+              for (final StateProxy source : codes) {
                 int targetIndex1;
                 int targetIndex2;
                 final int sourceIndex = codes.indexOf(source);
 
-                if ((targetIndex1 = transitionMap[sourceIndex][eventIndex1]) > -1 &&
-                    (targetIndex2 = transitionMap[sourceIndex][eventIndex2]) > -1){
-                  commuting = transitionMap[targetIndex1][eventIndex2] == transitionMap[targetIndex2][eventIndex1];
+                //check if both events are enabled in the current state and store their targets
+                if ((targetIndex1 = transitionMap[sourceIndex][eventIndex1]) > -1
+                    && (targetIndex2 =
+                      transitionMap[sourceIndex][eventIndex2]) > -1) {
+                  //when both events are enabled they commute iff when executed in either sequence they result in the same state and they do not disable one another.
+                  //As soon as the two events are found not to commute in any single automaton they will not commute in the synchronous product unless they are found
+                  //to be exclusive.
+                  commuting &=
+                    transitionMap[targetIndex1][eventIndex2] == transitionMap[targetIndex2][eventIndex1]
+                      && transitionMap[targetIndex1][eventIndex2] != -1;
+                  //two events enabled in the same state are by definition not exclusive in that automaton
                   exclusive = false;
                 }
               }
-              if (exclusive){
+              //two events found to remain exclusive after checking all states in any automaton where they both exist guarantees the independence of those events
+              //in the synchronous product, regardless of whether or not they commute in any or all automata
+              if (exclusive) {
                 mEventDependencyMap[eventIndex1][eventIndex2] = EXCLUSIVE;
                 break;
               }
             }
-            if (commuting){
-              if (mEventDependencyMap[eventIndex1][eventIndex2] != EXCLUSIVE){
+            //if after checking all the states in which both events occur the states are found to commute every time they are both enabled, then those events will be
+            //independent in the synchronous product
+            if (commuting) {
+              if (mEventDependencyMap[eventIndex1][eventIndex2] != EXCLUSIVE) {
                 mEventDependencyMap[eventIndex1][eventIndex2] = COMMUTING;
               }
             }
@@ -341,6 +361,12 @@ public class PartialOrderSafetyVerifier
     }
   }
 
+  /**
+   * Finds and returns the index of a given automaton in a given array
+   * @param ap - automaton to be found
+   * @param automata - array to search
+   * @return - index of ap in automaton or -1 if not contained
+   */
   private int indexOfAutomaton(final AutomatonProxy ap, final AutomatonProxy[] automata)
   {
     for (int i = 0; i < automata.length; i++){
@@ -351,15 +377,19 @@ public class PartialOrderSafetyVerifier
     return -1;
   }
 
+  /**
+   * Finds and returns the subset of automata from a given set of automata where the given event exists in the set of events for every automata in the subset
+   * @param ep - the event to check the existence of
+   * @param automata - the set of automata to filter
+   * @return - the subset of automata
+   */
   private List<AutomatonProxy> automataContainingEvent(final EventProxy ep, final Collection<AutomatonProxy> automata){
-   final List<AutomatonProxy> containingAutomata = new ArrayList<AutomatonProxy>();
-
+    final List<AutomatonProxy> containingAutomata = new ArrayList<AutomatonProxy>();
     for (final AutomatonProxy ap: automata){
       if (ap.getStates().contains(ep)){
         containingAutomata.add(ap);
       }
     }
-
     return containingAutomata;
   }
 
