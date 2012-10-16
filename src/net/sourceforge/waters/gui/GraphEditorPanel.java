@@ -4206,7 +4206,6 @@ public class GraphEditorPanel
         mMoveVisitor = new MoveVisitor();
         final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
         final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-        //have to clone the graph because the undo changes the original graph
         final GraphSubject g0 = (GraphSubject) cloner.getClone(getGraph());
         final UndoInterface undoInterface = mRoot.getUndoInterface();
 
@@ -4215,10 +4214,12 @@ public class GraphEditorPanel
         }
         else if(mLastCommand != null && mLastCommand == undoInterface.getLastCommand()){
           mLastCommand.setUpdatesSelection(false);
-          undoInterface.undo();
-          undoInterface.removeLastCommand();
+          undoInterface.undoAndRemoveLastCommand();
           mDisplacement.setLocation(x+mDisplacement.getX(),
                                             y+mDisplacement.getY());
+        }
+        else{
+          mDisplacement.setLocation(x,y);
         }
         createSecondaryGraph();
         mMoveVisitor.moveAll((int)mDisplacement.getX(),
@@ -4276,8 +4277,7 @@ public class GraphEditorPanel
           if (mLastCommand != null
               && mLastCommand == undoInterface.getLastCommand()) {
             mLastCommand.setUpdatesSelection(false);
-            undoInterface.undo();
-            undoInterface.removeLastCommand();
+            undoInterface.undoAndRemoveLastCommand();
           }
         final Command cmd =
           graph.createUpdateCommand(GraphEditorPanel.this, description, selecting);

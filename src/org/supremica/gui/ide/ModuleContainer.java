@@ -437,6 +437,14 @@ public class ModuleContainer
     fireUndoRedoEvent();
   }
 
+  public void undoAndRemoveLastCommand() throws CannotUndoException
+  {
+    mUndoManager.undo();
+    mUndoIndex--;
+    removeLastCommand();
+    fireUndoRedoEvent();
+  }
+
   public void removeLastCommand(){
     mUndoManager.removeLast();
   }
