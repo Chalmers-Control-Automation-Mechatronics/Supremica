@@ -92,6 +92,8 @@ public class PartialOrderSafetyVerifier
 
   //#########################################################################
   //# Invocation
+
+  @SuppressWarnings("unchecked")
   public boolean run()
     throws AnalysisException
   {
@@ -245,12 +247,14 @@ public class PartialOrderSafetyVerifier
         return setFailedResult(counterexample);
       }
 
+      //Begin to compute dependency of events
+
       List<AutomatonProxy> firstAutomata;
       List<AutomatonProxy> sharingAutomata;
       int eventIndex1;
       int eventIndex2;
 
-      mEventDependencyMap = new byte[mEventCodingList.size()][mEventCodingList.size()];
+      mEventDependencyMap = PartialOrderEventDependencyKind.arrayOfDefault(mNumEvents);
 
       for (final EventProxy ep1 : mEventCodingList) {
         eventIndex1 = mEventCodingList.indexOf(ep1);
@@ -314,17 +318,27 @@ public class PartialOrderSafetyVerifier
               //two events found to remain exclusive after checking all states in any automaton where they both exist guarantees the independence of those events
               //in the synchronous product, regardless of whether or not they commute in any or all automata
               if (exclusive) {
-                mEventDependencyMap[eventIndex1][eventIndex2] = EXCLUSIVE;
+                mEventDependencyMap[eventIndex1][eventIndex2] = PartialOrderEventDependencyKind.EXCLUSIVE;
                 break;
               }
             }
             //if after checking all the states in which both events occur the states are found to commute every time they are both enabled, then those events will be
             //independent in the synchronous product
             if (commuting) {
-              if (mEventDependencyMap[eventIndex1][eventIndex2] != EXCLUSIVE) {
-                mEventDependencyMap[eventIndex1][eventIndex2] = COMMUTING;
+              if (mEventDependencyMap[eventIndex1][eventIndex2] != PartialOrderEventDependencyKind.EXCLUSIVE) {
+                mEventDependencyMap[eventIndex1][eventIndex2] = PartialOrderEventDependencyKind.COMMUTING;
               }
             }
+          }
+        }
+      }
+
+      mReducedEventDependencyMap = (ArrayList<PartialOrderEventDependencyTuple>[]) new ArrayList[mNumEvents];
+      for (i = 0; i < mNumEvents; i++){
+        mReducedEventDependencyMap[i] = new ArrayList<PartialOrderEventDependencyTuple>();
+        for (j = 0; j < mNumEvents; j++){
+          if (mEventDependencyMap[i][j] != PartialOrderEventDependencyKind.NONCOMMUTING){
+            mReducedEventDependencyMap[i].add(new PartialOrderEventDependencyTuple(j, mEventDependencyMap[i][j]));
           }
         }
       }
@@ -719,15 +733,15 @@ public class PartialOrderSafetyVerifier
   //# Data Members
 
   // Ample conditions
-  private byte[][] mEventDependencyMap;
+  private PartialOrderEventDependencyKind[][] mEventDependencyMap;
+  private List<PartialOrderEventDependencyTuple>[] mReducedEventDependencyMap;
   @SuppressWarnings("unused")
   private int[] mStutterEvents;
 
   //Dependency constants
-  @SuppressWarnings("unused")
-  private static final byte NONCOMMUTING = 0;
+ /* private static final byte NONCOMMUTING = 0;
   private static final byte COMMUTING = 1;
-  private static final byte EXCLUSIVE = 2;
+  private static final byte EXCLUSIVE = 2;*/
 
   // Transition map
   private List<int[][]> mPlantTransitionMap;
