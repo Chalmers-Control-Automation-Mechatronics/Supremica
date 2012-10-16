@@ -174,18 +174,6 @@ public abstract class AbstractCompilerTest
     compile("tests", "hisc", "parManEg_I_mfb_lowlevel");
   }
 
-  public void testCompile_patrik1()
-    throws IOException, WatersException
-  {
-    compile("tests", "nasty", "patrik1");
-  }
-
-  public void testCompile_patrik2()
-    throws IOException, WatersException
-  {
-    compile("tests", "nasty", "patrik2");
-  }
-
   public void testCompile_PLanTS()
     throws IOException, WatersException
   {
@@ -276,7 +264,7 @@ public abstract class AbstractCompilerTest
   public void testCompile_batch_tank_vout()
     throws IOException, WatersException
   {
-    compile("tests", "nasty", "batch_tank_vout");
+    compile("tests", "efa", "batch_tank_vout");
   }
 
   public void testCompile_ControllableTestModelEFA()
@@ -375,6 +363,18 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "nondetvar");
   }
 
+  public void testCompile_patrik1()
+    throws IOException, WatersException
+  {
+    compile("tests", "efa", "patrik1");
+  }
+
+  public void testCompile_patrik2()
+    throws IOException, WatersException
+  {
+    compile("tests", "efa", "patrik2");
+  }
+
   /*
   public void testCompile_profisafe_ihost_efa()
     throws IOException, WatersException
@@ -392,27 +392,33 @@ public abstract class AbstractCompilerTest
   public void testCompile_profisafe_ihost_nonsubsumptions()
     throws IOException, WatersException
   {
-    compile("tests", "nasty", "profisafe_ihost_nonsubsumptions");
+    compile("tests", "efa", "profisafe_ihost_nonsubsumptions");
   }
 
   /*
   public void testCompile_profisafe_islave_property()
     throws IOException, WatersException
   {
-    compile("tests", "nasty", "profisafe_islave_property");
+    compile("tests", "efa", "profisafe_islave_property");
   }
   */
 
   public void testCompile_profisafe_islave_pfork()
     throws IOException, WatersException
   {
-    compile("tests", "nasty", "profisafe_islave_pfork");
+    compile("tests", "efa", "profisafe_islave_pfork");
   }
 
-  public void testCompile_sahar()
+  public void testCompile_sahar1()
     throws IOException, WatersException
   {
-    compile("efa", "sahar");
+    compile("tests", "efa", "sahar1");
+  }
+
+  public void testCompile_sahar2()
+    throws IOException, WatersException
+  {
+    compile("tests", "efa", "sahar2");
   }
 
   public void testCompile_sensoractuator1()

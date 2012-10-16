@@ -273,18 +273,16 @@ public class EFACompiler
         final ConstraintList guard = part.getGuard();
         propagator.addConstraints(guard);
         propagator.propagate();
-       // if (!propagator.isUnsatisfiable()) {
-          parts.add(part);
-          if (!guard.isTrue()) {
-            locations.addAll(part.getSourceLocations());
-          }
-          collectEventPartition
-            (edecl, groups, parts, index + 1, propagator, locations);
-          parts.remove(index);
-          for (int i = locations.size() - 1; i >= numlocs; i--) {
-            locations.remove(i);
-          }
-       // }
+        parts.add(part);
+        if (!guard.isTrue()) {
+          locations.addAll(part.getSourceLocations());
+        }
+        collectEventPartition(edecl, groups, parts, index + 1,
+                              propagator, locations);
+        parts.remove(index);
+        for (int i = locations.size() - 1; i >= numlocs; i--) {
+          locations.remove(i);
+        }
       }
     } else {
       splitEventPartition(edecl, parent, locations);
