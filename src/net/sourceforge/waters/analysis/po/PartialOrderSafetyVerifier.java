@@ -47,15 +47,16 @@ import org.apache.log4j.Logger;
 
 
 /**
- * <P>A Java implementation of the controllability check algorithm.
- * This algorithm does a brute-force state exploration to check whether
- * the given model is controllable.</P>
+ * <P>
+ * A Java implementation of the controllability check algorithm. This
+ * algorithm does a brute-force state exploration to check whether the given
+ * model is controllable.
+ * </P>
  *
  * @author Jinjian Shi
  */
 
-public class PartialOrderSafetyVerifier
-  extends AbstractSafetyVerifier
+public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   implements SafetyVerifier
 {
 
@@ -63,39 +64,42 @@ public class PartialOrderSafetyVerifier
   //# Constructors
   /**
    * Creates a new safety verifier to check a particular model.
-   * @param  translator  The kind translator is used to remap component and
-   *                     event kinds.
-   * @param  factory     The factory used for trace construction.
+   *
+   * @param translator
+   *          The kind translator is used to remap component and event kinds.
+   * @param factory
+   *          The factory used for trace construction.
    */
   public PartialOrderSafetyVerifier(final KindTranslator translator,
-                                  final SafetyDiagnostics diag,
-                                  final ProductDESProxyFactory factory)
+                                    final SafetyDiagnostics diag,
+                                    final ProductDESProxyFactory factory)
   {
     this(null, translator, diag, factory);
   }
 
   /**
    * Creates a new safety verifier to check a particular model.
-   * @param  model       The model to be checked by this verifier.
-   * @param  translator  The kind translator is used to remap component and
-   *                     event kinds.
-   * @param  factory     The factory used for trace construction.
+   *
+   * @param model
+   *          The model to be checked by this verifier.
+   * @param translator
+   *          The kind translator is used to remap component and event kinds.
+   * @param factory
+   *          The factory used for trace construction.
    */
   public PartialOrderSafetyVerifier(final ProductDESProxy model,
-                                  final KindTranslator translator,
-                                  final SafetyDiagnostics diag,
-                                  final ProductDESProxyFactory factory)
+                                    final KindTranslator translator,
+                                    final SafetyDiagnostics diag,
+                                    final ProductDESProxyFactory factory)
   {
     super(model, translator, diag, factory);
   }
-
 
   //#########################################################################
   //# Invocation
 
   @SuppressWarnings("unchecked")
-  public boolean run()
-    throws AnalysisException
+  public boolean run() throws AnalysisException
   {
     try {
       setUp();
@@ -115,7 +119,8 @@ public class PartialOrderSafetyVerifier
       mNumPlants = 0;
       mStateTupleSize = 0;
 
-      final Collection<AutomatonProxy> automata = new LinkedList<AutomatonProxy>();
+      final Collection<AutomatonProxy> automata =
+        new LinkedList<AutomatonProxy>();
       for (final AutomatonProxy aut : model.getAutomata()) {
         final ComponentKind kind = translator.getComponentKind(aut);
         if (kind != null) {
@@ -155,6 +160,9 @@ public class PartialOrderSafetyVerifier
       mCodePosition = new int[mNumAutomata];
       mSystemState = new int[mNumAutomata];
 
+      final List<AutomatonProxy>[] automataContainingEvents = new ArrayList[mNumEvents];
+      Arrays.fill(automataContainingEvents,new ArrayList<AutomatonProxy>());
+
       // Separate the automatons by kind
       AutomatonProxy initUncontrollable = null;
       for (final AutomatonProxy ap : automata) {
@@ -165,7 +173,9 @@ public class PartialOrderSafetyVerifier
         // Encoding events to binary values
         final byte[] aneventCodingList = new byte[mNumEvents];
         for (final EventProxy evp : ap.getEvents()) {
-          aneventCodingList[mEventCodingList.indexOf(evp)] = 1;
+          final int eventIndex = mEventCodingList.indexOf(evp);
+          aneventCodingList[eventIndex] = 1;
+          automataContainingEvents[eventIndex].add(ap);
         }
         // Encoding transitions to binary values
         final int stateSize = codes.size();
@@ -179,8 +189,8 @@ public class PartialOrderSafetyVerifier
           final int source = codes.indexOf(tp.getSource());
           final int event = mEventCodingList.indexOf(tp.getEvent());
           if (atransition[source][event] >= 0) {
-            throw new NondeterministicDESException
-              (ap, tp.getSource(), tp.getEvent());
+            throw new NondeterministicDESException(ap, tp.getSource(),
+                                                   tp.getEvent());
           }
           final int target = codes.indexOf(tp.getTarget());
           atransition[source][event] = target;
@@ -202,9 +212,8 @@ public class PartialOrderSafetyVerifier
         }
         final ComponentKind kind = translator.getComponentKind(ap);
         if (initialState == null) {
-          if (kind == ComponentKind.PLANT ||
-              translator.getEventKind(KindTranslator.INIT) ==
-              EventKind.CONTROLLABLE) {
+          if (kind == ComponentKind.PLANT
+              || translator.getEventKind(KindTranslator.INIT) == EventKind.CONTROLLABLE) {
             return setSatisfiedResult();
           } else {
             initUncontrollable = ap;
@@ -242,33 +251,29 @@ public class PartialOrderSafetyVerifier
           getTraceComment(null, initUncontrollable, null);
         final TraceStepProxy step = factory.createTraceStepProxy(null);
         final List<TraceStepProxy> steps = Collections.singletonList(step);
-        final SafetyTraceProxy counterexample = factory.createSafetyTraceProxy
-          (tracename, comment, null, model, automata, steps);
+        final SafetyTraceProxy counterexample =
+          factory.createSafetyTraceProxy(tracename, comment, null, model,
+                                         automata, steps);
         return setFailedResult(counterexample);
       }
 
       //Begin to compute dependency of events
 
-      List<AutomatonProxy> firstAutomata;
       List<AutomatonProxy> sharingAutomata;
-      int eventIndex1;
-      int eventIndex2;
 
-      mEventDependencyMap = PartialOrderEventDependencyKind.arrayOfDefault(mNumEvents);
+      mEventDependencyMap =
+        PartialOrderEventDependencyKind.arrayOfDefault(mNumEvents);
 
-      for (final EventProxy ep1 : mEventCodingList) {
-        eventIndex1 = mEventCodingList.indexOf(ep1);
-        firstAutomata = automataContainingEvent(ep1, automata);
+      for (i = 0; i < mEventCodingList.size(); i++) {
         //consider every possible pairs of events in the model by looping through events twice
-        for (final EventProxy ep2 : mEventCodingList) {
-          eventIndex2 = mEventCodingList.indexOf(ep2);
+        for (j = 0; j < mEventCodingList.size(); j++) {
           //ordering has no effect on dependency so only check events one way
-          if (eventIndex2 > eventIndex1) {
+          if (j > i) {
             boolean commuting = true;
-            sharingAutomata = automataContainingEvent(ep2, automata);
-
+            //get the list of automata containing event at index i
+            sharingAutomata = new ArrayList<AutomatonProxy>(automataContainingEvents[i]);
             //compute the list of all automata that contain both of the events currently being considered
-            sharingAutomata.retainAll(firstAutomata);
+            sharingAutomata.retainAll(automataContainingEvents[j]);
 
             for (final AutomatonProxy ap : sharingAutomata) {
               stateSet = ap.getStates();
@@ -296,21 +301,20 @@ public class PartialOrderSafetyVerifier
               }
 
               //check ever state in the current automaton and check commutativity and exclusivity
-              for (final StateProxy source : codes) {
+              for (k = 0; k < codes.size(); k++) {
                 int targetIndex1;
                 int targetIndex2;
-                final int sourceIndex = codes.indexOf(source);
 
                 //check if both events are enabled in the current state and store their targets
-                if ((targetIndex1 = transitionMap[sourceIndex][eventIndex1]) > -1
+                if ((targetIndex1 = transitionMap[k][i]) > -1
                     && (targetIndex2 =
-                      transitionMap[sourceIndex][eventIndex2]) > -1) {
+                      transitionMap[k][j]) > -1) {
                   //when both events are enabled they commute iff when executed in either sequence they result in the same state and they do not disable one another.
                   //As soon as the two events are found not to commute in any single automaton they will not commute in the synchronous product unless they are found
                   //to be exclusive.
                   commuting &=
-                    transitionMap[targetIndex1][eventIndex2] == transitionMap[targetIndex2][eventIndex1]
-                      && transitionMap[targetIndex1][eventIndex2] != -1;
+                    transitionMap[targetIndex1][j] == transitionMap[targetIndex2][i]
+                      && transitionMap[targetIndex1][j] != -1;
                   //two events enabled in the same state are by definition not exclusive in that automaton
                   exclusive = false;
                 }
@@ -318,35 +322,41 @@ public class PartialOrderSafetyVerifier
               //two events found to remain exclusive after checking all states in any automaton where they both exist guarantees the independence of those events
               //in the synchronous product, regardless of whether or not they commute in any or all automata
               if (exclusive) {
-                mEventDependencyMap[eventIndex1][eventIndex2] = PartialOrderEventDependencyKind.EXCLUSIVE;
+                mEventDependencyMap[i][j] =
+                  PartialOrderEventDependencyKind.EXCLUSIVE;
                 break;
               }
             }
             //if after checking all the states in which both events occur the states are found to commute every time they are both enabled, then those events will be
             //independent in the synchronous product
             if (commuting) {
-              if (mEventDependencyMap[eventIndex1][eventIndex2] != PartialOrderEventDependencyKind.EXCLUSIVE) {
-                mEventDependencyMap[eventIndex1][eventIndex2] = PartialOrderEventDependencyKind.COMMUTING;
+              if (mEventDependencyMap[i][j] !=
+                  PartialOrderEventDependencyKind.EXCLUSIVE) {
+                mEventDependencyMap[i][j] =
+                  PartialOrderEventDependencyKind.COMMUTING;
               }
             }
           }
         }
       }
 
-      mReducedEventDependencyMap = (ArrayList<PartialOrderEventDependencyTuple>[]) new ArrayList[mNumEvents];
-      for (i = 0; i < mNumEvents; i++){
-        mReducedEventDependencyMap[i] = new ArrayList<PartialOrderEventDependencyTuple>();
-        for (j = 0; j < mNumEvents; j++){
-          if (mEventDependencyMap[i][j] != PartialOrderEventDependencyKind.NONCOMMUTING){
-            mReducedEventDependencyMap[i].add(new PartialOrderEventDependencyTuple(j, mEventDependencyMap[i][j]));
+      mReducedEventDependencyMap =
+        new PartialOrderEventDependencyTuple[mNumEvents][];
+      for (i = 0; i < mNumEvents; i++) {
+        final ArrayList<PartialOrderEventDependencyTuple> temp = new ArrayList<PartialOrderEventDependencyTuple>();
+        for (j = 0; j < mNumEvents; j++) {
+          if (mEventDependencyMap[i][j] != PartialOrderEventDependencyKind.NONCOMMUTING) {
+            temp.add(new PartialOrderEventDependencyTuple
+                     (j, mEventDependencyMap[i][j]));
           }
         }
+        mReducedEventDependencyMap[i] =  temp.toArray(new PartialOrderEventDependencyTuple[temp.size()]);
       }
 
       // Set the mCodePosition list
       for (i = 0; i < mNumAutomata; i++) {
         codeLength += mBitLengthList[i];
-        if (codeLength <= 32){
+        if (codeLength <= 32) {
           mCodePosition[i] = cp;
         } else {
           codeLength = mBitLengthList[i];
@@ -377,36 +387,23 @@ public class PartialOrderSafetyVerifier
 
   /**
    * Finds and returns the index of a given automaton in a given array
-   * @param ap - automaton to be found
-   * @param automata - array to search
+   *
+   * @param ap
+   *          - automaton to be found
+   * @param automata
+   *          - array to search
    * @return - index of ap in automaton or -1 if not contained
    */
-  private int indexOfAutomaton(final AutomatonProxy ap, final AutomatonProxy[] automata)
+  private int indexOfAutomaton(final AutomatonProxy ap,
+                               final AutomatonProxy[] automata)
   {
-    for (int i = 0; i < automata.length; i++){
-      if (automata[i] == ap){
+    for (int i = 0; i < automata.length; i++) {
+      if (automata[i] == ap) {
         return i;
       }
     }
     return -1;
   }
-
-  /**
-   * Finds and returns the subset of automata from a given set of automata where the given event exists in the set of events for every automata in the subset
-   * @param ep - the event to check the existence of
-   * @param automata - the set of automata to filter
-   * @return - the subset of automata
-   */
-  private List<AutomatonProxy> automataContainingEvent(final EventProxy ep, final Collection<AutomatonProxy> automata){
-    final List<AutomatonProxy> containingAutomata = new ArrayList<AutomatonProxy>();
-    for (final AutomatonProxy ap: automata){
-      if (ap.getStates().contains(ep)){
-        containingAutomata.add(ap);
-      }
-    }
-    return containingAutomata;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -415,7 +412,6 @@ public class PartialOrderSafetyVerifier
     return false;
   }
 
-
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
   public void setKindTranslator(final KindTranslator translator)
@@ -423,7 +419,6 @@ public class PartialOrderSafetyVerifier
     super.setKindTranslator(translator);
     clearAnalysisResult();
   }
-
 
   //#########################################################################
   //# Setting the Result
@@ -438,18 +433,18 @@ public class PartialOrderSafetyVerifier
     result.setPeakNumberOfNodes(numstates);
   }
 
-
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * Check the controllability of the model with a parameter of
-   * initial synchronous product.
-   * @param sState The initial synchronous product of the model
+   * Check the controllability of the model with a parameter of initial
+   * synchronous product.
+   *
+   * @param sState
+   *          The initial synchronous product of the model
    * @return <CODE>true</CODE> if the model is controllable, or
    *         <CODE>false</CODE> if it is not.
    */
-  private boolean isControllable(final int[] sState)
-    throws AnalysisException
+  private boolean isControllable(final int[] sState) throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
     final THashSet<StateTuple> systemSet = new THashSet<StateTuple>();
@@ -461,30 +456,28 @@ public class PartialOrderSafetyVerifier
     encode(sState, mStateTuple);
     systemSet.add(mStateTuple);
     mStateSpace.add(mStateTuple);
-    mIndexList.add(mStateSpace.size()-1);
+    mIndexList.add(mStateSpace.size() - 1);
 
     int indexSize = 0;
     final int mNumEvents = mEventCodingList.size();
-    int i,j,k,temp;
+    int i, j, k, temp;
 
     while (true) {
       // For each current state in the current level, check its controllability
       indexSize = mIndexList.size();
-      for (j = (indexSize == 1) ? 0 : (mIndexList.get(indexSize - 2) + 1);
-           j <= mIndexList.get(indexSize-1);
-           j++) {
-        decode(mStateSpace.get(j),mSystemState);
+      for (j = (indexSize == 1) ? 0 : (mIndexList.get(indexSize - 2) + 1); j <= mIndexList
+        .get(indexSize - 1); j++) {
+        decode(mStateSpace.get(j), mSystemState);
         for (int e = 0; e < mNumEvents; e++) {
           // Retrieve all enabled events
           enabled = true;
           for (i = 0; i < mNumPlants; i++) {
-            if (mPlantEventList.get(i)[e] == 1){
+            if (mPlantEventList.get(i)[e] == 1) {
               temp = mPlantTransitionMap.get(i)[mSystemState[i]][e];
               if (temp == -1) {
                 enabled = false;
                 break;
-              }
-              else if (temp > -1){
+              } else if (temp > -1) {
                 mSuccessor[i] = temp;
                 continue;
               }
@@ -502,8 +495,7 @@ public class PartialOrderSafetyVerifier
             for (i = 0; i < mNumAutomata - mNumPlants; i++) {
               final int si = i + mNumPlants;
               if (mSpecEventList.get(i)[e] == 1) {
-                temp =
-                  mSpecTransitionMap.get(i)[mSystemState[si]][e];
+                temp = mSpecTransitionMap.get(i)[mSystemState[si]][e];
                 if (temp == -1) {
                   mErrorEvent = e;
                   mErrorAutomaton = si;
@@ -517,7 +509,7 @@ public class PartialOrderSafetyVerifier
               mSuccessor[si] = mSystemState[si];
             }
           } else {
-            for (k = 0; k < mNumAutomata - mNumPlants; k++){
+            for (k = 0; k < mNumAutomata - mNumPlants; k++) {
               if (mSpecEventList.get(k)[e] == 1) {
                 temp =
                   mSpecTransitionMap.get(k)[mSystemState[k + mNumPlants]][e];
@@ -525,7 +517,7 @@ public class PartialOrderSafetyVerifier
                   enabled = false;
                   break;
                 }
-                if (temp > -1){
+                if (temp > -1) {
                   mSuccessor[k + mNumPlants] = temp;
                   continue;
                 }
@@ -565,8 +557,11 @@ public class PartialOrderSafetyVerifier
   //# Encoding
   /**
    * Encode the synchronous product into StateTuple
-   * @param sState The state to be encoded
-   * @param sTuple The encoded StateTuple
+   *
+   * @param sState
+   *          The state to be encoded
+   * @param sTuple
+   *          The encoded StateTuple
    */
   private void encode(final int[] sState, final StateTuple sTuple)
   {
@@ -589,13 +584,15 @@ public class PartialOrderSafetyVerifier
     }
   }
 
-
   //#########################################################################
   //# Decoding
   /**
    * Decode the StateTuple
-   * @param sTuple The StateTuple to be decoded
-   * @param state  The decoded state
+   *
+   * @param sTuple
+   *          The StateTuple to be decoded
+   * @param state
+   *          The decoded state
    */
   private void decode(final StateTuple sTuple, final int[] state)
   {
@@ -622,23 +619,24 @@ public class PartialOrderSafetyVerifier
 
   /**
    * Gets a counterexample if the model was found to be not controllable.
-   * representing a controllability error trace. A controllability error
-   * trace is a nonempty sequence of events such that all except the last
-   * event in the list can be executed by the model. The last event in list
-   * is an uncontrollable event that is possible in all plant automata, but
-   * not in all specification automata present in the model. Thus, the last
-   * step demonstrates why the model is not controllable.
-   * @return A trace object representing the counterexample.
-   *         The returned trace is constructed for the input product DES
-   *         of this controllability checker and shares its automata and
-   *         event objects.
-   * @throws IllegalStateException if this method is called before
-   *         model checking has completed, i.e., before {@link #run() run()}
-   *         has been called, or model checking has found that the
-   *         property is satisfied and there is no counterexample.
+   * representing a controllability error trace. A controllability error trace
+   * is a nonempty sequence of events such that all except the last event in
+   * the list can be executed by the model. The last event in list is an
+   * uncontrollable event that is possible in all plant automata, but not in
+   * all specification automata present in the model. Thus, the last step
+   * demonstrates why the model is not controllable.
+   *
+   * @return A trace object representing the counterexample. The returned
+   *         trace is constructed for the input product DES of this
+   *         controllability checker and shares its automata and event
+   *         objects.
+   * @throws IllegalStateException
+   *           if this method is called before model checking has completed,
+   *           i.e., before {@link #run() run()} has been called, or model
+   *           checking has found that the property is satisfied and there is
+   *           no counterexample.
    */
-  private SafetyTraceProxy computeCounterExample()
-    throws AbortException
+  private SafetyTraceProxy computeCounterExample() throws AbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
@@ -651,33 +649,34 @@ public class PartialOrderSafetyVerifier
     final int[] errorState = new int[mNumAutomata];
     final EventProxy event0 = mEventCodingList.get(mErrorEvent);
     final AutomatonProxy aut = mAutomata[mErrorAutomaton];
-    final List<StateProxy> codes0 = new ArrayList<StateProxy>(aut.getStates());
+    final List<StateProxy> codes0 =
+      new ArrayList<StateProxy>(aut.getStates());
     final int code0 = mSystemState[mErrorAutomaton];
     final StateProxy state0 = codes0.get(code0);
     final TraceStepProxy step0 = factory.createTraceStepProxy(event0);
     steps.add(0, step0);
 
-    while(true){
+    while (true) {
       for (i = 0; i < mNumAutomata; i++) {
         errorState[i] = mSystemState[i];
       }
       mIndexList.remove(--indexSize);
-      if(mIndexList.size()==0) break;
+      if (mIndexList.size() == 0)
+        break;
       // Backward search the previous level states, compute their
       // successors and compare them with the error state
-      for (j = indexSize == 1 ? 0 : mIndexList.get(indexSize - 2) + 1;
-           j <= mIndexList.get(indexSize - 1);
-           j++) {
+      for (j = indexSize == 1 ? 0 : mIndexList.get(indexSize - 2) + 1; j <= mIndexList
+        .get(indexSize - 1); j++) {
         decode(mStateSpace.get(j), mSystemState);
         for (int e = 0; e < mNumEvents; e++) {
           enabled = true;
           for (i = 0; i < mNumPlants; i++) {
-            if (mPlantEventList.get(i)[e] == 1){
+            if (mPlantEventList.get(i)[e] == 1) {
               temp = mPlantTransitionMap.get(i)[mSystemState[i]][e];
               if (temp == -1) {
                 enabled = false;
                 break;
-              } else if (temp > -1){
+              } else if (temp > -1) {
                 mSuccessor[i] = temp;
                 continue;
               }
@@ -689,7 +688,8 @@ public class PartialOrderSafetyVerifier
           }
           for (k = 0; k < mNumAutomata - mNumPlants; k++) {
             if (mSpecEventList.get(k)[e] == 1) {
-              temp = mSpecTransitionMap.get(k)[mSystemState[k+mNumPlants]][e];
+              temp =
+                mSpecTransitionMap.get(k)[mSystemState[k + mNumPlants]][e];
               if (temp == -1) {
                 enabled = false;
                 break;
@@ -724,8 +724,9 @@ public class PartialOrderSafetyVerifier
     final String tracename = getTraceName();
     final String comment = getTraceComment(event0, aut, state0);
     final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
-    final SafetyTraceProxy trace = factory.createSafetyTraceProxy
-      (tracename, comment, null, des, automata, steps);
+    final SafetyTraceProxy trace =
+      factory.createSafetyTraceProxy(tracename, comment, null, des, automata,
+                                     steps);
     return trace;
   }
 
@@ -734,14 +735,15 @@ public class PartialOrderSafetyVerifier
 
   // Ample conditions
   private PartialOrderEventDependencyKind[][] mEventDependencyMap;
-  private List<PartialOrderEventDependencyTuple>[] mReducedEventDependencyMap;
+  private PartialOrderEventDependencyTuple[][] mReducedEventDependencyMap;
   @SuppressWarnings("unused")
   private int[] mStutterEvents;
 
   //Dependency constants
- /* private static final byte NONCOMMUTING = 0;
-  private static final byte COMMUTING = 1;
-  private static final byte EXCLUSIVE = 2;*/
+  /*
+   * private static final byte NONCOMMUTING = 0; private static final byte
+   * COMMUTING = 1; private static final byte EXCLUSIVE = 2;
+   */
 
   // Transition map
   private List<int[][]> mPlantTransitionMap;
