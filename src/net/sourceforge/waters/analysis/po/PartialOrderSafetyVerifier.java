@@ -258,33 +258,26 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
 
       //Begin to compute dependency of events
-
-      List<AutomatonProxy> sharingAutomata;
-
       mEventDependencyMap =
         PartialOrderEventDependencyKind.arrayOfDefault(mNumEvents);
 
       for (i = 0; i < mEventCodingList.size(); i++) {
-        //consider every possible pairs of events in the model by looping through events twice
-        for (j = 0; j < mEventCodingList.size(); j++) {
+        // Consider every possible pairs of events in the model by looping
+        // through events twice.
+        final Collection<AutomatonProxy> outerAutomata =
+          new THashSet<AutomatonProxy>(automataContainingEvents[i]);
+        for (j = 0; j < i; j++) {
           //ordering has no effect on dependency so only check events one way
-          if (j > i) {
-            boolean commuting = true;
-            //get the list of automata containing event at index i
-            sharingAutomata = new ArrayList<AutomatonProxy>(automataContainingEvents[i]);
-            //compute the list of all automata that contain both of the events currently being considered
-            sharingAutomata.retainAll(automataContainingEvents[j]);
-
-            for (final AutomatonProxy ap : sharingAutomata) {
+          boolean commuting = true;
+          //get the list of automata containing event at index i
+          final Collection<AutomatonProxy> innerAutomata = automataContainingEvents[i];
+          //compute the list of all automata that contain both of the events currently being considered
+          for (final AutomatonProxy ap : innerAutomata) {
+            if (outerAutomata.contains(ap)) {
               stateSet = ap.getStates();
-              // Encoding states to binary values
-              final List<StateProxy> codes =
-                new ArrayList<StateProxy>(stateSet);
-
               //the two events can either be exclusive or not in any automata
               boolean exclusive = true;
-              int[][] transitionMap = new int[stateSet.size()][mNumEvents];
-
+              int[][] transitionMap = null;
               //get the appropriate transition map for the automata currently being considered
               final int index = indexOfAutomaton(ap, mAutomata);
               if (index >= 0) {
@@ -300,8 +293,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
                                                 + ap.getName());
               }
 
-              //check ever state in the current automaton and check commutativity and exclusivity
-              for (k = 0; k < codes.size(); k++) {
+              //check every state in the current automaton and check commutativity and exclusivity
+              for (k = 0; k < stateSet.size(); k++) {
                 int targetIndex1;
                 int targetIndex2;
 
