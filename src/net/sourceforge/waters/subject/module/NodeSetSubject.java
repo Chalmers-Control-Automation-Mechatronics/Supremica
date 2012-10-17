@@ -49,7 +49,7 @@ import net.sourceforge.waters.subject.base.UndoInfo;
 
 class NodeSetSubject
   extends AbstractSet<NodeSubject>
-  implements IndexedSetSubject<NodeSubject>
+  implements IndexedSetSubject<NodeSubject>, ModelObserver
 {
 
   //#########################################################################
@@ -72,6 +72,7 @@ class NodeSetSubject
     @SuppressWarnings("unchecked")
     final Collection<NodeSubject> downcast = (Collection<NodeSubject>) input;
     insertAllUnique(downcast);
+    addModelObserver(this);
   }
 
 
@@ -276,6 +277,24 @@ class NodeSetSubject
     rearrangeGroupNodes(empty);
   }
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.ModelObserver;
+  public void modelChanged(final ModelChangeEvent event)
+  {
+    if(event.getKind() == ModelChangeEvent.NAME_CHANGED){
+      if(event.getSource() instanceof NodeSubject){
+        final NodeSubject node = (NodeSubject)event.getSource();
+        //make sure the key and value are updated in mNameMap
+        mNameMap.remove(event.getValue());
+        mNameMap.put(node.getName(), node);
+      }
+    }
+  }
+
+  public int getModelObserverPriority()
+  {
+    return ModelObserver.RENDERING_PRIORITY;
+  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
@@ -720,5 +739,6 @@ class NodeSetSubject
    * All nodes in this set, indexed by their names.
    */
   private final Map<String,NodeSubject> mNameMap;
+
 
 }

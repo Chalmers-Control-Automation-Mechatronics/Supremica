@@ -4643,7 +4643,7 @@ public class GraphEditorPanel
       final SimpleIdentifierProxy ident = super.parse(text);
       final String oldname = getOldName();
       if (!text.equals(oldname)) {
-        if (getGraph().getNodesModifiable().containsName(text)) {
+        if (nodes.containsName(text)) {
           throw new ParseException
             ("State name '" + text + "' is already taken!", 0);
         }
@@ -4653,6 +4653,7 @@ public class GraphEditorPanel
 
   }
 
+        final IndexedSetSubject<NodeSubject> nodes = getGraph().getNodesModifiable();
 
   //#########################################################################
   //# Inner Class SelectableVisitor
