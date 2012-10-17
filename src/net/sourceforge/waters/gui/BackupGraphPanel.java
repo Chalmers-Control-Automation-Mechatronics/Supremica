@@ -271,6 +271,22 @@ public class BackupGraphPanel
     }
   }
 
+  protected ProxySubject getCopy(final Proxy proxy)
+  {
+    final ProxySubject subject = (ProxySubject) proxy;
+    return getCopy(subject);
+  }
+
+  protected ProxySubject getCopy(final ProxySubject item)
+  {
+    assert(item != null);
+    if (mSecondaryGraph == null) {
+      return item;
+    } else {
+      return mSecondaryGraph.getCopy(item);
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class GraphModelObserver

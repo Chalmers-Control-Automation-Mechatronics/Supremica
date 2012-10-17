@@ -699,18 +699,24 @@ public class GraphEditorPanel
       // Beware---the list may contain identifiers, but the proxy
       // shape producer does not support them :-(
       final Set<Proxy> scrollable = new THashSet<Proxy>();
-      for (final Proxy proxy : list) {
-        if (proxy instanceof IdentifierSubject ||
-            proxy instanceof ForeachSubject) {
+      for (Proxy proxy : list) {
+        if (proxy instanceof IdentifierSubject
+            || proxy instanceof ForeachSubject) {
           final Subject subject = (Subject) proxy;
           final ProxySubject parent =
             (ProxySubject) SubjectTools.getAncestor(subject,
                                                     LabelBlockSubject.class,
                                                     SimpleNodeSubject.class);
-          scrollable.add(parent);
-        } else {
+          proxy = parent;
+        }
+        final Proxy copy = getCopy(proxy);
+        if(copy == null){
           scrollable.add(proxy);
         }
+        else{
+          scrollable.add(copy);
+        }
+
       }
       final Rectangle2D bounds =
         getShapeProducer().getMinimumBoundingRectangle(scrollable);
@@ -4643,7 +4649,7 @@ public class GraphEditorPanel
       final SimpleIdentifierProxy ident = super.parse(text);
       final String oldname = getOldName();
       if (!text.equals(oldname)) {
-        if (nodes.containsName(text)) {
+        if (getGraph().getNodesModifiable().containsName(text)) {
           throw new ParseException
             ("State name '" + text + "' is already taken!", 0);
         }
@@ -4653,7 +4659,6 @@ public class GraphEditorPanel
 
   }
 
-        final IndexedSetSubject<NodeSubject> nodes = getGraph().getNodesModifiable();
 
   //#########################################################################
   //# Inner Class SelectableVisitor

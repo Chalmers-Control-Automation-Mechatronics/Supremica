@@ -293,7 +293,7 @@ class NodeSetSubject
 
   public int getModelObserverPriority()
   {
-    return ModelObserver.RENDERING_PRIORITY;
+    return ModelObserver.CLEANUP_PRIORITY_0;
   }
 
   //#########################################################################
