@@ -179,6 +179,11 @@ public class OPSearchAutomatonSimplifierTest
     runOPSearch("op20.wmod");
   }
 
+  public void testOP21() throws Exception
+  {
+    runOPSearch("op21.wmod");
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
