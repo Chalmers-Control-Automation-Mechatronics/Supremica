@@ -28,6 +28,8 @@ import java.util.Set;
 public final class AutomatonTools
 {
 
+  //#########################################################################
+  //# Public Methods
   /**
    * Calculates binary logarithm.
    * @return The largest number <I>k</I> such that
@@ -156,12 +158,12 @@ public final class AutomatonTools
   }
 
 
-  //#####################################################################
+  //#########################################################################
   //# Inner Class TransitionHashingStrategy
   private static class TransitionHashingStrategy
     implements TObjectHashingStrategy<TransitionProxy>
   {
-    //#####################################################################
+    //#######################################################################
     //# Interface gnu.trove.TObjectHashingStrategy
     public int computeHashCode(final TransitionProxy trans)
     {
@@ -177,7 +179,7 @@ public final class AutomatonTools
         trans1.getEvent() == trans2.getEvent();
     }
 
-    //#####################################################################
+    //#######################################################################
     //# Class Constants
     private static final TransitionHashingStrategy INSTANCE =
       new TransitionHashingStrategy();

@@ -436,7 +436,9 @@ public class OPSearchAutomatonSimplifier
     final int numStates = mOriginalStates.length;
     mTarjan = new Tarjan(numStates);
     mComponentOfState = new StronglyConnectedComponent[numStates];
-    mTarjan.findStronglyConnectedComponents();
+    final int comps = mTarjan.findStronglyConnectedComponents();
+    final OPSearchAutomatonResult result = getAnalysisResult();
+    result.recordComponents(comps);
   }
 
   private void setUpVerifier()
@@ -484,6 +486,8 @@ public class OPSearchAutomatonSimplifier
         break;
       }
     }
+    final OPSearchAutomatonResult result = getAnalysisResult();
+    result.recordVerifier(mVerifierStatePairs.size());
   }
 
   private void expandVerifierPairSingleton(final int code)
@@ -1646,16 +1650,18 @@ public class OPSearchAutomatonSimplifier
 
     //#########################################################################
     //# Invocation
-    private void findStronglyConnectedComponents()
+    private int findStronglyConnectedComponents()
     {
-      final int numStates = mTarjan.length;
       mCallIndex = 1;
+      mNumComponents = 0;
+      final int numStates = mTarjan.length;
       for (int state = 0; state < numStates; state++) {
         if (mTarjan[state] == 0) {
           tarjan(state);
         }
       }
       setUpEventStatus();
+      return mNumComponents;
     }
 
     private void split(final StronglyConnectedComponent comp)
@@ -1717,6 +1723,7 @@ public class OPSearchAutomatonSimplifier
           mOnStack[pop] = false;
           count++;
         } while (pop != state);
+        mNumComponents++;
         if (count > 1) {
           final StronglyConnectedComponent comp =
             new StronglyConnectedComponent(list);
@@ -1739,6 +1746,7 @@ public class OPSearchAutomatonSimplifier
     private final int[] mLowLink;
     private final TIntStack mStack;
     private final boolean[] mOnStack;
+    private int mNumComponents;
     private final Collection<StronglyConnectedComponent> mComponents;
 
     private int mCallIndex;
