@@ -451,8 +451,6 @@ public class OPVerifierExperiment
     }
     if (!keeptau) {
       return null;
-    } else if ((double) numStates * (double) newNumEvents > 1.0e8) {
-      return null;
     }
 
     final Collection<EventProxy> newEvents =

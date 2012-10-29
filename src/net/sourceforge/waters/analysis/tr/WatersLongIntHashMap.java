@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.tr
-//# CLASS:   WatersIntIntHashMap
+//# CLASS:   WatersLongIntHashMap
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -11,54 +11,55 @@ package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.HashFunctions;
 import gnu.trove.TIntFunction;
-import gnu.trove.TIntIntProcedure;
 import gnu.trove.TIntProcedure;
+import gnu.trove.TLongIntProcedure;
+import gnu.trove.TLongProcedure;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
 
 /**
- * An open addressed map implementation for <CODE>int</CODE> keys and
+ * An open addressed map implementation for <CODE>long</CODE> keys and
  * <CODE>int</CODE> values.
  *
- * This is a modified version of {@link gnu.trove.TIntIntHashMap} that supports
- * configurable equality of keys.
+ * This is a modified version of {@link gnu.trove.TLongIntHashMap} that
+ * supports configurable equality of keys.
  *
  * @author Eric D. Friedman, Robi Malik
  */
 
-public class WatersIntIntHashMap
-  extends WatersIntHash
+public class WatersLongIntHashMap
+  extends WatersLongHash
 {
 
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new <code>WatersIntIntHashMap</code> instance with the default
+   * Creates a new <code>WatersLongIntHashMap</code> instance with the default
    * capacity and load factor.
    */
-  public WatersIntIntHashMap()
+  public WatersLongIntHashMap()
   {
     super();
     mDefaultValue = 0;
   }
 
   /**
-   * Creates a new <code>WatersIntIntHashMap</code> instance with a prime
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime
    * capacity equal to or greater than <tt>initialCapacity</tt> and with the
    * default load factor.
    * @param initialCapacity
    *          used to find a prime capacity for the table.
    */
-  public WatersIntIntHashMap(final int initialCapacity)
+  public WatersLongIntHashMap(final int initialCapacity)
   {
     super(initialCapacity);
     mDefaultValue = 0;
   }
 
   /**
-   * Creates a new <code>WatersIntIntHashMap</code> instance with a prime
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime
    * capacity equal to or greater than <tt>initialCapacity</tt> and with the
    * specified load factor.
    * @param initialCapacity
@@ -66,14 +67,15 @@ public class WatersIntIntHashMap
    * @param defaultValue
    *          value to be returned when looking up a nonexistent key.
    */
-  public WatersIntIntHashMap(final int initialCapacity, final int defaultValue)
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final int defaultValue)
   {
     super(initialCapacity);
     mDefaultValue = defaultValue;
   }
 
   /**
-   * Creates a new <code>WatersIntIntHashMap</code> instance with a prime
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime
    * capacity equal to or greater than <tt>initialCapacity</tt> and with the
    * specified load factor.
    * @param initialCapacity
@@ -81,28 +83,28 @@ public class WatersIntIntHashMap
    * @param defaultValue
    *          value to be returned when looking up a nonexistent key.
    */
-  public WatersIntIntHashMap(final int initialCapacity,
-                             final int defaultValue,
-                             final float loadFactor)
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final int defaultValue,
+                              final float loadFactor)
   {
     super(initialCapacity, loadFactor);
     mDefaultValue = defaultValue;
   }
 
   /**
-   * Creates a new <code>WatersIntIntHashMap</code> instance with the default
+   * Creates a new <code>WatersLongIntHashMap</code> instance with the default
    * capacity and load factor.
    * @param strategy
    *          used to compute hash codes and to compare keys.
    */
-  public WatersIntIntHashMap(final WatersIntHashingStrategy strategy)
+  public WatersLongIntHashMap(final WatersLongHashingStrategy strategy)
   {
     super(strategy);
     mDefaultValue = 0;
   }
 
   /**
-   * Creates a new <code>WatersIntIntHashMap</code> instance whose capacity is
+   * Creates a new <code>WatersLongIntHashMap</code> instance whose capacity is
    * the next highest prime above <tt>initialCapacity + 1</tt> unless that value
    * is already prime.
    * @param initialCapacity
@@ -110,15 +112,15 @@ public class WatersIntIntHashMap
    * @param strategy
    *          used to compute hash codes and to compare keys.
    */
-  public WatersIntIntHashMap(final int initialCapacity,
-                             final WatersIntHashingStrategy strategy)
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final WatersLongHashingStrategy strategy)
   {
     super(initialCapacity, strategy);
     mDefaultValue = 0;
   }
 
   /**
-   * Creates a new <code>WatersIntIntHashMap</code> instance with a prime value
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime value
    * at or near the specified capacity and load factor.
    * @param initialCapacity
    *          used to find a prime capacity for the table.
@@ -127,15 +129,16 @@ public class WatersIntIntHashMap
    * @param strategy
    *          used to compute hash codes and to compare keys.
    */
-  public WatersIntIntHashMap(final int initialCapacity, final int defaultValue,
-                             final WatersIntHashingStrategy strategy)
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final int defaultValue,
+                              final WatersLongHashingStrategy strategy)
   {
     super(initialCapacity, strategy);
     mDefaultValue = defaultValue;
   }
 
   /**
-   * Creates a new <code>WatersIntIntHashMap</code> instance with a prime value
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime value
    * at or near the specified capacity and load factor.
    * @param initialCapacity
    *          used to find a prime capacity for the table.
@@ -146,9 +149,10 @@ public class WatersIntIntHashMap
    * @param strategy
    *          used to compute hash codes and to compare keys.
    */
-  public WatersIntIntHashMap(final int initialCapacity, final int defaultValue,
-                             final float loadFactor,
-                             final WatersIntHashingStrategy strategy)
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final int defaultValue,
+                              final float loadFactor,
+                              final WatersLongHashingStrategy strategy)
   {
     super(initialCapacity, loadFactor, strategy);
     mDefaultValue = defaultValue;
@@ -162,7 +166,7 @@ public class WatersIntIntHashMap
    */
   public Object clone()
   {
-    final WatersIntIntHashMap m = (WatersIntIntHashMap) super.clone();
+    final WatersLongIntHashMap m = (WatersLongIntHashMap) super.clone();
     m.mValues = (int[]) this.mValues.clone();
     return m;
   }
@@ -193,7 +197,7 @@ public class WatersIntIntHashMap
    * @return The previous value associated with <tt>key</tt>,
    *         or the default value if none was found.
    */
-  public int put(final int key, final int value)
+  public int put(final long key, final int value)
   {
     final int index = insertionIndex(key);
     return doPut(key, value, index);
@@ -205,7 +209,7 @@ public class WatersIntIntHashMap
    * @return The previous value associated with <tt>key</tt>,
    *         or the default value if none was found.
    */
-  public int putIfAbsent(final int key, final int value)
+  public int putIfAbsent(final long key, final int value)
   {
     final int index = insertionIndex(key);
     if (index < 0) {
@@ -215,7 +219,7 @@ public class WatersIntIntHashMap
     }
   }
 
-  private int doPut(final int key, final int value, int index)
+  private int doPut(final long key, final int value, int index)
   {
     byte previousState;
     int previous = mDefaultValue;
@@ -241,7 +245,7 @@ public class WatersIntIntHashMap
    * @param map
    *          The map from which entries will be obtained to put into this map.
    */
-  public void putAll(final WatersIntIntHashMap map)
+  public void putAll(final WatersLongIntHashMap map)
   {
     map.forEachEntry(PUT_ALL_PROC);
   }
@@ -250,22 +254,22 @@ public class WatersIntIntHashMap
    * rehashes the map to the new capacity.
    *
    * @param newCapacity
-   *          an <code>int</code> value
+   *          a <code>long</code> value
    */
   protected void rehash(final int newCapacity)
   {
     final int oldCapacity = _set.length;
-    final int oldKeys[] = _set;
+    final long oldKeys[] = _set;
     final int oldVals[] = mValues;
     final byte oldStates[] = _states;
 
-    _set = new int[newCapacity];
+    _set = new long[newCapacity];
     mValues = new int[newCapacity];
     _states = new byte[newCapacity];
 
     for (int i = oldCapacity; i-- > 0;) {
       if (oldStates[i] == FULL) {
-        final int o = oldKeys[i];
+        final long o = oldKeys[i];
         final int index = insertionIndex(o);
         _set[index] = o;
         mValues[index] = oldVals[i];
@@ -278,11 +282,11 @@ public class WatersIntIntHashMap
    * retrieves the value for <tt>key</tt>
    *
    * @param key
-   *          an <code>int</code> value
+   *          a <code>long</code> value
    * @return the value of <tt>key</tt> or the default value if no such
    *         mapping exists.
    */
-  public int get(final int key)
+  public int get(final long key)
   {
     final int index = index(key);
     return index < 0 ? mDefaultValue : mValues[index];
@@ -295,7 +299,7 @@ public class WatersIntIntHashMap
   public void clear()
   {
     super.clear();
-    Arrays.fill(_set, 0, _set.length, (int) 0);
+    Arrays.fill(_set, 0, _set.length, (long) 0);
     Arrays.fill(mValues, 0, mValues.length, (int) 0);
     Arrays.fill(_states, 0, _states.length, FREE);
   }
@@ -304,11 +308,11 @@ public class WatersIntIntHashMap
    * Deletes a key/value pair from the map.
    *
    * @param key
-   *          an <code>int</code> value
+   *          a <code>long</code> value
    * @return an <code>int</code> value, or the default value if no mapping
    *         for key exists
    */
-  public int remove(final int key)
+  public int remove(final long key)
   {
     int prev = mDefaultValue;
     final int index = index(key);
@@ -328,10 +332,10 @@ public class WatersIntIntHashMap
    */
   public boolean equals(final Object other)
   {
-    if (!(other instanceof WatersIntIntHashMap)) {
+    if (!(other instanceof WatersLongIntHashMap)) {
       return false;
     }
-    final WatersIntIntHashMap that = (WatersIntIntHashMap) other;
+    final WatersLongIntHashMap that = (WatersLongIntHashMap) other;
     if (that.size() != this.size()) {
       return false;
     }
@@ -346,7 +350,7 @@ public class WatersIntIntHashMap
   }
 
 
-  private final class HashProcedure implements TIntIntProcedure
+  private final class HashProcedure implements TLongIntProcedure
   {
     private int h = 0;
 
@@ -355,7 +359,7 @@ public class WatersIntIntHashMap
       return h;
     }
 
-    public final boolean execute(final int key, final int value)
+    public final boolean execute(final long key, final int value)
     {
       h += (_hashingStrategy.computeHashCode(key) ^ HashFunctions.hash(value));
       return true;
@@ -363,16 +367,16 @@ public class WatersIntIntHashMap
   }
 
 
-  private static final class EqProcedure implements TIntIntProcedure
+  private static final class EqProcedure implements TLongIntProcedure
   {
-    private final WatersIntIntHashMap _otherMap;
+    private final WatersLongIntHashMap _otherMap;
 
-    EqProcedure(final WatersIntIntHashMap otherMap)
+    EqProcedure(final WatersLongIntHashMap otherMap)
     {
       _otherMap = otherMap;
     }
 
-    public final boolean execute(final int key, final int value)
+    public final boolean execute(final long key, final int value)
     {
       final int index = _otherMap.index(key);
       if (index >= 0 && eq(value, _otherMap.get(key))) {
@@ -427,10 +431,10 @@ public class WatersIntIntHashMap
    *
    * @return a <code>Set</code> value
    */
-  public int[] keys()
+  public long[] keys()
   {
-    final int[] keys = new int[size()];
-    final int[] k = _set;
+    final long[] keys = new long[size()];
+    final long[] k = _set;
     final byte[] states = _states;
     for (int i = k.length, j = 0; i-- > 0;) {
       if (states[i] == FULL) {
@@ -449,13 +453,13 @@ public class WatersIntIntHashMap
    *          allocated for this purpose.
    * @return a <code>Set</code> value
    */
-  public int[] keys(int[] a)
+  public long[] keys(long[] a)
   {
     final int size = size();
     if (a.length < size) {
-      a = (int[]) Array.newInstance(a.getClass().getComponentType(), size);
+      a = (long[]) Array.newInstance(a.getClass().getComponentType(), size);
     }
-    final int[] k = (int[]) _set;
+    final long[] k = (long[]) _set;
     final byte[] states = _states;
     for (int i = k.length, j = 0; i-- > 0;) {
       if (states[i] == FULL) {
@@ -491,7 +495,7 @@ public class WatersIntIntHashMap
    *          an <code>int</code> value
    * @return a <code>boolean</code> value
    */
-  public boolean containsKey(final int key)
+  public boolean containsKey(final long key)
   {
     return contains(key);
   }
@@ -504,7 +508,7 @@ public class WatersIntIntHashMap
    * @return false if the loop over the keys terminated because the procedure
    *         returned false for some key.
    */
-  public boolean forEachKey(final TIntProcedure procedure)
+  public boolean forEachKey(final TLongProcedure procedure)
   {
     return forEach(procedure);
   }
@@ -537,10 +541,10 @@ public class WatersIntIntHashMap
    * @return false if the loop over the entries terminated because the procedure
    *         returned false for some entry.
    */
-  public boolean forEachEntry(final TIntIntProcedure procedure)
+  public boolean forEachEntry(final TLongIntProcedure procedure)
   {
     final byte[] states = _states;
-    final int[] keys = _set;
+    final long[] keys = _set;
     final int[] values = mValues;
     for (int i = keys.length; i-- > 0;) {
       if (states[i] == FULL && !procedure.execute(keys[i], values[i])) {
@@ -558,11 +562,11 @@ public class WatersIntIntHashMap
    *          determines which entries to keep
    * @return true if the map was modified.
    */
-  public boolean retainEntries(final TIntIntProcedure procedure)
+  public boolean retainEntries(final TLongIntProcedure procedure)
   {
     boolean modified = false;
     final byte[] states = _states;
-    final int[] keys = _set;
+    final long[] keys = _set;
     final int[] values = mValues;
     // Temporarily disable compaction. This is a fix for bug #1738760
     tempDisableAutoCompaction();
@@ -603,7 +607,7 @@ public class WatersIntIntHashMap
    *          the key of the value to increment
    * @return true if a mapping was found and modified.
    */
-  public boolean increment(final int key)
+  public boolean increment(final long key)
   {
     return adjustValue(key, (int) 1);
   }
@@ -617,7 +621,7 @@ public class WatersIntIntHashMap
    *          the amount to adjust the value by.
    * @return true if a mapping was found and modified.
    */
-  public boolean adjustValue(final int key, final int amount)
+  public boolean adjustValue(final long key, final int amount)
   {
     final int index = index(key);
     if (index < 0) {
@@ -640,7 +644,7 @@ public class WatersIntIntHashMap
    *          the value put into the map if the key is not initial present
    * @return the value present in the map after the adjustment or put operation
    */
-  public int adjustOrPutValue(final int key, final int adjust_amount,
+  public int adjustOrPutValue(final long key, final int adjust_amount,
                               final int put_amount)
   {
     int index = insertionIndex(key);
@@ -666,10 +670,10 @@ public class WatersIntIntHashMap
   public String toString()
   {
     final StringBuilder buf = new StringBuilder("{");
-    forEachEntry(new TIntIntProcedure() {
+    forEachEntry(new TLongIntProcedure() {
       private boolean first = true;
 
-      public boolean execute(final int key, final int value)
+      public boolean execute(final long key, final int value)
       {
         if (first)
           first = false;
@@ -704,8 +708,8 @@ public class WatersIntIntHashMap
   //# Class Constants
   private static final long serialVersionUID = 1L;
 
-  private final TIntIntProcedure PUT_ALL_PROC = new TIntIntProcedure() {
-    public boolean execute(final int key, final int value)
+  private final TLongIntProcedure PUT_ALL_PROC = new TLongIntProcedure() {
+    public boolean execute(final long key, final int value)
     {
       put(key, value);
       return true;
