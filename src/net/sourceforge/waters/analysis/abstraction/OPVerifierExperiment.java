@@ -153,7 +153,7 @@ public class OPVerifierExperiment
     oeqResult.setRunTime(stop - start);
 
     // 4. Write stats
-    writeLog(aut, opResult, oeqResult);
+    writeLog(aut, tau, opResult, oeqResult);
     return opResult.isSatisfied();
   }
 
@@ -491,12 +491,13 @@ public class OPVerifierExperiment
   }
 
   private void writeLog(final AutomatonProxy aut,
+                        final EventProxy tau,
                         final OPSearchAutomatonResult opResult,
                         final TRSimplifierStatistics oeqResult)
   {
     if (mLogWriter != null) {
       if (!mHeaderWritten) {
-        mLogWriter.print("Name,NumStates,NumTrans,");
+        mLogWriter.print("Name,NumEvents,NumStates,NumTrans,NumTau,");
         opResult.printCSVHorizontalHeadings(mLogWriter);
         oeqResult.printCSVHorizontalHeadings(mLogWriter);
         mLogWriter.println();
@@ -506,11 +507,22 @@ public class OPVerifierExperiment
       mLogWriter.print('\"');
       mLogWriter.print(name);
       mLogWriter.print("\",");
+      final int numEvents = aut.getEvents().size();
+      mLogWriter.print(numEvents);
+      mLogWriter.print(',');
       final int numStates = aut.getStates().size();
       mLogWriter.print(numStates);
       mLogWriter.print(',');
       final int numTrans = aut.getTransitions().size();
       mLogWriter.print(numTrans);
+      mLogWriter.print(',');
+      int numTau = 0;
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        if (trans.getEvent() == tau) {
+          numTau++;
+        }
+      }
+      mLogWriter.print(numTau);
       mLogWriter.print(',');
       opResult.printCSVHorizontal(mLogWriter);
       oeqResult.printCSVHorizontal(mLogWriter);
