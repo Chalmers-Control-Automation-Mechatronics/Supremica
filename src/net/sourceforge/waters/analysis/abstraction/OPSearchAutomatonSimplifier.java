@@ -1497,7 +1497,7 @@ public class OPSearchAutomatonSimplifier
   //# Auxiliary Methods
   private int getObservableSuccessor(final int state, final int event)
   {
-    final long key = state | (((long) event) << 32);
+    final long key = state | ((long) event << 32);
     return mObservableSuccessor.get(key);
   }
 
@@ -1505,7 +1505,7 @@ public class OPSearchAutomatonSimplifier
                                      final int event,
                                      final int succ)
   {
-    final long key = state | (((long) event) << 32);
+    final long key = state | ((long) event << 32);
     return mObservableSuccessor.put(key, succ);
   }
 

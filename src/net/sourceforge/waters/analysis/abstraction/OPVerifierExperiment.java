@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.TransitionRemoval;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -44,6 +45,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -68,6 +70,7 @@ public class OPVerifierExperiment
     mOEQSimplifier.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
     mOEQSimplifier.setAppliesPartitionAutomatically(false);
+    mOEQSimplifier.setTransitionRemovalMode(TransitionRemoval.NONE);
     mLogWriter = null;
     mHeaderWritten = false;
   }
@@ -99,14 +102,19 @@ public class OPVerifierExperiment
   public void runExperiment(final AutomatonProxy aut,
                             final EventProxy tau)
   {
+    final boolean gotcha =
+      aut.getName().equals("{eingabe_er,eingabe_fs,eingabe_ser,eingabe_vr,keine_wsp,{eingabe_zs,kein_zs}}");
+
     // 1. Check OP for determinised automaton
     final AutomatonProxy detAut = makeDeterministic(aut, tau);
+    if (gotcha) MarshallingTools.saveModule(detAut, "det.wmod");
     final boolean op = runOPVerifiers(detAut, tau);
 
     // 2. Find OP abstraction
     if (!op) {
       final AutomatonProxy opAut = findOPAbstraction(aut, tau);
       if (opAut != null) {
+        if (gotcha) MarshallingTools.saveModule(opAut, "op.wmod");
         runOPVerifiers(opAut, tau);
       }
     }
@@ -366,27 +374,33 @@ public class OPVerifierExperiment
     final int numEvents = eventEnc.getNumberOfProperEvents();
     final TIntHashSet splitEvents = new TIntHashSet(numEvents);
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    final TIntHashSet targetClasses = new TIntHashSet();
+    final TIntHashSet classSuccessors = new TIntHashSet();
+    final TIntHashSet stateSuccessors = new TIntHashSet();
     final TransitionIterator iter = rel.createSuccessorsModifyingIterator();
     for (int e = 0; e < numEvents; e++) {
-      for (int s = 0; s < numStates; s++) {
-        final int sourceClass = stateToClass[s];
-        iter.reset(s, e);
-        while (iter.advance()) {
-          final int t = iter.getCurrentTargetState();
-          final int targetClass = stateToClass[t];
-          if (e == EventEncoding.TAU) {
-            if (sourceClass != targetClass) {
-              targetClasses.add(targetClass);
+      final int limit = e == EventEncoding.TAU ? 1 : 2;
+      int sourceClass = 0;
+      for (final int[] clazz : partition) {
+        for (final int s : clazz) {
+          iter.reset(s, e);
+          while (iter.advance()) {
+            final int t = iter.getCurrentTargetState();
+            final int targetClass = stateToClass[t];
+            if (e != EventEncoding.TAU || sourceClass != targetClass) {
+              if (stateSuccessors.add(targetClass)) {
+                classSuccessors.add(targetClass);
+              } else {
+                iter.remove();
+              }
             }
-          } else if (!targetClasses.add(targetClass)) {
-            iter.remove();
           }
+          stateSuccessors.clear();
         }
-        if (targetClasses.size() > 1) {
+        if (classSuccessors.size() >= limit) {
           splitEvents.add(e);
         }
-        targetClasses.clear();
+        classSuccessors.clear();
+        sourceClass++;
       }
     }
 
@@ -416,7 +430,7 @@ public class OPVerifierExperiment
       final StateProxy target = stateEnc.getState(t);
       if (splitEvents.contains(e) &&
           (e != EventEncoding.TAU || stateToClass[s] != stateToClass[t])) {
-        final long code = e | (stateToClass[t] << 32);
+        final long code = e | ((long) stateToClass[t] << 32);
         EventProxy newEvent = eventMap.get(code);
         if (newEvent == null) {
           List<EventProxy> replacement = replacements.get(e);
