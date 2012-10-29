@@ -39,6 +39,8 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.analysis.tr.WatersLongHashingStrategy;
+import net.sourceforge.waters.analysis.tr.WatersLongIntHashMap;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -372,10 +374,12 @@ public class OPSearchAutomatonSimplifier
       stateMap.put(state, code);
     }
 
-    mObservableSuccessor = new int[numStates][numEvents];
-    for (next = 0; next < numStates; next++) {
-      Arrays.fill(mObservableSuccessor[next], NO_TRANSITION);
-    }
+    final Collection<TransitionProxy> transitions =
+      mInputAutomaton.getTransitions();
+    final int numTransitions = transitions.size();
+    mObservableSuccessor =
+      new WatersLongIntHashMap(2 * numTransitions, NO_TRANSITION,
+                               ObservableSuccessorHashingStrategy.INSTANCE);
     mUnobservableTauSuccessors = new int[numStates];
     Arrays.fill(mUnobservableTauSuccessors, IntListBuffer.NULL);
     mObservableTauSuccessors = new int[numStates];
@@ -424,10 +428,11 @@ public class OPSearchAutomatonSimplifier
           mListBuffer.prepend(list, targetCode);
         }
       }
-    } else if (mObservableSuccessor[sourceCode][eventCode] == NO_TRANSITION) {
-      mObservableSuccessor[sourceCode][eventCode] = targetCode;
-    } else if (mObservableSuccessor[sourceCode][eventCode] != targetCode){
-      throw new NondeterministicDESException(aut, source, event);
+    } else {
+      final int old = putObservableSuccessor(sourceCode, eventCode, targetCode);
+      if (old != NO_TRANSITION && old != targetCode) {
+        throw new NondeterministicDESException(aut, source, event);
+      }
     }
   }
 
@@ -436,7 +441,9 @@ public class OPSearchAutomatonSimplifier
     final int numStates = mOriginalStates.length;
     mTarjan = new Tarjan(numStates);
     mComponentOfState = new StronglyConnectedComponent[numStates];
-    mTarjan.findStronglyConnectedComponents();
+    final int comps = mTarjan.findStronglyConnectedComponents();
+    final OPSearchAutomatonResult result = getAnalysisResult();
+    result.recordComponents(comps);
   }
 
   private void setUpVerifier()
@@ -484,6 +491,8 @@ public class OPSearchAutomatonSimplifier
         break;
       }
     }
+    final OPSearchAutomatonResult result = getAnalysisResult();
+    result.recordVerifier(mVerifierStatePairs.size());
   }
 
   private void expandVerifierPairSingleton(final int code)
@@ -543,13 +552,13 @@ public class OPSearchAutomatonSimplifier
         int esucc1 = 0, esucc2 = 0;
         final boolean en1, en2;
         if (comp1 == null) {
-          esucc1 = mObservableSuccessor[code1][e];
+          esucc1 = getObservableSuccessor(code1, e);
           en1 = esucc1 != NO_TRANSITION;
         } else {
           en1 = comp1.isEnabledEvent(e);
         }
         if (comp2 == null) {
-          esucc2 = mObservableSuccessor[code2][e];
+          esucc2 = getObservableSuccessor(code2, e);
           en2 = esucc2 != NO_TRANSITION;
         } else {
           en2 = comp2.isEnabledEvent(e);
@@ -570,7 +579,7 @@ public class OPSearchAutomatonSimplifier
               comp1.iterate(mReadOnlyIterator);
               while (mReadOnlyIterator.advance()) {
                 final int member1 = mReadOnlyIterator.getCurrentData();
-                final int succ1 = mObservableSuccessor[member1][e];
+                final int succ1 = getObservableSuccessor(member1, e);
                 if (succ1 != NO_TRANSITION) {
                   enqueueSuccessors(pcode, e, succ1, comp2);
                 }
@@ -600,12 +609,12 @@ public class OPSearchAutomatonSimplifier
     comp.iterate(mReadOnlyIterator);
     while (mReadOnlyIterator.advance()) {
       final int source1 = mReadOnlyIterator.getCurrentData();
-      final int succ1 = mObservableSuccessor[source1][e];
+      final int succ1 = getObservableSuccessor(source1, e);
       if (succ1 != NO_TRANSITION) {
         mAltReadOnlyIterator.reset(mReadOnlyIterator);
         while (mAltReadOnlyIterator.advance()) {
           final int source2 = mAltReadOnlyIterator.getCurrentData();
-          final int succ2 = mObservableSuccessor[source2][e];
+          final int succ2 = getObservableSuccessor(source2, e);
           if (succ2 != NO_TRANSITION) {
             enqueueSuccessor(pcode, succ1, succ2);
           }
@@ -623,7 +632,7 @@ public class OPSearchAutomatonSimplifier
     comp2.iterate(mAltReadOnlyIterator);
     while (mAltReadOnlyIterator.advance()) {
       final int member2 = mAltReadOnlyIterator.getCurrentData();
-      final int succ2 = mObservableSuccessor[member2][e];
+      final int succ2 = getObservableSuccessor(member2, e);
       if (succ2 != NO_TRANSITION) {
         enqueueSuccessor(pcode, esucc1, succ2);
       }
@@ -971,8 +980,8 @@ public class OPSearchAutomatonSimplifier
     final long predpair = getPair(current1, current2);
     final long predinfo = mBFSLongVisited.get(predpair);
     for (int e = 0; e < mUnobservableTau; e++) {
-      final int succ1 = mObservableSuccessor[current1][e];
-      final int succ2 = mObservableSuccessor[current2][e];
+      final int succ1 = getObservableSuccessor(current1, e);
+      final int succ2 = getObservableSuccessor(current2, e);
       if (succ1 != NO_TRANSITION && succ2 != NO_TRANSITION && succ1 != succ2) {
         final int root1 = getRootIndex(succ1);
         final int root2 = getRootIndex(succ2);
@@ -1100,7 +1109,7 @@ public class OPSearchAutomatonSimplifier
         for (int p1 = 0; p1 < numProps; p1++) {
           final EventProxy prop = mEventEncoding.getProposition(p1);
           final int p0 = mEventMap.get(prop);
-          if (mObservableSuccessor[s0][p0] != NO_TRANSITION) {
+          if (getObservableSuccessor(s0, p0) != NO_TRANSITION) {
             rel.setMarked(s1, p1, true);
           }
         }
@@ -1159,7 +1168,7 @@ public class OPSearchAutomatonSimplifier
         final EventProxy event = mEventEncoding.getProperEvent(e1);
         final int e0 = mEventMap.get(event);
         if (comp == null) {
-          final int succ = mObservableSuccessor[s0][e0];
+          final int succ = getObservableSuccessor(s0, e0);
           if (succ != NO_TRANSITION) {
             final int t0 = getRootIndex(succ);
             final int t1 = stateMap.get(t0);
@@ -1169,7 +1178,7 @@ public class OPSearchAutomatonSimplifier
           comp.iterate(mReadOnlyIterator);
           while (mReadOnlyIterator.advance()) {
             final int src = mReadOnlyIterator.getCurrentData();
-            final int succ = mObservableSuccessor[src][e0];
+            final int succ = getObservableSuccessor(src, e0);
             if (succ != NO_TRANSITION) {
               final int t0 = getRootIndex(succ);
               final int t1 = stateMap.get(t0);
@@ -1486,6 +1495,20 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
+  private int getObservableSuccessor(final int state, final int event)
+  {
+    final long key = state | (((long) event) << 32);
+    return mObservableSuccessor.get(key);
+  }
+
+  private int putObservableSuccessor(final int state,
+                                     final int event,
+                                     final int succ)
+  {
+    final long key = state | (((long) event) << 32);
+    return mObservableSuccessor.put(key, succ);
+  }
+
   private long getPair(final int root1, final int root2)
   {
     if (root1 < root2) {
@@ -1539,7 +1562,7 @@ public class OPSearchAutomatonSimplifier
     writer.println("TRANSITIONS");
     for (int s = 0; s < mOriginalStates.length; s++) {
       for (int e = 0; e < mEvents.length; e++) {
-        final int succ = mObservableSuccessor[s][e];
+        final int succ = getObservableSuccessor(s, e);
         switch (succ) {
         case DUMP_STATE:
           writer.println("  " + s + " -" + e + "-> DUMP");
@@ -1646,16 +1669,18 @@ public class OPSearchAutomatonSimplifier
 
     //#########################################################################
     //# Invocation
-    private void findStronglyConnectedComponents()
+    private int findStronglyConnectedComponents()
     {
-      final int numStates = mTarjan.length;
       mCallIndex = 1;
+      mNumComponents = 0;
+      final int numStates = mTarjan.length;
       for (int state = 0; state < numStates; state++) {
         if (mTarjan[state] == 0) {
           tarjan(state);
         }
       }
       setUpEventStatus();
+      return mNumComponents;
     }
 
     private void split(final StronglyConnectedComponent comp)
@@ -1717,6 +1742,7 @@ public class OPSearchAutomatonSimplifier
           mOnStack[pop] = false;
           count++;
         } while (pop != state);
+        mNumComponents++;
         if (count > 1) {
           final StronglyConnectedComponent comp =
             new StronglyConnectedComponent(list);
@@ -1739,6 +1765,7 @@ public class OPSearchAutomatonSimplifier
     private final int[] mLowLink;
     private final TIntStack mStack;
     private final boolean[] mOnStack;
+    private int mNumComponents;
     private final Collection<StronglyConnectedComponent> mComponents;
 
     private int mCallIndex;
@@ -1821,7 +1848,7 @@ public class OPSearchAutomatonSimplifier
         iterate(mReadOnlyIterator);
         while (mReadOnlyIterator.advance()) {
           final int state = mReadOnlyIterator.getCurrentData();
-          if (mObservableSuccessor[state][e] != NO_TRANSITION) {
+          if (getObservableSuccessor(state, e) != NO_TRANSITION) {
             mEnabledEvents.set(e);
             break;
           }
@@ -1860,7 +1887,7 @@ public class OPSearchAutomatonSimplifier
       }
       mComponentOfState[state] = this;
       for (int e = 0; e < mUnobservableTau; e++) {
-        if (mObservableSuccessor[state][e] != NO_TRANSITION) {
+        if (getObservableSuccessor(state, e) != NO_TRANSITION) {
           mEnabledEvents.set(e);
         }
       }
@@ -1904,6 +1931,37 @@ public class OPSearchAutomatonSimplifier
 
 
   //#########################################################################
+  //# Inner Class ObservableSuccessorHashingStrategy
+  private static class ObservableSuccessorHashingStrategy
+    implements WatersLongHashingStrategy
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.analysis.tr.
+    //# WatersLongHashingStrategy
+    public int computeHashCode(final long val)
+    {
+      final int h0 = -2128831035;
+      final int h1 = 16777619;
+      final int lo = (int) (val & 0xffffffffL);
+      final int hi = (int) (val >> 32);
+      return ((h0 * h1) ^ hi) * h1 ^ lo;
+      // return 31 * (int) (val + (val >> 16));
+    }
+
+    public boolean equals(final long val1, final long val2)
+    {
+      return val1 == val2;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final ObservableSuccessorHashingStrategy INSTANCE =
+      new ObservableSuccessorHashingStrategy();
+    private static final long serialVersionUID = 1L;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final KindTranslator mKindTranslator;
   private Mode mOperationMode;
@@ -1921,7 +1979,7 @@ public class OPSearchAutomatonSimplifier
   private int mUnobservableTau;
   private int mObservableTau;
   private StateProxy[] mOriginalStates;
-  private int[][] mObservableSuccessor;
+  private WatersLongIntHashMap mObservableSuccessor;
   private int[] mUnobservableTauSuccessors;
   private int[] mObservableTauSuccessors;
   private Tarjan mTarjan;

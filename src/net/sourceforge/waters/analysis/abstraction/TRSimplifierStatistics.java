@@ -291,6 +291,11 @@ public class TRSimplifierStatistics
     mRunTime += runTime;
   }
 
+  public void setRunTime(final long runTime)
+  {
+    mRunTime = runTime;
+  }
+
   public void merge(final TRSimplifierStatistics stats)
   {
     if (mSimplifierClass == stats.mSimplifierClass) {

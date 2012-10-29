@@ -183,6 +183,11 @@ public class OPVerifierTest
     runOPVerifier("op20.wmod", true);
   }
 
+  public void testOP21() throws Exception
+  {
+    runOPVerifier("op21.wmod", true);
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods

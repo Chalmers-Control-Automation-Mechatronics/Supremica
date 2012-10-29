@@ -1877,7 +1877,7 @@ public class ObservationEquivalenceTRSimplifier
      * Enables the first pass to remove of redundant transitions for all events
      * except the silent event with code {@link EventEncoding#TAU}. This option
      * is safe for all automata, and is used as the default. The second pass is
-     * performed in addition (even in case of trivial partition, to remove
+     * performed in addition (even in case of a trivial partition, to remove
      * tau-transitions).
      */
     NONTAU {

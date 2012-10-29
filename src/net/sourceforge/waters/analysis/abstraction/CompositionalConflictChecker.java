@@ -613,6 +613,26 @@ public class CompositionalConflictChecker
     return new ObserverProjectionAbstractionProcedure(chain, op);
   }
 
+  private AbstractionProcedure createOPVerifierChain
+    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
+  {
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(loopRemover);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode
+    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+    (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+    final int limit = getInternalTransitionLimit();
+    bisimulator.setTransitionLimit(limit);
+    chain.add(bisimulator);
+    return new OPVerifierAbstractionProcedure(chain);
+  }
+
   private AbstractionProcedure createStandardNonblockingAbstractionChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
      final boolean includeNonAlphaDeterminisation,
@@ -1094,6 +1114,21 @@ public class CompositionalConflictChecker
       boolean supportsNondeterminism()
       {
         return false;
+      }
+    },
+    /**
+     * <P>An experimental abstraction procedure that works like weak
+     * observation equivalence, but in addition runs the OP-verifier
+     * algorithm on each automaton to gather performance statistics.</P>
+     */
+    OPVERIFIER {
+      @Override
+      AbstractionProcedure createAbstractionRule
+        (final CompositionalConflictChecker checker)
+      {
+        return checker.createOPVerifierChain
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           WEAK_OBSERVATION_EQUIVALENCE);
       }
     },
     /**
@@ -1616,6 +1651,44 @@ public class CompositionalConflictChecker
       return null;
     }
 
+  }
+
+
+  //#########################################################################
+  //# Inner Class OPVerifierAbstractionProcedure
+  private class OPVerifierAbstractionProcedure
+    extends ConflictCheckerAbstractionProcedure
+  {
+
+    //#######################################################################
+    //# Constructor
+    OPVerifierAbstractionProcedure
+      (final TransitionRelationSimplifier simplifier)
+    {
+      super(simplifier);
+      mExperiment = new OPVerifierExperiment();
+      mExperiment.setLogStream("opverifier.csv");
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractionProcedure
+    @Override
+    protected boolean run(final AutomatonProxy aut,
+                          final Collection<EventProxy> local,
+                          final List<AbstractionStep> steps)
+      throws AnalysisException
+    {
+      if (!local.isEmpty()) {
+        assert local.size() <= 1 : "At most one tau event supported!";
+        final EventProxy tau = local.iterator().next();
+        mExperiment.runExperiment(aut, tau);
+      }
+      return super.run(aut, local, steps);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final OPVerifierExperiment mExperiment;
   }
 
 
