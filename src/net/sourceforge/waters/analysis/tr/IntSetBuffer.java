@@ -177,11 +177,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
           final int bitsleft = 32 - totalShifted;
 
            totalShifted = 0 - bitsleft;
-           long newblock = block[offset];
-           // negative? get rid of the upper 32 bits of 1's
-           newblock = newblock << 32;
-           newblock = newblock >>> 32;
-           newblock = newblock << bitsleft;
+           final long newblock = block[offset] & 0xffffffffL;
            data |= (newblock);
         }
         // this cast is OK as mDataMask < 32
