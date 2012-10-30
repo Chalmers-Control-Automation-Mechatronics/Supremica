@@ -476,7 +476,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     super.tearDown();
     mPropositions = null;
-    mAbstractionProcedure = null;
     mPreselectingHeuristic = null;
     mSelectingHeuristic = null;
     mCurrentSynchronousProductBuilder = null;

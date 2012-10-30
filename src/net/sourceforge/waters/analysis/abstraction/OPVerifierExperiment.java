@@ -38,6 +38,7 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -45,7 +46,6 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -102,19 +102,14 @@ public class OPVerifierExperiment
   public void runExperiment(final AutomatonProxy aut,
                             final EventProxy tau)
   {
-    final boolean gotcha =
-      aut.getName().equals("{eingabe_er,eingabe_fs,eingabe_ser,eingabe_vr,keine_wsp,{eingabe_zs,kein_zs}}");
-
     // 1. Check OP for determinised automaton
     final AutomatonProxy detAut = makeDeterministic(aut, tau);
-    if (gotcha) MarshallingTools.saveModule(detAut, "det.wmod");
     final boolean op = runOPVerifiers(detAut, tau);
 
     // 2. Find OP abstraction
     if (!op) {
       final AutomatonProxy opAut = findOPAbstraction(aut, tau);
       if (opAut != null) {
-        if (gotcha) MarshallingTools.saveModule(opAut, "op.wmod");
         runOPVerifiers(opAut, tau);
       }
     }
@@ -142,22 +137,27 @@ public class OPVerifierExperiment
     final OPSearchAutomatonResult opResult = mOPVerifier.getAnalysisResult();
 
     // 3. Run Observation Equivalence
-    mOEQSimplifier.createStatistics();
+    final TRSimplifierStatistics oeqResult = mOEQSimplifier.createStatistics();
     final long start = System.currentTimeMillis();
     final EventEncoding eventEnc =
       new EventEncoding(aut, mKindTranslator, tau);
     final StateEncoding stateEnc = new StateEncoding(aut);
     final int config = mOEQSimplifier.getPreferredInputConfiguration();
+    ListBufferTransitionRelation rel = null;
     try {
-      final ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
+      rel = new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
+    } catch (final OverflowException exception) {
+      oeqResult.recordOverflow(aut);
+    }
+    if (rel != null) {
       mOEQSimplifier.setTransitionRelation(rel);
-      mOEQSimplifier.run();
-    } catch (final AnalysisException exception) {
-      // Never mind ...
+      try {
+        mOEQSimplifier.run();
+      } catch (final AnalysisException exception) {
+        // Never mind ...
+      }
     }
     final long stop = System.currentTimeMillis();
-    final TRSimplifierStatistics oeqResult = mOEQSimplifier.getStatistics();
     oeqResult.setRunTime(stop - start);
 
     // 4. Write stats

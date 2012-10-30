@@ -205,7 +205,10 @@ public class CompositionalConflictChecker
    */
   public void setAbstractionMethod(final AbstractionMethod method)
   {
-    mAbstractionMethod = method;
+    if (mAbstractionMethod != method) {
+      mAbstractionMethod = method;
+      setAbstractionProcedure(null);
+    }
   }
 
   public void setCompositionalSafetyVerifier(final SafetyVerifier checker)
@@ -463,9 +466,11 @@ public class CompositionalConflictChecker
       props = Arrays.asList(markings);
     }
     setPropositions(props);
-    final AbstractionProcedure proc =
-      mAbstractionMethod.createAbstractionRule(this);
-    setAbstractionProcedure(proc);
+    if (getAbstractionProcedure() == null) {
+      final AbstractionProcedure proc =
+        mAbstractionMethod.createAbstractionRule(this);
+      setAbstractionProcedure(proc);
+    }
     super.setUp();
     setupSafetyVerifiers();
   }

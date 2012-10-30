@@ -170,7 +170,7 @@ abstract public class WatersLongHash
    * @param index an <code>int</code> value
    */
   protected void removeAt(final int index) {
-    _set[index] = (int)0;
+    _set[index] = 0;
     super.removeAt(index);
   }
 
@@ -180,7 +180,8 @@ abstract public class WatersLongHash
    * @param val a <code>long</code> value
    * @return the index of <tt>val</tt> or -1 if it isn't in the set.
    */
-  protected int index(final long val) {
+  protected int index(final long val)
+  {
     int hash, probe, index, length;
 
     final byte[] states = _states;
