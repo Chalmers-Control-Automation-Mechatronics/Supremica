@@ -269,8 +269,9 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         for (j = 0; j < i; j++) {
           //ordering has no effect on dependency so only check events one way
           boolean commuting = true;
-          //get the list of automata containing event at index i
-          final Collection<AutomatonProxy> innerAutomata = automataContainingEvents[i];
+          //get the list of automata containing event at index j
+          final Collection<AutomatonProxy> innerAutomata =
+            automataContainingEvents[j];
           //compute the list of all automata that contain both of the events currently being considered
           for (final AutomatonProxy ap : innerAutomata) {
             if (outerAutomata.contains(ap)) {
@@ -320,14 +321,14 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
                 break;
               }
             }
-            //if after checking all the states in which both events occur the states are found to commute every time they are both enabled, then those events will be
-            //independent in the synchronous product
-            if (commuting) {
-              if (mEventDependencyMap[i][j] !=
-                  PartialOrderEventDependencyKind.EXCLUSIVE) {
-                mEventDependencyMap[i][j] =
-                  PartialOrderEventDependencyKind.COMMUTING;
-              }
+          }
+          //if after checking all the states in which both events occur the states are found to commute every time they are both enabled, then those events will be
+          //independent in the synchronous product
+          if (commuting) {
+            if (mEventDependencyMap[i][j] !=
+              PartialOrderEventDependencyKind.EXCLUSIVE) {
+              mEventDependencyMap[i][j] =
+                PartialOrderEventDependencyKind.COMMUTING;
             }
           }
         }
