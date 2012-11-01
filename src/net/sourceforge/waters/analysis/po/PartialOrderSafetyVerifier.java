@@ -13,7 +13,6 @@ import gnu.trove.THashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -352,22 +351,36 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
 
       // Compute stuttering of events
-
+      // Set up initial conditions, all events labelled as stuttering
       setEnablings();
-      Arrays.fill(mStutterEvents = new int[mNumEvents], STUTTERING);
 
+      //Non-stuttering if an event can take the system from a controllable
+      //state to an uncontrollable state. Controllability of states depends
+      //on the kinds of events (uncontrollable/controllable) that are enabled
+      //in them and if they belong to a plant or spec automaton
+
+      //Iterate over all uncontrollable events
       for (i = 0; i < mNumEvents; i++){
         if (mEventCodingList.get(i).getKind() == EventKind.UNCONTROLLABLE){
           events:
+          //Iterate over all events to consider every event pairing
           for (j = 0; j < mNumEvents; j++){
+            //If a transition in a plant involving event x never leads to a
+            //state in which an uncontrollable event y is enabled, then event
+            //x can never lead to an uncontrollable state, and hence is a
+            //stuttering event
             for (k = 0; k < mNumPlants; k++){
-              if (!mPartialOrderEvents[j].eventEnablesUncontrollable(i,k,true)){
+              if (!mPartialOrderEvents[j].eventEnablesUncontrollable(i,k)){
                 continue events;
               }
             }
+            //If a transition involving event x can lead to a state y in which
+            //and uncontrollable state is enabled, then all transitions in all
+            //specs involving x must lead to a state where that uncontrollable
+            //event is enabled, otherwise x is non stuttering
             for (int l = mNumPlants; l < mNumAutomata; l++){
-              if (mPartialOrderEvents[j].eventEnablesUncontrollable(i,l,false)){
-                mStutterEvents[j] = NONSTUTTERING;
+              if (mPartialOrderEvents[j].eventDisablesUncontrollable(i,l)){
+                mPartialOrderEvents[j].setStutter(PartialOrderEventStutteringKind.NONSTUTTERING);
                 break;
               }
             }
@@ -428,22 +441,39 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     return -1;
   }
 
+  /**
+   * Initialises the array of partial order events and synchronises it with
+   * the existing array of events. Calculates for every event which uncontrollable
+   * events they either enable for each plant, or disable for each spec
+   */
   private void setEnablings(){
+    //Initialising array of partial order events
     mPartialOrderEvents = new PartialOrderEvent[mNumEvents];
     for (int i = 0; i < mNumEvents; i++){
-      mPartialOrderEvents[i] = new PartialOrderEvent(i,mNumAutomata,mNumPlants);
-      // TODO Need new BitSet for each entry.
-      Arrays.fill(mPartialOrderEvents[i].getEnablings(), new BitSet(mNumEvents));
-      Arrays.fill(mPartialOrderEvents[i].getDisablings(), new BitSet(mNumEvents));
+      mPartialOrderEvents[i] = new PartialOrderEvent(i,mNumAutomata,mNumPlants,mNumEvents);
     }
+    //Begin to compute enablings/disablings for events
+    //Each event has a different set of enablings for every automata, so loop
+    //over each automata
     for (int j = 0; j < mNumAutomata; j++){
+      //pick out the transition map for the current automata
       final int[][] transitionMap = j < mNumPlants ? mPlantTransitionMap.get(j) :
         mSpecTransitionMap.get(j - mNumPlants);
       final int size = mAutomata[j].getStates().size();
+      //Each event can be enabled in any number of states initially so loop
+      //over each state
       for (int i = 0; i < size; i++){
+        //The index of the following loop will be the index of the event that
+        //the enabling is being computed for
         for (int k = 0; k < mNumEvents; k++){
+          //find the target state for the transition involving the currently
+          //visited state and the event being considered for enablings
           final int target = transitionMap[i][k];
           if (target != -1){
+            //if such a target exists then the event is enabled in that state
+            //so now check all other uncontrollable events to see if they are
+            //enabled or disabled in that target state and record the information
+            //in the current partial order event
             for (int l = 0; l < mNumEvents; l++){
               if (mEventCodingList.get(l).getKind() == EventKind.UNCONTROLLABLE){
                 mPartialOrderEvents[k].addEnabled
@@ -787,14 +817,9 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   // Ample conditions
   private PartialOrderEventDependencyKind[][] mEventDependencyMap;
   private PartialOrderEventDependencyTuple[][] mReducedEventDependencyMap;
-  private int[] mStutterEvents;
 
   //Event information
   private PartialOrderEvent[] mPartialOrderEvents;
-
-  //Stuttering constants
-  private static final byte NONSTUTTERING = 0;
-  private static final byte STUTTERING = 1;
 
   // Transition map
   private List<int[][]> mPlantTransitionMap;
