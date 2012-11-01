@@ -143,6 +143,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       mSpecTransitionMap = new ArrayList<int[][]>();
       mIndexList = new ArrayList<Integer>();
       mStateSpace = new BlockedArrayList<StateTuple>(StateTuple.class);
+      // TODO Order events so uncontrollables are first.
       mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
       mPlantEventList = new ArrayList<byte[]>();
       mSpecEventList = new ArrayList<byte[]>();
@@ -357,20 +358,17 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
 
       for (i = 0; i < mNumEvents; i++){
         if (mEventCodingList.get(i).getKind() == EventKind.UNCONTROLLABLE){
+          events:
           for (j = 0; j < mNumEvents; j++){
-            boolean skip = false;
             for (k = 0; k < mNumPlants; k++){
               if (!mPartialOrderEvents[j].eventEnablesUncontrollable(i,k,true)){
-                skip = true;
-                break;
+                continue events;
               }
             }
-            if (!skip){
-              for (int l = mNumPlants; l < mNumAutomata; l++){
-                if (mPartialOrderEvents[j].eventEnablesUncontrollable(i,l,false)){
-                  mStutterEvents[j] = NONSTUTTERING;
-                  break;
-                }
+            for (int l = mNumPlants; l < mNumAutomata; l++){
+              if (mPartialOrderEvents[j].eventEnablesUncontrollable(i,l,false)){
+                mStutterEvents[j] = NONSTUTTERING;
+                break;
               }
             }
           }
@@ -434,6 +432,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     mPartialOrderEvents = new PartialOrderEvent[mNumEvents];
     for (int i = 0; i < mNumEvents; i++){
       mPartialOrderEvents[i] = new PartialOrderEvent(i,mNumAutomata,mNumPlants);
+      // TODO Need new BitSet for each entry.
       Arrays.fill(mPartialOrderEvents[i].getEnablings(), new BitSet(mNumEvents));
       Arrays.fill(mPartialOrderEvents[i].getDisablings(), new BitSet(mNumEvents));
     }
@@ -447,7 +446,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
           if (target != -1){
             for (int l = 0; l < mNumEvents; l++){
               if (mEventCodingList.get(l).getKind() == EventKind.UNCONTROLLABLE){
-                mPartialOrderEvents[k].addEnabled(j, l,transitionMap[target][l] != -1);
+                mPartialOrderEvents[k].addEnabled
+                  (j, l, transitionMap[target][l] != -1);
               }
             }
           }

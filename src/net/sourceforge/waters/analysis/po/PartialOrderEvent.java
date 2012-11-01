@@ -5,6 +5,7 @@ import java.util.BitSet;
 
 public class PartialOrderEvent
 {
+  // TODO Add stuttering status?
   private final int eventIndex_;
   private final BitSet[] enablings_;
   private final BitSet[] disablings_;
@@ -46,6 +47,7 @@ public class PartialOrderEvent
                                             final int automatonIndex,
                                             final boolean enable)
   {
+    // TODO Should disablings be negated?
     return enable ? enablings_[automatonIndex].get(uncontrollableIndex) :
                     disablings_[automatonIndex - enablings_.length].get(uncontrollableIndex);
   }
