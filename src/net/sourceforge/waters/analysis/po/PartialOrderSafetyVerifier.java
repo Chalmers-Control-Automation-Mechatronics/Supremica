@@ -360,14 +360,14 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
           for (j = 0; j < mNumEvents; j++){
             boolean skip = false;
             for (k = 0; k < mNumPlants; k++){
-              if (!mPartialOrderEvents[j].eventEnablesUncontrollable(i,k)){
+              if (!mPartialOrderEvents[j].eventEnablesUncontrollable(i,k,true)){
                 skip = true;
                 break;
               }
             }
             if (!skip){
               for (int l = mNumPlants; l < mNumAutomata; l++){
-                if (!mPartialOrderEvents[j].eventEnablesUncontrollable(i,l)){
+                if (mPartialOrderEvents[j].eventEnablesUncontrollable(i,l,false)){
                   mStutterEvents[j] = NONSTUTTERING;
                   break;
                 }
@@ -431,27 +431,28 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   }
 
   private void setEnablings(){
-    PartialOrderEvent.NUMAUTOMATA_ = mNumAutomata;
     mPartialOrderEvents = new PartialOrderEvent[mNumEvents];
     for (int i = 0; i < mNumEvents; i++){
-      final EventProxy currentEvent =  mEventCodingList.get(i);
-      mPartialOrderEvents[i] = new PartialOrderEvent(currentEvent);
-      mPartialOrderEvents[i].setEnablings(new BitSet[mNumAutomata]);
+      mPartialOrderEvents[i] = new PartialOrderEvent(i,mNumAutomata,mNumPlants);
       Arrays.fill(mPartialOrderEvents[i].getEnablings(), new BitSet(mNumEvents));
+      Arrays.fill(mPartialOrderEvents[i].getDisablings(), new BitSet(mNumEvents));
     }
     for (int j = 0; j < mNumAutomata; j++){
       final int[][] transitionMap = j < mNumPlants ? mPlantTransitionMap.get(j) :
-                                   mSpecTransitionMap.get(j - mNumPlants);
-     final int size = mAutomata[j].getStates().size();
-     for (int i = 0; i < size; i++){
-       for (int k = 0; k < mNumEvents; k++){
-         for (int l = 0; l < mNumEvents; l++){
-           if (transitionMap[transitionMap[i][k]][l] != -1){
-             mPartialOrderEvents[k].addEnabled(j, l);
-           }
-         }
-       }
-     }
+        mSpecTransitionMap.get(j - mNumPlants);
+      final int size = mAutomata[j].getStates().size();
+      for (int i = 0; i < size; i++){
+        for (int k = 0; k < mNumEvents; k++){
+          final int target = transitionMap[i][k];
+          if (target != -1){
+            for (int l = 0; l < mNumEvents; l++){
+              if (mEventCodingList.get(l).getKind() == EventKind.UNCONTROLLABLE){
+                mPartialOrderEvents[k].addEnabled(j, l,transitionMap[target][l] != -1);
+              }
+            }
+          }
+        }
+      }
     }
   }
 
@@ -786,7 +787,6 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   // Ample conditions
   private PartialOrderEventDependencyKind[][] mEventDependencyMap;
   private PartialOrderEventDependencyTuple[][] mReducedEventDependencyMap;
-  @SuppressWarnings("unused")
   private int[] mStutterEvents;
 
   //Event information

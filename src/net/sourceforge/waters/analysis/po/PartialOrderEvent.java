@@ -1,23 +1,23 @@
 package net.sourceforge.waters.analysis.po;
 
 import java.util.BitSet;
-import net.sourceforge.waters.model.des.EventProxy;
 
 
 public class PartialOrderEvent
 {
-  public static int NUMAUTOMATA_;
-  private final EventProxy event_;
-  private BitSet[] enablings_;
+  private final int eventIndex_;
+  private final BitSet[] enablings_;
+  private final BitSet[] disablings_;
 
-  public PartialOrderEvent(final EventProxy event){
-    event_ = event;
-    enablings_ = new BitSet[NUMAUTOMATA_];
+  public PartialOrderEvent(final int eventIndex,final int numAutomata, final int numPlants){
+    eventIndex_ = eventIndex;
+    enablings_ = new BitSet[numPlants];
+    disablings_ = new BitSet[numAutomata - numPlants];
   }
 
-  public EventProxy getEvent()
+  public int getEvent()
   {
-    return event_;
+    return eventIndex_;
   }
 
   public BitSet[] getEnablings()
@@ -25,18 +25,29 @@ public class PartialOrderEvent
     return enablings_;
   }
 
-  public void addEnabled(final int automatonIndex, final int eventIndex){
-    enablings_[automatonIndex].set(eventIndex);
+  public BitSet[] getDisablings()
+  {
+    return disablings_;
   }
 
-  public void setEnablings(final BitSet[] bitSets)
-  {
-    enablings_ = bitSets;
+  public void addEnabled(final int automatonIndex, final int eventIndex,
+                         final boolean enable){
+    if (enable && automatonIndex < enablings_.length) {
+      enablings_[automatonIndex].set(eventIndex);
+    }
+    else if (!enable && automatonIndex >= enablings_.length){
+      disablings_[automatonIndex - enablings_.length].set(eventIndex);
+    }
   }
+
+
 
   public boolean eventEnablesUncontrollable(final int uncontrollableIndex,
-                                            final int automatonIndex)
+                                            final int automatonIndex,
+                                            final boolean enable)
   {
-    return enablings_[automatonIndex].get(uncontrollableIndex);
+    return enable ? enablings_[automatonIndex].get(uncontrollableIndex) :
+                    disablings_[automatonIndex - enablings_.length].get(uncontrollableIndex);
   }
+
 }
