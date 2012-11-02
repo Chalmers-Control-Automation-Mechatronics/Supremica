@@ -109,6 +109,12 @@ public class OPVerifierTRSimplifier
     return true;
   }
 
+  @Override
+  public OPSearchTRSimplifierStatistics getStatistics()
+  {
+    return (OPSearchTRSimplifierStatistics) super.getStatistics();
+  }
+
 
   //#########################################################################
   //# Overrides for
@@ -160,6 +166,8 @@ public class OPVerifierTRSimplifier
   @Override
   protected void tearDown()
   {
+    final OPSearchTRSimplifierStatistics stats = getStatistics();
+    stats.recordVerifier(mVerifierStatePairs.size());
     mVerifierStatePairs = null;
     mVerifierStateMap = null;
     mTransitionIterator1 = mTransitionIterator2 = null;
