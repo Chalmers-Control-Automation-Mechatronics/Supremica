@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -100,15 +101,18 @@ public class OPVerifierExperiment
                             final EventProxy omega)
   {
     mOmegaEvent = omega;
+    final boolean gotcha =
+      aut.getName().equals("{{ircount[WSP],wspcount},{timer[WSP],wsptime}}");
 
     // 1. Check OP for determinised automaton
     final AutomatonProxy detAut = makeDeterministic(aut, tau);
     final boolean op = runOPVerifiers(detAut, tau);
-
+    if (gotcha) MarshallingTools.saveModule(detAut, "det.wmod");
     // 2. Find OP abstraction
     if (!op) {
       final AutomatonProxy opAut = findOPAbstraction(aut, tau);
       if (opAut != null) {
+        if (gotcha) MarshallingTools.saveModule(opAut, "op.wmod");
         runOPVerifiers(opAut, tau);
       }
     }
@@ -311,18 +315,23 @@ public class OPVerifierExperiment
     for (final TransitionProxy trans : transitions) {
       final EventProxy event = trans.getEvent();
       final List<EventProxy> replacements = eventReplacements.get(event);
+      final EventProxy altEvent;
       if (replacements == null) {
-        newTransitions.add(trans);
+        altEvent = event;
       } else {
         int next = transitionFanOut.get(trans);
-        final EventProxy replacement = replacements.get(next++);
+        altEvent = replacements.get(next++);
         transitionFanOut.put(trans, next);
-        final StateProxy source = trans.getSource();
-        final StateProxy altSource = getAltState(altStateMap, source);
-        final StateProxy target = trans.getTarget();
-        final StateProxy altTarget = getAltState(altStateMap, target);
+      }
+      final StateProxy source = trans.getSource();
+      final StateProxy altSource = getAltState(altStateMap, source);
+      final StateProxy target = trans.getTarget();
+      final StateProxy altTarget = getAltState(altStateMap, target);
+      if (altSource == source && altEvent == event && altTarget == target) {
+        newTransitions.add(trans);
+      } else {
         final TransitionProxy newTrans =
-          mFactory.createTransitionProxy(altSource, replacement, altTarget);
+          mFactory.createTransitionProxy(altSource, altEvent, altTarget);
         newTransitions.add(newTrans);
       }
     }

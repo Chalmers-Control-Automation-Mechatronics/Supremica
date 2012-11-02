@@ -188,6 +188,11 @@ public class OPVerifierTRChainTest
     runOPVerifier("op21.wmod", true);
   }
 
+  public void testOP22() throws Exception
+  {
+    runOPVerifier("op22.wmod", true);
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods

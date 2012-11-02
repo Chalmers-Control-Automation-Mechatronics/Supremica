@@ -214,6 +214,10 @@ public class OPVerifierTRSimplifier
   private void expandVerifierPair(final long pair)
     throws OverflowException
   {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int lastEvent = rel.getNumberOfProperEvents() - 1;
+    mTransitionIterator1.resetEvents(0, lastEvent);
+    mTransitionIterator2.resetEvents(0, lastEvent);
     final int code1 = (int) (pair & 0xffffffffL);
     final int code2 = (int) (pair >> 32);
 
@@ -237,7 +241,6 @@ public class OPVerifierTRSimplifier
       event2 = getNextEvent(mTransitionIterator2);
     }
 
-    final ListBufferTransitionRelation rel = getTransitionRelation();
     for (final int prop : getPropositions()) {
       final boolean marked1 = rel.isMarked(code1, prop);
       final boolean marked2 = rel.isMarked(code2, prop);
@@ -250,7 +253,6 @@ public class OPVerifierTRSimplifier
       }
     }
 
-    final int lastEvent = rel.getNumberOfProperEvents() - 1;
     while (event1 < Integer.MAX_VALUE || event2 < Integer.MAX_VALUE) {
       if (event1 < event2) {
         if (entau2) {

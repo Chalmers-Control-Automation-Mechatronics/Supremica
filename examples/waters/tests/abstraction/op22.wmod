@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="op22" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for the OP-Verifier algorithm.
+This tests whether observation equivalent classes linked by tau and other transitions can be handled correctly.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="autom_VR"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="SER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="SERFS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TAST"/>
+        <EventDecl Kind="CONTROLLABLE" Name="wsp"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ZS"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="vtau"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S:0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="96" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:1">
+                        <PointGeometry>
+                            <Point X="96" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-31" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:2">
+                        <PointGeometry>
+                            <Point X="208" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:3">
+                        <PointGeometry>
+                            <Point X="208" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:4">
+                        <PointGeometry>
+                            <Point X="304" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-35" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:5">
+                        <PointGeometry>
+                            <Point X="208" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S:0" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="autom_VR"/>
+                            <SimpleIdentifier Name="ER"/>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <SimpleIdentifier Name="TAST"/>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-70" Y="-43"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="13" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="141" Y="215"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="vtau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="270" Y="217"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="autom_VR"/>
+                            <SimpleIdentifier Name="ER"/>
+                            <SimpleIdentifier Name="SER"/>
+                            <SimpleIdentifier Name="SERFS"/>
+                            <SimpleIdentifier Name="TAST"/>
+                            <SimpleIdentifier Name="ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="-58"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:4" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="wsp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="348" Y="160"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:4" Target="S:5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="vtau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="284" Y="80"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:5" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-12" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
