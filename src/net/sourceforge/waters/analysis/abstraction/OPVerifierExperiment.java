@@ -43,7 +43,6 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -63,11 +62,16 @@ public class OPVerifierExperiment
     mFactory = ProductDESElementFactory.getInstance();
     mKindTranslator = IdenticalKindTranslator.getInstance();
     mOPVerifier = new OPVerifierTRChain();
+    mOEQChain = new ChainTRSimplifier();
+    final TauLoopRemovalTRSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    mOEQChain.add(loopRemover);
     mOEQSimplifier = new ObservationEquivalenceTRSimplifier();
     mOEQSimplifier.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
     mOEQSimplifier.setAppliesPartitionAutomatically(false);
     mOEQSimplifier.setTransitionRemovalMode(TransitionRemoval.NONE);
+    mOEQChain.add(mOEQSimplifier);
     mLogWriter = null;
     mHeaderWritten = false;
   }
@@ -100,20 +104,14 @@ public class OPVerifierExperiment
                             final EventProxy tau,
                             final EventProxy omega)
   {
-    mOmegaEvent = omega;
-    final boolean gotcha =
-      aut.getName().equals("{{ircount[WSP],wspcount},{timer[WSP],wsptime}}");
-
     // 1. Check OP for determinised automaton
     final AutomatonProxy detAut = makeDeterministic(aut, tau);
-    final boolean op = runOPVerifiers(detAut, tau);
-    if (gotcha) MarshallingTools.saveModule(detAut, "det.wmod");
+    final boolean op = runOPVerifiers(detAut, tau, omega);
     // 2. Find OP abstraction
     if (!op) {
-      final AutomatonProxy opAut = findOPAbstraction(aut, tau);
-      if (opAut != null) {
-        if (gotcha) MarshallingTools.saveModule(opAut, "op.wmod");
-        runOPVerifiers(opAut, tau);
+      final AutomatonProxy opAut1 = findOPAbstraction(aut, tau, omega);
+      if (opAut1 != null) {
+        runOPVerifiers(opAut1, tau, omega);
       }
     }
   }
@@ -122,11 +120,12 @@ public class OPVerifierExperiment
   //#########################################################################
   //# Auxiliary Methods
   private boolean runOPVerifiers(final AutomatonProxy aut,
-                                 final EventProxy tau)
+                                 final EventProxy tau,
+                                 final EventProxy omega)
   {
     // 1. Run OP-Verifier
     ListBufferTransitionRelation rel =
-      createTransitionRelation(aut, tau, mOPVerifier);
+      createTransitionRelation(aut, tau, omega, mOPVerifier);
     if (rel == null) {
       return false;
     }
@@ -136,26 +135,29 @@ public class OPVerifierExperiment
       // Never mind ...
     }
     // 2. Run Observation Equivalence
-    rel = createTransitionRelation(aut, tau, mOEQSimplifier);
+    rel = createTransitionRelation(aut, tau, omega, mOEQChain);
     try {
-      mOEQSimplifier.run();
+      mOEQChain.run();
     } catch (final AnalysisException exception) {
       // Never mind ...
     }
     // 3. Write stats
     final List<TRSimplifierStatistics> stats =
       new LinkedList<TRSimplifierStatistics>();
-    final TRSimplifierStatistics chainStats = mOPVerifier.getStatistics();
-    stats.add(chainStats);
+    final TRSimplifierStatistics opChainStats = mOPVerifier.getStatistics();
+    stats.add(opChainStats);
     mOPVerifier.collectStatistics(stats);
-    mOEQSimplifier.collectStatistics(stats);
-    writeLog(aut, tau, stats);
+    final TRSimplifierStatistics oeqChainStats = mOEQChain.getStatistics();
+    stats.add(oeqChainStats);
+    mOEQChain.collectStatistics(stats);
+    writeLog(aut, tau, omega, stats);
     return mOPVerifier.getOPResult();
   }
 
   private ListBufferTransitionRelation createTransitionRelation
     (final AutomatonProxy aut,
      final EventProxy tau,
+     final EventProxy omega,
      final TransitionRelationSimplifier simplifier)
   {
     try {
@@ -166,7 +168,7 @@ public class OPVerifierExperiment
       final ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
       simplifier.setTransitionRelation(rel);
-      final int omegaID = eventEnc.getEventCode(mOmegaEvent);
+      final int omegaID = eventEnc.getEventCode(omega);
       simplifier.setDefaultMarkingID(omegaID);
       simplifier.createStatistics();
       return rel;
@@ -345,7 +347,8 @@ public class OPVerifierExperiment
   }
 
   private AutomatonProxy findOPAbstraction(final AutomatonProxy aut,
-                                           final EventProxy tau)
+                                           final EventProxy tau,
+                                           final EventProxy omega)
   {
     final Collection<StateProxy> states = aut.getStates();
     boolean hasInit = false;
@@ -367,6 +370,8 @@ public class OPVerifierExperiment
     try {
       rel = new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
       mOEQSimplifier.setTransitionRelation(rel);
+      final int omegaID = eventEnc.getEventCode(omega);
+      mOEQSimplifier.setDefaultMarkingID(omegaID);
       mOEQSimplifier.run();
     } catch (final AnalysisException exception) {
       return null;
@@ -521,6 +526,7 @@ public class OPVerifierExperiment
 
   private void writeLog(final AutomatonProxy aut,
                         final EventProxy tau,
+                        final EventProxy omega,
                         final List<TRSimplifierStatistics> stats)
   {
     if (mLogWriter != null) {
@@ -542,7 +548,14 @@ public class OPVerifierExperiment
       final int numStates = aut.getStates().size();
       mLogWriter.print(numStates);
       mLogWriter.print(',');
-      final int numTrans = aut.getTransitions().size();
+      int numTrans = aut.getTransitions().size();
+      if (aut.getEvents().contains(omega)) {
+        for (final StateProxy state : aut.getStates()) {
+          if (state.getPropositions().contains(omega)) {
+            numTrans++;
+          }
+        }
+      }
       mLogWriter.print(numTrans);
       mLogWriter.print(',');
       int numTau = 0;
@@ -595,9 +608,8 @@ public class OPVerifierExperiment
   private final ProductDESProxyFactory mFactory;
   private final KindTranslator mKindTranslator;
   private final OPVerifierTRChain mOPVerifier;
+  private final ChainTRSimplifier mOEQChain;
   private final ObservationEquivalenceTRSimplifier mOEQSimplifier;
-
-  private EventProxy mOmegaEvent;
 
   private PrintWriter mLogWriter;
   private boolean mHeaderWritten;

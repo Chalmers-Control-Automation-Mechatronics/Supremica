@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import gnu.trove.TLongArrayList;
+import gnu.trove.TLongHashingStrategy;
 import gnu.trove.TLongIntHashMap;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -135,7 +136,8 @@ public class OPVerifierTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     mVerifierStatePairs = new TLongArrayList(numStates);
-    mVerifierStateMap = new TLongIntHashMap(numStates);
+    mVerifierStateMap =
+      new TLongIntHashMap(numStates, VerifierPairHashingStrategy.INSTANCE);
     mTransitionIterator1 = rel.createSuccessorsReadOnlyIterator();
     mTransitionIterator2 = rel.createSuccessorsReadOnlyIterator();
     mOPResult = true;
@@ -167,7 +169,9 @@ public class OPVerifierTRSimplifier
   protected void tearDown()
   {
     final OPSearchTRSimplifierStatistics stats = getStatistics();
-    stats.recordVerifier(mVerifierStatePairs.size());
+    if (stats != null && mVerifierStatePairs != null) {
+      stats.recordVerifier(mVerifierStatePairs.size());
+    }
     mVerifierStatePairs = null;
     mVerifierStateMap = null;
     mTransitionIterator1 = mTransitionIterator2 = null;
@@ -360,6 +364,32 @@ public class OPVerifierTRSimplifier
       final int p2 = (int) (pair >> 32);
       writer.println("  " + code + ": (" + p1 + '/' + p2 + ')');
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class VerifierPairHashingStrategy
+  private static class VerifierPairHashingStrategy
+    implements TLongHashingStrategy
+  {
+
+    //#######################################################################
+    //# Interface gnu.trove.TLongHashingStrategy
+    public int computeHashCode(final long val)
+    {
+      final int h0 = -2128831035;
+      final int h1 = 16777619;
+      final int lo = (int) (val & 0xffffffffL);
+      final int hi = (int) (val >> 32);
+      return ((h0 * h1) ^ hi) * h1 ^ lo;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final VerifierPairHashingStrategy INSTANCE =
+      new VerifierPairHashingStrategy();
+    private static final long serialVersionUID = 1L;
+
   }
 
 

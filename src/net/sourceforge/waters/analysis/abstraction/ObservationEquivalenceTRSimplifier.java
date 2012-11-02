@@ -235,6 +235,19 @@ public class ObservationEquivalenceTRSimplifier
     mStateShift = AutomatonTools.log2(mNumEvents);
   }
 
+  @Override
+  public void setPropositions(final int preconditionID, final int defaultID)
+  {
+    long mask = 0;
+    if (preconditionID >= 0) {
+      mask |= (1L << preconditionID);
+    }
+    if (defaultID >= 0) {
+      mask |= (1L << defaultID);
+    }
+    setPropositionMask(mask);
+  }
+
   public boolean isPartitioning()
   {
     return true;
