@@ -1686,7 +1686,8 @@ public class CompositionalConflictChecker
       if (!local.isEmpty()) {
         assert local.size() <= 1 : "At most one tau event supported!";
         final EventProxy tau = local.iterator().next();
-        mExperiment.runExperiment(aut, tau);
+        final EventProxy omega = getUsedDefaultMarking();
+        mExperiment.runExperiment(aut, tau, omega);
       }
       return super.run(aut, local, steps);
     }

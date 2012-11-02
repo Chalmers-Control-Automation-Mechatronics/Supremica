@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,9 +39,7 @@ import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -64,8 +61,7 @@ public class OPVerifierExperiment
   {
     mFactory = ProductDESElementFactory.getInstance();
     mKindTranslator = IdenticalKindTranslator.getInstance();
-    mOPVerifier = new OPSearchAutomatonSimplifier(mFactory, mKindTranslator);
-    mOPVerifier.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
+    mOPVerifier = new OPVerifierTRChain();
     mOEQSimplifier = new ObservationEquivalenceTRSimplifier();
     mOEQSimplifier.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
@@ -100,8 +96,11 @@ public class OPVerifierExperiment
   //#########################################################################
   //# Invocation
   public void runExperiment(final AutomatonProxy aut,
-                            final EventProxy tau)
+                            final EventProxy tau,
+                            final EventProxy omega)
   {
+    mOmegaEvent = omega;
+
     // 1. Check OP for determinised automaton
     final AutomatonProxy detAut = makeDeterministic(aut, tau);
     final boolean op = runOPVerifiers(detAut, tau);
@@ -121,48 +120,55 @@ public class OPVerifierExperiment
   private boolean runOPVerifiers(final AutomatonProxy aut,
                                  final EventProxy tau)
   {
-    // 1. Common Data
-    final List<EventProxy> hidden = Collections.singletonList(tau);
-    final ProductDESProxy des =
-      AutomatonTools.createProductDESProxy(aut, mFactory);
-
-    // 2. Run OP-Verifier
-    mOPVerifier.setModel(des);
-    mOPVerifier.setHiddenEvents(hidden);
+    // 1. Run OP-Verifier
+    ListBufferTransitionRelation rel =
+      createTransitionRelation(aut, tau, mOPVerifier);
+    if (rel == null) {
+      return false;
+    }
     try {
       mOPVerifier.run();
     } catch (final AnalysisException exception) {
       // Never mind ...
     }
-    final OPSearchAutomatonResult opResult = mOPVerifier.getAnalysisResult();
-
-    // 3. Run Observation Equivalence
-    final TRSimplifierStatistics oeqResult = mOEQSimplifier.createStatistics();
-    final long start = System.currentTimeMillis();
-    final EventEncoding eventEnc =
-      new EventEncoding(aut, mKindTranslator, tau);
-    final StateEncoding stateEnc = new StateEncoding(aut);
-    final int config = mOEQSimplifier.getPreferredInputConfiguration();
-    ListBufferTransitionRelation rel = null;
+    // 2. Run Observation Equivalence
+    rel = createTransitionRelation(aut, tau, mOEQSimplifier);
     try {
-      rel = new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
-    } catch (final OverflowException exception) {
-      oeqResult.recordOverflow(aut);
+      mOEQSimplifier.run();
+    } catch (final AnalysisException exception) {
+      // Never mind ...
     }
-    if (rel != null) {
-      mOEQSimplifier.setTransitionRelation(rel);
-      try {
-        mOEQSimplifier.run();
-      } catch (final AnalysisException exception) {
-        // Never mind ...
-      }
-    }
-    final long stop = System.currentTimeMillis();
-    oeqResult.setRunTime(stop - start);
+    // 3. Write stats
+    final List<TRSimplifierStatistics> stats =
+      new LinkedList<TRSimplifierStatistics>();
+    final TRSimplifierStatistics chainStats = mOPVerifier.getStatistics();
+    stats.add(chainStats);
+    mOPVerifier.collectStatistics(stats);
+    mOEQSimplifier.collectStatistics(stats);
+    writeLog(aut, tau, stats);
+    return mOPVerifier.getOPResult();
+  }
 
-    // 4. Write stats
-    writeLog(aut, tau, opResult, oeqResult);
-    return opResult.isSatisfied();
+  private ListBufferTransitionRelation createTransitionRelation
+    (final AutomatonProxy aut,
+     final EventProxy tau,
+     final TransitionRelationSimplifier simplifier)
+  {
+    try {
+      final EventEncoding eventEnc =
+        new EventEncoding(aut, mKindTranslator, tau);
+      final StateEncoding stateEnc = new StateEncoding(aut);
+      final int config = simplifier.getPreferredInputConfiguration();
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
+      simplifier.setTransitionRelation(rel);
+      final int omegaID = eventEnc.getEventCode(mOmegaEvent);
+      simplifier.setDefaultMarkingID(omegaID);
+      simplifier.createStatistics();
+      return rel;
+    } catch (final OverflowException exception) {
+      return null;
+    }
   }
 
   private AutomatonProxy makeDeterministic(final AutomatonProxy aut,
@@ -506,14 +512,14 @@ public class OPVerifierExperiment
 
   private void writeLog(final AutomatonProxy aut,
                         final EventProxy tau,
-                        final OPSearchAutomatonResult opResult,
-                        final TRSimplifierStatistics oeqResult)
+                        final List<TRSimplifierStatistics> stats)
   {
     if (mLogWriter != null) {
       if (!mHeaderWritten) {
-        mLogWriter.print("Name,NumEvents,NumStates,NumTrans,NumTau,");
-        opResult.printCSVHorizontalHeadings(mLogWriter);
-        oeqResult.printCSVHorizontalHeadings(mLogWriter);
+        mLogWriter.print("Name,NumEvents,NumStates,NumTrans,NumTau");
+        for (final TRSimplifierStatistics stat : stats) {
+          stat.printCSVHorizontalHeadings(mLogWriter);
+        }
         mLogWriter.println();
         mHeaderWritten = true;
       }
@@ -537,9 +543,9 @@ public class OPVerifierExperiment
         }
       }
       mLogWriter.print(numTau);
-      mLogWriter.print(',');
-      opResult.printCSVHorizontal(mLogWriter);
-      oeqResult.printCSVHorizontal(mLogWriter);
+      for (final TRSimplifierStatistics stat : stats) {
+        stat.printCSVHorizontal(mLogWriter);
+      }
       mLogWriter.println();
       mLogWriter.flush();
     }
@@ -579,8 +585,10 @@ public class OPVerifierExperiment
   //# Data Members
   private final ProductDESProxyFactory mFactory;
   private final KindTranslator mKindTranslator;
-  private final OPSearchAutomatonSimplifier mOPVerifier;
+  private final OPVerifierTRChain mOPVerifier;
   private final ObservationEquivalenceTRSimplifier mOEQSimplifier;
+
+  private EventProxy mOmegaEvent;
 
   private PrintWriter mLogWriter;
   private boolean mHeaderWritten;

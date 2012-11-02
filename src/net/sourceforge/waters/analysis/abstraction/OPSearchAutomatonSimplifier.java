@@ -304,6 +304,7 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     final StringWriter writer = new StringWriter();

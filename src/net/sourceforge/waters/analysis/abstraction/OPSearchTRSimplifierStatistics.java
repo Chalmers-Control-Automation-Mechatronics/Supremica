@@ -32,6 +32,7 @@ public class OPSearchTRSimplifierStatistics extends TRSimplifierStatistics
                                         final boolean markings)
   {
     super(simplifier, trans, markings);
+    mPeakVerifierPairs = -1;
     mNumberOfIterations = 0;
   }
 
@@ -49,6 +50,15 @@ public class OPSearchTRSimplifierStatistics extends TRSimplifierStatistics
     return mNumberOfIterations;
   }
 
+  /**
+   * Gets the peak number of verifier pairs constructed during OP-Search.
+   * @return Number of pairs or <CODE>-1</CODE> if not set.
+   */
+  public int getPeakNumberOfVerifierPairs()
+  {
+    return mPeakVerifierPairs;
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AnalysisResult
@@ -58,6 +68,8 @@ public class OPSearchTRSimplifierStatistics extends TRSimplifierStatistics
     super.merge(other);
     final OPSearchTRSimplifierStatistics stats =
       (OPSearchTRSimplifierStatistics) other;
+    mPeakVerifierPairs = Math.max(mPeakVerifierPairs,
+                                  stats.mPeakVerifierPairs);
     mNumberOfIterations =
       DefaultAnalysisResult.mergeAdd(mNumberOfIterations,
                                      stats.mNumberOfIterations);
@@ -67,6 +79,10 @@ public class OPSearchTRSimplifierStatistics extends TRSimplifierStatistics
   public void print(final PrintWriter writer)
   {
     super.print(writer);
+    if (mPeakVerifierPairs >= 0) {
+      writer.println("Peak number of verifier pairs: " +
+                     mPeakVerifierPairs);
+    }
     if (mNumberOfIterations >= 0) {
       writer.println("Total number of OP-search iterations: " +
                      mNumberOfIterations);
@@ -78,6 +94,10 @@ public class OPSearchTRSimplifierStatistics extends TRSimplifierStatistics
   {
     super.printCSVHorizontal(writer);
     writer.print(',');
+    if (mPeakVerifierPairs >= 0) {
+      writer.print(mPeakVerifierPairs);
+    }
+    writer.print(',');
     if (mNumberOfIterations >= 0) {
       writer.print(mNumberOfIterations);
     }
@@ -87,12 +107,19 @@ public class OPSearchTRSimplifierStatistics extends TRSimplifierStatistics
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
-    writer.print(",Iter");
+    writer.print(",VPairs,Iter");
   }
 
 
   //#########################################################################
   //# Gathering
+  void recordVerifier(final int numPairs)
+  {
+    if (numPairs > mPeakVerifierPairs) {
+      mPeakVerifierPairs = numPairs;
+    }
+  }
+
   void recordIterations(final int iter)
   {
     mNumberOfIterations =
@@ -102,6 +129,7 @@ public class OPSearchTRSimplifierStatistics extends TRSimplifierStatistics
 
   //#########################################################################
   //# Data Members
+  private int mPeakVerifierPairs;
   private int mNumberOfIterations;
 
 }

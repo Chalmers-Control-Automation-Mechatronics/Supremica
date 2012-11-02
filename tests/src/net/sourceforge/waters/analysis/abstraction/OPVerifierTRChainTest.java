@@ -2,18 +2,21 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   OPVerifierTest
+//# CLASS:   OPVerifierTRChainTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.List;
+import java.util.Collection;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -21,14 +24,14 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 /**
  * @author Robi Malik
  */
 
-public class OPVerifierTest
+public class OPVerifierTRChainTest
   extends AbstractAnalysisTest
 {
 
@@ -36,7 +39,7 @@ public class OPVerifierTest
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    final TestSuite testSuite = new TestSuite(OPVerifierTest.class);
+    final TestSuite testSuite = new TestSuite(OPVerifierTRChainTest.class);
     return testSuite;
   }
 
@@ -52,10 +55,7 @@ public class OPVerifierTest
   protected void setUp() throws Exception
   {
     super.setUp();
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    mVerifier = new OPSearchAutomatonSimplifier(factory, translator);
-    mVerifier.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
+    mVerifier = new OPVerifierTRChain();
   }
 
   @Override
@@ -197,10 +197,26 @@ public class OPVerifierTest
     final ProductDESProxy des = getCompiledDES("tests", "abstraction", name);
     final String desname = des.getName();
     getLogger().info("Checking " + desname + " ...");
-    final AutomatonProxy before = findAutomaton(des, BEFORE);
-    final List<EventProxy> hidden = getUnobservableEvents(des);
-    mVerifier.setModel(before);
-    mVerifier.setHiddenEvents(hidden);
+    final AutomatonProxy aut = findAutomaton(des, BEFORE);
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    final Collection<EventProxy> hidden = getUnobservableEvents(des);
+    final EventEncoding eventEnc = new EventEncoding();
+    for (final EventProxy event : aut.getEvents()) {
+      if (hidden.contains(event)) {
+        eventEnc.addSilentEvent(event);
+      } else {
+        eventEnc.addEvent(event, translator, false);
+      }
+    }
+    final StateEncoding stateEnc = new StateEncoding(aut);
+    final int config = mVerifier.getPreferredInputConfiguration();
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
+    rel.checkReachability();
+    mVerifier.setTransitionRelation(rel);
+    final EventProxy omega = getEvent(des, OMEGA);
+    final int omegaID = eventEnc.getEventCode(omega);
+    mVerifier.setDefaultMarkingID(omegaID);
     final boolean result = mVerifier.run();
     assertEquals("Unexpected result from OP-Verifier!", expect, result);
     getLogger().info("Done " + desname);
@@ -219,11 +235,12 @@ public class OPVerifierTest
 
   //#########################################################################
   //# Data Members
-  private OPSearchAutomatonSimplifier mVerifier;
+  private OPVerifierTRChain mVerifier;
 
 
   //#########################################################################
   //# Class Constants
   private final String BEFORE = "before";
+  private final String OMEGA = EventDeclProxy.DEFAULT_MARKING_NAME;
 
 }
