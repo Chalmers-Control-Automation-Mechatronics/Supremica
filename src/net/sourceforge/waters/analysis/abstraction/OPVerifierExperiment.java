@@ -56,6 +56,19 @@ public class OPVerifierExperiment
 {
 
   //#########################################################################
+  //# Singleton Pattern
+  public static OPVerifierExperiment getInstance()
+  {
+    return SingletonHolder.INSTANCE;
+  }
+
+  private static class SingletonHolder {
+    private static final OPVerifierExperiment INSTANCE =
+      new OPVerifierExperiment("opverifier.csv");
+  }
+
+
+  //#########################################################################
   //# Constructor
   public OPVerifierExperiment()
   {
@@ -74,6 +87,12 @@ public class OPVerifierExperiment
     mOEQChain.add(mOEQSimplifier);
     mLogWriter = null;
     mHeaderWritten = false;
+  }
+
+  public OPVerifierExperiment(final String logFileName)
+  {
+    this();
+    setLogStream(logFileName);
   }
 
 

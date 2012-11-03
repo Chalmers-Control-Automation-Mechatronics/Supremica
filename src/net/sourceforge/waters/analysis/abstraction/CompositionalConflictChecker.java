@@ -205,10 +205,7 @@ public class CompositionalConflictChecker
    */
   public void setAbstractionMethod(final AbstractionMethod method)
   {
-    if (mAbstractionMethod != method) {
-      mAbstractionMethod = method;
-      setAbstractionProcedure(null);
-    }
+    mAbstractionMethod = method;
   }
 
   public void setCompositionalSafetyVerifier(final SafetyVerifier checker)
@@ -1671,8 +1668,7 @@ public class CompositionalConflictChecker
       (final TransitionRelationSimplifier simplifier)
     {
       super(simplifier);
-      mExperiment = new OPVerifierExperiment();
-      mExperiment.setLogStream("opverifier.csv");
+      mExperiment = OPVerifierExperiment.getInstance();
     }
 
     //#######################################################################
