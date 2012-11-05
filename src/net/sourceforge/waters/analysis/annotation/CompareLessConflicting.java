@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.annotation
+//# CLASS:   CompareLessConflicting
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis.annotation;
 
 import gnu.trove.THashSet;
@@ -36,11 +45,22 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
+/**
+ * <P>An implementation of the conflict preorder algorithm.</P>
+ *
+ * <P><I>Reference:</I><BR>
+ * Simon Ware, Robi Malik. A State-Based Characterisation of the Conflict
+ * Preorder. Proc. 10th Workshop on the Foundations of Coordination Languages
+ * and Software Architecture, FOCLASA 2011, 34-48, Aachen, Germany, 2011.</P>
+ *
+ * @author Simon Ware
+ */
+
 public class CompareLessConflicting
 {
   private final ListBufferTransitionRelation mFirstRelation;
   private final ListBufferTransitionRelation mSecondRelation;
-  private final Map<TIntHashSet, TIntHashSet> mSetCache;
+  private final Map<TIntHashSet,TIntHashSet> mSetCache;
   private final TObjectIntHashMap<Tuple> mTupleCache;
   private final List<Tuple> mStates;
   //private final TObjectIntHashMap<Triple> mTripleCache;
