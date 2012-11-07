@@ -34,7 +34,7 @@ public class MarkingRemovalTRSimplifier
 
   //#########################################################################
   //# Constructors
-  MarkingRemovalTRSimplifier()
+  public MarkingRemovalTRSimplifier()
   {
   }
 

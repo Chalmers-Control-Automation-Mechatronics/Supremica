@@ -17,8 +17,8 @@ for F in "$@"; do
     -bdd)
         FACTORY="$WPACK.analysis.bdd.BDDModelVerifierFactory"
         ;;
-    -comp|-composing)
-        FACTORY="$WPACK.analysis.abstraction.CompositionalModelVerifierFactory"
+    -comp|-compositional)
+        FACTORY="$WPACK.analysis.compositional.CompositionalModelVerifierFactory"
         ;;
     -dist)
         FACTORY="$WPACK.analysis.distributed.DistributedModelVerifierFactory"

@@ -34,7 +34,7 @@ public class MarkingSaturationTRSimplifier
 
   //#########################################################################
   //# Constructors
-  MarkingSaturationTRSimplifier()
+  public MarkingSaturationTRSimplifier()
   {
   }
 

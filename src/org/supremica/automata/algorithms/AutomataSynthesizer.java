@@ -52,8 +52,8 @@ package org.supremica.automata.algorithms;
 import java.math.BigDecimal;
 import java.util.*;
 
-import net.sourceforge.waters.analysis.abstraction.AbstractCompositionalModelAnalyzer;
-import net.sourceforge.waters.analysis.abstraction.CompositionalSynthesizer;
+import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
+import net.sourceforge.waters.analysis.compositional.CompositionalSynthesizer;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -368,7 +368,7 @@ public class AutomataSynthesizer
 
           final CompositionalSynthesizer synthesizer =
             new CompositionalSynthesizer(des, factory, translator);
-          synthesizer.setMarkingProposition(marking);
+          synthesizer.setConfiguredDefaultMarking(marking);
           synthesizer.setInternalStateLimit(10000);
            synthesizer.setPreselectingMethod
              (AbstractCompositionalModelAnalyzer.MustL);

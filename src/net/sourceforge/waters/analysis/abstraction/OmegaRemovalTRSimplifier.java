@@ -26,12 +26,12 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * @author Rachel Francis
  */
 
-class OmegaRemovalTRSimplifier
+public class OmegaRemovalTRSimplifier
   extends AbstractMarkingTRSimplifier
 {
   //#########################################################################
   //# Constructors
-  OmegaRemovalTRSimplifier()
+  public OmegaRemovalTRSimplifier()
   {
   }
 

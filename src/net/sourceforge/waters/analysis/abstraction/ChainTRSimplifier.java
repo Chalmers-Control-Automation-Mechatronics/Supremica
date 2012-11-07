@@ -54,17 +54,17 @@ public class ChainTRSimplifier
 
   //#########################################################################
   //# Configuration
-  int size()
+  public int size()
   {
     return mSteps.size();
   }
 
-  TransitionRelationSimplifier getStep(final int index)
+  public TransitionRelationSimplifier getStep(final int index)
   {
     return mSteps.get(index);
   }
 
-  int add(final TransitionRelationSimplifier step)
+  public int add(final TransitionRelationSimplifier step)
   {
     final int index = size();
     final int config = step.getPreferredInputConfiguration();
@@ -221,7 +221,7 @@ public class ChainTRSimplifier
 
   //#########################################################################
   //# Merging Partitions
-  static List<int[]> mergePartitions(final List<int[]> part1,
+  public static List<int[]> mergePartitions(final List<int[]> part1,
                                      final List<int[]> part2)
   {
     if (part1 == null) {
