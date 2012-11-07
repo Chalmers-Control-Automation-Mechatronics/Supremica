@@ -99,7 +99,7 @@ public class ProjectingNonBlockingCheckerB
       }
     }
     for (final AutomatonProxy auto : automata) {
-      final TransitionRelation tr = new TransitionRelation(auto, getMarkingProposition());
+      final TransitionRelation tr = new TransitionRelation(auto, getConfiguredDefaultMarking());
       final Collection<EventProxy> allselflooped = tr.getAllSelfLoops();
       for (final EventProxy event : allselflooped) {
         mAllSelfLoops.get(event).remove(auto);
@@ -118,8 +118,8 @@ public class ProjectingNonBlockingCheckerB
   {
     clearStats();
     mTime -= System.currentTimeMillis();
-    if (getMarkingProposition() == null) {
-      setMarkingProposition(getUsedMarkingProposition());
+    if (getConfiguredDefaultMarking() == null) {
+      setConfiguredDefaultMarking(getUsedDefaultMarking());
     }
     boolean result = false;
     double checkerstates = 0;
@@ -132,7 +132,7 @@ public class ProjectingNonBlockingCheckerB
       }
       //System.out.println(list.getModel());
       final ConflictChecker checker =
-        new NativeConflictChecker(list.getModel(), getMarkingProposition(),
+        new NativeConflictChecker(list.getModel(), getConfiguredDefaultMarking(),
                                   getFactory());
       result = checker.run();
       checkerstates = checker.getAnalysisResult().getTotalNumberOfStates();
@@ -387,7 +387,7 @@ public class ProjectingNonBlockingCheckerB
     final TObjectIntHashMap<Set<AutomatonProxy>> numoccuring =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
+      if (e == getConfiguredDefaultMarking()) {
         continue;
       }
       final Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
@@ -430,7 +430,7 @@ public class ProjectingNonBlockingCheckerB
       new TreeMap<SortedSet<AutomatonProxy>,Integer>(new AutomataComparator());
     Events:
     for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
+      if (e == getConfiguredDefaultMarking()) {
         continue;
       }
       final SortedSet<AutomatonProxy> possess = new TreeSet<AutomatonProxy>();
@@ -758,7 +758,7 @@ public class ProjectingNonBlockingCheckerB
           if (containsAny(aut1.getEvents(), aut2.getEvents())) {
             List<AutomatonProxy> tocomp =
               Arrays.asList(new AutomatonProxy[]{aut1, aut2});
-            final BlockedEvents be = new BlockedEvents(tocomp, getFactory(), getMarkingProposition());
+            final BlockedEvents be = new BlockedEvents(tocomp, getFactory(), getConfiguredDefaultMarking());
             be.setNodeLimit(100000);
             try {
               tocomp = be.run();
@@ -803,8 +803,8 @@ public class ProjectingNonBlockingCheckerB
           mHidden.removeAll(a.getEvents());
         }
       }
-      if (mHidden.contains(getMarkingProposition())) {
-        mHidden.remove(getMarkingProposition());
+      if (mHidden.contains(getConfiguredDefaultMarking())) {
+        mHidden.remove(getConfiguredDefaultMarking());
       }
       final AutomataHidden ah =
         new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
@@ -820,7 +820,7 @@ public class ProjectingNonBlockingCheckerB
         }
       } else {
         //blockedEvents();
-        System.out.println("marking: " + getMarkingProposition());
+        System.out.println("marking: " + getConfiguredDefaultMarking());
         try {
           //addselfloops
           compAutomata.clear();
@@ -829,8 +829,8 @@ public class ProjectingNonBlockingCheckerB
             //System.out.println(aut);
             final Set<EventProxy> selfloops = new THashSet<EventProxy>(mOriginalAlphabet);
             selfloops.removeAll(aut.getEvents());
-            final TransitionRelation tr = new TransitionRelation(aut, getMarkingProposition());
-            final PrepareForComposition pfc = new PrepareForComposition(tr, getMarkingProposition(),
+            final TransitionRelation tr = new TransitionRelation(aut, getConfiguredDefaultMarking());
+            final PrepareForComposition pfc = new PrepareForComposition(tr, getConfiguredDefaultMarking(),
                                                                   selfloops);
             aut = pfc.run(getFactory());
             compAutomata.add(aut);
@@ -841,7 +841,7 @@ public class ProjectingNonBlockingCheckerB
           final NonDeterministicComposer composer =
             new NonDeterministicComposer(
               new ArrayList<AutomatonProxy>(mCompautomata), getFactory(),
-                                            getMarkingProposition());
+                                            getConfiguredDefaultMarking());
           final int size = maxsize;
           System.out.println(size);
           composer.setNodeLimit(size);
@@ -855,7 +855,7 @@ public class ProjectingNonBlockingCheckerB
           System.out.println("compsize: " + compsize);
           if (!mHidden.isEmpty()) {
             final TransitionRelation tr = new TransitionRelation(minAutomaton,
-                                                           getMarkingProposition());
+                                                           getConfiguredDefaultMarking());
             final int tau = tr.mergeEvents(mHidden, getFactory());
             /*for (EventProxy event : mOriginalAlphabet) {
               if (mAllSelfLoops.containsKey(event) && mAllSelfLoops.get(event).isEmpty()) {
@@ -920,7 +920,7 @@ public class ProjectingNonBlockingCheckerB
           } else {
             mBITIME -= System.currentTimeMillis();
             final BiSimulator sim = new BiSimulator(minAutomaton2,
-                                            getMarkingProposition(),
+                                            getConfiguredDefaultMarking(),
                                             getFactory());
             //mBISIMulation += minAutomaton2.getStates().size();
             minAutomaton = sim.run();
@@ -932,7 +932,7 @@ public class ProjectingNonBlockingCheckerB
             switched++;
             minAutomaton = minAutomaton2;
           }*/
-          final TransitionRelation tr = new TransitionRelation(minAutomaton, getMarkingProposition());
+          final TransitionRelation tr = new TransitionRelation(minAutomaton, getConfiguredDefaultMarking());
           allwaysenabled = tr.getAllwaysEnabled();
           allselflooped = tr.getAllSelfLoops();
           //mMinAutMap.put(ah, minAutomaton);

@@ -327,7 +327,7 @@ public abstract class AbstractModelVerifierFactory
       if (markingname != null) {
         final EventProxy marking =
           AbstractConflictChecker.getMarkingProposition(model, markingname);
-        cchecker.setMarkingProposition(marking);
+        cchecker.setConfiguredDefaultMarking(marking);
       }
     }
   }
@@ -411,7 +411,7 @@ public abstract class AbstractModelVerifierFactory
       if (markingname != null) {
         final EventProxy marking =
           AbstractConflictChecker.getMarkingProposition(model, markingname);
-        cchecker.setPreconditionMarking(marking);
+        cchecker.setConfiguredPreconditionMarking(marking);
       }
     }
   }

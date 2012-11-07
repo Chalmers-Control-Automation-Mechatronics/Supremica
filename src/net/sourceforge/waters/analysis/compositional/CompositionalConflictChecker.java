@@ -149,26 +149,6 @@ public class CompositionalConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
-  public void setMarkingProposition(final EventProxy marking)
-  {
-    setConfiguredDefaultMarking(marking);
-  }
-
-  public EventProxy getMarkingProposition()
-  {
-    return getConfiguredDefaultMarking();
-  }
-
-  public void setPreconditionMarking(final EventProxy alpha)
-  {
-    setConfiguredPreconditionMarking(alpha);
-  }
-
-  public EventProxy getPreconditionMarking()
-  {
-    return getConfiguredPreconditionMarking();
-  }
-
   @Override
   public ConflictTraceProxy getCounterExample()
   {
@@ -338,9 +318,9 @@ public class CompositionalConflictChecker
         current = configured;
       }
       final EventProxy defaultMarking = getUsedDefaultMarking();
-      current.setMarkingProposition(defaultMarking);
+      current.setConfiguredDefaultMarking(defaultMarking);
       final EventProxy preconditionMarking = getUsedPreconditionMarking();
-      current.setPreconditionMarking(preconditionMarking);
+      current.setConfiguredPreconditionMarking(preconditionMarking);
       setCurrentMonolithicVerifier(current);
       super.setupMonolithicVerifier();
     }

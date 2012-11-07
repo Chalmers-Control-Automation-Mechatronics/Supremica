@@ -100,7 +100,7 @@ public class CompNonBlockingChecker
       }
     }
     for (final AutomatonProxy auto : automata) {
-      final TransitionRelation tr = new TransitionRelation(auto, getMarkingProposition());
+      final TransitionRelation tr = new TransitionRelation(auto, getConfiguredDefaultMarking());
       final Collection<EventProxy> allselflooped = tr.getAllSelfLoops();
       for (final EventProxy event : allselflooped) {
         mAllSelfLoops.get(event).remove(auto);
@@ -120,8 +120,8 @@ public class CompNonBlockingChecker
     System.out.println("run comp conf");
     clearStats();
     mTime -= System.currentTimeMillis();
-    if (getMarkingProposition() == null) {
-      setMarkingProposition(getUsedMarkingProposition());
+    if (getConfiguredDefaultMarking() == null) {
+      setConfiguredDefaultMarking(getUsedDefaultMarking());
     }
     boolean result = false;
     double checkerstates = 0;
@@ -134,7 +134,7 @@ public class CompNonBlockingChecker
       }
       //System.out.println(list.getModel());
       final ConflictChecker checker =
-        new NativeConflictChecker(list.getModel(), getMarkingProposition(),
+        new NativeConflictChecker(list.getModel(), getConfiguredDefaultMarking(),
                                   getFactory());
       result = checker.run();
       checkerstates = checker.getAnalysisResult().getTotalNumberOfStates();
@@ -291,7 +291,7 @@ public class CompNonBlockingChecker
     final TObjectIntHashMap<Set<AutomatonProxy>> numoccuring =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
+      if (e == getConfiguredDefaultMarking()) {
         continue;
       }
       final Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
@@ -421,7 +421,7 @@ public class CompNonBlockingChecker
       new TreeMap<SortedSet<AutomatonProxy>,Integer>(new AutomataComparator());
     Events:
     for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
+      if (e == getConfiguredDefaultMarking()) {
         continue;
       }
       final SortedSet<AutomatonProxy> possess = new TreeSet<AutomatonProxy>();
@@ -747,7 +747,7 @@ public class CompNonBlockingChecker
           if (containsAny(aut1.getEvents(), aut2.getEvents())) {
             List<AutomatonProxy> tocomp =
               Arrays.asList(new AutomatonProxy[]{aut1, aut2});
-            final BlockedEvents be = new BlockedEvents(tocomp, getFactory(), getMarkingProposition());
+            final BlockedEvents be = new BlockedEvents(tocomp, getFactory(), getConfiguredDefaultMarking());
             be.setNodeLimit(100000);
             try {
               tocomp = be.run();
@@ -794,8 +794,8 @@ public class CompNonBlockingChecker
           mHidden.removeAll(a.getEvents());
         }
       }
-      if (mHidden.contains(getMarkingProposition())) {
-        mHidden.remove(getMarkingProposition());
+      if (mHidden.contains(getConfiguredDefaultMarking())) {
+        mHidden.remove(getConfiguredDefaultMarking());
       }
       final AutomataHidden ah =
         new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
@@ -814,7 +814,7 @@ public class CompNonBlockingChecker
           final NonDeterministicComposer composer =
             new NonDeterministicComposer(
               new ArrayList<AutomatonProxy>(mCompautomata), getFactory(),
-                                            getMarkingProposition());
+                                            getConfiguredDefaultMarking());
           final int size = maxsize;
           //System.out.println(size);
           composer.setNodeLimit(size);
@@ -835,7 +835,7 @@ public class CompNonBlockingChecker
           if (!mHidden.isEmpty()) {
             //System.out.println("hiding:" + mHidden.size());
             final TransitionRelation tr = new TransitionRelation(minAutomaton,
-                                                           getMarkingProposition());
+                                                           getConfiguredDefaultMarking());
             final int tau = tr.mergeEvents(mHidden, getFactory());
             // EventProxy tauevent = tr.getEvent(tau);
             //System.out.println("TLR");
@@ -893,7 +893,7 @@ public class CompNonBlockingChecker
             mBITIME -= System.currentTimeMillis();
             mBISIMulation += minAutomaton.getStates().size();
             final BiSimulator sim = new BiSimulator(minAutomaton2,
-                                            getMarkingProposition(),
+                                            getConfiguredDefaultMarking(),
                                             getFactory());
             //mBISIMulation += minAutomaton2.getStates().size();
             minAutomaton = sim.run();

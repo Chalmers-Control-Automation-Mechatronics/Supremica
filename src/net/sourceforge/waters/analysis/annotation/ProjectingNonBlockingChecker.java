@@ -97,7 +97,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
     }
     for (final AutomatonProxy auto : automata) {
       final TransitionRelation tr =
-          new TransitionRelation(auto, getMarkingProposition());
+          new TransitionRelation(auto, getConfiguredDefaultMarking());
       final Collection<EventProxy> allselflooped = tr.getAllSelfLoops();
       for (final EventProxy event : allselflooped) {
         mAllSelfLoops.get(event).remove(auto);
@@ -115,8 +115,8 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   {
     clearStats();
     mTime -= System.currentTimeMillis();
-    if (getMarkingProposition() == null) {
-      setMarkingProposition(getUsedMarkingProposition());
+    if (getConfiguredDefaultMarking() == null) {
+      setConfiguredDefaultMarking(getUsedDefaultMarking());
     }
     try {
       mWriter = new BufferedWriter(new FileWriter("/home/darius/supremicastuff/reductions" + getModel().getName()));
@@ -136,7 +136,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       }
       //System.out.println(list.getModel());
       final ConflictChecker checker =
-        new NativeConflictChecker(list.getModel(), getMarkingProposition(),
+        new NativeConflictChecker(list.getModel(), getConfiguredDefaultMarking(),
                                   getFactory());
       result = checker.run();
       checkerstates = checker.getAnalysisResult().getTotalNumberOfStates();
@@ -279,7 +279,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
     final TObjectIntHashMap<Set<AutomatonProxy>> numoccuring =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
+      if (e == getConfiguredDefaultMarking()) {
         continue;
       }
       final Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
@@ -1034,7 +1034,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
             List<AutomatonProxy> tocomp =
                 Arrays.asList(new AutomatonProxy[] {aut1, aut2});
             final BlockedEvents be =
-                new BlockedEvents(tocomp, getFactory(), getMarkingProposition());
+                new BlockedEvents(tocomp, getFactory(), getConfiguredDefaultMarking());
             be.setNodeLimit(100000);
             try {
               tocomp = be.run();
@@ -1081,8 +1081,8 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
           mHidden.removeAll(a.getEvents());
         }
       }
-      if (mHidden.contains(getMarkingProposition())) {
-        mHidden.remove(getMarkingProposition());
+      if (mHidden.contains(getConfiguredDefaultMarking())) {
+        mHidden.remove(getConfiguredDefaultMarking());
       }
       //AutomataHidden ah =
       //  new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
@@ -1112,7 +1112,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
           // end remove transitions
           final NonDeterministicComposer composer =
               new NonDeterministicComposer(new ArrayList<AutomatonProxy>(
-                  mCompautomata), getFactory(), getMarkingProposition());
+                  mCompautomata), getFactory(), getConfiguredDefaultMarking());
           final int size = maxsize;
           //System.out.println(size);
           composer.setNodeLimit(size);
@@ -1132,8 +1132,8 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
               getFactory().createEventProxy("tau:" + minAutomaton.getName(),
                                             EventKind.UNCONTROLLABLE);
           final EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(), tauproxy);
-          if (!minAutomaton.getEvents().contains(getMarkingProposition())) {
-            ee.addEvent(getMarkingProposition(), getKindTranslator(), true);
+          if (!minAutomaton.getEvents().contains(getConfiguredDefaultMarking())) {
+            ee.addEvent(getConfiguredDefaultMarking(), getKindTranslator(), true);
           }
           final ListBufferTransitionRelation orig =
             new ListBufferTransitionRelation(minAutomaton, ee,
@@ -1166,7 +1166,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
           if (!mHidden.isEmpty()) {
             //System.out.println("hiding:" + mHidden.size());
             TransitionRelation tr = new TransitionRelation(minAutomaton,
-                                                           getMarkingProposition());
+                                                           getConfiguredDefaultMarking());
             /*for (EventProxy event : mOriginalAlphabet) {
               if (mAllSelfLoops.containsKey(event) && mAllSelfLoops.get(event).isEmpty()) {
                 System.out.println("self looped");
@@ -1237,11 +1237,11 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
             //eq = new EquivalentIncoming(tr); eq.run();
             //System.out.println("UA");
             final UnAnnotateGraph ua =
-                new UnAnnotateGraph(tr, getMarkingProposition(), tauproxy);
+                new UnAnnotateGraph(tr, getConfiguredDefaultMarking(), tauproxy);
             minAutomaton = ua.run(getFactory());
             //System.out.println(minAutomaton);
             tauevent = ua.getTau();
-            tr = new TransitionRelation(minAutomaton, getMarkingProposition());
+            tr = new TransitionRelation(minAutomaton, getConfiguredDefaultMarking());
             tau = tr.getEventInt(tauevent);
             //System.out.println("IE");
             //System.out.println("before");
@@ -1362,7 +1362,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
             //System.out.println("events:" + minAutomaton.getEvents().size());
             //System.out.println("hidden: " + mHidden);
           } else {
-            final TransitionRelation tr = new TransitionRelation(minAutomaton, getMarkingProposition());
+            final TransitionRelation tr = new TransitionRelation(minAutomaton, getConfiguredDefaultMarking());
             //OptimisticBiSimulatorRedundant obsr = new OptimisticBiSimulatorRedundant(tr); obsr.run();
             //BiSimulatorRedundant bsr = new BiSimulatorRedundant(tr); bsr.run();
             minAutomaton = tr.getAutomaton(getFactory());
@@ -1371,7 +1371,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
             mBITIME -= System.currentTimeMillis();
             mBISIMulation += minAutomaton.getStates().size();
             final BiSimulator sim = new BiSimulator(minAutomaton,
-                                            getMarkingProposition(),
+                                            getConfiguredDefaultMarking(),
                                             getFactory());
             //mBISIMulation += minAutomaton2.getStates().size();
             minAutomaton = sim.run();
@@ -1388,7 +1388,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
             minAutomaton = minAutomaton2;
           }*/
           final TransitionRelation tr =
-              new TransitionRelation(minAutomaton, getMarkingProposition());
+              new TransitionRelation(minAutomaton, getConfiguredDefaultMarking());
           allwaysenabled = tr.getAllwaysEnabled();
           allselflooped = tr.getAllSelfLoops();
           // mMinAutMap.put(ah, minAutomaton);

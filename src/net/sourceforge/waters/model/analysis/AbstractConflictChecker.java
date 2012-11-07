@@ -112,22 +112,22 @@ public abstract class AbstractConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
-  public void setMarkingProposition(final EventProxy marking)
+  public void setConfiguredDefaultMarking(final EventProxy marking)
   {
     mMarking = marking;
     mUsedMarking = null;
   }
 
-  public EventProxy getMarkingProposition()
+  public EventProxy getConfiguredDefaultMarking()
   {
     return mMarking;
   }
 
-  public void setPreconditionMarking(final EventProxy marking){
+  public void setConfiguredPreconditionMarking(final EventProxy marking){
     mPreconditionMarking = marking;
   }
 
-  public EventProxy getPreconditionMarking(){
+  public EventProxy getConfiguredPreconditionMarking(){
     return mPreconditionMarking;
   }
 
@@ -152,13 +152,13 @@ public abstract class AbstractConflictChecker
   /**
    * Gets the marking proposition to be used.
    * This method returns the marking proposition specified by the {@link
-   * #setMarkingProposition(EventProxy) setMarkingProposition()} method, if
+   * #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()} method, if
    * non-null, or the default marking proposition of the input model.
    * @throws IllegalArgumentException to indicate that the a
    *         <CODE>null</CODE> marking was specified, but input model does
    *         not contain any proposition with the default marking name.
    */
-  protected EventProxy getUsedMarkingProposition()
+  protected EventProxy getUsedDefaultMarking()
     throws EventNotFoundException
   {
     if (mUsedMarking == null) {

@@ -135,29 +135,30 @@ public class NativeConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
-  public void setMarkingProposition(final EventProxy marking)
+  public void setConfiguredDefaultMarking(final EventProxy marking)
   {
     mMarking = marking;
     mUsedMarking = null;
     clearAnalysisResult();
   }
 
-  public EventProxy getMarkingProposition()
+  public EventProxy getConfiguredDefaultMarking()
   {
     return mMarking;
   }
 
-  public void setPreconditionMarking(final EventProxy marking)
+  public void setConfiguredPreconditionMarking(final EventProxy marking)
   {
     mPreconditionMarking = marking;
     clearAnalysisResult();
   }
 
-  public EventProxy getPreconditionMarking()
+  public EventProxy getConfiguredPreconditionMarking()
   {
     return mPreconditionMarking;
   }
 
+  @Override
   public ConflictTraceProxy getCounterExample()
   {
     return (ConflictTraceProxy) super.getCounterExample();
@@ -166,7 +167,7 @@ public class NativeConflictChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  public EventProxy getUsedMarkingProposition()
+  public EventProxy getUsedDefaultMarking()
     throws EventNotFoundException
   {
     if (mUsedMarking == null) {

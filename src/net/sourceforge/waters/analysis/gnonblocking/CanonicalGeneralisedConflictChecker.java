@@ -124,10 +124,10 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     setUp();
     clearStats();
     MarshallingTools.saveModule(getModel(), "_sic5.wmod");
-    mAlpha = getPreconditionMarking();
+    mAlpha = getConfiguredPreconditionMarking();
     mTime -= System.currentTimeMillis();
-    if (getMarkingProposition() == null) {
-      setMarkingProposition(getUsedMarkingProposition());
+    if (getConfiguredDefaultMarking() == null) {
+      setConfiguredDefaultMarking(getUsedDefaultMarking());
     }
     try {
       mWriter = new BufferedWriter(new FileWriter("/home/darius/supremicastuff/reductions" + getModel().getName()));
@@ -151,10 +151,10 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       //System.out.println(list.getModel());
       MarshallingTools.saveModule(list.getModel(), "final_sic5.wmod");
       final ConflictChecker checker =
-        new NativeConflictChecker(list.getModel(), getMarkingProposition(),
+        new NativeConflictChecker(list.getModel(), getConfiguredDefaultMarking(),
                                   getFactory());
       checker
-          .setPreconditionMarking(mAlpha);
+          .setConfiguredPreconditionMarking(mAlpha);
       checker.setNodeLimit(50000000);
       System.out.println("2");
       result = checker.run();
@@ -262,7 +262,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     final TObjectIntHashMap<Set<AutomatonProxy>> numoccuring =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
+      if (e == getConfiguredDefaultMarking()) {
         continue;
       }
       final Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
@@ -480,7 +480,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     final TObjectIntHashMap<Set<AutomatonProxy>> numoccuring =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
+      if (e == getConfiguredDefaultMarking()) {
         continue;
       }
       final Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
@@ -1096,7 +1096,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
             List<AutomatonProxy> tocomp =
                 Arrays.asList(new AutomatonProxy[] {aut1, aut2});
             final BlockedEvents be =
-                new BlockedEvents(tocomp, getFactory(), getMarkingProposition());
+                new BlockedEvents(tocomp, getFactory(), getConfiguredDefaultMarking());
             be.setNodeLimit(100000);
             try {
               tocomp = be.run();
@@ -1147,7 +1147,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
         }
       }
       //if (mHidden.contains(getMarkingProposition())) {
-      mHidden.remove(getMarkingProposition());
+      mHidden.remove(getConfiguredDefaultMarking());
       mHidden.remove(mAlpha);
       //}
       //AutomataHidden ah =
@@ -1181,7 +1181,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
             final MonolithicSynchronousProductBuilder composer =
               new MonolithicSynchronousProductBuilder(compmodel, getFactory());
             final List<EventProxy> propositions = new ArrayList<EventProxy>();
-            propositions.add(getMarkingProposition());
+            propositions.add(getConfiguredDefaultMarking());
             propositions.add(mAlpha);
             composer.setPropositions(propositions);
             //System.out.println(size);
@@ -1278,7 +1278,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
   //          System.out.println("hidden ; "+ mHidden);
             // System.out.println(minAutomaton);
             // System.out.println(mCompautomata);
-            final int marking = ee.getEventCode(getMarkingProposition());
+            final int marking = ee.getEventCode(getConfiguredDefaultMarking());
             final int alpha = ee.getEventCode(mAlpha);
             final int cont = ee.getEventCode(mCont);
             if (mCompautomata.size() != 1) {
@@ -1379,7 +1379,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
             minAutomaton = minAutomaton2;
           }*/
           final TransitionRelation tr =
-              new TransitionRelation(minAutomaton, getMarkingProposition());
+              new TransitionRelation(minAutomaton, getConfiguredDefaultMarking());
           allwaysenabled = tr.getAllwaysEnabled();
           allselflooped = tr.getAllSelfLoops();
           // mMinAutMap.put(ah, minAutomaton);

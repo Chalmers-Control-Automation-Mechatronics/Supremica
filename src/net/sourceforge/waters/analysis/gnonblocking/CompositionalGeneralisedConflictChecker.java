@@ -195,37 +195,37 @@ public class CompositionalGeneralisedConflictChecker
 
   // Ugly override to make this method visible within package.
   @Override
-  protected EventProxy getUsedMarkingProposition()
+  protected EventProxy getUsedDefaultMarking()
       throws EventNotFoundException
   {
-    return super.getUsedMarkingProposition();
+    return super.getUsedDefaultMarking();
   }
 
   @Override
-  public void setPreconditionMarking(final EventProxy marking)
+  public void setConfiguredPreconditionMarking(final EventProxy marking)
   {
-    super.setPreconditionMarking(marking);
+    super.setConfiguredPreconditionMarking(marking);
     mUsedPreconditionMarking = null;
   }
 
   /**
    * Gets the precondition marking proposition to be used. This method returns
    * the marking proposition specified by the
-   * {@link #setPreconditionMarking(EventProxy)
+   * {@link #setConfiguredPreconditionMarking(EventProxy)
    * setGeneralisedPrecondition()} method, if non-null, or creates an alpha
    * marking if the model does not contain one.
    */
   protected EventProxy getUsedPreconditionMarkingProposition()
   {
     if (mUsedPreconditionMarking == null) {
-      if (getPreconditionMarking() == null) {
+      if (getConfiguredPreconditionMarking() == null) {
         final ProductDESProxyFactory factory = getFactory();
         final EventProxy alpha =
             factory.createEventProxy(":alpha", EventKind.PROPOSITION);
 
         mUsedPreconditionMarking = alpha;
       } else {
-        mUsedPreconditionMarking = getPreconditionMarking();
+        mUsedPreconditionMarking = getConfiguredPreconditionMarking();
       }
     }
     return mUsedPreconditionMarking;
@@ -340,12 +340,12 @@ public class CompositionalGeneralisedConflictChecker
       }
       // MarshallingTools.saveModule(model, "model.wmod");
       final ConflictChecker checker =
-          new NativeConflictChecker(model, getUsedMarkingProposition(),
+          new NativeConflictChecker(model, getUsedDefaultMarking(),
               getFactory());
       // final ConflictChecker checker = new MonolithicConflictChecker(model,
       // getUsedMarkingProposition(), getFactory());
       checker
-          .setPreconditionMarking(getUsedPreconditionMarkingProposition());
+          .setConfiguredPreconditionMarking(getUsedPreconditionMarkingProposition());
       checker.setNodeLimit(mFinalStepNodeLimit);
       checker.setTransitionLimit(mFinalStepTransitionLimit);
       final boolean result = checker.run();
@@ -616,7 +616,7 @@ public class CompositionalGeneralisedConflictChecker
     mTemporaryModifyingSteps = new ArrayList<Step>();
     mUsedPreconditionMarking = null;
     final EventProxy alpha = getUsedPreconditionMarkingProposition();
-    final EventProxy omega = getUsedMarkingProposition();
+    final EventProxy omega = getUsedDefaultMarking();
     mPropositions = new ArrayList<EventProxy>(2);
     mPropositions.add(alpha);
     mPropositions.add(omega);

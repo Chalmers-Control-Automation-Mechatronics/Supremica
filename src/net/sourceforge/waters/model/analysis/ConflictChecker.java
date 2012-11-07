@@ -48,15 +48,15 @@ public interface ConflictChecker extends ModelVerifier
    *                  or <CODE>null</CODE> to use the default marking
    *                  proposition of the model.
    */
-  public void setMarkingProposition(EventProxy marking);
+  public void setConfiguredDefaultMarking(EventProxy marking);
 
   /**
    * Gets the <I>marking proposition</I> used for conflict checking.
    * @return The current marking proposition or <CODE>null</CODE> to
    *         indicate default marking.
-   * @see #setMarkingProposition(EventProxy)
+   * @see #setConfiguredDefaultMarking(EventProxy)
    */
-  public EventProxy getMarkingProposition();
+  public EventProxy getConfiguredDefaultMarking();
 
   /**
    * <P>Sets the precondition (alpha marking) for a generalised nonblocking
@@ -68,16 +68,16 @@ public interface ConflictChecker extends ModelVerifier
    * @param  marking  The marking proposition to be used,
    *                  or <CODE>null</CODE> for a standard nonblocking check.
    */
-  public void setPreconditionMarking(EventProxy marking);
+  public void setConfiguredPreconditionMarking(EventProxy marking);
 
   /**
    * Gets the precondition (alpha marking) for a generalised nonblocking
    * check.
    * @return The current precondition or <CODE>null</CODE> to
    *         indicate standard conflict check.
-   * @see #setPreconditionMarking(EventProxy)
+   * @see #setConfiguredPreconditionMarking(EventProxy)
    */
-  public EventProxy getPreconditionMarking();
+  public EventProxy getConfiguredPreconditionMarking();
 
 
   //#########################################################################

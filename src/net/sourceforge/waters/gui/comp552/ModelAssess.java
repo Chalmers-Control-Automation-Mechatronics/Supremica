@@ -1405,7 +1405,7 @@ public class ModelAssess
         final EventProxy marking = getSecondaryMarking(propdes);
         if (marking != null) {
           final ConflictChecker checker = (ConflictChecker) getModelVerifier();
-          checker.setMarkingProposition(marking);
+          checker.setConfiguredDefaultMarking(marking);
         }
         return super.check(propdes);
       }
