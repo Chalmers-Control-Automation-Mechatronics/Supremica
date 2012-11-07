@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.composing
+//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
 //# CLASS:   GNBModelVerifierFactory
 //###########################################################################
 //# $Id$
@@ -9,9 +9,6 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import net.sourceforge.waters.analysis.composing.ComposingControllabilityChecker;
-import net.sourceforge.waters.analysis.composing.ComposingLanguageInclusionChecker;
-import net.sourceforge.waters.analysis.composing.ComposingSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
@@ -72,13 +69,6 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
   @Override
-  public ComposingControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new ComposingControllabilityChecker(factory);
-  }
-
-  @Override
   public CompositionalGeneralisedConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
@@ -86,7 +76,7 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
   }
 
   /*public AlphaNonBlockingChecker createConflictChecker
-    (final ProductDESProxyFactory factory)   
+    (final ProductDESProxyFactory factory)
   {
     return new AlphaNonBlockingChecker(null, factory);
   }*/
@@ -96,13 +86,6 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
   {
     return new CanonicalGeneralisedConflictChecker(null, factory);
   }*/
-
-  @Override
-  public ComposingLanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new ComposingLanguageInclusionChecker(factory);
-  }
 
 
   //#########################################################################
@@ -125,11 +108,7 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof ComposingSafetyVerifier) {
-        final ComposingSafetyVerifier composer =
-            (ComposingSafetyVerifier) verifier;
-        composer.setNodeLimit(limit);
-      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
             (CompositionalGeneralisedConflictChecker) verifier;
         composer.setFinalStepNodeLimit(limit);
@@ -159,11 +138,7 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof ComposingSafetyVerifier) {
-        final ComposingSafetyVerifier composer =
-            (ComposingSafetyVerifier) verifier;
-        composer.setProjectionNodeLimit(limit);
-      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
             (CompositionalGeneralisedConflictChecker) verifier;
         composer.setInternalStepNodeLimit(limit);
@@ -193,11 +168,7 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof ComposingSafetyVerifier) {
-        final ComposingSafetyVerifier composer =
-            (ComposingSafetyVerifier) verifier;
-        composer.setTransitionLimit(limit);
-      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
             (CompositionalGeneralisedConflictChecker) verifier;
         composer.setFinalStepTransitionLimit(limit);
@@ -227,11 +198,7 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
-      if (verifier instanceof ComposingSafetyVerifier) {
-        final ComposingSafetyVerifier composer =
-            (ComposingSafetyVerifier) verifier;
-        composer.setTransitionLimit(limit);
-      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
             (CompositionalGeneralisedConflictChecker) verifier;
         composer.setInternalStepTransitionLimit(limit);
@@ -259,11 +226,7 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final String name = getValue();
-      if (verifier instanceof ComposingSafetyVerifier) {
-        final ComposingSafetyVerifier composing =
-          (ComposingSafetyVerifier) verifier;
-        composing.setHeuristic(name);
-      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
           (CompositionalGeneralisedConflictChecker) verifier;
         CompositionalGeneralisedConflictChecker.PreselectingHeuristic heuristic = null;
@@ -303,11 +266,7 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     protected void configure(final ModelVerifier verifier)
     {
       final String name = getValue();
-      if (verifier instanceof ComposingSafetyVerifier) {
-        final ComposingSafetyVerifier composing =
-          (ComposingSafetyVerifier) verifier;
-        composing.setHeuristic(name);
-      } else if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
           (CompositionalGeneralisedConflictChecker) verifier;
         CompositionalGeneralisedConflictChecker.SelectingHeuristic heuristic = null;

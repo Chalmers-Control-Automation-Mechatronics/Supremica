@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.composing.AllSame;
 import net.sourceforge.waters.analysis.modular.BlockedEvents;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;

@@ -34,7 +34,6 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.annotation.CertainConflictException;
 import net.sourceforge.waters.analysis.annotation.TransitionRelation;
-import net.sourceforge.waters.analysis.composing.AutomataStats;
 import net.sourceforge.waters.analysis.modular.BlockedEvents;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;

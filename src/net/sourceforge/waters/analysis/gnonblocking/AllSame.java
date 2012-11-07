@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.modular
-//# CLASS:   ProjectingControllabilityChecker
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.gnonblocking
+//# CLASS:   AllSame
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java 4468 2008-11-01 21:54:58Z robi $
+//# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.composing;
+package net.sourceforge.waters.analysis.gnonblocking;
 
 import gnu.trove.THashMap;
 import gnu.trove.THashSet;
@@ -33,13 +33,12 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+
 /**
- * The projecting controllability check algorithm.
- *
  * @author Simon Ware
  */
 
-public class AllSame
+class AllSame
 {
   private final TObjectIntHashMap<EventProxy> mEventNumber;
   private final EventProxy[] mNumberEvent;
