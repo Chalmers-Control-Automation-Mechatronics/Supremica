@@ -19,8 +19,8 @@ import java.util.List;
  * An enumeration-value command line argument passed to a
  * {@link ModelVerifierFactory}.
  * Enumeration command line arguments are specified on the command line by
- * their name followed by a string that represents of the enumeration
- * object to be selected. The command line argument knows the enumeration
+ * their name followed by a string that represents one of the enumeration
+ * objects to be selected. The command line argument knows the enumeration
  * class of the value type and uses it to convert the parsed text to an
  * appropriate object, which is stored in the
  * <CODE>CommandLineArgumentEnum</CODE> object for retrieval.

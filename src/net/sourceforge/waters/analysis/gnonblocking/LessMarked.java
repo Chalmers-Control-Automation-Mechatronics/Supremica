@@ -52,7 +52,8 @@ public class LessMarked
     //if (mRevisited % 1000000 == 0) {outputstats();}
   }
 
-  public void outputstats()
+  @SuppressWarnings("unused")
+  private void outputstats()
   {
     System.out.println("Distinct States: " + allvisited.size());
     System.out.println("Revisits: " + mRevisited);

@@ -91,7 +91,6 @@ public class ListBufferTauLoopRemoval
         tarjan(s);
       }
     }
-    System.out.println(mToBeMerged.size());
     mTransitionRelation.merge(mToBeMerged);
     mTransitionRelation.removeTauSelfLoops();
     TIME += System.currentTimeMillis();

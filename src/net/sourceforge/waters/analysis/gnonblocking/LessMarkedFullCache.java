@@ -64,7 +64,8 @@ public class LessMarkedFullCache
     }
   }
 
-  public void outputstats()
+  @SuppressWarnings("unused")
+  private void outputstats()
   {
     System.out.println("Distinct States: " + allvisited.size());
     System.out.println("Revisits: " + mRevisited);

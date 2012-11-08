@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * A command line argument passed to a {@link ModelVerifierFactory} to specify
  * multiple strings. String list command line arguments can be used several
- * times in the command line by their each time specifying a string value. The
+ * times in the command line, each time specifying a string value. The
  * list of parsed values is stored in the
  * <CODE>CommandLineArgumentStringList</CODE> object for retrieval.
  *
