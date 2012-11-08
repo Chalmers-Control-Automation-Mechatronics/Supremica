@@ -27,9 +27,17 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
+
 /**
+ * A special abstraction step for compositional conflict checkers.
+ * Includes support for counterexample expansion after synchronous
+ * product computations, during which dump states of the input automata
+ * are merged into a single dump state of the synchronous product that
+ * is not further expanded.
+ *
  * @author Robi Malik
  */
+
 class ConflictHidingStep extends HidingStep
 {
 
@@ -68,7 +76,7 @@ class ConflictHidingStep extends HidingStep
      final Map<AutomatonProxy,StateProxy> nextMapResult,
      final EventProxy resultEvent)
   {
-    final Collection<AutomatonProxy> originalAutomata =
+    final List<AutomatonProxy> originalAutomata =
       getOriginalAutomata();
     final int numAutomata = originalAutomata.size();
 
@@ -139,7 +147,11 @@ class ConflictHidingStep extends HidingStep
         final DumpStateSearchData data = entry.getValue();
         if (!alphabet.contains(event)) {
           final StateProxy state = previousMapOrig.get(aut);
-          data.setTarget(aut, state);
+          final boolean dump =
+            nonDumpStates != null &&
+            !nonDumpStates.contains(state) &&
+            !state.getPropositions().contains(marking);
+          data.setTarget(aut, state, dump);
         } else if (data.findTarget(aut, nonDumpStates, marking) == null) {
           iter.remove();
         }
@@ -202,9 +214,11 @@ class ConflictHidingStep extends HidingStep
     }
 
     private StateProxy setTarget(final AutomatonProxy aut,
-                                 final StateProxy state)
+                                 final StateProxy state,
+                                 final boolean dump)
     {
       mTargetStateMap.put(aut, state);
+      mHasDumpState |= dump;
       return state;
     }
     private StateProxy findTarget(final AutomatonProxy aut,
@@ -232,7 +246,7 @@ class ConflictHidingStep extends HidingStep
         }
       }
       mCurrentTargets.clear();
-      return setTarget(aut, state);
+      return setTarget(aut, state, false);
     }
 
     //#######################################################################

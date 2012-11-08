@@ -214,6 +214,14 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- nasty
+  public void testAgvbPart() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "agvb_part.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testCertainConf1() throws Exception
   {
     final String group = "tests";
