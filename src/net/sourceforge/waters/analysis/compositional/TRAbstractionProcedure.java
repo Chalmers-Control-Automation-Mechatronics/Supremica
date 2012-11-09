@@ -28,13 +28,13 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 /**
  * @author Robi Malik
  */
-abstract class TRSimplifierAbstractionProcedure
+abstract class TRAbstractionProcedure
   extends AbstractAbstractionProcedure
 {
 
   //#########################################################################
   //# Constructor
-  TRSimplifierAbstractionProcedure
+  TRAbstractionProcedure
     (final AbstractCompositionalModelAnalyzer analyzer,
      final TransitionRelationSimplifier simplifier)
   {
@@ -129,7 +129,7 @@ abstract class TRSimplifierAbstractionProcedure
   //#########################################################################
   //# Auxiliary Methods
   EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                              final EventProxy tau)
+                                    final EventProxy tau)
   {
     final KindTranslator translator = getKindTranslator();
     Collection<EventProxy> filter = getPropositions();

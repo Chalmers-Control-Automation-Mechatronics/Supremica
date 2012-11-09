@@ -27,7 +27,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-class ProjectionAbstractionProcedure extends TRSimplifierAbstractionProcedure
+class ProjectionAbstractionProcedure extends TRAbstractionProcedure
 {
   //#########################################################################
   //# Constructor

@@ -26,11 +26,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SynthesisObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -294,36 +290,9 @@ public class CompositionalSynthesizer
   {
     final EventProxy defaultMarking = createDefaultMarking();
     setPropositionsForMarkings(defaultMarking, null);
-    final ChainTRSimplifier chain = new ChainTRSimplifier();
-    if ((mUsedAbstractionMethods & USE_HALFWAY) != 0) {
-      final HalfWaySynthesisTRSimplifier halfWay =
-        new HalfWaySynthesisTRSimplifier();
-      chain.add(halfWay);
-    }
-    if ((mUsedAbstractionMethods & USE_BISIMULATION) != 0) {
-      final TransitionRelationSimplifier bisimulator =
-        new BisimulationTRSimplifier();
-      chain.add(bisimulator);
-    }
-    final int limit = getInternalTransitionLimit();
-    if ((mUsedAbstractionMethods & USE_SOE) != 0) {
-      final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction =
-        new SynthesisObservationEquivalenceTRSimplifier();
-      synthesisAbstraction.setTransitionLimit(limit);
-      synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(false);
-      chain.add(synthesisAbstraction);
-    }
-    if ((mUsedAbstractionMethods & USE_WSOE) != 0) {
-      final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction =
-        new SynthesisObservationEquivalenceTRSimplifier();
-      synthesisAbstraction.setTransitionLimit(limit);
-      synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(true);
-      chain.add(synthesisAbstraction);
-    }
     final AbstractionProcedure proc =
-      new SynthesisAbstractionProcedure(this, chain);
+      SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure(this);
     setAbstractionProcedure(proc);
-
     mDistinguisherInfoList = new LinkedList<DistinguisherInfo> ();
     mRenamedEvents = new THashSet<EventProxy>();
     super.setUp();
@@ -1175,44 +1144,6 @@ public class CompositionalSynthesizer
 
 
   //#########################################################################
-  //# Inner Class BisimulationTRSimplifier
-  /**
-   * A specialised observation equivalence simplifier for use only in
-   * synthesis. This is used for bisimulation abstraction before
-   * synthesis observation equivalence.
-   */
-  private static class BisimulationTRSimplifier
-    extends ObservationEquivalenceTRSimplifier
-  {
-    //#######################################################################
-    //# Constructor
-    private BisimulationTRSimplifier()
-    {
-      setEquivalence
-        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
-    @Override
-    /**
-     * Destructively applies the computed partitioning to the simplifier's
-     * transition relation. After applying the partition, this implementation
-     * removes the result partition from the simplifier, pretending to the
-     * chain that no partition was computed. In this way, the partition
-     * computed from the chain will only include the synthesis observation
-     * equivalence steps.
-     */
-    protected void applyResultPartition() throws AnalysisException
-    {
-      super.applyResultPartition();
-      setResultPartitionList(null);
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class SynthesisEventInfo
   /**
    * An event information record for compositional synthesis.
@@ -1293,55 +1224,10 @@ public class CompositionalSynthesizer
   //# Data Members
   private String mOutputName;
   private boolean mConstructsResult = true;
-  private int mUsedAbstractionMethods = CHAIN_ALL;
+  private int mUsedAbstractionMethods =
+    SynthesisAbstractionProcedure.CHAIN_ALL;
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
-
-
-  //#########################################################################
-  //# Class Constants
-  /**
-   * Flag to include halfway synthesis in abstraction chain.
-   */
-  public static final int USE_HALFWAY = 0x01;
-  /**
-   * Flag to include halfway bisimulation in abstraction chain.
-   */
-  public static final int USE_BISIMULATION = 0x02;
-  /**
-   * Flag to include synthesis observation equivalence in abstraction chain.
-   */
-  public static final int USE_SOE = 0x04;
-  /**
-   * Flag to include weak synthesis observation equivalence in abstraction
-   * chain.
-   */
-  public static final int USE_WSOE = 0x08;
-
-  /**
-   * Argument to {@link #setUsedAbstractionMethods(int)
-   * setUsedAbstractionMethods()} for specifying an abstraction chain
-   * consisting of halfway synthesis, bisimulation, and synthesis observation
-   * equivalence.
-   */
-  public static final int CHAIN_SOE =
-    USE_HALFWAY | USE_BISIMULATION | USE_SOE;
-  /**
-   * Argument to {@link #setUsedAbstractionMethods(int)
-   * setUsedAbstractionMethods()} for specifying an abstraction chain
-   * consisting of halfway synthesis, bisimulation, and weak synthesis
-   * observation equivalence. This is the default.
-   */
-  public static final int CHAIN_WSOE =
-    USE_HALFWAY | USE_BISIMULATION | USE_WSOE;
-  /**
-   * Argument to {@link #setUsedAbstractionMethods(int)
-   * setUsedAbstractionMethods()} for specifying an abstraction chain
-   * consisting of halfway synthesis, bisimulation, synthesis observation
-   * equivalence, and weak synthesis observation equivalence.
-   */
-  public static final int CHAIN_ALL =
-    USE_HALFWAY | USE_BISIMULATION | USE_SOE | USE_WSOE;
 
 }

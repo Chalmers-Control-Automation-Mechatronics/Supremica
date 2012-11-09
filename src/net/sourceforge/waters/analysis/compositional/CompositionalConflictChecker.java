@@ -19,22 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.abstraction.AlphaDeterminisationTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.CoreachabilityTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.ObserverProjectionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.OmegaRemovalTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.certainconf.CertainConflictsTRSimplifier;import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
@@ -534,186 +520,6 @@ public class CompositionalConflictChecker
 
 
   //#########################################################################
-  //# Chains
-  private AbstractionProcedure createObservationEquivalenceChain
-    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
-  {
-    final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-    final int limit = getInternalTransitionLimit();
-    bisimulator.setTransitionLimit(limit);
-    chain.add(bisimulator);
-    if (getUsedPreconditionMarking() != null) {
-      return new GeneralisedConflictCheckerAbstractionProcedure(this, chain);
-    } else {
-      return new ConflictCheckerAbstractionProcedure(this, chain);
-    }
-  }
-
-  private AbstractionProcedure createObserverProjectionChain()
-  {
-    final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover);
-    final ObserverProjectionTRSimplifier op =
-      new ObserverProjectionTRSimplifier();
-    final int limit = getInternalTransitionLimit();
-    op.setTransitionLimit(limit);
-    op.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    chain.add(op);
-    return new ObserverProjectionAbstractionProcedure(this, chain, op);
-  }
-
-  private AbstractionProcedure createOPVerifierChain
-    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
-  {
-    final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-    (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-    final int limit = getInternalTransitionLimit();
-    bisimulator.setTransitionLimit(limit);
-    chain.add(bisimulator);
-    return new OPVerifierAbstractionProcedure(this, chain);
-  }
-
-  private AbstractionProcedure createStandardNonblockingAbstractionChain
-    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
-     final boolean includeNonAlphaDeterminisation,
-     final boolean useLimitedCertainConflicts,
-     final boolean useProperCertainConflicts)
-  {
-    final ChainTRSimplifier preChain = new ChainTRSimplifier();
-    final ChainTRSimplifier postChain = new ChainTRSimplifier();
-    final TauLoopRemovalTRSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    preChain.add(loopRemover);
-    final MarkingRemovalTRSimplifier markingRemover =
-      new MarkingRemovalTRSimplifier();
-    preChain.add(markingRemover);
-    final SilentIncomingTRSimplifier silentInRemover =
-      new SilentIncomingTRSimplifier();
-    silentInRemover.setRestrictsToUnreachableStates(true);
-    preChain.add(silentInRemover);
-    final OnlySilentOutgoingTRSimplifier silentOutRemover =
-      new OnlySilentOutgoingTRSimplifier();
-    preChain.add(silentOutRemover);
-    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
-      new IncomingEquivalenceTRSimplifier();
-    final int limit = getInternalTransitionLimit();
-    incomingEquivalenceSimplifier.setTransitionLimit(limit);
-    preChain.add(incomingEquivalenceSimplifier);
-    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
-    if (useLimitedCertainConflicts) {
-      limitedCertainConflictsRemover =
-        new LimitedCertainConflictsTRSimplifier();
-    } else {
-      limitedCertainConflictsRemover = null;
-    }
-    final CertainConflictsTRSimplifier certainConflictsRemover;
-    if (useProperCertainConflicts) {
-      certainConflictsRemover = new CertainConflictsTRSimplifier();
-    } else {
-      certainConflictsRemover = null;
-    }
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
-    bisimulator.setTransitionLimit(limit);
-    postChain.add(bisimulator);
-    if (includeNonAlphaDeterminisation) {
-      final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-        new NonAlphaDeterminisationTRSimplifier();
-      nonAlphaDeterminiser.setTransitionRemovalMode
-        (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-      nonAlphaDeterminiser.setTransitionLimit(limit);
-      postChain.add(nonAlphaDeterminiser);
-    }
-    final MarkingSaturationTRSimplifier saturator =
-      new MarkingSaturationTRSimplifier();
-    postChain.add(saturator);
-    return new StandardConflictCheckerAbstractionProcedure
-      (this, preChain, limitedCertainConflictsRemover,
-       certainConflictsRemover, postChain);
-  }
-
-  private AbstractionProcedure createGeneralisedNonblockingAbstractionChain
-    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
-  {
-    final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final TauLoopRemovalTRSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover);
-    final MarkingRemovalTRSimplifier alphaRemover =
-      new MarkingRemovalTRSimplifier();
-    chain.add(alphaRemover);
-    final OmegaRemovalTRSimplifier omegaRemover =
-      new OmegaRemovalTRSimplifier();
-    chain.add(omegaRemover);
-    if (getConfiguredPreconditionMarking() != null) {
-      final CoreachabilityTRSimplifier nonCoreachableRemover =
-        new CoreachabilityTRSimplifier();
-      chain.add(nonCoreachableRemover);
-    }
-    final SilentIncomingTRSimplifier silentInRemover =
-      new SilentIncomingTRSimplifier();
-    silentInRemover.setRestrictsToUnreachableStates(true);
-    chain.add(silentInRemover);
-    final OnlySilentOutgoingTRSimplifier silentOutRemover =
-      new OnlySilentOutgoingTRSimplifier();
-    chain.add(silentOutRemover);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    final int limit = getInternalTransitionLimit();
-    bisimulator.setTransitionLimit(limit);
-    chain.add(bisimulator);
-    final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-      new NonAlphaDeterminisationTRSimplifier();
-    nonAlphaDeterminiser.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-    nonAlphaDeterminiser.setTransitionLimit(limit);
-    chain.add(nonAlphaDeterminiser);
-    if (getConfiguredPreconditionMarking() != null) {
-      final AlphaDeterminisationTRSimplifier alphaDeterminiser =
-        new AlphaDeterminisationTRSimplifier();
-      alphaDeterminiser.setTransitionRemovalMode
-        (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-      alphaDeterminiser.setTransitionLimit(limit);
-      chain.add(alphaDeterminiser);
-    }
-    final MarkingSaturationTRSimplifier saturator =
-      new MarkingSaturationTRSimplifier();
-    chain.add(saturator);
-    return new GeneralisedConflictCheckerAbstractionProcedure(this, chain);
-  }
-
-
-  //#########################################################################
   //# Events+Automata Maps
   @Override
   protected void initialiseEventsToAutomata()
@@ -949,9 +755,10 @@ public class CompositionalConflictChecker
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createStandardNonblockingAbstractionChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           OBSERVATION_EQUIVALENCE, false, false, true);
+        return ThreeStepConflictEquivalenceAbstractionProcedure.
+          createThreeStepConflictEquivalenceAbstractionProcedure
+            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
+             OBSERVATION_EQUIVALENCE, false, false, true);
       }
     },
     /**
@@ -968,9 +775,10 @@ public class CompositionalConflictChecker
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createGeneralisedNonblockingAbstractionChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE);
+        return TRConflictEquivalenceAbstractionProcedure.
+          createGeneralisedNonblockingProcedure
+            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
+             WEAK_OBSERVATION_EQUIVALENCE);
       }
     },
     /**
@@ -986,9 +794,10 @@ public class CompositionalConflictChecker
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createStandardNonblockingAbstractionChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, false, true, false);
+        return ThreeStepConflictEquivalenceAbstractionProcedure.
+          createThreeStepConflictEquivalenceAbstractionProcedure
+            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
+             WEAK_OBSERVATION_EQUIVALENCE, false, true, false);
       }
     },
     /**
@@ -1005,9 +814,10 @@ public class CompositionalConflictChecker
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createStandardNonblockingAbstractionChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, true, true, false);
+        return ThreeStepConflictEquivalenceAbstractionProcedure.
+          createThreeStepConflictEquivalenceAbstractionProcedure
+            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
+             WEAK_OBSERVATION_EQUIVALENCE, true, true, false);
       }
     },
     /**
@@ -1025,9 +835,10 @@ public class CompositionalConflictChecker
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createStandardNonblockingAbstractionChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, false, true, true);
+        return ThreeStepConflictEquivalenceAbstractionProcedure.
+          createThreeStepConflictEquivalenceAbstractionProcedure
+            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
+             WEAK_OBSERVATION_EQUIVALENCE, false, true, true);
       }
     },
     /**
@@ -1038,9 +849,10 @@ public class CompositionalConflictChecker
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createObservationEquivalenceChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           OBSERVATION_EQUIVALENCE);
+        return TRConflictEquivalenceAbstractionProcedure.
+          createObservationEquivalenceProcedure
+            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
+             OBSERVATION_EQUIVALENCE);
       }
     },
     /**
@@ -1054,7 +866,8 @@ public class CompositionalConflictChecker
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createObserverProjectionChain();
+        return ObserverProjectionAbstractionProcedure.
+          createObserverProjectionProcedure(checker);
       }
     },
     /**
@@ -1067,8 +880,8 @@ public class CompositionalConflictChecker
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createOPVerifierChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
+        return OPVerifierAbstractionProcedure.createOPVerifierProcedure
+          (checker, ObservationEquivalenceTRSimplifier.Equivalence.
            WEAK_OBSERVATION_EQUIVALENCE);
       }
     },
@@ -1081,16 +894,17 @@ public class CompositionalConflictChecker
      * <P><I>Reference.</I> Rong Su, Jan H. van Schuppen, Jacobus E. Rooda,
      * Albert T. Hofkamp. Nonconflict check by using sequential automaton
      * abstractions based on weak observation equivalence. Automatica,
-     * <STRONG>46</STRONG>(6), 968--978, 2010.</P>
+     * <STRONG>46</STRONG>(6), 968-978, 2010.</P>
      */
     WOEQ {
       @Override
       AbstractionProcedure createAbstractionRule
         (final CompositionalConflictChecker checker)
       {
-        return checker.createObservationEquivalenceChain
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE);
+        return TRConflictEquivalenceAbstractionProcedure.
+          createObservationEquivalenceProcedure
+            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
+             WEAK_OBSERVATION_EQUIVALENCE);
       }
     };
 

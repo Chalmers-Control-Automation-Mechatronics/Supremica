@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
 //# CLASS:   SynthesisAbstractionProcedure
 //###########################################################################
@@ -19,6 +19,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.abstraction.AbstractSynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SynthesisObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -30,16 +31,55 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+
 /**
- * @author robi
+ * @author Robi Malik
  */
+
 public class SynthesisAbstractionProcedure
   extends AbstractAbstractionProcedure
 {
 
-  //#######################################################################
+  //#########################################################################
+  //# Factory Methods
+  public static SynthesisAbstractionProcedure
+    createSynthesisAbstractionProcedure
+      (final CompositionalSynthesizer synthesizer)
+  {
+    final int abstractionMethods = synthesizer.getUsedAbstractionMethods();
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    if ((abstractionMethods & USE_HALFWAY) != 0) {
+      final HalfWaySynthesisTRSimplifier halfWay =
+        new HalfWaySynthesisTRSimplifier();
+      chain.add(halfWay);
+    }
+    if ((abstractionMethods & USE_BISIMULATION) != 0) {
+      final TransitionRelationSimplifier bisimulator =
+        new BisimulationTRSimplifier();
+      chain.add(bisimulator);
+    }
+    final int limit = synthesizer.getInternalTransitionLimit();
+    if ((abstractionMethods & USE_SOE) != 0) {
+      final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction =
+        new SynthesisObservationEquivalenceTRSimplifier();
+      synthesisAbstraction.setTransitionLimit(limit);
+      synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(false);
+      chain.add(synthesisAbstraction);
+    }
+    if ((abstractionMethods & USE_WSOE) != 0) {
+      final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction =
+        new SynthesisObservationEquivalenceTRSimplifier();
+      synthesisAbstraction.setTransitionLimit(limit);
+      synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(true);
+      chain.add(synthesisAbstraction);
+    }
+    return new SynthesisAbstractionProcedure(synthesizer, chain);
+  }
+
+
+  //#########################################################################
   //# Constructor
-  protected SynthesisAbstractionProcedure
+  private SynthesisAbstractionProcedure
     (final CompositionalSynthesizer synthesizer,
      final ChainTRSimplifier chain)
   {
@@ -48,7 +88,7 @@ public class SynthesisAbstractionProcedure
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Interface net.sourceforge.waters.analysis.compositional.
   //# AbstractionProcedure
   @Override
@@ -126,7 +166,7 @@ public class SynthesisAbstractionProcedure
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.compositional.
   //# AbstractAbstractionProcedure
   @Override
@@ -280,6 +320,91 @@ public class SynthesisAbstractionProcedure
 
 
   //#########################################################################
+  //# Inner Class BisimulationTRSimplifier
+  /**
+   * A specialised observation equivalence simplifier for use only in
+   * synthesis. This is used for bisimulation abstraction before
+   * synthesis observation equivalence.
+   */
+  private static class BisimulationTRSimplifier
+    extends ObservationEquivalenceTRSimplifier
+  {
+    //#######################################################################
+    //# Constructor
+    private BisimulationTRSimplifier()
+    {
+      setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+    /**
+     * Destructively applies the computed partitioning to the simplifier's
+     * transition relation. After applying the partition, this implementation
+     * removes the result partition from the simplifier, pretending to the
+     * chain that no partition was computed. In this way, the partition
+     * computed from the chain will only include the synthesis observation
+     * equivalence steps.
+     */
+    @Override
+    protected void applyResultPartition() throws AnalysisException
+    {
+      super.applyResultPartition();
+      setResultPartitionList(null);
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final ChainTRSimplifier mChain;
+
+
+  //#########################################################################
+  //# Class Constants
+  /**
+   * Flag to include halfway synthesis in abstraction chain.
+   */
+  public static final int USE_HALFWAY = 0x01;
+  /**
+   * Flag to include halfway bisimulation in abstraction chain.
+   */
+  public static final int USE_BISIMULATION = 0x02;
+  /**
+   * Flag to include synthesis observation equivalence in abstraction chain.
+   */
+  public static final int USE_SOE = 0x04;
+  /**
+   * Flag to include weak synthesis observation equivalence in abstraction
+   * chain.
+   */
+  public static final int USE_WSOE = 0x08;
+
+  /**
+   * Argument to {@link #setUsedAbstractionMethods(int)
+   * setUsedAbstractionMethods()} for specifying an abstraction chain
+   * consisting of halfway synthesis, bisimulation, and synthesis observation
+   * equivalence.
+   */
+  public static final int CHAIN_SOE =
+    USE_HALFWAY | USE_BISIMULATION | USE_SOE;
+  /**
+   * Argument to {@link #setUsedAbstractionMethods(int)
+   * setUsedAbstractionMethods()} for specifying an abstraction chain
+   * consisting of halfway synthesis, bisimulation, and weak synthesis
+   * observation equivalence. This is the default.
+   */
+  public static final int CHAIN_WSOE =
+    USE_HALFWAY | USE_BISIMULATION | USE_WSOE;
+  /**
+   * Argument to {@link #setUsedAbstractionMethods(int)
+   * setUsedAbstractionMethods()} for specifying an abstraction chain
+   * consisting of halfway synthesis, bisimulation, synthesis observation
+   * equivalence, and weak synthesis observation equivalence.
+   */
+  public static final int CHAIN_ALL =
+    USE_HALFWAY | USE_BISIMULATION | USE_SOE | USE_WSOE;
+
 }

@@ -159,7 +159,7 @@ public class CompositionalSynthesizerExperiments
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mSynthesizer.setModel(des);
     mSynthesizer.setUsedAbstractionMethods
-    (CompositionalSynthesizer.USE_SOE);
+      (SynthesisAbstractionProcedure.USE_SOE);
     try {
       mSynthesizer.run();
     } catch (final AnalysisException exception) {

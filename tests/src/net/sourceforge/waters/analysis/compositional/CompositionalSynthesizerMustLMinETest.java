@@ -48,8 +48,8 @@ public class CompositionalSynthesizerMustLMinETest
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);
     synthesizer.setUsedAbstractionMethods
-      (CompositionalSynthesizer.USE_BISIMULATION |
-       CompositionalSynthesizer.USE_SOE);
+      (SynthesisAbstractionProcedure.USE_BISIMULATION |
+       SynthesisAbstractionProcedure.USE_SOE);
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
     synthesizer.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinE);
     return synthesizer;

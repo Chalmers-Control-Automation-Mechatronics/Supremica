@@ -12,6 +12,9 @@ package net.sourceforge.waters.analysis.compositional;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -26,20 +29,45 @@ import net.sourceforge.waters.model.des.EventProxy;
  */
 
 class OPVerifierAbstractionProcedure
-  extends ConflictCheckerAbstractionProcedure
+  extends TRConflictEquivalenceAbstractionProcedure
 {
 
-  //#######################################################################
-  //# Constructor
-  OPVerifierAbstractionProcedure
+  //#########################################################################
+  //# Factory Methods
+  public static OPVerifierAbstractionProcedure createOPVerifierProcedure
     (final AbstractCompositionalModelAnalyzer analyzer,
-     final TransitionRelationSimplifier simplifier)
+     final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
   {
-    super(analyzer, simplifier);
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(loopRemover);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+    final int limit = analyzer.getInternalTransitionLimit();
+    bisimulator.setTransitionLimit(limit);
+    chain.add(bisimulator);
+    return new OPVerifierAbstractionProcedure(analyzer, chain);
+  }
+
+
+  //#########################################################################
+  //# Constructor
+  private OPVerifierAbstractionProcedure
+    (final AbstractCompositionalModelAnalyzer analyzer,
+     final ChainTRSimplifier simplifier)
+  {
+    super(analyzer, simplifier, false);
     mExperiment = OPVerifierExperiment.getInstance();
   }
 
-  //#######################################################################
+
+  //#########################################################################
   //# Overrides for AbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
@@ -56,7 +84,8 @@ class OPVerifierAbstractionProcedure
     return super.run(aut, local, steps);
   }
 
-  //#######################################################################
+
+  //#########################################################################
   //# Data Members
   private final OPVerifierExperiment mExperiment;
 

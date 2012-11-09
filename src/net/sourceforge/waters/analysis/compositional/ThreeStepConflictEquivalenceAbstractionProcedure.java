@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   StandardConflictCheckerAbstractionProcedure
+//# CLASS:   ThreeStepConflictEquivalenceAbstractionProcedure
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -15,7 +15,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.certainconf.CertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -28,15 +36,91 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
+ * A specialised abstraction procedure used by the compositional conflict
+ * check algorithm. This abstraction procedure splits the abstraction
+ * process into three stages. Abstraction steps before and after certain
+ * conflicts are separated from certain conflicts computation to facilitate
+ * counterexample expansion.
+ *
  * @author Robi Malik
  */
 
-class StandardConflictCheckerAbstractionProcedure
+class ThreeStepConflictEquivalenceAbstractionProcedure
   extends AbstractAbstractionProcedure
 {
-  //#######################################################################
+
+  //#########################################################################
+  //# Factory Methods
+  public static ThreeStepConflictEquivalenceAbstractionProcedure
+    createThreeStepConflictEquivalenceAbstractionProcedure
+      (final AbstractCompositionalModelAnalyzer analyzer,
+       final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+       final boolean includeNonAlphaDeterminisation,
+       final boolean useLimitedCertainConflicts,
+       final boolean useProperCertainConflicts)
+  {
+    final ChainTRSimplifier preChain = new ChainTRSimplifier();
+    final ChainTRSimplifier postChain = new ChainTRSimplifier();
+    final TauLoopRemovalTRSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    preChain.add(loopRemover);
+    final MarkingRemovalTRSimplifier markingRemover =
+      new MarkingRemovalTRSimplifier();
+    preChain.add(markingRemover);
+    final SilentIncomingTRSimplifier silentInRemover =
+      new SilentIncomingTRSimplifier();
+    silentInRemover.setRestrictsToUnreachableStates(true);
+    preChain.add(silentInRemover);
+    final OnlySilentOutgoingTRSimplifier silentOutRemover =
+      new OnlySilentOutgoingTRSimplifier();
+    preChain.add(silentOutRemover);
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    final int limit = analyzer.getInternalTransitionLimit();
+    incomingEquivalenceSimplifier.setTransitionLimit(limit);
+    preChain.add(incomingEquivalenceSimplifier);
+    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
+    if (useLimitedCertainConflicts) {
+      limitedCertainConflictsRemover =
+        new LimitedCertainConflictsTRSimplifier();
+    } else {
+      limitedCertainConflictsRemover = null;
+    }
+    final CertainConflictsTRSimplifier certainConflictsRemover;
+    if (useProperCertainConflicts) {
+      certainConflictsRemover = new CertainConflictsTRSimplifier();
+    } else {
+      certainConflictsRemover = null;
+    }
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode
+    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+    (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator.setTransitionLimit(limit);
+    postChain.add(bisimulator);
+    if (includeNonAlphaDeterminisation) {
+      final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
+        new NonAlphaDeterminisationTRSimplifier();
+      nonAlphaDeterminiser.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+      nonAlphaDeterminiser.setTransitionLimit(limit);
+      postChain.add(nonAlphaDeterminiser);
+    }
+    final MarkingSaturationTRSimplifier saturator =
+      new MarkingSaturationTRSimplifier();
+    postChain.add(saturator);
+    return new ThreeStepConflictEquivalenceAbstractionProcedure
+      (analyzer, preChain, limitedCertainConflictsRemover,
+       certainConflictsRemover, postChain);
+  }
+
+
+  //#########################################################################
   //# Constructor
-  StandardConflictCheckerAbstractionProcedure
+  private ThreeStepConflictEquivalenceAbstractionProcedure
     (final AbstractCompositionalModelAnalyzer analyzer,
      final ChainTRSimplifier preChain,
      final LimitedCertainConflictsTRSimplifier limitedCCSimplifier,
@@ -59,7 +143,7 @@ class StandardConflictCheckerAbstractionProcedure
     mCompleteChain.add(postChain);
   }
 
-  //#######################################################################
+  //#########################################################################
   //# Overrides for AbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
