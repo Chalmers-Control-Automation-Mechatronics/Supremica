@@ -143,8 +143,10 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     mCompleteChain.add(postChain);
   }
 
+
   //#########################################################################
-  //# Overrides for AbstractionProcedure
+  //# Interface
+  //# net.sourceforge.waters.analysis.compositional.AbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
@@ -279,6 +281,12 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
   public void resetStatistics()
   {
     mCompleteChain.createStatistics();
+  }
+
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return true;
   }
 
 

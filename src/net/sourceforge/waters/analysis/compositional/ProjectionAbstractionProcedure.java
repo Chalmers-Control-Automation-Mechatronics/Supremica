@@ -90,7 +90,8 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
 
 
   //#########################################################################
-  //# Overrides for TRSimplifierAbstractionProcedure
+  //# Interface
+  //# net.sourceforge.waters.analysis.compositional.AbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
@@ -139,6 +140,16 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
     }
   }
 
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.compositional.TRAbstractionProcedure
   @Override
   ProjectionStep createStep(final AutomatonProxy input,
                             final StateEncoding inputStateEnc,

@@ -178,6 +178,12 @@ public class SynthesisAbstractionProcedure
     mChain.createStatistics();
   }
 
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable

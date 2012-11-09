@@ -274,12 +274,6 @@ public class CompositionalSynthesizer
     return (CompositionalSynthesisResult) super.getAnalysisResult();
   }
 
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return false;
-  }
-
 
   //#########################################################################
   //# Hooks
@@ -385,6 +379,14 @@ public class CompositionalSynthesizer
   protected SynthesisEventInfo createEventInfo(final EventProxy event)
   {
     return new SynthesisEventInfo(event);
+  }
+
+  @Override
+  protected boolean isPermissibleCandidate(final List<AutomatonProxy> automata)
+  {
+    return
+      super.isPermissibleCandidate(automata) &&
+      automata.size() < getCurrentAutomata().size();
   }
 
   @Override
@@ -1105,7 +1107,7 @@ public class CompositionalSynthesizer
    * In compositional synthesis, there are no tau events, yet all events
    * are subject to selfloop removal.
    */
-  protected static class SynthesisEventInfo extends EventInfo
+  private final class SynthesisEventInfo extends EventInfo
   {
     //#######################################################################
     //# Constructor

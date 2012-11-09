@@ -93,7 +93,7 @@ public interface ModelAnalyzer
   //# Parameters
   /**
    * Returns whether or not this model analyser supports nondeterministic
-   * automata. Only model analyser that return <CODE>true</CODE> on this
+   * automata. Only model analysers that return <CODE>true</CODE> on this
    * call are guaranteed to give correct results when presented an input
    * containing nondeterministic automata. Model analysers not supporting
    * nondeterministic automata should throw

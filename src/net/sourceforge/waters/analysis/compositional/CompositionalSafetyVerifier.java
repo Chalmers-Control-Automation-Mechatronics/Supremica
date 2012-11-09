@@ -121,14 +121,6 @@ public class CompositionalSafetyVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
-  public boolean supportsNondeterminism()
-  {
-    return true;
-  }
-
-
-  //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   @Override
   protected void tearDown()
@@ -360,7 +352,7 @@ public class CompositionalSafetyVerifier
 
   //#########################################################################
   //# Inner Class SafetyEventInfo
-  private class SafetyEventInfo
+  private final class SafetyEventInfo
     extends EventInfo
   {
     //#######################################################################

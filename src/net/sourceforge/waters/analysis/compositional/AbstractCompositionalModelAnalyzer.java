@@ -319,21 +319,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
 
-  @Override
-  public int getNodeLimit()
-  {
-    final int limit1 = getInternalStateLimit();
-    final int limit2 = getMonolithicStateLimit();
-    return Math.max(limit1, limit2);
-  }
-
-  @Override
-  public void setNodeLimit(final int limit)
-  {
-    setInternalStateLimit(limit);
-    setMonolithicStateLimit(limit);
-  }
-
   public int getInternalStateLimit()
   {
     return Math.max(mLowerInternalStateLimit, mUpperInternalStateLimit);
@@ -407,6 +392,30 @@ public abstract class AbstractCompositionalModelAnalyzer
   public void setInternalTransitionLimit(final int limit)
   {
     mInternalTransitionLimit = limit;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return mAbstractionProcedure.supportsNondeterminism();
+  }
+
+  @Override
+  public int getNodeLimit()
+  {
+    final int limit1 = getInternalStateLimit();
+    final int limit2 = getMonolithicStateLimit();
+    return Math.max(limit1, limit2);
+  }
+
+  @Override
+  public void setNodeLimit(final int limit)
+  {
+    setInternalStateLimit(limit);
+    setMonolithicStateLimit(limit);
   }
 
 
@@ -697,6 +706,23 @@ public abstract class AbstractCompositionalModelAnalyzer
       doMonolithicAnalysis(empty);
     }
     restoreAutomata();
+  }
+
+  /**
+   * Checks whether the given automata for a possible candidate for
+   * composition. This method is called after construction of candidates
+   * to check whether or not a given combination of automata may be
+   * considered. The default implementation merely checks whether the
+   * automata have been composed before resulting in an overflow, to
+   * prevent a second attempt. It is recommended for subclasses overriding
+   * this method to call the superclass method also.
+   * @param  automata  List of automata to form a {@link Candidate}.
+   * @return <CODE>true</CODE> if a {@link Candidate} should be formed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  protected boolean isPermissibleCandidate(final List<AutomatonProxy> automata)
+  {
+    return !mOverflowCandidates.contains(automata);
   }
 
   /**
@@ -1057,13 +1083,6 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
     return events;
-  }
-
-  private boolean isPermissibleCandidate(final List<AutomatonProxy> automata)
-  {
-    return
-      automata.size() < mCurrentAutomata.size() &&
-      !mOverflowCandidates.contains(automata);
   }
 
   /**

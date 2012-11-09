@@ -293,6 +293,14 @@ public abstract class AbstractCompositionalModelVerifier
   //#########################################################################
   //# Hooks
   @Override
+  protected boolean isPermissibleCandidate(final List<AutomatonProxy> automata)
+  {
+    return
+      super.isPermissibleCandidate(automata) &&
+      automata.size() < getCurrentAutomata().size();
+  }
+
+  @Override
   protected void recordAbstractionStep(final AbstractionStep step)
   {
     mAbstractionSteps.add(step);

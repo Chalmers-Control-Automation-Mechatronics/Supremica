@@ -112,12 +112,6 @@ public class CompositionalSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   @Override
-  public boolean supportsNondeterminism()
-  {
-    return true;
-  }
-
-  @Override
   protected CompositionalSimplificationResult createAnalysisResult()
   {
     return new CompositionalSimplificationResult();
@@ -230,7 +224,7 @@ public class CompositionalSimplifier
 
   //#########################################################################
   //# Inner Class SimplificationEventInfo
-  private class SimplificationEventInfo
+  private final class SimplificationEventInfo
     extends EventInfo
   {
     //#######################################################################
@@ -253,8 +247,7 @@ public class CompositionalSimplifier
     @Override
     protected boolean isLocal()
     {
-      final EventProxy event = getEvent();
-      return !mPreservedEvents.contains(event);
+      return isTau();
     }
   }
 

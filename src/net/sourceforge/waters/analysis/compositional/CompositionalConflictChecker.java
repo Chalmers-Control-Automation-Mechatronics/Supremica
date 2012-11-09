@@ -351,15 +351,6 @@ public class CompositionalConflictChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return true;
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
