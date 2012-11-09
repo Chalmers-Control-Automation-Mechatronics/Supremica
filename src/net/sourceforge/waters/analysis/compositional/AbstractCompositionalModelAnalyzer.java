@@ -629,38 +629,38 @@ public abstract class AbstractCompositionalModelAnalyzer
     Collection<Candidate> candidates;
     Candidate candidate = null;
     outer:
+    do {
+      subsystem:
       do {
-        subsystem:
-          do {
-            if (isSubsystemTrivial(mCurrentAutomata)) {
-              if (result.isFinished()) {
-                break outer;
-              } else {
-                continue outer;
-              }
-            }
-            candidates = mPreselectingHeuristic.findCandidates();
-            candidate = selectCandidate(candidates);
-            while (candidate != null) {
-              try {
-                mMayBeSplit = false;
-                applyCandidate(candidate);
-                simplify();
-                cancheck = true;
-                continue subsystem;
-              } catch (final OutOfMemoryError error) {
-                getLogger().debug("<out of memory>");
-                // caught - go on ...
-              } catch (final OverflowException overflow) {
-                // caught - go on ...
-              }
-              recordUnsuccessfulComposition();
-              final List<AutomatonProxy> automata = candidate.getAutomata();
-              mOverflowCandidates.add(automata);
-              candidates.remove(candidate);
-              candidate = selectCandidate(candidates);
-            }
-          } while (candidate != null);
+        if (isSubsystemTrivial(mCurrentAutomata)) {
+          if (result.isFinished()) {
+            break outer;
+          } else {
+            continue outer;
+          }
+        }
+        candidates = mPreselectingHeuristic.findCandidates();
+        candidate = selectCandidate(candidates);
+        while (candidate != null) {
+          try {
+            mMayBeSplit = false;
+            applyCandidate(candidate);
+            simplify();
+            cancheck = true;
+            continue subsystem;
+          } catch (final OutOfMemoryError error) {
+            getLogger().debug("<out of memory>");
+            // caught - go on ...
+          } catch (final OverflowException overflow) {
+            // caught - go on ...
+          }
+          recordUnsuccessfulComposition();
+          final List<AutomatonProxy> automata = candidate.getAutomata();
+          mOverflowCandidates.add(automata);
+          candidates.remove(candidate);
+          candidate = selectCandidate(candidates);
+        }
+      } while (candidate != null);
       try {
         if (cancheck) {
           doMonolithicAnalysis(mCurrentAutomata);
@@ -689,8 +689,8 @@ public abstract class AbstractCompositionalModelAnalyzer
           throw lastOverflow;
         }
       }
-      } while (lastOverflow != null ||
-        !result.isFinished() && popEventDisjointSubsystem());
+    } while (lastOverflow != null ||
+             !result.isFinished() && popEventDisjointSubsystem());
 
     if (!result.isFinished()) {
       final List<AutomatonProxy> empty = Collections.emptyList();

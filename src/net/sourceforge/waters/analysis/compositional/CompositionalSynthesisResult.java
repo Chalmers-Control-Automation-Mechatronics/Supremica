@@ -24,11 +24,11 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
  * A result returned by the compositional synthesis algorithms
- * {@link CompositionalSynthesizer}. In addition to the common result data, it
- * includes a collection of automata representing the synthesised modular
+ * ({@link CompositionalSynthesizer}). In addition to the common result data,
+ * it includes a collection of automata representing the synthesised modular
  * supervisor.
  *
- * @author Robi Malik
+ * @author Robi Malik, Sahar Mohajerani
  */
 
 public class CompositionalSynthesisResult
@@ -54,7 +54,6 @@ public class CompositionalSynthesisResult
     return mProductDES;
   }
 
-
   public void setComputedProxy(final ProductDESProxy des)
   {
     setSatisfied(des != null);
@@ -69,33 +68,46 @@ public class CompositionalSynthesisResult
     return getComputedProxy();
   }
 
-
   public Collection<AutomatonProxy> getComputedAutomata()
   {
     return mSupervisors;
   }
-
 
   public void setComputedProductDES(final ProductDESProxy des)
   {
     setComputedProxy(des);
   }
 
-  void setRenamingIsUsed (final int renaming) {
+
+  //#########################################################################
+  //# Specific Access
+  /**
+   * Adds the given automaton to the list of synthesised supervisors.
+   */
+  void addSupervisor(final AutomatonProxy sup)
+  {
+    mSupervisors.add(sup);
+  }
+
+  void setRenamingIsUsed(final int renaming)
+  {
     mRenamingIsUsed = renaming;
   }
 
-   int getRenamingIsUsed() {
+  int getRenamingIsUsed()
+  {
     return mRenamingIsUsed;
   }
 
-   void addSynchSize (final int size) {
-     mSynchSize = mSynchSize + size;
-   }
+  void addSynchSize(final int size)
+  {
+    mSynchSize = mSynchSize + size;
+  }
 
-    int getSynchSize() {
-     return mSynchSize;
-   }
+  int getSynchSize()
+  {
+    return mSynchSize;
+  }
 
 
   //#########################################################################
@@ -131,7 +143,6 @@ public class CompositionalSynthesisResult
     writer.print("NumberOfSupervisors");
     writer.print(',');
     writer.print("LargestSupervisor");
-
   }
 
   @Override
@@ -146,8 +157,8 @@ public class CompositionalSynthesisResult
     writer.print(mSupervisors.size());
     writer.print(",");
     int largest = 0;
-    for (int i=0; i<mSupervisors.size(); i++){
-      final int currentSupSize = mSupervisors.get(i).getStates().size();
+    for (final AutomatonProxy sup : mSupervisors) {
+      final int currentSupSize = sup.getStates().size();
       if (currentSupSize > largest) {
         largest = currentSupSize;
       }
@@ -155,16 +166,9 @@ public class CompositionalSynthesisResult
     writer.print(largest);
   }
 
+
   //#########################################################################
   //# Specific Access
-  /**
-   * Adds the given automaton to the list of synthesised supervisors.
-   */
-  void addSupervisor(final AutomatonProxy sup)
-  {
-    mSupervisors.add(sup);
-  }
-
   /**
    * Completes the result by constructing and storing a product DES consisting
    * of the synthesised supervisors.
@@ -184,6 +188,7 @@ public class CompositionalSynthesisResult
       setComputedProductDES(des);
     }
   }
+
 
   //#########################################################################
   //# Data Members
