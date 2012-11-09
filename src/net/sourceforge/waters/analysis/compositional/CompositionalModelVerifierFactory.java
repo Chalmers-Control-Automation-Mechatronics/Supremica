@@ -81,9 +81,7 @@ public class CompositionalModelVerifierFactory
   public CompositionalConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
-    final CompositionalConflictChecker.AbstractionMethod method =
-      CompositionalConflictChecker.AbstractionMethod.OEQ;
-    return new CompositionalConflictChecker(method, factory);
+    return new CompositionalConflictChecker(factory);
   }
 
   @Override
@@ -274,7 +272,7 @@ public class CompositionalModelVerifierFactory
   //#########################################################################
   //# Inner Class AbstractionMethodArgument
   private static class AbstractionMethodArgument
-    extends CommandLineArgumentEnum<CompositionalConflictChecker.AbstractionMethod>
+    extends CommandLineArgumentEnum<ConflictAbstractionProcedureFactory>
   {
 
     //#######################################################################
@@ -282,7 +280,7 @@ public class CompositionalModelVerifierFactory
     private AbstractionMethodArgument()
     {
       super("-method", "Abstraction method used for conflict check",
-            CompositionalConflictChecker.AbstractionMethod.class);
+            ConflictAbstractionProcedureFactory.class);
     }
 
     //#######################################################################
@@ -291,12 +289,13 @@ public class CompositionalModelVerifierFactory
     @Override
     protected void configure(final ModelVerifier verifier)
     {
-      final CompositionalConflictChecker.AbstractionMethod method =
-        getValue();
+      final ConflictAbstractionProcedureFactory method = getValue();
       if (verifier instanceof CompositionalConflictChecker) {
         final CompositionalConflictChecker composer =
           (CompositionalConflictChecker) verifier;
-        composer.setAbstractionMethod(method);
+        final AbstractionProcedure proc =
+          method.createAbstractionProecudure(composer);
+        composer.setAbstractionProcedure(proc);
       } else {
         fail(getName() + " option only supported for conflict check!");
       }

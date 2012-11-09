@@ -42,11 +42,39 @@ public class SynthesisAbstractionProcedure
 
   //#########################################################################
   //# Factory Methods
+  /**
+   * <P>Creates a synthesis abstraction procedure.</P>
+   *
+   * <P>The abstraction chain is specified by flags,
+   * that indicate whether or not a particular method is used.
+   * The order of abstraction is predefined: first halfway synthesis,
+   * then bisimulation, then synthesis observation equivalence,
+   * and finally weak synthesis observation equivalence, if these methods
+   * are included.</P>
+   *
+   * @param  synthesizer
+   *           The compositional synthesiser that will control the entire
+   *           synthesis run.
+   * @param  abstractionMethods
+   *           An integer combination of flags specifying which abstraction
+   *           methods are in the chain. For example use
+   *           {@link #USE_HALFWAY}&nbsp;|&nbsp;{@link #USE_BISIMULATION} to
+   *           specify an abstraction sequence that performs only halfway
+   *           synthesis and bisimulation.
+   *
+   * @see #USE_HALFWAY
+   * @see #USE_BISIMULATION
+   * @see #USE_SOE
+   * @see #USE_WSOE
+   * @see #CHAIN_SOE
+   * @see #CHAIN_WSOE
+   * @see #CHAIN_ALL
+   */
   public static SynthesisAbstractionProcedure
     createSynthesisAbstractionProcedure
-      (final CompositionalSynthesizer synthesizer)
+      (final CompositionalSynthesizer synthesizer,
+       final int abstractionMethods)
   {
-    final int abstractionMethods = synthesizer.getUsedAbstractionMethods();
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     if ((abstractionMethods & USE_HALFWAY) != 0) {
       final HalfWaySynthesisTRSimplifier halfWay =

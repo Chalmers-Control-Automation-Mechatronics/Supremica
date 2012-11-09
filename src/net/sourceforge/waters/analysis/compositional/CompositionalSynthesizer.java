@@ -98,7 +98,7 @@ public class CompositionalSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator)
   {
-    super(factory, translator);
+    this(null, factory, translator);
   }
 
   /**
@@ -120,8 +120,8 @@ public class CompositionalSynthesizer
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    super(factory, translator,
-          preselectingMethodFactory, selectingMethodFactory);
+    this(null, factory, translator,
+         preselectingMethodFactory, selectingMethodFactory);
   }
 
   /**
@@ -139,7 +139,8 @@ public class CompositionalSynthesizer
      final ProductDESProxyFactory factory,
      final KindTranslator translator)
   {
-    super(model, factory, translator);
+    this(model, factory, translator,
+         new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
   /**
@@ -167,6 +168,10 @@ public class CompositionalSynthesizer
   {
     super(model, factory, translator,
           preselectingMethodFactory, selectingMethodFactory);
+    final AbstractionProcedure proc =
+      SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure
+        (this, SynthesisAbstractionProcedure.CHAIN_WSOE);
+    setAbstractionProcedure(proc);
   }
 
 
@@ -208,52 +213,6 @@ public class CompositionalSynthesizer
 
 
   //#########################################################################
-  //# Configuration
-  /**
-   * <P>Specifies the abstraction methods used in the abstraction chain.</P>
-   *
-   * <P>The abstraction chain defines the methods used to simplify automata
-   * during compositional minimisation. Then chain is specified by flags,
-   * that indicate whether or not a particular method is used.</P>
-   *
-   * <P>The order of abstraction is predefined: first halfway synthesis,
-   * then bisimulation, then synthesis observation equivalence,
-   * and finally weak synthesis observation equivalence, if these methods
-   * are included. The default setting is {@link #CHAIN_WSOE}, which includes
-   * all methods except synthesis observation equivalence.</P>
-   *
-   * @param  methods
-   *           An integer combination of flags specifying which abstraction
-   *           methods are in the chain. For example use
-   *           {@link #USE_HALFWAY}&nbsp;|&nbsp;{@link #USE_BISIMULATION} to
-   *           specify an abstraction sequence that performs only halfway
-   *           synthesis and bisimulation.
-   *
-   * @see #USE_HALFWAY
-   * @see #USE_BISIMULATION
-   * @see #USE_SOE
-   * @see #USE_WSOE
-   * @see #CHAIN_SOE
-   * @see #CHAIN_WSOE
-   * @see #CHAIN_ALL
-   */
-  public void setUsedAbstractionMethods(final int methods)
-  {
-    mUsedAbstractionMethods = methods;
-  }
-
-  /**
-   * Gets the combination of abstraction methods used in the abstraction
-   * chain.
-   * @see #setUsedAbstractionMethods(int) setUsedAbstractionMethods()
-   */
-  public int getUsedAbstractionMethods()
-  {
-    return mUsedAbstractionMethods;
-  }
-
-
-  //#########################################################################
   //# Invocation
   public boolean run() throws AnalysisException
   {
@@ -290,13 +249,9 @@ public class CompositionalSynthesizer
   {
     final EventProxy defaultMarking = createDefaultMarking();
     setPropositionsForMarkings(defaultMarking, null);
-    final AbstractionProcedure proc =
-      SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure(this);
-    setAbstractionProcedure(proc);
     mDistinguisherInfoList = new LinkedList<DistinguisherInfo> ();
     mRenamedEvents = new THashSet<EventProxy>();
     super.setUp();
-    proc.storeStatistics();
   }
 
   @Override
@@ -1224,8 +1179,6 @@ public class CompositionalSynthesizer
   //# Data Members
   private String mOutputName;
   private boolean mConstructsResult = true;
-  private int mUsedAbstractionMethods =
-    SynthesisAbstractionProcedure.CHAIN_ALL;
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;

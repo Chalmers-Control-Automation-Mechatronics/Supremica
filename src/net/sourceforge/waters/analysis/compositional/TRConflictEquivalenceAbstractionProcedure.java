@@ -213,6 +213,12 @@ class TRConflictEquivalenceAbstractionProcedure
     }
   }
 
+  @Override
+  public boolean expectsAllMarkings()
+  {
+    return mForceMarkings;
+  }
+
 
   //#########################################################################
   //# Data Members

@@ -211,6 +211,16 @@ public abstract class AbstractCompositionalModelAnalyzer
     mConfiguredPreconditionMarking = event;
   }
 
+  public void setAbstractionProcedure(final AbstractionProcedure proc)
+  {
+    mAbstractionProcedure = proc;
+  }
+
+  public AbstractionProcedure getAbstractionProcedure()
+  {
+    return mAbstractionProcedure;
+  }
+
   /**
    * Gets the enumeration factory that provides the possible preselection
    * methods.
@@ -460,16 +470,6 @@ public abstract class AbstractCompositionalModelAnalyzer
     return mPropositions;
   }
 
-  protected void setAbstractionProcedure(final AbstractionProcedure proc)
-  {
-    mAbstractionProcedure = proc;
-  }
-
-  protected AbstractionProcedure getAbstractionProcedure()
-  {
-    return mAbstractionProcedure;
-  }
-
   protected MonolithicSynchronousProductBuilder
     getCurrentSynchronousProductBuilder()
   {
@@ -561,7 +561,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     super.tearDown();
     mUsedDefaultMarking = mUsedPreconditionMarking = null;
-    mAbstractionProcedure = null;
     mPropositions = null;
     mPreselectingHeuristic = null;
     mSelectingHeuristic = null;

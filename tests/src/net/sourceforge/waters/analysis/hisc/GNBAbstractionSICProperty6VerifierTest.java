@@ -12,7 +12,9 @@ package net.sourceforge.waters.analysis.hisc;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.compositional.AbstractionProcedure;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
+import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -44,8 +46,10 @@ public class GNBAbstractionSICProperty6VerifierTest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalConflictChecker checker =
-      new CompositionalConflictChecker
-        (CompositionalConflictChecker.AbstractionMethod.GNB, factory);
+      new CompositionalConflictChecker(factory);
+    final AbstractionProcedure proc =
+      ConflictAbstractionProcedureFactory.GNB.createAbstractionProecudure(checker);
+    checker.setAbstractionProcedure(proc);
     checker.setInternalStateLimit(5000);
     return new SICProperty6Verifier(checker, factory);
   }

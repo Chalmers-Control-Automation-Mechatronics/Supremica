@@ -20,11 +20,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -105,6 +100,9 @@ public class CompositionalSafetyVerifier
   {
     super(model, factory, translator);
     mDiagnostics = diag;
+    final AbstractionProcedure proc =
+      ProjectionAbstractionProcedure.createProjectionAbstractionProcedure(this);
+    setAbstractionProcedure(proc);
   }
 
 
@@ -132,36 +130,6 @@ public class CompositionalSafetyVerifier
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
-  @Override
-  protected void setUp()
-    throws AnalysisException
-  {
-    final int slimit = getInternalStateLimit();
-    final int tlimit = getInternalTransitionLimit();
-    final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final TransitionRelationSimplifier loopRemover1 =
-      new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover1);
-    final SubsetConstructionTRSimplifier subset =
-      new SubsetConstructionTRSimplifier();
-    chain.add(subset);
-    subset.setStateLimit(slimit);
-    subset.setTransitionLimit(tlimit);
-    final TransitionRelationSimplifier loopRemover2 =
-      new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover2);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence
-      (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
-    bisimulator.setTransitionLimit(tlimit);
-    chain.add(bisimulator);
-    final AbstractionProcedure proc =
-      new ProjectionAbstractionProcedure(this, chain, subset);
-    setAbstractionProcedure(proc);
-    super.setUp();
-  }
-
   @Override
   protected void tearDown()
   {

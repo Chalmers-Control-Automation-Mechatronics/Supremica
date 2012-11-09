@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
@@ -74,15 +73,12 @@ public class CompositionalConflictChecker
   //# Constructors
   /**
    * Creates a new conflict checker without a model or marking proposition.
-   * @param method
-   *          Abstraction procedure used for simplification.
    * @param factory
    *          Factory used for trace construction.
    */
-  public CompositionalConflictChecker(final AbstractionMethod method,
-                                      final ProductDESProxyFactory factory)
+  public CompositionalConflictChecker(final ProductDESProxyFactory factory)
   {
-    this(null, method, factory);
+    this(null, factory);
   }
 
   /**
@@ -96,10 +92,9 @@ public class CompositionalConflictChecker
    *          Factory used for trace construction.
    */
   public CompositionalConflictChecker(final ProductDESProxy model,
-                                      final AbstractionMethod method,
                                       final ProductDESProxyFactory factory)
   {
-    this(model, null, method, factory);
+    this(model, null, factory);
   }
 
   /**
@@ -120,7 +115,6 @@ public class CompositionalConflictChecker
    */
   public CompositionalConflictChecker(final ProductDESProxy model,
                                       final EventProxy marking,
-                                      final AbstractionMethod method,
                                       final ProductDESProxyFactory factory)
   {
     super(model,
@@ -128,8 +122,10 @@ public class CompositionalConflictChecker
           ConflictKindTranslator.getInstance(),
           new PreselectingMethodFactory(),
           new SelectingMethodFactory());
-    mAbstractionMethod = method;
     setConfiguredDefaultMarking(marking);
+    final AbstractionProcedure proc =
+      ConflictAbstractionProcedureFactory.OEQ.createAbstractionProecudure(this);
+    setAbstractionProcedure(proc);
   }
 
 
@@ -144,24 +140,6 @@ public class CompositionalConflictChecker
 
   //#########################################################################
   //# Configuration
-  /**
-   * Gets the abstraction strategy used to simplify automata.
-   * @see AbstractionMethod
-   */
-  public AbstractionMethod getAbstractionMethod()
-  {
-    return mAbstractionMethod;
-  }
-
-  /**
-   * Sets the abstraction strategy to be used to simplify automata.
-   * @see AbstractionMethod
-   */
-  public void setAbstractionMethod(final AbstractionMethod method)
-  {
-    mAbstractionMethod = method;
-  }
-
   public void setCompositionalSafetyVerifier(final SafetyVerifier checker)
   {
     mCompositionalSafetyVerifier = checker;
@@ -374,9 +352,10 @@ public class CompositionalConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
-    return mAbstractionMethod.supportsNondeterminism();
+    return true;
   }
 
 
@@ -403,16 +382,14 @@ public class CompositionalConflictChecker
     throws AnalysisException
   {
     final EventProxy defaultMarking = createDefaultMarking();
+    final AbstractionProcedure proc = getAbstractionProcedure();
     final EventProxy preconditionMarking;
-    if (mAbstractionMethod == AbstractionMethod.GNB) {
+    if (proc.expectsAllMarkings()) {
       preconditionMarking = createPreconditionMarking();
     } else {
       preconditionMarking = getConfiguredPreconditionMarking();
     }
     setPropositionsForMarkings(defaultMarking, preconditionMarking);
-    final AbstractionProcedure proc =
-      mAbstractionMethod.createAbstractionRule(this);
-    setAbstractionProcedure(proc);
     super.setUp();
     setupSafetyVerifiers();
   }
@@ -729,192 +706,6 @@ public class CompositionalConflictChecker
     steps.set(0, initStep);
     return factory.createConflictTraceProxy(name, null, null, model, automata,
                                             steps, ConflictKind.CONFLICT);
-  }
-
-
-  //#########################################################################
-  //# Inner Enumeration AbstractionMethod
-  /**
-   * The configuration setting to determine the abstraction method applied
-   * to intermediate automata during compositional nonblocking verification.
-   */
-  public enum AbstractionMethod
-  {
-    /**
-     * <P>Minimisation is performed according to a sequence of abstraction
-     * rules for standard nonblocking, but using weak observation
-     * equivalence instead of observation equivalence, and using proper
-     * certain conflicts simplification instead of limited certain
-     * conflicts.</P>
-     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
-     * Verification in Supervisory Control. SIAM Journal of Control and
-     * Optimization, 48(3), 1914-1938, 2009.</P>
-     */
-    CC {
-      @Override
-      AbstractionProcedure createAbstractionRule
-        (final CompositionalConflictChecker checker)
-      {
-        return ThreeStepConflictEquivalenceAbstractionProcedure.
-          createThreeStepConflictEquivalenceAbstractionProcedure
-            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
-             OBSERVATION_EQUIVALENCE, false, false, true);
-      }
-    },
-    /**
-      * <P>Minimisation is performed according to a sequence of abstraction
-     * rules for generalised nonblocking proposed, but using weak observation
-     * equivalence instead of observation equivalence.</P>
-     * <P><I>Reference:</I> Robi Malik, Ryan Leduc. A Compositional Approach
-     * for Verifying Generalised Nonblocking, Proc. 7th International
-     * Conference on Control and Automation, ICCA'09, 448-453, Christchurch,
-     * New Zealand, 2009.</P>
-     */
-    GNB {
-      @Override
-      AbstractionProcedure createAbstractionRule
-        (final CompositionalConflictChecker checker)
-      {
-        return TRConflictEquivalenceAbstractionProcedure.
-          createGeneralisedNonblockingProcedure
-            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
-             WEAK_OBSERVATION_EQUIVALENCE);
-      }
-    },
-    /**
-     * <P>Minimisation is performed according to a sequence of abstraction rules
-     * for standard nonblocking, but using weak observation
-     * equivalence instead of observation equivalence.</P>
-     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
-     * Verification in Supervisory Control. SIAM Journal of Control and
-     * Optimization, 48(3), 1914-1938, 2009.</P>
-     */
-    NB {
-      @Override
-      AbstractionProcedure createAbstractionRule
-        (final CompositionalConflictChecker checker)
-      {
-        return ThreeStepConflictEquivalenceAbstractionProcedure.
-          createThreeStepConflictEquivalenceAbstractionProcedure
-            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
-             WEAK_OBSERVATION_EQUIVALENCE, false, true, false);
-      }
-    },
-    /**
-     * <P>Minimisation is performed according to a sequence of abstraction rules
-     * for standard nonblocking, but using weak observation equivalence instead
-     * of observation equivalence, and with an additional step of non-alpha
-     * determinisation at the end.</P>
-     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
-     * Verification in Supervisory Control. SIAM Journal of Control and
-     * Optimization, 48(3), 1914-1938, 2009.</P>
-     */
-    NBA {
-      @Override
-      AbstractionProcedure createAbstractionRule
-        (final CompositionalConflictChecker checker)
-      {
-        return ThreeStepConflictEquivalenceAbstractionProcedure.
-          createThreeStepConflictEquivalenceAbstractionProcedure
-            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
-             WEAK_OBSERVATION_EQUIVALENCE, true, true, false);
-      }
-    },
-    /**
-     * <P>Minimisation is performed according to a sequence of abstraction rules
-     * for standard nonblocking, but using weak observation
-     * equivalence instead of observation equivalence, and using proper
-     * certain conflicts simplification in addition to limited certain
-     * conflicts.</P>
-     * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional
-     * Verification in Supervisory Control. SIAM Journal of Control and
-     * Optimization, 48(3), 1914-1938, 2009.</P>
-     */
-    NBC {
-      @Override
-      AbstractionProcedure createAbstractionRule
-        (final CompositionalConflictChecker checker)
-      {
-        return ThreeStepConflictEquivalenceAbstractionProcedure.
-          createThreeStepConflictEquivalenceAbstractionProcedure
-            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
-             WEAK_OBSERVATION_EQUIVALENCE, false, true, true);
-      }
-    },
-    /**
-     * Automata are minimised according to <I>observation equivalence</I>.
-     */
-    OEQ {
-      @Override
-      AbstractionProcedure createAbstractionRule
-        (final CompositionalConflictChecker checker)
-      {
-        return TRConflictEquivalenceAbstractionProcedure.
-          createObservationEquivalenceProcedure
-            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
-             OBSERVATION_EQUIVALENCE);
-      }
-    },
-    /**
-     * Automata are minimised according using <I>observer projection</I>.
-     * The present implementation determines a coarsest causal reporter
-     * map satisfying the observer property. Nondeterminism in the projected
-     * automata is not resolved, nondeterministic abstractions are used instead.
-     */
-    OP {
-      @Override
-      AbstractionProcedure createAbstractionRule
-        (final CompositionalConflictChecker checker)
-      {
-        return ObserverProjectionAbstractionProcedure.
-          createObserverProjectionProcedure(checker);
-      }
-    },
-    /**
-     * <P>An experimental abstraction procedure that works like weak
-     * observation equivalence, but in addition runs the OP-verifier
-     * algorithm on each automaton to gather performance statistics.</P>
-     */
-    OPVERIFIER {
-      @Override
-      AbstractionProcedure createAbstractionRule
-        (final CompositionalConflictChecker checker)
-      {
-        return OPVerifierAbstractionProcedure.createOPVerifierProcedure
-          (checker, ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE);
-      }
-    },
-    /**
-     * <P>Automata are minimised according to <I>weak observation
-     * equivalence</I>. Initial states and markings are not saturated, silent
-     * transitions are retained instead in a bid to reduce the overall number of
-     * transitions.</P>
-     *
-     * <P><I>Reference.</I> Rong Su, Jan H. van Schuppen, Jacobus E. Rooda,
-     * Albert T. Hofkamp. Nonconflict check by using sequential automaton
-     * abstractions based on weak observation equivalence. Automatica,
-     * <STRONG>46</STRONG>(6), 968-978, 2010.</P>
-     */
-    WOEQ {
-      @Override
-      AbstractionProcedure createAbstractionRule
-        (final CompositionalConflictChecker checker)
-      {
-        return TRConflictEquivalenceAbstractionProcedure.
-          createObservationEquivalenceProcedure
-            (checker, ObservationEquivalenceTRSimplifier.Equivalence.
-             WEAK_OBSERVATION_EQUIVALENCE);
-      }
-    };
-
-    abstract AbstractionProcedure createAbstractionRule
-      (CompositionalConflictChecker checker);
-
-    boolean supportsNondeterminism()
-    {
-      return true;
-    }
   }
 
 
@@ -1353,7 +1144,6 @@ public class CompositionalConflictChecker
 
   //#########################################################################
   //# Data Members
-  private AbstractionMethod mAbstractionMethod;
   private SafetyVerifier mCompositionalSafetyVerifier;
   private SafetyVerifier mMonolithicSafetyVerifier;
 

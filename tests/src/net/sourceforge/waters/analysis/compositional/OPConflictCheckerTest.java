@@ -42,8 +42,10 @@ public class OPConflictCheckerTest extends
     (final ProductDESProxyFactory factory)
   {
     final CompositionalConflictChecker checker =
-      new CompositionalConflictChecker
-        (CompositionalConflictChecker.AbstractionMethod.OP, factory);
+      new CompositionalConflictChecker(factory);
+    final AbstractionProcedure proc =
+      ConflictAbstractionProcedureFactory.OP.createAbstractionProecudure(checker);
+    checker.setAbstractionProcedure(proc);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

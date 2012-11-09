@@ -12,7 +12,9 @@ package net.sourceforge.waters.analysis.certainconf;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.compositional.AbstractionProcedure;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
+import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -45,8 +47,10 @@ public class CCAbstractionStandardConflictCheckerTest extends
     (final ProductDESProxyFactory factory)
   {
     final CompositionalConflictChecker checker =
-      new CompositionalConflictChecker
-        (CompositionalConflictChecker.AbstractionMethod.CC, factory);
+      new CompositionalConflictChecker(factory);
+    final AbstractionProcedure proc =
+      ConflictAbstractionProcedureFactory.CC.createAbstractionProecudure(checker);
+    checker.setAbstractionProcedure(proc);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
