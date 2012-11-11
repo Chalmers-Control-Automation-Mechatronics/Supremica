@@ -129,6 +129,11 @@ public class CompositionalSimplifier
     try {
       setUp();
       runCompositionalMinimisation();
+      final CompositionalSimplificationResult result = getAnalysisResult();
+      result.setSatisfied(true);
+      final ProductDESProxyFactory factory = getFactory();
+      final String name = getModel().getName();
+      result.close(factory, name);
       return true;
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -173,6 +178,7 @@ public class CompositionalSimplifier
   protected void setupSynchronousProductBuilder()
   {
     super.setupSynchronousProductBuilder();
+    // TODO This is specific to nonblocking and should be in a subclass.
     final MonolithicSynchronousProductBuilder builder =
       getCurrentSynchronousProductBuilder();
     builder.setPruningDeadlocks(true);
@@ -187,6 +193,7 @@ public class CompositionalSimplifier
       if (isTrivial(aut)) {
         continue;
       } else if (isTriviallyBlocking(aut)) {
+        // TODO This is specific to nonblocking and should be in a subclass.
         result.clearAutomata();
         result.addAutomaton(aut);
         result.setSatisfied(true);

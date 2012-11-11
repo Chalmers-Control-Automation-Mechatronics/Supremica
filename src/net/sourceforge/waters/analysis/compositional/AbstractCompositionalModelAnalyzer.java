@@ -2354,7 +2354,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         new THashSet<List<AutomatonProxy>>(size);
       for (final EventInfo info : mEventInfoMap.values()) {
         assert info.getNumberOfAutomata() > 0;
-        if (info.isLocal() && info.getNumberOfAutomata() > 1) {
+        if (info.getNumberOfAutomata() > 1) {
           final List<AutomatonProxy> list = info.getSortedAutomataList();
           if (isPermissibleCandidate(list) && found.add(list)) {
             final Set<EventProxy> localEvents = identifyLocalEvents(list);

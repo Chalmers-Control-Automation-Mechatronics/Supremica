@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -823,11 +824,15 @@ public abstract class TransitionListBuffer
    * if this is not the case, transitions will be overwritten without
    * releasing all memory. To correctly replace transitions in a used buffer,
    * call {@link #clear()} first.
+   * @param  events       The event alphabet of the automaton to be
+   *                      represented. This is used to determine which
+   *                      additional selfloops are to be added.
    * @param  transitions  List of transitions to populate the new buffer.
    *                      The list will be reordered to match the order
    *                      chosen by the buffer.
    */
-  public void setUpTransitions(final List<TransitionProxy> transitions,
+  public void setUpTransitions(final Set<EventProxy> events,
+                               final List<TransitionProxy> transitions,
                                final EventEncoding eventEnc,
                                final StateEncoding stateEnc)
   {
@@ -872,7 +877,8 @@ public abstract class TransitionListBuffer
     if (extra != null) {
       final int numStates = getNumberOfStates();
       for (final EventProxy event : extra) {
-        if (event.getKind() != EventKind.PROPOSITION) {
+        if (event.getKind() != EventKind.PROPOSITION &&
+            !events.contains(event)) {
           final int e = eventEnc.getEventCode(event);
           for (int s = 0; s < numStates; s++) {
             addTransition(s, e, s);

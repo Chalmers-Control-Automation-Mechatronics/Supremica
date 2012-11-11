@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntStack;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -165,6 +167,7 @@ public class ListBufferTransitionRelation
     mKind = aut.getKind();
     mStateBuffer = new IntStateBuffer(eventEnc, stateEnc);
     mExtraStates = stateEnc.getNumberOfExtraStates();
+    final Set<EventProxy> events = new THashSet<EventProxy>(aut.getEvents());
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     final List<TransitionProxy> list =
       new ArrayList<TransitionProxy>(transitions);
@@ -174,12 +177,12 @@ public class ListBufferTransitionRelation
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
         new OutgoingTransitionListBuffer(numEvents, numStates, numTrans);
-      mSuccessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
+      mSuccessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
         new IncomingTransitionListBuffer(numEvents, numStates, numTrans);
-      mPredecessorBuffer.setUpTransitions(list, eventEnc, stateEnc);
+      mPredecessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
     }
     mUsedEvents = new BitSet(numEvents);
     final int tau = EventEncoding.TAU;

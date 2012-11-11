@@ -58,22 +58,20 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 public class CompareLessConflicting
 {
-  private final ListBufferTransitionRelation mFirstRelation;
-  private final ListBufferTransitionRelation mSecondRelation;
-  private final Map<TIntHashSet,TIntHashSet> mSetCache;
-  private final TObjectIntHashMap<Tuple> mTupleCache;
-  private final List<Tuple> mStates;
-  //private final TObjectIntHashMap<Triple> mTripleCache;
-  //private final List<Triple> mMCStates;
-  private final List<TIntArrayList> mSuccessors;
-  private final List<TIntHashSet[]> mPredeccessors;
-  private final TIntHashSet mFirstLC;
-  private final TIntHashSet mSecondBlocking;
-  //private final TIntHashSet mLessConflicting;
-  //private final TIntHashSet mNotLessConflicting;
-  private final int mMarking;
-  private int mExpanded;
 
+  //#########################################################################
+  //# Constructors
+  /**
+   * Creates a conflict preorder checker to compare two transition
+   * relations. The conflict preorder checker compares two transition
+   * relations defined using the same event encoding.
+   * @param first   A transition relation that is to be checked whether it
+   *                is less conflicting than the second argument.
+   * @param second  A transition relation that is to be checked whether it
+   *                is more conflicting than the first argument.
+   * @param marking The event code of the marking proposition in both
+   *                transition relations.
+   */
   public CompareLessConflicting(final ListBufferTransitionRelation first,
                                 final ListBufferTransitionRelation second,
                                 final int marking)
@@ -96,15 +94,50 @@ public class CompareLessConflicting
     mPredeccessors = new ArrayList<TIntHashSet[]>();
   }
 
-  public TIntHashSet calculateTauReachable(final int state, final ListBufferTransitionRelation trans)
+
+  //#########################################################################
+  //# Invocation
+  /**
+   * Runs this checker to determine whether the given transition relations
+   * are related through the conflict preorder.
+   * @return <CODE>true</CODE> if the given first transition relation is
+   *         less conflicting than the given second transition relation.
+   * @see #CompareLessConflicting(ListBufferTransitionRelation, ListBufferTransitionRelation, int)
+   *      CompareLessConflicting()
+   */
+  public boolean isLessConflicting()
+  {
+    final TIntHashSet first = new TIntHashSet();
+    final TIntHashSet second = new TIntHashSet();
+    for (int s = 0; s < mFirstRelation.getNumberOfStates(); s++) {
+      if (mFirstRelation.isInitial(s)) {
+        first.add(s);
+        continue;
+      }
+    }
+    for (int s = 0; s < mSecondRelation.getNumberOfStates(); s++) {
+      if (mSecondRelation.isInitial(s)) {
+        second.add(s);
+        continue;
+      }
+    }
+    return isLessConflicting(new Tuple(calculateTauReachable(first, mFirstRelation),
+                                       calculateTauReachable(second, mSecondRelation)));
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private TIntHashSet calculateTauReachable(final int state,
+                                            final ListBufferTransitionRelation trans)
   {
     final TIntHashSet set = new TIntHashSet();
     set.add(state);
     return calculateTauReachable(set, trans);
   }
 
-  public TIntHashSet calculateTauReachable(final TIntHashSet set,
-                                           final ListBufferTransitionRelation trans)
+  private TIntHashSet calculateTauReachable(final TIntHashSet set,
+                                            final ListBufferTransitionRelation trans)
   {
     final TIntHashSet taureach = new TIntHashSet(set.toArray());
     final TIntArrayList togo = new TIntArrayList(set.toArray());
@@ -118,12 +151,11 @@ public class CompareLessConflicting
         }
       }
     }
-
     return taureach;
   }
 
-  public TIntHashSet calculateSuccessor(TIntHashSet set, final int event,
-                                        final ListBufferTransitionRelation trans)
+  private TIntHashSet calculateSuccessor(TIntHashSet set, final int event,
+                                         final ListBufferTransitionRelation trans)
   {
     set = calculateTauReachable(set, trans);// this shouldn't be needed
     final TIntHashSet succ = new TIntHashSet();
@@ -173,7 +205,7 @@ public class CompareLessConflicting
     return state;
   }
 
-  public void expandStates()
+  private void expandStates()
   {
     for (;mExpanded < mStates.size(); mExpanded++) {
       final int state = mExpanded;
@@ -209,7 +241,7 @@ public class CompareLessConflicting
     }
   }
 
-  public void calculateLCStates()
+  private void calculateLCStates()
   {
     boolean modified = true;
     int LC = 0;
@@ -276,33 +308,13 @@ public class CompareLessConflicting
     }
   }
 
-  public boolean isLessConflicting()
-  {
-    final TIntHashSet first = new TIntHashSet();
-    final TIntHashSet second = new TIntHashSet();
-    for (int s = 0; s < mFirstRelation.getNumberOfStates(); s++) {
-      if (mFirstRelation.isInitial(s)) {
-        first.add(s);
-        continue;
-      }
-    }
-    for (int s = 0; s < mSecondRelation.getNumberOfStates(); s++) {
-      if (mSecondRelation.isInitial(s)) {
-        second.add(s);
-        continue;
-      }
-    }
-    return isLessConflicting(new Tuple(calculateTauReachable(first, mFirstRelation),
-                                       calculateTauReachable(second, mSecondRelation)));
-  }
-
-  public boolean isLessConflicting(final int s1, final int s2)
+  private boolean isLessConflicting(final int s1, final int s2)
   {
     return isLessConflicting(new Tuple(calculateTauReachable(s1, mFirstRelation),
                                        calculateTauReachable(s2, mSecondRelation)));
   }
 
-  public boolean isLessConflicting(final Tuple tuple)
+  private boolean isLessConflicting(final Tuple tuple)
   {
     long time = System.currentTimeMillis();
     final int initial = getState(tuple);
@@ -377,7 +389,7 @@ public class CompareLessConflicting
     return true;
   }
 
-  public TIntHashSet getSet(final TIntHashSet set)
+  private TIntHashSet getSet(final TIntHashSet set)
   {
     TIntHashSet tset = mSetCache.get(set);
     if (tset == null) {
@@ -387,7 +399,10 @@ public class CompareLessConflicting
     return tset;
   }
 
-  private class Triple
+
+  //#########################################################################
+  //# Inner Class Triple
+  private static class Triple
   {
     public final Tuple tuple;
     public final int state;
@@ -410,6 +425,50 @@ public class CompareLessConflicting
     }
   }
 
+
+  //#########################################################################
+  //# Inner Class Tuple
+  private class Tuple
+  {
+    public final TIntHashSet firstset;
+    public final TIntHashSet secondset;
+
+    public Tuple(final TIntHashSet first, final TIntHashSet second)
+    {
+      firstset = getSet(first);
+      secondset = getSet(second);
+      if (firstset == null || secondset == null) {
+        throw new RuntimeException();
+      }
+    }
+
+    @SuppressWarnings("unused")
+    public Tuple(final TIntHashSet first, final TIntHashSet second, final boolean alreadycanon)
+    {
+      firstset = first;
+      secondset = second;
+    }
+
+    public int hashCode()
+    {
+      return firstset.hashCode() * 13 + secondset.hashCode();
+    }
+
+    public boolean equals(final Object o)
+    {
+      final Tuple other = (Tuple)o;
+      return firstset == other.firstset && secondset == other.secondset;
+    }
+
+    public String toString()
+    {
+      return Arrays.toString(firstset.toArray()) + " : " + Arrays.toString(secondset.toArray());
+    }
+  }
+
+
+  //#########################################################################
+  //# Main Method
   public static void main(final String[] args)
   {
     final String modname = args[0];
@@ -452,62 +511,6 @@ public class CompareLessConflicting
     }
   }
 
-  private class Tuple
-  {
-    public final TIntHashSet firstset;
-    public final TIntHashSet secondset;
-
-    public Tuple(final TIntHashSet first, final TIntHashSet second)
-    {
-      firstset = getSet(first);
-      secondset = getSet(second);
-      if (firstset == null || secondset == null) {
-        throw new RuntimeException();
-      }
-    }
-
-    @SuppressWarnings("unused")
-    public Tuple(final TIntHashSet first, final TIntHashSet second, final boolean alreadycanon)
-    {
-      firstset = first;
-      secondset = second;
-    }
-
-    public int hashCode()
-    {
-      return firstset.hashCode() * 13 + secondset.hashCode();
-    }
-
-    public boolean equals(final Object o)
-    {
-      final Tuple other = (Tuple)o;
-      return firstset == other.firstset && secondset == other.secondset;
-    }
-
-    public String toString()
-    {
-      return Arrays.toString(firstset.toArray()) + " : " + Arrays.toString(secondset.toArray());
-    }
-  }
-
-  private static ProductDESProxy getCompiledDES
-    (final File filename,
-     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final DocumentProxy doc = mDocumentManager.load(filename);
-    if (doc instanceof ProductDESProxy) {
-      return (ProductDESProxy) doc;
-    } else if (doc instanceof ModuleProxy) {
-      final ModuleProxy module = (ModuleProxy) doc;
-      final ModuleCompiler compiler =
-        new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
-      return compiler.compile(bindings);
-    } else {
-      return null;
-    }
-  }
-
   public static ListBufferTransitionRelation
     mergeConflictEquivalent(final ListBufferTransitionRelation aut, final int marking)
   {
@@ -541,6 +544,25 @@ public class CompareLessConflicting
   private static DocumentManager mDocumentManager = new DocumentManager();
   private static ProductDESProxyFactory mProductDESProxyFactory = ProductDESElementFactory.getInstance();
 
+  private static ProductDESProxy getCompiledDES
+    (final File filename,
+     final List<ParameterBindingProxy> bindings)
+    throws Exception
+  {
+    final DocumentProxy doc = mDocumentManager.load(filename);
+    if (doc instanceof ProductDESProxy) {
+      return (ProductDESProxy) doc;
+    } else if (doc instanceof ModuleProxy) {
+      final ModuleProxy module = (ModuleProxy) doc;
+      final ModuleCompiler compiler =
+        new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
+      return compiler.compile(bindings);
+    } else {
+      return null;
+    }
+  }
+
+
   static {
     final ModuleElementFactory mModuleFactory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
@@ -552,4 +574,20 @@ public class CompareLessConflicting
       e.printStackTrace();
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ListBufferTransitionRelation mFirstRelation;
+  private final ListBufferTransitionRelation mSecondRelation;
+  private final Map<TIntHashSet,TIntHashSet> mSetCache;
+  private final TObjectIntHashMap<Tuple> mTupleCache;
+  private final List<Tuple> mStates;
+  private final List<TIntArrayList> mSuccessors;
+  private final List<TIntHashSet[]> mPredeccessors;
+  private final TIntHashSet mFirstLC;
+  private final TIntHashSet mSecondBlocking;
+  private final int mMarking;
+  private int mExpanded;
+
 }
