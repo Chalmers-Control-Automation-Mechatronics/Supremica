@@ -30,12 +30,13 @@ public abstract class WatersActionManager implements Observer
   // # Constructor
   public WatersActionManager(final IDE ide)
   {
-    final int SIZE = 32;
+    final int SIZE = 64;
     mActionMap = new HashMap<Class<? extends IDEAction>,IDEAction>(SIZE);
     mKeyboardActionMap = new HashMap<Class<? extends IDEAction>,Action>(SIZE);
     addAction(new AnalyzeConflictCheckAction(ide));
     addAction(new AnalyzeControllabilityAction(ide));
     addAction(new AnalyzeControlLoopAction(ide));
+    addAction(new AnalyzeHISCCPInterfaceConsistencyAction(ide));
     addAction(new AnalyzeLanguageInclusionAction(ide));
     addAction(new AnalyzeSICProperty5Action(ide));
     addAction(new AnalyzeSICProperty6Action(ide));

@@ -25,6 +25,7 @@ import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
+import net.sourceforge.waters.gui.actions.AnalyzeHISCCPInterfaceConsistencyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCThree_one_propertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDControllabilityAction;
@@ -310,7 +311,6 @@ public class IDEMenuBar extends JMenuBar
     final Component panel = getActivePanel();
     if (panel != null) {
       // Create
-      // Why not "Insert"? All MS programs use insert. ~~~Robi
       if (mCreateMenu == null && panel instanceof EditorPanel) {
         mCreateMenu = new JMenu("Create");
         mCreateMenu.setMnemonic(KeyEvent.VK_C);
@@ -329,7 +329,6 @@ public class IDEMenuBar extends JMenuBar
           final Action inseventalias =
             actions.getAction(InsertEventAliasAction.class);
           mCreateMenu.add(inseventalias);
-       // TODO Auto-generated method stub
           final Action insinstance =
             actions.getAction(InsertInstanceAction.class);
           mCreateMenu.add(insinstance);
@@ -339,8 +338,6 @@ public class IDEMenuBar extends JMenuBar
         }
         final Action insevent = actions.getAction(InsertEventDeclAction.class);
         mCreateMenu.add(insevent);
-        // menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
-        // menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
       }
 
       // Verify
@@ -369,6 +366,9 @@ public class IDEMenuBar extends JMenuBar
           final Action sic6 =
             actions.getAction(AnalyzeSICProperty6Action.class);
           mVerifyMenu.add(sic6);
+          final Action hisccp =
+            actions.getAction(AnalyzeHISCCPInterfaceConsistencyAction.class);
+          mVerifyMenu.add(hisccp);
         }
 	    if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
            mVerifyMenu.addSeparator();
@@ -405,8 +405,7 @@ public class IDEMenuBar extends JMenuBar
             final Action PTimeBeh =
               actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
             mVerifyMenu.add(PTimeBeh);
-
-		}
+        }
       }
 
       // Analyze

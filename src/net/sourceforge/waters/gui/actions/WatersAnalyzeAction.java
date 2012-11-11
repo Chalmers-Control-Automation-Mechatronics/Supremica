@@ -7,7 +7,6 @@
 //# $Id$
 //###########################################################################
 
-
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.BorderLayout;
@@ -16,7 +15,6 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -51,6 +49,7 @@ public abstract class WatersAnalyzeAction
   extends WatersAction
   implements SupremicaPropertyChangeListener
 {
+
   //#########################################################################
   //# Constructor
   protected WatersAnalyzeAction(final IDE ide)
@@ -193,7 +192,7 @@ public abstract class WatersAnalyzeAction
       final Border border = BorderFactory.createCompoundBorder(outer, inner);
       mInformationLabel.setBorder(border);
       mExitButton = new JButton("Abort");
-      mExitButton.addActionListener(new ActionListener(){
+      mExitButton.addActionListener(new ActionListener() {
         public void actionPerformed(final ActionEvent e)
         {
           runner.abort();
@@ -229,73 +228,38 @@ public abstract class WatersAnalyzeAction
     {
       mExitButton.setText("OK");
       mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
-      traceButton = new JButton("Show Trace");
-      mExitButton.addActionListener(new ActionListener(){
+      mExitButton.addActionListener(new ActionListener() {
         public void actionPerformed(final ActionEvent e)
         {
           AnalyzerDialog.this.dispose();
         }
       });
-      traceButton.addActionListener(new ActionListener(){
-        public void actionPerformed(final ActionEvent e)
-        {
-          AnalyzerDialog.this.dispose();
-          final TraceProxy counterexample = mVerifier.getCounterExample();
-          /*
-          if (verifier instanceof MonolithicSCCControlLoopChecker) {
-            final Collection<EventProxy> nonLoop = ((MonolithicSCCControlLoopChecker)verifier).getNonLoopEvents();
-            String info = "The non loop events are:";
-            for (final EventProxy evt : nonLoop)
-            {
-              info += evt.getName() + ",";
-            }
-            getIDE().info(info);
-          }
-          */
-          final IDE ide = getIDE();
-          final ModuleContainer container =
-            (ModuleContainer) ide.getActiveDocumentContainer();
-          container.switchToTraceMode(counterexample);
-          final String comment = counterexample.getComment();
-          if (comment != null && comment.length() > 0) {
-            ide.info(comment);
-          }
-          /*
-          catch (final NonDeterministicException exception)
+      final TraceProxy counterexample = mVerifier.getCounterExample();
+      String comment = null;
+      if (counterexample != null) {
+        traceButton = new JButton("Show Trace");
+        traceButton.addActionListener(new ActionListener() {
+          public void actionPerformed(final ActionEvent e)
           {
-            final DocumentManager docManager = getIDE().getDocumentContainerManager().getDocumentManager();
-            final ProxyMarshaller<TraceProxy> marshaller =
-              docManager.findProxyMarshaller(TraceProxy.class);
-            final String ext = marshaller.getDefaultExtension();
-            final File outdir = getOutputDirectory();
-            final String outname = getIDE().getActiveDocumentContainer().getName();
-            final File outfile = new File(outdir, outname + ext);
-            getIDE().error(("The trace data is missing Non-Deterministic information, and thus, it cannot be compiled. The trace has been saved to " + outfile.getAbsolutePath()));
-            try {
-              docManager.saveAs(counterexample, outfile);
-            } catch (final WatersMarshalException exception1) {
-              getIDE().error("Waters Marshal Error prevented the file from being written.");
-            } catch (final IOException exception1) {
-              getIDE().error("IO Exception prevented the file from being written: " + exception1);
+            AnalyzerDialog.this.dispose();
+            final IDE ide = getIDE();
+            final ModuleContainer container =
+              (ModuleContainer) ide.getActiveDocumentContainer();
+            container.switchToTraceMode(counterexample);
+            final String comment = counterexample.getComment();
+            if (comment != null && comment.length() > 0) {
+              ide.info(comment);
             }
           }
-          */
-        }
-
-        @SuppressWarnings("unused")
-        private File getOutputDirectory()
-        {
-          return getIDE().getActiveDocumentContainer().getFileLocation().getParentFile();
-        }
-      });
-      final String comment = mVerifier.getCounterExample().getComment();
-      if (comment == null || comment.length() == 0) {
-        mInformationLabel.setText("Model " + mProductDES.getName() + " " +
-                                  getFailureDescription() + ".");
-      } else {
-        mInformationLabel.setText(comment);
+        });
+        mBottomPanel.add(traceButton, BorderLayout.EAST);
+        comment = counterexample.getComment();
       }
-      mBottomPanel.add(traceButton, BorderLayout.EAST);
+      if (comment == null || comment.length() == 0) {
+        final String name = mProductDES.getName();
+        comment = "Model " + name + " " + getFailureDescription() + ".";
+      }
+      mInformationLabel.setText(comment);
       repaint();
     }
 
@@ -371,7 +335,7 @@ public abstract class WatersAnalyzeAction
       }
     }
 
-    //######################################################################
+    //#######################################################################
     //# Data Members
     private final AnalyzerThread runner;
     private ModelVerifier mVerifier;
@@ -380,44 +344,44 @@ public abstract class WatersAnalyzeAction
     private JButton traceButton;
     private final WrapperLabel mInformationLabel;
 
-    //######################################################################
+    //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = -2478548485525996982L;
   }
 
 
-  //########################################################################
+  //#########################################################################
   //# Inner Class WrapperLabel
   private class WrapperLabel extends JLabel
   {
 
-    //######################################################################
+    //#######################################################################
     //# Constructor
     private WrapperLabel(final String e)
     {
       super(wrapInHTML(e));
     }
 
-    //######################################################################
+    //#######################################################################
     //# Overrides for javax.swing.JLabel
     public void setText(final String e)
     {
       super.setText(wrapInHTML(e));
     }
 
-    //######################################################################
+    //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = -6693747793242415495L;
 
   }
 
 
-  //########################################################################
+  //#########################################################################
   //# Data Members
   private ProductDESProxy mProductDES;
 
 
-  //########################################################################
+  //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -3797986885054648213L;
 
