@@ -430,8 +430,9 @@ class AttributesPanel extends JPanel
        final int row, final int column)
     {
       @SuppressWarnings("unchecked")
-      final JComboBox<String> combo = (JComboBox<String>) super.getTableCellEditorComponent
-                                      (table, value, isSelected, row, column);
+      final JComboBox<String> combo =
+        (JComboBox<String>) super.getTableCellEditorComponent
+                                   (table, value, isSelected, row, column);
       final Collection<String> completions;
       switch (column) {
       case 0:
@@ -446,15 +447,14 @@ class AttributesPanel extends JPanel
         throw new IllegalArgumentException
           ("Unknown column " + column + " in attribute table!");
       }
+      final DefaultComboBoxModel<String> model =
+        new DefaultComboBoxModel<String>();
+      if (completions != null) {
+        for (final String completion : completions) {
+          model.addElement(completion);
+        }
+      }
       final String text = value.toString();
-      final DefaultComboBoxModel<String> model;
-      if(completions == null){
-        model = new DefaultComboBoxModel<String>();
-      }
-      else{
-        final String[] array = new String[completions.size()];
-        model = new DefaultComboBoxModel<String>(array);
-      }
       model.setSelectedItem(text);
       combo.setModel(model);
       return combo;
@@ -506,10 +506,11 @@ class AttributesPanel extends JPanel
     if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
       ATTRIBUTE_FACTORIES.add(HISCAttributeFactory.getInstance());
     }
-
     // A condition could be added to check if the model contains any clocks
-    ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());
-    ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());
+    if (Config.INCLUDE_RAS_SUPPORT.isTrue()) {
+      ATTRIBUTE_FACTORIES.add(TimeInvariantAttributeFactory.getInstance());
+      ATTRIBUTE_FACTORIES.add(ForcibleEventAttributeFactory.getInstance());
+    }
     //=======================================================================
   }
 
