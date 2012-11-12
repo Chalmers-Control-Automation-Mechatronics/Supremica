@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="verriegel4ft" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Front door subsystem of HISC-CP model of central locking system model from KorSys project.
+<Module Name="verriegel4ht" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Rear door subsystem of HISC-CP model of central locking system model from KorSys project.
 This model is HISC-CP interface consistent. The interface iface_interrupt ensures that a high level using this subsystem must always allow a complete locking or unlocking sequence that is not interrupted by the door opening or closing, thus ensuring nonblocking in combination with the sync automaton.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="stop_VR"/>
@@ -60,7 +60,6 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="MER_aus"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="STZV"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="timeout"/>
         <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="soft_VR">
             <ns2:AttributeMap>
@@ -74,6 +73,8 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="reset"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MZS_an"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MZS_aus"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="iface_main">
@@ -132,10 +133,10 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                     </SimpleNode>
                     <GroupNode Name="G0">
                         <NodeRef Name="er"/>
-                        <NodeRef Name="init"/>
-                        <NodeRef Name="vr"/>
                         <NodeRef Name="zs"/>
+                        <NodeRef Name="vr"/>
                         <NodeRef Name="idle"/>
+                        <NodeRef Name="init"/>
                         <BoxGeometry>
                             <Box Height="240" Width="288" X="112" Y="16"/>
                         </BoxGeometry>
@@ -355,8 +356,8 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="S2"/>
                         <NodeRef Name="S1"/>
+                        <NodeRef Name="S2"/>
                         <NodeRef Name="S0"/>
                         <BoxGeometry>
                             <Box Height="176" Width="368" X="64" Y="32"/>
@@ -685,30 +686,30 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":0">
-                        <NodeRef Name="vr8"/>
-                        <NodeRef Name="zs8"/>
-                        <NodeRef Name="ZS"/>
-                        <NodeRef Name="zs3"/>
-                        <NodeRef Name="vr3"/>
-                        <NodeRef Name="er1"/>
-                        <NodeRef Name="vr2"/>
-                        <NodeRef Name="vr7"/>
-                        <NodeRef Name="VR"/>
-                        <NodeRef Name="zs9"/>
-                        <NodeRef Name="vr1"/>
                         <NodeRef Name="IN"/>
-                        <NodeRef Name="vr6"/>
-                        <NodeRef Name="er3"/>
-                        <NodeRef Name="zs5"/>
-                        <NodeRef Name="ER"/>
-                        <NodeRef Name="er2"/>
-                        <NodeRef Name="zs1"/>
-                        <NodeRef Name="vr5"/>
-                        <NodeRef Name="zs2"/>
-                        <NodeRef Name="vr4"/>
-                        <NodeRef Name="zs6"/>
                         <NodeRef Name="zs7"/>
                         <NodeRef Name="zs4"/>
+                        <NodeRef Name="vr4"/>
+                        <NodeRef Name="vr7"/>
+                        <NodeRef Name="vr8"/>
+                        <NodeRef Name="vr6"/>
+                        <NodeRef Name="zs8"/>
+                        <NodeRef Name="ZS"/>
+                        <NodeRef Name="vr2"/>
+                        <NodeRef Name="zs3"/>
+                        <NodeRef Name="zs5"/>
+                        <NodeRef Name="zs1"/>
+                        <NodeRef Name="ER"/>
+                        <NodeRef Name="vr1"/>
+                        <NodeRef Name="zs6"/>
+                        <NodeRef Name="vr5"/>
+                        <NodeRef Name="er1"/>
+                        <NodeRef Name="vr3"/>
+                        <NodeRef Name="VR"/>
+                        <NodeRef Name="zs9"/>
+                        <NodeRef Name="er3"/>
+                        <NodeRef Name="er2"/>
+                        <NodeRef Name="zs2"/>
                         <BoxGeometry>
                             <Box Height="432" Width="512" X="80" Y="48"/>
                         </BoxGeometry>
@@ -1260,7 +1261,7 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="mvrstzv">
+        <SimpleComponent Kind="PLANT" Name="mvr">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="IDLE">
@@ -1304,17 +1305,6 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="104" Y="63"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="RUN" Target="RUN">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="STZV"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="-28"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="199" Y="80"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -1657,68 +1647,84 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
         <SimpleComponent Kind="SPEC" Name="tmotor">
             <Graph>
                 <NodeList>
-                    <SimpleNode Name="er1">
+                    <SimpleNode Name="zs3a">
                         <PointGeometry>
-                            <Point X="128" Y="192"/>
+                            <Point X="400" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-29" Y="7"/>
+                            <Point X="11" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="zs1">
-                        <PointGeometry>
-                            <Point X="464" Y="192"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point X="-26" Y="14"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="er2">
-                        <PointGeometry>
-                            <Point X="128" Y="272"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point X="-27" Y="4"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="zs2">
-                        <PointGeometry>
-                            <Point X="464" Y="272"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point X="-30" Y="6"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="er3">
-                        <PointGeometry>
-                            <Point X="128" Y="352"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point X="-24" Y="17"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="zs3">
+                    <SimpleNode Name="zs3b">
                         <PointGeometry>
                             <Point X="464" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-28" Y="12"/>
+                            <Point X="-34" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="er1">
+                        <PointGeometry>
+                            <Point X="112" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="11" Y="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="er2">
+                        <PointGeometry>
+                            <Point X="112" Y="272"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="10" Y="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="zs1">
+                        <PointGeometry>
+                            <Point X="432" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-27" Y="14"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="er3">
+                        <PointGeometry>
+                            <Point X="112" Y="352"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="13" Y="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="zs2">
+                        <PointGeometry>
+                            <Point X="432" Y="272"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-28" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="er4">
                         <PointGeometry>
-                            <Point X="128" Y="432"/>
+                            <Point X="112" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-26" Y="8"/>
+                            <Point X="11" Y="2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="zs4">
                         <PointGeometry>
-                            <Point X="464" Y="432"/>
+                            <Point X="432" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="10" Y="1"/>
+                            <Point X="-27" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="zs5">
+                        <PointGeometry>
+                            <Point X="432" Y="512"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-31" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="IN">
@@ -1726,314 +1732,136 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="288" Y="112"/>
+                            <Point X="272" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="15" Y="2"/>
+                            <Point X="11" Y="0"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="vr1">
                         <PointGeometry>
-                            <Point X="288" Y="192"/>
+                            <Point X="272" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-23" Y="7"/>
+                            <Point X="-25" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="vr2">
                         <PointGeometry>
-                            <Point X="288" Y="272"/>
+                            <Point X="272" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-26" Y="4"/>
+                            <Point X="-28" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="vr3">
                         <PointGeometry>
-                            <Point X="288" Y="352"/>
+                            <Point X="272" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-25" Y="4"/>
+                            <Point X="-27" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="vr4">
                         <PointGeometry>
-                            <Point X="288" Y="432"/>
+                            <Point X="272" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-25" Y="6"/>
+                            <Point X="-27" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="vr5">
-                        <PointGeometry>
-                            <Point X="288" Y="512"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point X="-27" Y="4"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <GroupNode Name=":1">
-                        <NodeRef Name="IN"/>
-                        <NodeRef Name="vr3"/>
-                        <NodeRef Name="vr1"/>
-                        <NodeRef Name="zs2"/>
-                        <NodeRef Name="zs3"/>
-                        <NodeRef Name="er4"/>
-                        <NodeRef Name="er3"/>
-                        <NodeRef Name="zs4"/>
-                        <NodeRef Name="zs1"/>
-                        <NodeRef Name="vr4"/>
+                    <GroupNode Name=":0">
                         <NodeRef Name="er1"/>
                         <NodeRef Name="er2"/>
-                        <NodeRef Name="vr5"/>
+                        <NodeRef Name="zs2"/>
+                        <NodeRef Name="er4"/>
+                        <NodeRef Name="zs5"/>
+                        <NodeRef Name="zs1"/>
+                        <NodeRef Name="er3"/>
+                        <NodeRef Name="vr1"/>
+                        <NodeRef Name="zs3a"/>
+                        <NodeRef Name="zs4"/>
+                        <NodeRef Name="zs3b"/>
+                        <NodeRef Name="vr3"/>
+                        <NodeRef Name="IN"/>
                         <NodeRef Name="vr2"/>
+                        <NodeRef Name="vr4"/>
                         <BoxGeometry>
-                            <Box Height="496" Width="512" X="48" Y="64"/>
+                            <Box Height="544" Width="512" X="32" Y="16"/>
                         </BoxGeometry>
                     </GroupNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="vr3" Target="vr4">
+                    <Edge Source="zs3a" Target="zs5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="STZV"/>
                             <SimpleIdentifier Name="timeout"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-60" Y="-23"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="er1" Target="er2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="time_ER"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-51" Y="-9"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="zs1" Target="zs2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="time_ZS"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-8"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source=":1" Target="IN">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="soft_CS"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-47" Y="-7"/>
+                                <Point X="-19" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="205" Y="92"/>
+                            <Point X="384" Y="438"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="zs3a" Target="zs4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MVR_an"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-44" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="zs3b" Target="zs5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-51" Y="23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="480" Y="438"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="zs3b" Target="zs4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MZS_an"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="vr1" Target="vr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="time_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="-4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="zs4" Target="zs5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="vr2" Target="vr4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-51" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="236" Y="352"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="vr2" Target="vr3">
                         <LabelBlock>
                             <SimpleIdentifier Name="MVR_an"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-64" Y="-7"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="vr2" Target="vr5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="timeout"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-61" Y="21"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="252" Y="392"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="zs4" Target="zs4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="MVR_aus"/>
-                            <SimpleIdentifier Name="STZV"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-43" Y="-17"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="464" Y="480"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="zs4" Target="IN">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="stop_ZS"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-15" Y="62"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="362" Y="270"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="er3" Target="er4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="timeout"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="zs3" Target="zs4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="timeout"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-13"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="zs3" Target="zs3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="STZV"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-22" Y="-4"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="502" Y="351"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="zs2" Target="zs4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="timeout"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-52" Y="-52"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="438" Y="355"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="zs2" Target="zs3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="MVR_an"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="5" Y="-5"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="vr5" Target="vr5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="reset"/>
-                            <SimpleIdentifier Name="timeout"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-35" Y="-25"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="289" Y="555"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="vr5" Target="IN">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="stop_VR"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-9" Y="63"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="328" Y="312"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="er4" Target="er4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="MER_aus"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="-20"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="128" Y="476"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="er4" Target="IN">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="stop_ER"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-61" Y="46"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="225" Y="287"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="vr1" Target="vr2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="time_VR"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-66" Y="-9"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="IN" Target="vr1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="start_VR"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-67" Y="-8"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="IN" Target="er1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="start_ER"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-65" Y="-21"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="IN" Target="zs1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="start_ZS"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-19" Y="-19"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="IN" Target="IN">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="MER_aus"/>
-                            <SimpleIdentifier Name="MVR_aus"/>
-                            <SimpleIdentifier Name="reset"/>
-                            <SimpleIdentifier Name="STZV"/>
-                            <SimpleIdentifier Name="timeout"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="19" Y="-54"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="289" Y="72"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="vr4" Target="vr4">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="STZV"/>
-                            <SimpleIdentifier Name="timeout"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-7" Y="-13"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="329" Y="431"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="vr4" Target="vr5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="MVR_aus"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-69" Y="-7"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="er2" Target="er3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="MER_an"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-17"/>
+                                <Point X="-49" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -2041,11 +1869,198 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                         <LabelBlock>
                             <SimpleIdentifier Name="timeout"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-44" Y="-27"/>
+                                <Point X="-40" Y="-27"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="92" Y="352"/>
+                            <Point X="76" Y="352"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="er2" Target="er3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MER_an"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="er3" Target="er4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="IN" Target="zs1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="357" Y="153"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN" Target="er1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-59" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="IN" Target="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MER_aus"/>
+                            <SimpleIdentifier Name="MVR_aus"/>
+                            <SimpleIdentifier Name="MZS_aus"/>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="-52"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="272" Y="72"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN" Target="vr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-64" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="zs2" Target="zs5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="34"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="511" Y="401"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="zs2" Target="zs3a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MZS_an"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="zs2" Target="zs3b">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MVR_an"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":0" Target="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="174" Y="69"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="vr4" Target="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="64"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="304" Y="283"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="vr4" Target="vr4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MVR_aus"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="273" Y="475"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="vr3" Target="vr4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="er1" Target="er2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="time_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-51" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="zs5" Target="zs5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MVR_aus"/>
+                            <SimpleIdentifier Name="MZS_aus"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="434" Y="553"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="zs5" Target="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-80" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="374" Y="431"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="zs1" Target="zs2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="time_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-49" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="er4" Target="er4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MER_aus"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="112" Y="474"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="er4" Target="IN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-44"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="189" Y="311"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

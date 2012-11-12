@@ -2,87 +2,24 @@
 <Module Name="verriegel4ft_bad" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Front door subsystem of HISC-CP model of central locking system model from KorSys project.
 This broken version does not satusfy HISC-CP interface consistency, because the marking conditions in the interface iface_main are more liberal than the markings imposed by the 'sync' automaton.</ns2:Comment>
-    <ConstantAliasList>
-        <ConstantAlias Name="HeckTueren">
-            <ConstantAliasExpression>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="FH"/>
-                    <SimpleIdentifier Name="BH"/>
-                </EnumSetExpression>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-        <ConstantAlias Name="Timers">
-            <ConstantAliasExpression>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="FT"/>
-                    <SimpleIdentifier Name="BT"/>
-                    <SimpleIdentifier Name="FH"/>
-                    <SimpleIdentifier Name="BH"/>
-                    <SimpleIdentifier Name="FS"/>
-                    <SimpleIdentifier Name="WSP"/>
-                </EnumSetExpression>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-        <ConstantAlias Name="NichtFahrerTueren">
-            <ConstantAliasExpression>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="BT"/>
-                    <SimpleIdentifier Name="FH"/>
-                    <SimpleIdentifier Name="BH"/>
-                </EnumSetExpression>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-        <ConstantAlias Name="Counters">
-            <ConstantAliasExpression>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="WSP"/>
-                </EnumSetExpression>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-        <ConstantAlias Name="FahrerTueren">
-            <ConstantAliasExpression>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="FT"/>
-                </EnumSetExpression>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-        <ConstantAlias Name="VorderTueren">
-            <ConstantAliasExpression>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="FT"/>
-                    <SimpleIdentifier Name="BT"/>
-                </EnumSetExpression>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-        <ConstantAlias Name="Tueren">
-            <ConstantAliasExpression>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="FT"/>
-                    <SimpleIdentifier Name="BT"/>
-                    <SimpleIdentifier Name="FH"/>
-                    <SimpleIdentifier Name="BH"/>
-                </EnumSetExpression>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-    </ConstantAliasList>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="stop_VR"/>
         <EventDecl Kind="CONTROLLABLE" Name="MER_an"/>
-        <EventDecl Kind="CONTROLLABLE" Name="soft_ZS">
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="soft_ZS">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="stop_ZS"/>
         <EventDecl Kind="CONTROLLABLE" Name="time_ER"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="tuer_auf">
+        <EventDecl Kind="UNCONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="tuer_auf">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="start_ER"/>
         <EventDecl Kind="CONTROLLABLE" Name="MVR_aus"/>
-        <EventDecl Kind="CONTROLLABLE" Name="done_ER">
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="done_ER">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
@@ -92,14 +29,14 @@ This broken version does not satusfy HISC-CP interface consistency, because the 
         <EventDecl Kind="CONTROLLABLE" Name="sync"/>
         <EventDecl Kind="CONTROLLABLE" Name="time_VR"/>
         <EventDecl Kind="CONTROLLABLE" Name="MVR_an"/>
-        <EventDecl Kind="CONTROLLABLE" Name="soft_CS">
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="soft_CS">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="time_ZS"/>
         <EventDecl Kind="CONTROLLABLE" Name="start_VR"/>
-        <EventDecl Kind="CONTROLLABLE" Name="soft_ER">
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="soft_ER">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
@@ -110,14 +47,14 @@ This broken version does not satusfy HISC-CP interface consistency, because the 
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="time_W"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="tuer_zu">
+        <EventDecl Kind="UNCONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="tuer_zu">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="stop_ER"/>
         <EventDecl Kind="CONTROLLABLE" Name="start_ZS"/>
-        <EventDecl Kind="CONTROLLABLE" Name="done_ZS">
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="done_ZS">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
@@ -125,20 +62,18 @@ This broken version does not satusfy HISC-CP interface consistency, because the 
         <EventDecl Kind="CONTROLLABLE" Name="MER_aus"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="STZV"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="timeout"/>
-        <EventDecl Kind="CONTROLLABLE" Name="soft_VR">
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="soft_VR">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="CS_ok">
+        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="CS_ok">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="reset"/>
-        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
-        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="iface_main">
@@ -196,11 +131,11 @@ This broken version does not satusfy HISC-CP interface consistency, because the 
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="er"/>
+                        <NodeRef Name="vr"/>
                         <NodeRef Name="idle"/>
+                        <NodeRef Name="er"/>
                         <NodeRef Name="init"/>
                         <NodeRef Name="zs"/>
-                        <NodeRef Name="vr"/>
                         <BoxGeometry>
                             <Box Height="240" Width="288" X="112" Y="16"/>
                         </BoxGeometry>
@@ -618,30 +553,30 @@ This broken version does not satusfy HISC-CP interface consistency, because the 
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":0">
-                        <NodeRef Name="zs3"/>
-                        <NodeRef Name="vr5"/>
-                        <NodeRef Name="zs1"/>
-                        <NodeRef Name="er2"/>
-                        <NodeRef Name="vr7"/>
-                        <NodeRef Name="zs2"/>
-                        <NodeRef Name="ER"/>
-                        <NodeRef Name="zs9"/>
-                        <NodeRef Name="er3"/>
-                        <NodeRef Name="VR"/>
                         <NodeRef Name="vr6"/>
-                        <NodeRef Name="ZS"/>
+                        <NodeRef Name="vr2"/>
+                        <NodeRef Name="vr5"/>
+                        <NodeRef Name="ER"/>
+                        <NodeRef Name="zs3"/>
+                        <NodeRef Name="zs4"/>
+                        <NodeRef Name="vr7"/>
+                        <NodeRef Name="vr3"/>
+                        <NodeRef Name="zs9"/>
+                        <NodeRef Name="vr8"/>
+                        <NodeRef Name="zs7"/>
+                        <NodeRef Name="vr4"/>
+                        <NodeRef Name="zs2"/>
                         <NodeRef Name="IN"/>
                         <NodeRef Name="er1"/>
-                        <NodeRef Name="zs5"/>
-                        <NodeRef Name="zs8"/>
-                        <NodeRef Name="zs7"/>
-                        <NodeRef Name="vr2"/>
-                        <NodeRef Name="vr3"/>
-                        <NodeRef Name="zs6"/>
-                        <NodeRef Name="vr4"/>
-                        <NodeRef Name="vr8"/>
                         <NodeRef Name="vr1"/>
-                        <NodeRef Name="zs4"/>
+                        <NodeRef Name="VR"/>
+                        <NodeRef Name="zs8"/>
+                        <NodeRef Name="er3"/>
+                        <NodeRef Name="ZS"/>
+                        <NodeRef Name="zs1"/>
+                        <NodeRef Name="zs5"/>
+                        <NodeRef Name="zs6"/>
+                        <NodeRef Name="er2"/>
                         <BoxGeometry>
                             <Box Height="432" Width="512" X="80" Y="48"/>
                         </BoxGeometry>
@@ -1587,7 +1522,7 @@ This broken version does not satusfy HISC-CP interface consistency, because the 
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="tmotor1">
+        <SimpleComponent Kind="SPEC" Name="tmotor">
             <Graph>
                 <NodeList>
                     <SimpleNode Name="er1">
@@ -1706,20 +1641,20 @@ This broken version does not satusfy HISC-CP interface consistency, because the 
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":1">
-                        <NodeRef Name="er1"/>
                         <NodeRef Name="zs4"/>
-                        <NodeRef Name="er2"/>
-                        <NodeRef Name="zs1"/>
-                        <NodeRef Name="vr3"/>
-                        <NodeRef Name="er3"/>
-                        <NodeRef Name="zs3"/>
-                        <NodeRef Name="zs2"/>
-                        <NodeRef Name="vr5"/>
+                        <NodeRef Name="er1"/>
+                        <NodeRef Name="IN"/>
                         <NodeRef Name="vr2"/>
+                        <NodeRef Name="zs1"/>
                         <NodeRef Name="vr4"/>
+                        <NodeRef Name="zs3"/>
+                        <NodeRef Name="vr3"/>
                         <NodeRef Name="er4"/>
                         <NodeRef Name="vr1"/>
-                        <NodeRef Name="IN"/>
+                        <NodeRef Name="vr5"/>
+                        <NodeRef Name="zs2"/>
+                        <NodeRef Name="er3"/>
+                        <NodeRef Name="er2"/>
                         <BoxGeometry>
                             <Box Height="496" Width="512" X="48" Y="64"/>
                         </BoxGeometry>
