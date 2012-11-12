@@ -14,6 +14,9 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntStack;
 import gnu.trove.TLongObjectHashMap;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -165,9 +168,9 @@ public class ListBufferTransitionRelation
     checkConfig(config);
     mName = aut.getName();
     mKind = aut.getKind();
-    mStateBuffer = new IntStateBuffer(eventEnc, stateEnc);
-    mExtraStates = stateEnc.getNumberOfExtraStates();
     final Set<EventProxy> events = new THashSet<EventProxy>(aut.getEvents());
+    mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, events);
+    mExtraStates = stateEnc.getNumberOfExtraStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     final List<TransitionProxy> list =
       new ArrayList<TransitionProxy>(transitions);
@@ -342,19 +345,6 @@ public class ListBufferTransitionRelation
     }
   }
 
-  //#########################################################################
-  //# Overrides for java.lang.object
-  public String toString()
-  {
-    if (mSuccessorBuffer != null) {
-      return mSuccessorBuffer.toString();
-    } else if (mPredecessorBuffer != null) {
-      return mPredecessorBuffer.toString();
-    } else {
-      return "{" + ProxyTools.getShortClassName(this)
-             + ": no buffer configured.}";
-    }
-  }
 
   //#########################################################################
   //# Simple Access
@@ -2213,6 +2203,30 @@ public class ListBufferTransitionRelation
 
   //#########################################################################
   //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter printer = new PrintWriter(writer);
+    dump(printer);
+    return writer.toString();
+  }
+
+  public void dump(final PrintWriter printer)
+  {
+    mStateBuffer.dump(printer);
+    printer.println();
+    if (mSuccessorBuffer != null) {
+      mSuccessorBuffer.dump(printer);
+    } else if (mPredecessorBuffer != null) {
+      mPredecessorBuffer.dump(printer);
+    } else {
+      printer.print("{" + ProxyTools.getShortClassName(this) +
+                    ": no buffer configured.}");
+    }
+    printer.println();
+  }
+
   public void checkIntegrity()
   {
     if (mPredecessorBuffer == null && mSuccessorBuffer == null) {

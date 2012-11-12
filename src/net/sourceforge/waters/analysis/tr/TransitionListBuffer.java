@@ -14,6 +14,9 @@ import gnu.trove.TIntHashSet;
 import gnu.trove.TIntHashingStrategy;
 import gnu.trove.TIntIntHashMap;
 import gnu.trove.TIntIntIterator;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -176,30 +179,6 @@ public abstract class TransitionListBuffer
   int getNumberOfStates()
   {
     return mStateTransitions.length;
-  }
-
-
-  //#########################################################################
-  //# Overrides for java.lang.Object
-  public String toString()
-  {
-    final StringBuffer buffer = new StringBuffer("{");
-    final TransitionIterator iter = createAllTransitionsReadOnlyIterator();
-    boolean first = true;
-    while (iter.advance()) {
-      if (first) {
-        first = false;
-      } else {
-        buffer.append(", ");
-      }
-      buffer.append(iter.getCurrentSourceState());
-      buffer.append(" -");
-      buffer.append(iter.getCurrentEvent());
-      buffer.append("-> ");
-      buffer.append(iter.getCurrentTargetState());
-    }
-    buffer.append('}');
-    return buffer.toString();
   }
 
 
@@ -1346,6 +1325,38 @@ public abstract class TransitionListBuffer
       mNextFreeIndex += 2;
       return result;
     }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter printer = new PrintWriter(writer);
+    dump(printer);
+    return writer.toString();
+  }
+
+  public void dump(final PrintWriter printer)
+  {
+    printer.print('{');
+    final TransitionIterator iter = createAllTransitionsReadOnlyIterator();
+    boolean first = true;
+    while (iter.advance()) {
+      if (first) {
+        first = false;
+      } else {
+        printer.print(", ");
+      }
+      printer.print(iter.getCurrentSourceState());
+      printer.print(" -");
+      printer.print(iter.getCurrentEvent());
+      printer.print("-> ");
+      printer.print(iter.getCurrentTargetState());
+    }
+    printer.print('}');
   }
 
 

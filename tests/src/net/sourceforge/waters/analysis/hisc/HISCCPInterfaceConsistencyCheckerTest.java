@@ -110,7 +110,7 @@ public class HISCCPInterfaceConsistencyCheckerTest
 
   public void testHISCCP_hisc7_low2() throws Exception
   {
-    runModelVerifier("despot", "testHISC", "hisc7_low2.wmod", true);
+    runModelVerifier("despot", "testHISC", "hisc7_low2.wmod", false);
   }
 
   public void testHISCCP_hisc8_low2() throws Exception
@@ -125,7 +125,7 @@ public class HISCCPInterfaceConsistencyCheckerTest
 
   public void testHISCCP_hisc10_low1() throws Exception
   {
-    runModelVerifier("despot", "testHISC", "hisc10_low1.wmod", true);
+    runModelVerifier("despot", "testHISC", "hisc10_low1.wmod", false);
   }
 
   public void testHISCCP_hisc12_low2() throws Exception
@@ -182,6 +182,13 @@ public class HISCCPInterfaceConsistencyCheckerTest
     runModelVerifier("tests", "hisc",
                      "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
                      false);
+  }
+
+  // Central Locking
+  public void testHISCCP_verriegel4ftbad()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc", "verriegel4ft_bad.wmod", false);
   }
 
   // SimpleManufacturingExample

@@ -12,10 +12,13 @@ package net.sourceforge.waters.analysis.tr;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TLongObjectHashMap;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -54,11 +57,16 @@ public class IntStateBuffer
    *                    events used as markings of the states.
    * @param  stateEnc   State encoding that defines the assignment of state
    *                    codes for the states in the buffer.
+   * @param  events     Set of events used in automaton, or <CODE>null</CODE>.
+   *                    If the event encoding defines propositions as extra
+   *                    selfloops, all states will be marked by extra-selfloop
+   *                    propositions not in the set of events.
    * @throws OverflowException if the event encoding map has more than 30
    *                    propositions.
    */
   public IntStateBuffer(final EventEncoding eventEnc,
-                        final StateEncoding stateEnc)
+                        final StateEncoding stateEnc,
+                        final Set<EventProxy> events)
     throws OverflowException
   {
     this(stateEnc.getNumberOfStatesIncludingExtra(),
@@ -72,7 +80,8 @@ public class IntStateBuffer
     final List<EventProxy> extra = eventEnc.getExtraSelfloops();
     if (extra != null) {
       for (final EventProxy event : extra) {
-        if (event.getKind() == EventKind.PROPOSITION) {
+        if (event.getKind() == EventKind.PROPOSITION &&
+            (events == null || !events.contains(event))) {
           final int code = eventEnc.getEventCode(event);
           tags0 |= (1 << code);
         }
@@ -562,6 +571,64 @@ public class IntStateBuffer
       }
     }
     return new StateEncoding(states);
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter printer = new PrintWriter(writer);
+    dump(printer);
+    return writer.toString();
+  }
+
+  public void dump(final PrintWriter printer)
+  {
+    printer.print('{');
+    int last = -1;
+    for (int s = 0; s < mStateInfo.length; s++) {
+      final int info = mStateInfo[s] &~ TAG_REACHABLE;
+      if (info != 0) {
+        if (last >= 0) {
+          printer.print(", ");
+        }
+        last = s;
+        if ((info & TAG_INITIAL) != 0) {
+          printer.print("->");
+        }
+        printer.print(s);
+        if ((info & mUsedPropositions) != 0) {
+          if (mNumPropositions == 1) {
+            printer.print('*');
+          } else {
+            printer.print('<');
+            boolean first = true;
+            for (int p = 0; p < mNumPropositions; p++) {
+              if (first) {
+                first = false;
+              } else {
+                printer.print(",");
+              }
+              if ((info & (1 << p) & mUsedPropositions) != 0) {
+                printer.print(p);
+              }
+            }
+            printer.print('<');
+          }
+        }
+      }
+    }
+    if (last < mStateInfo.length - 1) {
+      if (last < 0) {
+        printer.print("0");
+      }
+      printer.print(" ... ");
+      printer.print(mStateInfo.length - 1);
+    }
+    printer.print('}');
   }
 
 
