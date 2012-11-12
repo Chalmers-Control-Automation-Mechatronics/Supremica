@@ -573,16 +573,30 @@ Class-Path: ${manifest.pathlist}</echo>
         </copy>
     </target>
 
-    <target name="cpp_waters" depends="-detect_arch"
-            description="Builds debug version of Waters dynamic link library.">
+
+    <target name="-cpp_waters_compile" depends="-detect_arch">
         <ant dir="${waters.dir}" target="cpp" inheritAll="false">
             <property name="native.host.arch" value="${native.host.arch}"/>
         </ant>
+    </target>
+
+    <target name="-cpp_waters_check">
+        <available file="${waters.dir}/cpp/lib/${native.host.arch}.debug"
+                   type="dir"
+                   property="native.compiled"/>
+    </target>
+
+    <target name="-cpp_waters_copy"
+            depends="-cpp_waters_compile,-cpp_waters_check"
+            if="native.compiled">
         <copy todir="${dist}" failonerror="false">
             <fileset dir="${waters.dir}/cpp/lib/${native.host.arch}.debug"
                      includes="*"/>
         </copy>
     </target>
+
+    <target name="cpp_waters" depends="-cpp_waters_compile,-cpp_waters_copy"
+           description="Builds debug version of Waters dynamic link library."/>
 
     <target name="ccpp_waters" depends="-detect_arch"
             description="Builds Waters dynamic libraries for multiple platforms.">

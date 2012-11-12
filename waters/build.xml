@@ -227,7 +227,7 @@
   </target>
 
   <target name="javah" depends="waters-compile"
-          description="Create JNI headers.">
+          if="native.make" description="Create JNI headers.">
     <mkdir dir="${javah.dir}"/>
     <javah outputFile="${javah.file}" classpath="${waters.classes}">
       <class name="net.sourceforge.waters.cpp.analysis.NativeConflictChecker"/>
@@ -257,7 +257,7 @@
   </target>
 
   <target name="jniglue" depends="jniglue-jar,waters-jar"
-          description="Create JNI Glue C++ files.">
+          if="native.make" description="Create JNI Glue C++ files.">
     <mkdir dir="${jniglue.outdir}"/>
     <java classname="net.sourceforge.waters.build.jniglue.GlueCompiler"
           fork="true" failonerror="true">
