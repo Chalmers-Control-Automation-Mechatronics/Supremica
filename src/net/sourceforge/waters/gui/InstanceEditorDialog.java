@@ -127,12 +127,11 @@ public class InstanceEditorDialog extends JDialog
     mMainPanel = new RaisedDialogPanel();
     final ExpressionParser parser = mRoot.getExpressionParser();
     mNameLabel = new JLabel("Name: ");
-    final String oldname = template.getName();
-    final SimpleIdentifierSubject ident =
-      new SimpleIdentifierSubject(oldname);
-    final SimpleIdentifierInputParser nameparser =
-      new SimpleIdentifierInputParser(ident, parser);
-    mNameInput = new SimpleExpressionCell(ident, nameparser);
+    final IdentifierProxy oldname = template.getIdentifier();
+    final ModuleContext context = mRoot.getModuleContext();
+    final FormattedInputParser nameparser =
+      new ComponentNameInputParser(oldname, context, parser);
+    mNameInput = new SimpleExpressionCell(oldname, nameparser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter the name");
 
