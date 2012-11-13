@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -72,6 +73,7 @@ public class ModuleCompiler
     pass1.setOptimizationEnabled(mIsOptimizationEnabled);
     pass1.setEnabledPropertyNames(mEnabledPropertyNames);
     pass1.setEnabledPropositionNames(mEnabledPropositionNames);
+    pass1.setHISCCompileMode(mHISCCompileMode);
     ModuleProxy intermediate = pass1.compile(bindings);
     final boolean efa = pass1.getHasEFAElements();
     pass1 = null;
@@ -163,6 +165,24 @@ public class ModuleCompiler
     mEnabledPropositionNames = names;
   }
 
+  /**
+   * Gets the current setting for partial compilation of HISC subsystems.
+   * @see HISCCompileMode
+   */
+  public HISCCompileMode getHISCCompileMode()
+  {
+    return mHISCCompileMode;
+  }
+
+  /**
+   * Configures the compiler for partial compilation of HISC subsystems.
+   * @see HISCCompileMode
+   */
+  public void setHISCCompileMode(final HISCCompileMode mode)
+  {
+    mHISCCompileMode = mode;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -212,5 +232,6 @@ public class ModuleCompiler
   private boolean mIsSourceInfoEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
+  private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
 
 }

@@ -60,7 +60,12 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
  *     of <I>default</I> or <I>local</I> type.
  *     For convenience, an enumeration {@link EventType} containing these
  *     values is provided, along with methods to read and write its values
- *     in attribute maps.</LI>
+ *     in attribute maps.<BR>
+ *     In addition, the compiler stores the key
+ *     <CODE>&quot;HISC:EventParameter&quot;</CODE> ({@link #PARAMETER_KEY})
+ *     when compiling a parameter event. This makes it possible to distinguish
+ *     whether a request or answer event is linked to the level above or
+ *     below the current module in a multi-level hierarchy.</LI>
  * </UL>
  *
  * <P>This class also implements the {@link AttributeFactory} interface for
@@ -188,6 +193,33 @@ public class HISCAttributeFactory implements AttributeFactory
     }
   }
 
+  /**
+   * Checks whether the given attribute map designates an event as
+   * a parameter.
+   */
+  public static boolean isParameter(final Map<String,String> attribs)
+  {
+    return attribs.containsKey(PARAMETER_KEY);
+  }
+
+  /**
+   * Changes an attribute map to designate an event as a parameter.
+   * @param attribs  The attribute map to be modified.
+   * @param iface    <CODE>true</CODE> if the attribute map should designate
+   *                 an event as a parameter, <CODE>false</CODE>
+   *                 if the event should not be a parameter after the
+   *                 call to this method.
+   */
+  public static void setParameter(final Map<String,String> attribs,
+                                  final boolean iface)
+  {
+    if (iface) {
+      attribs.put(PARAMETER_KEY, "");
+    } else {
+      attribs.remove(PARAMETER_KEY);
+    }
+  }
+
 
   //#########################################################################
   //# Inner Enumeration Class EventKind
@@ -217,6 +249,10 @@ public class HISCAttributeFactory implements AttributeFactory
    * The attribute key used to define the HISC event type.
    */
   public static final String EVENTTYPE_KEY = "HISC:EventType";
+  /**
+   * The attribute key used to identify an event as a parameter.
+   */
+  public static final String PARAMETER_KEY = "HISC:EventParameter";
   /**
    * The attribute key used to designate components as an HISC interface.
    */

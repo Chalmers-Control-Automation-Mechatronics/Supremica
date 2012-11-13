@@ -22,6 +22,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
+import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
@@ -201,6 +203,16 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     mEnabledPropositionNames = names;
   }
 
+  public HISCCompileMode getHISCCompileMode()
+  {
+    return mHISCCompileMode;
+  }
+
+  public void setHISCCompileMode(final HISCCompileMode mode)
+  {
+    mHISCCompileMode = mode;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
@@ -312,6 +324,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final List<SimpleExpressionProxy> declRanges = decl.getRanges();
       CompiledEvent event = binding == null ? null : binding.getEventValue();
       if (event == null) {
+        // Declare new event ...
         final int numranges = declRanges.size();
         final List<CompiledRange> ranges =
           new ArrayList<CompiledRange>(numranges);
@@ -334,6 +347,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
           }
         }
       } else {
+        // Use event through parameter binding ...
         final EventKind kind = decl.getKind();
         final int mask = event.getKindMask();
         if (!EventKindMask.isAssignable(kind, mask) ||
@@ -584,6 +598,15 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   {
     final BindingContext oldContext = mContext;
     final CompiledNameSpace oldNameSpace = mNameSpace;
+    switch (mHISCCompileMode) {
+    case HISC_LOW:
+      return null;
+    case HISC_HIGH:
+      mHISCCompileMode = HISCCompileMode.HISC_LOW;
+      break;
+    default:
+      break;
+    }
     try {
       final IdentifierProxy ident = inst.getIdentifier();
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
@@ -613,6 +636,9 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       mContext = oldContext;
       mNameSpace = oldNameSpace;
       mParameterMap = null;
+      if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
+        mHISCCompileMode = HISCCompileMode.HISC_HIGH;
+      }
     }
   }
 
@@ -699,13 +725,21 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
       final IdentifierProxy fullname =
         mNameSpace.getPrefixedIdentifier(suffix, mFactory);
-      final ComponentKind kind = comp.getKind();
+      ComponentKind kind = comp.getKind();
       if (isDisabledProperty(kind, fullname)) {
         return null;
       }
+      Map<String,String> attribs = comp.getAttributes();
+      if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
+        if (HISCAttributeFactory.isInterface(attribs)) {
+          attribs = null;
+          kind = ComponentKind.PLANT;
+        } else {
+          return null;
+        }
+      }
       final GraphProxy graph = comp.getGraph();
       final GraphProxy newgraph = visitGraphProxy(graph);
-      final Map<String,String> attribs = comp.getAttributes();
       final SimpleComponentProxy newcomp =
         mFactory.createSimpleComponentProxy(fullname, kind, newgraph, attribs);
       mNameSpace.addComponent(suffix, newcomp);
@@ -756,6 +790,9 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     throws VisitorException
   {
     try {
+      if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
+        return null;
+      }
       mHasEFAElements = true;
       final IdentifierProxy ident = var.getIdentifier();
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
@@ -888,7 +925,14 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       namespace.getPrefixedIdentifier(suffix, mFactory);
     final EventKind kind = edecl.getKind();
     final boolean observable = edecl.isObservable();
-    final Map<String,String> attribs = edecl.getAttributes();
+    Map<String,String> attribs = edecl.getAttributes();
+    if (mHISCCompileMode == HISCCompileMode.HISC_HIGH &&
+        edecl.getScope() != ScopeKind.LOCAL &&
+        HISCAttributeFactory.getEventType(attribs) !=
+        HISCAttributeFactory.EventType.DEFAULT) {
+      attribs = new HashMap<String,String>(attribs);
+      HISCAttributeFactory.setParameter(attribs, true);
+    }
     final EventDeclProxy decl = mFactory.createEventDeclProxy
       (ident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
     mCompiledEvents.add(decl);
@@ -1257,6 +1301,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   private boolean mIsOptimizationEnabled = true;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
+  private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
 
   private boolean mHasEFAElements;
 
