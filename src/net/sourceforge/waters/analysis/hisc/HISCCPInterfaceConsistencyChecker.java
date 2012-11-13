@@ -179,6 +179,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
         }
       }
       final int markingID = eventEnc.addEvent(mUsedMarking, translator, true);
+      checkAbort();
 
       // Separate into interface and subsystem automata ...
       final Collection<AutomatonProxy> automata = des.getAutomata();
@@ -195,6 +196,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
           subsystem.add(aut);
         }
       }
+      checkAbort();
 
       // If there is no interface, just run a conflict check ...
       if (!hasInterface) {
@@ -229,6 +231,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
           }
         }
       }
+      checkAbort();
 
       // Compose the interface and subsystem to single transition relations ...
       final ListBufferTransitionRelation interfaceRel =
@@ -237,9 +240,9 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
         createTransitionRelation(subsystemDES, eventEnc);
 
       /// Check the conflict preorder ...
-      final TRConflictPreorderChecker checker =
+      mConflictPreorderChecker =
         new TRConflictPreorderChecker(subsystemRel, interfaceRel, markingID);
-      final boolean lc = checker.isLessConflicting();
+      final boolean lc = mConflictPreorderChecker.isLessConflicting();
       final VerificationResult result = getAnalysisResult();
       result.setSatisfied(lc);
       return lc;
@@ -252,7 +255,24 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   protected void tearDown()
   {
     mUsedMarking = null;
+    mConflictPreorderChecker = null;
     super.tearDown();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    mConflictChecker.requestAbort();
+    if (mSimplifier != null) {
+      mSimplifier.requestAbort();
+    }
+    if (mConflictPreorderChecker != null) {
+      mConflictPreorderChecker.requestAbort();
+    }
   }
 
 
@@ -272,7 +292,10 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
       aut = mSynchronousProductBuilder.getComputedAutomaton();
     }
     final int config = TRConflictPreorderChecker.getPreferredInputConfiguration();
-    return new ListBufferTransitionRelation(aut, eventEnc, config);
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation(aut, eventEnc, config);
+    checkAbort();
+    return rel;
   }
 
 
@@ -284,5 +307,6 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   private ConflictChecker mConflictChecker;
   private CompositionalSimplifier mSimplifier;
   private final SynchronousProductBuilder mSynchronousProductBuilder;
+  private TRConflictPreorderChecker mConflictPreorderChecker;
 
 }
