@@ -28,6 +28,7 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 
 /**
  * An implementation of the {@link java.util.Set Set} interface that uses an
@@ -39,7 +40,7 @@ import java.io.Serializable;
  * @version $Id$
  */
 
-class StateHashSet extends StateObjectHash implements Serializable {
+public class StateHashSet<E> extends StateObjectHash<E> implements Serializable {
 
     static final long serialVersionUID = -2353400642617702135L;
 
@@ -47,8 +48,8 @@ class StateHashSet extends StateObjectHash implements Serializable {
      * Creates a new <code>StateHashSet</code> instance with the default
      * capacity and load factor.
      */
-    public StateHashSet() {
-        super();
+    public StateHashSet(final Class<? extends E> clazz) {
+        super(clazz);
     }
 
     /**
@@ -58,8 +59,8 @@ class StateHashSet extends StateObjectHash implements Serializable {
      *
      * @param initialCapacity an <code>int</code> value
      */
-    public StateHashSet(int initialCapacity) {
-        super(initialCapacity);
+    public StateHashSet(final Class<? extends E> clazz,final int initialCapacity) {
+        super(clazz,initialCapacity);
     }
 
     /**
@@ -67,16 +68,17 @@ class StateHashSet extends StateObjectHash implements Serializable {
      *
      * @param newCapacity an <code>int</code> value
      */
-    protected void rehash(int newCapacity) {
-        int oldCapacity = _set.length;
-        EncodedStateTuple oldSet[] = _set;
+    @SuppressWarnings("unchecked")
+    protected void rehash(final int newCapacity) {
+        final int oldCapacity = _set.length;
+        final E oldSet[] = _set;
 
-        _set = new EncodedStateTuple[newCapacity];
+        _set = (E[]) Array.newInstance(_clazz, newCapacity);
 
         for (int i = oldCapacity; i-- > 0;) {
             if(oldSet[i] != null) {
-                EncodedStateTuple o = oldSet[i];
-                int index = insertionIndex(o);
+                final E o = oldSet[i];
+                final int index = insertionIndex(o);
                 if (index < 0) { // everyone pays for this because some people can't RTFM
                     throwObjectContractViolation(_set[(-index -1)], o);
                 }
@@ -84,4 +86,5 @@ class StateHashSet extends StateObjectHash implements Serializable {
             }
         }
     }
+
 } // StateHashSet

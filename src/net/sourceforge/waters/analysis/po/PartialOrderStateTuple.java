@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.analysis.po;
 
 import java.util.Arrays;
 
@@ -18,7 +18,7 @@ import java.util.Arrays;
  * @author Peter Yunil Park
  */
 
-public class StateTuple
+public class PartialOrderStateTuple
 {
 
   //#########################################################################
@@ -27,15 +27,16 @@ public class StateTuple
    * Creates an empty state tuple.
    * @param size number of integers used to store encoded state.
    */
-  public StateTuple(final int size)
+  public PartialOrderStateTuple(final int size)
   {
     mStateCodes = new int[size];
+    mVisited = false;
   }
 
   /**
    * Creates a state tuple with given encoded state tuple (integer array).
    */
-  public StateTuple(final int[] codes)
+  public PartialOrderStateTuple(final int[] codes)
   {
     mStateCodes = codes;
   }
@@ -61,6 +62,14 @@ public class StateTuple
     return mStateCodes[index];
   }
 
+  public void setVisited(final boolean visited){
+    mVisited = visited;
+  }
+
+  public boolean getVisited(){
+    return mVisited;
+  }
+
 
   //#########################################################################
   //# Overrides for Baseclass java.lang.Object
@@ -77,7 +86,7 @@ public class StateTuple
   public boolean equals(final Object other)
   {
     if (other != null && getClass() == other.getClass()) {
-      final StateTuple tuple = (StateTuple) other;
+      final PartialOrderStateTuple tuple = (PartialOrderStateTuple) other;
       for(int i = 0; i < mStateCodes.length; i++){
         if (mStateCodes[i] != tuple.get(i)) {
           return false;
@@ -97,5 +106,6 @@ public class StateTuple
   //#########################################################################
   //# Data Members
   private final int mStateCodes[];
+  private boolean mVisited;
 
 }

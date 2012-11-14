@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:   MonolithicSafetyVerifier
+//# PACKAGE: net.sourceforge.waters.analysis.po
+//# CLASS:   PartialOrderSafetyVerifier
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.po;
 
 import gnu.trove.THashSet;
+import gnu.trove.TIntArrayList;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.Set;
 import java.util.Arrays;
 
 import net.sourceforge.waters.analysis.monolithic.BlockedArrayList;
-import net.sourceforge.waters.analysis.monolithic.StateTuple;
+import net.sourceforge.waters.analysis.monolithic.StateHashSet;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -42,7 +43,6 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
 import org.apache.log4j.Logger;
 
 
@@ -53,7 +53,7 @@ import org.apache.log4j.Logger;
  * model is controllable.
  * </P>
  *
- * @author Jinjian Shi
+ * @author Adrian Shaw
  */
 
 public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
@@ -141,7 +141,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       mPlantTransitionMap = new ArrayList<int[][]>();
       mSpecTransitionMap = new ArrayList<int[][]>();
       mIndexList = new ArrayList<Integer>();
-      mStateSpace = new BlockedArrayList<StateTuple>(StateTuple.class);
+      mStateList = new BlockedArrayList<PartialOrderStateTuple>(PartialOrderStateTuple.class);
       // TODO Order events so uncontrollables are first.
       mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
       mPlantEventList = new ArrayList<byte[]>();
@@ -402,10 +402,11 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
       mStateTupleSize = cp + 1;
 
-      if (isControllable(mSystemState)) {
+      if (isControllableReduced(mSystemState)) {
         return setSatisfiedResult();
       } else {
-        final SafetyTraceProxy counterexample = computeCounterExample();
+        convertToBredthFirst();
+        final SafetyTraceProxy counterexample = computePOCounterExample();
         return setFailedResult(counterexample);
       }
     } catch (final AnalysisException exception) {
@@ -486,6 +487,14 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     }
   }
 
+  @Override
+  public void tearDown(){
+    super.tearDown();
+    mStateList = null;
+    mStateSet = null;
+    mIndexList = null;
+  }
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   public boolean supportsNondeterminism()
@@ -508,131 +517,232 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   {
     super.addStatistics();
     final VerificationResult result = getAnalysisResult();
-    final int numstates = mStateSpace.size();
     result.setNumberOfAutomata(mNumAutomata);
-    result.setNumberOfStates(numstates);
-    result.setPeakNumberOfNodes(numstates);
+    if (mStateSet != null){
+      final int numstates = mStateSet.size();
+      result.setNumberOfStates(numstates);
+      result.setPeakNumberOfNodes(numstates);
+    }
   }
 
   //#########################################################################
   //# Auxiliary Methods
-  /**
-   * Check the controllability of the model with a parameter of initial
-   * synchronous product.
-   *
-   * @param sState
-   *          The initial synchronous product of the model
-   * @return <CODE>true</CODE> if the model is controllable, or
-   *         <CODE>false</CODE> if it is not.
-   */
-  private boolean isControllable(final int[] sState) throws AnalysisException
-  {
-    final KindTranslator translator = getKindTranslator();
-    final THashSet<StateTuple> systemSet = new THashSet<StateTuple>();
-    boolean enabled = true;
-
-    // Add the initial synchronous product in systemSet and mStateSpace
+  private boolean isControllableReduced(final int[] sState) throws AnalysisException{
+    final List <PartialOrderStateTuple> stack = new ArrayList<PartialOrderStateTuple>();
+    mStateSet = new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
     mSuccessor = new int[mNumAutomata];
-    mStateTuple = new StateTuple(mStateTupleSize);
-    encode(sState, mStateTuple);
-    systemSet.add(mStateTuple);
-    mStateSpace.add(mStateTuple);
-    mIndexList.add(mStateSpace.size() - 1);
+    mInitialState = new PartialOrderStateTuple(mStateTupleSize);
+    encode(sState, mInitialState);
+    mStateSet.getOrAdd(mInitialState);
+    stack.add(mInitialState);
+    mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
 
-    int indexSize = 0;
-    final int mNumEvents = mEventCodingList.size();
-    int i, j, k, temp;
+    int i;
 
-    while (true) {
-      // For each current state in the current level, check its controllability
-      indexSize = mIndexList.size();
-      for (j = (indexSize == 1) ? 0 : (mIndexList.get(indexSize - 2) + 1); j <= mIndexList
-        .get(indexSize - 1); j++) {
-        decode(mStateSpace.get(j), mSystemState);
-        for (int e = 0; e < mNumEvents; e++) {
-          // Retrieve all enabled events
-          enabled = true;
-          for (i = 0; i < mNumPlants; i++) {
-            if (mPlantEventList.get(i)[e] == 1) {
-              temp = mPlantTransitionMap.get(i)[mSystemState[i]][e];
-              if (temp == -1) {
-                enabled = false;
-                break;
-              } else if (temp > -1) {
-                mSuccessor[i] = temp;
-                continue;
-              }
-            }
+    while(stack.size() > 0){
+      final PartialOrderStateTuple current = stack.remove(stack.size() - 1);
+      final int[] ample;
+      if ((ample = enabled(current)) == null){
+        return false;
+      }
+      for (final int e : ample){
+        for (i = 0; i < mNumAutomata; i++){
+          final boolean plant = i < mNumPlants;
+          final int si = i - mNumPlants;
+          if ((plant ?
+              mPlantEventList.get(i)[e]:mSpecEventList.get(si)[e]) != 1){
             mSuccessor[i] = mSystemState[i];
           }
-          if (!enabled) {
-            continue;
-          }
-
-          // Check controllability of current state
-          final EventProxy event = mEventCodingList.get(e);
-          final EventKind kind = translator.getEventKind(event);
-          if (kind == EventKind.UNCONTROLLABLE) {
-            for (i = 0; i < mNumAutomata - mNumPlants; i++) {
-              final int si = i + mNumPlants;
-              if (mSpecEventList.get(i)[e] == 1) {
-                temp = mSpecTransitionMap.get(i)[mSystemState[si]][e];
-                if (temp == -1) {
-                  mErrorEvent = e;
-                  mErrorAutomaton = si;
-                  return false;
-                }
-                if (temp > -1) {
-                  mSuccessor[si] = temp;
-                  continue;
-                }
-              }
-              mSuccessor[si] = mSystemState[si];
-            }
-          } else {
-            for (k = 0; k < mNumAutomata - mNumPlants; k++) {
-              if (mSpecEventList.get(k)[e] == 1) {
-                temp =
-                  mSpecTransitionMap.get(k)[mSystemState[k + mNumPlants]][e];
-                if (temp == -1) {
-                  enabled = false;
-                  break;
-                }
-                if (temp > -1) {
-                  mSuccessor[k + mNumPlants] = temp;
-                  continue;
-                }
-              }
-              mSuccessor[k + mNumPlants] = mSystemState[k + mNumPlants];
-            }
-            if (!enabled) {
-              continue;
-            }
-          }
-
-          // Encode the new system state and put it into mStateSpace
-          mStateTuple = new StateTuple(mStateTupleSize);
-          encode(mSuccessor, mStateTuple);
-          if (systemSet.add(mStateTuple)) {
-            mStateSpace.add(mStateTuple);
-            if (mStateSpace.size() > getNodeLimit()) {
-              throw new OverflowException(getNodeLimit());
-            } else {
-              checkAbort();
-            }
+          else {
+            mSuccessor[i] = plant ? mPlantTransitionMap.get(i)[mSystemState[i]][e] :
+              mSpecTransitionMap.get(si)[mSystemState[i]][e];
           }
         }
-      }
-      // If mStateSpace has added a new state, update mIndexList at the last
-      // loop of current level
-      if (mStateSpace.size() != mIndexList.get(indexSize - 1) + 1) {
-        mIndexList.add(mStateSpace.size() - 1);
-      } else {
-        break;
+        //mStateTuple = new StateTuple(mStateTupleSize);
+        encode(mSuccessor, mStateTuple);
+        if (mStateSet.getOrAdd(mStateTuple) == null) {
+          stack.add(mStateTuple);
+          mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
+          if (stack.size() > getNodeLimit()) {
+            throw new OverflowException(getNodeLimit());
+          } else {
+            checkAbort();
+          }
+        }
       }
     }
     return true;
   }
+
+  private int[] enabled(final PartialOrderStateTuple current)
+  {
+    final KindTranslator translator = getKindTranslator();
+    final TIntArrayList temp = new TIntArrayList();
+    decode(current,mSystemState);
+    events:
+    for (int i = 0; i < mNumEvents; i++){
+      final EventProxy event = mEventCodingList.get(i);
+      final EventKind kind = translator.getEventKind(event);
+      for (int j = 0; j < mNumAutomata; j++){
+        final boolean plant = j < mNumPlants;
+        final int si = j - mNumPlants;
+        if ((plant ? mPlantEventList.get(j)[i]:mSpecEventList.get(si)[i]) == 0){
+          continue;
+        }
+        final int[][] transitionMap = plant ? mPlantTransitionMap.get(j) :
+          mSpecTransitionMap.get(j - mNumPlants);
+        if (transitionMap[mSystemState[j]][i] == -1){
+          if (kind == EventKind.UNCONTROLLABLE && !plant){
+            mErrorEvent = i;
+            mErrorAutomaton = j;
+            mErrorState = current;
+            return null;
+          }
+          else{
+            continue events;
+          }
+        }
+      }
+      temp.add(i);
+    }
+    return temp.toNativeArray();
+  }
+
+  @SuppressWarnings("unused")
+  private int[] ample(final PartialOrderStateTuple current){
+    final int[] enabled = enabled(current);
+    int numStutter = 0;
+    for (int i = 0; i < enabled.length; i++){
+      if (mPartialOrderEvents[i].getStutter() ==
+            PartialOrderEventStutteringKind.STUTTERING){
+        numStutter++;
+      }
+    }
+    final TIntArrayList stack = new TIntArrayList();
+    while (stack.size() < enabled.length){
+
+    }
+    return stack.toNativeArray();
+  }
+
+  private void convertToBredthFirst(){
+   // mStateListTotal = new ArrayList<PartialOrderStateTuple>(mStateSet);
+    mStateList = new ArrayList<PartialOrderStateTuple>();
+    mStateList.add(mInitialState);
+    int open = 0;
+    mIndexList.add(open);
+    mIndexList.add(mStateList.size());
+    mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
+
+    int i,j,temp;
+
+    while (open < mStateList.size()){
+      final PartialOrderStateTuple current = mStateList.get(open);
+      open++;
+      decode(current,mSystemState);
+      events:
+      for (i = 0; i < mNumEvents; i++){
+        for (j = 0; j < mNumAutomata; j++){
+          final boolean plant = j < mNumPlants;
+          final int si = j - mNumPlants;
+          if ((plant ? mPlantEventList.get(j)[i]:mSpecEventList.get(si)[i]) == 0){
+            mSuccessor[j] = mSystemState[j];
+          }
+          else if ((temp = plant ? mPlantTransitionMap.get(j)[mSystemState[j]][i] :
+            mSpecTransitionMap.get(si)[mSystemState[j]][i]) != -1){
+            mSuccessor[j] = temp;
+          }
+          else{
+            continue events;
+          }
+        }
+        encode(mSuccessor, mStateTuple);
+        final PartialOrderStateTuple tuple = mStateSet.get(mStateTuple);
+        if (tuple != null && !tuple.getVisited()){
+          mStateList.add(tuple);
+          tuple.setVisited(true);
+          if (tuple == mErrorState){
+            return;
+          }
+        }
+      }
+      if (open == mIndexList.get(mIndexList.size() - 1)){
+        mIndexList.add(mStateList.size());
+      }
+    }
+  }
+
+  private SafetyTraceProxy computePOCounterExample() throws AbortException
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = getModel();
+    final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
+    final EventProxy errorEvent = mEventCodingList.get(mErrorEvent);
+    final AutomatonProxy errorAut = mAutomata[mErrorAutomaton];
+    final List<StateProxy> states =
+      new ArrayList<StateProxy>(errorAut.getStates());
+    final int errorStateIndex = mSystemState[mErrorAutomaton];
+    final StateProxy errorState = states.get(errorStateIndex);
+    final TraceStepProxy errorStep = factory.createTraceStepProxy(errorEvent);
+    steps.add(0, errorStep);
+
+    int[] errorSystemState = new int[mNumAutomata];
+    final int[] initialState = new int[mNumAutomata];
+    decode(mErrorState,errorSystemState);
+    decode(mInitialState,initialState);
+
+    //StateTuple error = mErrorState;
+
+    int i,j,k,temp;
+
+    //Start searching at the second to last level
+    int currentLevel = mIndexList.size() - 1;
+    outer:
+    while (!Arrays.equals(initialState, errorSystemState)){
+      for (i = mIndexList.get(currentLevel - 1); i < mIndexList.get(currentLevel); i++){
+        decode(mStateList.get(i),mSystemState);
+        events:
+        for (j = 0; j < mNumEvents; j++){
+          for (k = 0; k < mNumAutomata; k++){
+            final boolean plant = k < mNumPlants;
+            final int si = k - mNumPlants;
+            if ((plant ?
+              mPlantEventList.get(k)[j]:mSpecEventList.get(si)[j]) == 0){
+              mSuccessor[k] = mSystemState[k];
+            }
+            else if ((temp = plant ? mPlantTransitionMap.get(k)[mSystemState[k]][j] :
+              mSpecTransitionMap.get(si)[mSystemState[k]][j]) != -1){
+              mSuccessor[k] = temp;
+            }
+            else{
+              continue events;
+            }
+          }
+
+          if (Arrays.equals(errorSystemState, mSuccessor)){
+            //error = mStateList.get(i);
+            errorSystemState = Arrays.copyOf(mSystemState, mNumAutomata);
+            final EventProxy event = mEventCodingList.get(j);
+            final TraceStepProxy step = factory.createTraceStepProxy(event);
+            steps.add(0, step);
+            currentLevel--;
+            continue outer;
+          }
+        }
+      }
+    }
+
+    final TraceStepProxy init = factory.createTraceStepProxy(null);
+    steps.add(0, init);
+    final String tracename = getTraceName();
+    final String comment = getTraceComment(errorEvent,errorAut,errorState);
+    final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
+    final SafetyTraceProxy trace =
+      factory.createSafetyTraceProxy(tracename, comment, null, des, automata,
+                                     steps);
+    return trace;
+  }
+
 
   //#########################################################################
   //# Encoding
@@ -644,7 +754,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
    * @param sTuple
    *          The encoded StateTuple
    */
-  private void encode(final int[] sState, final StateTuple sTuple)
+  private void encode(final int[] sState, final PartialOrderStateTuple sTuple)
   {
     int i;
     int k = 0;
@@ -675,7 +785,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
    * @param state
    *          The decoded state
    */
-  private void decode(final StateTuple sTuple, final int[] state)
+  private void decode(final PartialOrderStateTuple sTuple, final int[] state)
   {
     int i;
     int result;
@@ -698,118 +808,6 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     }
   }
 
-  /**
-   * Gets a counterexample if the model was found to be not controllable.
-   * representing a controllability error trace. A controllability error trace
-   * is a nonempty sequence of events such that all except the last event in
-   * the list can be executed by the model. The last event in list is an
-   * uncontrollable event that is possible in all plant automata, but not in
-   * all specification automata present in the model. Thus, the last step
-   * demonstrates why the model is not controllable.
-   *
-   * @return A trace object representing the counterexample. The returned
-   *         trace is constructed for the input product DES of this
-   *         controllability checker and shares its automata and event
-   *         objects.
-   * @throws IllegalStateException
-   *           if this method is called before model checking has completed,
-   *           i.e., before {@link #run() run()} has been called, or model
-   *           checking has found that the property is satisfied and there is
-   *           no counterexample.
-   */
-  private SafetyTraceProxy computeCounterExample() throws AbortException
-  {
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = getModel();
-    final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
-
-    boolean enabled;
-    boolean found = false;
-    int i, j, k, temp;
-    int indexSize = mIndexList.size();
-    final int[] errorState = new int[mNumAutomata];
-    final EventProxy event0 = mEventCodingList.get(mErrorEvent);
-    final AutomatonProxy aut = mAutomata[mErrorAutomaton];
-    final List<StateProxy> codes0 =
-      new ArrayList<StateProxy>(aut.getStates());
-    final int code0 = mSystemState[mErrorAutomaton];
-    final StateProxy state0 = codes0.get(code0);
-    final TraceStepProxy step0 = factory.createTraceStepProxy(event0);
-    steps.add(0, step0);
-
-    while (true) {
-      for (i = 0; i < mNumAutomata; i++) {
-        errorState[i] = mSystemState[i];
-      }
-      mIndexList.remove(--indexSize);
-      if (mIndexList.size() == 0)
-        break;
-      // Backward search the previous level states, compute their
-      // successors and compare them with the error state
-      for (j = indexSize == 1 ? 0 : mIndexList.get(indexSize - 2) + 1; j <= mIndexList
-        .get(indexSize - 1); j++) {
-        decode(mStateSpace.get(j), mSystemState);
-        for (int e = 0; e < mNumEvents; e++) {
-          enabled = true;
-          for (i = 0; i < mNumPlants; i++) {
-            if (mPlantEventList.get(i)[e] == 1) {
-              temp = mPlantTransitionMap.get(i)[mSystemState[i]][e];
-              if (temp == -1) {
-                enabled = false;
-                break;
-              } else if (temp > -1) {
-                mSuccessor[i] = temp;
-                continue;
-              }
-            }
-            mSuccessor[i] = mSystemState[i];
-          }
-          if (!enabled) {
-            continue;
-          }
-          for (k = 0; k < mNumAutomata - mNumPlants; k++) {
-            if (mSpecEventList.get(k)[e] == 1) {
-              temp =
-                mSpecTransitionMap.get(k)[mSystemState[k + mNumPlants]][e];
-              if (temp == -1) {
-                enabled = false;
-                break;
-              }
-              if (temp > -1) {
-                mSuccessor[k + mNumPlants] = temp;
-                continue;
-              }
-            }
-            mSuccessor[k + mNumPlants] = mSystemState[k + mNumPlants];
-          }
-          if (!enabled) {
-            continue;
-          }
-          if (Arrays.equals(mSuccessor, errorState)) {
-            found = true;
-            final EventProxy event = mEventCodingList.get(e);
-            final TraceStepProxy step = factory.createTraceStepProxy(event);
-            steps.add(0, step);
-            break;
-          }
-        }
-        if (found) {
-          found = false;
-          break;
-        }
-        checkAbort();
-      }
-    }
-    final TraceStepProxy init = factory.createTraceStepProxy(null);
-    steps.add(0, init);
-    final String tracename = getTraceName();
-    final String comment = getTraceComment(event0, aut, state0);
-    final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
-    final SafetyTraceProxy trace =
-      factory.createSafetyTraceProxy(tracename, comment, null, des, automata,
-                                     steps);
-    return trace;
-  }
 
   //#########################################################################
   //# Data Members
@@ -827,7 +825,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
 
   // Level states storage
   private List<Integer> mIndexList;
-  private List<StateTuple> mStateSpace;
+  private List<PartialOrderStateTuple> mStateList;
+  private StateHashSet<PartialOrderStateTuple> mStateSet;
 
   // For encoding/decoding
   private AutomatonProxy[] mAutomata;
@@ -837,7 +836,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   private int[] mBitLengthList;
   private int[] mMaskList;
   private int[] mCodePosition;
-  private StateTuple mStateTuple;
+  private PartialOrderStateTuple mStateTuple;
 
   // Size
   private int mNumAutomata;
@@ -846,8 +845,10 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   private int mStateTupleSize;
 
   // For computing successor and counterexample
+  private PartialOrderStateTuple mInitialState;
   private int[] mSystemState;
   private int[] mSuccessor;
+  private PartialOrderStateTuple mErrorState;
   private int mErrorEvent;
   private int mErrorAutomaton;
 

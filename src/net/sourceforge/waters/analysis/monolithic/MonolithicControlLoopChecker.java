@@ -321,7 +321,7 @@ public class MonolithicControlLoopChecker
     }
 
     // create initial state tuple
-    mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
+    mGlobalStateSet = new StateHashSet<EncodedStateTuple>(EncodedStateTuple.class,SIZE_BUFFER);
     mInitialStateTuple = new int[mNumAutomata];
     int i = 0;
     for (final AutomatonProxy aProxy: mAutomataList) {
@@ -771,7 +771,7 @@ public class MonolithicControlLoopChecker
   private ArrayList<ArrayList<TransitionProxy>> mTransitionList;
 
   /** a map of state tuple in synchronised model */
-  private StateHashSet mGlobalStateSet;
+  private StateHashSet<EncodedStateTuple> mGlobalStateSet;
 
   /** a list of unvisited state tuple. */
   private List<EncodedStateTuple> mUnvisitedList;
