@@ -76,6 +76,7 @@ public class HISCCPInterfaceConsistencyCheckerTest
   @Override
   protected void configure(final ModuleCompiler compiler)
   {
+    super.configure(compiler);
     compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
   }
 
@@ -253,6 +254,24 @@ public class HISCCPInterfaceConsistencyCheckerTest
   throws Exception
   {
     runModelVerifier("tests", "hisc", "parManEg_I_mfb_highlevel.wmod", true);
+  }
+
+  public void testHISCCP_parManEg_node0()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "Node0.wmod", true);
+  }
+
+  public void testHISCCP_parManEg_node1()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "Node1.wmod", true);
+  }
+
+  public void testHISCCP_parManEg_node4()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "Node4.wmod", false);
   }
 
 

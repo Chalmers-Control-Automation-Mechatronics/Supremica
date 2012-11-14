@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Interface-3-6" type="interface">
+            <Integrity status="not-verified" date-stamp=""/>
+            <Reachable status="not-verified" date-stamp=""/>
+            <Nonblocking status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="5" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="1" sx="270" sy="200" lx="-41" ly="-18"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="1" sx="190" sy="39" lx="11" ly="-21"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="1" sx="489" sy="90" lx="10" ly="10"/>
+            <St id="4" nm="s4" al="s4" mk="0" rch="1" sx="100" sy="330" lx="8" ly="14"/>
+            <St id="5" nm="s5" al="s5" mk="0" rch="1" sx="460" sy="370" lx="18" ly="0"/>
+        </States>
+        <Events count="8" ctrl-count="6" unctrl-count="2" ans-count="4" req-count="4" ld-count="0">
+            <Ev id="1" nm="start-polish-6" al="str-pol-6" ctrl="1" type="r"/>
+            <Ev id="2" nm="complete-polish-6" al="compl-pol-6" ctrl="0" type="a"/>
+            <Ev id="3" nm="attach-part-a-6" al="attch-ptA-6" ctrl="1" type="r"/>
+            <Ev id="4" nm="finish-attach-a-6" al="finA-attch-6" ctrl="1" type="a"/>
+            <Ev id="5" nm="attach-part-b-6" al="attch-ptB-6" ctrl="1" type="r"/>
+            <Ev id="6" nm="finish-attach-b-6" al="finB-attch-6" ctrl="1" type="a"/>
+            <Ev id="7" nm="complete-case-6" al="compl-case-6" ctrl="0" type="a"/>
+            <Ev id="8" nm="start-case-6" al="str-case-6" ctrl="1" type="r"/>
+        </Events>
+        <Trans-Function count="8">
+            <Transitions count="8">
+                <Tr fID="2" eID="2" tID="1" lx="224.744" ly="47.8312" cnt="3">
+                    <Pos x="268.75" y="190"/>
+                    <Pos x="258" y="104"/>
+                    <Pos x="200" y="48.5588"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="2" lx="91.824" ly="99.349" cnt="3">
+                    <Pos x="191.383" y="49"/>
+                    <Pos x="203" y="133"/>
+                    <Pos x="260" y="190"/>
+                </Tr>
+                <Tr fID="1" eID="3" tID="3" lx="420.871" ly="157.075" cnt="3">
+                    <Pos x="479" y="99.2045"/>
+                    <Pos x="401" y="171"/>
+                    <Pos x="280" y="197.786"/>
+                </Tr>
+                <Tr fID="1" eID="5" tID="4" lx="66.9811" ly="196.044" cnt="3">
+                    <Pos x="106.224" y="320"/>
+                    <Pos x="161" y="232"/>
+                    <Pos x="260" y="202.936"/>
+                </Tr>
+                <Tr fID="1" eID="8" tID="5" lx="324.675" ly="351.49" cnt="3">
+                    <Pos x="450" y="365.203"/>
+                    <Pos x="337" y="311"/>
+                    <Pos x="276.036" y="210"/>
+                </Tr>
+                <Tr fID="4" eID="6" tID="1" lx="216.397" ly="310.242" cnt="3">
+                    <Pos x="263.011" y="210"/>
+                    <Pos x="205" y="293"/>
+                    <Pos x="110" y="326.476"/>
+                </Tr>
+                <Tr fID="3" eID="4" tID="1" lx="315.974" ly="74.9057" cnt="3">
+                    <Pos x="280" y="190.44"/>
+                    <Pos x="361" y="113"/>
+                    <Pos x="479" y="91.7969"/>
+                </Tr>
+                <Tr fID="5" eID="7" tID="1" lx="377.942" ly="236.009" cnt="3">
+                    <Pos x="280" y="205.798"/>
+                    <Pos x="389" y="269"/>
+                    <Pos x="452.97" y="360"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

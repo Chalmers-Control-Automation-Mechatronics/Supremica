@@ -17,6 +17,7 @@ import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -29,6 +30,17 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 public abstract class AbstractSICProperty6VerifierTest extends
     AbstractConflictCheckerTest
 {
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractAnalysisTest
+  @Override
+  protected void configure(final ModuleCompiler compiler)
+  {
+    super.configure(compiler);
+    compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
+  }
+
 
   //#########################################################################
   //# Test Cases
@@ -144,6 +156,18 @@ public abstract class AbstractSICProperty6VerifierTest extends
     runModelVerifier("tests", "hisc",
                      "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
                      false);
+  }
+
+  public void testSICProperty6Verifier_parManEg_node1()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "Node1.wmod", true);
+  }
+
+  public void testSICProperty6Verifier_parManEg_node4()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "Node4.wmod", true);
   }
 
   // SimpleManufacturingExample

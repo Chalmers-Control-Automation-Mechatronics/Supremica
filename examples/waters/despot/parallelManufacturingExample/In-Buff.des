@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="In-Buff" type="subsystem">
+            <Integrity status="valid" date-stamp="Mon Nov 12 15:23:33 2012"/>
+            <Reachable status="yes" date-stamp="Mon Nov 12 15:23:33 2012"/>
+            <Nonblocking status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="4" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="1" sx="160" sy="160" lx="-7" ly="15"/>
+            <St id="2" nm="s2" al="s2" mk="0" rch="1" sx="320" sy="160" lx="11" ly="7"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="1" sx="527" sy="166" lx="12" ly="4"/>
+            <St id="4" nm="s4" al="s4" mk="0" rch="1" sx="532" sy="336" lx="20" ly="20"/>
+        </States>
+        <Events count="5" ctrl-count="5" unctrl-count="0" def-count="2" ans-count="0" req-count="3">
+            <Ev id="1" nm="new-part" al="nw-pt" ctrl="1" type="d"/>
+            <Ev id="2" nm="ret-inbuff" al="ret-inb" ctrl="1" type="d"/>
+            <Ev id="3" nm="part-enter-1" al="part-ent-1" ctrl="1" type="r"/>
+            <Ev id="4" nm="part-enter-2" al="part-ent-2" ctrl="1" type="r"/>
+            <Ev id="5" nm="part-enter-3" al="part-ent-3" ctrl="1" type="r"/>
+        </Events>
+        <Trans-Function count="15">
+            <Transitions count="15">
+                <Tr fID="2" eID="2" tID="3" lx="418.289" ly="92.917" cnt="3">
+                    <Pos x="517" y="161.435"/>
+                    <Pos x="435" y="124"/>
+                    <Pos x="330" y="156.87"/>
+                </Tr>
+                <Tr fID="2" eID="5" tID="1" lx="193.032" ly="191.352" cnt="3">
+                    <Pos x="170" y="163.684"/>
+                    <Pos x="236" y="188"/>
+                    <Pos x="310" y="163.333"/>
+                </Tr>
+                <Tr fID="2" eID="3" tID="1" lx="193.032" ly="191.352" cnt="3">
+                    <Pos x="170" y="163.684"/>
+                    <Pos x="236" y="188"/>
+                    <Pos x="310" y="163.333"/>
+                </Tr>
+                <Tr fID="2" eID="1" tID="3" lx="418.289" ly="92.917" cnt="3">
+                    <Pos x="517" y="161.435"/>
+                    <Pos x="435" y="124"/>
+                    <Pos x="330" y="156.87"/>
+                </Tr>
+                <Tr fID="2" eID="4" tID="1" lx="193.032" ly="191.352" cnt="3">
+                    <Pos x="170" y="163.684"/>
+                    <Pos x="236" y="188"/>
+                    <Pos x="310" y="163.333"/>
+                </Tr>
+                <Tr fID="3" eID="2" tID="4" lx="571.782" ly="235.307" cnt="3">
+                    <Pos x="535.98" y="326"/>
+                    <Pos x="571" y="238"/>
+                    <Pos x="533.111" y="176"/>
+                </Tr>
+                <Tr fID="3" eID="5" tID="2" lx="413.837" ly="204.723" cnt="3">
+                    <Pos x="330" y="163.675"/>
+                    <Pos x="437" y="203"/>
+                    <Pos x="517" y="170.111"/>
+                </Tr>
+                <Tr fID="3" eID="3" tID="2" lx="413.837" ly="204.723" cnt="3">
+                    <Pos x="330" y="163.675"/>
+                    <Pos x="437" y="203"/>
+                    <Pos x="517" y="170.111"/>
+                </Tr>
+                <Tr fID="3" eID="1" tID="4" lx="571.782" ly="235.307" cnt="3">
+                    <Pos x="535.98" y="326"/>
+                    <Pos x="571" y="238"/>
+                    <Pos x="533.111" y="176"/>
+                </Tr>
+                <Tr fID="3" eID="4" tID="2" lx="413.837" ly="204.723" cnt="3">
+                    <Pos x="330" y="163.675"/>
+                    <Pos x="437" y="203"/>
+                    <Pos x="517" y="170.111"/>
+                </Tr>
+                <Tr fID="1" eID="2" tID="2" lx="194.128" ly="95.4491" cnt="3">
+                    <Pos x="310" y="156.25"/>
+                    <Pos x="240" y="130"/>
+                    <Pos x="170" y="156.25"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="2" lx="194.128" ly="95.4491" cnt="3">
+                    <Pos x="310" y="156.25"/>
+                    <Pos x="240" y="130"/>
+                    <Pos x="170" y="156.25"/>
+                </Tr>
+                <Tr fID="4" eID="5" tID="3" lx="439.218" ly="275.693" cnt="3">
+                    <Pos x="523.237" y="176"/>
+                    <Pos x="492" y="259"/>
+                    <Pos x="526.805" y="326"/>
+                </Tr>
+                <Tr fID="4" eID="3" tID="3" lx="439.218" ly="275.693" cnt="3">
+                    <Pos x="523.237" y="176"/>
+                    <Pos x="492" y="259"/>
+                    <Pos x="526.805" y="326"/>
+                </Tr>
+                <Tr fID="4" eID="4" tID="3" lx="439.218" ly="275.693" cnt="3">
+                    <Pos x="523.237" y="176"/>
+                    <Pos x="492" y="259"/>
+                    <Pos x="526.805" y="326"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

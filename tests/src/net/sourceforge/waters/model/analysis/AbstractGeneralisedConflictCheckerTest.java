@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
+import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -237,6 +238,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
     propositions.add(":alpha");
     propositions.add(EventDeclProxy.DEFAULT_MARKING_NAME);
     compiler.setEnabledPropositionNames(propositions);
+    compiler.setHISCCompileMode(mHISCCompileMode);
   }
 
   @Override
@@ -262,23 +264,28 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
                                 final String fileName, final String eventName,
                                 final boolean expect) throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    final File dir = new File(groupdir, subdir);
-    final File fullName = new File(dir, fileName);
-    final ProductDESProxy origDES = getCompiledDES(fullName);
-    mBuilder.setInputModel(origDES);
-    final EventProxy answer = findAnswerEvent(origDES, eventName);
-    final ProductDESProxy answerDES = mBuilder.createSIC5Model(answer);
-    final DocumentManager docman = getDocumentManager();
-    final ProxyMarshaller<ProductDESProxy> marshaller =
+    try {
+      final File rootdir = getWatersInputRoot();
+      final File groupdir = new File(rootdir, group);
+      final File dir = new File(groupdir, subdir);
+      final File fullName = new File(dir, fileName);
+      mHISCCompileMode = HISCCompileMode.HISC_HIGH;
+      final ProductDESProxy origDES = getCompiledDES(fullName);
+      mBuilder.setInputModel(origDES);
+      final EventProxy answer = findAnswerEvent(origDES, eventName);
+      final ProductDESProxy answerDES = mBuilder.createSIC5Model(answer);
+      final DocumentManager docman = getDocumentManager();
+      final ProxyMarshaller<ProductDESProxy> marshaller =
         docman.findProxyMarshaller(ProductDESProxy.class);
-    final String ext = marshaller.getDefaultExtension();
-    final File outdir = getOutputDirectory();
-    final String outname = answerDES.getName();
-    final File outfile = new File(outdir, outname + ext);
-    docman.saveAs(answerDES, outfile);
-    runModelVerifier(answerDES, expect);
+      final String ext = marshaller.getDefaultExtension();
+      final File outdir = getOutputDirectory();
+      final String outname = answerDES.getName();
+      final File outfile = new File(outdir, outname + ext);
+      docman.saveAs(answerDES, outfile);
+      runModelVerifier(answerDES, expect);
+    } finally {
+      mHISCCompileMode = HISCCompileMode.NOT_HISC;
+    }
   }
 
 
@@ -298,9 +305,10 @@ public abstract class AbstractGeneralisedConflictCheckerTest extends
   }
 
 
-  // #########################################################################
-  // # Data Members
-  private SICPropertyBuilder mBuilder;
+  //#########################################################################
+  //# Data Members
+  private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
   private EventProxy mAlpha = null;
+  private SICPropertyBuilder mBuilder;
 
 }
