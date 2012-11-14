@@ -417,26 +417,29 @@ public class SynthesisAbstractionProcedure
   public static final int USE_WSOE = 0x08;
 
   /**
-   * Argument to {@link #setUsedAbstractionMethods(int)
-   * setUsedAbstractionMethods()} for specifying an abstraction chain
-   * consisting of halfway synthesis, bisimulation, and synthesis observation
-   * equivalence.
+   * Argument to
+   * {@link #createSynthesisAbstractionProcedure(CompositionalSynthesizer,int)
+   * createSynthesisAbstractionProcedure()} for specifying an abstraction
+   * chain consisting of halfway synthesis, bisimulation, and synthesis
+   * observation equivalence.
    */
   public static final int CHAIN_SOE =
     USE_HALFWAY | USE_BISIMULATION | USE_SOE;
   /**
-   * Argument to {@link #setUsedAbstractionMethods(int)
-   * setUsedAbstractionMethods()} for specifying an abstraction chain
-   * consisting of halfway synthesis, bisimulation, and weak synthesis
+   * Argument to
+   * {@link #createSynthesisAbstractionProcedure(CompositionalSynthesizer,int)
+   * createSynthesisAbstractionProcedure()} for specifying an abstraction
+   * chain consisting of halfway synthesis, bisimulation, and weak synthesis
    * observation equivalence. This is the default.
    */
   public static final int CHAIN_WSOE =
     USE_HALFWAY | USE_BISIMULATION | USE_WSOE;
   /**
-   * Argument to {@link #setUsedAbstractionMethods(int)
-   * setUsedAbstractionMethods()} for specifying an abstraction chain
-   * consisting of halfway synthesis, bisimulation, synthesis observation
-   * equivalence, and weak synthesis observation equivalence.
+   * Argument to
+   * {@link #createSynthesisAbstractionProcedure(CompositionalSynthesizer,int)
+   * createSynthesisAbstractionProcedure()} for specifying an abstraction
+   * chain consisting of halfway synthesis, bisimulation, synthesis
+   * observation equivalence, and weak synthesis observation equivalence.
    */
   public static final int CHAIN_ALL =
     USE_HALFWAY | USE_BISIMULATION | USE_SOE | USE_WSOE;

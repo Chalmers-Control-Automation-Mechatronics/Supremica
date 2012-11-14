@@ -869,7 +869,7 @@ public abstract class TransitionListBuffer
 
   /**
    * Gets the from-state for the given transition. This method is used by
-   * {@link #setUpTransitions(List,EventEncoding,StateEncoding)
+   * {@link #setUpTransitions(Set,List,EventEncoding,StateEncoding)
    * setUpTransitions()} to interpret transitions. It is overridden by
    * subclasses to handle forward and backward transition buffers uniformly.
    */
@@ -877,7 +877,7 @@ public abstract class TransitionListBuffer
 
   /**
    * Gets the to-state for the given transition. This method is used by
-   * {@link #setUpTransitions(List,EventEncoding,StateEncoding)
+   * {@link #setUpTransitions(Set,List,EventEncoding,StateEncoding)
    * setUpTransitions()} to interpret transitions. It is overridden by
    * subclasses to handle forward and backward transition buffers uniformly.
    */

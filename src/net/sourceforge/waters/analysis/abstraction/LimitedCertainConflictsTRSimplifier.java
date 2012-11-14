@@ -117,7 +117,8 @@ public class LimitedCertainConflictsTRSimplifier
    * states. If this returns <CODE>false</CODE>, the result may be treated
    * as the merging of blocking states, which allows for simple trace
    * expansion. Otherwise proper certain conflicts trace expansion using
-   * {@link LimitedCertainConflictsTraceExpander} is necessary.
+   * {@link net.sourceforge.waters.analysis.compositional.LimitedCertainConflictsTraceExpander
+   * LimitedCertainConflictsTraceExpander} is necessary.
    */
   public boolean hasCertainConflictTransitions()
   {

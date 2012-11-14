@@ -115,7 +115,7 @@ public final class AutomatonTools
    * Returns whether the given product DES is deterministic.
    * An product DES is considered as deterministic if all its
    * automata are deterministic.
-   * @see {@link #isDeterministic(AutomatonProxy)}
+   * @see #isDeterministic(AutomatonProxy)
    */
   public static boolean isDeterministic(final ProductDESProxy des)
   {
