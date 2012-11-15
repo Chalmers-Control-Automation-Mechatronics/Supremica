@@ -608,7 +608,6 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     return temp.toNativeArray();
   }
 
-  @SuppressWarnings("unused")
   private int[] ample(final PartialOrderStateTuple current){
     final int[] enabled = enabled(current);
     if (enabled == null){
