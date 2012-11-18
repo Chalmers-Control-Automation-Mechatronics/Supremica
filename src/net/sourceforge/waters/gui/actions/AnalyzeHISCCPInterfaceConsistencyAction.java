@@ -40,7 +40,7 @@ import org.supremica.gui.ide.ModuleContainer;
  */
 
 public class AnalyzeHISCCPInterfaceConsistencyAction
-  extends WatersAnalyzeAction
+  extends WatersAnalyzeHISCAction
 {
 
   //#########################################################################

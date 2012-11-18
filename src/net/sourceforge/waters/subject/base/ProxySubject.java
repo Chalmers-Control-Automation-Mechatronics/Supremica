@@ -42,7 +42,7 @@ public interface ProxySubject
    * by the contents of another list. This method attempts to produce a
    * minimal sequence of deletions and insertions to convert this set
    * to the given new set.
-   * @param  newSet   The list containing the data after the intended
+   * @param  newState An object containing the data after the intended
    *                  assignment.
    * @param  boundary Set of unchanged {@link Subject}s. Any children of
    *                  the receiving subject contained in this set will be

@@ -93,8 +93,8 @@ public class TRConflictPreorderChecker
    * are related through the conflict preorder.
    * @return <CODE>true</CODE> if the given first transition relation is
    *         less conflicting than the given second transition relation.
-   * @see #CompareLessConflicting(ListBufferTransitionRelation, ListBufferTransitionRelation, int)
-   *      CompareLessConflicting()
+   * @see #TRConflictPreorderChecker(ListBufferTransitionRelation, ListBufferTransitionRelation, int)
+   *      TRConflictPreorderChecker()
    */
   public boolean isLessConflicting()
     throws AbortException

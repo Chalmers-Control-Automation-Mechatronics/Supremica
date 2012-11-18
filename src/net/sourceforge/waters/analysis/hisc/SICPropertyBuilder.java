@@ -138,7 +138,7 @@ public class SICPropertyBuilder
     final Set<EventProxy> allEvents = mModel.getEvents();
     final List<EventProxy> answerEvents = new ArrayList<EventProxy>(0);
     for (final EventProxy event : allEvents) {
-      if (HISCAttributeFactory.getEventType(event.getAttributes()) == HISCAttributeFactory.EventType.ANSWER) {
+      if (getUpperEventType(event) == HISCAttributeFactory.EventType.ANSWER) {
         answerEvents.add(event);
       }
     }
@@ -191,8 +191,7 @@ public class SICPropertyBuilder
 
     for (final EventProxy event : events) {
       if (event.getKind() != EventKind.PROPOSITION) {
-        final Map<String,String> attribs = event.getAttributes();
-        switch (HISCAttributeFactory.getEventType(attribs)) {
+        switch (getUpperEventType(event)) {
         case REQUEST:
         case ANSWER:
         case LOWDATA:
@@ -263,8 +262,7 @@ public class SICPropertyBuilder
     for (final EventProxy event : oldEvents) {
       if (event.getKind() != EventKind.PROPOSITION) {
         newEvents.add(event);
-        final Map<String,String> attribs = event.getAttributes();
-        switch (HISCAttributeFactory.getEventType(attribs)) {
+        switch (getUpperEventType(event)) {
         case REQUEST:
         case ANSWER:
         case LOWDATA:
@@ -448,16 +446,10 @@ public class SICPropertyBuilder
     for (final EventProxy event : events) {
       if (event.getKind() == EventKind.PROPOSITION) {
         global.add(event);
-      } else {
-        final Map<String,String> attribs = event.getAttributes();
-        switch (HISCAttributeFactory.getEventType(attribs)) {
-        case DEFAULT:
-          local.add(event);
-          global.add(event);
-          break;
-        default:
-          break;
-        }
+      } else if (getUpperEventType(event) ==
+                 HISCAttributeFactory.EventType.DEFAULT) {
+        local.add(event);
+        global.add(event);
       }
     }
     final AutomatonProxy testaut = createSIC5Test(answer, iface, local, "test");
@@ -509,10 +501,7 @@ public class SICPropertyBuilder
         mFactory.createTransitionProxy(initialState, event, initialState);
       transitions.add(transition);
       // the transition which accepts any request event
-      final Map<String,String> attribs = event.getAttributes();
-      final HISCAttributeFactory.EventType etype =
-        HISCAttributeFactory.getEventType(attribs);
-      switch (etype) {
+      switch (getUpperEventType(event)) {
       case REQUEST:
         final TransitionProxy requestTransition =
             mFactory.createTransitionProxy(initialState, event, alphaState);
@@ -639,10 +628,8 @@ public class SICPropertyBuilder
     final Collection<EventProxy> allEvents = mModel.getEvents();
     final List<EventProxy> events = new ArrayList<EventProxy>();
     for (final EventProxy event : allEvents) {
-      final Map<String,String> attribs = event.getAttributes();
-      final HISCAttributeFactory.EventType type =
-        HISCAttributeFactory.getEventType(attribs);
-      if (type != HISCAttributeFactory.EventType.DEFAULT) {
+      if (getUpperEventType(event) !=
+          HISCAttributeFactory.EventType.DEFAULT) {
         events.add(event);
         numInterfaceEvents++;
       }
@@ -723,6 +710,17 @@ public class SICPropertyBuilder
     final ComponentKind kind = aut.getKind();
     return mFactory.createAutomatonProxy
       (name, kind, newEvents, newStates, newTransitions);
+  }
+
+  private HISCAttributeFactory.EventType getUpperEventType
+    (final EventProxy event)
+  {
+    final Map<String,String> attribs = event.getAttributes();
+    if (HISCAttributeFactory.isParameter(attribs)) {
+      return HISCAttributeFactory.getEventType(attribs);
+    } else {
+      return HISCAttributeFactory.EventType.DEFAULT;
+    }
   }
 
   /**

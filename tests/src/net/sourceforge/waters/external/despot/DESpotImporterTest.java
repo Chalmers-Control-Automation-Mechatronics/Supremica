@@ -194,9 +194,14 @@ public class DESpotImporterTest extends AbstractWatersTest
     testImport("testHISC", "testHISCld");
   }
 
-  public void testImport_ManufacturingExampleSimple() throws Exception
+  public void testImport_SimpleManufacturingExample() throws Exception
   {
     testImport("simpleManufacturingExample", "Manufacturing-Example-Simple");
+  }
+
+  public void testImport_ParallelManufacturingExample() throws Exception
+  {
+    testImport("parallelManufacturingExample", "mtlyiintf");
   }
 
   // #########################################################################

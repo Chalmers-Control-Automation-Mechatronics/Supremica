@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Define-New-Events-5" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+            <Reachable status="not-verified" date-stamp=""/>
+            <Nonblocking status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="1" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="1" sx="267" sy="209" lx="5" ly="5"/>
+        </States>
+        <Events count="4" ctrl-count="4" unctrl-count="0" def-count="0" ans-count="2" req-count="2">
+            <Ev id="1" nm="attach-part-a-5" al="attch-ptA-5" ctrl="1" type="r"/>
+            <Ev id="2" nm="attach-part-b-5" al="attch-ptB-5" ctrl="1" type="r"/>
+            <Ev id="3" nm="finish-attach-a-5" al="finA-attch-5" ctrl="1" type="a"/>
+            <Ev id="4" nm="finish-attach-b-5" al="finB-attch-5" ctrl="1" type="a"/>
+        </Events>
+        <Trans-Function count="4">
+            <Transitions count="4">
+                <Tr fID="1" eID="4" tID="1" lx="75.3405" ly="50.313" ang="225">
+                </Tr>
+                <Tr fID="1" eID="3" tID="1" lx="75.3405" ly="50.313" ang="225">
+                </Tr>
+                <Tr fID="1" eID="2" tID="1" lx="75.3405" ly="50.313" ang="225">
+                </Tr>
+                <Tr fID="1" eID="1" tID="1" lx="75.3405" ly="50.313" ang="225">
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>
