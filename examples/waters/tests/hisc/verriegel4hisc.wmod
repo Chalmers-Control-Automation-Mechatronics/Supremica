@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="verriegel4hisc" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Central locking system model from KorSys project. This is the high level of a modularised version for HISC-CP.
-The model is globally controllable and nonblocking. The number of reachable states (with interfaces included) is 791272171132.</ns2:Comment>
+The model is globally controllable and nonblocking. The number of reachable states
+without interfaces is 38854673784, and the diameter is 109. (With interfaces included the number of reachable states is 791272171132.)</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name="Counters">
             <ConstantAliasExpression>
@@ -188,8 +189,8 @@ The model is globally controllable and nonblocking. The number of reachable stat
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":3">
-                        <NodeRef Name="AU2"/>
                         <NodeRef Name="AU3"/>
+                        <NodeRef Name="AU2"/>
                         <NodeRef Name="AU1"/>
                         <BoxGeometry>
                             <Box Height="224" Width="144" X="192" Y="304"/>
@@ -197,9 +198,9 @@ The model is globally controllable and nonblocking. The number of reachable stat
                     </GroupNode>
                     <GroupNode Name=":1">
                         <NodeRef Name=":3"/>
-                        <NodeRef Name="FS"/>
-                        <NodeRef Name="ER"/>
                         <NodeRef Name="VR"/>
+                        <NodeRef Name="ER"/>
+                        <NodeRef Name="FS"/>
                         <BoxGeometry>
                             <Box Height="432" Width="320" X="80" Y="112"/>
                         </BoxGeometry>
@@ -609,10 +610,10 @@ The model is globally controllable and nonblocking. The number of reachable stat
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="ser"/>
-                        <NodeRef Name="zs"/>
-                        <NodeRef Name="idle"/>
                         <NodeRef Name="vr"/>
+                        <NodeRef Name="idle"/>
+                        <NodeRef Name="zs"/>
+                        <NodeRef Name="ser"/>
                         <NodeRef Name="er"/>
                         <BoxGeometry>
                             <Box Height="256" Width="256" X="80" Y="80"/>
@@ -1192,17 +1193,17 @@ The model is globally controllable and nonblocking. The number of reachable stat
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":1">
-                        <NodeRef Name="SER"/>
-                        <NodeRef Name="RQSER"/>
-                        <NodeRef Name="VR"/>
-                        <NodeRef Name="COD"/>
                         <NodeRef Name="ZS"/>
                         <NodeRef Name="TSTZS"/>
-                        <NodeRef Name="IN"/>
-                        <NodeRef Name="ER"/>
-                        <NodeRef Name="RQVR"/>
-                        <NodeRef Name="RQZS"/>
+                        <NodeRef Name="SER"/>
                         <NodeRef Name="RQER"/>
+                        <NodeRef Name="RQSER"/>
+                        <NodeRef Name="IN"/>
+                        <NodeRef Name="COD"/>
+                        <NodeRef Name="ER"/>
+                        <NodeRef Name="RQZS"/>
+                        <NodeRef Name="VR"/>
+                        <NodeRef Name="RQVR"/>
                         <BoxGeometry>
                             <Box Height="416" Width="480" X="112" Y="16"/>
                         </BoxGeometry>

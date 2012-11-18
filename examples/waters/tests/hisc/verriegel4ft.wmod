@@ -76,7 +76,7 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
         <EventDecl Kind="CONTROLLABLE" Name="reset"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="SPEC" Name="iface_main">
+        <SimpleComponent Kind="PROPERTY" Name="iface_main">
             <Graph>
                 <NodeList>
                     <SimpleNode Name="idle">
@@ -132,10 +132,10 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                     </SimpleNode>
                     <GroupNode Name="G0">
                         <NodeRef Name="er"/>
+                        <NodeRef Name="idle"/>
                         <NodeRef Name="init"/>
                         <NodeRef Name="vr"/>
                         <NodeRef Name="zs"/>
-                        <NodeRef Name="idle"/>
                         <BoxGeometry>
                             <Box Height="240" Width="288" X="112" Y="16"/>
                         </BoxGeometry>
@@ -266,7 +266,7 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                 <ns2:Attribute Name="HISC:Interface"/>
             </ns2:AttributeMap>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="iface_tklemme">
+        <SimpleComponent Kind="PROPERTY" Name="iface_tklemme">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="open">
@@ -321,7 +321,7 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                 <ns2:Attribute Name="HISC:Interface"/>
             </ns2:AttributeMap>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="iface_continue">
+        <SimpleComponent Kind="PROPERTY" Name="iface_continue">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
@@ -355,9 +355,9 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="S2"/>
-                        <NodeRef Name="S1"/>
                         <NodeRef Name="S0"/>
+                        <NodeRef Name="S1"/>
+                        <NodeRef Name="S2"/>
                         <BoxGeometry>
                             <Box Height="176" Width="368" X="64" Y="32"/>
                         </BoxGeometry>
@@ -686,29 +686,29 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                     </SimpleNode>
                     <GroupNode Name=":0">
                         <NodeRef Name="vr8"/>
-                        <NodeRef Name="zs8"/>
-                        <NodeRef Name="ZS"/>
+                        <NodeRef Name="vr1"/>
                         <NodeRef Name="zs3"/>
-                        <NodeRef Name="vr3"/>
+                        <NodeRef Name="zs7"/>
+                        <NodeRef Name="vr4"/>
+                        <NodeRef Name="zs5"/>
+                        <NodeRef Name="zs6"/>
+                        <NodeRef Name="zs2"/>
+                        <NodeRef Name="ZS"/>
+                        <NodeRef Name="zs4"/>
                         <NodeRef Name="er1"/>
+                        <NodeRef Name="IN"/>
+                        <NodeRef Name="vr3"/>
+                        <NodeRef Name="er3"/>
+                        <NodeRef Name="zs1"/>
                         <NodeRef Name="vr2"/>
+                        <NodeRef Name="ER"/>
+                        <NodeRef Name="zs8"/>
+                        <NodeRef Name="er2"/>
+                        <NodeRef Name="vr6"/>
+                        <NodeRef Name="vr5"/>
+                        <NodeRef Name="zs9"/>
                         <NodeRef Name="vr7"/>
                         <NodeRef Name="VR"/>
-                        <NodeRef Name="zs9"/>
-                        <NodeRef Name="vr1"/>
-                        <NodeRef Name="IN"/>
-                        <NodeRef Name="vr6"/>
-                        <NodeRef Name="er3"/>
-                        <NodeRef Name="zs5"/>
-                        <NodeRef Name="ER"/>
-                        <NodeRef Name="er2"/>
-                        <NodeRef Name="zs1"/>
-                        <NodeRef Name="vr5"/>
-                        <NodeRef Name="zs2"/>
-                        <NodeRef Name="vr4"/>
-                        <NodeRef Name="zs6"/>
-                        <NodeRef Name="zs7"/>
-                        <NodeRef Name="zs4"/>
                         <BoxGeometry>
                             <Box Height="432" Width="512" X="80" Y="48"/>
                         </BoxGeometry>
@@ -1773,20 +1773,20 @@ This model is HISC-CP interface consistent. The interface iface_interrupt ensure
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":1">
-                        <NodeRef Name="IN"/>
-                        <NodeRef Name="vr3"/>
-                        <NodeRef Name="vr1"/>
-                        <NodeRef Name="zs2"/>
                         <NodeRef Name="zs3"/>
                         <NodeRef Name="er4"/>
-                        <NodeRef Name="er3"/>
+                        <NodeRef Name="vr1"/>
                         <NodeRef Name="zs4"/>
-                        <NodeRef Name="zs1"/>
-                        <NodeRef Name="vr4"/>
-                        <NodeRef Name="er1"/>
                         <NodeRef Name="er2"/>
-                        <NodeRef Name="vr5"/>
+                        <NodeRef Name="er3"/>
                         <NodeRef Name="vr2"/>
+                        <NodeRef Name="vr4"/>
+                        <NodeRef Name="zs1"/>
+                        <NodeRef Name="vr3"/>
+                        <NodeRef Name="vr5"/>
+                        <NodeRef Name="IN"/>
+                        <NodeRef Name="zs2"/>
+                        <NodeRef Name="er1"/>
                         <BoxGeometry>
                             <Box Height="496" Width="512" X="48" Y="64"/>
                         </BoxGeometry>

@@ -25,7 +25,6 @@ import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -34,6 +33,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -71,7 +71,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
                                            final ConflictChecker checker,
                                            final CompositionalSimplifier simplifier)
   {
-    super(model, factory, ConflictKindTranslator.getInstance());
+    super(model, factory, HISCConflictKindTranslator.getInstance());
     mConflictChecker = checker;
     mSimplifier = simplifier;
     mSynchronousProductBuilder =
@@ -139,6 +139,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   {
     super.setUp();
     final KindTranslator translator = getKindTranslator();
+    mConflictChecker.setKindTranslator(translator);
     mSimplifier.setKindTranslator(translator);
     mSynchronousProductBuilder.setKindTranslator(translator);
     if (mConfiguredMarking == null) {
@@ -192,7 +193,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
         if (HISCAttributeFactory.isInterface(attribs)) {
           interfaces.add(aut);
           hasInterface = true;
-        } else {
+        } else if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
           subsystem.add(aut);
         }
       }

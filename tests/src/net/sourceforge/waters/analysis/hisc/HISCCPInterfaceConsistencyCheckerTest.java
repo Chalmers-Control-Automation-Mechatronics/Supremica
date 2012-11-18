@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.analysis.hisc;
 
+import java.util.Collections;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -18,6 +21,7 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 /**
@@ -76,6 +80,9 @@ public class HISCCPInterfaceConsistencyCheckerTest
   @Override
   protected void configure(final ModuleCompiler compiler)
   {
+    final List<String> accepting =
+      Collections.singletonList(EventDeclProxy.DEFAULT_MARKING_NAME);
+    compiler.setEnabledPropositionNames(accepting);
     compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
   }
 

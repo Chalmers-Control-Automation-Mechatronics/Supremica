@@ -18,7 +18,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -77,9 +76,7 @@ public class CompositionalSimplifier
                                  final ProductDESProxyFactory factory,
                                  final KindTranslator translator)
   {
-    super(model,
-          factory,
-          ConflictKindTranslator.getInstance(),
+    super(model, factory, translator,
           new PreselectingMethodFactory(),
           new SelectingMethodFactory());
     final AbstractionProcedure proc =
