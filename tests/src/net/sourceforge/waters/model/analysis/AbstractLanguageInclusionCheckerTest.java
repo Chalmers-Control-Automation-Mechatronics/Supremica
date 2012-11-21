@@ -100,6 +100,15 @@ public abstract class AbstractLanguageInclusionCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  //#########################################################################
+  //# Test Cases -- traffic light language inclusion
+  public void testTrafficLightac61() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "ac61lang.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
 
   //#########################################################################
   //# Test Cases --- nondeterministic

@@ -11,9 +11,9 @@ package net.sourceforge.waters.analysis.po;
 
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -163,7 +163,10 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       mSystemState = new int[mNumAutomata];
 
       final List<AutomatonProxy>[] automataContainingEvents = new ArrayList[mNumEvents];
-      Arrays.fill(automataContainingEvents,new ArrayList<AutomatonProxy>());
+      for (i = 0; i < mNumEvents; i++){
+        automataContainingEvents[i] = new ArrayList<AutomatonProxy>();
+      }
+      //Arrays.fill(automataContainingEvents,new ArrayList<AutomatonProxy>());
 
       // Separate the automatons by kind
       AutomatonProxy initUncontrollable = null;
@@ -320,6 +323,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
               if (exclusive) {
                 mEventDependencyMap[i][j] =
                   PartialOrderEventDependencyKind.EXCLUSIVE;
+                mEventDependencyMap[j][i] =
+                  PartialOrderEventDependencyKind.EXCLUSIVE;
                 break;
               }
             }
@@ -330,6 +335,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
             if (mEventDependencyMap[i][j] !=
               PartialOrderEventDependencyKind.EXCLUSIVE) {
               mEventDependencyMap[i][j] =
+                PartialOrderEventDependencyKind.COMMUTING;
+              mEventDependencyMap[j][i] =
                 PartialOrderEventDependencyKind.COMMUTING;
             }
           }
@@ -342,7 +349,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         final ArrayList<PartialOrderEventDependencyTuple> temp =
           new ArrayList<PartialOrderEventDependencyTuple>();
         for (j = 0; j < mNumEvents; j++) {
-          if (mEventDependencyMap[i][j] != PartialOrderEventDependencyKind.NONCOMMUTING) {
+          if (mEventDependencyMap[i][j] == PartialOrderEventDependencyKind.NONCOMMUTING) {
             temp.add(new PartialOrderEventDependencyTuple
                      (j, mEventDependencyMap[i][j]));
           }
@@ -615,14 +622,21 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     }
     orderStutterEvents(enabled);
     final TIntArrayList ample = new TIntArrayList();
+    final BitSet ampleDependencies = new BitSet(mNumEvents);
     boolean nonStutterAdded = false;
 
-    int i,j,temp,e;
+    int i, temp, e;
     int next = 0;
+    final int[] ampleState = new int[mNumAutomata];
 
     ample:
     while (ample.size() < enabled.length){
-      ample.add(enabled[next]);
+      final int ampleCandidate = enabled[next];
+      ample.add(ampleCandidate);
+      for (final PartialOrderEventDependencyTuple t :
+        mReducedEventDependencyMap[ampleCandidate]){
+        ampleDependencies.set(t.getCoupling());
+      }
       next++;
       final int eventIndex = ample.get(ample.size() - 1);
       if (mPartialOrderEvents[eventIndex].getStutter() !=
@@ -635,10 +649,9 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         final StateHashSet<PartialOrderStateTuple> localStateSet =
           new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
         stack.add(current);
-        stack:
         while(stack .size() > 0){
           final PartialOrderStateTuple newCurrent = stack.remove(stack.size() - 1);
-          decode(newCurrent,mSystemState);
+          decode(newCurrent,ampleState);
           events:
           for (e = 0; e < mNumEvents; e++){
             for (i = 0; i < mNumAutomata; i++){
@@ -646,10 +659,10 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
               final int si = i - mNumPlants;
               if ((plant ?
                 mPlantEventList.get(i)[e]:mSpecEventList.get(si)[e]) != 1){
-                mSuccessor[i] = mSystemState[i];
+                mSuccessor[i] = ampleState[i];
               }
-              else if ((temp = plant ? mPlantTransitionMap.get(i)[mSystemState[i]][e] :
-                mSpecTransitionMap.get(si)[mSystemState[i]][e]) != -1){
+              else if ((temp = plant ? mPlantTransitionMap.get(i)[ampleState[i]][e] :
+                mSpecTransitionMap.get(si)[ampleState[i]][e]) != -1){
                 mSuccessor[i] = temp;
               }
               else{
@@ -657,18 +670,11 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
               }
             }
             if (ample.contains(e)){
-              continue stack;
+              continue events;
             }
-            boolean independent = true;
-            for (final PartialOrderEventDependencyTuple t : mReducedEventDependencyMap[e]){
-              for (j = 0; j < ample.size(); j++){
-                independent &= t.getCoupling() == ample.get(j);
-              }
-            }
-            if(!independent){
+            if (ampleDependencies.get(e)){
               continue ample;
             }
-
             encode(mSuccessor, mStateTuple);
             if (localStateSet.getOrAdd(mStateTuple) == null) {
               stack.add(mStateTuple);
@@ -679,6 +685,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
             }
           }
         }
+        break;
       }
     }
     return nonStutterAdded ? enabled : ample.toNativeArray();
@@ -707,6 +714,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   private void convertToBredthFirst(){
     mStateList = new ArrayList<PartialOrderStateTuple>();
     mStateList.add(mInitialState);
+    mInitialState.setVisited(true);
     int open = 0;
     mIndexList.add(open);
     mIndexList.add(mStateList.size());
@@ -748,6 +756,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         mIndexList.add(mStateList.size());
       }
     }
+    assert false;  // could not find error state ???
   }
 
   private SafetyTraceProxy computePOCounterExample() throws AbortException
