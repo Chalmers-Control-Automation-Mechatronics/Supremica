@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="io" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Model of an automated manufacturing system 'Atelier Inter-établissement de Productique' (AIP) based on 'Symbolic Synthesis and Verification of Hierarchical Interface-based Supervisory Control' by Raoguang Song, MSc Thesis, McMaster University, Hamilton, ON, Canada.
+This model has been modified from the original version to use HISC-CP interfaces and reduced polling.
+This subsystem represents the I/O station in external loop 4.
+The model is controllable and nonblocking, and satisfies the HISC-CP interface consistency properties.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="CplMvInPalletIO">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="CplMvOutPalletIO">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="MvInPalletType1IO">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="MvInPalletType2IO">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="MvOutPalletIO">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PROPERTY" Name="iface">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="144" Y="128"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-33" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="144" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="144" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvOutPalletIO"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="156" Y="167"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s0" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvInPalletType1IO"/>
+                            <SimpleIdentifier Name="MvInPalletType2IO"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="156" Y="88"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-108" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="133" Y="166"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-99" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="132" Y="91"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="io">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="144" Y="128"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-33" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="144" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="144" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvOutPalletIO"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="156" Y="167"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s0" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvInPalletType1IO"/>
+                            <SimpleIdentifier Name="MvInPalletType2IO"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="156" Y="88"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvOutPalletIO"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-108" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="133" Y="166"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CplMvInPalletIO"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-99" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="132" Y="91"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

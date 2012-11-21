@@ -286,25 +286,25 @@ public class HISCCPInterfaceConsistencyCheckerTest
   public void testHISCCP_verriegel4ft()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "verriegel4ft.wmod", true);
+    runModelVerifier("hisccp", "central_locking", "verriegel4ft.wmod", true);
   }
 
   public void testHISCCP_verriegel4ftbad()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "verriegel4ft_bad.wmod", false);
+    runModelVerifier("hisccp", "central_locking", "verriegel4ft_bad.wmod", false);
   }
 
   public void testHISCCP_verriegel4ht()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "verriegel4ht.wmod", true);
+    runModelVerifier("hisccp", "central_locking", "verriegel4ht.wmod", true);
   }
 
   public void testHISCCP_verriegel4hisc()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "verriegel4hisc.wmod", true);
+    runModelVerifier("hisccp", "central_locking", "verriegel4hisc.wmod", true);
   }
 
 
