@@ -41,7 +41,6 @@ import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -345,22 +344,22 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       for (int j = 0; j < eventList.size(); j++) {
         final EventDeclProxy event = eventList.get(j);
         final String eventName = event.getName();
-        final ExpressionProxy identifier =
-            mFactory.createSimpleIdentifierProxy(eventName);
-
         // No binding parameter is created if the event is local
         if (!event.getScope().equals(ScopeKind.LOCAL)) {
-
           // if the parameter is not already used by the module
           // referencing it, add it to the list of events for the module
           // referencing it
           if (!mEvents.containsKey(eventName)) {
+            final IdentifierProxy identifier =
+              mFactory.createSimpleIdentifierProxy(eventName);
             final EventDeclProxy newEvent =
-                mFactory.createEventDeclProxy(event.getIdentifier(), event
-                    .getKind(), true, ScopeKind.LOCAL, null, null, event
-                    .getAttributes());
+                mFactory.createEventDeclProxy(identifier, event.getKind(),
+                                              true, ScopeKind.LOCAL, null,
+                                              null, event.getAttributes());
             mEvents.put(eventName, newEvent);
           }
+          final IdentifierProxy identifier =
+            mFactory.createSimpleIdentifierProxy(eventName);
           bindings.add(mFactory.createParameterBindingProxy(eventName,
                                                             identifier));
         }

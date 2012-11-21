@@ -103,7 +103,7 @@ public class IntListBuffer
    *                 first list to be catenated.
    * @param  list2   The unique list number that identifies the
    *                 second list to be catenated.
-   * @return list    A unique list number that identifying a new list
+   * @return list    A unique list number that identifies a new list
    *                 containing the elements of list1 followed by list2.
    */
   public int catenateDestructively(final int list1, final int list2)
