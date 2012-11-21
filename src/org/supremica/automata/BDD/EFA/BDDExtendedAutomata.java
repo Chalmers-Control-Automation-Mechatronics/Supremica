@@ -152,7 +152,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     List<Object> variableOrdering = null;
     List<String> variableOrderingNames;
 
-    BDDExDisjDepSets depSets;
+    BDDPartitionAlgoWorker parAlgoWorker;
 
     public BDDExtendedAutomata(final ExtendedAutomata orgExAutomata, final  EditorSynthesizerOptions options)
     {
@@ -200,7 +200,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     void initialize()
     {
         unionAlphabet = orgExAutomata.getUnionAlphabet();
-        if (!synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
+        if (synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
             event2AutomatonsEdges = new TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>>(unionAlphabet.size());
         }
 
@@ -250,9 +250,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 //        System.out.println("domain: "+orgExAutomata.getDomain());
         setVariableOrdering();
         // Set after the IDD bug is fixed.
-        if(!synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
+        if(synType.equals(SynthesisAlgorithm.PARTITIONBDD))
         {
-            FORCEAutomatonVariableSorter forceSorter = new FORCEAutomatonVariableSorter(orgExAutomata, variableOrderingNames);
+            BDDPartitionVarOrdSorter forceSorter = new BDDPartitionVarOrdSorter(orgExAutomata, variableOrdering, variableOrderingNames);
             forceSorter.sort();
 
             variableOrdering.clear();
@@ -286,7 +286,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
                 for(final EventDeclProxy event:((List<EventDeclProxy>) obj))
                 {
                     final int currEventIndex = getEventIndex(event);
-                    if(!synType.equals(SynthesisAlgorithm.MONOLITHICBDD)){
+                    if(synType.equals(SynthesisAlgorithm.PARTITIONBDD)){
                         event2AutomatonsEdges.put(currEventIndex, new HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>());
                     }
                     final BDD eventBDD = manager.createBDD(currEventIndex, eventDomain);
@@ -399,6 +399,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
         if (options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.MONOLITHICBDD))
         {
             bddEdges = new BDDEdgeFactory(this).createEdges();
+        } else if (options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD)) {
+            parAlgoWorker = getParAlgoWorker();
         }
 
         System.err.println("Variable ordering: "+variableOrderingNames);
@@ -814,12 +816,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
     {
         if (reachableStatesBDD == null)
         {
-            if (!synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
-            {
-               getDepSets();
-               reachableStatesBDD = depSets.forwardWorkSetAlgorithm(getInitialState());
-               // TEST
-               //reachableStatesBDD = depSets.randomForwardWorkSet(getInitialState());
+            if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
+            { 
+                parAlgoWorker = getParAlgoWorker();
+                reachableStatesBDD = parAlgoWorker.forwardWorkSetAlgorithm(getInitialState());
             }
             else
             {
@@ -849,18 +849,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
     BDD getCoreachableStates()
     {
-        if (coreachableStatesBDD == null)
-         {
-            if (!synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
-            {
-                coreachableStatesBDD = getDepSets().reachableBackwardWorkSetAlgorithm(getMarkedStates(), getReachableStates()); 
-                //coreachableStatesBDD = getDepSets().backwardWorkSetAlgorithm(getMarkedStates());
-                // TEST
-                //coreachableStatesBDD = depSets.randomBackwardWorkSet(getMarkedStates());
-            }
-            else
-            {
-                
+        if (coreachableStatesBDD == null) {
+            if (synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+                parAlgoWorker = getParAlgoWorker();
+                coreachableStatesBDD = parAlgoWorker.reachableBackwardWorkSetAlgorithm(getMarkedStates(), getReachableStates());
+            } else {
                 coreachableStatesBDD = manager.restrictedBackward(manager.getZeroBDD());
             }
 
@@ -883,7 +876,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
             {
                 nonblockingControllableStatesBDD = manager.nonblockingControllable(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()),reachable);
             }
-            else
+            else if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
             {
                 nonblockingControllableStatesBDD = manager.disjunctiveNonblockingControllable
                         (manager.getDisjunctiveInitiallyUncontrollableStates().or(getForbiddenLocations()), reachable);
@@ -914,11 +907,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
                     controllableStatesBDD = uncontrollableStates.not();
                 }
             }
-            else
+            else if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
             {
                 uncontrollableStatesBDD = manager.getDisjunctiveInitiallyUncontrollableStates().or(getForbiddenLocations());
                 if (reachable) {
-                     controllableStatesBDD = getDepSets().forwardRestrictedWorkSetAlgorithm(getInitialState(), uncontrollableStatesBDD);
+                     controllableStatesBDD = parAlgoWorker.forwardRestrictedWorkSetAlgorithm(getInitialState(), uncontrollableStatesBDD);
                 } else {
                     controllableStatesBDD = uncontrollableStatesBDD.not();
                 }
@@ -948,9 +941,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 //            coreachableStatesBDD.printDot();
 
 //            nonblockingStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
-            if (!synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
+            if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
             {
-                nonblockingStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
+                nonblockingStatesBDD = coreachableStatesBDD;
             }
             else
             {
@@ -962,8 +955,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
 
 //            BDD2IDD2PS(nonblockingStatesBDD, nonblockingStatesBDD, "nonblockingStates");
             System.err.println("Nonblocking states computed!: " + nonblockingStatesBDD.satCount(sourceStateVariables));
-//            final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
-//            nbrOfNonblockingStates = nbrOfStatesIDD(idd).longValue();
+            final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
+            nbrOfNonblockingStates = nbrOfStatesIDD(idd).longValue();
 //            nbrOfNonblockingStates = 1;
 
             nbrOfBlockingStates = nbrOfReachableStates - nbrOfNonblockingStates;
@@ -1408,9 +1401,24 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton>{
        return synType;
     }
     
-    public BDDExDisjDepSets getDepSets() {
-        if(depSets == null)
-            depSets = BDDExDisjPartitioningTypeFactory.getDepSets(this, synType);
-        return depSets;
+    public BDDPartitionAlgoWorker getParAlgoWorker() {
+        if (parAlgoWorker == null) {
+            parAlgoWorker = BDDPartitionTypeFactory.getPartitioningAlgorithmWorker(this, synType);
+        }
+        return parAlgoWorker;
+    }
+    
+    /**
+     * Returns true if and only everything is marked.
+     * 
+     * @return <code>true</code> if and only if all locations of all EFAs, and all values of all variables are marked 
+     */
+    public boolean isAllMarked () {
+       for (Iterator<ExtendedAutomaton> exAutItr = theExAutomata.iterator(); exAutItr.hasNext();) {
+           if (!exAutItr.next().isAllMarked()) {
+               return false;
+           }
+       }
+       return markedValuesBDD.equals(manager.getOneBDD());
     }
 }

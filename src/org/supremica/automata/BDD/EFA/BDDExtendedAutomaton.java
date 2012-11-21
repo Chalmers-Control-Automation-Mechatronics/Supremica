@@ -6,6 +6,7 @@ package org.supremica.automata.BDD.EFA;
  */
 
 import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -55,8 +56,10 @@ public class BDDExtendedAutomaton {
     HashMap<Integer,String> bddIndex2SourceStateName;
     public HashMap<String,HashSet<Integer>> enablingSigmaMap;
 
+    BDD edgeForwardBDDWithoutSelfLoops; // The DFA partitioning approach needs this BDD.
     BDD selfLoopsBDD;
-    TIntArrayList caredEventsIndex;
+    TIntHashSet caredEventsIndex;
+    TIntHashSet caredUncontrollableEventsIndex;
 
     String OR = " | ";
     String AND = " & ";
@@ -98,8 +101,10 @@ public class BDDExtendedAutomaton {
         edgeForwardDisjunctiveBDD = manager.getZeroBDD();
         edgeBackwardDisjunctiveBDD = manager.getZeroBDD();
 
+        edgeForwardBDDWithoutSelfLoops = manager.getZeroBDD();
         selfLoopsBDD = manager.getZeroBDD();
-        caredEventsIndex = new TIntArrayList();
+        caredEventsIndex = new TIntHashSet();
+        caredUncontrollableEventsIndex = new TIntHashSet();
     }
 
     public void initialize()
@@ -118,7 +123,7 @@ public class BDDExtendedAutomaton {
         boolean anyMarkedLocation = false;
 
         for (final NodeProxy currLocation : theExAutomaton.getNodes()) {
-            if (!bddExAutomata.synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
+            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
                 // Add the node proxy in the map
                 for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {
                     final EdgeSubject currEdge = edgeIt.next();
@@ -276,18 +281,35 @@ public class BDDExtendedAutomaton {
 
     private void addNodeProxy(final EdgeSubject theEdge) {
 
+        BDD theEdgeBDD = manager.getOneBDD();
+        BDD edgeEventsBDD = manager.getZeroBDD();
+        
+        if (bddExAutomata.orgExAutomata.getVars().isEmpty()) { // for the DFA partitioning method
+            int sourceLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, theEdge.getSource());
+            int destLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, theEdge.getTarget());
+            BDD sourceLocationBDD = manager.getFactory().buildCube(sourceLocationIndex, sourceLocationDomain.vars());
+            BDD destLocationBDD = manager.getFactory().buildCube(destLocationIndex, destLocationDomain.vars());
+            theEdgeBDD.andWith(sourceLocationBDD.andWith(destLocationBDD));
+        }
+
         final Iterator<Proxy> eventIterator = theEdge.getLabelBlock().getEventList().iterator();
         while (eventIterator.hasNext()) {
 
             final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
             final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
             final int eventIndex = bddExAutomata.getEventIndex(theEvent);
+            
+            if (bddExAutomata.orgExAutomata.getVars().isEmpty()) { // for the DFA partitioning method
+                edgeEventsBDD.orWith(manager.getFactory().buildCube(eventIndex, bddExAutomata.getEventDomain().vars()));
+            }
 
             caredEventsIndex.add(eventIndex);
 
             if(theEvent.getKind() == EventKind.UNCONTROLLABLE){
-                if(theExAutomaton.isSpecification())
+                caredUncontrollableEventsIndex.add(eventIndex);
+                if(theExAutomaton.isSpecification()) {
                     bddExAutomata.specUncontrollableEventIndexList.add(eventIndex);
+                }
                 else{
                     bddExAutomata.plantUncontrollableEventIndexList.add(eventIndex);
                 }
@@ -302,14 +324,23 @@ public class BDDExtendedAutomaton {
                 currentEventsAutEdgeMap.put(theExAutomaton, edgeList);
             }
         }
+        edgeForwardBDDWithoutSelfLoops.orWith(theEdgeBDD.andWith(edgeEventsBDD));
     }
 
-    public TIntArrayList getCaredEventsIndex() {
+    public TIntHashSet getCaredEventsIndex() {
         return caredEventsIndex;
+    }
+    
+    public TIntHashSet getCaredUncontrollableEventsIndex() {
+        return caredUncontrollableEventsIndex;
     }
 
     public BDD getSelfLoopsBDD() {
         return selfLoopsBDD;
+    }
+    
+    public BDD getEdgeForwardWithoutSelfLoops () {
+        return edgeForwardBDDWithoutSelfLoops;
     }
 
     public BDD getForbiddenStateSet()

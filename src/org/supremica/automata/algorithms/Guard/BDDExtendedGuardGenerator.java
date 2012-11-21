@@ -17,6 +17,7 @@ package org.supremica.automata.algorithms.Guard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -25,11 +26,13 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.EFA.BDDEdges;
-import org.supremica.automata.BDD.EFA.BDDExDisjDepSetsDecorator;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
 import org.supremica.automata.BDD.EFA.BDDExtendedManager;
 import org.supremica.automata.BDD.EFA.BDDMonolithicEdges;
+import org.supremica.automata.BDD.EFA.BDDPartitionAlgoWorker;
+import org.supremica.automata.BDD.EFA.BDDPartitionAlgoWorkerAut;
+import org.supremica.automata.BDD.EFA.BDDPartitionAlgoWorkerEve;
 import org.supremica.automata.BDD.EFA.IDD;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
@@ -164,7 +167,7 @@ public class BDDExtendedGuardGenerator {
 
         }
 
-        else if (!bddAutomata.getSynthAlg().equals(SynthesisAlgorithm.MONOLITHICBDD)) {
+        else if (bddAutomata.getSynthAlg().equals(SynthesisAlgorithm.PARTITIONBDD)) {
             disjunctivelyComputeMustAllowedStates();
             disjunctivelyComputeMustForbiddenStates();
         }
@@ -824,53 +827,78 @@ public class BDDExtendedGuardGenerator {
 
     private void disjunctivelyComputeMustAllowedStates() {
 
+        BDDPartitionAlgoWorker parAlgoWorker = automataBDD.getParAlgoWorker();
         final int eventIndex = automataBDD.getEventIndex(eventName);
 
-        final BDD safeStatesAsTargetStates = safeStatesBDD.replace(automataBDD.getSource2DestLocationPairing())
+        final BDD safeStatesAsTargetStates = safeStatesBDD
+                .replace(automataBDD.getSource2DestLocationPairing())
                 .replace(automataBDD.getSource2DestVariablePairing());
+
         final BDD safeStatesWithEvent = safeStatesAsTargetStates.and(sigmaBDD);
 
         BDD tmp = manager.getZeroBDD();
 
-        final BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
+        if (parAlgoWorker instanceof BDDPartitionAlgoWorkerEve) {
 
-        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToBDDMap().get(eventIndex);
-        final BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
+            BDD eventTransBDD = parAlgoWorker.getCompBDD(eventIndex);
+            tmp = safeStatesWithEvent.and(eventTransBDD)
+                    .exist(automataBDD.getDestStatesVarSet()).exist(automataBDD.getEventVarSet());
 
-        final BDD transWithEventBDD = transBDD.and(eventBDD);
-        tmp = safeStatesWithEvent.and(transWithEventBDD).exist(automataBDD.getDestStatesVarSet())
-                    .exist(automataBDD.getEventVarSet());
+        } else if (parAlgoWorker instanceof BDDPartitionAlgoWorkerAut) {
 
+            for (Iterator<ExtendedAutomaton> autItr = automataBDD.getExtendedAutomata().iterator(); autItr.hasNext();) {
+                ExtendedAutomaton aut = autItr.next();
+                int autIndex = automataBDD.getIndexMap().getExAutomatonIndex(aut.getName());
+                if (automataBDD.getBDDExAutomaton(aut).getCaredEventsIndex().contains(eventIndex)) {
+                    tmp = tmp.or(safeStatesWithEvent.and(parAlgoWorker.getCompBDD(autIndex))
+                            .exist(automataBDD.getDestStatesVarSet())
+                            .exist(automataBDD.getEventVarSet()));
+                }
+            }
+
+        }
         mustAllowedStatesBDD = tmp.and(safeStatesBDD);
-        tmp.free();
         safeStatesWithEvent.free();
+        tmp.free();
     }
 
     private void disjunctivelyComputeMustForbiddenStates() {
 
+        BDDPartitionAlgoWorker parAlgoWorker = automataBDD.getParAlgoWorker();
         final int eventIndex = automataBDD.getEventIndex(eventName);
+
         final BDD reachableStatesAsTargetStates = automataBDD.getReachableStates()
-                .replace(automataBDD.getSource2DestLocationPairing()).replace(automataBDD.getSource2DestVariablePairing());
+                .replace(automataBDD.getSource2DestLocationPairing())
+                .replace(automataBDD.getSource2DestVariablePairing());
+
         final BDD reachableStatesWithEvent = reachableStatesAsTargetStates.and(sigmaBDD);
 
         BDD tmp = manager.getZeroBDD();
 
-        final BDDExDisjDepSetsDecorator depset = (BDDExDisjDepSetsDecorator)automataBDD.getDepSets();
+        if (parAlgoWorker instanceof BDDPartitionAlgoWorkerEve) {
 
-        final BDD eventBDD = depset.getEventParDepSets().getEventIndexToBDDMap().get(eventIndex);
-        final BDD transBDD = depset.getEventParDepSets().getComponentToComponentTransMap().get(eventIndex);
+            BDD eventTransBDD = parAlgoWorker.getCompBDD(eventIndex);
 
-        final BDD transWithEventBDD = transBDD.and(eventBDD);
-        tmp = reachableStatesWithEvent.and(transWithEventBDD).exist(automataBDD.getDestStatesVarSet())
-                    .exist(automataBDD.getEventVarSet());
+            tmp = reachableStatesWithEvent.and(eventTransBDD)
+                    .exist(automataBDD.getDestStatesVarSet()).exist(automataBDD.getEventVarSet());
+
+        } else if (parAlgoWorker instanceof BDDPartitionAlgoWorkerAut) {
+
+            for (Iterator<ExtendedAutomaton> autItr = automataBDD.getExtendedAutomata().iterator(); autItr.hasNext();) {
+                ExtendedAutomaton aut = autItr.next();
+                int autIndex = automataBDD.getIndexMap().getExAutomatonIndex(aut.getName());
+                if (automataBDD.getBDDExAutomaton(aut).getCaredEventsIndex().contains(eventIndex)) {
+                    tmp = tmp.or(reachableStatesWithEvent.and(parAlgoWorker.getCompBDD(autIndex))
+                            .exist(automataBDD.getDestStatesVarSet()).exist(automataBDD.getEventVarSet()));
+                }
+            }
+        }
+
         safeStatesEnablingSigmaBDD = tmp.and(safeStatesBDD);
         mustForbiddenStatesBDD = safeStatesEnablingSigmaBDD.and(mustAllowedStatesBDD.not());
-
         tmp.free();
         reachableStatesWithEvent.free();
     }
-
-
 
     class StringIntPair
     {
