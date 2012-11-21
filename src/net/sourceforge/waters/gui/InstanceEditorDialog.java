@@ -60,6 +60,7 @@ import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.subject.base.UndoInfo;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -297,32 +298,31 @@ public class InstanceEditorDialog extends JDialog
     if (isInputLocked()) {
       // nothing
     } else {
-      final IdentifierProxy newName = (IdentifierProxy) mNameInput.getValue();
+      final ModuleProxyCloner cloner =
+        ModuleSubjectFactory.getCloningInstance();
+      final IdentifierSubject inputIdent =
+        (IdentifierSubject) mNameInput.getValue();
+      final IdentifierSubject newIdent =
+        (IdentifierSubject) cloner.getClone(inputIdent);
       final String moduleName = mModuleInput.getText();
-
-      if(moduleName.compareTo("") == 0){
+      if (moduleName.equals("")){
         mModuleInput.requestFocusInWindow();
         mNameInput.setErrorMessage("Enter or select a .wmod file!");
         return;
       }
-
       final SelectionOwner panel = mRoot.getComponentsPanel();
-      final ModuleProxyCloner cloner =
-        ModuleSubjectFactory.getCloningInstance();
       InstanceSubject template = (InstanceSubject) cloner.getClone(mInstance);
       if (mInstance == null) {
-        template = new InstanceSubject(newName, moduleName);
+        template = new InstanceSubject(newIdent, moduleName);
         final ModuleSubject module = mRoot.getModuleSubject();
-        final DocumentManager docman = mRoot.getRootWindow().getDocumentManager();
+        final DocumentManager manager = mRoot.getRootWindow().getDocumentManager();
         URI uri;
         try {
-          uri = docman.resolve(module, moduleName, ModuleProxy.class);
+          uri = manager.resolve(module, moduleName, ModuleProxy.class);
         } catch (final WatersUnmarshalException exception1) {
           throw new WatersRuntimeException(exception1);
         }
         final File filename = new File(uri);
-        final DocumentManager manager =
-          mRoot.getRootWindow().getDocumentManager();
         ModuleProxy proxy = null;
         try {
           proxy = (ModuleProxy) manager.load(filename);
@@ -357,16 +357,12 @@ public class InstanceEditorDialog extends JDialog
         final Command command = new InsertCommand(list, panel, mRoot);
         mInstance = template;
         mRoot.getUndoInterface().executeCommand(command);
-
       } else {
-        final String oldname = mInstance.getName();
-        final boolean nameChange = !newName.toString().equals(oldname);
-        final boolean moduleChange =
-          !moduleName.equals(template.getModuleName());
-        if (nameChange || moduleChange) {
-          template.setModuleName(moduleName);
-          template.setIdentifier((IdentifierSubject) newName);
-          final Command command = new EditCommand(mInstance, template, panel);
+        template.setModuleName(moduleName);
+        template.setIdentifier(newIdent);
+        final UndoInfo info = mInstance.createUndoInfo(template, null);
+        if (info != null) {
+          final Command command = new EditCommand(mInstance, info, panel, null);
           mRoot.getUndoInterface().executeCommand(command);
         }
       }
