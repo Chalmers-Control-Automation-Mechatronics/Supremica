@@ -267,10 +267,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
             final TIntArrayList specUncontrollableEvents = bddExAutomata.specUncontrollableEventIndexList;
 
             final TIntObjectHashMap<BDD> plantsEnabledStates =
-                    new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.plants, plantUncontrollableEvents).getUncontrollableEvents2EnabledStates();
+                    new BDDPartitionUncontSetEve(bddExAutomata, bddExAutomata.plants, plantUncontrollableEvents).getUncontrollableEvents2EnabledStates();
             final TIntObjectHashMap<BDD> specEnabledStates =
-                    new UncontrollableEventDepSets(bddExAutomata, bddExAutomata.specs, specUncontrollableEvents).getUncontrollableEvents2EnabledStates();
-
+                    new BDDPartitionUncontSetEve(bddExAutomata, bddExAutomata.specs, specUncontrollableEvents).getUncontrollableEvents2EnabledStates();
             final BDD uncontrollableStates = getZeroBDD();
 
             for (int i = 0; i < specUncontrollableEvents.size(); i++) {
@@ -289,15 +288,19 @@ public class BDDExtendedManager extends BDDAbstractManager {
         BDD previousForbidenStates = null;
         BDD tmpCoreachableStates = null;
         BDD currentForbidenStates = forbiddenStates;
-
+        
         boolean flag = false;
         do {
             previousForbidenStates = currentForbidenStates.id();
-            currentForbidenStates = bddExAutomata.getDepSets().uncontrollableBackwardWorkSetAlgorithm(currentForbidenStates);
+            currentForbidenStates = bddExAutomata.getParAlgoWorker().uncontrollableBackwardWorkSetAlgorithm(currentForbidenStates);
             if (flag && currentForbidenStates.equals(previousForbidenStates)) {
                 break;
             } else {
-                tmpCoreachableStates = bddExAutomata.getDepSets().backwardRestrictedWorkSetAlgorithm(bddExAutomata.getMarkedStates(), currentForbidenStates);
+                // TEST!!
+                //parAlgoWorker = new BDDPartitionAlgoWorkerRan(eventPartitions, eventCoordinator);
+                tmpCoreachableStates = bddExAutomata.getParAlgoWorker()
+                                    .reachableBackwardRestrictedWorkSetAlgorithm(bddExAutomata.getMarkedStates(), 
+                                     currentForbidenStates, bddExAutomata.getReachableStates());
                 currentForbidenStates = tmpCoreachableStates.not();
                 flag = true;
             }
@@ -305,8 +308,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         BDD nonblockingControllableStates = null;
         if (reachable) {
-            nonblockingControllableStates = bddExAutomata.getDepSets().
-                    forwardRestrictedWorkSetAlgorithm(bddExAutomata.getInitialState(), currentForbidenStates);
+            nonblockingControllableStates = bddExAutomata.getParAlgoWorker()
+                    .forwardRestrictedWorkSetAlgorithm(bddExAutomata.getInitialState(), currentForbidenStates);
         } else {
             nonblockingControllableStates = currentForbidenStates.not();
         }
