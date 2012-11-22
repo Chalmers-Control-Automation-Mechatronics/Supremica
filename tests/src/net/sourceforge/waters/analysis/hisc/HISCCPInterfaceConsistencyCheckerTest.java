@@ -309,6 +309,28 @@ public class HISCCPInterfaceConsistencyCheckerTest
 
 
   // SimpleManufacturingExample
+  public void testHISCCP_SimpleManufMultiLD0()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_multi_ld",
+                     "simple_manuf_multi_ld.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufMultiLD1()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_multi_ld",
+                     "subsystem.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufMultiLD02()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_multi_ld",
+                     "assembly.wmod", true);
+  }
+
+
   public void testHISCCP_ManufCell()
   throws Exception
   {
