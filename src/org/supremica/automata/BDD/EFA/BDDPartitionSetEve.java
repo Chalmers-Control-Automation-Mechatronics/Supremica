@@ -295,6 +295,24 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                 }
             });
         }
+        
+        // debug the successors of each event
+//        forwardEveDependencyMap.forEachEntry(new TIntObjectProcedure<TIntHashSet>() {
+//            @Override
+//            public boolean execute(int eventIndex, TIntHashSet successors) {
+//                System.err.println(theIndexMap.getEventAt(eventIndex).getName() + " successor events are: ");
+//                successors.forEach(new TIntProcedure() {
+//
+//                    @Override
+//                    public boolean execute(int successor) {
+//                        System.err.print(" " + theIndexMap.getEventAt(successor).getName() + " ;");
+//                        return true;
+//                    }
+//                });
+//                System.err.println();
+//                return true;
+//            }
+//        });
     }
     
     /* get all of the predecessor-events for each event. */
@@ -365,7 +383,9 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
             this.eventIndex = eventIndex;
             this.includingAutomata2Edges = includingAutomata2Edges;
             this.eventForwardTransitionBDD = manager.getZeroBDD();
-            buildTansitionBDD();
+            if (!includingAutomata2Edges.isEmpty()) {
+                buildTansitionBDD();
+            }
         }
 
         private void buildTansitionBDD() {
@@ -465,7 +485,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                 eventIsQualifiedForMarkedComponent = eventIsQualifiedForMarkedComponent && currAutIncTrans.qualifiedForMarkedComponent;
             }
 
-            final BDD tmp = manager.getOneBDD(); // a bug in bddExAutomata.getMinBDDBitVecOf(varIndex)) !!! comment first.
+            final BDD tmp = manager.getOneBDD();
             for (VariableComponentProxy var : bddExAutomata.orgExAutomata.getVars()) {
                 int varIndex = bddExAutomata.theIndexMap.getVariableIndex(var);
                 transCorrespondingToUpdatedVariables[varIndex] = transCorrespondingToUpdatedVariables[varIndex]

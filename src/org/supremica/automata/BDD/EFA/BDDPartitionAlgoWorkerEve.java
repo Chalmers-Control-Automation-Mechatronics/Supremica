@@ -38,6 +38,7 @@ public class BDDPartitionAlgoWorkerEve extends BDDPartitionAlgoWorker {
         while (!shouldStop()) {
             previousReachableStatesBDD = currentReachableStatesBDD.id();
             int choice = pickCompFwd();
+            System.err.println(partitions.theIndexMap.getEventAt(choice));
             BDD currentTransitionRelation = getCompBDD(choice);
             currentReachableStatesBDD = restrictedImage(partitions.bddExAutomata, currentReachableStatesBDD,
                     forbiddenStates, currentTransitionRelation);
@@ -126,7 +127,7 @@ public class BDDPartitionAlgoWorkerEve extends BDDPartitionAlgoWorker {
 
         resetCoordinator();
 
-        BDD targetMarkedStates = markedStates.and(reachableStates).id()
+        BDD targetMarkedStates = markedStates.id()
                 .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
                 .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
         BDD targetForbiddenStates = forbiddenStates.id()
