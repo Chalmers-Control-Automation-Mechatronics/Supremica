@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
 //# PACKAGE: net.sourceforge.waters.gui.actions
-//# CLASS:   AnalyzeHISCCPInterfaceConsistencyAction
+//# CLASS:   AnalyzeHISCCPControllabilityAction
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -10,9 +10,6 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
-import net.sourceforge.waters.analysis.hisc.HISCCPInterfaceConsistencyChecker;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -20,18 +17,22 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the HISC-CP interface consistency check.
+ * The action to invoke an HISC-CP controllability check.
+ * This invokes just a standard controllability check.
+ * The only difference to {@link AnalyzeControllabilityAction} is that
+ * the module is compiled differently for HISC, with only the interfaces
+ * of instantiated modules included.
  *
  * @author Robi Malik
  */
 
-public class AnalyzeHISCCPInterfaceConsistencyAction
+public class AnalyzeHISCCPControllabilityAction
   extends WatersAnalyzeHISCAction
 {
 
   //#########################################################################
   //# Constructor
-  protected AnalyzeHISCCPInterfaceConsistencyAction(final IDE ide)
+  protected AnalyzeHISCCPControllabilityAction(final IDE ide)
   {
     super(ide);
   }
@@ -43,13 +44,13 @@ public class AnalyzeHISCCPInterfaceConsistencyAction
   @Override
   protected String getCheckName()
   {
-    return "HISC-CP Interface Consistency";
+    return "HISC-CP Controllability";
   }
 
   @Override
   protected String getFailureDescription()
   {
-    return "is not interface consistent";
+    return "is not locally controllable";
   }
 
   @Override
@@ -57,21 +58,13 @@ public class AnalyzeHISCCPInterfaceConsistencyAction
     (final ModelVerifierFactory factory,
      final ProductDESProxyFactory desFactory)
   {
-    final ConflictChecker checker = factory.createConflictChecker(desFactory);
-    if (checker == null) {
-      return null;
-    } else {
-      final CompositionalSimplifier simplifier =
-        new CompositionalSimplifier(desFactory);
-      return new HISCCPInterfaceConsistencyChecker
-        (desFactory, checker, simplifier);
-    }
+    return factory.createControllabilityChecker(desFactory);
   }
 
   @Override
   protected String getSuccessDescription()
   {
-    return "is interface consistent";
+    return "is locally controllable";
   }
 
 

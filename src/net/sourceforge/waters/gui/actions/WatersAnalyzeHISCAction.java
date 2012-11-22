@@ -73,8 +73,6 @@ public abstract class WatersAnalyzeHISCAction
     compiler.setSourceInfoEnabled(false);
     compiler.setOptimizationEnabled(true);
     compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
-    final List<String> empty = Collections.emptyList();
-    compiler.setEnabledPropertyNames(empty);
     final List<String> accepting =
       Collections.singletonList(EventDeclProxy.DEFAULT_MARKING_NAME);
     compiler.setEnabledPropositionNames(accepting);
