@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="polishing_machine" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="finish_polish">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="dip_acid"/>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="err_polish">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="polish"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="start_polish">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="start_release"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="repair"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PROPERTY" Name="iface">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="64" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-30" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="p1">
+                        <PointGeometry>
+                            <Point X="160" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="4" Y="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="ok">
+                        <PointGeometry>
+                            <Point X="160" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-14"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="err">
+                        <PointGeometry>
+                            <Point X="64" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-20" Y="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="p1" Target="err">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="err_polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="108" Y="169"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="idle" Target="p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-38" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="p1" Target="ok">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="169" Y="108"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="ok" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish_polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="116" Y="54"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="err" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="54" Y="115"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="polishing_sequence">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="80" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2:pol:seq">
+                        <PointGeometry>
+                            <Point X="144" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-4" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <PointGeometry>
+                            <Point X="256" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s4">
+                        <PointGeometry>
+                            <Point X="320" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="3" Y="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s5">
+                        <PointGeometry>
+                            <Point X="256" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s6">
+                        <PointGeometry>
+                            <Point X="144" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="1" Y="13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <GroupNode Name="G0">
+                        <NodeRef Name="s5"/>
+                        <NodeRef Name="s2:pol:seq"/>
+                        <NodeRef Name="s3"/>
+                        <NodeRef Name="s4"/>
+                        <NodeRef Name="s6"/>
+                        <BoxGeometry>
+                            <Box Height="192" Width="224" X="128" Y="32"/>
+                        </BoxGeometry>
+                    </GroupNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s6" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_release"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-81" Y="-4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2:pol:seq" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="-4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2:pol:seq">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-81" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s5" Target="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="G0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="err_polish"/>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="179" Y="224"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point X="114" Y="247"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="polish_part">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="64" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-34" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="polishing">
+                        <PointGeometry>
+                            <Point X="160" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="12" Y="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="done">
+                        <PointGeometry>
+                            <Point X="64" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-40" Y="-1"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="err">
+                        <PointGeometry>
+                            <Point X="160" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="-18"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="polishing" Target="polishing">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid"/>
+                            <SimpleIdentifier Name="polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="13" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="204" Y="211"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="polishing" Target="done">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_release"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="109" Y="185"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="idle" Target="polishing">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="done" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish_polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-85" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="55" Y="131"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="polishing" Target="err">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="err_polish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="169" Y="125"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="err" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="116" Y="71"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

@@ -142,7 +142,12 @@ public class ExpressionParser {
   public IdentifierProxy parseIdentifier(final String input)
     throws ParseException
   {
-    return (IdentifierProxy) parse(input, Operator.TYPE_NAME);
+    final SimpleExpressionProxy expr = parse(input, Operator.TYPE_NAME);
+    if (!(expr instanceof IdentifierProxy)) {
+      System.err.println("ERROR: ExpressionParser fails to recognise " +
+                         input + " as a non-identifier!");
+    }
+    return (IdentifierProxy) expr;
   }
 
   /**
