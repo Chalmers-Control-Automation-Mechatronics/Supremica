@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="polishing_machine" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Polishing machine for simple manufacturing system proposed by Ryan Leduc.
+This is a modified version with HISC-CP interfaces of a variation of the "parallel manufacturing example" from the DESpot examples collection.
+</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
         <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="finish_polish">
@@ -178,9 +181,9 @@
                     </SimpleNode>
                     <GroupNode Name="G0">
                         <NodeRef Name="s5"/>
+                        <NodeRef Name="s4"/>
                         <NodeRef Name="s2:pol:seq"/>
                         <NodeRef Name="s3"/>
-                        <NodeRef Name="s4"/>
                         <NodeRef Name="s6"/>
                         <BoxGeometry>
                             <Box Height="192" Width="224" X="128" Y="32"/>
