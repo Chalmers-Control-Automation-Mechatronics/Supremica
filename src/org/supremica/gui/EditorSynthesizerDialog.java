@@ -399,7 +399,7 @@ class EditorSynthesizerDialogStandardPanel
         if (typeSelector.getType() == SynthesisType.CONTROLLABLE)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Event);
+            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD);
 //            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
 //            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
 /*            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
@@ -411,7 +411,7 @@ class EditorSynthesizerDialogStandardPanel
         else if (typeSelector.getType() == SynthesisType.NONBLOCKING)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Event);
+            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD);
 //            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
 //            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
 
@@ -425,7 +425,7 @@ class EditorSynthesizerDialogStandardPanel
         else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
-            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Event);
+            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD);
 //            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Automaton);
 //            algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD_Variable);
 /*

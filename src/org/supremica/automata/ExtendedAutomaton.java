@@ -823,4 +823,13 @@ public class ExtendedAutomaton {
         }
         return result;
     }
+
+    /**
+     * Returns true if either all the locations are marked or no location is marked.
+     * 
+     * @return <code>true</code> if all the locations are marked or no one is marked. 
+     */
+    public boolean isAllMarked(){
+        return nodes.size() == acceptedLocations.size() || acceptedLocations.isEmpty();
+    }
 }
