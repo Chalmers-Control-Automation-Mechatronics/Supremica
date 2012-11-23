@@ -62,17 +62,17 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik
  */
 
-public abstract class AbstractSynthesizerTest
+public abstract class AbstractSupervisorSynthesizerTest
   extends AbstractAnalysisTest
 {
 
   //#########################################################################
   //# Overrides for base class junit.framework.TestCase
-  public AbstractSynthesizerTest()
+  public AbstractSupervisorSynthesizerTest()
   {
   }
 
-  public AbstractSynthesizerTest(final String name)
+  public AbstractSupervisorSynthesizerTest(final String name)
   {
     super(name);
   }
@@ -135,7 +135,7 @@ public abstract class AbstractSynthesizerTest
     throws Exception
   {
     try {
-      final ProductDESBuilder synthesizer = getSynthesizer();
+      final SupervisorSynthesizer synthesizer = getSynthesizer();
       synthesizer.setNodeLimit(2);
       testSmallFactory2();
       fail("Expected overflow not caught!");
@@ -539,7 +539,7 @@ public abstract class AbstractSynthesizerTest
     runSynthesizerWithBindings(des, expect);
   }
 
-  protected ProductDESBuilder getSynthesizer()
+  protected SupervisorSynthesizer getSynthesizer()
   {
     return mSynthesizer;
   }
@@ -548,14 +548,14 @@ public abstract class AbstractSynthesizerTest
   //#########################################################################
   //# To be Provided by Subclasses
   /**
-   * Creates an instance of the synthesizer under test. This method
-   * instantiates the class of the synthesizer tested by the particular
+   * Creates an instance of the synthesiser under test. This method
+   * instantiates the class of the synthesiser tested by the particular
    * subclass of this test, and configures it as needed.
    * @param factory
-   *          The factory used by the synthesizer to create its output.
-   * @return An instance of the synthesizer.
+   *          The factory used by the synthesiser to create its output.
+   * @return An instance of the synthesiser.
    */
-  protected abstract ProductDESBuilder createSynthesizer
+  protected abstract SupervisorSynthesizer createSynthesizer
     (ProductDESProxyFactory factory);
 
   /**
@@ -745,7 +745,7 @@ public abstract class AbstractSynthesizerTest
 
   //#########################################################################
   //# Data Members
-  private ProductDESBuilder mSynthesizer;
+  private SupervisorSynthesizer mSynthesizer;
   private ControllabilityChecker mControllabilityChecker;
   private LanguageInclusionChecker mLanguageInclusionChecker;
   private ConflictChecker mConflictChecker;
