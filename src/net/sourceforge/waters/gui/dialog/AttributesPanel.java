@@ -1,13 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.gui
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   AttributesPanel
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui;
+
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Component;
@@ -54,6 +55,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
+import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
@@ -69,7 +71,7 @@ import org.supremica.properties.Config;
  * with columns for keys and values, and two buttons to add and remove entries
  * from the table. The panel can be added to dialogs.
  *
- * @author Robi Malik
+ * @author Carly Hona, Robi Malik
  */
 
 class AttributesPanel extends JPanel

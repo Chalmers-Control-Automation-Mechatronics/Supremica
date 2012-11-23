@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.gui
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   ForeachEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -28,6 +28,9 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+
+import net.sourceforge.waters.gui.ErrorLabel;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;

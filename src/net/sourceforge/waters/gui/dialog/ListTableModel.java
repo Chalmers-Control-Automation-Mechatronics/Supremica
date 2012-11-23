@@ -1,14 +1,14 @@
 //# -*-  indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   ListTableModel
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ import javax.swing.event.TableModelEvent;
 public class ListTableModel<E>
   extends AbstractTableModel
   implements CellEditorListener
-{  
+{
 
   //#########################################################################
   //# Constructors

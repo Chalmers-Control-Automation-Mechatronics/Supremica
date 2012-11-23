@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   SimpleExpressionCell
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.event.KeyEvent;
 
@@ -21,6 +21,9 @@ import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
 
+import net.sourceforge.waters.gui.ErrorDisplay;
+import net.sourceforge.waters.gui.FormattedInputParser;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -123,8 +126,7 @@ public class SimpleExpressionCell
    * @param  expr      The initial value for the text field.
    * @param  parser    An input parser to validate the text input.
    *                   By specifying a customised input parser, the user
-   *                   possible to implement type checking beyond the type
-   *                   masks.
+   *                   can implement type checking beyond the type masks.
    * @see    SimpleIdentifierInputParser
    */
   public SimpleExpressionCell(final SimpleExpressionProxy expr,

@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.gui
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   VariableEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Component;
@@ -59,6 +59,11 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.DocumentFilter;
 
+import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.ErrorLabel;
+import net.sourceforge.waters.gui.FormattedInputParser;
+import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
@@ -91,6 +96,10 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.subject.module.VariableMarkingSubject;
 
+
+/**
+ * @author Robi Malik
+ */
 
 public class VariableEditorDialog
   extends JDialog

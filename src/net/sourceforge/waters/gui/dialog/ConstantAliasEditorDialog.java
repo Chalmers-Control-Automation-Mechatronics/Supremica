@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   ForeachComponentEditorDialog
+//# PACKAGE: net.sourceforge.waters.gui.dialog
+//# CLASS:   ConstantAliasEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -30,6 +30,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
+import net.sourceforge.waters.gui.ErrorLabel;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
@@ -49,6 +51,10 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
+
+/**
+ * @author Carly Hona
+ */
 
 public class ConstantAliasEditorDialog
   extends JDialog

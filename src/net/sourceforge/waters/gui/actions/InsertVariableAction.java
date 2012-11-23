@@ -17,7 +17,8 @@ import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.VariableEditorDialog;
+import net.sourceforge.waters.gui.dialog.VariableEditorDialog;
+
 import org.supremica.gui.ide.IDE;
 
 

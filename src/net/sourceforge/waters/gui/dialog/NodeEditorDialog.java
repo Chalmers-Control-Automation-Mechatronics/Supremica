@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   SimpleComponentEditorDialog
+//# PACKAGE: net.sourceforge.waters.gui.dialog
+//# CLASS:   NodeEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import gnu.trove.THashSet;
 
@@ -28,6 +28,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
+import net.sourceforge.waters.gui.ErrorLabel;
+import net.sourceforge.waters.gui.GraphEditorPanel;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.language.ProxyNamer;
@@ -52,6 +55,10 @@ import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
+
+/**
+ * @author Carly Hona
+ */
 
 public class NodeEditorDialog
   extends JDialog

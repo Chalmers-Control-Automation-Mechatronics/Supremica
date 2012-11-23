@@ -1,22 +1,32 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.gui
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   ParameterBindingEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
+import net.sourceforge.waters.gui.FormattedInputParser;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
+
+/**
+ * @author Carly Hona
+ */
 
 public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
 {
@@ -41,6 +51,7 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
     initialize();
   }
 
+
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.AbstractBindingEditorDialog
   @Override
@@ -63,13 +74,14 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
   }
 
   @Override
-  ProxySubject createNewProxySubject(final Object id,
-                                     ExpressionSubject exp)
+  ProxySubject createNewProxySubject(final IdentifierSubject ident,
+                                     ExpressionSubject expr)
   {
-    if(exp == null){
-      exp = new PlainEventListSubject();
+    final String name = ident.toString();
+    if (expr == null){
+      expr = new PlainEventListSubject();
     }
-    return new ParameterBindingSubject((String) id, exp);
+    return new ParameterBindingSubject(name, expr);
   }
 
   @Override
@@ -86,19 +98,30 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
   }
 
   @Override
-  String getProxyName()
+  FormattedInputParser createInputParser(final IdentifierProxy oldIdent,
+                                         final ExpressionParser parser)
   {
-    if (mBinding == null) {
-      return null;
-    }
-    return mBinding.getName();
+    final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) oldIdent;
+    return new SimpleIdentifierInputParser(simple, parser);
   }
 
   @Override
-  String getProxyName(final ProxySubject template)
+  IdentifierSubject getProxyIdentifier()
+  {
+    if (mBinding == null) {
+      return null;
+    } else {
+      final String name = mBinding.getName();
+      return new SimpleIdentifierSubject(name);
+    }
+  }
+
+  @Override
+  IdentifierSubject getProxyIdentifier(final ProxySubject template)
   {
     final ParameterBindingSubject para = (ParameterBindingSubject) template;
-    return para.getName();
+    final String name = para.getName();
+    return new SimpleIdentifierSubject(name);
   }
 
   @Override
@@ -114,10 +137,12 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
   }
 
   @Override
-  void setIdentifier(final ProxySubject template, final Object id)
+  void setIdentifier(final ProxySubject template,
+                     final IdentifierSubject ident)
   {
     final ParameterBindingSubject para = (ParameterBindingSubject) template;
-    para.setName((String) id);
+    final String name = ident.toString();
+    para.setName(name);
   }
 
   @Override
@@ -125,12 +150,6 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
   {
     final ParameterBindingSubject para = (ParameterBindingSubject) template;
     para.setExpression(exp);
-  }
-
-  @Override
-  Object getInput(final SimpleExpressionCell name)
-  {
-    return name.getText();
   }
 
 

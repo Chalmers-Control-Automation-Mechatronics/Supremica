@@ -1,24 +1,33 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.gui
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   EventAliasEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
+import net.sourceforge.waters.gui.FormattedInputParser;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
+
+/**
+ * @author Carly Hona
+ */
 
 public class EventAliasEditorDialog extends AbstractBindingEditorDialog
 {
@@ -66,13 +75,17 @@ public class EventAliasEditorDialog extends AbstractBindingEditorDialog
   }
 
   @Override
-  ProxySubject createNewProxySubject(final Object id,
+  ProxySubject createNewProxySubject(IdentifierSubject ident,
                                      ExpressionSubject exp)
   {
-    if(exp == null){
+    if (ident.getParent() != null) {
+      final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+      ident = (IdentifierSubject) cloner.getClone(ident);
+    }
+    if (exp == null){
       exp = new PlainEventListSubject();
     }
-    return new EventAliasSubject((IdentifierProxy) id, exp);
+    return new EventAliasSubject(ident, exp);
   }
 
   @Override
@@ -89,19 +102,27 @@ public class EventAliasEditorDialog extends AbstractBindingEditorDialog
   }
 
   @Override
-  String getProxyName()
+  FormattedInputParser createInputParser(final IdentifierProxy oldIdent,
+                                         final ExpressionParser parser)
   {
-    if (mAlias == null) {
-      return null;
-    }
-    return mAlias.getName();
+    return new IdentifierInputParser(oldIdent, parser);
   }
 
   @Override
-  String getProxyName(final ProxySubject template)
+  IdentifierSubject getProxyIdentifier()
+  {
+    if (mAlias == null) {
+      return null;
+    } else {
+      return mAlias.getIdentifier();
+    }
+  }
+
+  @Override
+  IdentifierSubject getProxyIdentifier(final ProxySubject template)
   {
     final EventAliasSubject temp = (EventAliasSubject) template;
-    return temp.getName();
+    return temp.getIdentifier();
   }
 
   @Override
@@ -118,10 +139,11 @@ public class EventAliasEditorDialog extends AbstractBindingEditorDialog
   }
 
   @Override
-  void setIdentifier(final ProxySubject template, final Object id)
+  void setIdentifier(final ProxySubject template,
+                     final IdentifierSubject ident)
   {
-    final EventAliasSubject temp = (EventAliasSubject) template;
-    temp.setIdentifier((IdentifierSubject) id);
+    final EventAliasSubject alias = (EventAliasSubject) template;
+    alias.setIdentifier(ident);
   }
 
   @Override
@@ -129,12 +151,6 @@ public class EventAliasEditorDialog extends AbstractBindingEditorDialog
   {
     final EventAliasSubject temp = (EventAliasSubject) template;
     temp.setExpression(exp);
-  }
-
-  @Override
-  Object getInput(final SimpleExpressionCell name)
-  {
-    return name.getValue();
   }
 
 

@@ -1,13 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.gui
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   AbstractBindingEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui;
+
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -29,6 +30,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
+import net.sourceforge.waters.gui.ErrorLabel;
+import net.sourceforge.waters.gui.FormattedInputParser;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
@@ -40,16 +44,21 @@ import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.ExpressionProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
+
+/**
+ * @author Carly Hona
+ */
 
 public abstract class AbstractBindingEditorDialog extends JDialog
 {
@@ -88,16 +97,18 @@ public abstract class AbstractBindingEditorDialog extends JDialog
   abstract SelectionOwner getSelectionOwner();
   abstract ProxySubject getProxySubject();
   abstract void setProxySubject(ProxySubject template);
-  abstract ProxySubject createNewProxySubject(Object id, ExpressionSubject exp);
+  abstract ProxySubject createNewProxySubject(IdentifierSubject ident,
+                                              ExpressionSubject exp);
   abstract ExpressionSubject getExpression();
   abstract ExpressionSubject getExpression(ProxySubject template);
-  abstract String getProxyName();
-  abstract String getProxyName(ProxySubject template);
+  abstract FormattedInputParser createInputParser(IdentifierProxy ident,
+                                                  ExpressionParser parser);
+  abstract IdentifierSubject getProxyIdentifier();
+  abstract IdentifierSubject getProxyIdentifier(ProxySubject template);
   abstract int getOperatorMask();
   abstract ProxySubject createTemplate();
-  abstract void setIdentifier(ProxySubject template, Object id);
+  abstract void setIdentifier(ProxySubject template, IdentifierSubject ident);
   abstract void setExpression(ProxySubject template, ExpressionSubject exp);
-  abstract Object getInput(SimpleExpressionCell name);
 
   Transferable createBlankTransferable()
   {
@@ -139,12 +150,9 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
-    final String oldname = getProxyName(template);
-    final SimpleIdentifierSubject ident =
-      new SimpleIdentifierSubject(oldname);
-    final SimpleIdentifierInputParser nameparser =
-      new SimpleIdentifierInputParser(ident, parser);
-    mNameInput = new SimpleExpressionCell(ident, nameparser);
+    final IdentifierSubject oldIdent = getProxyIdentifier(template);
+    final FormattedInputParser nameparser = createInputParser(oldIdent, parser);
+    mNameInput = new SimpleExpressionCell(oldIdent, nameparser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter the name");
     mExpressionLabel = new JLabel("Expression:");
@@ -292,43 +300,42 @@ public abstract class AbstractBindingEditorDialog extends JDialog
           (SimpleExpressionSubject) mExpressionInput.getValue();
         exp = makeUnique(exp0);
       }
-      final Object name = getInput(mNameInput);
+      final IdentifierSubject ident =
+        (IdentifierSubject) mNameInput.getValue();
       final SelectionOwner panel = getSelectionOwner();
       final ProxySubject subject = getProxySubject();
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
       ProxySubject template = (ProxySubject) cloner.getClone(subject);
       if (subject == null) {
-        template = createNewProxySubject(name, exp);
+        template = createNewProxySubject(ident, exp);
         final InsertInfo insert = new InsertInfo(template, mInsertPosition);
         final List<InsertInfo> list = Collections.singletonList(insert);
         final Command command = new InsertCommand(list, panel, mRoot);
         setProxySubject(template);
         mRoot.getUndoInterface().executeCommand(command);
       } else {
-        final String oldname = getProxyName();
-        final boolean namechange = !name.equals(oldname);
+        final ModuleEqualityVisitor eq =
+          ModuleEqualityVisitor.getInstance(true);
+        final IdentifierSubject oldIdent = getProxyIdentifier();
+        final boolean namechange = !eq.equals(ident, oldIdent);
         final ExpressionSubject oldExp = getExpression();
         boolean expchange = false;
-        if (exp == null){
-          if(oldExp instanceof SimpleExpressionProxy) {
+        if (exp == null) {
+          if (oldExp instanceof SimpleExpressionProxy) {
             exp = new PlainEventListSubject();
             expchange = true;
           }
         } else {
-          final ModuleEqualityVisitor eq =
-            ModuleEqualityVisitor.getInstance(true);
           expchange = !eq.equals(exp, oldExp);
         }
-        if (namechange) {
-          setIdentifier(template, name);
-        }
-        if (expchange) {
-          setExpression(template, exp);
-        }
-        final ModuleEqualityVisitor equalityChecker =
-          ModuleEqualityVisitor.getInstance(true);
-        if (!equalityChecker.equals(subject, template)) {
+        if (namechange || expchange) {
+          if (namechange) {
+            setIdentifier(template, ident);
+          }
+          if (expchange) {
+            setExpression(template, exp);
+          }
           final Command command = new EditCommand(subject, template, panel);
           mRoot.getUndoInterface().executeCommand(command);
         }

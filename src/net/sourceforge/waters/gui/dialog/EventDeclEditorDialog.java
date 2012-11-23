@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   EventEditorDialog
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
+//# CLASS:   EventDeclEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
@@ -59,6 +59,13 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.ErrorLabel;
+import net.sourceforge.waters.gui.FormattedInputParser;
+import net.sourceforge.waters.gui.IconLoader;
+import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.PropositionIcon;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
@@ -89,6 +96,10 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.supremica.properties.Config;
 
+
+/**
+ * @author Robi Malik
+ */
 
 public class EventDeclEditorDialog
   extends JDialog

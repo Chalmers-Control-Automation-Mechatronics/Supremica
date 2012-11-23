@@ -1,13 +1,13 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   InstanceEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -42,6 +42,10 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
+import net.sourceforge.waters.gui.ErrorLabel;
+import net.sourceforge.waters.gui.FormattedInputParser;
+import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
@@ -71,6 +75,10 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
+/**
+ * @author Carly Hona
+ */
+
 public class InstanceEditorDialog extends JDialog
 {
 
@@ -84,7 +92,7 @@ public class InstanceEditorDialog extends JDialog
   public InstanceEditorDialog(final ModuleWindowInterface root,
                               final InstanceSubject inst)
   {
-    setTitle("Instance Component Editor");
+    setTitle("Instance Editor");
     mRoot = root;
     mInstance = inst;
     createComponents();

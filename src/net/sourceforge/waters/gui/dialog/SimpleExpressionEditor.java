@@ -1,22 +1,27 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.waters.gui
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   SimpleExpressionEditor
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JTable;
 
+import net.sourceforge.waters.gui.ErrorDisplay;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 
+
+/**
+ * @author Robi Malik
+ */
 
 public class SimpleExpressionEditor
   extends DefaultCellEditor
@@ -47,19 +52,19 @@ public class SimpleExpressionEditor
 
   //#########################################################################
   //# Simple Access
-  void setAllowNull(final boolean allow)
+  public void setAllowNull(final boolean allow)
   {
     final SimpleExpressionCell cell = getComponent();
     cell.setAllowNull(allow);
   }
 
-  void setToolTipText(final String tooltip)
+  public void setToolTipText(final String tooltip)
   {
     final SimpleExpressionCell cell = getComponent();
     cell.setToolTipText(tooltip);
   }
 
-  void addFocusListener(final FocusListener listener)
+  public void addFocusListener(final FocusListener listener)
   {
     final SimpleExpressionCell cell = getComponent();
     cell.addFocusListener(listener);

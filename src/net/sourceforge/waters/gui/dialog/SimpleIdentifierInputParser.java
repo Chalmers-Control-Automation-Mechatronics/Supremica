@@ -1,42 +1,47 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   SimpleIdentifierInputParser
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import net.sourceforge.waters.gui.FormattedInputParser;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 
-class SimpleIdentifierInputParser
+/**
+ * @author Robi Malik
+ */
+
+public class SimpleIdentifierInputParser
   extends DocumentFilter
   implements FormattedInputParser
 {
 
   //#########################################################################
   //# Constructor
-  SimpleIdentifierInputParser(final SimpleIdentifierProxy oldident,
-                              final ExpressionParser parser)
+  public SimpleIdentifierInputParser(final SimpleIdentifierProxy oldident,
+                                     final ExpressionParser parser)
   {
     mOldName = oldident.getName();
     mOldIdentifier = oldident;
     mExpressionParser = parser;
   }
 
-  SimpleIdentifierInputParser(final String oldname,
-                              final ExpressionParser parser)
+  public SimpleIdentifierInputParser(final String oldname,
+                                     final ExpressionParser parser)
   {
     mOldName = oldname;
     mOldIdentifier = new SimpleIdentifierSubject(oldname);
@@ -46,7 +51,7 @@ class SimpleIdentifierInputParser
 
   //#########################################################################
   //# Simple Access
-  String getOldName()
+  public String getOldName()
   {
     return mOldName;
   }

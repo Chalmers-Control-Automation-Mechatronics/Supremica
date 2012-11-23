@@ -1,19 +1,20 @@
 //# -*-  indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   VariableMarkingTableModel
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;

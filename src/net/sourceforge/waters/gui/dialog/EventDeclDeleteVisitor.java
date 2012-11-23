@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   EventDeclDeleteVisitor
 //###########################################################################
 //# $Id: f375c8944815472a3899ed383590675643eacdde $
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import gnu.trove.THashSet;
 
@@ -22,6 +22,9 @@ import java.util.ListIterator;
 import java.util.Set;
 import javax.swing.JOptionPane;
 
+import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
@@ -57,13 +60,17 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 
-class EventDeclDeleteVisitor
+/**
+ * @author Carly Hona, Robi Malik
+ */
+
+public class EventDeclDeleteVisitor
   extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################
   //# Constructor
-  EventDeclDeleteVisitor(final ModuleWindowInterface root)
+  public EventDeclDeleteVisitor(final ModuleWindowInterface root)
   {
     mRoot = root;
     mNames = null;
@@ -75,7 +82,7 @@ class EventDeclDeleteVisitor
 
   //#########################################################################
   //# Invocation
-  List<InsertInfo> getDeletionVictims
+  public List<InsertInfo> getDeletionVictims
     (final List<? extends EventDeclProxy> decls, final String action)
   {
     try {
@@ -111,7 +118,7 @@ class EventDeclDeleteVisitor
     }
   }
 
-  void insertItems(final List<InsertInfo> inserts)
+  public void insertItems(final List<InsertInfo> inserts)
   {
     final EditorWindowInterface iface = mRoot.getActiveEditorWindowInterface();
     final GraphEditorPanel surface;
@@ -160,7 +167,7 @@ class EventDeclDeleteVisitor
     }
   }
 
-  void deleteItems(final List<InsertInfo> deletes)
+  public void deleteItems(final List<InsertInfo> deletes)
   {
     final ModuleSubject module = mRoot.getModuleSubject();
     final List<EventDeclSubject> events = module.getEventDeclListModifiable();

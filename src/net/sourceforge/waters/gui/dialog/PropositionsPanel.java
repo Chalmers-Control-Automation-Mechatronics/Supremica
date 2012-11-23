@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   AttributesPanel
+//# PACKAGE: net.sourceforge.waters.gui.dialog
+//# CLASS:   PropositionsPanel
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Container;
@@ -22,6 +22,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
+import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.PropositionsTree;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;

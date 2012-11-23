@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   SimpleExpressionDocumentFilter
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -16,6 +16,10 @@ import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
 
+
+/**
+ * @author Robi Malik
+ */
 
 class SimpleExpressionDocumentFilter
   extends DocumentFilter
