@@ -1,20 +1,23 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   FormattedInputParser
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
+///# CLASS:   FormattedInputParser
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import net.sourceforge.waters.model.expr.ParseException;
 
 import javax.swing.text.DocumentFilter;
 
 
+/**
+ * @author Robi Malik
+ */
 
 public interface FormattedInputParser
 {

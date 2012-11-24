@@ -1,20 +1,25 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
 //# CLASS:   ErrorLabel
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+import net.sourceforge.waters.gui.ErrorDisplay;
 
+
+/**
+ * @author Robi Malik
+ */
 
 public class ErrorLabel
   extends JLabel

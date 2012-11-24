@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import org.supremica.properties.Config;

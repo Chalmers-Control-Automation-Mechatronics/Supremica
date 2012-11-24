@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.util;
 
 import java.net.URL;
 

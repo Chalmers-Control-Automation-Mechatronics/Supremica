@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;

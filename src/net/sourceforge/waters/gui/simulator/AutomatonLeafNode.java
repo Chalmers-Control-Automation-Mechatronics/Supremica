@@ -5,8 +5,8 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;

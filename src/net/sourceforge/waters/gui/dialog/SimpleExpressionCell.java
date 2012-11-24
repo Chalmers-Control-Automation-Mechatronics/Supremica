@@ -22,7 +22,6 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.ErrorDisplay;
-import net.sourceforge.waters.gui.FormattedInputParser;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;

@@ -8,7 +8,7 @@
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.util;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.swing.Icon;
 
+import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 
 

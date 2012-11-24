@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import net.sourceforge.waters.gui.FormattedInputParser;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.expr.ExpressionParser;

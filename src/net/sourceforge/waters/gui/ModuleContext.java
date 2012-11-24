@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 import javax.swing.Icon;
 
 import net.sourceforge.waters.gui.language.ProxyNamer;
+import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.ParseException;

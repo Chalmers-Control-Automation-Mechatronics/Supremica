@@ -60,8 +60,6 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.ErrorLabel;
-import net.sourceforge.waters.gui.FormattedInputParser;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;

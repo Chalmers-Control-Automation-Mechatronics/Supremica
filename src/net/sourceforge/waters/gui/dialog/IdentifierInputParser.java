@@ -12,7 +12,6 @@ package net.sourceforge.waters.gui.dialog;
 
 import javax.swing.text.DocumentFilter;
 
-import net.sourceforge.waters.gui.FormattedInputParser;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;

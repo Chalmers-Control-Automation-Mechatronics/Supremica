@@ -42,8 +42,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 
-import net.sourceforge.waters.gui.ErrorLabel;
-import net.sourceforge.waters.gui.FormattedInputParser;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
