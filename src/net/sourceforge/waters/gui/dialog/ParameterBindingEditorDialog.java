@@ -13,13 +13,18 @@ import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.transfer.ProxyTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.ExpressionSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -44,6 +49,21 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
   {
     super(root);
     mBinding = binding;
+    final SelectionOwner panel = getSelectionOwner();
+    final Proxy anchor = panel.getSelectionAnchor();
+    if (anchor == null) {
+      mExistingBindings = null;
+    } else if (anchor instanceof InstanceSubject) {
+      final InstanceSubject inst = (InstanceSubject) anchor;
+      mExistingBindings = inst.getBindingListModifiable();
+    } else if (anchor instanceof ProxySubject) {
+      final ProxySubject subject = (ProxySubject) anchor;
+      final InstanceSubject inst =
+        SubjectTools.getAncestor(subject, InstanceSubject.class);
+      mExistingBindings = inst.getBindingListModifiable();
+    } else {
+      mExistingBindings = null;
+    }
     if (binding == null) {
       setTitle("Creating new Parameter Binding");
     } else {
@@ -103,7 +123,7 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
                                          final ExpressionParser parser)
   {
     final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) oldIdent;
-    return new SimpleIdentifierInputParser(simple, parser);
+    return new ParameterBindingInputParser(simple, parser);
   }
 
   @Override
@@ -157,8 +177,49 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
 
 
   //#########################################################################
+  //# Inner Class ParameterBindingInputParser
+  private class ParameterBindingInputParser
+  extends SimpleIdentifierInputParser
+  {
+    //#######################################################################
+    //# Constructor
+    ParameterBindingInputParser(final SimpleIdentifierProxy oldname,
+                                final ExpressionParser parser)
+    {
+      super(oldname, parser);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    @Override
+    public SimpleIdentifierProxy parse(final String text)
+      throws ParseException
+    {
+      final SimpleIdentifierProxy ident = super.parse(text);
+      if (mExistingBindings != null && ident != getOldIdentifier()) {
+        final String name = ident.getName();
+        if (mExistingBindings.containsName(name)) {
+          final InstanceSubject inst =
+            SubjectTools.getAncestor(mExistingBindings, InstanceSubject.class);
+          final String instName = inst.getName();
+          final StringBuffer buffer = new StringBuffer("Instance '");
+          buffer.append(instName);
+          buffer.append("' already has a binding for '");
+          buffer.append(name);
+          buffer.append("'!");
+          final String msg = buffer.toString();
+          throw new ParseException(msg, 0);
+        }
+      }
+      return ident;
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private ParameterBindingSubject mBinding;
+  private final IndexedListSubject<ParameterBindingSubject> mExistingBindings;
 
 
   //#########################################################################

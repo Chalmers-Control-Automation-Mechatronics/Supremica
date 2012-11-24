@@ -893,8 +893,8 @@ public abstract class ModuleTree
         }
         final ProxySubject dropTarget =
           (ProxySubject) dropPath.getLastPathComponent();
-        boolean moveWithin = true;
-        if (support.getDropAction() == MOVE) {
+        boolean moveWithin = support.getDropAction() == MOVE;
+        if (moveWithin) {
           final int min = getMinSelectionRow();
           final int max = getMaxSelectionRow();
           for (int row = min; row <= max; row++) {

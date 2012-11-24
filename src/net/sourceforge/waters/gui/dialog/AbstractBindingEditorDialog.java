@@ -211,6 +211,9 @@ public abstract class AbstractBindingEditorDialog extends JDialog
    */
   private void layoutComponents()
   {
+    mNameInput.setColumns(30);
+    mExpressionInput.setColumns(30);
+
     final GridBagConstraints constraints = new GridBagConstraints();
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
@@ -226,14 +229,12 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     mainlayout.setConstraints(mNameLabel, constraints);
     mMainPanel.add(mNameLabel);
 
-    mNameInput.setColumns(20);
     constraints.gridx++;
     constraints.gridwidth = 1;
     constraints.weightx = 1.0;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     mainlayout.setConstraints(mNameInput, constraints);
     mMainPanel.add(mNameInput);
-    mNameInput.setColumns(20);
 
     constraints.gridy++;
     constraints.weightx = 0.0;
@@ -340,6 +341,7 @@ public abstract class AbstractBindingEditorDialog extends JDialog
       dispose();
     }
   }
+
 
   //#########################################################################
   //# Auxiliary Methods

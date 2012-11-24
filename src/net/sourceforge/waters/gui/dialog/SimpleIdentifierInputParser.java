@@ -55,6 +55,11 @@ public class SimpleIdentifierInputParser
     return mOldName;
   }
 
+  public SimpleIdentifierProxy getOldIdentifier()
+  {
+    return mOldIdentifier;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.FormattedInputParser
