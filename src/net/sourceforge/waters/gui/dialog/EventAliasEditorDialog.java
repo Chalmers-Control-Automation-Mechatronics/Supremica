@@ -10,7 +10,9 @@
 package net.sourceforge.waters.gui.dialog;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.transfer.ProxyTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -131,10 +133,11 @@ public class EventAliasEditorDialog extends AbstractBindingEditorDialog
   }
 
   @Override
-  ProxySubject createTemplate()
+  ProxyTransferable createTemplateTransferable()
   {
-    return new EventAliasSubject(new SimpleIdentifierSubject(""),
-                                 new SimpleIdentifierSubject(""));
+   final EventAliasSubject template = new EventAliasSubject
+     (new SimpleIdentifierSubject(""), new SimpleIdentifierSubject(""));
+    return WatersDataFlavor.createTransferable(template, false);
   }
 
   @Override

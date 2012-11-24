@@ -398,35 +398,25 @@ public abstract class ModuleTree
     }
     DataFlavor flavor =
       mAcceptTransferableVisitor.getFlavorIfDropAllowed(anchor, transferable);
-    ListSubject<? extends ProxySubject> listInModule =
-      mModel.getChildren(anchor);
-    Proxy parent = null;
-    int pos;
-    if (flavor != null) {
-      pos = listInModule.size();
-    } else {
+    Proxy parent = anchor;
+    while (flavor == null) {
+      anchor = parent;
       parent = mModel.getProperAncestorInTree((Subject) anchor);
-      flavor =
-        mAcceptTransferableVisitor.getFlavorIfDropAllowed(parent,
-                                                          transferable);
-      listInModule = mModel.getChildren(parent);
-      pos = mModel.getIndexOfChild(parent, anchor) + 1;
-      if (flavor == null) {
+      if (parent == null) {
         return null;
       }
+      flavor =
+        mAcceptTransferableVisitor.getFlavorIfDropAllowed(parent, transferable);
+    };
+    final ListSubject<? extends ProxySubject> listInModule =
+      mModel.getChildren(parent);
+    final int pos;
+    if (parent == anchor) {
+      pos = listInModule.size();
+    } else {
+      pos = mModel.getIndexOfChild(parent, anchor) + 1;
     }
-    if (flavor == WatersDataFlavor.IDENTIFIER
-      && transferable
-        .isDataFlavorSupported(WatersDataFlavor.EVENT_ALIAS)) {
-      flavor = WatersDataFlavor.EVENT_ALIAS;
-    }
-
-    List<InsertInfo> result = new ArrayList<InsertInfo>(pos);
-    result =
-      getInsertInfo(transferable, flavor, listInModule,
-                    parent == null ? anchor : parent, pos);
-
-    return result;
+    return getInsertInfo(transferable, flavor, listInModule, parent, pos);
   }
 
   public boolean canDelete(final List<? extends Proxy> items)
@@ -1154,24 +1144,24 @@ public abstract class ModuleTree
     }
 
     private boolean isInList(final List<Proxy> listOfEvents)
+      throws VisitorException
     {
-      if (mTransferable
-        .isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
+      if (mTransferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
         try {
+          final ModuleEqualityVisitor eq =
+            ModuleEqualityVisitor.getInstance(false);
           @SuppressWarnings("unchecked")
-          final List<Proxy> transferData =
-            (List<Proxy>) mTransferable
-              .getTransferData(WatersDataFlavor.IDENTIFIER);
+          final List<Proxy> transferData = (List<Proxy>)
+            mTransferable.getTransferData(WatersDataFlavor.IDENTIFIER);
           for (final Proxy transferredProxy : transferData) {
-            if (!ModuleEqualityVisitor.getInstance(false)
-              .contains(listOfEvents, transferredProxy)) {
+            if (!eq.contains(listOfEvents, transferredProxy)) {
               return false;
             }
           }
         } catch (final UnsupportedFlavorException exception) {
-          throw new WatersRuntimeException(exception);
+          throw new VisitorException(exception);
         } catch (final IOException exception) {
-          throw new WatersRuntimeException(exception);
+          throw new VisitorException(exception);
         }
       }
       return true;
@@ -1189,6 +1179,7 @@ public abstract class ModuleTree
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
     public DataFlavor visitEventAliasProxy(final EventAliasProxy alias)
+      throws VisitorException
     {
       final EventAliasSubject event = (EventAliasSubject) alias;
       final ExpressionProxy exp = event.getExpression();
@@ -1202,6 +1193,7 @@ public abstract class ModuleTree
 
     @Override
     public DataFlavor visitForeachProxy(final ForeachProxy foreach)
+      throws VisitorException
     {
       final Subject subject = (Subject) foreach;
       if (SubjectTools.getAncestor(subject, EventAliasSubject.class,
@@ -1227,7 +1219,9 @@ public abstract class ModuleTree
       return WatersDataFlavor.PARAMETER_BINDING;
     }
 
+    @Override
     public DataFlavor visitParameterBindingProxy(final ParameterBindingProxy binding)
+      throws VisitorException
     {
       final ParameterBindingSubject event = (ParameterBindingSubject) binding;
       final ExpressionProxy exp = event.getExpression();
@@ -1242,11 +1236,14 @@ public abstract class ModuleTree
       return null;
     }
 
-    public DataFlavor visitSimpleNodeProxy(final SimpleNodeProxy node){
-
+    @Override
+    public DataFlavor visitSimpleNodeProxy(final SimpleNodeProxy node)
+    {
       return WatersDataFlavor.IDENTIFIER;
     }
 
+    //#######################################################################
+    //# Data Members
     private Transferable mTransferable;
   }
 

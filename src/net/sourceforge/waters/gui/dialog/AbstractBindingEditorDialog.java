@@ -15,7 +15,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,10 +34,11 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
+import net.sourceforge.waters.gui.transfer.ProxyTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.ExpressionProxy;
@@ -104,14 +104,9 @@ public abstract class AbstractBindingEditorDialog extends JDialog
   abstract IdentifierSubject getProxyIdentifier();
   abstract IdentifierSubject getProxyIdentifier(ProxySubject template);
   abstract int getOperatorMask();
-  abstract ProxySubject createTemplate();
+  abstract ProxyTransferable createTemplateTransferable();
   abstract void setIdentifier(ProxySubject template, IdentifierSubject ident);
   abstract void setExpression(ProxySubject template, ExpressionSubject exp);
-
-  Transferable createBlankTransferable()
-  {
-    return WatersDataFlavor.createTransferable(createTemplate());
-  }
 
 
   //#########################################################################
@@ -124,11 +119,15 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     ProxySubject template;
     if (getProxySubject() == null) {
       try {
-        template = createTemplate();
         final SelectionOwner panel = getSelectionOwner();
-        final List<InsertInfo> inserts = panel.getInsertInfo(createBlankTransferable());
+        final ProxyTransferable transferable = createTemplateTransferable();
+        final List<InsertInfo> inserts = panel.getInsertInfo(transferable);
         final InsertInfo insert = inserts.get(0);
         mInsertPosition = insert.getInsertPosition();
+        final ModuleProxyCloner cloner =
+          ModuleSubjectFactory.getCloningInstance();
+        final Proxy raw = transferable.getRawData().get(0);
+        template = (ProxySubject) cloner.getClone(raw);
       } catch (final IOException exception) {
         throw new WatersRuntimeException(exception);
       } catch (final UnsupportedFlavorException exception) {
