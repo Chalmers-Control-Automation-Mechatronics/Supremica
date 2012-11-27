@@ -353,7 +353,7 @@ public class CompositionalSynthesizerExperiments
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
     final long start = System.currentTimeMillis();
-    runModel("handwritten", null, "transferline.wmod", bindings);
+    runModel("handwritten", null, "transferline_uncont.wmod", bindings);
     final long stop = System.currentTimeMillis();
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(System.out);
