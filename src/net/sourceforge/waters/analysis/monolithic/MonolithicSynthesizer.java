@@ -10,13 +10,13 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,18 +25,21 @@ import java.util.Map;
 import java.util.Queue;
 
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
-import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
+import net.sourceforge.waters.model.analysis.AbstractModelBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.AutomatonResult;
+import net.sourceforge.waters.model.analysis.DefaultProductDESResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.ProductDESResult;
+import net.sourceforge.waters.model.analysis.ProxyResult;
+import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -58,8 +61,8 @@ import org.apache.log4j.Logger;
  * @author Simon Ware, Rachel Francis, Robi Malik
  */
 
-public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
-  SynchronousProductBuilder
+public class MonolithicSynthesizer extends
+  AbstractModelBuilder<ProductDESProxy> implements SupervisorSynthesizer
 {
 
   //#########################################################################
@@ -97,23 +100,30 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     mUsedPropositions = props;
   }
 
-  public void addMask(final Collection<EventProxy> hidden,
-                      final EventProxy replacement)
-  {
-
-  }
-
-  public void clearMask()
-  {
-
-  }
-
   public SynchronousProductStateMap getStateMap()
   {
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();
     final MemStateMap stateMap = new MemStateMap(automata, mDeadlockState);
     return stateMap;
+  }
+
+  @Override
+  public ProductDESResult createAnalysisResult()
+  {
+    return new DefaultProductDESResult();
+  }
+
+  @Override
+  public ProductDESResult getAnalysisResult()
+  {
+    return (ProductDESResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public ProductDESProxy getComputedProductDES()
+  {
+    return getAnalysisResult().getComputedProductDES();
   }
 
   //#########################################################################
@@ -123,6 +133,10 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     try {
       setUp();
       final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
+      mNonCoreachableStates = new BitSet(mNumStates);
+      mReachableStates = new BitSet(mNumStates);
+      mBadStates = new BitSet(mNumStates);
+      mCoreachabilityChanged = mControllabilityChanged = true;
       final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
       mStates = new TObjectIntHashMap<int[]>(strategy);
       mStates.ensureCapacity(tableSize);
@@ -132,14 +146,103 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
       mNumStates = 0;
       mUnvisited = new ArrayDeque<int[]>(100);
       permutations(mNumAutomata, null, -1, -1);
+      mNDTuple2 = Arrays.copyOf(mNDTuple, mNumAutomata);
       mNumInitialStates = mNumStates;
       while (!mUnvisited.isEmpty()) {
         final int[] tuple = mUnvisited.remove();
         explore(tuple);
       }
+      while (mCoreachabilityChanged || mControllabilityChanged) {
+        //trim
+        mNonCoreachableStates.set(0, mNumStates);
+        mNumCoreachableStates = 0;
+        mCoreachabilityChanged = false;
+        tuples: for (int t = 0; t < mStateTuples.size(); t++) {
+          if (!mBadStates.get(t)) {
+            final int[] aTuple = mStateTuples.get(t);
+            for (int aut = 0; aut < aTuple.length; aut++) {
+              if (!mStateMarkings[aut][aTuple[aut]].isEmpty()) {
+                if (aut == aTuple.length - 1) {
+                  mUnvisited.add(mStateTuples.get(t));
+                  mNonCoreachableStates.set(t, false);
+                  mNumCoreachableStates++;
+                }
+              } else {
+                continue tuples;
+              }
+            }
+            if (aTuple.length == 0) {
+              mNonCoreachableStates.set(t, false);
+              mNumCoreachableStates++;
+            }
+          }
+        }
+        while (!mUnvisited.isEmpty()) {
+          final int[] ss = mUnvisited.remove();
+          exploreCoreachableStates(ss);
+        }
+        if (mNumCoreachableStates != mLastNumCoreachableStates) {
+          mCoreachabilityChanged = true;
+          mLastNumCoreachableStates = mNumCoreachableStates;
+        }
+        if (!mCoreachabilityChanged && !mControllabilityChanged) {
+          break;
+        }
+        for (int b = 0; b < mNumInitialStates; b++) {
+          if (!mBadStates.get(b) && mNonCoreachableStates.get(b)) {
+            initialIsBad = true;
+          }
+        }
+        mBadStates.or(mNonCoreachableStates);
+        //mark uncontrollable states (bad states)
+        mControllabilityChanged = false;
+        for (int e = 0; e < mNumUncontrollableEvents; e++) {
+          states: for (int state = 0; state < mStateTuples.size(); state++) {
+            if (!mBadStates.get(state)) {
+              exploreSuccessorStates(mStateTuples.get(state));
+              for (int a = 0; a < mEventAutomata[e].length; a++) {
+                final int aut = mEventAutomata[e][a];
+                final int source = mStateTuples.get(state)[aut];
+                if (mTransitions[aut][e][source] == null) {
+                  if (aut < mNumPlants) {
+                    continue states;
+                  } else {
+                    if (state < mNumInitialStates) {
+                      initialIsBad = true;
+                    }
+                    mBadStates.set(state);
+                    mControllabilityChanged = true;
+                  }
+                }
+              }
+            }
+          }
+        }
+        if (!mCoreachabilityChanged && !mControllabilityChanged) {
+          break;
+        }
+      }
+      mUnvisited = new ArrayDeque<int[]>(100);
+      reachableStatesPermutations(mNumAutomata, null, -1, -1);
+      while (!mUnvisited.isEmpty()) {
+        final int[] tuple = mUnvisited.remove();
+        exploreReachableStates(tuple);
+      }
+      for (int b = 0; b < mNumInitialStates; b++) {
+        if (!mReachableStates.get(b)) {
+          initialIsBad = true;
+        }
+      }
+
+      if (initialIsBad) {
+        return setBooleanResult(false);
+      }
+
       if (getConstructsResult()) {
         final AutomatonProxy aut = createAutomaton();
-        return setAutomatonResult(aut);
+        final ProductDESProxy des =
+          AutomatonTools.createProductDESProxy(aut, getFactory());
+        return setProxyResult(des);
       } else {
         return true;
       }
@@ -182,9 +285,25 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
 
     final ProductDESProxy model = getModel();
     final Collection<EventProxy> events = model.getEvents();
-    final Collection<AutomatonProxy> automata = model.getAutomata();
     mNumEvents = events.size();
-    mNumAutomata = automata.size();
+
+    final KindTranslator translator = getKindTranslator();
+
+    ArrayList<AutomatonProxy> plants = new ArrayList<AutomatonProxy>();
+    ArrayList<AutomatonProxy> specs = new ArrayList<AutomatonProxy>();
+    for (final AutomatonProxy aut : model.getAutomata()) {
+      if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
+        plants.add(aut);
+      } else if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
+        specs.add(aut);
+      }
+    }
+    mNumAutomata = plants.size() + specs.size();
+    mNumPlants = plants.size();
+    mAutomata = new ArrayList<AutomatonProxy>(mNumAutomata);
+    mAutomata.addAll(plants);
+    mAutomata.addAll(specs);
+    plants = specs = null;
 
     TObjectIntHashMap<EventProxy> eventToIndex =
       new TObjectIntHashMap<EventProxy>(mNumEvents);
@@ -195,22 +314,21 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     }
 
     int numProperEvents = 0;
-    final KindTranslator translator = getKindTranslator();
-    for(final EventProxy event : events){
-      if (translator.getEventKind(event) != EventKind.PROPOSITION){
+    for (final EventProxy event : events) {
+      if (translator.getEventKind(event) != EventKind.PROPOSITION) {
         numProperEvents += 1;
       }
     }
     int unctrlEvents = 0;
-    int ctrlEvents = numProperEvents -1;
+    int ctrlEvents = numProperEvents - 1;
     for (final EventProxy event : events) {
       if (translator.getEventKind(event) == EventKind.PROPOSITION) {
         if (mUsedPropositions == null) {
           mCurrentPropositions.add(event);
         }
-      } else if(translator.getEventKind(event) == EventKind.UNCONTROLLABLE){
+      } else if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
         eventToIndex.put(event, unctrlEvents++);
-      } else if(translator.getEventKind(event) == EventKind.CONTROLLABLE){
+      } else if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
         eventToIndex.put(event, ctrlEvents--);
       }
     }
@@ -232,15 +350,17 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     mStateMarkings = new List<?>[mNumAutomata][];
     // transitions indexed first by automaton then by event then by source state
     mTransitions = new int[mNumAutomata][mNumProperEvents][][];
+    mReverseTransitions = new int[mNumAutomata][mNumProperEvents][][];
 
     mDeadlock = new boolean[mNumAutomata][];
 
     mTargetTuple = new int[mNumAutomata];
     mNDTuple = new int[mNumAutomata][];
+    mNDTupleRvs = new int[mNumAutomata][];
     mDeadlockState = -1;
 
     int a = 0;
-    for (final AutomatonProxy aut : automata) {
+    for (final AutomatonProxy aut : mAutomata) {
       final Collection<EventProxy> localEvents = aut.getEvents();
       final List<EventProxy> nonLocalProps =
         new ArrayList<EventProxy>(numProps);
@@ -289,11 +409,14 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
       mNDTuple[a] = initials.toNativeArray();
       final TIntArrayList[][] autTransitionLists =
         new TIntArrayList[mNumProperEvents][numStates];
+      final TIntArrayList[][] autTransitionListsRvs =
+        new TIntArrayList[mNumProperEvents][numStates];
       for (final TransitionProxy trans : aut.getTransitions()) {
         final int event = eventToIndex.get(trans.getEvent());
         final int source = stateToIndex.get(trans.getSource());
         final int target = stateToIndex.get(trans.getTarget());
         TIntArrayList list = autTransitionLists[event][source];
+        TIntArrayList listRvs = autTransitionListsRvs[event][target];
         if (list == null) {
           list = new TIntArrayList(1);
           autTransitionLists[event][source] = list;
@@ -302,16 +425,27 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
         if (source != target) {
           mDeadlock[a][source] = false;
         }
+        if (listRvs == null) {
+          listRvs = new TIntArrayList(1);
+          autTransitionListsRvs[event][target] = listRvs;
+        }
+        listRvs.add(source);
       }
       for (final EventProxy event : localEvents) {
         if (translator.getEventKind(event) != EventKind.PROPOSITION) {
           final int e = eventToIndex.get(event);
           mTransitions[a][e] = new int[numStates][];
+          mReverseTransitions[a][e] = new int[numStates][];
           for (int source = 0; source < numStates; source++) {
             final TIntArrayList list = autTransitionLists[e][source];
             if (list != null) {
               mTransitions[a][e][source] = list.toNativeArray();
-
+            }
+          }
+          for (int target = 0; target < numStates; target++) {
+            final TIntArrayList listRvs = autTransitionListsRvs[e][target];
+            if (listRvs != null) {
+              mReverseTransitions[a][e][target] = listRvs.toNativeArray();
             }
           }
         }
@@ -321,7 +455,11 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     eventToIndex = null;
 
     mEventAutomata = new int[mNumProperEvents][];
-    final List<IntDouble> list = new ArrayList<IntDouble>(mNumAutomata);
+    mEventAutomataRvs = new int[mNumProperEvents][];
+    final List<AutomatonEventInfo> list =
+      new ArrayList<AutomatonEventInfo>(mNumAutomata);
+    final List<AutomatonEventInfo> listRvs =
+      new ArrayList<AutomatonEventInfo>(mNumAutomata);
     for (int e = 0; e < mNumProperEvents; e++) {
       for (a = 0; a < mNumAutomata; a++) {
         if (mTransitions[a][e] != null) {
@@ -333,18 +471,46 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
             }
           }
           final double avg = (double) count / (double) numStates;
-          final IntDouble pair = new IntDouble(a, avg);
-          list.add(pair);
+          if (e >= mNumUncontrollableEvents) {
+            final ControllableAutomatonEventInfo pair =
+              new ControllableAutomatonEventInfo(a, avg);
+            list.add(pair);
+          } else {
+            final UncontrollableAutomatonEventInfo pair =
+              new UncontrollableAutomatonEventInfo(a, avg);
+            list.add(pair);
+          }
+        }
+        if (mReverseTransitions[a][e] != null) {
+          final int numStates = mReverseTransitions[a][e].length;
+          int countRvs = 0;
+          for (int target = 0; target < numStates; target++) {
+            if (mReverseTransitions[a][e][target] != null) {
+              countRvs++;
+            }
+          }
+          final double avgRvs = (double) countRvs / (double) numStates;
+          final ControllableAutomatonEventInfo pairRvs =
+            new ControllableAutomatonEventInfo(a, avgRvs);
+          listRvs.add(pairRvs);
         }
       }
       Collections.sort(list);
+      Collections.sort(listRvs);
       final int count = list.size();
+      final int countRvs = listRvs.size();
       mEventAutomata[e] = new int[count];
+      mEventAutomataRvs[e] = new int[countRvs];
       int i = 0;
-      for (final IntDouble pair : list) {
-        mEventAutomata[e][i++] = pair.mInt;
+      for (final AutomatonEventInfo info : list) {
+        mEventAutomata[e][i++] = info.getAutomaton();
+      }
+      int j = 0;
+      for (final AutomatonEventInfo info : listRvs) {
+        mEventAutomataRvs[e][j++] = info.getAutomaton();
       }
       list.clear();
+      listRvs.clear();
     }
   }
 
@@ -352,7 +518,7 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
   protected void addStatistics()
   {
     super.addStatistics();
-    final AutomatonResult result = getAnalysisResult();
+    final ProxyResult<ProductDESProxy> result = getAnalysisResult();
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(mNumStates);
     if (mTransitionBuffer != null) {
@@ -366,7 +532,6 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     super.tearDown();
     mEvents = null;
     mCurrentPropositions = null;
-    mProjectionMask = null;
     mOriginalStates = null;
     mAllMarkings = null;
     mStateMarkings = null;
@@ -379,7 +544,6 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     mTransitionBuffer = null;
     mNDTuple = null;
     mTargetTuple = null;
-    mCurrentSuccessors = null;
     mCurrentDeadlock = null;
   }
 
@@ -388,11 +552,7 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
   private void explore(final int[] sourceTuple) throws OverflowException
   {
     final int source = mStates.get(sourceTuple);
-    if (mCurrentSuccessors != null) {
-      for (int e = 0; e < mNumEvents; e++) {
-        mCurrentSuccessors[e].clear();
-      }
-    } else if (mCurrentDeadlock != null) {
+    if (mCurrentDeadlock != null) {
       Arrays.fill(mCurrentDeadlock, false);
     }
     events: for (int e = 0; e < mNumProperEvents; e++) {
@@ -407,6 +567,62 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
         }
       }
       permutations(mNumAutomata, sourceTuple, source, e);
+    }
+  }
+
+  private void exploreCoreachableStates(final int[] coreachableTuple)
+  {
+    final int coreachableState = mStates.get(coreachableTuple);
+    events: for (int e = 0; e < mNumProperEvents; e++) {
+      Arrays.fill(mNDTupleRvs, null);
+      for (final int a : mEventAutomataRvs[e]) {
+        if (mReverseTransitions[a][e] != null) {
+          final int[] pre = mReverseTransitions[a][e][coreachableTuple[a]];
+          if (pre == null) {
+            continue events;
+          }
+          mNDTupleRvs[a] = pre;
+        }
+      }
+      reversePermutations(mNumAutomata, coreachableTuple, coreachableState, e);
+    }
+  }
+
+  private void exploreSuccessorStates(final int[] sourceTuple)
+    throws OverflowException
+  {
+    final int source = mStates.get(sourceTuple);
+    events: for (int e = 0; e < mNumUncontrollableEvents; e++) {
+      Arrays.fill(mNDTuple, null);
+      for (final int a : mEventAutomata[e]) {
+        if (mTransitions[a][e] != null) {
+          final int[] succ = mTransitions[a][e][sourceTuple[a]];
+          if (succ == null) {
+            continue events;
+          }
+          mNDTuple[a] = succ;
+        }
+      }
+      successorStatesPermutations(mNumAutomata, sourceTuple, source, e);
+    }
+  }
+
+  private void exploreReachableStates(final int[] sourceTuple)
+    throws OverflowException
+  {
+    final int source = mStates.get(sourceTuple);
+    events: for (int e = 0; e < mNumProperEvents; e++) {
+      Arrays.fill(mNDTuple2, null);
+      for (final int a : mEventAutomata[e]) {
+        if (mTransitions[a][e] != null) {
+          final int[] succ = mTransitions[a][e][sourceTuple[a]];
+          if (succ == null) {
+            continue events;
+          }
+          mNDTuple2[a] = succ;
+        }
+      }
+      reachableStatesPermutations(mNumAutomata, sourceTuple, source, e);
     }
   }
 
@@ -430,21 +646,106 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     }
   }
 
+  private void reversePermutations(int a, final int[] coreachableTuple,
+                                   final int coreachable, final int event)
+  {
+    if (a == 0) {
+      if (mStates.containsKey(mTargetTuple)) {
+        final int cs = mStates.get(mTargetTuple);
+        if (!mBadStates.get(cs) && mNonCoreachableStates.get(cs)) {
+          final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
+          mUnvisited.offer(newTuple);
+          mNonCoreachableStates.set(cs, false);
+          mNumCoreachableStates++;
+        }
+      }
+    } else {
+      a--;
+      final int[] codes = mNDTupleRvs[a];
+      if (codes == null) {
+        mTargetTuple[a] = coreachableTuple[a];
+        reversePermutations(a, coreachableTuple, coreachable, event);
+      } else {
+        for (int i = 0; i < codes.length; i++) {
+          mTargetTuple[a] = codes[i];
+          reversePermutations(a, coreachableTuple, coreachable, event);
+        }
+      }
+    }
+  }
+
+  private void successorStatesPermutations(int a, final int[] sourceTuple,
+                                           final int source, final int event)
+    throws OverflowException
+  {
+    if (a == 0) {
+      final int rs = mStates.get(mTargetTuple);
+      if (mBadStates.get(rs)) {
+        if (source < mNumInitialStates) {
+          initialIsBad = true;
+        }
+        mBadStates.set(source);
+        mControllabilityChanged = true;
+      }
+    } else {
+      a--;
+      final int[] codes = mNDTuple[a];
+      if (codes == null) {
+        mTargetTuple[a] = sourceTuple[a];
+        successorStatesPermutations(a, sourceTuple, source, event);
+      } else {
+        for (int i = 0; i < codes.length; i++) {
+          mTargetTuple[a] = codes[i];
+          successorStatesPermutations(a, sourceTuple, source, event);
+        }
+      }
+    }
+  }
+
+  private void reachableStatesPermutations(int a, final int[] sourceTuple,
+                                           final int source, final int event)
+    throws OverflowException
+  {
+    if (a == 0) {
+      final int rs = mStates.get(mTargetTuple);
+      if (!mBadStates.get(rs) && !mReachableStates.get(rs)) {
+        final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
+        mUnvisited.offer(newTuple);
+        mReachableStates.set(rs);
+      }
+    } else {
+      a--;
+      final int[] codes = mNDTuple2[a];
+      if (codes == null) {
+        mTargetTuple[a] = sourceTuple[a];
+        reachableStatesPermutations(a, sourceTuple, source, event);
+      } else {
+        for (int i = 0; i < codes.length; i++) {
+          mTargetTuple[a] = codes[i];
+          reachableStatesPermutations(a, sourceTuple, source, event);
+        }
+      }
+    }
+  }
+
   private void addTargetState(final int source, final int event,
                               final boolean isInitial)
     throws OverflowException
   {
     final int target;
     if (mStates.containsKey(mTargetTuple)) {
-      target = mStates.get(mTargetTuple);
-    } else if (isDeadlockTuple()) {
-      if (mDeadlockState < 0) {
-        mDeadlockState = getNewState();
-        final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
-        mStates.put(newTuple, mDeadlockState);
-        mStateTuples.add(newTuple);
-      }
-      target = mDeadlockState;
+      target = mStates.get(mTargetTuple);/*
+                                          * } else if (isDeadlockTuple()) { if
+                                          * (mDeadlockState < 0) {
+                                          * mDeadlockState = getNewState();
+                                          * final int[] newTuple =
+                                          * Arrays.copyOf(mTargetTuple,
+                                          * mNumAutomata);
+                                          * mStates.put(newTuple,
+                                          * mDeadlockState);
+                                          * mStateTuples.add(newTuple); }
+                                          * target = mDeadlockState;
+                                          */
     } else {
       target = getNewState();
       final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
@@ -468,47 +769,29 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     return mNumStates++;
   }
 
-  private boolean isDeadlockTuple()
-  {
-    for (int a = 0; a < mNumAutomata; a++) {
-      final int state = mTargetTuple[a];
-      if (mDeadlock[a][state]) {
-        return true;
-      }
-    }
-    return false;
-  }
+  /*
+   * private boolean isDeadlockTuple() { for (int a = 0; a < mNumAutomata;
+   * a++) { final int state = mTargetTuple[a]; if (mDeadlock[a][state]) {
+   * return true; } } return false; }
+   */
 
   private void addTransition(final int source, final int event,
                              final int target) throws OverflowException
   {
-    if (mProjectionMask == null) {
-      if (target == mDeadlockState) {
-        if (mCurrentDeadlock[event]) {
-          return;
-        } else {
-          mCurrentDeadlock[event] = true;
-        }
-      }
-      if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
-        throw new OverflowException(OverflowKind.TRANSITION,
-                                    getTransitionLimit());
-      }
-      mTransitionBuffer.add(source);
-      mTransitionBuffer.add(event);
-      mTransitionBuffer.add(target);
-    } else {
-      final int masked = mProjectionMask[event];
-      if (mCurrentSuccessors[masked].add(target)) {
-        if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
-          throw new OverflowException(OverflowKind.TRANSITION,
-                                      getTransitionLimit());
-        }
-        mTransitionBuffer.add(source);
-        mTransitionBuffer.add(masked);
-        mTransitionBuffer.add(target);
+    if (target == mDeadlockState) {
+      if (mCurrentDeadlock[event]) {
+        return;
+      } else {
+        mCurrentDeadlock[event] = true;
       }
     }
+    if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
+      throw new OverflowException(OverflowKind.TRANSITION,
+                                  getTransitionLimit());
+    }
+    mTransitionBuffer.add(source);
+    mTransitionBuffer.add(event);
+    mTransitionBuffer.add(target);
   }
 
   private AutomatonProxy createAutomaton()
@@ -523,24 +806,29 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
 
     final int numProps = mCurrentPropositions.size();
     final List<StateProxy> states = new ArrayList<StateProxy>(mNumStates);
+    final StateProxy[] stateArray = new StateProxy[mNumStates];
     for (int code = 0; code < mNumStates; code++) {
-      final boolean initial = code < mNumInitialStates;
-      final int[] tuple = mStateTuples.get(code);
-      final List<EventProxy> marking = new ArrayList<EventProxy>(numProps);
-      props: for (final EventProxy prop : mCurrentPropositions) {
-        for (int a = 0; a < mNumAutomata; a++) {
-          final List<EventProxy> stateMarking = getStateMarking(a, tuple[a]);
-          if (Collections.binarySearch(stateMarking, prop) < 0) {
-            continue props;
+      if (mReachableStates.get(code)) {
+        final boolean initial = code < mNumInitialStates;
+        final int[] tuple = mStateTuples.get(code);
+        final List<EventProxy> marking = new ArrayList<EventProxy>(numProps);
+        props: for (final EventProxy prop : mCurrentPropositions) {
+          for (int a = 0; a < mNumAutomata; a++) {
+            final List<EventProxy> stateMarking =
+              getStateMarking(a, tuple[a]);
+            if (Collections.binarySearch(stateMarking, prop) < 0) {
+              continue props;
+            }
           }
+          marking.add(prop);
         }
-        marking.add(prop);
+        Collections.sort(marking);
+        final List<EventProxy> unique = getUniqueMarking(marking);
+        final StateProxy state =
+          new MemStateProxy(code, tuple, unique, initial);
+        states.add(state);
+        stateArray[code] = state;
       }
-      Collections.sort(marking);
-      final List<EventProxy> unique = getUniqueMarking(marking);
-      final StateProxy state =
-        new MemStateProxy(code, tuple, unique, initial);
-      states.add(state);
     }
 
     final ProductDESProxyFactory factory = getFactory();
@@ -550,16 +838,23 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     int t = 0;
     while (t < bufferSize) {
       int code = mTransitionBuffer.get(t++);
-      final StateProxy source = states.get(code);
+      if (!mReachableStates.get(code)) {
+        t += 2;
+        continue;
+      }
+      final StateProxy source = stateArray[code];
       code = mTransitionBuffer.get(t++);
       final EventProxy event = mEvents[code];
       code = mTransitionBuffer.get(t++);
-      final StateProxy target = states.get(code);
+      if (!mReachableStates.get(code)) {
+        continue;
+      }
+      final StateProxy target = stateArray[code];
       transitions.add(factory.createTransitionProxy(source, event, target));
     }
 
     final String name = computeOutputName();
-    final ComponentKind kind = computeOutputKind();
+    final ComponentKind kind = ComponentKind.SUPERVISOR;
     return factory.createAutomatonProxy(name, kind, events, states,
                                         transitions);
   }
@@ -575,29 +870,21 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     }
   }
 
+  @SuppressWarnings("unused")
+  private String showStateTuple(final int[] tuple)
+  {
+    String msg = "";
+    for (int i = 0; i < tuple.length; i++) {
+      final AutomatonProxy aut = mAutomata.get(i);
+      final ComponentKind kind = getKindTranslator().getComponentKind(aut);
+      final StateProxy state = mOriginalStates[i][tuple[i]];
+      msg +=
+        kind.toString() + " " + aut.getName() + " : state " + state.getName()
+          + "\n";
+    }
+    return msg;
+  }
 
-  //#########################################################################
-  //# Inner Class MaskingPair
-  /*
-   * private static class MaskingPair {
-   * //#######################################################################
-   * //# Constructor private MaskingPair(final Collection<EventProxy> hidden,
-   * final EventProxy replacement, final boolean forbidden) { mHiddenEvents =
-   * hidden; mReplacement = replacement; mForbidden = forbidden; }
-   *
-   * //#######################################################################
-   * //# Simple Access private Collection<EventProxy> getHiddenEvents() {
-   * return mHiddenEvents; }
-   *
-   * private EventProxy getReplacement() { return mReplacement; }
-   *
-   * private boolean isForbidden() { return mForbidden; }
-   *
-   * //#######################################################################
-   * //# Data Members private final Collection<EventProxy> mHiddenEvents;
-   * private final EventProxy mReplacement; private final boolean mForbidden;
-   * }
-   */
 
   //#########################################################################
   //# Inner Class MemStateMap
@@ -764,47 +1051,98 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
 
 
   //#########################################################################
-  //# Inner Class IntDouble
-  private static class IntDouble implements Comparable<IntDouble>
+  //# Inner Class AutomatonEventInfo
+  private abstract static class AutomatonEventInfo implements
+    Comparable<AutomatonEventInfo>
   {
-    public IntDouble(final int i, final double d)
+    public AutomatonEventInfo(final int aut, final double probability)
     {
-      mInt = i;
-      mDouble = d;
+      mAut = aut;
+      mProbability = probability;
     }
 
-    public int compareTo(final IntDouble pair)
+    protected int getAutomaton()
     {
-      if (mDouble < pair.mDouble) {
+      return mAut;
+    }
+
+    protected double getProbability()
+    {
+      return mProbability;
+    }
+
+    private final int mAut;
+    private final double mProbability;
+  }
+
+
+  //# Inner Class UncontrollableAutomatonEventInfo
+  private static class UncontrollableAutomatonEventInfo extends
+    AutomatonEventInfo
+  {
+    public UncontrollableAutomatonEventInfo(final int aut,
+                                            final double probability)
+    {
+      super(aut, probability);
+    }
+
+    public int compareTo(final AutomatonEventInfo info)
+    {
+      if (this.getAutomaton() < mNumPlants && this.getProbability() == 1.0f) {
+        return 1;
+      } else if (info.mAut < mNumPlants && info.mProbability == 1.0f) {
         return -1;
-      } else if (mDouble > pair.mDouble) {
+      } else if ((this.getAutomaton() < mNumPlants && info.mAut < mNumPlants)
+                 || (this.getAutomaton() >= mNumPlants && info.mAut >= mNumPlants)) {
+        return (this.getProbability() < info.mProbability) ? -1 : 1;
+      } else {
+        return (this.getAutomaton() < mNumPlants) ? -1 : 1;
+      }
+    }
+  }
+
+
+  //# Inner Class ControllableAutomatonEventInfo
+  private static class ControllableAutomatonEventInfo extends
+    AutomatonEventInfo
+  {
+    public ControllableAutomatonEventInfo(final int aut,
+                                          final double probability)
+    {
+      super(aut, probability);
+    }
+
+    public int compareTo(final AutomatonEventInfo info)
+    {
+      if (this.getProbability() < info.getProbability()) {
+        return -1;
+      } else if (this.getProbability() < info.getProbability()) {
         return 1;
       } else {
         return 0;
       }
     }
-
-    private final int mInt;
-    private final double mDouble;
   }
 
   //#########################################################################
   //# Data Members
+  private List<AutomatonProxy> mAutomata;
   private Collection<EventProxy> mUsedPropositions;
   private int mNumAutomata;
-  private int mNumProperEvents;//
-  @SuppressWarnings("unused")
+  private static int mNumPlants;
+  private int mNumProperEvents;
   private int mNumUncontrollableEvents;
   private int mNumEvents;
   private EventProxy[] mEvents;
   private Collection<EventProxy> mCurrentPropositions;
-  private int[] mProjectionMask;
   private StateProxy[][] mOriginalStates;
   private Map<List<EventProxy>,List<EventProxy>> mAllMarkings;
   private List<?>[][] mStateMarkings;
   private int[][][][] mTransitions;
+  private int[][][][] mReverseTransitions;
   private boolean[][] mDeadlock;
   private int[][] mEventAutomata;
+  private int[][] mEventAutomataRvs;
 
   private int mNumStates;
   private int mNumInitialStates;
@@ -813,10 +1151,19 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
   private Queue<int[]> mUnvisited;
   private TIntArrayList mTransitionBuffer;
   private int mTransitionBufferLimit;
+  private BitSet mNonCoreachableStates;
+  private BitSet mBadStates;
+  private BitSet mReachableStates;
+  private boolean mCoreachabilityChanged;
+  private boolean mControllabilityChanged;
+  private boolean initialIsBad;
+  private int mNumCoreachableStates;
+  private int mLastNumCoreachableStates;
 
   private int[][] mNDTuple;
+  private int[][] mNDTuple2;
+  private int[][] mNDTupleRvs;
   private int[] mTargetTuple;
-  private TIntHashSet[] mCurrentSuccessors;
   private boolean[] mCurrentDeadlock;
   private int mDeadlockState;
 
