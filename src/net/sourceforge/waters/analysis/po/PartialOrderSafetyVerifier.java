@@ -468,6 +468,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       //pick out the transition map for the current automata
       final int[][] transitionMap = j < mNumPlants ? mPlantTransitionMap.get(j) :
         mSpecTransitionMap.get(j - mNumPlants);
+      final byte[] eventList = j < mNumPlants ? mPlantEventList.get(j) :
+        mSpecEventList.get(j - mNumPlants);
       final int size = mAutomata[j].getStates().size();
       //Each event can be enabled in any number of states initially so loop
       //over each state
@@ -475,6 +477,9 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         //The index of the following loop will be the index of the event that
         //the enabling is being computed for
         for (int k = 0; k < mNumEvents; k++){
+          if (eventList[k] != 1){
+            continue;
+          }
           //find the target state for the transition involving the currently
           //visited state and the event being considered for enablings
           final int target = transitionMap[i][k];
@@ -484,6 +489,9 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
             //enabled or disabled in that target state and record the information
             //in the current partial order event
             for (int l = 0; l < mNumEvents; l++){
+              if (eventList[l] != 1){
+                continue;
+              }
               if (mEventCodingList.get(l).getKind() == EventKind.UNCONTROLLABLE){
                 mPartialOrderEvents[k].addEnabled
                   (j, l, transitionMap[target][l] != -1);
