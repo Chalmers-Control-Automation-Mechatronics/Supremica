@@ -1,41 +1,83 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   IDEDimensions
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 
 package org.supremica.gui.ide;
 
 import java.awt.Dimension;
 
+
+/**
+ * A static class containing constants identifying the preferred window
+ * sizes of the IDE.
+ *
+ * @author Knut &Aring;kesson
+ */
+
 public class IDEDimensions
 {
-	private final static int MAINWINDOWWIDTH = 800;
-	private final static int MAINWINDOWHEIGHT = 600
-	;
-	public static Dimension mainWindowPreferredSize = new Dimension(MAINWINDOWWIDTH, MAINWINDOWHEIGHT);
-	public static Dimension mainWindowMinimumSize = new Dimension(100, 100);
 
-	public static Dimension loggerPreferredSize = new Dimension(MAINWINDOWWIDTH, MAINWINDOWHEIGHT*1/3);
-	public static Dimension loggerMinimumSize = new Dimension(100, 100);
+  //#########################################################################
+  //# Class Constants
+  private static final int MAINWINDOWWIDTH = 1024;
+  private static final int MAINWINDOWHEIGHT = 768;
 
-	public static Dimension mainPanelPreferredSize = new Dimension(MAINWINDOWWIDTH, MAINWINDOWHEIGHT*2/3);
-	public static Dimension mainPanelMinimumSize = new Dimension(100, 100);
+  public static final Dimension mainWindowPreferredSize =
+    new Dimension(MAINWINDOWWIDTH, MAINWINDOWHEIGHT);
+  public static final Dimension mainWindowMinimumSize =
+    new Dimension(100, 100);
 
-	public static Dimension leftEditorPreferredSize = new Dimension(MAINWINDOWWIDTH*1/3, MAINWINDOWHEIGHT*2/3);
-	public static Dimension leftEditorMinimumSize = new Dimension(100, 50);
+  public static final Dimension loggerPreferredSize =
+    new Dimension(MAINWINDOWWIDTH, MAINWINDOWHEIGHT/4);
+  public static final Dimension loggerMinimumSize =
+    new Dimension(100, 100);
 
-	public static Dimension rightEditorPreferredSize = new Dimension(MAINWINDOWWIDTH*2/3, MAINWINDOWHEIGHT*2/3);
-	public static Dimension rightEditorMinimumSize = new Dimension(100, 50);
+  public static final Dimension mainPanelPreferredSize =
+    new Dimension(MAINWINDOWWIDTH, MAINWINDOWHEIGHT*3/4);
+  public static final Dimension mainPanelMinimumSize =
+    new Dimension(100, 100);
 
-	public static Dimension leftAnalyzerPreferredSize = new Dimension(MAINWINDOWWIDTH*2/5, MAINWINDOWHEIGHT*2/3);
-	public static Dimension leftAnalyzerMinimumSize = leftEditorMinimumSize;
+  public static final Dimension leftEditorPreferredSize =
+    new Dimension(MAINWINDOWWIDTH/3, MAINWINDOWHEIGHT*3/4);
+  public static final Dimension leftEditorMinimumSize =
+    new Dimension(100, 50);
 
-	public static Dimension rightAnalyzerPreferredSize = new Dimension(MAINWINDOWWIDTH*3/5, MAINWINDOWHEIGHT*2/3);
-	public static Dimension rightAnalyzerMinimumSize = rightEditorMinimumSize;
+  public static final Dimension rightEditorPreferredSize =
+    new Dimension(MAINWINDOWWIDTH*2/3, MAINWINDOWHEIGHT*3/4);
+  public static final Dimension rightEditorMinimumSize =
+    new Dimension(100, 50);
 
-	public static Dimension rightEmptyPreferredSize = leftEditorPreferredSize;
-	public static Dimension rightEmptyMinimumSize = leftEditorMinimumSize;
+  public static final Dimension leftAnalyzerPreferredSize =
+    new Dimension(MAINWINDOWWIDTH*2/5, MAINWINDOWHEIGHT*3/4);
+  public static final Dimension leftAnalyzerMinimumSize =
+    leftEditorMinimumSize;
 
-	public static Dimension leftSimulatorTablePreferredSize = new Dimension(MAINWINDOWWIDTH*1/3 - 20, MAINWINDOWHEIGHT * 2 / 3 - 30);
-	public static Dimension leftSimulatorTableMinimumSize = new Dimension(80, 20);
+  public static final Dimension rightAnalyzerPreferredSize =
+    new Dimension(MAINWINDOWWIDTH*3/5, MAINWINDOWHEIGHT*3/4);
+  public static final Dimension rightAnalyzerMinimumSize =
+    rightEditorMinimumSize;
 
-	private IDEDimensions()
-	{
-	}
+  public static final Dimension rightEmptyPreferredSize =
+    leftEditorPreferredSize;
+  public static final Dimension rightEmptyMinimumSize =
+    leftEditorMinimumSize;
+
+  public static final Dimension leftSimulatorTablePreferredSize =
+    new Dimension(MAINWINDOWWIDTH*1/3 - 20, MAINWINDOWHEIGHT*3/4 - 30);
+  public static final Dimension leftSimulatorTableMinimumSize =
+    new Dimension(80, 20);
+
+
+  //#########################################################################
+  //# Dummy Constructor to Prevent Instantiation of Class
+  private IDEDimensions()
+  {
+  }
+
 }

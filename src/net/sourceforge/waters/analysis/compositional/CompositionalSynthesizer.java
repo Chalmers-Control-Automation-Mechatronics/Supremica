@@ -37,8 +37,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.ProductDESBuilder;
 import net.sourceforge.waters.model.analysis.ProductDESResult;
+import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.SupervisorTooBigException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -71,7 +71,7 @@ import org.apache.log4j.Logger;
 
 public class CompositionalSynthesizer
   extends AbstractCompositionalModelAnalyzer
-  implements ProductDESBuilder
+  implements SupervisorSynthesizer
 {
 
   //#########################################################################

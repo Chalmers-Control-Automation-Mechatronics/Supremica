@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="small_factory_2u-sync" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Classical "small factory" example by P.J.G. Ramadge and W.M. Wonham.
+This is the uncontrollable version without repair specification.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="start1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="break1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="repair1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start2"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="break2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="repair2"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="small_factory_2u">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1"/>
+                    <SimpleNode Name="q10"/>
+                    <SimpleNode Name="q11"/>
+                    <SimpleNode Name="q12"/>
+                    <SimpleNode Name="q13"/>
+                    <SimpleNode Name="q14"/>
+                    <SimpleNode Name="q15"/>
+                    <SimpleNode Name="q16"/>
+                    <SimpleNode Name="q17"/>
+                    <SimpleNode Name="q2">
+                        <EventList>
+                            <SimpleIdentifier Name=":forbidden"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q3"/>
+                    <SimpleNode Name="q4">
+                        <EventList>
+                            <SimpleIdentifier Name=":forbidden"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q5"/>
+                    <SimpleNode Name="q6">
+                        <EventList>
+                            <SimpleIdentifier Name=":forbidden"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q7"/>
+                    <SimpleNode Name="q8"/>
+                    <SimpleNode Name="q9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0" Target="q10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q1" Target="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q1" Target="q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q10" Target="q16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q10" Target="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q11" Target="q10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q11" Target="q17">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q11" Target="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q11" Target="q9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q12" Target="q13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q12" Target="q15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q13" Target="q16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q13" Target="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q14" Target="q12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q14" Target="q13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q14" Target="q17">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q15" Target="q16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q15" Target="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q16" Target="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q16" Target="q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q17" Target="q15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q17" Target="q16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q17" Target="q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q2" Target="q12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q2" Target="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q3" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q5" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q5" Target="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q5" Target="q8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q6" Target="q14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q6" Target="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q6" Target="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q7" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q7" Target="q9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q8" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q8" Target="q11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q8" Target="q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q9" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q9" Target="q10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q9" Target="q15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

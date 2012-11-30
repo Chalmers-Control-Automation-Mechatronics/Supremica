@@ -12,12 +12,12 @@ package net.sourceforge.waters.analysis.compositional;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractSynthesizerTest;
+import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public class CompositionalSynthesizerMustLMinSTest
-  extends AbstractSynthesizerTest
+  extends AbstractSupervisorSynthesizerTest
 {
 
   //#########################################################################

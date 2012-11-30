@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.analysis.hisc;
 
+import java.util.Collections;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -18,6 +21,7 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 /**
@@ -77,6 +81,9 @@ public class HISCCPInterfaceConsistencyCheckerTest
   protected void configure(final ModuleCompiler compiler)
   {
     super.configure(compiler);
+    final List<String> accepting =
+      Collections.singletonList(EventDeclProxy.DEFAULT_MARKING_NAME);
+    compiler.setEnabledPropositionNames(accepting);
     compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
   }
 
@@ -279,29 +286,87 @@ public class HISCCPInterfaceConsistencyCheckerTest
   public void testHISCCP_verriegel4ft()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "verriegel4ft.wmod", true);
+    runModelVerifier("hisccp", "central_locking", "verriegel4ft.wmod", true);
   }
 
   public void testHISCCP_verriegel4ftbad()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "verriegel4ft_bad.wmod", false);
+    runModelVerifier("hisccp", "central_locking", "verriegel4ft_bad.wmod", false);
   }
 
   public void testHISCCP_verriegel4ht()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "verriegel4ht.wmod", true);
+    runModelVerifier("hisccp", "central_locking", "verriegel4ht.wmod", true);
   }
 
   public void testHISCCP_verriegel4hisc()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "verriegel4hisc.wmod", true);
+    runModelVerifier("hisccp", "central_locking", "verriegel4hisc.wmod", true);
   }
 
 
   // SimpleManufacturingExample
+  public void testHISCCP_SimpleManufMultiLD0()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_multi_ld",
+                     "simple_manuf_multi_ld.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufMultiLD1()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_multi_ld",
+                     "subsystem.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufMultiLD02()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_multi_ld",
+                     "assembly.wmod", true);
+  }
+
+
+  public void testHISCCP_SimpleManufHISCCP0()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "simple_manuf_hisccp.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufHISCCP1()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "subsystem.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufHISCCP1bad()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "subsystem_bad.wmod", false);
+  }
+
+  public void testHISCCP_SimpleManufHISCCP2am()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "assembly_machine.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufHISCCP2pm()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "polishing_machine.wmod", true);
+  }
+
+
   public void testHISCCP_ManufCell()
   throws Exception
   {

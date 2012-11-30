@@ -101,6 +101,9 @@ public class ArchitectureDetector
         }
       } else {
         final String name = child.getName();
+        if (name.equals("libBisimulationEquivalence.so")) {
+          continue;
+        }
         final String libname = LIBRARY_FILTER.getLibraryName(name);
         try {
           System.setProperty("java.library.path", subdir.toString());

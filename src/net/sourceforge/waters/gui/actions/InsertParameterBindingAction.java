@@ -14,9 +14,9 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.EventAliasEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.ParameterBindingEditorDialog;
+import net.sourceforge.waters.gui.dialog.EventAliasEditorDialog;
+import net.sourceforge.waters.gui.dialog.ParameterBindingEditorDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;

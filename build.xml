@@ -554,7 +554,8 @@ Class-Path: ${manifest.pathlist}</echo>
         <ant dir="schema/" target="gen_manufacturingtables_eop" inheritAll="false"/>
     </target>
 
-    <target name="-detect_arch" unless="native.host.arch">
+    <target name="detect_arch"
+            description="Forces call to ArchitectureDetector to recreate arch.properties file.">
         <ant dir="${waters.dir}" target="jniglue-jar" inheritAll="false"/>
         <java classname="net.sourceforge.waters.build.arch.ArchitectureDetector"
               fork="true" failonerror="true">
@@ -566,6 +567,9 @@ Class-Path: ${manifest.pathlist}</echo>
         </java>
         <property file="${arch.properties}"/>
     </target>
+
+    <target name="-detect_arch" depends="detect_arch"
+            unless="native.host.arch"/>
 
     <target name="-dynamic_libs" depends="-detect_arch">
         <copy todir="${dist}" failonerror="false">
