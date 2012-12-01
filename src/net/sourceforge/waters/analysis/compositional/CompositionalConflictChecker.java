@@ -118,6 +118,7 @@ public class CompositionalConflictChecker
           ConflictKindTranslator.getInstance(),
           new PreselectingMethodFactory(),
           new SelectingMethodFactory());
+    setPruningDeadlocks(true);
     setConfiguredDefaultMarking(marking);
     final AbstractionProcedure proc =
       ConflictAbstractionProcedureFactory.OEQ.createAbstractionProecudure(this);
@@ -394,23 +395,13 @@ public class CompositionalConflictChecker
   //#########################################################################
   //# Hooks
   @Override
-  protected void setupSynchronousProductBuilder()
-  {
-    super.setupSynchronousProductBuilder();
-    final MonolithicSynchronousProductBuilder builder =
-      getCurrentSynchronousProductBuilder();
-    builder.setPruningDeadlocks(true);
-  }
-
-  @Override
   protected HidingStep createSynchronousProductStep
     (final Collection<AutomatonProxy> automata,
      final AutomatonProxy sync,
      final Collection<EventProxy> hidden,
      final EventProxy tau)
   {
-    final SynchronousProductBuilder builder =
-      getCurrentSynchronousProductBuilder();
+    final SynchronousProductBuilder builder = getSynchronousProductBuilder();
     final SynchronousProductStateMap stateMap =  builder.getStateMap();
     return new ConflictHidingStep(this, sync, hidden, tau, stateMap);
   }
@@ -1030,7 +1021,7 @@ public class CompositionalConflictChecker
       final Comparator<Candidate> comparator = getComparator();
       Collections.sort(list, comparator);
       final MonolithicSynchronousProductBuilder builder =
-        getCurrentSynchronousProductBuilder();
+        getSynchronousProductBuilder();
       final int limit = getCurrentInternalStateLimit();
       builder.setNodeLimit(limit);
       builder.setConstructsResult(false);
@@ -1072,7 +1063,7 @@ public class CompositionalConflictChecker
       throws OverflowException
     {
       final MonolithicSynchronousProductBuilder builder =
-        getCurrentSynchronousProductBuilder();
+        getSynchronousProductBuilder();
       boolean alpha = true;
       for (int a = 0; a < tuple.length; a++) {
         final List<EventProxy> props =

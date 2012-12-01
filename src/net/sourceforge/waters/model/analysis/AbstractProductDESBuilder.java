@@ -90,7 +90,7 @@ public abstract class AbstractProductDESBuilder
   //#########################################################################
   //# Setting the Result
   /**
-   * Stores an product DES result containing a single automaton,
+   * Stores a product DES result containing a single automaton,
    * indicating successful completion. Setting the result also marks the
    * analysis run as completed and sets the Boolean result.
    * @param  aut    The computed automaton, or <CODE>null</CODE> to
@@ -111,7 +111,7 @@ public abstract class AbstractProductDESBuilder
   }
 
   /**
-   * Stores an product DES result indicating successful completion.
+   * Stores a product DES result indicating successful completion.
    * Setting the product DES also marks the analysis run as completed and
    * sets the Boolean result.
    * @param  aut    The computed product DES, or <CODE>null</CODE> to

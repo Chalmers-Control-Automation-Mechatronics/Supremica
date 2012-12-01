@@ -313,8 +313,7 @@ public abstract class AbstractCompositionalModelVerifier
      final Collection<EventProxy> hidden,
      final EventProxy tau)
   {
-    final SynchronousProductBuilder builder =
-      getCurrentSynchronousProductBuilder();
+    final SynchronousProductBuilder builder = getSynchronousProductBuilder();
     final SynchronousProductStateMap stateMap =  builder.getStateMap();
     return new HidingStep(this, sync, hidden, tau, stateMap);
   }

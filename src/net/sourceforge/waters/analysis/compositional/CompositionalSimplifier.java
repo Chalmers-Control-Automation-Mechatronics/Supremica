@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -82,6 +81,8 @@ public class CompositionalSimplifier
     final AbstractionProcedure proc =
       ConflictAbstractionProcedureFactory.OEQ.createAbstractionProecudure(this);
     setAbstractionProcedure(proc);
+    // TODO This is specific to nonblocking and should be in a subclass.
+    setPruningDeadlocks(true);
   }
 
 
@@ -169,16 +170,6 @@ public class CompositionalSimplifier
   protected EventInfo createEventInfo(final EventProxy event)
   {
     return new SimplificationEventInfo(event);
-  }
-
-  @Override
-  protected void setupSynchronousProductBuilder()
-  {
-    super.setupSynchronousProductBuilder();
-    // TODO This is specific to nonblocking and should be in a subclass.
-    final MonolithicSynchronousProductBuilder builder =
-      getCurrentSynchronousProductBuilder();
-    builder.setPruningDeadlocks(true);
   }
 
   @Override

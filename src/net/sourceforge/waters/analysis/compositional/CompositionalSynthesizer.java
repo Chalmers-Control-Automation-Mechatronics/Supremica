@@ -172,6 +172,7 @@ public class CompositionalSynthesizer
       SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure
         (this, SynthesisAbstractionProcedure.CHAIN_WSOE);
     setAbstractionProcedure(proc);
+    setPruningDeadlocks(true);
   }
 
 
@@ -277,15 +278,6 @@ public class CompositionalSynthesizer
 
   //#########################################################################
   //# Hooks
-  @Override
-  protected void setupSynchronousProductBuilder()
-  {
-    super.setupSynchronousProductBuilder();
-    final MonolithicSynchronousProductBuilder builder =
-      getCurrentSynchronousProductBuilder();
-    builder.setPruningDeadlocks(true);
-  }
-
   @Override
   protected AutomatonProxy plantify(final AutomatonProxy spec)
     throws OverflowException
@@ -494,7 +486,7 @@ public class CompositionalSynthesizer
                      " automata, estimated " + estimate + " states.");
       }
       final MonolithicSynchronousProductBuilder syncBuilder =
-        getCurrentSynchronousProductBuilder();
+        getSynchronousProductBuilder();
       final ProductDESProxy des = createProductDESProxy(automata);
 
       syncBuilder.setModel(des);
@@ -985,7 +977,7 @@ public class CompositionalSynthesizer
       automata.add(distinguisher);
       final ProductDESProxy model = createProductDESProxy (automata);
       final MonolithicSynchronousProductBuilder builder =
-        getCurrentSynchronousProductBuilder();
+        getSynchronousProductBuilder();
       builder.setNodeLimit(getMonolithicStateLimit());
       builder.setTransitionLimit(getMonolithicTransitionLimit());
       builder.setConstructsResult(true);
