@@ -174,7 +174,7 @@ public class MonolithicSynthesizerExperiments
     synthesissRhoneSubPatch1();
     synthesisPhilosophers(8);
     synthesisPhilosophers(9);
-    synthesisPhilosophers(10);
+    //synthesisPhilosophers(10);
     synthesisTransferline(4);
 
 //    synthesiseTbedNoderailB();
