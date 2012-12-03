@@ -11,6 +11,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
+import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCPInterfaceConsistencyChecker;
 import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
@@ -62,7 +63,8 @@ public class AnalyzeHISCCPInterfaceConsistencyAction
       return null;
     } else {
       final CompositionalSimplifier simplifier =
-        new CompositionalSimplifier(desFactory);
+        new CompositionalSimplifier(desFactory,
+                                    ConflictAbstractionProcedureFactory.NB);
       return new HISCCPInterfaceConsistencyChecker
         (desFactory, checker, simplifier);
     }

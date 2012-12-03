@@ -213,18 +213,6 @@ class TRConflictEquivalenceAbstractionProcedure
     }
   }
 
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return true;
-  }
-
-  @Override
-  public boolean expectsAllMarkings()
-  {
-    return mForceMarkings;
-  }
-
 
   //#########################################################################
   //# Data Members

@@ -46,17 +46,4 @@ public interface AbstractionProcedure extends Abortable
 
   public void resetStatistics();
 
-  /**
-   * Returns whether or not this abstraction procedure supports
-   * nondeterministic automata.
-   */
-  public boolean supportsNondeterminism();
-
-  /**
-   * Returns whether or not this abstraction procedure expects both
-   * default and precondition markings to be set when the model analyser
-   * is running, even for models without these propositions.
-   */
-  public boolean expectsAllMarkings();
-
 }

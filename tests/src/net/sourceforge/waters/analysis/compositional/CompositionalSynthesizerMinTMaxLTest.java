@@ -43,7 +43,8 @@ public class CompositionalSynthesizerMinTMaxLTest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalSynthesizer synthesizer =
-      new CompositionalSynthesizer(factory);
+      new CompositionalSynthesizer(factory,
+                                   SynthesisAbstractionProcedureFactory.WSOE);
     synthesizer.setInternalStateLimit(5000);
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);

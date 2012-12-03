@@ -43,16 +43,11 @@ public class CompositionalSynthesizerMustLMinETest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalSynthesizer synthesizer =
-      new CompositionalSynthesizer(factory);
+      new CompositionalSynthesizer(factory,
+                                   SynthesisAbstractionProcedureFactory.SOE_ONLY);
     synthesizer.setInternalStateLimit(5000);
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);
-    final AbstractionProcedure proc =
-      SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure
-        (synthesizer,
-         SynthesisAbstractionProcedure.USE_BISIMULATION |
-         SynthesisAbstractionProcedure.USE_SOE);
-    synthesizer.setAbstractionProcedure(proc);
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
     synthesizer.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinE);
     return synthesizer;

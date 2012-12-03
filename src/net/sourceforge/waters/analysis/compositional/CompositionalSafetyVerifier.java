@@ -98,11 +98,9 @@ public class CompositionalSafetyVerifier
                                      final KindTranslator translator,
                                      final SafetyDiagnostics diag)
   {
-    super(model, factory, translator);
+    super(model, factory, translator,
+          ProjectionAbstractionProcedureFactory.INSTANCE);
     mDiagnostics = diag;
-    final AbstractionProcedure proc =
-      ProjectionAbstractionProcedure.createProjectionAbstractionProcedure(this);
-    setAbstractionProcedure(proc);
   }
 
 
@@ -384,6 +382,44 @@ public class CompositionalSafetyVerifier
     {
       return isTau();
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class ProjectionAbstractionProcedureFactory
+  private static class ProjectionAbstractionProcedureFactory
+    implements AbstractionProcedureFactory
+  {
+    //#######################################################################
+    //# Interface
+    //# net.sourceforge.waters.model.analysis.compositional.
+    //# AbstractionProcedureFactory
+    @Override
+    public AbstractionProcedure createAbstractionProcedure
+      (final AbstractCompositionalModelAnalyzer analyzer)
+    {
+      final CompositionalSafetyVerifier verifier =
+        (CompositionalSafetyVerifier) analyzer;
+      return ProjectionAbstractionProcedure.
+        createProjectionAbstractionProcedure(verifier);
+    }
+
+    @Override
+    public boolean supportsNondeterminism()
+    {
+      return true;
+    }
+
+    @Override
+    public boolean expectsAllMarkings()
+    {
+      return false;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final ProjectionAbstractionProcedureFactory INSTANCE =
+      new ProjectionAbstractionProcedureFactory();
   }
 
 

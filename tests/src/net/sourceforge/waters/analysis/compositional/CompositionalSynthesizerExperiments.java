@@ -158,10 +158,8 @@ public class CompositionalSynthesizerExperiments
     final File filename = new File(dir, name);
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mSynthesizer.setModel(des);
-    final AbstractionProcedure proc =
-      SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure
-        (mSynthesizer, SynthesisAbstractionProcedure.USE_SOE);
-    mSynthesizer.setAbstractionProcedure(proc);
+    mSynthesizer.setAbstractionProcedureFactory
+      (SynthesisAbstractionProcedureFactory.SOE_ONLY);
     try {
       mSynthesizer.run();
     } catch (final AnalysisException exception) {

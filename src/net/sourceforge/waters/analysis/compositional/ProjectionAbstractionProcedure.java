@@ -140,12 +140,6 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
     }
   }
 
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return true;
-  }
-
 
   //#########################################################################
   //# Overrides for

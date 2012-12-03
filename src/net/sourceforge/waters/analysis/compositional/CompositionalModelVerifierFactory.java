@@ -294,9 +294,7 @@ public class CompositionalModelVerifierFactory
       if (verifier instanceof CompositionalConflictChecker) {
         final CompositionalConflictChecker composer =
           (CompositionalConflictChecker) verifier;
-        final AbstractionProcedure proc =
-          method.createAbstractionProecudure(composer);
-        composer.setAbstractionProcedure(proc);
+        composer.setAbstractionProcedureFactory(method);
       } else {
         fail(getName() + " option only supported for conflict check!");
       }

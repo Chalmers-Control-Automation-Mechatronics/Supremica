@@ -82,6 +82,20 @@ public class CompositionalConflictChecker
   }
 
   /**
+   * Creates a new conflict checker without a model or marking proposition.
+   * @param factory
+   *          Factory used for trace construction.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
+   */
+  public CompositionalConflictChecker
+    (final ProductDESProxyFactory factory,
+     final ConflictAbstractionProcedureFactory abstractionFactory)
+  {
+    this(null, null, factory, abstractionFactory);
+  }
+
+  /**
    * Creates a new conflict checker to check whether the given model is
    * nonblocking with respect to its default marking.
    * @param model
@@ -113,16 +127,39 @@ public class CompositionalConflictChecker
                                       final EventProxy marking,
                                       final ProductDESProxyFactory factory)
   {
+    this(model, marking, factory, ConflictAbstractionProcedureFactory.OEQ);
+  }
+
+  /**
+   * Creates a new conflict checker to check whether the given model is
+   * nonblocking.
+   * @param model
+   *          The model to be checked by this conflict checker.
+   * @param marking
+   *          The proposition event that defines which states are marked.
+   *          Every state has a list of propositions attached to it; the
+   *          conflict checker considers only those states as marked that are
+   *          labelled by <CODE>marking</CODE>, i.e., their list of
+   *          propositions must contain this event (exactly the same object).
+   * @param factory
+   *          Factory used for trace construction.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
+   */
+  public CompositionalConflictChecker
+    (final ProductDESProxy model,
+     final EventProxy marking,
+     final ProductDESProxyFactory factory,
+     final ConflictAbstractionProcedureFactory abstractionFactory)
+  {
     super(model,
           factory,
           ConflictKindTranslator.getInstance(),
+          abstractionFactory,
           new PreselectingMethodFactory(),
           new SelectingMethodFactory());
     setPruningDeadlocks(true);
     setConfiguredDefaultMarking(marking);
-    final AbstractionProcedure proc =
-      ConflictAbstractionProcedureFactory.OEQ.createAbstractionProecudure(this);
-    setAbstractionProcedure(proc);
   }
 
 
@@ -370,9 +407,10 @@ public class CompositionalConflictChecker
     throws AnalysisException
   {
     final EventProxy defaultMarking = createDefaultMarking();
-    final AbstractionProcedure proc = getAbstractionProcedure();
+    final AbstractionProcedureFactory abstraction =
+      getAbstractionProcedureFactory();
     final EventProxy preconditionMarking;
-    if (proc.expectsAllMarkings()) {
+    if (abstraction.expectsAllMarkings()) {
       preconditionMarking = createPreconditionMarking();
     } else {
       preconditionMarking = getConfiguredPreconditionMarking();

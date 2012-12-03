@@ -283,12 +283,6 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     mCompleteChain.createStatistics();
   }
 
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return true;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable

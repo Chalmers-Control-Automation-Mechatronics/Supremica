@@ -86,12 +86,15 @@ public abstract class AbstractCompositionalModelAnalyzer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxyFactory factory,
-     final KindTranslator translator)
+     final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory)
   {
-    this(factory, translator,
+    this(factory, translator, abstractionFactory,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
@@ -101,6 +104,8 @@ public abstract class AbstractCompositionalModelAnalyzer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -111,10 +116,11 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    this(null, factory, translator,
+    this(null, factory, translator, abstractionFactory,
          preselectingMethodFactory, selectingMethodFactory);
   }
 
@@ -126,13 +132,16 @@ public abstract class AbstractCompositionalModelAnalyzer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
-     final KindTranslator translator)
+     final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory)
   {
-    this(model, factory, translator,
+    this(model, factory, translator, abstractionFactory,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
@@ -144,6 +153,8 @@ public abstract class AbstractCompositionalModelAnalyzer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -155,10 +166,12 @@ public abstract class AbstractCompositionalModelAnalyzer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
     super(model, factory, translator);
+    mAbstractionProcedureFactory = abstractionFactory;
     mPreselectingMethodFactory = preselectingMethodFactory;
     mSelectingMethodFactory = selectingMethodFactory;
     // Default for all model analysers---please do not change.
@@ -213,14 +226,15 @@ public abstract class AbstractCompositionalModelAnalyzer
     mConfiguredPreconditionMarking = event;
   }
 
-  public void setAbstractionProcedure(final AbstractionProcedure proc)
+  public void setAbstractionProcedureFactory
+    (final AbstractionProcedureFactory factory)
   {
-    mAbstractionProcedure = proc;
+    mAbstractionProcedureFactory = factory;
   }
 
-  public AbstractionProcedure getAbstractionProcedure()
+  public AbstractionProcedureFactory getAbstractionProcedureFactory()
   {
-    return mAbstractionProcedure;
+    return mAbstractionProcedureFactory;
   }
 
   /**
@@ -430,7 +444,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   @Override
   public boolean supportsNondeterminism()
   {
-    return mAbstractionProcedure.supportsNondeterminism();
+    return mAbstractionProcedureFactory.supportsNondeterminism();
   }
 
   @Override
@@ -509,6 +523,11 @@ public abstract class AbstractCompositionalModelAnalyzer
     return mPropositions;
   }
 
+  protected AbstractionProcedure getAbstractionProcedure()
+  {
+    return mAbstractionProcedure;
+  }
+
   protected List<AutomatonProxy> getCurrentAutomata()
   {
     return mCurrentAutomata;
@@ -568,6 +587,8 @@ public abstract class AbstractCompositionalModelAnalyzer
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.setNumberOfStates(0.0);
     result.setNumberOfTransitions(0.0);
+    mAbstractionProcedure =
+      mAbstractionProcedureFactory.createAbstractionProcedure(this);
     mAbstractionProcedure.storeStatistics();
     mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
     mSelectingHeuristic = mSelectingMethod.createHeuristic(this);
@@ -2695,6 +2716,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    */
   private Collection<EventProxy> mPropositions;
 
+  private AbstractionProcedureFactory mAbstractionProcedureFactory;
   private final PreselectingMethodFactory mPreselectingMethodFactory;
   private PreselectingMethod mPreselectingMethod;
   private final SelectingMethodFactory mSelectingMethodFactory;

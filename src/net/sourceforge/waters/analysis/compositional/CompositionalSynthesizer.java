@@ -81,24 +81,23 @@ public class CompositionalSynthesizer
    * @param factory
    *          Factory used for trace construction.
    */
-  public CompositionalSynthesizer
-    (final ProductDESProxyFactory factory)
+  public CompositionalSynthesizer(final ProductDESProxyFactory factory)
   {
-    this(factory, IdenticalKindTranslator.getInstance());
+    this(factory, SynthesisAbstractionProcedureFactory.WSOE);
   }
 
   /**
    * Creates a compositional synthesiser without a model.
    * @param factory
    *          Factory used for trace construction.
-   * @param translator
-   *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalSynthesizer
     (final ProductDESProxyFactory factory,
-     final KindTranslator translator)
+     final SynthesisAbstractionProcedureFactory abstractionFactory)
   {
-    this(null, factory, translator);
+    this(factory, IdenticalKindTranslator.getInstance(), abstractionFactory);
   }
 
   /**
@@ -107,6 +106,25 @@ public class CompositionalSynthesizer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
+   */
+  public CompositionalSynthesizer
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final SynthesisAbstractionProcedureFactory abstractionFactory)
+  {
+    this(null, factory, translator, abstractionFactory);
+  }
+
+  /**
+   * Creates a compositional synthesiser without a model.
+   * @param factory
+   *          Factory used for trace construction.
+   * @param translator
+   *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -117,10 +135,11 @@ public class CompositionalSynthesizer
   public CompositionalSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final SynthesisAbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    this(null, factory, translator,
+    this(null, factory, translator, abstractionFactory,
          preselectingMethodFactory, selectingMethodFactory);
   }
 
@@ -133,13 +152,16 @@ public class CompositionalSynthesizer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
-     final KindTranslator translator)
+     final KindTranslator translator,
+     final SynthesisAbstractionProcedureFactory abstractionFactory)
   {
-    this(model, factory, translator,
+    this(model, factory, translator, abstractionFactory,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
@@ -152,6 +174,8 @@ public class CompositionalSynthesizer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -163,15 +187,12 @@ public class CompositionalSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final SynthesisAbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    super(model, factory, translator,
+    super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory, selectingMethodFactory);
-    final AbstractionProcedure proc =
-      SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure
-        (this, SynthesisAbstractionProcedure.CHAIN_WSOE);
-    setAbstractionProcedure(proc);
     setPruningDeadlocks(true);
   }
 

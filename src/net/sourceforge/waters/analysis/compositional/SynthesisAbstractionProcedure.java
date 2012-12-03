@@ -178,12 +178,6 @@ public class SynthesisAbstractionProcedure
     mChain.createStatistics();
   }
 
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return false;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -401,20 +395,20 @@ public class SynthesisAbstractionProcedure
   /**
    * Flag to include halfway synthesis in abstraction chain.
    */
-  public static final int USE_HALFWAY = 0x01;
+  static final int USE_HALFWAY = 0x01;
   /**
    * Flag to include halfway bisimulation in abstraction chain.
    */
-  public static final int USE_BISIMULATION = 0x02;
+  static final int USE_BISIMULATION = 0x02;
   /**
    * Flag to include synthesis observation equivalence in abstraction chain.
    */
-  public static final int USE_SOE = 0x04;
+  static final int USE_SOE = 0x04;
   /**
    * Flag to include weak synthesis observation equivalence in abstraction
    * chain.
    */
-  public static final int USE_WSOE = 0x08;
+  static final int USE_WSOE = 0x08;
 
   /**
    * Argument to
@@ -423,8 +417,7 @@ public class SynthesisAbstractionProcedure
    * chain consisting of halfway synthesis, bisimulation, and synthesis
    * observation equivalence.
    */
-  public static final int CHAIN_SOE =
-    USE_HALFWAY | USE_BISIMULATION | USE_SOE;
+  static final int CHAIN_SOE = USE_HALFWAY | USE_BISIMULATION | USE_SOE;
   /**
    * Argument to
    * {@link #createSynthesisAbstractionProcedure(CompositionalSynthesizer,int)
@@ -432,8 +425,7 @@ public class SynthesisAbstractionProcedure
    * chain consisting of halfway synthesis, bisimulation, and weak synthesis
    * observation equivalence. This is the default.
    */
-  public static final int CHAIN_WSOE =
-    USE_HALFWAY | USE_BISIMULATION | USE_WSOE;
+  static final int CHAIN_WSOE = USE_HALFWAY | USE_BISIMULATION | USE_WSOE;
   /**
    * Argument to
    * {@link #createSynthesisAbstractionProcedure(CompositionalSynthesizer,int)
@@ -441,7 +433,7 @@ public class SynthesisAbstractionProcedure
    * chain consisting of halfway synthesis, bisimulation, synthesis
    * observation equivalence, and weak synthesis observation equivalence.
    */
-  public static final int CHAIN_ALL =
+  static final int CHAIN_ALL =
     USE_HALFWAY | USE_BISIMULATION | USE_SOE | USE_WSOE;
 
 }

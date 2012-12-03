@@ -43,10 +43,14 @@ public class CompositionalSimplifier
    * Creates a new compositional simplifier without a model.
    * @param factory
    *          Factory used for result construction.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalSimplifier(final ProductDESProxyFactory factory)
+  public CompositionalSimplifier
+    (final ProductDESProxyFactory factory,
+     final AbstractionProcedureFactory abstractionFactory)
   {
-    this(null, factory);
+    this(null, factory, abstractionFactory);
   }
 
   /**
@@ -55,11 +59,16 @@ public class CompositionalSimplifier
    *          The model to be minimised.
    * @param factory
    *          Factory used for result construction.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalSimplifier(final ProductDESProxy model,
-                                 final ProductDESProxyFactory factory)
+  public CompositionalSimplifier
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory,
+     final AbstractionProcedureFactory abstractionFactory)
   {
-    this(model, factory, IdenticalKindTranslator.getInstance());
+    this(model, factory,
+         IdenticalKindTranslator.getInstance(), abstractionFactory);
   }
 
   /**
@@ -70,17 +79,18 @@ public class CompositionalSimplifier
    *          Factory used for result construction.
    * @param translator
    *          Kind translator to determine event and automaton types.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalSimplifier(final ProductDESProxy model,
-                                 final ProductDESProxyFactory factory,
-                                 final KindTranslator translator)
+  public CompositionalSimplifier
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory)
   {
-    super(model, factory, translator,
+    super(model, factory, translator, abstractionFactory,
           new PreselectingMethodFactory(),
           new SelectingMethodFactory());
-    final AbstractionProcedure proc =
-      ConflictAbstractionProcedureFactory.OEQ.createAbstractionProecudure(this);
-    setAbstractionProcedure(proc);
     // TODO This is specific to nonblocking and should be in a subclass.
     setPruningDeadlocks(true);
   }
@@ -152,9 +162,10 @@ public class CompositionalSimplifier
     throws AnalysisException
   {
     final EventProxy defaultMarking = createDefaultMarking();
-    final AbstractionProcedure proc = getAbstractionProcedure();
+    final AbstractionProcedureFactory abstraction =
+      getAbstractionProcedureFactory();
     final EventProxy preconditionMarking;
-    if (proc.expectsAllMarkings()) {
+    if (abstraction.expectsAllMarkings()) {
       preconditionMarking = createPreconditionMarking();
     } else {
       preconditionMarking = getConfiguredPreconditionMarking();
