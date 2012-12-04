@@ -10,6 +10,8 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntStack;
 
 import java.util.BitSet;
 
@@ -154,24 +156,39 @@ public class SilentIncomingTRSimplifier
     if (keep.cardinality() == numStates) {
       return false;
     }
-    final TransitionIterator iter = rel.createSuccessorsModifyingIterator();
+    final TransitionIterator reader = rel.createSuccessorsReadOnlyIterator();
+    final TransitionIterator writer = rel.createSuccessorsModifyingIterator();
     final TIntArrayList targets = new TIntArrayList();
+    final TIntStack stack = new TIntStack();
     int source = 0;
     boolean modified = false;
     main:
     while (source < numStates) {
       if (rel.isReachable(source)) {
         checkAbort();
-        iter.reset(source, tauID);
-        while (iter.advance()) {
-          final int target = iter.getCurrentTargetState();
-          if (!keep.get(target)) {
-            iter.remove();
-            targets.add(target);
+        final TIntHashSet visited = new TIntHashSet();
+        stack.push(source);
+        visited.add(source);
+        while (stack.size() > 0) {
+          final int current = stack.pop();
+          reader.reset(current, tauID);
+          while (reader.advance()) {
+            final int target = reader.getCurrentTargetState();
+            if (!keep.get(target) && visited.add(target)) {
+              stack.push(target);
+              targets.add(target);
+            }
           }
         }
         if (!targets.isEmpty()) {
           rel.copyOutgoingTransitions(targets, source);
+          writer.reset(source, tauID);
+          while (writer.advance()) {
+            final int target = writer.getCurrentTargetState();
+            if (visited.contains(target)) {
+              writer.remove();
+            }
+          }
           targets.clear();
           modified = true;
           // After copying outgoing transitions from target to source,
