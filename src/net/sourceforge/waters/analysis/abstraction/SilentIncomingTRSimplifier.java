@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.TIntArrayList;
+
 import java.util.BitSet;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -153,28 +155,33 @@ public class SilentIncomingTRSimplifier
       return false;
     }
     final TransitionIterator iter = rel.createSuccessorsModifyingIterator();
+    final TIntArrayList targets = new TIntArrayList();
     int source = 0;
     boolean modified = false;
     main:
-      while (source < numStates) {
-        if (rel.isReachable(source)) {
-          checkAbort();
-          iter.reset(source, tauID);
-          while (iter.advance()) {
-            final int target = iter.getCurrentTargetState();
-            if (!keep.get(target)) {
-              iter.remove();
-              rel.copyOutgoingTransitions(target, source);
-              modified = true;
-              // After copying outgoing transitions from target to source,
-              // the source state may receive new tau-transitions. To make sure
-              // these are processed, we start checking the source state again.
-              continue main;
-            }
+    while (source < numStates) {
+      if (rel.isReachable(source)) {
+        checkAbort();
+        iter.reset(source, tauID);
+        while (iter.advance()) {
+          final int target = iter.getCurrentTargetState();
+          if (!keep.get(target)) {
+            iter.remove();
+            targets.add(target);
           }
         }
-        source++;
+        if (!targets.isEmpty()) {
+          rel.copyOutgoingTransitions(targets, source);
+          targets.clear();
+          modified = true;
+          // After copying outgoing transitions from target to source,
+          // the source state may receive new tau-transitions. To make sure
+          // these are processed, we start checking the source state again.
+          continue main;
+        }
       }
+      source++;
+    }
     if (modified) {
       applyResultPartitionAutomatically();
     }

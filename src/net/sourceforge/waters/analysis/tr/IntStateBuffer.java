@@ -607,16 +607,16 @@ public class IntStateBuffer
             printer.print('<');
             boolean first = true;
             for (int p = 0; p < mNumPropositions; p++) {
-              if (first) {
-                first = false;
-              } else {
-                printer.print(",");
-              }
               if ((info & (1 << p) & mUsedPropositions) != 0) {
+                if (first) {
+                  first = false;
+                } else {
+                  printer.print(",");
+                }
                 printer.print(p);
               }
             }
-            printer.print('<');
+            printer.print('>');
           }
         }
       }
