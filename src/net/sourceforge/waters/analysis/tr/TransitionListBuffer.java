@@ -1114,25 +1114,30 @@ public abstract class TransitionListBuffer
           current = next;
         }
       }
-      final int[] transarray = transitions.toArray();
-      transitions.clear();
-      Arrays.sort(transarray);
-      newStateTransitions[code] = list = createList();
-      int event0 = -1;
-      for (final int trans : transarray) {
-        final int event = (trans >>> eventShift);
-        final int target = trans & stateMask;
-        if (event0 != event) {
-          final int fromCode = (code << mStateShift) | event;
-          mStateEventTransitions.put(fromCode, list);
-          event0 = event;
+      if (transitions.isEmpty()) {
+        newStateTransitions[code] = NULL;
+      } else {
+        final int[] transarray = transitions.toArray();
+        transitions.clear();
+        Arrays.sort(transarray);
+        newStateTransitions[code] = list = createList();
+        int event0 = -1;
+        for (final int trans : transarray) {
+          final int event = (trans >>> eventShift);
+          final int target = trans & stateMask;
+          if (event0 != event) {
+            final int fromCode = (code << mStateShift) | event;
+            mStateEventTransitions.put(fromCode, list);
+            event0 = event;
+          }
+          final int data = (target << mStateShift) | event;
+          list = prepend(list, data);
         }
-        final int data = (target << mStateShift) | event;
-        list = prepend(list, data);
       }
       code++;
     }
     mStateTransitions = newStateTransitions;
+    mNumStates = numClasses;
   }
 
 
@@ -1847,7 +1852,6 @@ public abstract class TransitionListBuffer
   private final int mBlockMask;
   private final int mBlockSize;
 
-  private final int mNumStates;
   private final int mNumEvents;
   private final int mStateShift;
   private final int mEventMask;
@@ -1855,6 +1859,7 @@ public abstract class TransitionListBuffer
   private int[] mStateTransitions;
   private final TIntIntHashMap mStateEventTransitions;
 
+  private int mNumStates;
   private int mRecycleStart;
   private int mNextFreeIndex;
 
