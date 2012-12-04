@@ -160,10 +160,8 @@ public class SilentIncomingTRSimplifier
     final TransitionIterator writer = rel.createSuccessorsModifyingIterator();
     final TIntArrayList targets = new TIntArrayList();
     final TIntStack stack = new TIntStack();
-    int source = 0;
     boolean modified = false;
-    main:
-    while (source < numStates) {
+    for (int source = 0; source < numStates; source++) {
       if (rel.isReachable(source)) {
         checkAbort();
         final TIntHashSet visited = new TIntHashSet();
@@ -191,13 +189,8 @@ public class SilentIncomingTRSimplifier
           }
           targets.clear();
           modified = true;
-          // After copying outgoing transitions from target to source,
-          // the source state may receive new tau-transitions. To make sure
-          // these are processed, we start checking the source state again.
-          continue main;
         }
       }
-      source++;
     }
     if (modified) {
       applyResultPartitionAutomatically();
