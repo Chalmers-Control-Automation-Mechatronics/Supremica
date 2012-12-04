@@ -36,7 +36,7 @@ public class IDEDimensions
   public static final Dimension loggerPreferredSize =
     new Dimension(MAINWINDOWWIDTH, MAINWINDOWHEIGHT/4);
   public static final Dimension loggerMinimumSize =
-    new Dimension(100, 100);
+    new Dimension(100, 60);
 
   public static final Dimension mainPanelPreferredSize =
     new Dimension(MAINWINDOWWIDTH, MAINWINDOWHEIGHT*3/4);
