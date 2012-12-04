@@ -251,6 +251,14 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testNoPlant2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "no_plant2";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testParrow() throws Exception
   {
     final String group = "tests";
