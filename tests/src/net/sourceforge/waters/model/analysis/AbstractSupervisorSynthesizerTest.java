@@ -414,6 +414,14 @@ public abstract class AbstractSupervisorSynthesizerTest
 
   //#########################################################################
   //# Test Cases --- BIG
+  public void testAip0Sub1P1() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "aip0sub1p1";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testKoordWspSynth() throws Exception
   {
     final String group = "tests";
