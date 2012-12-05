@@ -224,29 +224,23 @@ public class MonolithicControlLoopChecker
       final int bits = getBitLength(aProxy);
       mNumBits[counter] = bits;
       mNumBitsMasks[counter] = (1 << bits) - 1;
-      if (totalBits >= bits) { // if current buffer can store this automaton
-        totalBits -= bits;
-      }
-      else {
+      if (totalBits < bits) {
         mNumInts++;
         totalBits = SIZE_INT;
       }
+      totalBits -= bits;
       counter++;
     }
-
     // get index
-    counter = 0;
     totalBits = SIZE_INT;
     mIndexAutomata = new int[mNumInts + 1];
-    mIndexAutomata[0] = counter++;
+    counter = 1;
     for (int i = 0; i < mNumAutomata; i++) {
-      if (totalBits >= mNumBits[i]) {
-        totalBits -= mNumBits[i];
-      }
-      else {
+      if (totalBits < mNumBits[i]) {
         mIndexAutomata[counter++] = i;
         totalBits = SIZE_INT;
       }
+      totalBits -= mNumBits[i];
     }
     mIndexAutomata[mNumInts] = mNumAutomata;
 
