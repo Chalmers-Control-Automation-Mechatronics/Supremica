@@ -319,6 +319,14 @@ public abstract class AbstractControlLoopCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void test_Nasty_HiddenLoop66() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "hidden_loop_66.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void test_Nasty_JustProperty() throws Exception
   {
     final String group = "tests";

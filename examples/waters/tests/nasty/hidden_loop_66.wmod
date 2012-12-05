@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="hidden_loop_66" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for the state encoding of monotlithic control-loop checkers.
+This model has 22 automata requiring 66 bits or three 32-bit words to encode.
+The control loop can only be found if the most significant bit of all automata is captured correctly in the encoding.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name="N">
+            <ConstantAliasExpression>
+                <IntConstant Value="22"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="step"/>
+        <EventDecl Kind="CONTROLLABLE" Name="loop"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <ForeachComponent Name="K">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="N"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="loop5">
+                        <SimpleIdentifier Name="K"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="S0">
+                                <PointGeometry>
+                                    <Point X="112" Y="64"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="S1">
+                                <PointGeometry>
+                                    <Point X="208" Y="64"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="S2">
+                                <PointGeometry>
+                                    <Point X="240" Y="144"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="S3">
+                                <PointGeometry>
+                                    <Point X="160" Y="192"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="S4">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="80" Y="144"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="S0" Target="S1">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="step"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-16" Y="-19"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Source="S1" Target="S2">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="step"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="4" Y="-15"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Source="S2" Target="S3">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="step"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-5" Y="-1"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Source="S3" Target="S4">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="step"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-20" Y="0"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Source="S4" Target="S0">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="step"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-30" Y="-17"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Source="S4" Target="S4">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="loop"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-8" Y="9"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="44" Y="172"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+    </ComponentList>
+</Module>
