@@ -134,15 +134,16 @@ public class MonolithicSynthesizer extends
   {
     try {
       setUp();
+
       while (!mGlobalStack.isEmpty()) {
         final int[] sentinel = new int[1];
-        final int[] root = mGlobalStack.pop();
-        final int r = mGlobalVisited.get(root);
+        final int[] encodedRoot = mGlobalStack.pop();
+        final int r = mGlobalVisited.get(encodedRoot);
         if (mSafeStates.get(r) || mBadStates.get(r)) {
           continue;
         }
-        mLocalStack.push(root);
-        mLocalVisited.add(root);
+        mLocalStack.push(encodedRoot);
+        mLocalVisited.add(mStateTuples.get(r));
         mBackTrace.push(sentinel);
         boolean safe = true;
         while (!mLocalStack.isEmpty()) {
@@ -160,7 +161,7 @@ public class MonolithicSynthesizer extends
         }
         if (safe) {
           for (final int[] current : mLocalVisited) {
-            final int n = addNewState(current);
+            final int n = addEncodedNewState(current);
             mSafeStates.set(n);
           }
           for (final int[] current : mLocalVisited) {
@@ -178,7 +179,7 @@ public class MonolithicSynthesizer extends
                   return setBooleanResult(false);
                 }
               } else {
-                n = addNewState(current);
+                n = addEncodedNewState(current);
               }
               mBadStates.set(n);
             }
@@ -189,45 +190,41 @@ public class MonolithicSynthesizer extends
         mBackTrace.clear();
       }
 
-      //====================================================================================================
       mMustContinue = false;
       do {
-        //////mark non-coreachable states (trim)
+        // mark non-coreachable states (trim)
         mNonCoreachableStates.set(0, mNumStates);
         tuples: for (int t = 0; t < mStateTuples.size(); t++) {
           if (!mBadStates.get(t)) {
-            final int[] aTuple = mStateTuples.get(t);
-            for (int aut = 0; aut < aTuple.length; aut++) {
-              if (!mStateMarkings[aut][aTuple[aut]].isEmpty()) {
-                if (aut == aTuple.length - 1) {
-                  mUnvisited.add(mStateTuples.get(t));
-                  mNonCoreachableStates.set(t, false);
-                  while (!mUnvisited.isEmpty()) {
-                    final int[] s = mUnvisited.remove();
-                    mCoreachabilityExplorer.explore(s);
-                  }
-                }
-              } else {
+            final int[] tuple = new int[mNumAutomata];
+            final int[] encodedTuple = mStateTuples.get(t);
+            decode(encodedTuple, tuple);
+            for (int aut = 0; aut < tuple.length; aut++) {
+              if (mStateMarkings[aut][tuple[aut]].isEmpty()) {
                 continue tuples;
               }
             }
-            if (aTuple.length == 0) {
-              mNonCoreachableStates.set(t, false);
+            mUnvisited.add(encodedTuple);
+            mNonCoreachableStates.set(t, false);
+            while (!mUnvisited.isEmpty()) {
+              final int[] s = mUnvisited.remove();
+              mCoreachabilityExplorer.explore(s);
             }
           }
         }
+
         for (int b = 0; b < mNumInitialStates; b++) {
           if (!mBadStates.get(b) && mNonCoreachableStates.get(b)) {
             initialIsBad = true;
           }
         }
-        //////mark uncontrollable states
+        // mark uncontrollable states
         mMustContinue = false;
         mUnvisited.clear();
         for (int state = 0; state < mStateTuples.size(); state++) {
           if (!mBadStates.get(state) && mNonCoreachableStates.get(state)) {
             mBadStates.set(state);
-            mUnvisited.add(mStateTuples.get(state));
+            mUnvisited.offer(mStateTuples.get(state));
             while (!mUnvisited.isEmpty()) {
               final int[] s = mUnvisited.remove();
               mSuccessorStatesExplorer.explore(s);
@@ -236,30 +233,12 @@ public class MonolithicSynthesizer extends
         }
       } while (mMustContinue);
 
-      if (mNumPlants == 0) {
-        states: for (int t = 0; t < mStateTuples.size(); t++) {
-          if (!mBadStates.get(t)) {
-            final int[] aTuple = mStateTuples.get(t);
-            for (int aut = 0; aut < aTuple.length; aut++) {
-              for (int e = 0; e < mNumUncontrollableEvents; e++) {
-                if (mTransitions[aut][e] != null) {
-                  final int[] succ = mTransitions[aut][e][aTuple[aut]];
-                  if (succ == null) {
-                    mBadStates.set(t);
-                    continue states;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      mUnvisited = new ArrayDeque<int[]>(100);
+      mUnvisited.clear();
       mFinalReachabilityExplorer.permutations(mNumAutomata, null, -1);
       while (!mUnvisited.isEmpty()) {
-        final int[] tuple = mUnvisited.remove();
-        if (mGlobalVisited.containsKey(tuple)) {
-          mFinalReachabilityExplorer.explore(tuple);
+        final int[] s = mUnvisited.remove();
+        if (mGlobalVisited.containsKey(s)) {
+          mFinalReachabilityExplorer.explore(s);
         }
       }
       for (int b = 0; b < mNumInitialStates; b++) {
@@ -313,6 +292,13 @@ public class MonolithicSynthesizer extends
   @Override
   protected void setUp() throws AnalysisException
   {
+    int[][][][] mTransitions;
+    int[][][][] mReverseTransitions;
+    int[][] mEventAutomata;
+    int[][] mReverseEventAutomata;
+    int[][] mNDTuple;
+    int[][] mNDTupleFinal;
+
     super.setUp();
 
     final ProductDESProxy model = getModel();
@@ -375,22 +361,20 @@ public class MonolithicSynthesizer extends
       final int e = iter.value();
       mEvents[e] = event;
     }
-
     final int numProps = mCurrentPropositions.size();
     mOriginalStates = new StateProxy[mNumAutomata][];
     mAllMarkings = new HashMap<List<EventProxy>,List<EventProxy>>();
     mStateMarkings = new List<?>[mNumAutomata][];
+    mDeadlock = new boolean[mNumAutomata][];
+    mTargetTuple = new int[mNumAutomata];
+    mDeadlockState = -1;
+
     //transitions indexed first by automaton then by event then by source state
     mTransitions = new int[mNumAutomata][mNumProperEvents][][];
     mReverseTransitions = new int[mNumAutomata][mNumProperEvents][][];
     mEventAutomata = new int[mNumProperEvents][];
     mReverseEventAutomata = new int[mNumProperEvents][];
-
-    mDeadlock = new boolean[mNumAutomata][];
-
-    mTargetTuple = new int[mNumAutomata];
     mNDTuple = new int[mNumAutomata][];
-    mDeadlockState = -1;
 
     int a = 0;
     for (final AutomatonProxy aut : mAutomata) {
@@ -434,9 +418,7 @@ public class MonolithicSynthesizer extends
           Collections.sort(stateProps);
         }
         mStateMarkings[a][snum] = getUniqueMarking(stateProps);
-
         mDeadlock[a][snum] = stateProps.isEmpty();
-
         snum++;
       }
       mNDTuple[a] = initials.toNativeArray();
@@ -486,7 +468,6 @@ public class MonolithicSynthesizer extends
       a++;
     }
     eventToIndex = null;
-
     mEventAutomata = new int[mNumProperEvents][];
     mReverseEventAutomata = new int[mNumProperEvents][];
     final List<AutomatonEventInfo> list =
@@ -561,8 +542,44 @@ public class MonolithicSynthesizer extends
     mStateTuples = new ArrayList<int[]>();
     mTransitionBuffer = new TIntArrayList();
     mTransitionBufferLimit = 3 * getTransitionLimit();
-    mNumStates = 0;
     mUnvisited = new ArrayDeque<int[]>(100);
+    mNumStates = 0;
+
+    // get encoding information
+    mNumBits = new int[mNumAutomata];
+    mNumBitsMasks = new int[mNumAutomata];
+
+    // get mNumBits
+    mNumInts = 1;
+    int totalBits = SIZE_INT;
+    int counter = 0;
+    for (int aut = 0; aut < mNumAutomata; aut++) {
+      final int bits = AutomatonTools.log2(mOriginalStates[aut].length);
+      mNumBits[counter] = bits;
+      mNumBitsMasks[counter] = (1 << bits) - 1;
+      if (totalBits >= bits) { // if current buffer can store this automaton
+        totalBits -= bits;
+      } else {
+        mNumInts++;
+        totalBits = SIZE_INT - bits;
+      }
+      counter++;
+    }
+
+    // get index
+    counter = 0;
+    totalBits = SIZE_INT;
+    mIndexAutomata = new int[mNumInts + 1];
+    mIndexAutomata[0] = counter++;
+    for (int i = 0; i < mNumAutomata; i++) {
+      if (totalBits >= mNumBits[i]) {
+        totalBits -= mNumBits[i];
+      } else {
+        mIndexAutomata[counter++] = i;
+        totalBits = SIZE_INT - mNumBits[i];
+      }
+    }
+    mIndexAutomata[mNumInts] = mNumAutomata;
 
     mCtrlInitialReachabilityExplorer =
       new CtrlInitialReachabilityExplorer(mEventAutomata, mTransitions,
@@ -609,14 +626,11 @@ public class MonolithicSynthesizer extends
     mOriginalStates = null;
     mAllMarkings = null;
     mStateMarkings = null;
-    mTransitions = null;
     mDeadlock = null;
-    mEventAutomata = null;
     mGlobalVisited = null;
     mStateTuples = null;
     mUnvisited = null;
     mTransitionBuffer = null;
-    mNDTuple = null;
     mTargetTuple = null;
     mCurrentDeadlock = null;
   }
@@ -624,31 +638,70 @@ public class MonolithicSynthesizer extends
   //#########################################################################
   //# Auxiliary Methods
 
-  private int addNewState(final int[] tuple) throws OverflowException
+  /**
+   * It will take a single state tuple as a parameter and encode it.
+   *
+   * @param stateCodes
+   *          state tuple that will be encoded
+   * @return encoded state tuple
+   */
+  private int[] encode(final int[] stateCodes)
   {
-    if (mGlobalVisited.containsKey(tuple)) {
-      return mGlobalVisited.get(tuple);
+    final int encoded[] = new int[mNumInts];
+    int i, j;
+    for (i = 0; i < mNumInts; i++) {
+      for (j = mIndexAutomata[i]; j < mIndexAutomata[i + 1]; j++) {
+        encoded[i] <<= mNumBits[j];
+        encoded[i] |= stateCodes[j];
+      }
+    }
+    return encoded;
+  }
+
+  /**
+   * It will take an encoded state tuple as a parameter and decode it. Decoded
+   * result will be contained in the second parameter
+   *
+   * @param encodedStateCodes
+   *          state tuple that will be decoded
+   * @param currTuple
+   *          the decoded state tuple will be stored here
+   */
+  private void decode(final int[] encodedStateCodes, final int[] currTuple)
+  {
+    int tmp, mask, i, j;
+    for (i = 0; i < mNumInts; i++) {
+      tmp = encodedStateCodes[i];
+      for (j = mIndexAutomata[i + 1] - 1; j >= mIndexAutomata[i]; j--) {
+        mask = mNumBitsMasks[j];
+        currTuple[j] = tmp & mask;
+        tmp = tmp >>> mNumBits[j];
+      }
+    }
+  }
+
+  private int addDecodedNewState(final int[] decodedTuple)
+    throws OverflowException
+  {
+    final int[] encoded = encode(decodedTuple);
+    return addEncodedNewState(encoded);
+  }
+
+  private int addEncodedNewState(final int[] encodedTuple)
+    throws OverflowException
+  {
+    if (mGlobalVisited.containsKey(encodedTuple)) {
+      return mGlobalVisited.get(encodedTuple);
     } else {
       final int code = mNumStates++;
       final int limit = getNodeLimit();
       if (mNumStates >= limit) {
         throw new OverflowException(limit);
       }
-      final int[] newTuple = Arrays.copyOf(tuple, mNumAutomata);
-      mGlobalVisited.put(newTuple, code);
-      mStateTuples.add(newTuple);
+      mGlobalVisited.put(encodedTuple, code);
+      mStateTuples.add(encodedTuple);
       return code;
     }
-  }
-
-  private boolean isNewState(final int[] tuple) throws OverflowException
-  {
-    final int currentNumStates = mNumStates;
-    addNewState(tuple);
-    if (currentNumStates == mNumStates) {
-      return false;
-    }
-    return true;
   }
 
   @SuppressWarnings("unused")
@@ -696,7 +749,8 @@ public class MonolithicSynthesizer extends
     for (int code = 0; code < mNumStates; code++) {
       if (mReachableStates.get(code)) {
         final boolean initial = code < mNumInitialStates;
-        final int[] tuple = mStateTuples.get(code);
+        final int[] tuple = new int[mNumAutomata];
+        decode(mStateTuples.get(code), tuple);
         final List<EventProxy> marking = new ArrayList<EventProxy>(numProps);
         props: for (final EventProxy prop : mCurrentPropositions) {
           for (int a = 0; a < mNumAutomata; a++) {
@@ -820,6 +874,7 @@ public class MonolithicSynthesizer extends
 
     //#######################################################################
     //# Auxiliary Methods
+
     /**
      * Gets the index position of the given automaton in state tuples.
      * Presently linear complexity --- is this good enough?
@@ -1010,7 +1065,6 @@ public class MonolithicSynthesizer extends
 
 
   //#########################################################################################################
-  //#########################################################################################################
   //# Inner Class StateExplorer
   private abstract class StateExplorer
   {
@@ -1026,45 +1080,47 @@ public class MonolithicSynthesizer extends
       mmNDTuple = theNDTuple;
     }
 
-    public boolean explore(final int[] stateTuple) throws OverflowException
+    public boolean explore(final int[] encodedTuple) throws OverflowException
     {
+      final int[] decoded = new int[mNumAutomata];
       events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
-            final int[] succ = mmTransitions[a][e][stateTuple[a]];
+            decode(encodedTuple, decoded);
+            final int[] succ = mmTransitions[a][e][decoded[a]];
             if (succ == null) {
               continue events;
             }
             mmNDTuple[a] = succ;
           }
         }
-        if (!permutations(mNumAutomata, stateTuple, e)) {
+        if (!permutations(mNumAutomata, decoded, e)) {
           return false;
         }
       }
       return true;
     }
 
-    public boolean permutations(int autNum, final int[] sourceTuple,
+    public boolean permutations(int a, final int[] decodedSource,
                                 final int event) throws OverflowException
     {
-      if (autNum == 0) {
-        if (!processNewState(sourceTuple, event, sourceTuple == null)) {
+      if (a == 0) {
+        if (!processNewState(decodedSource, event, decodedSource == null)) {
           return false;
         }
       } else {
-        autNum--;
-        final int[] codes = mmNDTuple[autNum];
+        a--;
+        final int[] codes = mmNDTuple[a];
         if (codes == null) {
-          mTargetTuple[autNum] = sourceTuple[autNum];
-          if (!permutations(autNum, sourceTuple, event)) {
+          mTargetTuple[a] = decodedSource[a];
+          if (!permutations(a, decodedSource, event)) {
             return false;
           }
         } else {
           for (int i = 0; i < codes.length; i++) {
-            mTargetTuple[autNum] = codes[i];
-            if (!permutations(autNum, sourceTuple, event)) {
+            mTargetTuple[a] = codes[i];
+            if (!permutations(a, decodedSource, event)) {
               return false;
             }
           }
@@ -1073,7 +1129,7 @@ public class MonolithicSynthesizer extends
       return true;
     }
 
-    public abstract boolean processNewState(int[] sourceTuple,
+    public abstract boolean processNewState(final int[] decodedSource,
                                             final int event,
                                             final boolean isInitial)
       throws OverflowException;
@@ -1098,12 +1154,14 @@ public class MonolithicSynthesizer extends
       super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
     }
 
-    public boolean processNewState(final int[] sourceTuple, final int event, final boolean isInitial)
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
       throws OverflowException
     {
-      if (isNewState(mTargetTuple)) {
-        final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
-        mGlobalStack.push(newTuple);
+      final int currentNumStates = mNumStates;
+      final int t = addDecodedNewState(mTargetTuple);
+      if (currentNumStates != mNumStates) {
+        mGlobalStack.push(mStateTuples.get(t));
       }
       return true;
     }
@@ -1123,15 +1181,17 @@ public class MonolithicSynthesizer extends
     }
 
     @Override
-    public boolean explore(final int[] stateTuple) throws OverflowException
+    public boolean explore(final int[] encodedTuple) throws OverflowException
     {
+      final int[] decoded = new int[mNumAutomata];
       events: for (int e = 0; e < mNumUncontrollableEvents; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
-            final int[] succ = mmTransitions[a][e][stateTuple[a]];
+            decode(encodedTuple, decoded);
+            final int[] succ = mmTransitions[a][e][decoded[a]];
             if (succ == null) {
-              if (a >= mNumPlants && mNumPlants != 0) {
+              if (a >= mNumPlants) {
                 return false;
               } else {
                 continue events;
@@ -1140,29 +1200,30 @@ public class MonolithicSynthesizer extends
             mmNDTuple[a] = succ;
           }
         }
-        if (!permutations(mNumAutomata, stateTuple, e)) {
+        if (!permutations(mNumAutomata, decoded, e)) {
           return false;
         }
       }
       return true;
     }
 
-    public boolean processNewState(final int[] sourceTuple, final int event, final boolean isInitial)
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
       throws OverflowException
     {
-      if (mLocalVisited.contains(mTargetTuple)) {
+      final int[] encoded = encode(mTargetTuple);
+      if (mLocalVisited.contains(encoded)) {
         return true;
-      } else if (mGlobalVisited.containsKey(mTargetTuple)) {
-        final int target = mGlobalVisited.get(mTargetTuple);
-        if (mBadStates.get(target)) {
+      } else if (mGlobalVisited.containsKey(encoded)) {
+        final int s = mGlobalVisited.get(encoded);
+        if (mBadStates.get(s)) {
           return false;
-        } else if (mSafeStates.get(target)) {
+        } else if (mSafeStates.get(s)) {
           return true;
         }
       }
-      final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
-      mLocalVisited.add(newTuple);
-      mLocalStack.push(newTuple);
+      mLocalVisited.add(encoded);
+      mLocalStack.push(encoded);
       return true;
     }
   }
@@ -1179,14 +1240,17 @@ public class MonolithicSynthesizer extends
       super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
     }
 
-    public boolean processNewState(final int[] sourceTuple, final int event, final boolean isInitial)
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
       throws OverflowException
     {
-      final int source = mGlobalVisited.get(sourceTuple);
-      final int target = mGlobalVisited.get(mTargetTuple);
+      int source = 0;
+      if (decodedSource != null) {
+        source = mGlobalVisited.get(encode(decodedSource));
+      }
+      final int target = mGlobalVisited.get(encode(mTargetTuple));
       if (!mBadStates.get(target) && !mReachableStates.get(target)) {
-        final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
-        mUnvisited.offer(newTuple);
+        mUnvisited.offer(mStateTuples.get(target));
         mReachableStates.set(target);
       }
       if (!isInitial) {
@@ -1208,14 +1272,15 @@ public class MonolithicSynthesizer extends
       super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
     }
 
-    public boolean processNewState(final int[] sourceTuple, final int event, final boolean isInitial)
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
     {
-      if (mGlobalVisited.containsKey(mTargetTuple)) {
-        final int target = mGlobalVisited.get(mTargetTuple);
-        if (!mBadStates.get(target) && mNonCoreachableStates.get(target)) {
-          final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
-          mUnvisited.offer(newTuple);
-          mNonCoreachableStates.set(target, false);
+      final int[] encoded = encode(mTargetTuple);
+      if (mGlobalVisited.containsKey(encoded)) {
+        final int s = mGlobalVisited.get(encoded);
+        if (!mBadStates.get(s) && mNonCoreachableStates.get(s)) {
+          mUnvisited.offer(mStateTuples.get(s));
+          mNonCoreachableStates.set(s, false);
         }
       }
       return true;
@@ -1234,14 +1299,15 @@ public class MonolithicSynthesizer extends
       super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
     }
 
-    public boolean processNewState(final int[] sourceTuple, final int event, final boolean isInitial)
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
     {
-      if (mGlobalVisited.containsKey(mTargetTuple)) {
-        final int target = mGlobalVisited.get(mTargetTuple);
-        if (!mBadStates.get(target) && !mNonCoreachableStates.get(target)) {
-          final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
-          mUnvisited.offer(newTuple);
-          mBadStates.set(target);
+      final int[] encoded = encode(mTargetTuple);
+      if (mGlobalVisited.containsKey(encoded)) {
+        final int s = mGlobalVisited.get(encoded);
+        if (!mBadStates.get(s)) {
+          mUnvisited.offer(mStateTuples.get(s));
+          mBadStates.set(s);
           mMustContinue = true;
         }
       }
@@ -1251,43 +1317,53 @@ public class MonolithicSynthesizer extends
 
   //#########################################################################
   //# Data Members
+  //# Variables used for encoding/decoding
+  /** a list contains number of bits needed for each automaton */
+  private int mNumBits[];
+
+  /** a list contains masks needed for each automaton */
+  private int mNumBitsMasks[];
+
+  /** a number of integers used to encode synchronized state */
+  private int mNumInts;
+
+  /** an index of first automaton in each integer buffer */
+  private int mIndexAutomata[];
+
   private List<AutomatonProxy> mAutomata;
-  private Collection<EventProxy> mUsedPropositions;
-  private int mNumAutomata;
-  private static int mNumPlants;
-  private int mNumProperEvents;
-  private int mNumUncontrollableEvents;
-  private int mNumEvents;
   private EventProxy[] mEvents;
   private Collection<EventProxy> mCurrentPropositions;
+  private Collection<EventProxy> mUsedPropositions;
+  private TIntArrayList mTransitionBuffer;
+  private int mTransitionBufferLimit;
+
+  private int mNumAutomata;
+  private static int mNumPlants;
+  private int mNumStates;
+  private int mNumInitialStates;
+  private int mNumEvents;
+  private int mNumProperEvents;
+  private int mNumUncontrollableEvents;
+
   private StateProxy[][] mOriginalStates;
   private Map<List<EventProxy>,List<EventProxy>> mAllMarkings;
   private List<?>[][] mStateMarkings;
   private boolean[][] mDeadlock;
+  private boolean[] mCurrentDeadlock;
+  private int mDeadlockState;
 
-  private int mNumStates;
-  private int mNumInitialStates;
-  private List<int[]> mStateTuples;
-  private Queue<int[]> mUnvisited;
-  private TIntArrayList mTransitionBuffer;
-  private int mTransitionBufferLimit;
+  private List<int[]> mStateTuples;//applied encode&decode
+  private TObjectIntHashMap<int[]> mGlobalVisited;//applied encode&decode
+  private Deque<int[]> mGlobalStack;//applied encode&decode
+  private Deque<int[]> mLocalStack;//applied encode&decode
+  private Deque<int[]> mBackTrace;//applied encode&decode
+  private Set<int[]> mLocalVisited;//applied encode&decode
+  private Queue<int[]> mUnvisited;//applied encode&decode
+
   private BitSet mNonCoreachableStates;
   private BitSet mBadStates;
   private BitSet mSafeStates;
   private BitSet mReachableStates;
-  private boolean initialIsBad;
-  private boolean mMustContinue;
-
-  private int[] mTargetTuple;////
-  private boolean[] mCurrentDeadlock;
-  private int mDeadlockState;
-
-  private int[][][][] mTransitions;////
-  private int[][][][] mReverseTransitions;////
-  private int[][] mEventAutomata;////
-  private int[][] mReverseEventAutomata;////
-  private int[][] mNDTuple;////
-  private int[][] mNDTupleFinal;////
 
   private StateExplorer mCtrlInitialReachabilityExplorer;
   private StateExplorer mUnctrlInitialReachabilityExplorer;
@@ -1295,14 +1371,13 @@ public class MonolithicSynthesizer extends
   private StateExplorer mCoreachabilityExplorer;
   private StateExplorer mSuccessorStatesExplorer;
 
-  private Deque<int[]> mGlobalStack;
-  private TObjectIntHashMap<int[]> mGlobalVisited;
-  private Deque<int[]> mLocalStack;
-  private Deque<int[]> mBackTrace;
-  private Set<int[]> mLocalVisited;
+  private boolean initialIsBad;
+  private boolean mMustContinue;
+
+  private int[] mTargetTuple;
 
   //#########################################################################
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
-
+  private static final int SIZE_INT = 32;
 }
