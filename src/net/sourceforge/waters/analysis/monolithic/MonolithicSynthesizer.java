@@ -36,7 +36,6 @@ import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.ProductDESResult;
 import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
-import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -88,9 +87,6 @@ public class MonolithicSynthesizer extends
   }
 
   //#########################################################################
-  //# Configuration
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
   public Collection<EventProxy> getPropositions()
   {
@@ -100,14 +96,6 @@ public class MonolithicSynthesizer extends
   public void setPropositions(final Collection<EventProxy> props)
   {
     mUsedPropositions = props;
-  }
-
-  public SynchronousProductStateMap getStateMap()
-  {
-    final ProductDESProxy model = getModel();
-    final Collection<AutomatonProxy> automata = model.getAutomata();
-    final MemStateMap stateMap = new MemStateMap(automata, mDeadlockState);
-    return stateMap;
   }
 
   @Override
@@ -765,7 +753,7 @@ public class MonolithicSynthesizer extends
         Collections.sort(marking);
         final List<EventProxy> unique = getUniqueMarking(marking);
         final StateProxy state =
-          new MemStateProxy(code, tuple, unique, initial);
+          new MemStateProxy(code, unique, initial);
         states.add(state);
         stateArray[code] = state;
       }
@@ -825,73 +813,6 @@ public class MonolithicSynthesizer extends
     return msg;
   }
 
-
-  //#########################################################################
-  //# Inner Class MemStateMap
-  private static class MemStateMap implements SynchronousProductStateMap
-  {
-    //#######################################################################
-    //# Constructor
-    private MemStateMap(final Collection<AutomatonProxy> automata,
-                        final int dumpState)
-    {
-      mInputAutomata = new ArrayList<AutomatonProxy>(automata);
-      final int numaut = automata.size();
-      mStateLists = new StateProxy[numaut][];
-      // Assumes state codes are given by their ordering in the original
-      // automata. If this is not good enough, need to provide method
-      // setStateList(int a, StateProxy[] states).
-      int a = 0;
-      for (final AutomatonProxy aut : mInputAutomata) {
-        final Collection<StateProxy> states = aut.getStates();
-        final int size = states.size();
-        mStateLists[a++] = states.toArray(new StateProxy[size]);
-      }
-      mDumpState = dumpState;
-    }
-
-    //#######################################################################
-    //# Interface
-    //# net.sourceforge.waters.model.analysis.SynchronousProductStateMap
-    public Collection<AutomatonProxy> getInputAutomata()
-    {
-      return mInputAutomata;
-    }
-
-    public StateProxy getOriginalState(final StateProxy state,
-                                       final AutomatonProxy aut)
-    {
-      final int a = getAutomatonIndex(aut);
-      final MemStateProxy memstate = (MemStateProxy) state;
-      if (memstate.getCode() == mDumpState) {
-        return null;
-      } else {
-        final int[] tuple = memstate.getStateTuple();
-        final int code = tuple[a];
-        return mStateLists[a][code];
-      }
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-
-    /**
-     * Gets the index position of the given automaton in state tuples.
-     * Presently linear complexity --- is this good enough?
-     */
-    private int getAutomatonIndex(final AutomatonProxy aut)
-    {
-      return mInputAutomata.indexOf(aut);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final List<AutomatonProxy> mInputAutomata;
-    private final StateProxy[][] mStateLists;
-    private final int mDumpState;
-  }
-
-
   //#########################################################################
   //# Inner Class MemStateProxy
   /**
@@ -902,12 +823,11 @@ public class MonolithicSynthesizer extends
   {
     //#######################################################################
     //# Constructor
-    private MemStateProxy(final int name, final int[] stateTuple,
+    private MemStateProxy(final int name,
                           final Collection<EventProxy> props,
                           final boolean isInitial)
     {
       mName = name;
-      mStateTuple = stateTuple;
       mProps = props;
       mIsInitial = isInitial;
     }
@@ -926,9 +846,10 @@ public class MonolithicSynthesizer extends
 
     public MemStateProxy clone()
     {
-      return new MemStateProxy(mName, mStateTuple, mProps, mIsInitial);
+      return new MemStateProxy(mName, mProps, mIsInitial);
     }
 
+    @SuppressWarnings("unused")
     public int getCode()
     {
       return mName;
@@ -937,11 +858,6 @@ public class MonolithicSynthesizer extends
     public String getName()
     {
       return "S:" + mName;
-    }
-
-    public int[] getStateTuple()
-    {
-      return mStateTuple;
     }
 
     public boolean refequals(final NamedProxy o)
@@ -985,7 +901,6 @@ public class MonolithicSynthesizer extends
     //#######################################################################
     //# Data Members
     private final int mName;
-    private final int[] mStateTuple;
     private final boolean mIsInitial;
     private final Collection<EventProxy> mProps;
   }
@@ -1078,24 +993,24 @@ public class MonolithicSynthesizer extends
       mmEventAutomata = theEventAutomata;
       mmTransitions = theTransitions;
       mmNDTuple = theNDTuple;
+      mmDecodedTuple = new int[mNumAutomata];
     }
 
     public boolean explore(final int[] encodedTuple) throws OverflowException
     {
-      final int[] decoded = new int[mNumAutomata];
       events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
-            decode(encodedTuple, decoded);
-            final int[] succ = mmTransitions[a][e][decoded[a]];
+            decode(encodedTuple, mmDecodedTuple);
+            final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
             if (succ == null) {
               continue events;
             }
             mmNDTuple[a] = succ;
           }
         }
-        if (!permutations(mNumAutomata, decoded, e)) {
+        if (!permutations(mNumAutomata, mmDecodedTuple, e)) {
           return false;
         }
       }
@@ -1139,6 +1054,7 @@ public class MonolithicSynthesizer extends
     protected final int[][] mmNDTuple;
     protected int mmFirstEvent;
     protected int mmLastEvent;
+    protected int[] mmDecodedTuple;
   }
 
 
@@ -1183,13 +1099,12 @@ public class MonolithicSynthesizer extends
     @Override
     public boolean explore(final int[] encodedTuple) throws OverflowException
     {
-      final int[] decoded = new int[mNumAutomata];
       events: for (int e = 0; e < mNumUncontrollableEvents; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
-            decode(encodedTuple, decoded);
-            final int[] succ = mmTransitions[a][e][decoded[a]];
+            decode(encodedTuple, mmDecodedTuple);
+            final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
             if (succ == null) {
               if (a >= mNumPlants) {
                 return false;
@@ -1200,7 +1115,7 @@ public class MonolithicSynthesizer extends
             mmNDTuple[a] = succ;
           }
         }
-        if (!permutations(mNumAutomata, decoded, e)) {
+        if (!permutations(mNumAutomata, mmDecodedTuple, e)) {
           return false;
         }
       }
@@ -1352,13 +1267,13 @@ public class MonolithicSynthesizer extends
   private boolean[] mCurrentDeadlock;
   private int mDeadlockState;
 
-  private List<int[]> mStateTuples;//applied encode&decode
-  private TObjectIntHashMap<int[]> mGlobalVisited;//applied encode&decode
-  private Deque<int[]> mGlobalStack;//applied encode&decode
-  private Deque<int[]> mLocalStack;//applied encode&decode
-  private Deque<int[]> mBackTrace;//applied encode&decode
-  private Set<int[]> mLocalVisited;//applied encode&decode
-  private Queue<int[]> mUnvisited;//applied encode&decode
+  private List<int[]> mStateTuples;
+  private TObjectIntHashMap<int[]> mGlobalVisited;
+  private Deque<int[]> mGlobalStack;
+  private Deque<int[]> mLocalStack;
+  private Deque<int[]> mBackTrace;
+  private Set<int[]> mLocalVisited;
+  private Queue<int[]> mUnvisited;
 
   private BitSet mNonCoreachableStates;
   private BitSet mBadStates;
