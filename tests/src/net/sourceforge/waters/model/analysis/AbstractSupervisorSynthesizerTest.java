@@ -219,6 +219,14 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testFTechnik() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "incremental_suite";
+    final String name = "ftechnik";
+    runSynthesizer(group, subdir, name, false);
+  }
+
   public void testIPC() throws Exception
   {
     final String group = "tests";

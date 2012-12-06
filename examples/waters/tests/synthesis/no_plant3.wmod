@@ -162,7 +162,6 @@ This test assumes that uncontrollable events not explicitly in the plant are alw
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="c"/>
-                    <SimpleIdentifier Name="d"/>
                     <LabelGeometry Anchor="NW">
                         <Point X="136" Y="36"/>
                     </LabelGeometry>
