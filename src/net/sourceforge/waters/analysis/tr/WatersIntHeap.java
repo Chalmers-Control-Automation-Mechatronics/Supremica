@@ -128,7 +128,6 @@ public class WatersIntHeap
    * Inserts into the priority queue. Duplicates are allowed.
    * @param x
    *          the item to insert.
-   * @return null, signifying that decreaseKey cannot be used.
    */
   public void add(final int x)
   {

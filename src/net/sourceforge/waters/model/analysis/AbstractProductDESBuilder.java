@@ -114,7 +114,7 @@ public abstract class AbstractProductDESBuilder
    * Stores a product DES result indicating successful completion.
    * Setting the product DES also marks the analysis run as completed and
    * sets the Boolean result.
-   * @param  aut    The computed product DES, or <CODE>null</CODE> to
+   * @param  des    The computed product DES, or <CODE>null</CODE> to
    *                indicate an unsuccessful computation. The Boolean analysis
    *                result is set to <CODE>false</CODE> if and only if this
    *                parameter is <CODE>null</CODE>.
