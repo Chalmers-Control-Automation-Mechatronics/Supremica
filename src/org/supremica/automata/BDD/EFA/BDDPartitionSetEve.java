@@ -404,6 +404,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
              */
             boolean eventIsQualifiedForInitialComponent = true;
             boolean eventIsQualifiedForMarkedComponent = true;
+            boolean allVarPossiblyUpdated = true;
 
             if (autIterator.hasNext()) {
 
@@ -418,6 +419,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
 
                 eventIsQualifiedForInitialComponent = eventIsQualifiedForInitialComponent && firstAutTransWithEvent.qualifiedForInitialComponent;
                 eventIsQualifiedForMarkedComponent = eventIsQualifiedForMarkedComponent && firstAutTransWithEvent.qualifiedForMarkedComponent;
+                allVarPossiblyUpdated = allVarPossiblyUpdated && firstAutTransWithEvent.allVarPossiblyUpdated;
             }
 
             if (includedAutomata.size() == 1) {
@@ -426,14 +428,6 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                     final BDD noneUpdateVar = bddExAutomata.getBDDBitVecTarget(varIndex).equ(bddExAutomata.getBDDBitVecSource(varIndex));
                     transCorrespondingToUpdatedVariables[varIndex] = transCorrespondingToUpdatedVariablesWithoutActions[varIndex]
                                                                     .ite(transCorrespondingToUpdatedVariables[varIndex], noneUpdateVar);
-                }
-                
-                if (eventIsQualifiedForInitialComponent) {
-                    initialComponentCandidates.add(eventIndex);
-                }
-
-                if (eventIsQualifiedForMarkedComponent) {
-                    markedComponentCandidates.add(eventIndex);
                 }
             }
 
@@ -483,6 +477,10 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                 /* Update eventIsQualifiedForInitialComponent and eventIsQualifiedForMarkedComponent */
                 eventIsQualifiedForInitialComponent = eventIsQualifiedForInitialComponent && currAutIncTrans.qualifiedForInitialComponent;
                 eventIsQualifiedForMarkedComponent = eventIsQualifiedForMarkedComponent && currAutIncTrans.qualifiedForMarkedComponent;
+                
+                if(allVarPossiblyUpdated) {
+                    allVarPossiblyUpdated = allVarPossiblyUpdated && currAutIncTrans.allVarPossiblyUpdated;
+                }
             }
 
             final BDD tmp = manager.getOneBDD();
@@ -529,6 +527,11 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
             if (eventIsQualifiedForMarkedComponent) {
                 markedComponentCandidates.add(eventIndex);
             }
+            
+            if (allVarPossiblyUpdated) {
+                eventIndex2GuardVariables.remove(eventIndex);
+                eventIndex2GuardVariables.put(eventIndex, new HashSet<String>());
+            }
 
             /* If the event is uncontrollable, put it into the uncontrollableComponentCandidates */
             if (bddExAutomata.plantUncontrollableEventIndexList.contains(eventIndex)
@@ -555,6 +558,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
             private BDD transitionBDDWithoutActions;
             private final BDD[] transitionBDDCorrespondingToUpdatedVariables;
             private final BDD[] transitionBDDCorrespondingToUpdatedVariablesWithoutActions;
+            private boolean allVarPossiblyUpdated;
 
             /* When iterate each edge, for one edge, if the source location of it is an initial location, qualifiedForInitialComponent is set true. */
             private boolean qualifiedForInitialComponent = false;
@@ -571,6 +575,8 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                 // Create these two BDD arrays 
                 this.transitionBDDCorrespondingToUpdatedVariablesWithoutActions = new BDD[orgAutomata.getVars().size()];
                 this.transitionBDDCorrespondingToUpdatedVariables = new BDD[orgAutomata.getVars().size()];
+                
+                allVarPossiblyUpdated = false;
 
                 /* First initialize the BDD and two BDD arrays*/
                 transitionBDDWithoutActions = manager.getZeroBDD();
@@ -659,6 +665,19 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                     guardBDD = manager.guard2BDD(guards.get(0));
                 }
 
+                /*
+                 * We still need to track another thing.  
+                 * First of all, let's see an example: assuming that EFA E_1 has two edges labeled by e. One edge has guards and one doesn't. 
+                 * What should be included in the guard variables if we only consider this EFA? Apprently, all, right? since one edge doesn't 
+                 * have any guard. Now, let's consider another EFA E_2 which also has two edges labeled by e. But at this time both edges have 
+                 * guards. What should be included in the guard variables if they are synchronized? The union of all variables in these guards. 
+                 * The non-guard edge in E_1 is synchronized with either edge in E_2 which does have guard. 
+                 * What if one edge in E_2 deosn't have guard. OK, here is the point: the guard variables should be all!
+                 */
+                if (guards == null || (guards != null && guards.isEmpty())) {
+                    allVarPossiblyUpdated = true;
+                }
+                
                 sourceBDD.andWith(destBDD);
                 sourceBDD.andWith(guardBDD);
                 return sourceBDD;

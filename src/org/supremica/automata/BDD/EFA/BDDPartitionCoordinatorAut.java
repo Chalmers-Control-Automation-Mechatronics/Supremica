@@ -66,10 +66,12 @@ public final class BDDPartitionCoordinatorAut extends BDDPartitionCoordinator{
         this.dependentMatrix = new int[size][size];
         for (int automatonIndex = 0; automatonIndex < size; automatonIndex++) {
             TIntHashSet depAutIndexSet = partitions.getForwardDependentComponentMap().get(automatonIndex);
-            dependentMatrix[automatonIndex][0] = depAutIndexSet.size();
-            int matrixIndex = 1;
-            for (TIntIterator depAutIndexItr = depAutIndexSet.iterator(); depAutIndexItr.hasNext();) {
-                dependentMatrix[automatonIndex][matrixIndex++] = depAutIndexItr.next();
+            if (depAutIndexSet != null) {
+                dependentMatrix[automatonIndex][0] = depAutIndexSet.size();
+                int matrixIndex = 1;
+                for (TIntIterator depAutIndexItr = depAutIndexSet.iterator(); depAutIndexItr.hasNext();) {
+                    dependentMatrix[automatonIndex][matrixIndex++] = depAutIndexItr.next();
+                }
             }
         }
         
