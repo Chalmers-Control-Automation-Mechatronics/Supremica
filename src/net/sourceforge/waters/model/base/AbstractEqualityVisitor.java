@@ -203,9 +203,10 @@ public abstract class AbstractEqualityVisitor
    * Returns a hashing strategy for use with GNU Trove,
    * using the equality defined by this visitor.
    */
-  public TObjectHashingStrategy<Proxy> getTObjectHashingStrategy()
+  public <P extends Proxy>
+  TObjectHashingStrategy<P> getTObjectHashingStrategy()
   {
-    return new ProxyHashingStrategy();
+    return new ProxyHashingStrategy<P>();
   }
 
 
@@ -841,20 +842,21 @@ public abstract class AbstractEqualityVisitor
 
   //#########################################################################
   //# Inner Class ProxyHashingStrategy
-  private class ProxyHashingStrategy implements TObjectHashingStrategy<Proxy>
+  private class ProxyHashingStrategy<P extends Proxy>
+    implements TObjectHashingStrategy<P>
   {
 
     //#######################################################################
     //# Interface gnu.trove.TObjectHashingStrategy<Proxy>
      @Override
-    public int computeHashCode(final Proxy proxy)
+    public int computeHashCode(final P proxy)
     {
       final AbstractHashCodeVisitor visitor = getHashCodeVisitor();
       return visitor.hashCode(proxy);
     }
 
     @Override
-    public boolean equals(final Proxy proxy0, final Proxy proxy1)
+    public boolean equals(final P proxy0, final P proxy1)
     {
       return AbstractEqualityVisitor.this.equals(proxy0, proxy1);
     }
