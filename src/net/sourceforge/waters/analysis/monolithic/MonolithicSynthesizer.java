@@ -11,6 +11,8 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
+import gnu.trove.TLongHashSet;
+import gnu.trove.TLongIterator;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 
@@ -27,6 +29,7 @@ import java.util.Queue;
 import java.util.Deque;
 import java.util.Set;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
+import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.model.analysis.AbstractModelBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultProductDESResult;
@@ -122,7 +125,7 @@ public class MonolithicSynthesizer extends
   {
     try {
       setUp();
-
+      // initial search
       while (!mGlobalStack.isEmpty()) {
         final int[] sentinel = new int[1];
         final int[] encodedRoot = mGlobalStack.pop();
@@ -221,6 +224,7 @@ public class MonolithicSynthesizer extends
         }
       } while (mMustContinue);
 
+      //final search
       mUnvisited.clear();
       mFinalReachabilityExplorer.permutations(mNumAutomata, null, -1);
       while (!mUnvisited.isEmpty()) {
@@ -591,6 +595,9 @@ public class MonolithicSynthesizer extends
     mFinalReachabilityExplorer =
       new FinalReachabilityExplorer(mEventAutomata, mTransitions,
                                     mNDTupleFinal, 0, mNumProperEvents - 1);
+    mTemp = new TempClass(mTransitions);
+    mWaitlist = new Waitlist();
+
   }
 
   @Override
@@ -752,8 +759,7 @@ public class MonolithicSynthesizer extends
         }
         Collections.sort(marking);
         final List<EventProxy> unique = getUniqueMarking(marking);
-        final StateProxy state =
-          new MemStateProxy(code, unique, initial);
+        final StateProxy state = new MemStateProxy(code, unique, initial);
         states.add(state);
         stateArray[code] = state;
       }
@@ -813,6 +819,7 @@ public class MonolithicSynthesizer extends
     return msg;
   }
 
+
   //#########################################################################
   //# Inner Class MemStateProxy
   /**
@@ -823,8 +830,7 @@ public class MonolithicSynthesizer extends
   {
     //#######################################################################
     //# Constructor
-    private MemStateProxy(final int name,
-                          final Collection<EventProxy> props,
+    private MemStateProxy(final int name, final Collection<EventProxy> props,
                           final boolean isInitial)
     {
       mName = name;
@@ -1230,6 +1236,325 @@ public class MonolithicSynthesizer extends
     }
   }
 
+
+  //##########################################################################################
+  //# Inner Class Waitlist
+  @SuppressWarnings("unused")
+  private static class Waitlist
+  {
+    public long constructPair(int state1, int state2)
+    {
+      if (state1 > state2) {
+        state1 = state1 + state2;
+        state2 = state1 - state2;
+        state1 = state1 - state2;
+      }
+      final long pair = (long) state1 | ((long) state2 << 32);
+      return pair;
+    }
+
+    public boolean contains(final int state1, final int state2)
+    {
+      final long pair = constructPair(state1, state2);
+      return mWaitlist.contains(pair);
+    }
+
+    public boolean add(final int state1, final int state2)
+    {
+      final long pair = constructPair(state1, state2);
+      return mWaitlist.add(pair);
+    }
+
+    public int compare(final long pair1, final long pair2)
+    {
+      final int hiPair1 = (int) (pair1 >>> 32);
+      final int hiPair2 = (int) (pair2 >>> 32);
+      if (hiPair1 < hiPair2) {
+        return -1;
+      } else if (hiPair1 > hiPair2) {
+        return 1;
+      } else {
+        final int loPair1 = (int) (pair1 & 0xffffffff);
+        final int loPair2 = (int) (pair2 & 0xffffffff);
+        if (loPair1 < loPair2) {
+          return -1;
+        } else if (loPair1 > loPair2) {
+          return 1;
+        }
+      }
+      return 0;
+    }
+
+    public int compare(int state1pair1, int state2pair1, int state1pair2,
+                       int state2pair2)
+    {
+      if (state1pair1 > state2pair1) {
+        state1pair1 = state1pair1 + state2pair1;
+        state2pair1 = state1pair1 - state2pair1;
+        state1pair1 = state1pair1 - state2pair1;
+      }
+      if (state1pair2 > state2pair2) {
+        state1pair2 = state1pair2 + state2pair2;
+        state2pair2 = state1pair2 - state2pair2;
+        state1pair2 = state1pair2 - state2pair2;
+      }
+      if (state1pair1 < state2pair1) {
+        return -1;
+      } else if (state1pair1 > state2pair1) {
+        return 1;
+      } else {
+        if (state1pair2 < state2pair2) {
+          return -1;
+        } else if (state1pair2 > state2pair2) {
+          return 1;
+        }
+      }
+      return 0;
+    }
+
+    public int getPosition(final int state, final long pair)
+    {
+      final int hi = (int) (pair >>> 32);
+      final int lo = (int) (pair & 0xffffffff);
+      if (hi == state) {
+        return 0;
+      } else if (lo == state) {
+        return 1;
+      }
+      return -1;
+    }
+
+    public int getState(final int position, final long pair)
+    {
+      if (position == 0) {
+        return (int) (pair >>> 32);
+      } else if (position == 1) {
+        return (int) (pair & 0xffffffff);
+      }
+      return -1;
+    }
+
+    public void clear()
+    {
+      mWaitlist.clear();
+    }
+
+    public TLongIterator getIterator()
+    {
+      return mWaitlist.iterator();
+    }
+
+    private TLongHashSet mWaitlist;
+  }
+
+
+  //#########################################################################
+  private class TempClass
+  {
+    public TempClass(final int[][][][] transitions)
+    {
+      this.mmTransitions = transitions;
+    }
+
+    public void setUpClasses()
+    {
+      mStateToClass = new int[mNumStates];
+      mClasses = new IntListBuffer();
+      for (int s = 0; s < mNumStates; s++) {
+        if (mReachableStates.get(s)) {
+          final int list = mClasses.createList();
+          mClasses.add(list, s);
+          mStateToClass[s] = list;
+        } else {
+          mStateToClass[s] = IntListBuffer.NULL;// a bad state
+        }
+      }
+    }
+
+    @SuppressWarnings("unused")
+    public void mainProcedure()
+    {
+      setUpClasses();
+      for (int i = 0; i < mNumStates - 1; i++) {
+        if ((mStateToClass[i] == IntListBuffer.NULL) || (i > getMin(i))) {
+          continue;
+        }
+        for (int j = i + 1; j < mNumStates; j++) {
+          if ((mStateToClass[j] == IntListBuffer.NULL) || (j > getMin(j))) {
+            continue;
+          }
+          mWaitlist.clear();
+          final boolean flag = checkMergibility(i, j, i);
+          if (flag) {
+            merge();
+          }
+        }
+      }
+    }
+
+    public boolean checkMergibility(final int xi, final int xj,
+                                    final int cnode)
+    {
+      final int[] arrayXi = constructList(xi).toNativeArray();
+      final int[] arrayXj = constructList(xj).toNativeArray();
+      for (int i = 0; i < arrayXi.length; i++) {
+        for (int j = 0; j < arrayXj.length; j++) {
+          if (mWaitlist.contains(arrayXi[i], arrayXj[j])) {
+            continue;
+          }
+          if (!isInRelation(arrayXi[i], arrayXj[j])) {
+            return false;
+          }
+          mWaitlist.add(arrayXi[i], arrayXj[j]);
+          for (int event = 0; event < mNumProperEvents; event++) {
+            final int iSucc = getSuccessorState(event, arrayXi[i]);
+            final int jSucc = getSuccessorState(event, arrayXj[j]);
+            if ((iSucc != -1) && (jSucc != -1)
+                && (mReachableStates.get(iSucc))
+                && (mReachableStates.get(jSucc))) {
+              if ((mStateToClass[iSucc] == mStateToClass[jSucc])
+                  || (mWaitlist.contains(iSucc, jSucc))) {
+                continue;
+              }
+              final int iMin = getMin(iSucc);
+              final int jMin = getMin(jSucc);
+              if (mWaitlist.compare(iMin, jMin, xi, xj) < 0) {
+                return false;
+              }
+              final boolean flag = checkMergibility(iSucc, jSucc, cnode);
+              if (!flag) {
+                return false;
+              }
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+    public boolean isInRelation(final int state1, final int state2)
+    {
+      for (int e = mNumUncontrollableEvents; e < mNumProperEvents; e++) {
+        final int state1Succ = getSuccessorState(e, state1);
+        final int state2Succ = getSuccessorState(e, state2);
+        if (state1Succ != -1 && state2Succ != -1) {
+          final boolean s1SuccBad = !mReachableStates.get(state1Succ);
+          final boolean s2SuccBad = !mReachableStates.get(state2Succ);
+          if ((s1SuccBad != s2SuccBad)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    public int getSuccessorState(final int event, final int source)
+    {
+      final int[] sourceTuple = new int[mNumAutomata];
+      decode(mStateTuples.get(source), sourceTuple);
+      for (int aut = 0; aut < mNumAutomata; aut++) {
+        if (mmTransitions[aut][event] == null) {
+          mTargetTuple[aut] = sourceTuple[aut];
+        } else {
+          if (mmTransitions[aut][event][sourceTuple[aut]] == null) {
+            return -1;
+          } else {
+            mTargetTuple[aut] =
+              mmTransitions[aut][event][sourceTuple[aut]][0];
+          }
+        }
+      }
+      final int[] encoded = encode(mTargetTuple);
+      if (mGlobalVisited.contains(encoded)) {
+        return mGlobalVisited.get(encoded);
+      } else {
+        return -1;
+      }
+    }
+
+    public TIntArrayList constructList(final int state)
+    {
+      final TIntArrayList arraylist = new TIntArrayList();
+      //lists: lists whose members will be added to the arraylist
+      final ArrayList<Integer> lists = new ArrayList<Integer>();
+      final TLongIterator itr = mWaitlist.getIterator();
+      while (itr.hasNext()) {
+        final long pair = itr.next();
+        final int pos = mWaitlist.getPosition(state, pair);
+        if (pos != -1) {
+          int theOtherState = -99;
+          int listID;
+          if (pos == 0) {
+            theOtherState = mWaitlist.getState(1, pair);
+          } else if (pos == 1) {
+            theOtherState = mWaitlist.getState(0, pair);
+          }
+          listID = getlist(theOtherState);
+          lists.add(listID);
+        }
+      }
+      for (final Integer l : lists) {
+        arraylist.add(getListArray(l));
+      }
+      return arraylist;
+    }
+
+    public void merge()
+    {
+      final TLongIterator itr = mWaitlist.getIterator();
+      while (itr.hasNext()) {
+        final long pair = itr.next();
+        final int state1 = mWaitlist.getState(0, pair);
+        final int state2 = mWaitlist.getState(1, pair);
+        if (mStateToClass[state1] != mStateToClass[state2]) {
+          final int list1 = getlist(state1);
+          final int list2 = getlist(state2);
+          final int list3 = mergeLists(list1, list2);
+          updateStateToClass(list3);
+        }
+      }
+    }
+
+    public int mergeLists(final int list1, final int list2)
+    {
+      final int x = mClasses.getFirst(list1);
+      final int y = mClasses.getFirst(list2);
+      if (x < y) {
+        return mClasses.catenateDestructively(list1, list2);
+      } else if (x > y) {
+        return mClasses.catenateDestructively(list2, list1);
+      }
+      return list1;
+    }
+
+    public void updateStateToClass(final int list)
+    {
+      final int[] array = getListArray(list);
+      for (int i = 0; i < array.length; i++) {
+        mStateToClass[array[i]] = list;
+      }
+    }
+
+    public int getMin(final int state)
+    {
+      final int list = mStateToClass[state];
+      final int min = mClasses.getFirst(list);
+      return min;
+    }
+
+    public int getlist(final int state)
+    {
+      return mStateToClass[state];
+    }
+
+    public int[] getListArray(final int list)
+    {
+      return mClasses.toArray(list);
+    }
+
+    int[][][][] mmTransitions;
+  }
+
   //#########################################################################
   //# Data Members
   //# Variables used for encoding/decoding
@@ -1249,8 +1574,8 @@ public class MonolithicSynthesizer extends
   private EventProxy[] mEvents;
   private Collection<EventProxy> mCurrentPropositions;
   private Collection<EventProxy> mUsedPropositions;
-  private TIntArrayList mTransitionBuffer;
   private int mTransitionBufferLimit;
+  private TIntArrayList mTransitionBuffer;
 
   private int mNumAutomata;
   private static int mNumPlants;
@@ -1274,11 +1599,14 @@ public class MonolithicSynthesizer extends
   private Deque<int[]> mBackTrace;
   private Set<int[]> mLocalVisited;
   private Queue<int[]> mUnvisited;
+  private int[] mTargetTuple;
 
   private BitSet mNonCoreachableStates;
   private BitSet mBadStates;
   private BitSet mSafeStates;
   private BitSet mReachableStates;
+  private boolean initialIsBad;
+  private boolean mMustContinue;
 
   private StateExplorer mCtrlInitialReachabilityExplorer;
   private StateExplorer mUnctrlInitialReachabilityExplorer;
@@ -1286,10 +1614,11 @@ public class MonolithicSynthesizer extends
   private StateExplorer mCoreachabilityExplorer;
   private StateExplorer mSuccessorStatesExplorer;
 
-  private boolean initialIsBad;
-  private boolean mMustContinue;
-
-  private int[] mTargetTuple;
+  private int[] mStateToClass;//!!!!!!!
+  private IntListBuffer mClasses;
+  private Waitlist mWaitlist;
+  @SuppressWarnings("unused")
+  private TempClass mTemp;//!!!!!!!
 
   //#########################################################################
   //# Class Constants
