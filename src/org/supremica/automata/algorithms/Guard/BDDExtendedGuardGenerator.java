@@ -82,6 +82,7 @@ public final class BDDExtendedGuardGenerator {
     private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
     String bestStateSet = "";
     private boolean isEventBlocked = false;
+    @SuppressWarnings("unused")
     private final EditorSynthesizerOptions options;
 
     /** Creates a new instance of BDDExtendedGuardGenerator */
@@ -146,9 +147,9 @@ public final class BDDExtendedGuardGenerator {
                 fileName = "iddSafeStates";
                 bddAutomata.BDD2IDD2PS(safeStatesBDD, safeStatesBDD, fileName);
 
-                
+
                 fileName = "iddReachableStates";
-                bddAutomata.BDD2IDD2PS(automataBDD.getReachableStates(), automataBDD.getReachableStates(), fileName);                
+                bddAutomata.BDD2IDD2PS(automataBDD.getReachableStates(), automataBDD.getReachableStates(), fileName);
 
                 fileName = "iddCoreachableStates";
                 bddAutomata.BDD2IDD2PS(automataBDD.getCoreachableStates(), automataBDD.getCoreachableStates(), fileName);
@@ -159,28 +160,28 @@ public final class BDDExtendedGuardGenerator {
 //        System.err.println("safe states enabling "+eventName+": "+bddAutomata.nbrOfStatesBDD(safeStatesEnablingSigmaBDD));
 
             if (generateIDD_PS) {
-                String fileName = "iddSafe_" + eventName + "_enabled";
+                final String fileName = "iddSafe_" + eventName + "_enabled";
                 bddAutomata.BDD2IDD2PS(safeStatesEnablingSigmaBDD, safeStatesEnablingSigmaBDD, fileName);
             }
 
             computeStatesLeading2ForbiddenStates();
 
             if (generateIDD_PS) {
-                String fileName = "idd_" + eventName + "_leadingToForbidden";
+                final String fileName = "idd_" + eventName + "_leadingToForbidden";
                 bddAutomata.BDD2IDD2PS(statesLeading2ForbiddenBDD, statesLeading2ForbiddenBDD, fileName);
             }
 
             computeMustAllowedSates();
 
             if (generateIDD_PS) {
-                String fileName = "idd_" + eventName + "_allowed";
+                final String fileName = "idd_" + eventName + "_allowed";
                 bddAutomata.BDD2IDD2PS(mustAllowedStatesBDD, mustAllowedStatesBDD, fileName);
             }
 
             computeMustForbiddenSates();
 
             if (generateIDD_PS) {
-                String fileName = "idd_" + eventName + "_forbidden";
+                final String fileName = "idd_" + eventName + "_forbidden";
                 bddAutomata.BDD2IDD2PS(mustForbiddenStatesBDD, mustForbiddenStatesBDD, fileName);
             }
         } else if (bddAutomata.getSynthAlg().equals(SynthesisAlgorithm.PARTITIONBDD)) {
@@ -763,7 +764,7 @@ public final class BDDExtendedGuardGenerator {
 
     private void disjunctivelyComputeMustAllowedStates() {
 
-        BDDPartitionAlgoWorker parAlgoWorker = automataBDD.getParAlgoWorker();
+        final BDDPartitionAlgoWorker parAlgoWorker = automataBDD.getParAlgoWorker();
         final int eventIndex = automataBDD.getEventIndex(eventName);
 
         final BDD safeStatesAsTargetStates = safeStatesBDD.replace(automataBDD.getSourceToDestLocationPairing()).replace(automataBDD.getSourceToDestVariablePairing());
@@ -773,15 +774,15 @@ public final class BDDExtendedGuardGenerator {
 
         if (parAlgoWorker instanceof BDDPartitionAlgoWorkerEve) {
 
-            BDD eventTransBDD = parAlgoWorker.getCompBDD(eventIndex);
+            final BDD eventTransBDD = parAlgoWorker.getCompBDD(eventIndex);
             tmp = safeStatesWithEvent.and(eventTransBDD)
                     .exist(automataBDD.getDestStatesVarSet()).exist(automataBDD.getEventVarSet());
 
         } else if (parAlgoWorker instanceof BDDPartitionAlgoWorkerAut) {
 
-            for (Iterator<ExtendedAutomaton> autItr = automataBDD.getExtendedAutomata().iterator(); autItr.hasNext();) {
-                ExtendedAutomaton aut = autItr.next();
-                int autIndex = automataBDD.getIndexMap().getExAutomatonIndex(aut.getName());
+            for (final Iterator<ExtendedAutomaton> autItr = automataBDD.getExtendedAutomata().iterator(); autItr.hasNext();) {
+                final ExtendedAutomaton aut = autItr.next();
+                final int autIndex = automataBDD.getIndexMap().getExAutomatonIndex(aut.getName());
                 if (automataBDD.getBDDExAutomaton(aut).getCaredEventsIndex().contains(eventIndex)) {
                     tmp = tmp.or(safeStatesWithEvent.and(parAlgoWorker.getCompBDD(autIndex))
                             .exist(automataBDD.getDestStatesVarSet())
@@ -797,7 +798,7 @@ public final class BDDExtendedGuardGenerator {
 
     private void disjunctivelyComputeMustForbiddenStates() {
 
-        BDDPartitionAlgoWorker parAlgoWorker = automataBDD.getParAlgoWorker();
+        final BDDPartitionAlgoWorker parAlgoWorker = automataBDD.getParAlgoWorker();
         final int eventIndex = automataBDD.getEventIndex(eventName);
         final BDD reachableStatesAsTargetStates = automataBDD.getReachableStates().replace(automataBDD.getSourceToDestLocationPairing()).replace(automataBDD.getSourceToDestVariablePairing());
         final BDD reachableStatesWithEvent = reachableStatesAsTargetStates.and(sigmaBDD);
@@ -806,16 +807,16 @@ public final class BDDExtendedGuardGenerator {
 
         if (parAlgoWorker instanceof BDDPartitionAlgoWorkerEve) {
 
-            BDD eventTransBDD = parAlgoWorker.getCompBDD(eventIndex);
+            final BDD eventTransBDD = parAlgoWorker.getCompBDD(eventIndex);
 
             tmp = reachableStatesWithEvent.and(eventTransBDD)
                     .exist(automataBDD.getDestStatesVarSet()).exist(automataBDD.getEventVarSet());
 
         } else if (parAlgoWorker instanceof BDDPartitionAlgoWorkerAut) {
 
-            for (Iterator<ExtendedAutomaton> autItr = automataBDD.getExtendedAutomata().iterator(); autItr.hasNext();) {
-                ExtendedAutomaton aut = autItr.next();
-                int autIndex = automataBDD.getIndexMap().getExAutomatonIndex(aut.getName());
+            for (final Iterator<ExtendedAutomaton> autItr = automataBDD.getExtendedAutomata().iterator(); autItr.hasNext();) {
+                final ExtendedAutomaton aut = autItr.next();
+                final int autIndex = automataBDD.getIndexMap().getExAutomatonIndex(aut.getName());
                 if (automataBDD.getBDDExAutomaton(aut).getCaredEventsIndex().contains(eventIndex)) {
                     tmp = tmp.or(reachableStatesWithEvent.and(parAlgoWorker.getCompBDD(autIndex))
                             .exist(automataBDD.getDestStatesVarSet()).exist(automataBDD.getEventVarSet()));

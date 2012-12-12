@@ -185,26 +185,52 @@ public class IntListBuffer
     }
   }
 
+  /**
+   * Creates a read-only iterator for lists in this buffer.
+   * The returned iterator is uninitialised, so the {@link Iterator#reset(int)
+   * reset()} needs to be called before it can be used.
+   */
   public ReadOnlyIterator createReadOnlyIterator()
   {
     return new ReadOnlyIterator();
   }
 
+  /**
+   * Creates a read-only iterator to iterate over the given list in this
+   * buffer.
+   */
   public ReadOnlyIterator createReadOnlyIterator(final int list)
   {
     return new ReadOnlyIterator(list);
   }
 
+  /**
+   * Creates a read/write iterator for lists in this buffer.
+   * The returned iterator is uninitialised, so the {@link Iterator#reset(int)
+   * reset()} needs to be called before it can be used.
+   */
   public ModifyingIterator createModifyingIterator()
   {
     return new ModifyingIterator();
   }
 
+  /**
+   * Creates a read/write iterator to iterate over the given list in this
+   * buffer.
+   */
   public ModifyingIterator createModifyingIterator(final int list)
   {
     return new ModifyingIterator(list);
   }
 
+  /**
+   * Releases memory for the given list. This method marks the list as
+   * deleted and enqueues its nodes for reuse in future operations. No
+   * memory is returned to the operation system.
+   * @param  list   The unique list number that identifies the list to be
+   *                deleted in this buffer. Accessing the list after this
+   *                disposal can produce undefined behaviour.
+   */
   public void dispose(final int list)
   {
     if (list != NULL) {
@@ -215,6 +241,11 @@ public class IntListBuffer
     }
   }
 
+  /**
+   * Checks whether the given list is empty.
+   * @param  list   The unique list number that identifies the list to be
+   *                examined in this buffer.
+   */
   public boolean isEmpty(final int list)
   {
     return getNext(list) == NULL;
@@ -225,7 +256,7 @@ public class IntListBuffer
    * @param  list   The unique list number that identifies the list to be
    *                examined in this buffer.
    * @throws IllegalArgumentException to indicate that the list
-   *                 is {@link #NULL} or empty.
+   *                is {@link #NULL} or empty.
    */
   public int getFirst(final int list)
   {
@@ -482,6 +513,30 @@ public class IntListBuffer
 
   //#########################################################################
   //# Inner Interface Iterator
+  /**
+   * <P>Interface for iterators over lists in an {@link IntListBuffer}.</P>
+   *
+   * <P>Iterators are needed to process lists by visiting their elements.
+   * After an iterator has been obtained by one of the methods
+   * {@link IntListBuffer#createReadOnlyIterator() createReadOnlyIterator()}
+   * or {@link IntListBuffer#createModifyingIterator()
+   * createModifyingIterator()}, the list elements can be retrieved using a
+   * combination of the methods {@link #advance()} and
+   * {@link #getCurrentData()}.</P>
+   *
+   * <PRE>
+   * IntListBuffer.Iterator iter = {@link IntListBuffer#createReadOnlyIterator() createReadOnlyIterator()};
+   * while (iter.{@link #advance()}) {
+   *   int data = iter.{@link #getCurrentData()};
+   *   // process data ...
+   * }</PRE>
+   *
+   * <P>Iterators can be reset, so the same iterator object can
+   * be reused for several iterations. There are read-only iterators
+   * ({@link ReadOnlyIterator}) for efficient read access to lists, and
+   * read/write iterators ({@link ModifyingIterator}) that support several
+   * operations to remove, replace, or move list elements during iteration.</P>
+   */
   public interface Iterator extends WatersIntIterator
   {
 

@@ -158,10 +158,8 @@ public class CompositionalSynthesizerExperiments
     final File filename = new File(dir, name);
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mSynthesizer.setModel(des);
-    final AbstractionProcedure proc =
-      SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure
-        (mSynthesizer, SynthesisAbstractionProcedure.USE_SOE);
-    mSynthesizer.setAbstractionProcedure(proc);
+    mSynthesizer.setAbstractionProcedureFactory
+      (SynthesisAbstractionProcedureFactory.SOE_ONLY);
     try {
       mSynthesizer.run();
     } catch (final AnalysisException exception) {
@@ -249,110 +247,98 @@ public class CompositionalSynthesizerExperiments
   // Central locking
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "koordwsp_block.wmod");
+    runModel("valid", "central_locking", "koordwsp_block.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesiseCentralLockingVerriegel3b() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "verriegel3b.wmod");
+    runModel("valid", "central_locking", "verriegel3b.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesiseVerrigel4B() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "verriegel4b.wmod");
+    runModel("valid", "central_locking", "verriegel4b.wmod");
   }
 
   // AIP
   private void synthesissAip0Alps() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "aip0alps.wmod");
+    runModel("tests", "incremental_suite", "aip0alps.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesiseAip0Aip() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "aip0aip.wmod");
+    runModel("tests", "incremental_suite", "aip0aip.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesisFenCaiWon09Synth() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "FenCaiWon09_synth.wmod");
-  }
-
-  @SuppressWarnings("unused")
-  private void synthesisLargestCoherent() throws Exception
-  {
-    runModel("valid", "synthesis_experiment", "largest_coherent.wmod");
+    runModel("tests", "fencaiwon09", "FenCaiWon09_synth.wmod");
   }
 
   // Train testbed
   private void synthesiseTbedNoderailUncont() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tbed_uncont.wmod");
+    runModel("tests", "incremental_suite", "tbed_uncont.wmod");
   }
 
   private void synthesiseTbedNoderailB() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tbed_noderail_block.wmod");
+    runModel("tests", "incremental_suite", "tbed_noderail_block.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesiseTbedCtct() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tbed_ctct.wmod");
+    runModel("tests", "incremental_suite", "tbed_ctct.wmod");
   }
 
   //AGV
   private void synthesisAGVB() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "agvb.wmod");
+    runModel("tests", "incremental_suite", "agvb.wmod");
   }
 
   private void synthesisAGV() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "agv.wmod");
+    runModel("tests", "incremental_suite", "agv.wmod");
   }
 
   //
   private void synthesiseIPC() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "IPC.wmod");
+    runModel("tests", "synthesis", "IPC.wmod");
   }
 
   private void synthesissRhoneSubPatch0() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "rhone_subsystem1_patch0.wmod");
+    runModel("tests", "hisc", "rhone_subsystem1_patch0.wmod");
   }
 
   private void synthesissFms2003() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "fms2003_synth1.wmod");
+    runModel("tests", "fms2003", "fms2003_synth1.wmod");
   }
 
   //flexible production cell
   private void synthesiseFischertechnik() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "ftechnik.wmod");
-  }
-
-  @SuppressWarnings("unused")
-  private void synthesiseFlexibleManufacturingSystem() throws Exception
-  {
-    runModel("valid", "synthesis_experiment", "flexible_man_sys.wmod");
+    runModel("tests", "incremental_suite", "ftechnik.wmod");
   }
 
   @SuppressWarnings("unused")
   private void synthesisTip3Bad() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "tip3_bad.wmod");
+    runModel("tip", "acsw2006", "tip3_bad.wmod");
   }
 
   private void synthesisFenCaiWon09B() throws Exception
   {
-    runModel("valid", "synthesis_experiment", "FenCaiWon09b.wmod");
+    runModel("tests", "fencaiwon09", "FenCaiWon09b.wmod");
   }
 
   @SuppressWarnings("unused")
@@ -365,7 +351,7 @@ public class CompositionalSynthesizerExperiments
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
     final long start = System.currentTimeMillis();
-    runModel("handwritten", null, "transferline.wmod", bindings);
+    runModel("handwritten", null, "transferline_uncont.wmod", bindings);
     final long stop = System.currentTimeMillis();
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(System.out);

@@ -44,10 +44,8 @@ public class GNBAbstractionStandardConflictCheckerTest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalConflictChecker checker =
-      new CompositionalConflictChecker(factory);
-    final AbstractionProcedure proc =
-      ConflictAbstractionProcedureFactory.GNB.createAbstractionProecudure(checker);
-    checker.setAbstractionProcedure(proc);
+      new CompositionalConflictChecker(factory,
+                                       ConflictAbstractionProcedureFactory.GNB);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

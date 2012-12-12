@@ -43,10 +43,8 @@ public class ObservationEquivalenceGeneralisedConflictCheckerTest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalConflictChecker checker =
-      new CompositionalConflictChecker(factory);
-    final AbstractionProcedure proc =
-      ConflictAbstractionProcedureFactory.OEQ.createAbstractionProecudure(checker);
-    checker.setAbstractionProcedure(proc);
+      new CompositionalConflictChecker(factory,
+                                       ConflictAbstractionProcedureFactory.OEQ);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

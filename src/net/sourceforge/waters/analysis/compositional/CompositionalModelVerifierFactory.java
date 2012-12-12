@@ -71,6 +71,7 @@ public class CompositionalModelVerifierFactory
     addArgument(new PreselectingMethodArgument());
     addArgument(new SelectingMethodArgument());
     addArgument(new SubsumptionArgument());
+    addArgument(new NoDeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
   }
 
@@ -293,9 +294,7 @@ public class CompositionalModelVerifierFactory
       if (verifier instanceof CompositionalConflictChecker) {
         final CompositionalConflictChecker composer =
           (CompositionalConflictChecker) verifier;
-        final AbstractionProcedure proc =
-          method.createAbstractionProecudure(composer);
-        composer.setAbstractionProcedure(proc);
+        composer.setAbstractionProcedureFactory(method);
       } else {
         fail(getName() + " option only supported for conflict check!");
       }
@@ -441,6 +440,32 @@ public class CompositionalModelVerifierFactory
       final AbstractCompositionalModelVerifier composer =
         (AbstractCompositionalModelVerifier) verifier;
       composer.setSubumptionEnabled(true);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class NoDeadlockPruning
+  private static class NoDeadlockPruningArgument extends CommandLineArgumentFlag
+  {
+
+    //#######################################################################
+    //# Constructors
+    private NoDeadlockPruningArgument()
+    {
+      super("-ndp", "Disable deadlock pruning in synchronous products");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModelVerifier verifier)
+    {
+      final AbstractCompositionalModelVerifier composer =
+        (AbstractCompositionalModelVerifier) verifier;
+      composer.setPruningDeadlocks(false);
     }
 
   }

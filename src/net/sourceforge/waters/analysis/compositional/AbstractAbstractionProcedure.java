@@ -73,16 +73,6 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
 
 
   //#########################################################################
-  //# Interface
-  //# net.sourceforge.waters.analysis.compositional.AbstractionProcedure
-  @Override
-  public boolean expectsAllMarkings()
-  {
-    return false;
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final AbstractCompositionalModelAnalyzer mAnalyzer;
 

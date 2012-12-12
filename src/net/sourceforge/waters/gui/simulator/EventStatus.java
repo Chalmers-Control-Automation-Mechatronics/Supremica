@@ -11,7 +11,7 @@ package net.sourceforge.waters.gui.simulator;
 
 import javax.swing.ImageIcon;
 
-import net.sourceforge.waters.gui.IconLoader;
+import net.sourceforge.waters.gui.util.IconLoader;
 
 /**
  * An enumeration representing the different status values an event

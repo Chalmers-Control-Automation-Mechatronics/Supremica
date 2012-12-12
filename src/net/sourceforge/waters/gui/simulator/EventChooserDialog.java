@@ -23,7 +23,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.BevelBorder;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.IconLoader;
+import net.sourceforge.waters.gui.util.IconLoader;
 
 
 public class EventChooserDialog extends JDialog

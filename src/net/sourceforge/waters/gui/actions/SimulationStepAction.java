@@ -14,11 +14,12 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.Action;
-import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.simulator.SimulatorStep;
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.supremica.gui.ide.IDE;
 
 

@@ -1,43 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="assembly_machine" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Assembly machine for simple manufacturing system proposed by Ryan Leduc.
+This is a modified version with HISC-CP interfaces of a variation of the "parallel manufacturing example" from the DESpot examples collection.
+</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="attach_case"/>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="start_part_a">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="start_part_b">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
-            </ns2:AttributeMap>
-        </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="finish_case">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="complete_attach_a"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="complete_attach_b"/>
-        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="err_attach">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
-            </ns2:AttributeMap>
+        <EventDecl Kind="UNCONTROLLABLE" Name="complete_attach">
+            <RangeList>
+                <EnumSetExpression Text="[a,b]">
+                    <SimpleIdentifier Name="a"/>
+                    <SimpleIdentifier Name="b"/>
+                </EnumSetExpression>
+            </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="err_case">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="finish_part_a">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="finish_part_b">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="return_part"/>
@@ -46,13 +30,52 @@
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="attach_part_a"/>
-        <EventDecl Kind="CONTROLLABLE" Name="attach_part_b"/>
+        <EventDecl Kind="CONTROLLABLE" Name="attach_part">
+            <RangeList>
+                <EnumSetExpression Text="[a,b]">
+                    <SimpleIdentifier Name="a"/>
+                    <SimpleIdentifier Name="b"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="take_part"/>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>
         <EventDecl Kind="CONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="repair">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="err_attach">
+            <RangeList>
+                <EnumSetExpression Text="[a,b]">
+                    <SimpleIdentifier Name="a"/>
+                    <SimpleIdentifier Name="b"/>
+                </EnumSetExpression>
+            </RangeList>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="finish_part">
+            <RangeList>
+                <EnumSetExpression Text="[a,b]">
+                    <SimpleIdentifier Name="a"/>
+                    <SimpleIdentifier Name="b"/>
+                </EnumSetExpression>
+            </RangeList>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="start_part">
+            <RangeList>
+                <EnumSetExpression Text="[a,b]">
+                    <SimpleIdentifier Name="a"/>
+                    <SimpleIdentifier Name="b"/>
+                </EnumSetExpression>
+            </RangeList>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
     </EventDeclList>
@@ -137,7 +160,9 @@
                     </Edge>
                     <Edge Source="b1" Target="idle">
                         <LabelBlock>
-                            <SimpleIdentifier Name="err_attach"/>
+                            <IndexedIdentifier Name="err_attach">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-46" Y="-1"/>
                             </LabelGeometry>
@@ -148,7 +173,9 @@
                     </Edge>
                     <Edge Source="a1" Target="idle">
                         <LabelBlock>
-                            <SimpleIdentifier Name="err_attach"/>
+                            <IndexedIdentifier Name="err_attach">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-28" Y="-15"/>
                             </LabelGeometry>
@@ -159,7 +186,9 @@
                     </Edge>
                     <Edge Source="idle" Target="a1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start_part_a"/>
+                            <IndexedIdentifier Name="start_part">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-18" Y="2"/>
                             </LabelGeometry>
@@ -181,7 +210,9 @@
                     </Edge>
                     <Edge Source="idle" Target="b1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start_part_b"/>
+                            <IndexedIdentifier Name="start_part">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-45" Y="-18"/>
                             </LabelGeometry>
@@ -216,7 +247,9 @@
                     </Edge>
                     <Edge Source="a2" Target="idle">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish_part_a"/>
+                            <IndexedIdentifier Name="finish_part">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-8" Y="-1"/>
                             </LabelGeometry>
@@ -227,9 +260,11 @@
                     </Edge>
                     <Edge Source="b2" Target="idle">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish_part_b"/>
+                            <IndexedIdentifier Name="finish_part">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="-6"/>
+                                <Point X="-44" Y="-2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -302,8 +337,6 @@
                     </Edge>
                     <Edge Source="S0" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start_part_a"/>
-                            <SimpleIdentifier Name="start_part_b"/>
                             <SimpleIdentifier Name="start_case"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="2" Y="-28"/>
@@ -376,8 +409,12 @@
                     </Edge>
                     <Edge Source="s4" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="err_attach"/>
-                            <SimpleIdentifier Name="finish_part_b"/>
+                            <IndexedIdentifier Name="err_attach">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="finish_part">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-52" Y="1"/>
                             </LabelGeometry>
@@ -388,8 +425,12 @@
                     </Edge>
                     <Edge Source="s3" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="err_attach"/>
-                            <SimpleIdentifier Name="finish_part_a"/>
+                            <IndexedIdentifier Name="err_attach">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="finish_part">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-42" Y="-31"/>
                             </LabelGeometry>
@@ -400,7 +441,9 @@
                     </Edge>
                     <Edge Source="s1" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start_part_a"/>
+                            <IndexedIdentifier Name="start_part">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-33" Y="2"/>
                             </LabelGeometry>
@@ -422,7 +465,9 @@
                     </Edge>
                     <Edge Source="s1" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start_part_b"/>
+                            <IndexedIdentifier Name="start_part">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-39" Y="-18"/>
                             </LabelGeometry>
@@ -535,7 +580,9 @@
                 <EdgeList>
                     <Edge Source="s6" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish_part_a"/>
+                            <IndexedIdentifier Name="finish_part">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="-5"/>
                             </LabelGeometry>
@@ -551,7 +598,9 @@
                     </Edge>
                     <Edge Source="s4" Target="s5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="complete_attach_a"/>
+                            <IndexedIdentifier Name="complete_attach">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-40" Y="-23"/>
                             </LabelGeometry>
@@ -559,17 +608,21 @@
                     </Edge>
                     <Edge Source="s1" Target="s7">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start_part_b"/>
+                            <IndexedIdentifier Name="start_part">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-93" Y="-15"/>
+                                <Point X="-84" Y="-14"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Source="s1" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start_part_a"/>
+                            <IndexedIdentifier Name="start_part">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-90" Y="-7"/>
+                                <Point X="-82" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -583,7 +636,9 @@
                     </Edge>
                     <Edge Source="s3" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="attach_part_a"/>
+                            <IndexedIdentifier Name="attach_part">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-34" Y="-22"/>
                             </LabelGeometry>
@@ -599,7 +654,9 @@
                     </Edge>
                     <Edge Source="s11" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish_part_b"/>
+                            <IndexedIdentifier Name="finish_part">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-2" Y="-21"/>
                             </LabelGeometry>
@@ -607,7 +664,9 @@
                     </Edge>
                     <Edge Source="s8" Target="s9">
                         <LabelBlock>
-                            <SimpleIdentifier Name="attach_part_b"/>
+                            <IndexedIdentifier Name="attach_part">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-38" Y="0"/>
                             </LabelGeometry>
@@ -623,7 +682,9 @@
                     </Edge>
                     <Edge Source="s9" Target="s10">
                         <LabelBlock>
-                            <SimpleIdentifier Name="complete_attach_b"/>
+                            <IndexedIdentifier Name="complete_attach">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-35" Y="1"/>
                             </LabelGeometry>
@@ -774,7 +835,9 @@
                 <EdgeList>
                     <Edge Source="s2" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="attach_part_a"/>
+                            <IndexedIdentifier Name="attach_part">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-67" Y="-24"/>
                             </LabelGeometry>
@@ -782,7 +845,9 @@
                     </Edge>
                     <Edge Source="s2" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="attach_part_b"/>
+                            <IndexedIdentifier Name="attach_part">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="1" Y="-12"/>
                             </LabelGeometry>
@@ -790,7 +855,9 @@
                     </Edge>
                     <Edge Source="s4" Target="s5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="complete_attach_b"/>
+                            <IndexedIdentifier Name="complete_attach">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="8" Y="-13"/>
                             </LabelGeometry>
@@ -798,7 +865,9 @@
                     </Edge>
                     <Edge Source="s4" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="err_attach"/>
+                            <IndexedIdentifier Name="err_attach">
+                                <SimpleIdentifier Name="b"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-42" Y="17"/>
                             </LabelGeometry>
@@ -817,7 +886,9 @@
                     </Edge>
                     <Edge Source="s3" Target="s5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="complete_attach_a"/>
+                            <IndexedIdentifier Name="complete_attach">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-121" Y="28"/>
                             </LabelGeometry>
@@ -828,7 +899,9 @@
                     </Edge>
                     <Edge Source="s3" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="err_attach"/>
+                            <IndexedIdentifier Name="err_attach">
+                                <SimpleIdentifier Name="a"/>
+                            </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-50" Y="0"/>
                             </LabelGeometry>
@@ -898,8 +971,6 @@
                     </Edge>
                     <Edge Source="S0" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start_part_a"/>
-                            <SimpleIdentifier Name="start_part_b"/>
                             <SimpleIdentifier Name="start_case"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="2" Y="-28"/>

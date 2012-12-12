@@ -13,8 +13,9 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.ConstantAliasEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.dialog.ConstantAliasEditorDialog;
+
 import org.supremica.gui.ide.IDE;
 
 

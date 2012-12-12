@@ -12,13 +12,29 @@ package net.sourceforge.waters.analysis.monolithic;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractSynchronousProductBuilderTest;
+import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
+import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public class MonolithicSynthesizerTest
-  extends AbstractSynchronousProductBuilderTest
+  extends AbstractSupervisorSynthesizerTest
 {
+  //#########################################################################
+  //# To be Provided by Subclasses
+  /**
+   * Creates an instance of the synthesiser under test. This method
+   * instantiates the class of the synthesiser tested by the particular
+   * subclass of this test, and configures it as needed.
+   * @param factory
+   *          The factory used by the synthesiser to create its output.
+   * @return An instance of the synthesiser.
+   */
+  protected SupervisorSynthesizer createSynthesizer
+    (final ProductDESProxyFactory factory){
+      return new MonolithicSynthesizer(factory);
+
+  }
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
@@ -35,33 +51,10 @@ public class MonolithicSynthesizerTest
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractAutomatonBuilderTest
+  //# Test Cases --- BIG
   @Override
-  protected MonolithicSynthesizer
-    createAutomatonBuilder(final ProductDESProxyFactory factory)
+  public void testKoordWspSynth() throws Exception
   {
-    return new MonolithicSynthesizer(factory);
   }
-
-  @Override
-  protected MonolithicSynthesizer getAutomatonBuilder()
-  {
-    return (MonolithicSynthesizer) super.getAutomatonBuilder();
-  }
-
-
-  //#########################################################################
-  //# Specific Test Cases
-
-
-  public void testDeadlockPruning() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "deadlockPruning";
-    runAutomatonBuilder(group, subdir, name);
-  }
-
 
 }

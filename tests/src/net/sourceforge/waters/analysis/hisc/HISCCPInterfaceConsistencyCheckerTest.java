@@ -309,6 +309,64 @@ public class HISCCPInterfaceConsistencyCheckerTest
 
 
   // SimpleManufacturingExample
+  public void testHISCCP_SimpleManufMultiLD0()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_multi_ld",
+                     "simple_manuf_multi_ld.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufMultiLD1()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_multi_ld",
+                     "subsystem.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufMultiLD02()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_multi_ld",
+                     "assembly.wmod", true);
+  }
+
+
+  public void testHISCCP_SimpleManufHISCCP0()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "simple_manuf_hisccp.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufHISCCP1()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "subsystem.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufHISCCP1bad()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "subsystem_bad.wmod", false);
+  }
+
+  public void testHISCCP_SimpleManufHISCCP2am()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "assembly_machine.wmod", true);
+  }
+
+  public void testHISCCP_SimpleManufHISCCP2pm()
+  throws Exception
+  {
+    runModelVerifier("hisccp", "simple_manuf_hisccp",
+                     "polishing_machine.wmod", true);
+  }
+
+
   public void testHISCCP_ManufCell()
   throws Exception
   {

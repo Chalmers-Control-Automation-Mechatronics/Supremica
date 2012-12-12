@@ -18,6 +18,7 @@ import net.sourceforge.waters.analysis.annotation.TRConflictPreorderChecker;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.CompositionalSimplificationResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
+import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -63,7 +64,8 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   {
     this(model, factory,
          new CompositionalConflictChecker(factory),
-         new CompositionalSimplifier(factory));
+         new CompositionalSimplifier(factory,
+                                     ConflictAbstractionProcedureFactory.OEQ));
   }
 
   public HISCCPInterfaceConsistencyChecker(final ProductDESProxy model,

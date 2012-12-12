@@ -351,8 +351,8 @@
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="net/sourceforge/waters/gui/**/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
-          <exclude name="net/sourceforge/waters/analysis/composing/**/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
+          <exclude name="net/sourceforge/waters/analysis/po/**/*.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Large*.java"/>
           <exclude name="**/Native*.java"/>

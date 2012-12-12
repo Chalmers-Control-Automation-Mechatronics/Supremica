@@ -21,9 +21,9 @@ import org.supremica.util.BDD.graph.Graph;
 import org.supremica.util.BDD.graph.Node;
 
 /**
- * Sort extended finite automata together with variables at the same time. 
- * The algorithm is the combination of PCG and FORCE. Some implementations are adopted from Arash's work. 
- * 
+ * Sort extended finite automata together with variables at the same time.
+ * The algorithm is the combination of PCG and FORCE. Some implementations are adopted from Arash's work.
+ *
  * @author  Zhennan
  * @version 2.0
  * @since   1.0
@@ -47,7 +47,7 @@ public class BDDPartitionVarOrdSorter {
         this.initialOrdering = variableOrdering;
         this.initialOrderingNames = variableOrderingNames;
 
-        this.unusedVariables = new ArrayList();
+        this.unusedVariables = new ArrayList<Object>();
         this.unusedVariableNames = new ArrayList<String>();
     }
 
@@ -72,6 +72,7 @@ public class BDDPartitionVarOrdSorter {
                 }
                 if (anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getGuards() != null
                         && !anEdge.getGuardActionBlock().getGuards().isEmpty()) {
+                    @SuppressWarnings("deprecation")
                     final Set<VariableComponentProxy> variablesOfCurrEdge = efa.extractVariablesFromExpr(anEdge.getGuardActionBlock().getGuards().get(0));
                     for (final VariableComponentProxy aVar : variablesOfCurrEdge) {
                         final String varName = aVar.getName();

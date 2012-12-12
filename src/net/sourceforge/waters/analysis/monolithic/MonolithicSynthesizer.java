@@ -9,34 +9,41 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
+import gnu.trove.TLongHashSet;
+import gnu.trove.TLongIterator;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-
+import java.util.Deque;
+import java.util.Set;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
-import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
+import net.sourceforge.waters.analysis.tr.IntListBuffer;
+import net.sourceforge.waters.model.analysis.AbstractModelBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.AutomatonResult;
+import net.sourceforge.waters.model.analysis.DefaultProductDESResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
-import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.ProductDESResult;
+import net.sourceforge.waters.model.analysis.ProxyResult;
+import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -58,8 +65,8 @@ import org.apache.log4j.Logger;
  * @author Simon Ware, Rachel Francis, Robi Malik
  */
 
-public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
-  SynchronousProductBuilder
+public class MonolithicSynthesizer extends
+  AbstractModelBuilder<ProductDESProxy> implements SupervisorSynthesizer
 {
 
   //#########################################################################
@@ -83,9 +90,6 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
   }
 
   //#########################################################################
-  //# Configuration
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
   public Collection<EventProxy> getPropositions()
   {
@@ -97,23 +101,22 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     mUsedPropositions = props;
   }
 
-  public void addMask(final Collection<EventProxy> hidden,
-                      final EventProxy replacement)
+  @Override
+  public ProductDESResult createAnalysisResult()
   {
-
+    return new DefaultProductDESResult();
   }
 
-  public void clearMask()
+  @Override
+  public ProductDESResult getAnalysisResult()
   {
-
+    return (ProductDESResult) super.getAnalysisResult();
   }
 
-  public SynchronousProductStateMap getStateMap()
+  @Override
+  public ProductDESProxy getComputedProductDES()
   {
-    final ProductDESProxy model = getModel();
-    final Collection<AutomatonProxy> automata = model.getAutomata();
-    final MemStateMap stateMap = new MemStateMap(automata, mDeadlockState);
-    return stateMap;
+    return getAnalysisResult().getComputedProductDES();
   }
 
   //#########################################################################
@@ -122,24 +125,127 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
   {
     try {
       setUp();
-      final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
-      final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
-      mStates = new TObjectIntHashMap<int[]>(strategy);
-      mStates.ensureCapacity(tableSize);
-      mStateTuples = new ArrayList<int[]>();
-      mTransitionBuffer = new TIntArrayList();
-      mTransitionBufferLimit = 3 * getTransitionLimit();
-      mNumStates = 0;
-      mUnvisited = new ArrayDeque<int[]>(100);
-      permutations(mNumAutomata, null, -1, -1);
-      mNumInitialStates = mNumStates;
+      // initial search
+      while (!mGlobalStack.isEmpty()) {
+        final int[] sentinel = new int[1];
+        final int[] encodedRoot = mGlobalStack.pop();
+        final int r = mGlobalVisited.get(encodedRoot);
+        if (mSafeStates.get(r) || mBadStates.get(r)) {
+          continue;
+        }
+        mLocalStack.push(encodedRoot);
+        mLocalVisited.add(mStateTuples.get(r));
+        mBackTrace.push(sentinel);
+        boolean safe = true;
+        while (!mLocalStack.isEmpty()) {
+          if (mLocalStack.peek() == mBackTrace.peek()) {
+            mLocalStack.pop();
+            mBackTrace.pop();
+          } else {
+            final int[] current = mLocalStack.peek();
+            mBackTrace.push(current);
+            safe = mUnctrlInitialReachabilityExplorer.explore(current);
+            if (!safe) {
+              break;
+            }
+          }
+        }
+        if (safe) {
+          for (final int[] current : mLocalVisited) {
+            final int n = addEncodedNewState(current);
+            mSafeStates.set(n);
+          }
+          for (final int[] current : mLocalVisited) {
+            mCtrlInitialReachabilityExplorer.explore(current);
+          }
+        } else {
+          for (final int[] current : mBackTrace) {
+            if (current == sentinel) {
+              continue;
+            } else {
+              int n = 0;
+              if (mGlobalVisited.containsKey(current)) {
+                n = mGlobalVisited.get(current);
+                if (n < mNumInitialStates) {
+                  return setBooleanResult(false);
+                }
+              } else {
+                n = addEncodedNewState(current);
+              }
+              mBadStates.set(n);
+            }
+          }
+        }
+        mLocalStack.clear();
+        mLocalVisited.clear();
+        mBackTrace.clear();
+      }
+
+      mMustContinue = false;
+      do {
+        // mark non-coreachable states (trim)
+        mNonCoreachableStates.set(0, mNumStates);
+        tuples: for (int t = 0; t < mStateTuples.size(); t++) {
+          if (!mBadStates.get(t)) {
+            final int[] tuple = new int[mNumAutomata];
+            final int[] encodedTuple = mStateTuples.get(t);
+            decode(encodedTuple, tuple);
+            for (int aut = 0; aut < tuple.length; aut++) {
+              if (mStateMarkings[aut][tuple[aut]].isEmpty()) {
+                continue tuples;
+              }
+            }
+            mUnvisited.add(encodedTuple);
+            mNonCoreachableStates.set(t, false);
+            while (!mUnvisited.isEmpty()) {
+              final int[] s = mUnvisited.remove();
+              mCoreachabilityExplorer.explore(s);
+            }
+          }
+        }
+
+        for (int b = 0; b < mNumInitialStates; b++) {
+          if (!mBadStates.get(b) && mNonCoreachableStates.get(b)) {
+            initialIsBad = true;
+          }
+        }
+        // mark uncontrollable states
+        mMustContinue = false;
+        mUnvisited.clear();
+        for (int state = 0; state < mStateTuples.size(); state++) {
+          if (!mBadStates.get(state) && mNonCoreachableStates.get(state)) {
+            mBadStates.set(state);
+            mUnvisited.offer(mStateTuples.get(state));
+            while (!mUnvisited.isEmpty()) {
+              final int[] s = mUnvisited.remove();
+              mSuccessorStatesExplorer.explore(s);
+            }
+          }
+        }
+      } while (mMustContinue);
+
+      //final search
+      mUnvisited.clear();
+      mFinalReachabilityExplorer.permutations(mNumAutomata, null, -1);
       while (!mUnvisited.isEmpty()) {
-        final int[] tuple = mUnvisited.remove();
-        explore(tuple);
+        final int[] s = mUnvisited.remove();
+        if (mGlobalVisited.containsKey(s)) {
+          mFinalReachabilityExplorer.explore(s);
+        }
+      }
+      for (int b = 0; b < mNumInitialStates; b++) {
+        if (!mReachableStates.get(b)) {
+          initialIsBad = true;
+        }
+      }
+      if (initialIsBad) {
+        return setBooleanResult(false);
       }
       if (getConstructsResult()) {
         final AutomatonProxy aut = createAutomaton();
-        return setAutomatonResult(aut);
+        final ProductDESProxy des =
+          AutomatonTools.createProductDESProxy(aut, getFactory());
+        return setProxyResult(des);
       } else {
         return true;
       }
@@ -178,13 +284,36 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
   @Override
   protected void setUp() throws AnalysisException
   {
+    int[][][][] mTransitions;
+    int[][][][] mReverseTransitions;
+    int[][] mEventAutomata;
+    int[][] mReverseEventAutomata;
+    int[][] mNDTuple;
+    int[][] mNDTupleFinal;
+
     super.setUp();
 
     final ProductDESProxy model = getModel();
     final Collection<EventProxy> events = model.getEvents();
-    final Collection<AutomatonProxy> automata = model.getAutomata();
     mNumEvents = events.size();
-    mNumAutomata = automata.size();
+
+    final KindTranslator translator = getKindTranslator();
+
+    ArrayList<AutomatonProxy> plants = new ArrayList<AutomatonProxy>();
+    ArrayList<AutomatonProxy> specs = new ArrayList<AutomatonProxy>();
+    for (final AutomatonProxy aut : model.getAutomata()) {
+      if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
+        plants.add(aut);
+      } else if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
+        specs.add(aut);
+      }
+    }
+    mNumAutomata = plants.size() + specs.size();
+    mNumPlants = plants.size();
+    mAutomata = new ArrayList<AutomatonProxy>(mNumAutomata);
+    mAutomata.addAll(plants);
+    mAutomata.addAll(specs);
+    plants = specs = null;
 
     TObjectIntHashMap<EventProxy> eventToIndex =
       new TObjectIntHashMap<EventProxy>(mNumEvents);
@@ -195,22 +324,21 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     }
 
     int numProperEvents = 0;
-    final KindTranslator translator = getKindTranslator();
-    for(final EventProxy event : events){
-      if (translator.getEventKind(event) != EventKind.PROPOSITION){
+    for (final EventProxy event : events) {
+      if (translator.getEventKind(event) != EventKind.PROPOSITION) {
         numProperEvents += 1;
       }
     }
     int unctrlEvents = 0;
-    int ctrlEvents = numProperEvents -1;
+    int ctrlEvents = numProperEvents - 1;
     for (final EventProxy event : events) {
       if (translator.getEventKind(event) == EventKind.PROPOSITION) {
         if (mUsedPropositions == null) {
           mCurrentPropositions.add(event);
         }
-      } else if(translator.getEventKind(event) == EventKind.UNCONTROLLABLE){
+      } else if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
         eventToIndex.put(event, unctrlEvents++);
-      } else if(translator.getEventKind(event) == EventKind.CONTROLLABLE){
+      } else if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
         eventToIndex.put(event, ctrlEvents--);
       }
     }
@@ -225,22 +353,23 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
       final int e = iter.value();
       mEvents[e] = event;
     }
-
     final int numProps = mCurrentPropositions.size();
     mOriginalStates = new StateProxy[mNumAutomata][];
     mAllMarkings = new HashMap<List<EventProxy>,List<EventProxy>>();
     mStateMarkings = new List<?>[mNumAutomata][];
-    // transitions indexed first by automaton then by event then by source state
-    mTransitions = new int[mNumAutomata][mNumProperEvents][][];
-
     mDeadlock = new boolean[mNumAutomata][];
-
     mTargetTuple = new int[mNumAutomata];
-    mNDTuple = new int[mNumAutomata][];
     mDeadlockState = -1;
 
+    //transitions indexed first by automaton then by event then by source state
+    mTransitions = new int[mNumAutomata][mNumProperEvents][][];
+    mReverseTransitions = new int[mNumAutomata][mNumProperEvents][][];
+    mEventAutomata = new int[mNumProperEvents][];
+    mReverseEventAutomata = new int[mNumProperEvents][];
+    mNDTuple = new int[mNumAutomata][];
+
     int a = 0;
-    for (final AutomatonProxy aut : automata) {
+    for (final AutomatonProxy aut : mAutomata) {
       final Collection<EventProxy> localEvents = aut.getEvents();
       final List<EventProxy> nonLocalProps =
         new ArrayList<EventProxy>(numProps);
@@ -281,19 +410,20 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
           Collections.sort(stateProps);
         }
         mStateMarkings[a][snum] = getUniqueMarking(stateProps);
-
         mDeadlock[a][snum] = stateProps.isEmpty();
-
         snum++;
       }
       mNDTuple[a] = initials.toNativeArray();
       final TIntArrayList[][] autTransitionLists =
+        new TIntArrayList[mNumProperEvents][numStates];
+      final TIntArrayList[][] autTransitionListsRvs =
         new TIntArrayList[mNumProperEvents][numStates];
       for (final TransitionProxy trans : aut.getTransitions()) {
         final int event = eventToIndex.get(trans.getEvent());
         final int source = stateToIndex.get(trans.getSource());
         final int target = stateToIndex.get(trans.getTarget());
         TIntArrayList list = autTransitionLists[event][source];
+        TIntArrayList listRvs = autTransitionListsRvs[event][target];
         if (list == null) {
           list = new TIntArrayList(1);
           autTransitionLists[event][source] = list;
@@ -302,16 +432,27 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
         if (source != target) {
           mDeadlock[a][source] = false;
         }
+        if (listRvs == null) {
+          listRvs = new TIntArrayList(1);
+          autTransitionListsRvs[event][target] = listRvs;
+        }
+        listRvs.add(source);
       }
       for (final EventProxy event : localEvents) {
         if (translator.getEventKind(event) != EventKind.PROPOSITION) {
           final int e = eventToIndex.get(event);
           mTransitions[a][e] = new int[numStates][];
+          mReverseTransitions[a][e] = new int[numStates][];
           for (int source = 0; source < numStates; source++) {
             final TIntArrayList list = autTransitionLists[e][source];
             if (list != null) {
               mTransitions[a][e][source] = list.toNativeArray();
-
+            }
+          }
+          for (int target = 0; target < numStates; target++) {
+            final TIntArrayList listRvs = autTransitionListsRvs[e][target];
+            if (listRvs != null) {
+              mReverseTransitions[a][e][target] = listRvs.toNativeArray();
             }
           }
         }
@@ -319,9 +460,12 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
       a++;
     }
     eventToIndex = null;
-
     mEventAutomata = new int[mNumProperEvents][];
-    final List<IntDouble> list = new ArrayList<IntDouble>(mNumAutomata);
+    mReverseEventAutomata = new int[mNumProperEvents][];
+    final List<AutomatonEventInfo> list =
+      new ArrayList<AutomatonEventInfo>(mNumAutomata);
+    final List<AutomatonEventInfo> listRvs =
+      new ArrayList<AutomatonEventInfo>(mNumAutomata);
     for (int e = 0; e < mNumProperEvents; e++) {
       for (a = 0; a < mNumAutomata; a++) {
         if (mTransitions[a][e] != null) {
@@ -333,26 +477,134 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
             }
           }
           final double avg = (double) count / (double) numStates;
-          final IntDouble pair = new IntDouble(a, avg);
-          list.add(pair);
+          if (e >= mNumUncontrollableEvents) {
+            final ControllableAutomatonEventInfo pair =
+              new ControllableAutomatonEventInfo(a, avg);
+            list.add(pair);
+          } else {
+            final UncontrollableAutomatonEventInfo pair =
+              new UncontrollableAutomatonEventInfo(a, avg);
+            list.add(pair);
+          }
+        }
+        if (mReverseTransitions[a][e] != null) {
+          final int numStates = mReverseTransitions[a][e].length;
+          int countRvs = 0;
+          for (int target = 0; target < numStates; target++) {
+            if (mReverseTransitions[a][e][target] != null) {
+              countRvs++;
+            }
+          }
+          final double avgRvs = (double) countRvs / (double) numStates;
+          final ControllableAutomatonEventInfo pairRvs =
+            new ControllableAutomatonEventInfo(a, avgRvs);
+          listRvs.add(pairRvs);
         }
       }
       Collections.sort(list);
+      Collections.sort(listRvs);
       final int count = list.size();
+      final int countRvs = listRvs.size();
       mEventAutomata[e] = new int[count];
+      mReverseEventAutomata[e] = new int[countRvs];
       int i = 0;
-      for (final IntDouble pair : list) {
-        mEventAutomata[e][i++] = pair.mInt;
+      for (final AutomatonEventInfo info : list) {
+        mEventAutomata[e][i++] = info.getAutomaton();
+      }
+      int j = 0;
+      for (final AutomatonEventInfo info : listRvs) {
+        mReverseEventAutomata[e][j++] = info.getAutomaton();
       }
       list.clear();
+      listRvs.clear();
     }
+
+    final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
+    mNonCoreachableStates = new BitSet(mNumStates);
+    mReachableStates = new BitSet(mNumStates);
+    mBadStates = new BitSet(mNumStates);
+    mSafeStates = new BitSet(mNumStates);
+    final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
+    mGlobalVisited = new TObjectIntHashMap<int[]>(strategy);
+    mGlobalVisited.ensureCapacity(tableSize);
+    mLocalVisited = new THashSet<int[]>(strategy);
+    mGlobalStack = new ArrayDeque<int[]>();
+    mLocalStack = new ArrayDeque<int[]>();
+    mBackTrace = new ArrayDeque<int[]>();
+    mStateTuples = new ArrayList<int[]>();
+    mTransitionBuffer = new TIntArrayList();
+    mTransitionBufferLimit = 3 * getTransitionLimit();
+    mUnvisited = new ArrayDeque<int[]>(100);
+    mNumStates = 0;
+
+    // get encoding information
+    mNumBits = new int[mNumAutomata];
+    mNumBitsMasks = new int[mNumAutomata];
+
+    // get mNumBits
+    mNumInts = 1;
+    int totalBits = SIZE_INT;
+    int counter = 0;
+    for (int aut = 0; aut < mNumAutomata; aut++) {
+      final int bits = AutomatonTools.log2(mOriginalStates[aut].length);
+      mNumBits[counter] = bits;
+      mNumBitsMasks[counter] = (1 << bits) - 1;
+      if (totalBits >= bits) { // if current buffer can store this automaton
+        totalBits -= bits;
+      } else {
+        mNumInts++;
+        totalBits = SIZE_INT - bits;
+      }
+      counter++;
+    }
+
+    // get index
+    counter = 0;
+    totalBits = SIZE_INT;
+    mIndexAutomata = new int[mNumInts + 1];
+    mIndexAutomata[0] = counter++;
+    for (int i = 0; i < mNumAutomata; i++) {
+      if (totalBits >= mNumBits[i]) {
+        totalBits -= mNumBits[i];
+      } else {
+        mIndexAutomata[counter++] = i;
+        totalBits = SIZE_INT - mNumBits[i];
+      }
+    }
+    mIndexAutomata[mNumInts] = mNumAutomata;
+
+    mCtrlInitialReachabilityExplorer =
+      new CtrlInitialReachabilityExplorer(mEventAutomata, mTransitions,
+                                          mNDTuple, mNumUncontrollableEvents,
+                                          mNumProperEvents - 1);
+
+    mCtrlInitialReachabilityExplorer.permutations(mNumAutomata, null, -1);
+    mNDTupleFinal = Arrays.copyOf(mNDTuple, mNumAutomata);
+    mNumInitialStates = mNumStates;
+
+    mUnctrlInitialReachabilityExplorer =
+      new UnctrlInitialReachabilityExplorer(mEventAutomata, mTransitions,
+                                            mNDTuple, 0,
+                                            mNumUncontrollableEvents);
+    mCoreachabilityExplorer =
+      new CoreachabilityExplorer(mReverseEventAutomata, mReverseTransitions,
+                                 mNDTuple, 0, mNumProperEvents - 1);
+    mSuccessorStatesExplorer =
+      new SuccessorStatesExplorer(mReverseEventAutomata, mReverseTransitions,
+                                  mNDTuple, 0, mNumUncontrollableEvents - 1);
+    mFinalReachabilityExplorer =
+      new FinalReachabilityExplorer(mEventAutomata, mTransitions,
+                                    mNDTupleFinal, 0, mNumProperEvents - 1);
+    mTemp = new TempClass(mTransitions);
+    mWaitlist = new Waitlist();
+
   }
 
   @Override
   protected void addStatistics()
   {
     super.addStatistics();
-    final AutomatonResult result = getAnalysisResult();
+    final ProxyResult<ProductDESProxy> result = getAnalysisResult();
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(mNumStates);
     if (mTransitionBuffer != null) {
@@ -366,99 +618,88 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     super.tearDown();
     mEvents = null;
     mCurrentPropositions = null;
-    mProjectionMask = null;
     mOriginalStates = null;
     mAllMarkings = null;
     mStateMarkings = null;
-    mTransitions = null;
     mDeadlock = null;
-    mEventAutomata = null;
-    mStates = null;
+    mGlobalVisited = null;
     mStateTuples = null;
     mUnvisited = null;
     mTransitionBuffer = null;
-    mNDTuple = null;
     mTargetTuple = null;
-    mCurrentSuccessors = null;
     mCurrentDeadlock = null;
   }
 
   //#########################################################################
   //# Auxiliary Methods
-  private void explore(final int[] sourceTuple) throws OverflowException
+
+  /**
+   * It will take a single state tuple as a parameter and encode it.
+   *
+   * @param stateCodes
+   *          state tuple that will be encoded
+   * @return encoded state tuple
+   */
+  private int[] encode(final int[] stateCodes)
   {
-    final int source = mStates.get(sourceTuple);
-    if (mCurrentSuccessors != null) {
-      for (int e = 0; e < mNumEvents; e++) {
-        mCurrentSuccessors[e].clear();
+    final int encoded[] = new int[mNumInts];
+    int i, j;
+    for (i = 0; i < mNumInts; i++) {
+      for (j = mIndexAutomata[i]; j < mIndexAutomata[i + 1]; j++) {
+        encoded[i] <<= mNumBits[j];
+        encoded[i] |= stateCodes[j];
       }
-    } else if (mCurrentDeadlock != null) {
-      Arrays.fill(mCurrentDeadlock, false);
     }
-    events: for (int e = 0; e < mNumProperEvents; e++) {
-      Arrays.fill(mNDTuple, null);
-      for (final int a : mEventAutomata[e]) {
-        if (mTransitions[a][e] != null) {
-          final int[] succ = mTransitions[a][e][sourceTuple[a]];
-          if (succ == null) {
-            continue events;
-          }
-          mNDTuple[a] = succ;
-        }
+    return encoded;
+  }
+
+  /**
+   * It will take an encoded state tuple as a parameter and decode it. Decoded
+   * result will be contained in the second parameter
+   *
+   * @param encodedStateCodes
+   *          state tuple that will be decoded
+   * @param currTuple
+   *          the decoded state tuple will be stored here
+   */
+  private void decode(final int[] encodedStateCodes, final int[] currTuple)
+  {
+    int tmp, mask, i, j;
+    for (i = 0; i < mNumInts; i++) {
+      tmp = encodedStateCodes[i];
+      for (j = mIndexAutomata[i + 1] - 1; j >= mIndexAutomata[i]; j--) {
+        mask = mNumBitsMasks[j];
+        currTuple[j] = tmp & mask;
+        tmp = tmp >>> mNumBits[j];
       }
-      permutations(mNumAutomata, sourceTuple, source, e);
     }
   }
 
-  private void permutations(int a, final int[] sourceTuple, final int source,
-                            final int event) throws OverflowException
-  {
-    if (a == 0) {
-      addTargetState(source, event, sourceTuple == null); // data in mTuple
-    } else {
-      a--;
-      final int[] codes = mNDTuple[a];
-      if (codes == null) {
-        mTargetTuple[a] = sourceTuple[a];
-        permutations(a, sourceTuple, source, event);
-      } else {
-        for (int i = 0; i < codes.length; i++) {
-          mTargetTuple[a] = codes[i];
-          permutations(a, sourceTuple, source, event);
-        }
-      }
-    }
-  }
-
-  private void addTargetState(final int source, final int event,
-                              final boolean isInitial)
+  private int addDecodedNewState(final int[] decodedTuple)
     throws OverflowException
   {
-    final int target;
-    if (mStates.containsKey(mTargetTuple)) {
-      target = mStates.get(mTargetTuple);
-    } else if (isDeadlockTuple()) {
-      if (mDeadlockState < 0) {
-        mDeadlockState = getNewState();
-        final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
-        mStates.put(newTuple, mDeadlockState);
-        mStateTuples.add(newTuple);
-      }
-      target = mDeadlockState;
+    final int[] encoded = encode(decodedTuple);
+    return addEncodedNewState(encoded);
+  }
+
+  private int addEncodedNewState(final int[] encodedTuple)
+    throws OverflowException
+  {
+    if (mGlobalVisited.containsKey(encodedTuple)) {
+      return mGlobalVisited.get(encodedTuple);
     } else {
-      target = getNewState();
-      final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
-      mStates.put(newTuple, target);
-      mUnvisited.offer(newTuple);
-      mStateTuples.add(newTuple);
-    }
-    // Only add a transition if not adding in an initial state,
-    // and avoid duplicates.
-    if (!isInitial) {
-      addTransition(source, event, target);
+      final int code = mNumStates++;
+      final int limit = getNodeLimit();
+      if (mNumStates >= limit) {
+        throw new OverflowException(limit);
+      }
+      mGlobalVisited.put(encodedTuple, code);
+      mStateTuples.add(encodedTuple);
+      return code;
     }
   }
 
+  @SuppressWarnings("unused")
   private int getNewState() throws OverflowException
   {
     final int limit = getNodeLimit();
@@ -468,47 +709,23 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     return mNumStates++;
   }
 
-  private boolean isDeadlockTuple()
-  {
-    for (int a = 0; a < mNumAutomata; a++) {
-      final int state = mTargetTuple[a];
-      if (mDeadlock[a][state]) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private void addTransition(final int source, final int event,
                              final int target) throws OverflowException
   {
-    if (mProjectionMask == null) {
-      if (target == mDeadlockState) {
-        if (mCurrentDeadlock[event]) {
-          return;
-        } else {
-          mCurrentDeadlock[event] = true;
-        }
-      }
-      if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
-        throw new OverflowException(OverflowKind.TRANSITION,
-                                    getTransitionLimit());
-      }
-      mTransitionBuffer.add(source);
-      mTransitionBuffer.add(event);
-      mTransitionBuffer.add(target);
-    } else {
-      final int masked = mProjectionMask[event];
-      if (mCurrentSuccessors[masked].add(target)) {
-        if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
-          throw new OverflowException(OverflowKind.TRANSITION,
-                                      getTransitionLimit());
-        }
-        mTransitionBuffer.add(source);
-        mTransitionBuffer.add(masked);
-        mTransitionBuffer.add(target);
+    if (target == mDeadlockState) {
+      if (mCurrentDeadlock[event]) {
+        return;
+      } else {
+        mCurrentDeadlock[event] = true;
       }
     }
+    if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
+      throw new OverflowException(OverflowKind.TRANSITION,
+                                  getTransitionLimit());
+    }
+    mTransitionBuffer.add(source);
+    mTransitionBuffer.add(event);
+    mTransitionBuffer.add(target);
   }
 
   private AutomatonProxy createAutomaton()
@@ -523,24 +740,29 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
 
     final int numProps = mCurrentPropositions.size();
     final List<StateProxy> states = new ArrayList<StateProxy>(mNumStates);
+    final StateProxy[] stateArray = new StateProxy[mNumStates];
     for (int code = 0; code < mNumStates; code++) {
-      final boolean initial = code < mNumInitialStates;
-      final int[] tuple = mStateTuples.get(code);
-      final List<EventProxy> marking = new ArrayList<EventProxy>(numProps);
-      props: for (final EventProxy prop : mCurrentPropositions) {
-        for (int a = 0; a < mNumAutomata; a++) {
-          final List<EventProxy> stateMarking = getStateMarking(a, tuple[a]);
-          if (Collections.binarySearch(stateMarking, prop) < 0) {
-            continue props;
+      if (mReachableStates.get(code)) {
+        final boolean initial = code < mNumInitialStates;
+        final int[] tuple = new int[mNumAutomata];
+        decode(mStateTuples.get(code), tuple);
+        final List<EventProxy> marking = new ArrayList<EventProxy>(numProps);
+        props: for (final EventProxy prop : mCurrentPropositions) {
+          for (int a = 0; a < mNumAutomata; a++) {
+            final List<EventProxy> stateMarking =
+              getStateMarking(a, tuple[a]);
+            if (Collections.binarySearch(stateMarking, prop) < 0) {
+              continue props;
+            }
           }
+          marking.add(prop);
         }
-        marking.add(prop);
+        Collections.sort(marking);
+        final List<EventProxy> unique = getUniqueMarking(marking);
+        final StateProxy state = new MemStateProxy(code, unique, initial);
+        states.add(state);
+        stateArray[code] = state;
       }
-      Collections.sort(marking);
-      final List<EventProxy> unique = getUniqueMarking(marking);
-      final StateProxy state =
-        new MemStateProxy(code, tuple, unique, initial);
-      states.add(state);
     }
 
     final ProductDESProxyFactory factory = getFactory();
@@ -550,16 +772,23 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     int t = 0;
     while (t < bufferSize) {
       int code = mTransitionBuffer.get(t++);
-      final StateProxy source = states.get(code);
+      if (!mReachableStates.get(code)) {
+        t += 2;
+        continue;
+      }
+      final StateProxy source = stateArray[code];
       code = mTransitionBuffer.get(t++);
       final EventProxy event = mEvents[code];
       code = mTransitionBuffer.get(t++);
-      final StateProxy target = states.get(code);
+      if (!mReachableStates.get(code)) {
+        continue;
+      }
+      final StateProxy target = stateArray[code];
       transitions.add(factory.createTransitionProxy(source, event, target));
     }
 
     final String name = computeOutputName();
-    final ComponentKind kind = computeOutputKind();
+    final ComponentKind kind = ComponentKind.SUPERVISOR;
     return factory.createAutomatonProxy(name, kind, events, states,
                                         transitions);
   }
@@ -575,92 +804,19 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     }
   }
 
-
-  //#########################################################################
-  //# Inner Class MaskingPair
-  /*
-   * private static class MaskingPair {
-   * //#######################################################################
-   * //# Constructor private MaskingPair(final Collection<EventProxy> hidden,
-   * final EventProxy replacement, final boolean forbidden) { mHiddenEvents =
-   * hidden; mReplacement = replacement; mForbidden = forbidden; }
-   *
-   * //#######################################################################
-   * //# Simple Access private Collection<EventProxy> getHiddenEvents() {
-   * return mHiddenEvents; }
-   *
-   * private EventProxy getReplacement() { return mReplacement; }
-   *
-   * private boolean isForbidden() { return mForbidden; }
-   *
-   * //#######################################################################
-   * //# Data Members private final Collection<EventProxy> mHiddenEvents;
-   * private final EventProxy mReplacement; private final boolean mForbidden;
-   * }
-   */
-
-  //#########################################################################
-  //# Inner Class MemStateMap
-  private static class MemStateMap implements SynchronousProductStateMap
+  @SuppressWarnings("unused")
+  private String showStateTuple(final int[] tuple)
   {
-    //#######################################################################
-    //# Constructor
-    private MemStateMap(final Collection<AutomatonProxy> automata,
-                        final int dumpState)
-    {
-      mInputAutomata = new ArrayList<AutomatonProxy>(automata);
-      final int numaut = automata.size();
-      mStateLists = new StateProxy[numaut][];
-      // Assumes state codes are given by their ordering in the original
-      // automata. If this is not good enough, need to provide method
-      // setStateList(int a, StateProxy[] states).
-      int a = 0;
-      for (final AutomatonProxy aut : mInputAutomata) {
-        final Collection<StateProxy> states = aut.getStates();
-        final int size = states.size();
-        mStateLists[a++] = states.toArray(new StateProxy[size]);
-      }
-      mDumpState = dumpState;
+    String msg = "";
+    for (int i = 0; i < tuple.length; i++) {
+      final AutomatonProxy aut = mAutomata.get(i);
+      final ComponentKind kind = getKindTranslator().getComponentKind(aut);
+      final StateProxy state = mOriginalStates[i][tuple[i]];
+      msg +=
+        kind.toString() + " " + aut.getName() + " : state " + state.getName()
+          + "\n";
     }
-
-    //#######################################################################
-    //# Interface
-    //# net.sourceforge.waters.model.analysis.SynchronousProductStateMap
-    public Collection<AutomatonProxy> getInputAutomata()
-    {
-      return mInputAutomata;
-    }
-
-    public StateProxy getOriginalState(final StateProxy state,
-                                       final AutomatonProxy aut)
-    {
-      final int a = getAutomatonIndex(aut);
-      final MemStateProxy memstate = (MemStateProxy) state;
-      if (memstate.getCode() == mDumpState) {
-        return null;
-      } else {
-        final int[] tuple = memstate.getStateTuple();
-        final int code = tuple[a];
-        return mStateLists[a][code];
-      }
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    /**
-     * Gets the index position of the given automaton in state tuples.
-     * Presently linear complexity --- is this good enough?
-     */
-    private int getAutomatonIndex(final AutomatonProxy aut)
-    {
-      return mInputAutomata.indexOf(aut);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final List<AutomatonProxy> mInputAutomata;
-    private final StateProxy[][] mStateLists;
-    private final int mDumpState;
+    return msg;
   }
 
 
@@ -674,12 +830,10 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
   {
     //#######################################################################
     //# Constructor
-    private MemStateProxy(final int name, final int[] stateTuple,
-                          final Collection<EventProxy> props,
+    private MemStateProxy(final int name, final Collection<EventProxy> props,
                           final boolean isInitial)
     {
       mName = name;
-      mStateTuple = stateTuple;
       mProps = props;
       mIsInitial = isInitial;
     }
@@ -698,9 +852,10 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
 
     public MemStateProxy clone()
     {
-      return new MemStateProxy(mName, mStateTuple, mProps, mIsInitial);
+      return new MemStateProxy(mName, mProps, mIsInitial);
     }
 
+    @SuppressWarnings("unused")
     public int getCode()
     {
       return mName;
@@ -709,11 +864,6 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     public String getName()
     {
       return "S:" + mName;
-    }
-
-    public int[] getStateTuple()
-    {
-      return mStateTuple;
     }
 
     public boolean refequals(final NamedProxy o)
@@ -757,71 +907,721 @@ public class MonolithicSynthesizer extends AbstractAutomatonBuilder implements
     //#######################################################################
     //# Data Members
     private final int mName;
-    private final int[] mStateTuple;
     private final boolean mIsInitial;
     private final Collection<EventProxy> mProps;
   }
 
 
   //#########################################################################
-  //# Inner Class IntDouble
-  private static class IntDouble implements Comparable<IntDouble>
+  //# Inner Class AutomatonEventInfo
+  private abstract class AutomatonEventInfo implements
+    Comparable<AutomatonEventInfo>
   {
-    public IntDouble(final int i, final double d)
+    public AutomatonEventInfo(final int aut, final double probability)
     {
-      mInt = i;
-      mDouble = d;
+      mAut = aut;
+      mProbability = probability;
     }
 
-    public int compareTo(final IntDouble pair)
+    protected int getAutomaton()
     {
-      if (mDouble < pair.mDouble) {
+      return mAut;
+    }
+
+    protected double getProbability()
+    {
+      return mProbability;
+    }
+
+    private final int mAut;
+    private final double mProbability;
+  }
+
+
+  //# Inner Class UncontrollableAutomatonEventInfo
+  private class UncontrollableAutomatonEventInfo extends AutomatonEventInfo
+  {
+    public UncontrollableAutomatonEventInfo(final int aut,
+                                            final double probability)
+    {
+      super(aut, probability);
+    }
+
+    public int compareTo(final AutomatonEventInfo info)
+    {
+      if (this.getAutomaton() < mNumPlants && this.getProbability() == 1.0f) {
+        return 1;
+      } else if (info.mAut < mNumPlants && info.mProbability == 1.0f) {
         return -1;
-      } else if (mDouble > pair.mDouble) {
+      } else if ((this.getAutomaton() < mNumPlants && info.mAut < mNumPlants)
+                 || (this.getAutomaton() >= mNumPlants && info.mAut >= mNumPlants)) {
+        return (this.getProbability() < info.mProbability) ? -1 : 1;
+      } else {
+        return (this.getAutomaton() < mNumPlants) ? -1 : 1;
+      }
+    }
+  }
+
+
+  //# Inner Class ControllableAutomatonEventInfo
+  private class ControllableAutomatonEventInfo extends AutomatonEventInfo
+  {
+    public ControllableAutomatonEventInfo(final int aut,
+                                          final double probability)
+    {
+      super(aut, probability);
+    }
+
+    public int compareTo(final AutomatonEventInfo info)
+    {
+      if (this.getProbability() < info.getProbability()) {
+        return -1;
+      } else if (this.getProbability() < info.getProbability()) {
         return 1;
       } else {
         return 0;
       }
     }
+  }
 
-    private final int mInt;
-    private final double mDouble;
+
+  //#########################################################################################################
+  //# Inner Class StateExplorer
+  private abstract class StateExplorer
+  {
+    public StateExplorer(final int[][] theEventAutomata,
+                         final int[][][][] theTransitions,
+                         final int[][] theNDTuple, final int theFirstEvent,
+                         final int theLastEvent)
+    {
+      mmFirstEvent = theFirstEvent;
+      mmLastEvent = theLastEvent;
+      mmEventAutomata = theEventAutomata;
+      mmTransitions = theTransitions;
+      mmNDTuple = theNDTuple;
+      mmDecodedTuple = new int[mNumAutomata];
+    }
+
+    public boolean explore(final int[] encodedTuple) throws OverflowException
+    {
+      events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
+        Arrays.fill(mmNDTuple, null);
+        for (final int a : mmEventAutomata[e]) {
+          if (mmTransitions[a][e] != null) {
+            decode(encodedTuple, mmDecodedTuple);
+            final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
+            if (succ == null) {
+              continue events;
+            }
+            mmNDTuple[a] = succ;
+          }
+        }
+        if (!permutations(mNumAutomata, mmDecodedTuple, e)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    public boolean permutations(int a, final int[] decodedSource,
+                                final int event) throws OverflowException
+    {
+      if (a == 0) {
+        if (!processNewState(decodedSource, event, decodedSource == null)) {
+          return false;
+        }
+      } else {
+        a--;
+        final int[] codes = mmNDTuple[a];
+        if (codes == null) {
+          mTargetTuple[a] = decodedSource[a];
+          if (!permutations(a, decodedSource, event)) {
+            return false;
+          }
+        } else {
+          for (int i = 0; i < codes.length; i++) {
+            mTargetTuple[a] = codes[i];
+            if (!permutations(a, decodedSource, event)) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+    public abstract boolean processNewState(final int[] decodedSource,
+                                            final int event,
+                                            final boolean isInitial)
+      throws OverflowException;
+
+    protected final int[][] mmEventAutomata;
+    protected final int[][][][] mmTransitions;
+    protected final int[][] mmNDTuple;
+    protected int mmFirstEvent;
+    protected int mmLastEvent;
+    protected int[] mmDecodedTuple;
+  }
+
+
+  //# Inner Class CtrlInitialReachabilityExplorer
+  private class CtrlInitialReachabilityExplorer extends StateExplorer
+  {
+    public CtrlInitialReachabilityExplorer(final int[][] eventAutomata,
+                                           final int[][][][] transitions,
+                                           final int[][] NDTuple,
+                                           final int firstEvent,
+                                           final int lastEvent)
+    {
+      super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
+    }
+
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
+      throws OverflowException
+    {
+      final int currentNumStates = mNumStates;
+      final int t = addDecodedNewState(mTargetTuple);
+      if (currentNumStates != mNumStates) {
+        mGlobalStack.push(mStateTuples.get(t));
+      }
+      return true;
+    }
+  }
+
+
+  //# Inner Class UCInitialReachabilityExplorer
+  private class UnctrlInitialReachabilityExplorer extends StateExplorer
+  {
+    public UnctrlInitialReachabilityExplorer(final int[][] eventAutomata,
+                                             final int[][][][] transitions,
+                                             final int[][] NDTuple,
+                                             final int firstEvent,
+                                             final int lastEvent)
+    {
+      super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
+    }
+
+    @Override
+    public boolean explore(final int[] encodedTuple) throws OverflowException
+    {
+      events: for (int e = 0; e < mNumUncontrollableEvents; e++) {
+        Arrays.fill(mmNDTuple, null);
+        for (final int a : mmEventAutomata[e]) {
+          if (mmTransitions[a][e] != null) {
+            decode(encodedTuple, mmDecodedTuple);
+            final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
+            if (succ == null) {
+              if (a >= mNumPlants) {
+                return false;
+              } else {
+                continue events;
+              }
+            }
+            mmNDTuple[a] = succ;
+          }
+        }
+        if (!permutations(mNumAutomata, mmDecodedTuple, e)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
+      throws OverflowException
+    {
+      final int[] encoded = encode(mTargetTuple);
+      if (mLocalVisited.contains(encoded)) {
+        return true;
+      } else if (mGlobalVisited.containsKey(encoded)) {
+        final int s = mGlobalVisited.get(encoded);
+        if (mBadStates.get(s)) {
+          return false;
+        } else if (mSafeStates.get(s)) {
+          return true;
+        }
+      }
+      mLocalVisited.add(encoded);
+      mLocalStack.push(encoded);
+      return true;
+    }
+  }
+
+
+  //# Inner Class FinalReachabilityExplorer
+  private class FinalReachabilityExplorer extends StateExplorer
+  {
+    public FinalReachabilityExplorer(final int[][] eventAutomata,
+                                     final int[][][][] transitions,
+                                     final int[][] NDTuple,
+                                     final int firstEvent, final int lastEvent)
+    {
+      super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
+    }
+
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
+      throws OverflowException
+    {
+      int source = 0;
+      if (decodedSource != null) {
+        source = mGlobalVisited.get(encode(decodedSource));
+      }
+      final int target = mGlobalVisited.get(encode(mTargetTuple));
+      if (!mBadStates.get(target) && !mReachableStates.get(target)) {
+        mUnvisited.offer(mStateTuples.get(target));
+        mReachableStates.set(target);
+      }
+      if (!isInitial) {
+        addTransition(source, event, target);
+      }
+      return true;
+    }
+  }
+
+
+  //# Inner Class CoreachabilityExplorer
+  private class CoreachabilityExplorer extends StateExplorer
+  {
+    public CoreachabilityExplorer(final int[][] eventAutomata,
+                                  final int[][][][] transitions,
+                                  final int[][] NDTuple,
+                                  final int firstEvent, final int lastEvent)
+    {
+      super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
+    }
+
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
+    {
+      final int[] encoded = encode(mTargetTuple);
+      if (mGlobalVisited.containsKey(encoded)) {
+        final int s = mGlobalVisited.get(encoded);
+        if (!mBadStates.get(s) && mNonCoreachableStates.get(s)) {
+          mUnvisited.offer(mStateTuples.get(s));
+          mNonCoreachableStates.set(s, false);
+        }
+      }
+      return true;
+    }
+  }
+
+
+  //# Inner Class SuccessorStatesExplorer
+  private class SuccessorStatesExplorer extends StateExplorer
+  {
+    public SuccessorStatesExplorer(final int[][] eventAutomata,
+                                   final int[][][][] transitions,
+                                   final int[][] NDTuple,
+                                   final int firstEvent, final int lastEvent)
+    {
+      super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
+    }
+
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event, final boolean isInitial)
+    {
+      final int[] encoded = encode(mTargetTuple);
+      if (mGlobalVisited.containsKey(encoded)) {
+        final int s = mGlobalVisited.get(encoded);
+        if (!mBadStates.get(s)) {
+          mUnvisited.offer(mStateTuples.get(s));
+          mBadStates.set(s);
+          mMustContinue = true;
+        }
+      }
+      return true;
+    }
+  }
+
+
+  //##########################################################################################
+  //# Inner Class Waitlist
+  @SuppressWarnings("unused")
+  private static class Waitlist
+  {
+    public long constructPair(int state1, int state2)
+    {
+      if (state1 > state2) {
+        state1 = state1 + state2;
+        state2 = state1 - state2;
+        state1 = state1 - state2;
+      }
+      final long pair = (long) state1 | ((long) state2 << 32);
+      return pair;
+    }
+
+    public boolean contains(final int state1, final int state2)
+    {
+      final long pair = constructPair(state1, state2);
+      return mWaitlist.contains(pair);
+    }
+
+    public boolean add(final int state1, final int state2)
+    {
+      final long pair = constructPair(state1, state2);
+      return mWaitlist.add(pair);
+    }
+
+    public int compare(final long pair1, final long pair2)
+    {
+      final int hiPair1 = (int) (pair1 >>> 32);
+      final int hiPair2 = (int) (pair2 >>> 32);
+      if (hiPair1 < hiPair2) {
+        return -1;
+      } else if (hiPair1 > hiPair2) {
+        return 1;
+      } else {
+        final int loPair1 = (int) (pair1 & 0xffffffff);
+        final int loPair2 = (int) (pair2 & 0xffffffff);
+        if (loPair1 < loPair2) {
+          return -1;
+        } else if (loPair1 > loPair2) {
+          return 1;
+        }
+      }
+      return 0;
+    }
+
+    public int compare(int state1pair1, int state2pair1, int state1pair2,
+                       int state2pair2)
+    {
+      if (state1pair1 > state2pair1) {
+        state1pair1 = state1pair1 + state2pair1;
+        state2pair1 = state1pair1 - state2pair1;
+        state1pair1 = state1pair1 - state2pair1;
+      }
+      if (state1pair2 > state2pair2) {
+        state1pair2 = state1pair2 + state2pair2;
+        state2pair2 = state1pair2 - state2pair2;
+        state1pair2 = state1pair2 - state2pair2;
+      }
+      if (state1pair1 < state2pair1) {
+        return -1;
+      } else if (state1pair1 > state2pair1) {
+        return 1;
+      } else {
+        if (state1pair2 < state2pair2) {
+          return -1;
+        } else if (state1pair2 > state2pair2) {
+          return 1;
+        }
+      }
+      return 0;
+    }
+
+    public int getPosition(final int state, final long pair)
+    {
+      final int hi = (int) (pair >>> 32);
+      final int lo = (int) (pair & 0xffffffff);
+      if (hi == state) {
+        return 0;
+      } else if (lo == state) {
+        return 1;
+      }
+      return -1;
+    }
+
+    public int getState(final int position, final long pair)
+    {
+      if (position == 0) {
+        return (int) (pair >>> 32);
+      } else if (position == 1) {
+        return (int) (pair & 0xffffffff);
+      }
+      return -1;
+    }
+
+    public void clear()
+    {
+      mWaitlist.clear();
+    }
+
+    public TLongIterator getIterator()
+    {
+      return mWaitlist.iterator();
+    }
+
+    private TLongHashSet mWaitlist;
+  }
+
+
+  //#########################################################################
+  private class TempClass
+  {
+    public TempClass(final int[][][][] transitions)
+    {
+      this.mmTransitions = transitions;
+    }
+
+    public void setUpClasses()
+    {
+      mStateToClass = new int[mNumStates];
+      mClasses = new IntListBuffer();
+      for (int s = 0; s < mNumStates; s++) {
+        if (mReachableStates.get(s)) {
+          final int list = mClasses.createList();
+          mClasses.add(list, s);
+          mStateToClass[s] = list;
+        } else {
+          mStateToClass[s] = IntListBuffer.NULL;// a bad state
+        }
+      }
+    }
+
+    @SuppressWarnings("unused")
+    public void mainProcedure()
+    {
+      setUpClasses();
+      for (int i = 0; i < mNumStates - 1; i++) {
+        if ((mStateToClass[i] == IntListBuffer.NULL) || (i > getMin(i))) {
+          continue;
+        }
+        for (int j = i + 1; j < mNumStates; j++) {
+          if ((mStateToClass[j] == IntListBuffer.NULL) || (j > getMin(j))) {
+            continue;
+          }
+          mWaitlist.clear();
+          final boolean flag = checkMergibility(i, j, i);
+          if (flag) {
+            merge();
+          }
+        }
+      }
+    }
+
+    public boolean checkMergibility(final int xi, final int xj,
+                                    final int cnode)
+    {
+      final int[] arrayXi = constructList(xi).toNativeArray();
+      final int[] arrayXj = constructList(xj).toNativeArray();
+      for (int i = 0; i < arrayXi.length; i++) {
+        for (int j = 0; j < arrayXj.length; j++) {
+          if (mWaitlist.contains(arrayXi[i], arrayXj[j])) {
+            continue;
+          }
+          if (!isInRelation(arrayXi[i], arrayXj[j])) {
+            return false;
+          }
+          mWaitlist.add(arrayXi[i], arrayXj[j]);
+          for (int event = 0; event < mNumProperEvents; event++) {
+            final int iSucc = getSuccessorState(event, arrayXi[i]);
+            final int jSucc = getSuccessorState(event, arrayXj[j]);
+            if ((iSucc != -1) && (jSucc != -1)
+                && (mReachableStates.get(iSucc))
+                && (mReachableStates.get(jSucc))) {
+              if ((mStateToClass[iSucc] == mStateToClass[jSucc])
+                  || (mWaitlist.contains(iSucc, jSucc))) {
+                continue;
+              }
+              final int iMin = getMin(iSucc);
+              final int jMin = getMin(jSucc);
+              if (mWaitlist.compare(iMin, jMin, xi, xj) < 0) {
+                return false;
+              }
+              final boolean flag = checkMergibility(iSucc, jSucc, cnode);
+              if (!flag) {
+                return false;
+              }
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+    public boolean isInRelation(final int state1, final int state2)
+    {
+      for (int e = mNumUncontrollableEvents; e < mNumProperEvents; e++) {
+        final int state1Succ = getSuccessorState(e, state1);
+        final int state2Succ = getSuccessorState(e, state2);
+        if (state1Succ != -1 && state2Succ != -1) {
+          final boolean s1SuccBad = !mReachableStates.get(state1Succ);
+          final boolean s2SuccBad = !mReachableStates.get(state2Succ);
+          if ((s1SuccBad != s2SuccBad)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    public int getSuccessorState(final int event, final int source)
+    {
+      final int[] sourceTuple = new int[mNumAutomata];
+      decode(mStateTuples.get(source), sourceTuple);
+      for (int aut = 0; aut < mNumAutomata; aut++) {
+        if (mmTransitions[aut][event] == null) {
+          mTargetTuple[aut] = sourceTuple[aut];
+        } else {
+          if (mmTransitions[aut][event][sourceTuple[aut]] == null) {
+            return -1;
+          } else {
+            mTargetTuple[aut] =
+              mmTransitions[aut][event][sourceTuple[aut]][0];
+          }
+        }
+      }
+      final int[] encoded = encode(mTargetTuple);
+      if (mGlobalVisited.contains(encoded)) {
+        return mGlobalVisited.get(encoded);
+      } else {
+        return -1;
+      }
+    }
+
+    public TIntArrayList constructList(final int state)
+    {
+      final TIntArrayList arraylist = new TIntArrayList();
+      //lists: lists whose members will be added to the arraylist
+      final ArrayList<Integer> lists = new ArrayList<Integer>();
+      final TLongIterator itr = mWaitlist.getIterator();
+      while (itr.hasNext()) {
+        final long pair = itr.next();
+        final int pos = mWaitlist.getPosition(state, pair);
+        if (pos != -1) {
+          int theOtherState = -99;
+          int listID;
+          if (pos == 0) {
+            theOtherState = mWaitlist.getState(1, pair);
+          } else if (pos == 1) {
+            theOtherState = mWaitlist.getState(0, pair);
+          }
+          listID = getlist(theOtherState);
+          lists.add(listID);
+        }
+      }
+      for (final Integer l : lists) {
+        arraylist.add(getListArray(l));
+      }
+      return arraylist;
+    }
+
+    public void merge()
+    {
+      final TLongIterator itr = mWaitlist.getIterator();
+      while (itr.hasNext()) {
+        final long pair = itr.next();
+        final int state1 = mWaitlist.getState(0, pair);
+        final int state2 = mWaitlist.getState(1, pair);
+        if (mStateToClass[state1] != mStateToClass[state2]) {
+          final int list1 = getlist(state1);
+          final int list2 = getlist(state2);
+          final int list3 = mergeLists(list1, list2);
+          updateStateToClass(list3);
+        }
+      }
+    }
+
+    public int mergeLists(final int list1, final int list2)
+    {
+      final int x = mClasses.getFirst(list1);
+      final int y = mClasses.getFirst(list2);
+      if (x < y) {
+        return mClasses.catenateDestructively(list1, list2);
+      } else if (x > y) {
+        return mClasses.catenateDestructively(list2, list1);
+      }
+      return list1;
+    }
+
+    public void updateStateToClass(final int list)
+    {
+      final int[] array = getListArray(list);
+      for (int i = 0; i < array.length; i++) {
+        mStateToClass[array[i]] = list;
+      }
+    }
+
+    public int getMin(final int state)
+    {
+      final int list = mStateToClass[state];
+      final int min = mClasses.getFirst(list);
+      return min;
+    }
+
+    public int getlist(final int state)
+    {
+      return mStateToClass[state];
+    }
+
+    public int[] getListArray(final int list)
+    {
+      return mClasses.toArray(list);
+    }
+
+    int[][][][] mmTransitions;
   }
 
   //#########################################################################
   //# Data Members
-  private Collection<EventProxy> mUsedPropositions;
-  private int mNumAutomata;
-  private int mNumProperEvents;//
-  @SuppressWarnings("unused")
-  private int mNumUncontrollableEvents;
-  private int mNumEvents;
+  //# Variables used for encoding/decoding
+  /** a list contains number of bits needed for each automaton */
+  private int mNumBits[];
+
+  /** a list contains masks needed for each automaton */
+  private int mNumBitsMasks[];
+
+  /** a number of integers used to encode synchronized state */
+  private int mNumInts;
+
+  /** an index of first automaton in each integer buffer */
+  private int mIndexAutomata[];
+
+  private List<AutomatonProxy> mAutomata;
   private EventProxy[] mEvents;
   private Collection<EventProxy> mCurrentPropositions;
-  private int[] mProjectionMask;
+  private Collection<EventProxy> mUsedPropositions;
+  private int mTransitionBufferLimit;
+  private TIntArrayList mTransitionBuffer;
+
+  private int mNumAutomata;
+  private static int mNumPlants;
+  private int mNumStates;
+  private int mNumInitialStates;
+  private int mNumEvents;
+  private int mNumProperEvents;
+  private int mNumUncontrollableEvents;
+
   private StateProxy[][] mOriginalStates;
   private Map<List<EventProxy>,List<EventProxy>> mAllMarkings;
   private List<?>[][] mStateMarkings;
-  private int[][][][] mTransitions;
   private boolean[][] mDeadlock;
-  private int[][] mEventAutomata;
-
-  private int mNumStates;
-  private int mNumInitialStates;
-  private TObjectIntHashMap<int[]> mStates;
-  private List<int[]> mStateTuples;
-  private Queue<int[]> mUnvisited;
-  private TIntArrayList mTransitionBuffer;
-  private int mTransitionBufferLimit;
-
-  private int[][] mNDTuple;
-  private int[] mTargetTuple;
-  private TIntHashSet[] mCurrentSuccessors;
   private boolean[] mCurrentDeadlock;
   private int mDeadlockState;
+
+  private List<int[]> mStateTuples;
+  private TObjectIntHashMap<int[]> mGlobalVisited;
+  private Deque<int[]> mGlobalStack;
+  private Deque<int[]> mLocalStack;
+  private Deque<int[]> mBackTrace;
+  private Set<int[]> mLocalVisited;
+  private Queue<int[]> mUnvisited;
+  private int[] mTargetTuple;
+
+  private BitSet mNonCoreachableStates;
+  private BitSet mBadStates;
+  private BitSet mSafeStates;
+  private BitSet mReachableStates;
+  private boolean initialIsBad;
+  private boolean mMustContinue;
+
+  private StateExplorer mCtrlInitialReachabilityExplorer;
+  private StateExplorer mUnctrlInitialReachabilityExplorer;
+  private StateExplorer mFinalReachabilityExplorer;
+  private StateExplorer mCoreachabilityExplorer;
+  private StateExplorer mSuccessorStatesExplorer;
+
+  private int[] mStateToClass;//!!!!!!!
+  private IntListBuffer mClasses;
+  private Waitlist mWaitlist;
+  @SuppressWarnings("unused")
+  private TempClass mTemp;//!!!!!!!
 
   //#########################################################################
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
-
+  private static final int SIZE_INT = 32;
 }

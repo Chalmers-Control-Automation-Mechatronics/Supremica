@@ -2,9 +2,9 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
-import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.simulator.EventStatus;
 import net.sourceforge.waters.gui.simulator.Simulation;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.des.EventProxy;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;

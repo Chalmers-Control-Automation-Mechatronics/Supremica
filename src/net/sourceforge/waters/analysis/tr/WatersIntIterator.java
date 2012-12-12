@@ -11,7 +11,15 @@ package net.sourceforge.waters.analysis.tr;
 
 
 /**
- * An iterator over a collection of <CODE>int</CODE> values.
+ * <P>An iterator over a collection of <CODE>int</CODE> values.</P>
+ *
+ * <P>The standard usage pattern is based on a combination of the methods
+ * {@link #advance()} and {@link #getCurrentData()}.</P>
+ * <PRE> WatersIntIterator iter = ...;
+ * while (iter.{@link #advance()}) {
+ *   int data = iter.{@link #getCurrentData()};
+ *   // process data ...
+ * }</PRE>
  *
  * @author Robi Malik
  */

@@ -156,7 +156,7 @@ public interface SelectionOwner
    * <CODE>true</CODE>, otherwise the result of this method is
    * undefined.</P>
    * <P>This method may perform user interaction, and the user may cancel
-   * the insertion of the transferable contents this point. In this case,
+   * the insertion of the transferable contents at this point. In this case,
    * <CODE>null</CODE> is returned.</P>
    * @return A list of {@link InsertInfo} objects identifying the items
    *         to be removed from the model, plus any information needed
