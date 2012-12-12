@@ -43,6 +43,7 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator{
     
     /** Final choice */
     private int choice;
+    private int previous_choice;
     
     public BDDPartitionCoordinatorEve (BDDPartitionSet eventPartitions) {
         super(eventPartitions);
@@ -65,6 +66,7 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator{
 			buildSubsequentCandidates(forForward); // update selectedCandidate array
 		}
 		choice = learner.choose(candidateEventIndexSet.toArray(), candidateEventIndexSet.size());
+                previous_choice = choice;
 		return choice;
     }
 
@@ -102,14 +104,14 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator{
         int maxDepSize = -1;
         for (TIntIterator compItr = compIndexSet.iterator(); compItr.hasNext();) {
             int eventIndex = compItr.next();
-            int eventDepSize = eventIndex2DepEventIndexSetMap.get(eventIndex).size();
-            if (eventDepSize > maxDepSize) {
-                maxDepSize = eventDepSize;
-                candidateEventIndexSet.clear();
-                candidateEventIndexSet.add(eventIndex);
-            } else if (eventDepSize == maxDepSize) {
-                candidateEventIndexSet.add(eventIndex);
-            }
+                int eventDepSize = eventIndex2DepEventIndexSetMap.get(eventIndex).size();
+                if (eventDepSize > maxDepSize) {
+                    maxDepSize = eventDepSize;
+                    candidateEventIndexSet.clear();
+                    candidateEventIndexSet.add(eventIndex);
+                } else if (eventDepSize == maxDepSize) {
+                    candidateEventIndexSet.add(eventIndex);
+                }
         }
     }
 

@@ -153,8 +153,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     SynthesisAlgorithm synType;
     List<ExtendedAutomaton> plants;
     List<ExtendedAutomaton> specs;
-    TIntArrayList plantUncontrollableEventIndexList;
-    TIntArrayList specUncontrollableEventIndexList;
+    TIntHashSet plantUncontrollableEventIndexList;
+    TIntHashSet specUncontrollableEventIndexList;
     TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> event2AutomatonsEdges;
     //String pathRoot = "C:/Users/sajed/Desktop/MDD_files/";
     String pathRoot = "/Users/sajed/Dropbox/Documents/Papers/Supremica_Models/MDD_files";
@@ -215,8 +215,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         this.plants = new ArrayList<ExtendedAutomaton>();
         this.specs = new ArrayList<ExtendedAutomaton>();
 
-        this.plantUncontrollableEventIndexList = new TIntArrayList();
-        this.specUncontrollableEventIndexList = new TIntArrayList();
+        this.plantUncontrollableEventIndexList = new TIntHashSet();
+        this.specUncontrollableEventIndexList = new TIntHashSet();
         
         if(!options.getOptVaribale().isEmpty())
         {

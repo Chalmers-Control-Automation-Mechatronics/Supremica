@@ -1,6 +1,6 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntProcedure;
 import java.util.ArrayList;
@@ -67,10 +67,10 @@ public class BDDPartitionUncontSetEve {
     /** 
      * Uncontrollable event indices 
      */
-    private TIntArrayList uncontrollableEventIndexList;
+    private TIntHashSet uncontrollableEventIndexList;
 
     public BDDPartitionUncontSetEve(BDDExtendedAutomata bddAutomata, List<ExtendedAutomaton> members, 
-                                                                     TIntArrayList caredUncontrollableEventIndexList) {
+                                                                     TIntHashSet caredUncontrollableEventIndexList) {
         
         this.bddExAutomata = bddAutomata;
         this.manager = bddAutomata.getManager();

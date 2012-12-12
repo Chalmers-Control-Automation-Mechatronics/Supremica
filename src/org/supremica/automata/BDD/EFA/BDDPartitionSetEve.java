@@ -248,8 +248,9 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                         int jEventIndex = eventIndexArray[j];
                         Set<String> tmpGuardVars = new HashSet<String>(eventIndex2GuardVariables.get(jEventIndex));
                         tmpGuardVars.retainAll(updatedVars);
-						
-                        if (!tmpGuardVars.isEmpty() || eventIndex2GuardVariables.get(jEventIndex).isEmpty()) {
+                        		
+                        if (!tmpGuardVars.isEmpty() || eventIndex2GuardVariables.get(jEventIndex).isEmpty() 
+                                || !eventIndex2UpdatedVariables.get(jEventIndex).isEmpty()) {
                             if (!forwardVarDependencyMap.contains(iEventIndex)) {
                                 forwardVarDependencyMap.put(iEventIndex, new TIntHashSet());
                             }

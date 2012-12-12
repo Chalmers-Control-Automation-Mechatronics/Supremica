@@ -263,23 +263,25 @@ public class BDDExtendedManager extends BDDAbstractManager {
             return getZeroBDD();
         } else {
 
-            final TIntArrayList plantUncontrollableEvents = bddExAutomata.plantUncontrollableEventIndexList;
-            final TIntArrayList specUncontrollableEvents = bddExAutomata.specUncontrollableEventIndexList;
-
+            final TIntHashSet plantUncontrollableEvents = bddExAutomata.plantUncontrollableEventIndexList;
+            final TIntHashSet specUncontrollableEvents = bddExAutomata.specUncontrollableEventIndexList;
+            
+            TIntHashSet sharedUncontrollableEvents = new TIntHashSet(specUncontrollableEvents.toArray());
+            sharedUncontrollableEvents.retainAll(plantUncontrollableEvents.toArray());
+            
             final TIntObjectHashMap<BDD> plantsEnabledStates =
-                    new BDDPartitionUncontSetEve(bddExAutomata, bddExAutomata.plants, plantUncontrollableEvents).getUncontrollableEvents2EnabledStates();
+                  new BDDPartitionUncontSetEve(bddExAutomata, bddExAutomata.plants, plantUncontrollableEvents).getUncontrollableEvents2EnabledStates();
             final TIntObjectHashMap<BDD> specEnabledStates =
-                    new BDDPartitionUncontSetEve(bddExAutomata, bddExAutomata.specs, specUncontrollableEvents).getUncontrollableEvents2EnabledStates();
+                  new BDDPartitionUncontSetEve(bddExAutomata, bddExAutomata.specs, specUncontrollableEvents).getUncontrollableEvents2EnabledStates();
             final BDD uncontrollableStates = getZeroBDD();
-
-            for (int i = 0; i < specUncontrollableEvents.size(); i++) {
-                if (plantUncontrollableEvents.contains(specUncontrollableEvents.get(i))) {
-                    final int eventIndex = specUncontrollableEvents.get(i);
-                    uncontrollableStates.orWith(plantsEnabledStates.get(eventIndex).and(specEnabledStates.get(eventIndex).not()));
-                }
+            
+            for(TIntIterator itr = sharedUncontrollableEvents.iterator(); itr.hasNext();) {
+                int unConEventIndex = itr.next();
+                BDD statesEnabledByPlants = plantsEnabledStates.get(unConEventIndex).and(bddExAutomata.getReachableStates());
+                    BDD statesEnabledBySpecs = specEnabledStates.get(unConEventIndex).and(bddExAutomata.getReachableStates());
+                    uncontrollableStates.orWith(statesEnabledByPlants.and(statesEnabledBySpecs.not()));
             }
-
-            return uncontrollableStates;
+            return uncontrollableStates.and(bddExAutomata.getReachableStates());
         }
     }
 

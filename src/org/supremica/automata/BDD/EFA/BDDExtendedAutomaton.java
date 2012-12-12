@@ -302,7 +302,7 @@ public class BDDExtendedAutomaton {
                 if(theExAutomaton.isSpecification()) {
                     bddExAutomata.specUncontrollableEventIndexList.add(eventIndex);
                 }
-                else{
+                else if(!bddExAutomata.plantUncontrollableEventIndexList.contains(eventIndex)){
                     bddExAutomata.plantUncontrollableEventIndexList.add(eventIndex);
                 }
             }
