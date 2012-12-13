@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -93,7 +94,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
                                     final ProductDESProxyFactory factory)
   {
     super(model, translator, diag, factory);
-    MAXDEPTH = 1000;
+    MAXDEPTH = 500;
   }
 
   //#########################################################################
@@ -558,7 +559,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     while(stack.size() > 0){
       final PartialOrderStateTuple current = stack.remove(stack.size() - 1);
       final int[] ample;
-      if ((ample = ample(current)) == null){
+      if ((ample = ample3(current)) == null){
         return false;
       }
       for (final int e : ample){
@@ -623,6 +624,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     return temp.toNativeArray();
   }
 
+  @SuppressWarnings("unused")
   private int[] ample(final PartialOrderStateTuple current){
     final int[] enabled = enabled(current);
     if (enabled == null){
@@ -697,6 +699,194 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
     }
     return nonStutterAdded ? enabled : ample.toNativeArray();
+  }
+
+  @SuppressWarnings("unused")
+  private int[] ample2(final PartialOrderStateTuple current){
+    final int[] enabled = enabled(current);
+    if (enabled == null){
+      return null;
+    }
+    orderStutterEvents(enabled);
+    Collection<Integer> ample = null;
+    final boolean addition = false;
+
+    final Collection<AutomatonProxy> automata =
+      new HashSet<AutomatonProxy>();
+    Collection<Integer> newEvents;
+    //TIntArrayList newEvents;
+    ample:
+    for (final int e : enabled){
+      ample = new ArrayList<Integer>();
+      ample.add(e);
+      do{
+        automata:
+        for (final AutomatonProxy ap : mAutomata){
+          for (final int a : ample){
+            if (ap.getEvents().contains(mEventCodingList.get(a))){
+              automata.add(ap);
+              continue automata;
+            }
+          }
+        }
+        for (final AutomatonProxy ap : automata){
+          newEvents = new ArrayList<Integer>();
+          for (final int a : enabled){
+            if (ap.getEvents().contains(mEventCodingList.get(a))){
+              newEvents.add(a);
+            }
+          }
+          newEvents.removeAll(ample);
+          if (newEvents.size() > 0){
+            ample.addAll(newEvents);
+            if (ample.size() == enabled.length){
+              continue ample;
+            }
+          }
+        }
+      }
+      while (!addition);
+    }
+
+    return buildIntArray(ample);
+  }
+
+  private int[] ample3(final PartialOrderStateTuple current){
+    final int[] enabled = enabled(current);
+    if (enabled == null){
+      return null;
+    }
+
+    final ArrayList<Integer> newArray = new ArrayList<Integer>(enabled.length);
+
+    for (final int value : enabled) {
+        newArray.add(Integer.valueOf(value));
+    }
+    final Set<Integer> enabledSet = new HashSet<Integer>(newArray);
+
+    orderStutterEvents(enabled);
+
+
+    TIntArrayList ample = new TIntArrayList();
+
+    int next = 0;
+    int i,j;
+
+    ample:
+    for (i = 0; i < enabled.length; i++){
+      final TIntArrayList dependentNonEnabled = new TIntArrayList();
+      final TIntArrayList eventsSetMinusAmple = new TIntArrayList();
+      ample.add(enabled[next]);
+      next++;
+      for (j = 0; j < mEventCodingList.size(); j++){
+        if (!ample.contains(j)){
+          eventsSetMinusAmple.add(j);
+        }
+      }
+      while (eventsSetMinusAmple.size() > 0){
+        final int event = eventsSetMinusAmple.remove(0);
+        final BitSet ampleDependencies = new BitSet(mNumEvents);
+        for (final PartialOrderEventDependencyTuple t :
+          mReducedEventDependencyMap[event]){
+          ampleDependencies.set(t.getCoupling());
+        }
+        for (final int ampleIndex : ample.toNativeArray()){
+          if (ampleDependencies.get(ampleIndex)){
+            if (enabledSet.contains(event)){
+              ample.add(event);
+            }
+            else{
+              dependentNonEnabled.add(event);
+            }
+            break;
+          }
+        }
+      }
+      TIntArrayList unionList =
+        new TIntArrayList(ample.size() + dependentNonEnabled.size());
+      unionList = (TIntArrayList) ample.clone();
+      for (j = 0; j < dependentNonEnabled.size(); j++){
+        unionList.add(dependentNonEnabled.get(j));
+      }
+      boolean danger = true;
+      for (final int dependent : dependentNonEnabled.toNativeArray()){
+        for (j = 0; j < mAutomata.length; j++){
+          final AutomatonProxy ap = mAutomata[j];
+          if (ap.getEvents().contains(mEventCodingList.get(dependent))){
+            if (!canBecomeEnabled(current,dependent,unionList,j)){
+              danger = false;
+              break;
+            }
+          }
+        }
+        if (danger){
+          ample = new TIntArrayList();
+          continue ample;
+        }
+      }
+      return ample.toNativeArray();
+    }
+    return enabled;
+  }
+
+  private boolean canBecomeEnabled(final PartialOrderStateTuple current,
+                                   final int dependent, final TIntArrayList unionList,
+                                   final int automatonIndex){
+    final boolean plant = automatonIndex < mNumPlants;
+    final int si = automatonIndex - mNumPlants;
+
+    final AutomatonProxy ap = mAutomata[automatonIndex];
+    final int[][] transMap = plant ? mPlantTransitionMap.get(automatonIndex):
+      mSpecTransitionMap.get(si);
+
+    final List<StateProxy> codes = new ArrayList<StateProxy>(ap.getStates());
+    final List<StateProxy> stack = new ArrayList<StateProxy>();
+    final int[] ampleState = new int[mNumAutomata];
+    final StateHashSet<StateProxy> localStateSet =
+      new StateHashSet<StateProxy>(StateProxy.class);
+
+    decode(current,ampleState);
+
+    StateProxy successor;
+
+    stack.add(codes.get(ampleState[automatonIndex]));
+
+    int e, temp;
+
+    while(stack .size() > 0){
+
+      final StateProxy newCurrent = stack.remove(stack.size() - 1);
+      final int stateIndex = codes.indexOf(newCurrent);
+
+      events:
+      for (e = 0; e < mNumEvents; e++){
+        if ((temp = transMap[stateIndex][e]) != -1){
+          successor = codes.get(temp);
+        }
+        else{
+          continue events;
+        }
+        if (e == dependent){
+          return true;
+        }
+        if (!unionList.contains(e)){
+          continue events;
+        }
+        if (localStateSet.getOrAdd(successor) == null) {
+          stack.add(successor);
+        }
+      }
+    }
+    return false;
+  }
+
+  private int[] buildIntArray(final Collection<Integer> integers) {
+    final int[] ints = new int[integers.size()];
+    int i = 0;
+    for (final Integer n : integers) {
+        ints[i++] = n;
+    }
+    return ints;
   }
 
   private void orderStutterEvents(final int[] events){
