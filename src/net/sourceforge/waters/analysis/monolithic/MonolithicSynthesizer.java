@@ -32,13 +32,13 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
-import net.sourceforge.waters.model.analysis.AbstractModelBuilder;
+import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.DefaultProductDESResult;
+import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-import net.sourceforge.waters.model.analysis.ProductDESResult;
 import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -65,11 +65,11 @@ import org.apache.log4j.Logger;
  * stored in integer arrays without compression, so it is not recommended to
  * use this implementation to compose a large number of automata.
  *
- * @author Simon Ware, Rachel Francis, Robi Malik
+ * @author Robi Malik, fq11
  */
 
-public class MonolithicSynthesizer extends
-  AbstractModelBuilder<ProductDESProxy> implements SupervisorSynthesizer
+public class MonolithicSynthesizer extends AbstractProductDESBuilder
+  implements SupervisorSynthesizer
 {
 
   //#########################################################################
@@ -93,6 +93,18 @@ public class MonolithicSynthesizer extends
   }
 
   //#########################################################################
+  //# Configuration
+  public void setSupervisorReductionEnabled(final boolean enable)
+  {
+    mSupervisorReductionEnabled = enable;
+  }
+
+  public boolean getSupervisorReductionEnabled()
+  {
+    return mSupervisorReductionEnabled;
+  }
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
   public Collection<EventProxy> getPropositions()
   {
@@ -104,22 +116,15 @@ public class MonolithicSynthesizer extends
     mUsedPropositions = props;
   }
 
-  @Override
-  public ProductDESResult createAnalysisResult()
+  public void setConfiguredDefaultMarking(EventProxy marking)
+    throws EventNotFoundException
   {
-    return new DefaultProductDESResult();
-  }
-
-  @Override
-  public ProductDESResult getAnalysisResult()
-  {
-    return (ProductDESResult) super.getAnalysisResult();
-  }
-
-  @Override
-  public ProductDESProxy getComputedProductDES()
-  {
-    return getAnalysisResult().getComputedProductDES();
+    if (marking == null) {
+      final ProductDESProxy model = getModel();
+      marking = AbstractConflictChecker.getMarkingProposition(model);
+    }
+    final Collection<EventProxy> props = Collections.singletonList(marking);
+    setPropositions(props);
   }
 
   //#########################################################################
@@ -245,8 +250,13 @@ public class MonolithicSynthesizer extends
         return setBooleanResult(false);
       }
       if (getConstructsResult()) {
-        mTemp.mainProcedure();
-        final AutomatonProxy aut = mTemp.createReducedAutomaton();
+        final AutomatonProxy aut;
+        if (mSupervisorReductionEnabled == true) {
+          mTemp.mainProcedure();
+          aut = mTemp.createReducedAutomaton();
+        } else {
+          aut = createAutomaton();
+        }
         final ProductDESProxy des =
           AutomatonTools.createProductDESProxy(aut, getFactory());
         return setProxyResult(des);
@@ -730,7 +740,6 @@ public class MonolithicSynthesizer extends
     mTransitionBuffer.add(target);
   }
 
-  @SuppressWarnings("unused")
   private AutomatonProxy createAutomaton()
   {
     final int numEvents = mNumEvents + mCurrentPropositions.size();
@@ -1494,7 +1503,7 @@ public class MonolithicSynthesizer extends
     {
       final TIntArrayList arraylist = new TIntArrayList();
       //lists: lists whose members will be added to the arraylist
-      final ArrayList<Integer> lists = new ArrayList<Integer>();
+      final ArrayList<Integer> lists = new ArrayList<Integer>();//
       final TLongIterator itr = mmWaitlist.getIterator();
       while (itr.hasNext()) {
         final long pair = itr.next();
@@ -1510,6 +1519,13 @@ public class MonolithicSynthesizer extends
           listID = getlist(theOtherState);
           lists.add(listID);
         }
+      }
+      final int list = getlist(state);
+      final ReadOnlyIterator it = mClasses.createReadOnlyIterator(list);
+      it.reset(list);
+      while (it.advance()) {
+        final int curr = it.getCurrentData();
+        arraylist.add(curr);
       }
       for (final Integer l : lists) {
         arraylist.add(getListArray(l));
@@ -1591,12 +1607,12 @@ public class MonolithicSynthesizer extends
         if (mStateToClass[i] != IntListBuffer.NULL) {
           final ReadOnlyIterator iter =
             mClasses.createReadOnlyIterator(mStateToClass[i]);
-          iter.reset();
+          iter.reset(mStateToClass[i]);
           final List<EventProxy> marking =
             new ArrayList<EventProxy>(numProps);
           while (iter.advance()) {
             final int s = iter.getCurrentData();
-            if(i == s){
+            if (i == s) {
               mini = s;
               initial = s < mNumInitialStates;
             }
@@ -1672,6 +1688,7 @@ public class MonolithicSynthesizer extends
 
   //#########################################################################
   //# Data Members
+  private boolean mSupervisorReductionEnabled = false;
   //# Variables used for encoding/decoding
   /** a list contains number of bits needed for each automaton */
   private int mNumBits[];

@@ -251,6 +251,7 @@ class SynthesizerDialogStandardPanel
         if (typeSelector.getType() == SynthesisType.CONTROLLABLE)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
+            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC_WATERS);
             algorithmSelector.addItem(SynthesisAlgorithm.MODULAR);
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
@@ -260,6 +261,7 @@ class SynthesizerDialogStandardPanel
         else if (typeSelector.getType() == SynthesisType.NONBLOCKING)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
+            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC_WATERS);
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
@@ -269,6 +271,7 @@ class SynthesizerDialogStandardPanel
         else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
+            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC_WATERS);
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
             algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);

@@ -52,6 +52,7 @@ package org.supremica.automata.algorithms;
 public enum SynthesisAlgorithm
 {
     MONOLITHIC("Monolithic (explicit)", false),
+    MONOLITHIC_WATERS("Monolithic (Waters)", false),
     MONOLITHICBDD("Monolithic (symbolic)", false),
 
     PARTITIONBDD("Partitioning (symbolic)", false),
