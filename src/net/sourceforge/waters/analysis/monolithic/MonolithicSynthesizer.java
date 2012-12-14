@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Deque;
 import java.util.Set;
+
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
@@ -1274,7 +1275,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         state2 = state1 - state2;
         state1 = state1 - state2;
       }
-      final long pair = (long) state1 | ((long) state2 << 32);
+      final long pair = (long) state2 | ((long) state1 << 32);
       return pair;
     }
 
@@ -1608,31 +1609,34 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           final ReadOnlyIterator iter =
             mClasses.createReadOnlyIterator(mStateToClass[i]);
           iter.reset(mStateToClass[i]);
-          final List<EventProxy> marking =
-            new ArrayList<EventProxy>(numProps);
-          while (iter.advance()) {
-            final int s = iter.getCurrentData();
-            if (i == s) {
-              mini = s;
-              initial = s < mNumInitialStates;
-            }
-            decode(mStateTuples.get(s), tuple);
-            props: for (final EventProxy prop : mCurrentPropositions) {
-              for (int a = 0; a < mNumAutomata; a++) {
-                final List<EventProxy> stateMarking =
-                  getStateMarking(a, tuple[a]);
-                if (Collections.binarySearch(stateMarking, prop) < 0) {
-                  continue props;
+          if(iter.advance()){
+            final int firstElement  = iter.getCurrentData();
+            if(firstElement == i){
+              mini = firstElement;
+              initial = firstElement < mNumInitialStates;
+              final List<EventProxy> marking =
+                new ArrayList<EventProxy>(numProps);
+              do{
+                final int curr = iter.getCurrentData();
+                decode(mStateTuples.get(curr), tuple);
+                props: for (final EventProxy prop : mCurrentPropositions) {
+                  for (int a = 0; a < mNumAutomata; a++) {
+                    final List<EventProxy> stateMarking =
+                      getStateMarking(a, tuple[a]);
+                    if (Collections.binarySearch(stateMarking, prop) < 0) {
+                      continue props;
+                    }
+                  }
+                  marking.add(prop);
                 }
-              }
-              marking.add(prop);
+              }while (iter.advance());
+              Collections.sort(marking);
+              final List<EventProxy> unique = getUniqueMarking(marking);
+              final StateProxy state = new MemStateProxy(mini, unique, initial);
+              states.add(state);
+              stateArray[mini] = state;
             }
           }
-          Collections.sort(marking);
-          final List<EventProxy> unique = getUniqueMarking(marking);
-          final StateProxy state = new MemStateProxy(mini, unique, initial);
-          states.add(state);
-          stateArray[mini] = state;
         }
       }
 
