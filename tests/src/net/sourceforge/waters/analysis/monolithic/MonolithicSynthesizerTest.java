@@ -32,8 +32,9 @@ public class MonolithicSynthesizerTest
    */
   protected SupervisorSynthesizer createSynthesizer
     (final ProductDESProxyFactory factory){
-      return new MonolithicSynthesizer(factory);
-
+      final MonolithicSynthesizer synthesizer =  new MonolithicSynthesizer(factory);
+      synthesizer.setSupervisorReductionEnabled(true);
+      return synthesizer;
   }
 
   //#########################################################################

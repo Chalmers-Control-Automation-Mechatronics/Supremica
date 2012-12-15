@@ -11,6 +11,17 @@
         <EventDecl Kind="UNCONTROLLABLE" Name="break2"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="finish2"/>
         <EventDecl Kind="CONTROLLABLE" Name="repair2"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="PROPOSITION" Name="disable_start1">
+            <ColorGeometry>
+                <Color Blue="255" Green="0" Red="51"/>
+            </ColorGeometry>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name="enable_start1">
+            <ColorGeometry>
+                <Color Blue="0" Green="102" Red="0"/>
+            </ColorGeometry>
+        </EventDecl>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="machine1">
@@ -299,6 +310,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="empty.idle.down.m2down">
+                        <EventList>
+                            <SimpleIdentifier Name="enable_start1"/>
+                        </EventList>
                         <PointGeometry>
                             <Point X="208" Y="32"/>
                         </PointGeometry>
@@ -309,6 +323,7 @@
                     <SimpleNode Initial="true" Name="empty.idle.idle.m2ok">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
+                            <SimpleIdentifier Name="enable_start1"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="48" Y="64"/>
@@ -318,6 +333,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="empty.idle.working.m2ok">
+                        <EventList>
+                            <SimpleIdentifier Name="enable_start1"/>
+                        </EventList>
                         <PointGeometry>
                             <Point X="192" Y="112"/>
                         </PointGeometry>
@@ -350,6 +368,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="full.idle.down.m2down">
+                        <EventList>
+                            <SimpleIdentifier Name="disable_start1"/>
+                        </EventList>
                         <PointGeometry>
                             <Point X="384" Y="112"/>
                         </PointGeometry>
@@ -358,6 +379,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="full.idle.idle.m2ok">
+                        <EventList>
+                            <SimpleIdentifier Name="disable_start1"/>
+                        </EventList>
                         <PointGeometry>
                             <Point X="384" Y="64"/>
                         </PointGeometry>
@@ -366,6 +390,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="full.idle.working.m2ok">
+                        <EventList>
+                            <SimpleIdentifier Name="disable_start1"/>
+                        </EventList>
                         <PointGeometry>
                             <Point X="400" Y="304"/>
                         </PointGeometry>

@@ -13,6 +13,7 @@ import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TLongHashSet;
 import gnu.trove.TLongIterator;
+import gnu.trove.TObjectHashingStrategy;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 
@@ -28,15 +29,17 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Deque;
 import java.util.Set;
+
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
-import net.sourceforge.waters.model.analysis.AbstractModelBuilder;
+import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
+import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.DefaultProductDESResult;
+import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-import net.sourceforge.waters.model.analysis.ProductDESResult;
 import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -45,6 +48,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
@@ -62,11 +66,11 @@ import org.apache.log4j.Logger;
  * stored in integer arrays without compression, so it is not recommended to
  * use this implementation to compose a large number of automata.
  *
- * @author Simon Ware, Rachel Francis, Robi Malik
+ * @author Robi Malik, fq11
  */
 
-public class MonolithicSynthesizer extends
-  AbstractModelBuilder<ProductDESProxy> implements SupervisorSynthesizer
+public class MonolithicSynthesizer extends AbstractProductDESBuilder
+  implements SupervisorSynthesizer
 {
 
   //#########################################################################
@@ -90,6 +94,18 @@ public class MonolithicSynthesizer extends
   }
 
   //#########################################################################
+  //# Configuration
+  public void setSupervisorReductionEnabled(final boolean enable)
+  {
+    mSupervisorReductionEnabled = enable;
+  }
+
+  public boolean getSupervisorReductionEnabled()
+  {
+    return mSupervisorReductionEnabled;
+  }
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
   public Collection<EventProxy> getPropositions()
   {
@@ -101,22 +117,15 @@ public class MonolithicSynthesizer extends
     mUsedPropositions = props;
   }
 
-  @Override
-  public ProductDESResult createAnalysisResult()
+  public void setConfiguredDefaultMarking(EventProxy marking)
+    throws EventNotFoundException
   {
-    return new DefaultProductDESResult();
-  }
-
-  @Override
-  public ProductDESResult getAnalysisResult()
-  {
-    return (ProductDESResult) super.getAnalysisResult();
-  }
-
-  @Override
-  public ProductDESProxy getComputedProductDES()
-  {
-    return getAnalysisResult().getComputedProductDES();
+    if (marking == null) {
+      final ProductDESProxy model = getModel();
+      marking = AbstractConflictChecker.getMarkingProposition(model);
+    }
+    final Collection<EventProxy> props = Collections.singletonList(marking);
+    setPropositions(props);
   }
 
   //#########################################################################
@@ -242,7 +251,13 @@ public class MonolithicSynthesizer extends
         return setBooleanResult(false);
       }
       if (getConstructsResult()) {
-        final AutomatonProxy aut = createAutomaton();
+        final AutomatonProxy aut;
+        if (mSupervisorReductionEnabled == true) {
+          mTemp.mainProcedure();
+          aut = mTemp.createReducedAutomaton();
+        } else {
+          aut = createAutomaton();
+        }
         final ProductDESProxy des =
           AutomatonTools.createProductDESProxy(aut, getFactory());
         return setProxyResult(des);
@@ -596,8 +611,6 @@ public class MonolithicSynthesizer extends
       new FinalReachabilityExplorer(mEventAutomata, mTransitions,
                                     mNDTupleFinal, 0, mNumProperEvents - 1);
     mTemp = new TempClass(mTransitions);
-    mWaitlist = new Waitlist();
-
   }
 
   @Override
@@ -985,7 +998,7 @@ public class MonolithicSynthesizer extends
   }
 
 
-  //#########################################################################################################
+  //#########################################################################
   //# Inner Class StateExplorer
   private abstract class StateExplorer
   {
@@ -1170,6 +1183,15 @@ public class MonolithicSynthesizer extends
         source = mGlobalVisited.get(encode(decodedSource));
       }
       final int target = mGlobalVisited.get(encode(mTargetTuple));
+      //if (mBadStates.get(target)) {
+      //return true;
+      //} else if (mReachableStates.get(target)) {
+      //addTransition(source, event, target);
+      //} else {
+      //addTransition(source, event, target);
+      //mUnvisited.offer(mStateTuples.get(target));
+      //mReachableStates.set(target);
+      //}
       if (!mBadStates.get(target) && !mReachableStates.get(target)) {
         mUnvisited.offer(mStateTuples.get(target));
         mReachableStates.set(target);
@@ -1237,11 +1259,15 @@ public class MonolithicSynthesizer extends
   }
 
 
-  //##########################################################################################
+  //#########################################################################
   //# Inner Class Waitlist
-  @SuppressWarnings("unused")
   private static class Waitlist
   {
+    public Waitlist()
+    {
+      mmWaitlist = new TLongHashSet();
+    }
+
     public long constructPair(int state1, int state2)
     {
       if (state1 > state2) {
@@ -1249,22 +1275,23 @@ public class MonolithicSynthesizer extends
         state2 = state1 - state2;
         state1 = state1 - state2;
       }
-      final long pair = (long) state1 | ((long) state2 << 32);
+      final long pair = (long) state2 | ((long) state1 << 32);
       return pair;
     }
 
     public boolean contains(final int state1, final int state2)
     {
       final long pair = constructPair(state1, state2);
-      return mWaitlist.contains(pair);
+      return mmWaitlist.contains(pair);
     }
 
     public boolean add(final int state1, final int state2)
     {
       final long pair = constructPair(state1, state2);
-      return mWaitlist.add(pair);
+      return mmWaitlist.add(pair);
     }
 
+    @SuppressWarnings("unused")
     public int compare(final long pair1, final long pair2)
     {
       final int hiPair1 = (int) (pair1 >>> 32);
@@ -1336,15 +1363,15 @@ public class MonolithicSynthesizer extends
 
     public void clear()
     {
-      mWaitlist.clear();
+      mmWaitlist.clear();
     }
 
     public TLongIterator getIterator()
     {
-      return mWaitlist.iterator();
+      return mmWaitlist.iterator();
     }
 
-    private TLongHashSet mWaitlist;
+    private final TLongHashSet mmWaitlist;
   }
 
 
@@ -1354,6 +1381,7 @@ public class MonolithicSynthesizer extends
     public TempClass(final int[][][][] transitions)
     {
       this.mmTransitions = transitions;
+      this.mmWaitlist = new Waitlist();
     }
 
     public void setUpClasses()
@@ -1371,10 +1399,10 @@ public class MonolithicSynthesizer extends
       }
     }
 
-    @SuppressWarnings("unused")
     public void mainProcedure()
     {
       setUpClasses();
+
       for (int i = 0; i < mNumStates - 1; i++) {
         if ((mStateToClass[i] == IntListBuffer.NULL) || (i > getMin(i))) {
           continue;
@@ -1383,7 +1411,7 @@ public class MonolithicSynthesizer extends
           if ((mStateToClass[j] == IntListBuffer.NULL) || (j > getMin(j))) {
             continue;
           }
-          mWaitlist.clear();
+          mmWaitlist.clear();
           final boolean flag = checkMergibility(i, j, i);
           if (flag) {
             merge();
@@ -1399,13 +1427,13 @@ public class MonolithicSynthesizer extends
       final int[] arrayXj = constructList(xj).toNativeArray();
       for (int i = 0; i < arrayXi.length; i++) {
         for (int j = 0; j < arrayXj.length; j++) {
-          if (mWaitlist.contains(arrayXi[i], arrayXj[j])) {
+          if (mmWaitlist.contains(arrayXi[i], arrayXj[j])) {
             continue;
           }
           if (!isInRelation(arrayXi[i], arrayXj[j])) {
             return false;
           }
-          mWaitlist.add(arrayXi[i], arrayXj[j]);
+          mmWaitlist.add(arrayXi[i], arrayXj[j]);
           for (int event = 0; event < mNumProperEvents; event++) {
             final int iSucc = getSuccessorState(event, arrayXi[i]);
             final int jSucc = getSuccessorState(event, arrayXj[j]);
@@ -1413,12 +1441,12 @@ public class MonolithicSynthesizer extends
                 && (mReachableStates.get(iSucc))
                 && (mReachableStates.get(jSucc))) {
               if ((mStateToClass[iSucc] == mStateToClass[jSucc])
-                  || (mWaitlist.contains(iSucc, jSucc))) {
+                  || (mmWaitlist.contains(iSucc, jSucc))) {
                 continue;
               }
               final int iMin = getMin(iSucc);
               final int jMin = getMin(jSucc);
-              if (mWaitlist.compare(iMin, jMin, xi, xj) < 0) {
+              if (mmWaitlist.compare(iMin, jMin, xi, xj) < 0) {
                 return false;
               }
               final boolean flag = checkMergibility(iSucc, jSucc, cnode);
@@ -1476,22 +1504,29 @@ public class MonolithicSynthesizer extends
     {
       final TIntArrayList arraylist = new TIntArrayList();
       //lists: lists whose members will be added to the arraylist
-      final ArrayList<Integer> lists = new ArrayList<Integer>();
-      final TLongIterator itr = mWaitlist.getIterator();
+      final ArrayList<Integer> lists = new ArrayList<Integer>();//
+      final TLongIterator itr = mmWaitlist.getIterator();
       while (itr.hasNext()) {
         final long pair = itr.next();
-        final int pos = mWaitlist.getPosition(state, pair);
+        final int pos = mmWaitlist.getPosition(state, pair);
         if (pos != -1) {
           int theOtherState = -99;
           int listID;
           if (pos == 0) {
-            theOtherState = mWaitlist.getState(1, pair);
+            theOtherState = mmWaitlist.getState(1, pair);
           } else if (pos == 1) {
-            theOtherState = mWaitlist.getState(0, pair);
+            theOtherState = mmWaitlist.getState(0, pair);
           }
           listID = getlist(theOtherState);
           lists.add(listID);
         }
+      }
+      final int list = getlist(state);
+      final ReadOnlyIterator it = mClasses.createReadOnlyIterator(list);
+      it.reset(list);
+      while (it.advance()) {
+        final int curr = it.getCurrentData();
+        arraylist.add(curr);
       }
       for (final Integer l : lists) {
         arraylist.add(getListArray(l));
@@ -1501,11 +1536,11 @@ public class MonolithicSynthesizer extends
 
     public void merge()
     {
-      final TLongIterator itr = mWaitlist.getIterator();
+      final TLongIterator itr = mmWaitlist.getIterator();
       while (itr.hasNext()) {
         final long pair = itr.next();
-        final int state1 = mWaitlist.getState(0, pair);
-        final int state2 = mWaitlist.getState(1, pair);
+        final int state1 = mmWaitlist.getState(0, pair);
+        final int state2 = mmWaitlist.getState(1, pair);
         if (mStateToClass[state1] != mStateToClass[state2]) {
           final int list1 = getlist(state1);
           final int list2 = getlist(state2);
@@ -1552,11 +1587,112 @@ public class MonolithicSynthesizer extends
       return mClasses.toArray(list);
     }
 
+    private AutomatonProxy createReducedAutomaton()
+    {
+      final int numEvents = mNumEvents + mCurrentPropositions.size();
+      final Collection<EventProxy> events =
+        new ArrayList<EventProxy>(numEvents);
+      for (final EventProxy event : mEvents) {
+        events.add(event);
+      }
+      events.addAll(mCurrentPropositions);
+
+      final int numProps = mCurrentPropositions.size();
+      final List<StateProxy> states = new ArrayList<StateProxy>(mNumStates);
+      final StateProxy[] stateArray = new StateProxy[mNumStates];
+      final int[] tuple = new int[mNumAutomata];
+      int mini = 0;
+      boolean initial = false;
+
+      for (int i = 0; i < mNumStates; i++) {
+        if (mStateToClass[i] != IntListBuffer.NULL) {
+          final ReadOnlyIterator iter =
+            mClasses.createReadOnlyIterator(mStateToClass[i]);
+          iter.reset(mStateToClass[i]);
+          if(iter.advance()){
+            final int firstElement  = iter.getCurrentData();
+            if(firstElement == i){
+              mini = firstElement;
+              initial = firstElement < mNumInitialStates;
+              final List<EventProxy> marking =
+                new ArrayList<EventProxy>(numProps);
+              do{
+                final int curr = iter.getCurrentData();
+                decode(mStateTuples.get(curr), tuple);
+                props: for (final EventProxy prop : mCurrentPropositions) {
+                  for (int a = 0; a < mNumAutomata; a++) {
+                    final List<EventProxy> stateMarking =
+                      getStateMarking(a, tuple[a]);
+                    if (Collections.binarySearch(stateMarking, prop) < 0) {
+                      continue props;
+                    }
+                  }
+                  marking.add(prop);
+                }
+              }while (iter.advance());
+              Collections.sort(marking);
+              final List<EventProxy> unique = getUniqueMarking(marking);
+              final StateProxy state = new MemStateProxy(mini, unique, initial);
+              states.add(state);
+              stateArray[mini] = state;
+            }
+          }
+        }
+      }
+
+      final ProductDESProxyFactory factory = getFactory();
+      final int bufferSize = mTransitionBuffer.size();
+      final ArrayList<TransitionProxy> transitions =
+        new ArrayList<TransitionProxy>(bufferSize / 3);
+
+      final TObjectHashingStrategy<TransitionProxy> strategy =
+        ProductDESEqualityVisitor.getInstance().getTObjectHashingStrategy();
+      final THashSet<TransitionProxy> proxyHashSet =
+        new THashSet<TransitionProxy>(strategy);
+
+      int t = 0;
+      int min = 0;
+      while (t < bufferSize) {
+        //source
+        int code = mTransitionBuffer.get(t++);
+        if (!mReachableStates.get(code)) {
+          t += 2;
+          continue;
+        }
+        min = getMin(code);
+        final StateProxy source = stateArray[min];
+        //event
+        code = mTransitionBuffer.get(t++);
+        final EventProxy event = mEvents[code];
+        //target
+        code = mTransitionBuffer.get(t++);
+        if (!mReachableStates.get(code)) {
+          continue;
+        }
+        min = getMin(code);
+        final StateProxy target = stateArray[min];
+
+        final TransitionProxy proxy =
+          factory.createTransitionProxy(source, event, target);
+        final boolean isNewTransition = proxyHashSet.add(proxy);
+        if (isNewTransition) {
+          transitions.add(proxy);
+        }
+      }
+
+      final String name = computeOutputName();
+      final ComponentKind kind = ComponentKind.SUPERVISOR;
+      return factory.createAutomatonProxy(name, kind, events, states,
+                                          transitions);
+    }
+
     int[][][][] mmTransitions;
+    Waitlist mmWaitlist;
   }
 
   //#########################################################################
   //# Data Members
+  private boolean mSupervisorReductionEnabled = false;
   //# Variables used for encoding/decoding
   /** a list contains number of bits needed for each automaton */
   private int mNumBits[];
@@ -1614,10 +1750,8 @@ public class MonolithicSynthesizer extends
   private StateExplorer mCoreachabilityExplorer;
   private StateExplorer mSuccessorStatesExplorer;
 
-  private int[] mStateToClass;//!!!!!!!
+  private int[] mStateToClass;
   private IntListBuffer mClasses;
-  private Waitlist mWaitlist;
-  @SuppressWarnings("unused")
   private TempClass mTemp;//!!!!!!!
 
   //#########################################################################
