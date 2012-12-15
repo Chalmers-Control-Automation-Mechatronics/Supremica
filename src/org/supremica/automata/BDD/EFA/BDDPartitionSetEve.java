@@ -518,7 +518,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
 
             final BDD transWithActions = isolatedTransWithActions.andWith(tmp);
             eventForwardTransitionBDD.orWith(transWithActions);
-            eventToCompleteTransitionBDD.put(eventIndex, eventForwardTransitionBDD);
+            //eventToCompleteTransitionBDD.put(eventIndex, eventForwardTransitionBDD);
 
             /* Determine whether or not to put this event as the initialComponentCandidate set or markedComponentCandidate set. */
             if (eventIsQualifiedForInitialComponent) {
