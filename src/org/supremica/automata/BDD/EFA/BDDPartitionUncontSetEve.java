@@ -4,13 +4,14 @@ import gnu.trove.TIntHashSet;
 import gnu.trove.TIntIterator;
 import gnu.trove.TIntObjectHashMap;
 import gnu.trove.TIntProcedure;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -19,6 +20,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -39,34 +41,34 @@ public class BDDPartitionUncontSetEve {
     /**
      * The reference to the bddExAutomata.
      */
-    private BDDExtendedAutomata bddExAutomata;
+    private final BDDExtendedAutomata bddExAutomata;
     /**
      * The reference to the manager.
      */
-    private BDDExtendedManager manager;
+    private final BDDExtendedManager manager;
     /**
      * Either a group of plants or specifications.
      */
-    private List<ExtendedAutomaton> members;
+    private final List<ExtendedAutomaton> members;
 
     /**
      * For plants, the fields contains the set of states which enable
      * uncontrollable events, For specifications, it contains the set of states
      * which cannot enable uncontrollable events.
      */
-    private TIntObjectHashMap<BDD> uncontrollableEvents2EnabledStates;
+    private final TIntObjectHashMap<BDD> uncontrollableEvents2EnabledStates;
     /**
      * Each uncontrollable event can appear on several edges on different
      * automata. This field keeps track of them.
      */
-    private TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> uncontrollableEvent2MembersEdges;
+    private final TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>> uncontrollableEvent2MembersEdges;
     /**
      * Uncontrollable event indices
      */
-    private TIntHashSet uncontrollableEventIndexList;
+    private final TIntHashSet uncontrollableEventIndexList;
 
-    public BDDPartitionUncontSetEve(BDDExtendedAutomata bddAutomata, List<ExtendedAutomaton> members,
-            TIntHashSet caredUncontrollableEventIndexList) {
+    public BDDPartitionUncontSetEve(final BDDExtendedAutomata bddAutomata, final List<ExtendedAutomaton> members,
+            final TIntHashSet caredUncontrollableEventIndexList) {
 
         this.bddExAutomata = bddAutomata;
         this.manager = bddAutomata.getManager();
@@ -83,10 +85,10 @@ public class BDDPartitionUncontSetEve {
     private void initialize() {
         uncontrollableEventIndexList.forEach(new TIntProcedure() {
             @Override
-            public boolean execute(int eventIndex) {
-                Set<ExtendedAutomaton> allAut = bddExAutomata.event2AutomatonsEdges.get(eventIndex).keySet();
-                HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> tmp = new HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>();
-                for (ExtendedAutomaton aut : allAut) {
+            public boolean execute(final int eventIndex) {
+                final Set<ExtendedAutomaton> allAut = bddExAutomata.event2AutomatonsEdges.get(eventIndex).keySet();
+                final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> tmp = new HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>();
+                for (final ExtendedAutomaton aut : allAut) {
                     if (members.contains(aut)) {
                         tmp.put(aut, bddExAutomata.event2AutomatonsEdges.get(eventIndex).get(aut));
                     }
@@ -98,7 +100,7 @@ public class BDDPartitionUncontSetEve {
 
         uncontrollableEventIndexList.forEach(new TIntProcedure() {
             @Override
-            public boolean execute(int anUncontrollableEvent) {
+            public boolean execute(final int anUncontrollableEvent) {
                 final HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>> automatonsEdges = uncontrollableEvent2MembersEdges.get(anUncontrollableEvent);
                 final BDDPartitionUnEve eventDisParSet = new BDDPartitionUnEve(automatonsEdges);
                 uncontrollableEvents2EnabledStates.put(anUncontrollableEvent, eventDisParSet.eventForwardTransitionBDD.exist(bddExAutomata.getDestStatesVarSet()));
@@ -136,7 +138,7 @@ public class BDDPartitionUncontSetEve {
             if (autIterator.hasNext()) {
 
                 final ExtendedAutomaton firstAutomaton = autIterator.next();
-                final AutIncludingTransLabeledByUnEvent firstAutTransWithEvent 
+                final AutIncludingTransLabeledByUnEvent firstAutTransWithEvent
                         = new AutIncludingTransLabeledByUnEvent(includingAutomata2UnconEdges.get(firstAutomaton), firstAutomaton);
 
                 transWithoutActions = firstAutTransWithEvent.transitionBDDWithoutActions;
@@ -156,7 +158,7 @@ public class BDDPartitionUncontSetEve {
             while (autIterator.hasNext()) {
 
                 final ExtendedAutomaton currAutomaton = autIterator.next();
-                final AutIncludingTransLabeledByUnEvent currAutIncTrans 
+                final AutIncludingTransLabeledByUnEvent currAutIncTrans
                         = new AutIncludingTransLabeledByUnEvent(includingAutomata2UnconEdges.get(currAutomaton), currAutomaton);
 
                 final BDD currTransWithoutActions = currAutIncTrans.transitionBDDWithoutActions;
@@ -261,10 +263,10 @@ public class BDDPartitionUncontSetEve {
                 for (final Iterator<EdgeProxy> edgeIterator = this.includedEdges.iterator(); edgeIterator.hasNext();) {
 
                     final EdgeProxy anEdge = edgeIterator.next();
-                    
+
                     /* Construct the BDD for the edge but exclude the actions. */
                     final BDD transitionWithoutActionsOnCurrEdge = getEdgeBDDWithoutActions(automaton, anEdge);
-                    
+
                     final TIntHashSet updatedVariableIndexSet = new TIntHashSet();
 
                     List<BinaryExpressionProxy> actions = null;
@@ -272,7 +274,7 @@ public class BDDPartitionUncontSetEve {
 
                     if (anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getActions() != null
                             && !anEdge.getGuardActionBlock().getActions().isEmpty()) {
-                        
+
                         actions = anEdge.getGuardActionBlock().getActions();
                         /* Iterate each action to extract variables and build BDD*/
                         for (final BinaryExpressionProxy anAction : actions) {
@@ -329,7 +331,8 @@ public class BDDPartitionUncontSetEve {
             }
 
             /* Find which EFA variables are in this edge. */
-            private HashSet<String> extractVariablesFromTheEdge(final SimpleExpressionProxy guard) {
+            @SuppressWarnings("unused")
+            private Set<String> extractVariablesFromTheEdge(final SimpleExpressionProxy guard) {
 
                 final HashSet<String> extractedVariables = new HashSet<String>();
 
