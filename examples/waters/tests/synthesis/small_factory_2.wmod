@@ -623,11 +623,11 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="repair2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-2" Y="-10"/>
+                                <Point X="-10" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="391" Y="94"/>
+                            <Point X="411" Y="96"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="full.idle.idle.m2ok" Target="empty.idle.working.m2ok">

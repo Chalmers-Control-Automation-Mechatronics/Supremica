@@ -56,7 +56,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
 import org.apache.log4j.Logger;
 
 
@@ -143,7 +142,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           continue;
         }
         mLocalStack.push(encodedRoot);
-        mLocalVisited.add(mStateTuples.get(r));
+        mLocalVisited.add(encodedRoot);
         mBackTrace.push(sentinel);
         boolean safe = true;
         while (!mLocalStack.isEmpty()) {
@@ -253,8 +252,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       if (getConstructsResult()) {
         final AutomatonProxy aut;
         if (mSupervisorReductionEnabled == true) {
-          mTemp.mainProcedure();
-          aut = mTemp.createReducedAutomaton();
+          mReduction.mainProcedure();
+          aut = mReduction.createReducedAutomaton();
         } else {
           aut = createAutomaton();
         }
@@ -610,7 +609,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mFinalReachabilityExplorer =
       new FinalReachabilityExplorer(mEventAutomata, mTransitions,
                                     mNDTupleFinal, 0, mNumProperEvents - 1);
-    mTemp = new TempClass(mTransitions);
+    mReduction = new Reduction(mTransitions);
   }
 
   @Override
@@ -826,10 +825,18 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final ComponentKind kind = getKindTranslator().getComponentKind(aut);
       final StateProxy state = mOriginalStates[i][tuple[i]];
       msg +=
-        kind.toString() + " " + aut.getName() + " : state " + state.getName()
-          + "\n";
+        kind.toString() + " " + aut.getName() + " : [" + tuple[i] + "] "
+          + state.getName() + "\n";
     }
     return msg;
+  }
+
+  @SuppressWarnings("unused")
+  private int[] showDecodedTuple(final int[] encodedTuple)
+  {
+    final int[] tuple = new int[mNumAutomata];
+    decode(encodedTuple, tuple);
+    return tuple;
   }
 
 
@@ -1103,7 +1110,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   }
 
 
-  //# Inner Class UCInitialReachabilityExplorer
+  //# Inner Class UnctrlInitialReachabilityExplorer
   private class UnctrlInitialReachabilityExplorer extends StateExplorer
   {
     public UnctrlInitialReachabilityExplorer(final int[][] eventAutomata,
@@ -1312,33 +1319,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return 0;
     }
 
-    public int compare(int state1pair1, int state2pair1, int state1pair2,
-                       int state2pair2)
-    {
-      if (state1pair1 > state2pair1) {
-        state1pair1 = state1pair1 + state2pair1;
-        state2pair1 = state1pair1 - state2pair1;
-        state1pair1 = state1pair1 - state2pair1;
-      }
-      if (state1pair2 > state2pair2) {
-        state1pair2 = state1pair2 + state2pair2;
-        state2pair2 = state1pair2 - state2pair2;
-        state1pair2 = state1pair2 - state2pair2;
-      }
-      if (state1pair1 < state2pair1) {
-        return -1;
-      } else if (state1pair1 > state2pair1) {
-        return 1;
-      } else {
-        if (state1pair2 < state2pair2) {
-          return -1;
-        } else if (state1pair2 > state2pair2) {
-          return 1;
-        }
-      }
-      return 0;
-    }
-
     public int getPosition(final int state, final long pair)
     {
       final int hi = (int) (pair >>> 32);
@@ -1376,9 +1356,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
 
   //#########################################################################
-  private class TempClass
+  private class Reduction
   {
-    public TempClass(final int[][][][] transitions)
+    public Reduction(final int[][][][] transitions)
     {
       this.mmTransitions = transitions;
       this.mmWaitlist = new Waitlist();
@@ -1402,7 +1382,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public void mainProcedure()
     {
       setUpClasses();
-
       for (int i = 0; i < mNumStates - 1; i++) {
         if ((mStateToClass[i] == IntListBuffer.NULL) || (i > getMin(i))) {
           continue;
@@ -1444,11 +1423,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                   || (mmWaitlist.contains(iSucc, jSucc))) {
                 continue;
               }
+
               final int iMin = getMin(iSucc);
               final int jMin = getMin(jSucc);
-              if (mmWaitlist.compare(iMin, jMin, xi, xj) < 0) {
+              if ((iMin < cnode) || (jMin < cnode)) {
                 return false;
               }
+
               final boolean flag = checkMergibility(iSucc, jSucc, cnode);
               if (!flag) {
                 return false;
@@ -1504,7 +1485,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     {
       final TIntArrayList arraylist = new TIntArrayList();
       //lists: lists whose members will be added to the arraylist
-      final ArrayList<Integer> lists = new ArrayList<Integer>();//
+      final TIntArrayList lists = new TIntArrayList();
       final TLongIterator itr = mmWaitlist.getIterator();
       while (itr.hasNext()) {
         final long pair = itr.next();
@@ -1517,19 +1498,20 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           } else if (pos == 1) {
             theOtherState = mmWaitlist.getState(0, pair);
           }
-          listID = getlist(theOtherState);
+          listID = mStateToClass[theOtherState];
           lists.add(listID);
         }
       }
-      final int list = getlist(state);
+      final int list = mStateToClass[state];
       final ReadOnlyIterator it = mClasses.createReadOnlyIterator(list);
       it.reset(list);
       while (it.advance()) {
         final int curr = it.getCurrentData();
         arraylist.add(curr);
       }
-      for (final Integer l : lists) {
-        arraylist.add(getListArray(l));
+      final int[] arr = lists.toNativeArray();
+      for (int i = 0; i < arr.length; i++) {
+        arraylist.add(getListArray(arr[i]));
       }
       return arraylist;
     }
@@ -1539,11 +1521,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final TLongIterator itr = mmWaitlist.getIterator();
       while (itr.hasNext()) {
         final long pair = itr.next();
-        final int state1 = mmWaitlist.getState(0, pair);
-        final int state2 = mmWaitlist.getState(1, pair);
-        if (mStateToClass[state1] != mStateToClass[state2]) {
-          final int list1 = getlist(state1);
-          final int list2 = getlist(state2);
+        final int hi = mmWaitlist.getState(0, pair);
+        final int lo = mmWaitlist.getState(1, pair);
+        if (mStateToClass[hi] != mStateToClass[lo]) {
+          final int list1 = mStateToClass[hi];
+          final int list2 = mStateToClass[lo];
           final int list3 = mergeLists(list1, list2);
           updateStateToClass(list3);
         }
@@ -1577,11 +1559,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return min;
     }
 
-    public int getlist(final int state)
-    {
-      return mStateToClass[state];
-    }
-
     public int[] getListArray(final int list)
     {
       return mClasses.toArray(list);
@@ -1609,14 +1586,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           final ReadOnlyIterator iter =
             mClasses.createReadOnlyIterator(mStateToClass[i]);
           iter.reset(mStateToClass[i]);
-          if(iter.advance()){
-            final int firstElement  = iter.getCurrentData();
-            if(firstElement == i){
+          if (iter.advance()) {
+            final int firstElement = iter.getCurrentData();
+            if (firstElement == i) {
               mini = firstElement;
               initial = firstElement < mNumInitialStates;
               final List<EventProxy> marking =
                 new ArrayList<EventProxy>(numProps);
-              do{
+              do {
                 final int curr = iter.getCurrentData();
                 decode(mStateTuples.get(curr), tuple);
                 props: for (final EventProxy prop : mCurrentPropositions) {
@@ -1629,10 +1606,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                   }
                   marking.add(prop);
                 }
-              }while (iter.advance());
+              } while (iter.advance());
               Collections.sort(marking);
               final List<EventProxy> unique = getUniqueMarking(marking);
-              final StateProxy state = new MemStateProxy(mini, unique, initial);
+              final StateProxy state =
+                new MemStateProxy(mini, unique, initial);
               states.add(state);
               stateArray[mini] = state;
             }
@@ -1752,7 +1730,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
   private int[] mStateToClass;
   private IntListBuffer mClasses;
-  private TempClass mTemp;//!!!!!!!
+  private Reduction mReduction;
 
   //#########################################################################
   //# Class Constants
