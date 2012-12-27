@@ -253,7 +253,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
       if (getConstructsResult()) {
         final AutomatonProxy aut;
-        if (mSupervisorReductionEnabled == true) {
+        if (mSupervisorReductionEnabled) {
           mReduction.mainProcedure();
           aut = mReduction.createReducedAutomaton();
         } else {
@@ -960,6 +960,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   }
 
 
+  //#########################################################################
   //# Inner Class UncontrollableAutomatonEventInfo
   private class UncontrollableAutomatonEventInfo extends AutomatonEventInfo
   {
@@ -985,6 +986,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   }
 
 
+  //#########################################################################
   //# Inner Class ControllableAutomatonEventInfo
   private class ControllableAutomatonEventInfo extends AutomatonEventInfo
   {
@@ -1086,6 +1088,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   }
 
 
+  //#########################################################################
   //# Inner Class CtrlInitialReachabilityExplorer
   private class CtrlInitialReachabilityExplorer extends StateExplorer
   {
@@ -1172,6 +1175,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   }
 
 
+  //#########################################################################
   //# Inner Class FinalReachabilityExplorer
   private class FinalReachabilityExplorer extends StateExplorer
   {

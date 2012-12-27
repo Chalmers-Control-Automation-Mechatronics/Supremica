@@ -371,6 +371,22 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testSupRed1() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "supred1";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testSupRed2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "supred2";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testTankProcess() throws Exception
   {
     final String group = "tests";
