@@ -11,6 +11,8 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntIterator;
 import gnu.trove.TLongHashSet;
 import gnu.trove.TLongIterator;
 import gnu.trove.TObjectHashingStrategy;
@@ -1391,6 +1393,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             continue;
           }
           mmWaitlist.clear();
+          counter = 0;
           final boolean flag = checkMergibility(i, j, i);
           if (flag) {
             merge();
@@ -1402,20 +1405,27 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public boolean checkMergibility(final int xi, final int xj,
                                     final int cnode)
     {
-      final int[] arrayXi = constructList(xi).toNativeArray();
-      final int[] arrayXj = constructList(xj).toNativeArray();
-      for (int i = 0; i < arrayXi.length; i++) {
-        for (int j = 0; j < arrayXj.length; j++) {
-          if (mmWaitlist.contains(arrayXi[i], arrayXj[j])) {
+      if (counter++ > LIMIT) {
+        return false;
+      }
+      final TIntHashSet setXi = constructList(xi);
+      final TIntHashSet setXj = constructList(xj);
+      final TIntIterator it = setXi.iterator();
+      final TIntIterator iter = setXj.iterator();
+      while(it.hasNext()) {
+        final int i = it.next();
+        while(iter.hasNext()){
+          final int j = iter.next();
+          if (mmWaitlist.contains(i, j)) {
             continue;
           }
-          if (!isInRelation(arrayXi[i], arrayXj[j])) {
+          if (!isInRelation(i, j)) {
             return false;
           }
-          mmWaitlist.add(arrayXi[i], arrayXj[j]);
+          mmWaitlist.add(i, j);
           for (int event = 0; event < mNumProperEvents; event++) {
-            final int iSucc = getSuccessorState(event, arrayXi[i]);
-            final int jSucc = getSuccessorState(event, arrayXj[j]);
+            final int iSucc = getSuccessorState(event, i);
+            final int jSucc = getSuccessorState(event, j);
             if ((iSucc != -1) && (jSucc != -1)
                 && (mReachableStates.get(iSucc))
                 && (mReachableStates.get(jSucc))) {
@@ -1481,11 +1491,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
 
-    public TIntArrayList constructList(final int state)
+    public TIntHashSet constructList(final int state)
     {
-      final TIntArrayList arraylist = new TIntArrayList();
-      //lists: lists whose members will be added to the arraylist
-      final TIntArrayList lists = new TIntArrayList();
+      final TIntHashSet arraylist = new TIntHashSet();
       final TLongIterator itr = mmWaitlist.getIterator();
       while (itr.hasNext()) {
         final long pair = itr.next();
@@ -1499,19 +1507,21 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             theOtherState = mmWaitlist.getState(0, pair);
           }
           listID = mStateToClass[theOtherState];
-          lists.add(listID);
+          final ReadOnlyIterator it = mClasses.createReadOnlyIterator(listID);
+          it.reset(listID);
+          while (it.advance()) {
+            final int curr = it.getCurrentData();
+            arraylist.add(curr);
+          }
+
         }
       }
-      final int list = mStateToClass[state];
-      final ReadOnlyIterator it = mClasses.createReadOnlyIterator(list);
-      it.reset(list);
+      final int l = mStateToClass[state];
+      final ReadOnlyIterator it = mClasses.createReadOnlyIterator(l);
+      it.reset(l);
       while (it.advance()) {
         final int curr = it.getCurrentData();
         arraylist.add(curr);
-      }
-      final int[] arr = lists.toNativeArray();
-      for (int i = 0; i < arr.length; i++) {
-        arraylist.add(getListArray(arr[i]));
       }
       return arraylist;
     }
@@ -1731,9 +1741,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private int[] mStateToClass;
   private IntListBuffer mClasses;
   private Reduction mReduction;
+  private int counter;
 
   //#########################################################################
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
   private static final int SIZE_INT = 32;
+  private static final int LIMIT = 100;
 }
