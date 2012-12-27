@@ -1303,22 +1303,19 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     @SuppressWarnings("unused")
     public int compare(final long pair1, final long pair2)
     {
-      final int hiPair1 = (int) (pair1 >>> 32);
-      final int hiPair2 = (int) (pair2 >>> 32);
-      if (hiPair1 < hiPair2) {
-        return -1;
-      } else if (hiPair1 > hiPair2) {
+      if ((pair1 < 0) && (pair2 > 0)) {
         return 1;
+      } else if ((pair1 > 0) && (pair2 > 0)) {
+        return -1;
       } else {
-        final int loPair1 = (int) (pair1 & 0xffffffff);
-        final int loPair2 = (int) (pair2 & 0xffffffff);
-        if (loPair1 < loPair2) {
+        if (pair1 < pair2) {
           return -1;
-        } else if (loPair1 > loPair2) {
+        } else if (pair1 > pair2) {
           return 1;
+        } else {
+          return 0;
         }
       }
-      return 0;
     }
 
     public int getPosition(final int state, final long pair)
@@ -1408,14 +1405,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       if (counter++ > LIMIT) {
         return false;
       }
-      final TIntHashSet setXi = constructList(xi);
-      final TIntHashSet setXj = constructList(xj);
-      final TIntIterator it = setXi.iterator();
-      final TIntIterator iter = setXj.iterator();
-      while(it.hasNext()) {
-        final int i = it.next();
-        while(iter.hasNext()){
-          final int j = iter.next();
+      final TIntHashSet setXi = constructSet(xi);
+      final TIntHashSet setXj = constructSet(xj);
+      final TIntIterator iIter = setXi.iterator();
+      while (iIter.hasNext()) {
+        final int i = iIter.next();
+        final TIntIterator jIter = setXj.iterator();
+        while (jIter.hasNext()) {
+          final int j = jIter.next();
           if (mmWaitlist.contains(i, j)) {
             continue;
           }
@@ -1491,9 +1488,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
 
-    public TIntHashSet constructList(final int state)
+    public TIntHashSet constructSet(final int state)
     {
-      final TIntHashSet arraylist = new TIntHashSet();
+      final TIntHashSet set = new TIntHashSet();
       final TLongIterator itr = mmWaitlist.getIterator();
       while (itr.hasNext()) {
         final long pair = itr.next();
@@ -1506,14 +1503,16 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           } else if (pos == 1) {
             theOtherState = mmWaitlist.getState(0, pair);
           }
-          listID = mStateToClass[theOtherState];
-          final ReadOnlyIterator it = mClasses.createReadOnlyIterator(listID);
-          it.reset(listID);
-          while (it.advance()) {
-            final int curr = it.getCurrentData();
-            arraylist.add(curr);
+          if (theOtherState == getMin(theOtherState)) {
+            listID = mStateToClass[theOtherState];
+            final ReadOnlyIterator it =
+              mClasses.createReadOnlyIterator(listID);
+            it.reset(listID);
+            while (it.advance()) {
+              final int curr = it.getCurrentData();
+              set.add(curr);
+            }
           }
-
         }
       }
       final int l = mStateToClass[state];
@@ -1521,9 +1520,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       it.reset(l);
       while (it.advance()) {
         final int curr = it.getCurrentData();
-        arraylist.add(curr);
+        set.add(curr);
       }
-      return arraylist;
+      return set;
     }
 
     public void merge()
@@ -1747,5 +1746,5 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
   private static final int SIZE_INT = 32;
-  private static final int LIMIT = 100;
+  private static final int LIMIT = 20;
 }
