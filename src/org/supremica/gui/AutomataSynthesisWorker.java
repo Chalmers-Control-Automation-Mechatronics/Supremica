@@ -61,6 +61,7 @@ import org.supremica.automata.algorithms.AutomataSynthesizer;
 import org.supremica.automata.algorithms.AutomatonSynthesizer;
 import org.supremica.automata.algorithms.Stoppable;
 import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.log.Logger;
@@ -80,18 +81,18 @@ public class AutomataSynthesisWorker
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataSynthesisWorker.class);
 
-    private IDEActionInterface ide;
-    private Automata theAutomata;
-    private SynthesizerOptions synthOptions;
+    private final IDEActionInterface ide;
+    private final Automata theAutomata;
+    private final SynthesizerOptions synthOptions;
 
     private ExecutionDialog executionDialog;
     private boolean stopRequested = false;
     @SuppressWarnings("unused")
-	private EventQueue eventQueue = new EventQueue();
+	private final EventQueue eventQueue = new EventQueue();
     private ActionTimer timer;
     private Automata result;
 
-    public AutomataSynthesisWorker(IDEActionInterface gui, Automata theAutomata, SynthesizerOptions options)
+    public AutomataSynthesisWorker(final IDEActionInterface gui, final Automata theAutomata, final SynthesizerOptions options)
     {
         this.ide = gui;
         this.theAutomata = theAutomata;
@@ -103,7 +104,7 @@ public class AutomataSynthesisWorker
     public void run()
     {
         // Initialize the ExecutionDialog
-        ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
+        final ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
         threadsToStop.add(this);
         if(ide != null){
             executionDialog = new ExecutionDialog(ide.getFrame(), "Synthesizing", threadsToStop);
@@ -111,7 +112,7 @@ public class AutomataSynthesisWorker
         }
 
         // OK options?
-        String errorMessage = synthOptions.validOptions();
+        final String errorMessage = synthOptions.validOptions();
         if (errorMessage != null)
         {
             if(ide != null)
@@ -126,22 +127,24 @@ public class AutomataSynthesisWorker
         // Do the work!!
         result = new Automata();
         // Are there many or just one automaton?
-        if (theAutomata.size() > 1)
+        if (theAutomata.size() > 1 ||
+            synthOptions.getSynthesisAlgorithm() ==
+            SynthesisAlgorithm.MONOLITHIC_WATERS)
         {
             // Get default synchronization options
-            SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
+            final SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
 
             try
             {
-                AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions, synthOptions);
+                final AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions, synthOptions);
                 if(ide != null)
                     synthesizer.setExecutionDialog(executionDialog);
                 threadsToStop.add(synthesizer);
-                
+
                 result.addAutomata(synthesizer.execute());
                 threadsToStop.remove(synthesizer);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Exception in AutomataSynthesisWorker. " + ex);
                 logger.debug(ex.getStackTrace());
@@ -150,17 +153,17 @@ public class AutomataSynthesisWorker
         else  // Single automaton
         {
             // Make copy
-            Automaton theAutomaton = new Automaton(theAutomata.getFirstAutomaton());
+            final Automaton theAutomaton = new Automaton(theAutomata.getFirstAutomaton());
 
             try
             {
-                AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, synthOptions);
+                final AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, synthOptions);
                 threadsToStop.add(synthesizer);
                 synthesizer.synthesize();
                 result.addAutomaton(synthesizer.getAutomaton());
                 threadsToStop.remove(synthesizer);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Exception in AutomataSynthesisWorker. Automaton: " + theAutomaton.getName(), ex);
                 logger.debug(ex.getStackTrace());
@@ -197,7 +200,7 @@ public class AutomataSynthesisWorker
                 {
                     ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.error(ex);
                 }
@@ -230,7 +233,7 @@ public class AutomataSynthesisWorker
 
     public BigDecimal getTimeSeconds()
     {
-        String[] result = (getTime()).split("\\s");
+        final String[] result = (getTime()).split("\\s");
         Float out = (float)-1;
         if(result.length==2)
             out = (new Float(result[0]))/1000;
@@ -243,7 +246,7 @@ public class AutomataSynthesisWorker
                 f1 = new Float(result[0])*60;
             else if(result[1].equals("hours"))
                 f1 = new Float(result[0])*120;
-            
+
             if(result[3].equals("milliseconds"))
                 f2 = new Float(result[2])/ 1000;
             else if(result[3].equals("seconds"))
@@ -253,12 +256,12 @@ public class AutomataSynthesisWorker
 
             out = (f1+f2);
         }
-        
+
         BigDecimal bd = new BigDecimal(out);
         bd = bd.setScale(3,BigDecimal.ROUND_DOWN);
-        
+
         return bd;
-        
+
     }
 
     /**
