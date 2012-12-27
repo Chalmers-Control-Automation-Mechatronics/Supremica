@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="prime_sieve4" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="prime_sieve6" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Distributed prime number sieve.
-This is version has four sieve processes for primes 2, 3, 5, and 7.
-It handles numbers up to 120.
-The number of reachable states is approximately 118088582663751140000,
-and the diameter is 166.
+This is version has six sieve processes for primes 2, 3, 5, 7, 11, and 13.
+It handles numbers up to 288.
 
 Source generates numbers and sends them to the first sieve process sieve2.
 There is one sieve process for each prime number p,
@@ -19,7 +17,7 @@ do
   c[2] = x[0]
 loop
 
-sieve[p] for p=2,3,5,7:
+sieve[p] for p=2,3,5,7,11,13:
 do
   await c[p] &gt; 0
   x[p] = c[p]
@@ -32,14 +30,14 @@ loop
 
 sink:
 do
-  await c[11] &gt; 0
-  print c[11]
-  c[11] = 0
+  await c[17] &gt; 0
+  print c[17]
+  c[17] = 0
 loop</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name="N">
             <ConstantAliasExpression>
-                <IntConstant Value="120"/>
+                <IntConstant Value="288"/>
             </ConstantAliasExpression>
         </ConstantAlias>
     </ConstantAliasList>
@@ -66,6 +64,14 @@ loop</ns2:Comment>
         <EventDecl Kind="CONTROLLABLE" Name="tau7c7"/>
         <EventDecl Kind="CONTROLLABLE" Name="tau7c11"/>
         <EventDecl Kind="CONTROLLABLE" Name="tau7x7"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau11"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau11x11"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau11c11"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau11c13"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau13"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau13c13"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau13c17"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau13x13"/>
     </EventDeclList>
     <ComponentList>
         <VariableComponent Deterministic="false" Name="x0">
@@ -1346,6 +1352,580 @@ loop</ns2:Comment>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="sieve11">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <PointGeometry>
+                            <Point X="160" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <PointGeometry>
+                            <Point X="160" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q4">
+                        <PointGeometry>
+                            <Point X="160" Y="336"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q5">
+                        <PointGeometry>
+                            <Point X="160" Y="400"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q6">
+                        <PointGeometry>
+                            <Point X="160" Y="464"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q3">
+                        <PointGeometry>
+                            <Point X="160" Y="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="11" Y="-11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="c11"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-2"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q1" Target="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau11x11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="x11"/>
+                                    <SimpleIdentifier Name="c11"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="1"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q2" Target="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau11c11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point X="160" Y="272"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="c11"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="1"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="!=">
+                                    <BinaryExpression Operator="%">
+                                        <SimpleIdentifier Name="x11"/>
+                                        <IntConstant Value="11"/>
+                                    </BinaryExpression>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-1"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q5" Target="q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="c13"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-3"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="101" Y="209"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <BinaryExpression Operator="%">
+                                        <SimpleIdentifier Name="x11"/>
+                                        <IntConstant Value="11"/>
+                                    </BinaryExpression>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="26"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q6" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau11c13"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="44" Y="266"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="c13"/>
+                                    <SimpleIdentifier Name="x11"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="38"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q3" Target="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="!=">
+                                    <SimpleIdentifier Name="x11"/>
+                                    <IntConstant Value="11"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q3" Target="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="228" Y="337"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="160" Y="400"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="x11"/>
+                                    <IntConstant Value="11"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-5"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="x11">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x11"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="c13">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="c13"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="sieve13">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <PointGeometry>
+                            <Point X="160" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <PointGeometry>
+                            <Point X="160" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q4">
+                        <PointGeometry>
+                            <Point X="160" Y="336"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q5">
+                        <PointGeometry>
+                            <Point X="160" Y="400"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q6">
+                        <PointGeometry>
+                            <Point X="160" Y="464"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q3">
+                        <PointGeometry>
+                            <Point X="160" Y="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="11" Y="-11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau13"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="c13"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-2"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q1" Target="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau13x13"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="x13"/>
+                                    <SimpleIdentifier Name="c13"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="1"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q2" Target="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau13c13"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point X="160" Y="272"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="c13"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="1"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau13"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="!=">
+                                    <BinaryExpression Operator="%">
+                                        <SimpleIdentifier Name="x13"/>
+                                        <IntConstant Value="13"/>
+                                    </BinaryExpression>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-1"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q5" Target="q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau13"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="c17"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-3"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau13"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="101" Y="209"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <BinaryExpression Operator="%">
+                                        <SimpleIdentifier Name="x13"/>
+                                        <IntConstant Value="13"/>
+                                    </BinaryExpression>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="26"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q6" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau13c17"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="44" Y="266"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="c17"/>
+                                    <SimpleIdentifier Name="x13"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="38"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q3" Target="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau13"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="!=">
+                                    <SimpleIdentifier Name="x13"/>
+                                    <IntConstant Value="13"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="q3" Target="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau13"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="228" Y="337"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="160" Y="400"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="x13"/>
+                                    <IntConstant Value="13"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-5"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="x13">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x13"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="c17">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="c17"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="sink">
             <Graph>
                 <NodeList>
@@ -1383,7 +1963,7 @@ loop</ns2:Comment>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="&gt;">
-                                    <SimpleIdentifier Name="c11"/>
+                                    <SimpleIdentifier Name="c17"/>
                                     <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Guards>
@@ -1405,7 +1985,7 @@ loop</ns2:Comment>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="c11"/>
+                                    <SimpleIdentifier Name="c17"/>
                                     <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Actions>
