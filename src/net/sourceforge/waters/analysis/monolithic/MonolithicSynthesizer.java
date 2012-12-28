@@ -1322,6 +1322,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
 
+    @SuppressWarnings("unused")
     public int getPosition(final int state, final long pair)
     {
       final int hi = (int) (pair >>> 32);
@@ -1370,6 +1371,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public void setUpClasses()
     {
       mStateToClass = new int[mNumStates];
+      mStateToFriends = new TIntHashSet[mNumStates];
       mClasses = new IntListBuffer();
       for (int s = 0; s < mNumStates; s++) {
         if (mReachableStates.get(s)) {
@@ -1394,7 +1396,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             continue;
           }
           mmWaitlist.clear();
-          counter = 0;
+          for(int n = 0; n < mNumStates; n++){
+            mStateToFriends[n] = new TIntHashSet();//////////////////////////////////////////////
+          }
+          mCounter = 0;
           final boolean flag = checkMergibility(i, j, i);
           if (flag) {
             merge();
@@ -1406,7 +1411,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public boolean checkMergibility(final int xi, final int xj,
                                     final int cnode)
     {
-      if (counter++ > LIMIT) {
+      if (mCounter++ > LIMIT) {
         return false;
       }
       final TIntHashSet setXi = constructSet(xi);
@@ -1424,6 +1429,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             return false;
           }
           mmWaitlist.add(i, j);
+          updateStateToFriends(i, j);
           for (int event = 0; event < mNumProperEvents; event++) {
             final int iSucc = getSuccessorState(event, i);
             final int jSucc = getSuccessorState(event, j);
@@ -1495,41 +1501,34 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public TIntHashSet constructSet(final int state)
     {
       final TIntHashSet set = new TIntHashSet();
+      final Queue<Integer> queue = new ArrayDeque<Integer>();////////////////////////////////
+      final TIntHashSet resultSet = new TIntHashSet();
       final TIntHashSet addedLists = new TIntHashSet();
-      final TLongIterator itr = mmWaitlist.getIterator();
-      while (itr.hasNext()) {
-        final long pair = itr.next();
-        final int pos = mmWaitlist.getPosition(state, pair);
-        if (pos != -1) {
-          int theOtherState = -99;
-          int listID;
-          if (pos == 0) {
-            theOtherState = mmWaitlist.getState(1, pair);
-          } else if (pos == 1) {
-            theOtherState = mmWaitlist.getState(0, pair);
-          }
 
-          listID = mStateToClass[theOtherState];
-          if (addedLists.add(listID)) {
-            final ReadOnlyIterator it =
-              mClasses.createReadOnlyIterator(listID);
-            it.reset(listID);
-            while (it.advance()) {
-              final int curr = it.getCurrentData();
-              set.add(curr);
-            }
+      set.add(state);
+      queue.add(new Integer(state));
+      while (!queue.isEmpty()) {
+        final Integer s = queue.poll();
+        final int listID = mStateToClass[s];
+        if (addedLists.add(listID)) {
+          final ReadOnlyIterator it = mClasses.createReadOnlyIterator(listID);
+          it.reset(listID);
+          while (it.advance()) {
+            final int current = it.getCurrentData();
+            resultSet.add(current);
           }
-
+        }
+        final TIntHashSet friends = mStateToFriends[s];
+        final int[] array = friends.toArray();///////////////////////////////////////////////
+        for (int i = 0; i < array.length; i++) {
+          final int curr = array[i];
+          if (set.add(curr)) {
+            queue.add(new Integer(curr));
+          }
         }
       }
-      final int l = mStateToClass[state];
-      final ReadOnlyIterator it = mClasses.createReadOnlyIterator(l);
-      it.reset(l);
-      while (it.advance()) {
-        final int curr = it.getCurrentData();
-        set.add(curr);
-      }
-      return set;
+
+      return resultSet;
     }
 
     public void merge()
@@ -1577,7 +1576,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
     public int[] getListArray(final int list)
     {
-      return mClasses.toArray(list);
+      return mClasses.toArray(list);/////////////////////////////////////////////////////////
+    }
+
+    public void updateStateToFriends(final int i, final int j){
+      mStateToFriends[i].add(j);
+      mStateToFriends[j].add(i);
     }
 
     private AutomatonProxy createReducedAutomaton()
@@ -1745,9 +1749,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private StateExplorer mSuccessorStatesExplorer;
 
   private int[] mStateToClass;
+  private TIntHashSet[] mStateToFriends;
   private IntListBuffer mClasses;
   private Reduction mReduction;
-  private int counter;
+  private int mCounter;
 
   //#########################################################################
   //# Class Constants
