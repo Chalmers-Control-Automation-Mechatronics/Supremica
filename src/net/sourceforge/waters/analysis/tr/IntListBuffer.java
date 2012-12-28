@@ -42,6 +42,9 @@ public class IntListBuffer
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new empty integer list buffer.
+   */
   public IntListBuffer()
   {
     mBlocks = new ArrayList<int[]>();
@@ -103,8 +106,8 @@ public class IntListBuffer
    *                 first list to be catenated.
    * @param  list2   The unique list number that identifies the
    *                 second list to be catenated.
-   * @return list    A unique list number that identifies a new list
-   *                 containing the elements of list1 followed by list2.
+   * @return A unique list number that identifies a new list
+   *         containing the elements of list1 followed by list2.
    */
   public int catenateDestructively(final int list1, final int list2)
   {
@@ -146,6 +149,37 @@ public class IntListBuffer
       next = block[offset + OFFSET_NEXT];
     }
     return false;
+  }
+
+  /**
+   * Duplicates a list in this buffer.
+   * This method creates a new list containing exactly the same data as
+   * the given list. All nodes of the new list are allocated freshly,
+   * so the original and the copy have no structure in common.
+   * @param  list    The unique list number that identifies the
+   *                 list to be duplicated.
+   * @return A unique list number that identifies a new list
+   *         containing exactly the same elements as list.
+   */
+  public int copy(final int list)
+  {
+    final int result = allocatePair();
+    int prev = result;
+    int prevdata = NULL;
+    int next = getNext(list);
+    while (next != NULL) {
+      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+      final int offset = next & BLOCK_MASK;
+      final int data = block[offset + OFFSET_DATA];
+      next = block[offset + OFFSET_NEXT];
+      final int current = allocatePair();
+      setDataAndNext(prev, prevdata, current);
+      prev = current;
+      prevdata = data;
+    }
+    setDataAndNext(prev, prevdata, NULL);
+    setData(result, prev);
+    return result;
   }
 
   /**
