@@ -159,16 +159,32 @@ public class IntListBuffer
    * @param  list    The unique list number that identifies the
    *                 list to be duplicated.
    * @return A unique list number that identifies a new list
-   *         containing exactly the same elements as list.
+   *         containing exactly the same elements as the given list.
    */
   public int copy(final int list)
+  {
+    return copy(list, this);
+  }
+
+  /**
+   * Duplicates a list from another integer list buffer.
+   * This method creates a new list in this buffer containing exactly the
+   * same data as the given list.
+   * @param  list    The unique list number that identifies the
+   *                 list to be duplicated in its buffer
+   * @param  other   The list buffer containing the list to be copied.
+   * @return A unique list number that identifies a new list
+   *         containing exactly the same elements as the given list.
+   */
+  public int copy(final int list, final IntListBuffer other)
   {
     final int result = allocatePair();
     int prev = result;
     int prevdata = NULL;
-    int next = getNext(list);
+    int next = other.getNext(list);
+    final List<int[]> otherBlocks = other.mBlocks;
     while (next != NULL) {
-      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+      final int[] block = otherBlocks.get(next >> BLOCK_SHIFT);
       final int offset = next & BLOCK_MASK;
       final int data = block[offset + OFFSET_DATA];
       next = block[offset + OFFSET_NEXT];
