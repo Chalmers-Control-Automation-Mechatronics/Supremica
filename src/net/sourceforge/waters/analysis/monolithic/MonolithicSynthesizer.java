@@ -1495,6 +1495,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public TIntHashSet constructSet(final int state)
     {
       final TIntHashSet set = new TIntHashSet();
+      final TIntHashSet addedLists = new TIntHashSet();
       final TLongIterator itr = mmWaitlist.getIterator();
       while (itr.hasNext()) {
         final long pair = itr.next();
@@ -1507,8 +1508,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           } else if (pos == 1) {
             theOtherState = mmWaitlist.getState(0, pair);
           }
-          if (theOtherState == getMin(theOtherState)) {
-            listID = mStateToClass[theOtherState];
+
+          listID = mStateToClass[theOtherState];
+          if (addedLists.add(listID)) {
             final ReadOnlyIterator it =
               mClasses.createReadOnlyIterator(listID);
             it.reset(listID);
@@ -1517,6 +1519,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
               set.add(curr);
             }
           }
+
         }
       }
       final int l = mStateToClass[state];
