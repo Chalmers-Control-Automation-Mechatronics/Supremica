@@ -11,8 +11,6 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
 import gnu.trove.TLongHashSet;
 import gnu.trove.TLongIterator;
 import gnu.trove.TObjectHashingStrategy;
@@ -1273,105 +1271,16 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
 
   //#########################################################################
-  //# Inner Class Waitlist
-  private static class Waitlist
-  {
-    public Waitlist()
-    {
-      mmWaitlist = new TLongHashSet();
-    }
-
-    public long constructPair(int state1, int state2)
-    {
-      if (state1 > state2) {
-        state1 = state1 + state2;
-        state2 = state1 - state2;
-        state1 = state1 - state2;
-      }
-      final long pair = (long) state2 | ((long) state1 << 32);
-      return pair;
-    }
-
-    public boolean contains(final int state1, final int state2)
-    {
-      final long pair = constructPair(state1, state2);
-      return mmWaitlist.contains(pair);
-    }
-
-    public boolean add(final int state1, final int state2)
-    {
-      final long pair = constructPair(state1, state2);
-      return mmWaitlist.add(pair);
-    }
-
-    @SuppressWarnings("unused")
-    public int compare(final long pair1, final long pair2)
-    {
-      if ((pair1 < 0) && (pair2 > 0)) {
-        return 1;
-      } else if ((pair1 > 0) && (pair2 > 0)) {
-        return -1;
-      } else {
-        if (pair1 < pair2) {
-          return -1;
-        } else if (pair1 > pair2) {
-          return 1;
-        } else {
-          return 0;
-        }
-      }
-    }
-
-    @SuppressWarnings("unused")
-    public int getPosition(final int state, final long pair)
-    {
-      final int hi = (int) (pair >>> 32);
-      final int lo = (int) (pair & 0xffffffff);
-      if (hi == state) {
-        return 0;
-      } else if (lo == state) {
-        return 1;
-      }
-      return -1;
-    }
-
-    public int getState(final int position, final long pair)
-    {
-      if (position == 0) {
-        return (int) (pair >>> 32);
-      } else if (position == 1) {
-        return (int) (pair & 0xffffffff);
-      }
-      return -1;
-    }
-
-    public void clear()
-    {
-      mmWaitlist.clear();
-    }
-
-    public TLongIterator getIterator()
-    {
-      return mmWaitlist.iterator();
-    }
-
-    private final TLongHashSet mmWaitlist;
-  }
-
-
-  //#########################################################################
   private class Reduction
   {
     public Reduction(final int[][][][] transitions)
     {
       this.mmTransitions = transitions;
-      this.mmWaitlist = new Waitlist();
     }
 
     public void setUpClasses()
     {
       mStateToClass = new int[mNumStates];
-      mStateToFriends = new TIntHashSet[mNumStates];
       mClasses = new IntListBuffer();
       for (int s = 0; s < mNumStates; s++) {
         if (mReachableStates.get(s)) {
@@ -1395,60 +1304,84 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           if ((mStateToClass[j] == IntListBuffer.NULL) || (j > getMin(j))) {
             continue;
           }
-          mmWaitlist.clear();
-          for(int n = 0; n < mNumStates; n++){
-            mStateToFriends[n] = new TIntHashSet();//////////////////////////////////////////////
-          }
+
           mCounter = 0;
-          final boolean flag = checkMergibility(i, j, i);
-          if (flag) {
-            merge();
+          mReRequested = new BitSet();
+          TLongHashSet mergedPairs = new TLongHashSet();
+          mShadowClasses = new IntListBuffer();
+          mShadowStateToClass = new int[mNumStates];
+          for (int n = 0; n < mNumStates; n++) {
+            mShadowStateToClass[n] = IntListBuffer.NULL;
           }
+
+          if (checkMergibility(i, j, i, j, mergedPairs)) {
+            merge(mergedPairs);
+          }
+
+          mReRequested = null;
+          mergedPairs = null;
+          mShadowClasses = null;
+          mShadowStateToClass = null;
         }
       }
     }
 
-    public boolean checkMergibility(final int xi, final int xj,
-                                    final int cnode)
+    public boolean checkMergibility(final int x, final int y, final int x0,
+                                    final int y0,
+                                    final TLongHashSet mergedPairs)
     {
       if (mCounter++ > LIMIT) {
         return false;
       }
-      final TIntHashSet setXi = constructSet(xi);
-      final TIntHashSet setXj = constructSet(xj);
-      final TIntIterator iIter = setXi.iterator();
-      while (iIter.hasNext()) {
-        final int i = iIter.next();
-        final TIntIterator jIter = setXj.iterator();
-        while (jIter.hasNext()) {
-          final int j = jIter.next();
-          if (mmWaitlist.contains(i, j)) {
-            continue;
-          }
-          if (!isInRelation(i, j)) {
+      int newlistX = 0;
+      int newlistY = 0;
+      if (!mReRequested.get(x)) {
+        mReRequested.set(x);
+        final int list = mStateToClass[x];
+        newlistX = mShadowClasses.copy(list, mClasses);
+        updateStateToClass(newlistX, mShadowStateToClass, mShadowClasses);
+      }
+      if (!mReRequested.get(y)) {
+        mReRequested.set(y);
+        final int list = mStateToClass[y];
+        newlistY = mShadowClasses.copy(list, mClasses);
+        updateStateToClass(newlistY, mShadowStateToClass, mShadowClasses);
+      }
+
+      if (mStateToClass[x] == mStateToClass[y]) {
+        return true;
+      } else if (mShadowStateToClass[x] == mShadowStateToClass[y]) {
+        return true;
+      }
+
+      final int[] listX = mShadowClasses.toArray(newlistX);
+      final int[] listY = mShadowClasses.toArray(newlistY);
+
+      //merge shadow-classes [x1]' and [y1]';
+      final int lx = mShadowStateToClass[x];
+      final int ly = mShadowStateToClass[y];
+      final int l = mergeLists(lx, ly, mShadowClasses);
+      updateStateToClass(l, mShadowStateToClass, mShadowClasses);
+
+      final long pair = constructPair(x, y);
+      mergedPairs.add(pair);
+
+      for (final int xx : listX) {
+        for (final int yy : listY) {
+          final long p1 = constructPair(xx, yy);
+          final long p2 = constructPair(x0, y0);
+          if (comparePairs(p1, p2) < 0) {
+            return false;
+          } else if (!isInRelation(xx, yy)) {
             return false;
           }
-          mmWaitlist.add(i, j);
-          updateStateToFriends(i, j);
           for (int event = 0; event < mNumProperEvents; event++) {
-            final int iSucc = getSuccessorState(event, i);
-            final int jSucc = getSuccessorState(event, j);
-            if ((iSucc != -1) && (jSucc != -1)
-                && (mReachableStates.get(iSucc))
-                && (mReachableStates.get(jSucc))) {
-              if ((mStateToClass[iSucc] == mStateToClass[jSucc])
-                  || (mmWaitlist.contains(iSucc, jSucc))) {
-                continue;
-              }
-
-              final int iMin = getMin(iSucc);
-              final int jMin = getMin(jSucc);
-              if ((iMin < cnode) || (jMin < cnode)) {
-                return false;
-              }
-
-              final boolean flag = checkMergibility(iSucc, jSucc, cnode);
-              if (!flag) {
+            final int xSucc = getSuccessorState(event, xx);
+            final int ySucc = getSuccessorState(event, yy);
+            if ((xSucc != -1) && (ySucc != -1)
+                && (mReachableStates.get(xSucc))
+                && (mReachableStates.get(ySucc))) {
+              if (!checkMergibility(xSucc, ySucc, x0, y0, mergedPairs)) {
                 return false;
               }
             }
@@ -1498,72 +1431,43 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
 
-    public TIntHashSet constructSet(final int state)
+    public void merge(final TLongHashSet mergedPairs)
     {
-      final TIntHashSet set = new TIntHashSet();
-      final Queue<Integer> queue = new ArrayDeque<Integer>();////////////////////////////////
-      final TIntHashSet resultSet = new TIntHashSet();
-      final TIntHashSet addedLists = new TIntHashSet();
-
-      set.add(state);
-      queue.add(new Integer(state));
-      while (!queue.isEmpty()) {
-        final Integer s = queue.poll();
-        final int listID = mStateToClass[s];
-        if (addedLists.add(listID)) {
-          final ReadOnlyIterator it = mClasses.createReadOnlyIterator(listID);
-          it.reset(listID);
-          while (it.advance()) {
-            final int current = it.getCurrentData();
-            resultSet.add(current);
-          }
-        }
-        final TIntHashSet friends = mStateToFriends[s];
-        final int[] array = friends.toArray();///////////////////////////////////////////////
-        for (int i = 0; i < array.length; i++) {
-          final int curr = array[i];
-          if (set.add(curr)) {
-            queue.add(new Integer(curr));
-          }
-        }
-      }
-
-      return resultSet;
-    }
-
-    public void merge()
-    {
-      final TLongIterator itr = mmWaitlist.getIterator();
+      final TLongIterator itr = mergedPairs.iterator();
       while (itr.hasNext()) {
         final long pair = itr.next();
-        final int hi = mmWaitlist.getState(0, pair);
-        final int lo = mmWaitlist.getState(1, pair);
+        final int hi = getState(0, pair);
+        final int lo = getState(1, pair);
         if (mStateToClass[hi] != mStateToClass[lo]) {
           final int list1 = mStateToClass[hi];
           final int list2 = mStateToClass[lo];
-          final int list3 = mergeLists(list1, list2);
-          updateStateToClass(list3);
+          final int list3 = mergeLists(list1, list2, mClasses);
+          updateStateToClass(list3, mStateToClass, mClasses);
         }
       }
     }
 
-    public int mergeLists(final int list1, final int list2)
+    public int mergeLists(final int list1, final int list2,
+                          final IntListBuffer classes)
     {
-      final int x = mClasses.getFirst(list1);
-      final int y = mClasses.getFirst(list2);
+      final int x = classes.getFirst(list1);
+      final int y = classes.getFirst(list2);
       if (x < y) {
-        return mClasses.catenateDestructively(list1, list2);
+        return classes.catenateDestructively(list1, list2);
       } else if (x > y) {
-        return mClasses.catenateDestructively(list2, list1);
+        return classes.catenateDestructively(list2, list1);
       }
       return list1;
     }
 
-    public void updateStateToClass(final int list)
+    public void updateStateToClass(final int list, final int[] stateToClass,
+                                   final IntListBuffer classes)
     {
-      final int[] array = getListArray(list);
-      for (int i = 0; i < array.length; i++) {
-        mStateToClass[array[i]] = list;
+      final ReadOnlyIterator iter = classes.createReadOnlyIterator(list);
+      iter.reset(list);
+      if (iter.advance()) {
+        final int current = iter.getCurrentData();
+        stateToClass[current] = list;
       }
     }
 
@@ -1574,14 +1478,42 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return min;
     }
 
-    public int[] getListArray(final int list)
+    public int getState(final int position, final long pair)
     {
-      return mClasses.toArray(list);/////////////////////////////////////////////////////////
+      if (position == 0) {
+        return (int) (pair >>> 32);
+      } else if (position == 1) {
+        return (int) (pair & 0xffffffff);
+      }
+      return -1;
     }
 
-    public void updateStateToFriends(final int i, final int j){
-      mStateToFriends[i].add(j);
-      mStateToFriends[j].add(i);
+    public long constructPair(int state1, int state2)
+    {
+      if (state1 > state2) {
+        state1 = state1 + state2;
+        state2 = state1 - state2;
+        state1 = state1 - state2;
+      }
+      final long pair = (long) state2 | ((long) state1 << 32);
+      return pair;
+    }
+
+    public int comparePairs(final long pair1, final long pair2)
+    {
+      if ((pair1 < 0) && (pair2 > 0)) {
+        return 1;
+      } else if ((pair1 > 0) && (pair2 > 0)) {
+        return -1;
+      } else {
+        if (pair1 < pair2) {
+          return -1;
+        } else if (pair1 > pair2) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
     }
 
     private AutomatonProxy createReducedAutomaton()
@@ -1685,7 +1617,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
 
     int[][][][] mmTransitions;
-    Waitlist mmWaitlist;
   }
 
   //#########################################################################
@@ -1749,10 +1680,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private StateExplorer mSuccessorStatesExplorer;
 
   private int[] mStateToClass;
-  private TIntHashSet[] mStateToFriends;
   private IntListBuffer mClasses;
+  private int[] mShadowStateToClass;
+  private IntListBuffer mShadowClasses;
   private Reduction mReduction;
   private int mCounter;
+  private BitSet mReRequested;
 
   //#########################################################################
   //# Class Constants
