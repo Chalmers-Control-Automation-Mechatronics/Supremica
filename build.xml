@@ -74,15 +74,6 @@
         <pathelement location="${jsr173_api.jar}"/>
     </path>
 
-    <!-- GROOVY -->
-    <property name="groovy-all.jar" location="${lib}/groovy-all-1.6-beta-1.jar"/>
-    
-    <path id="groovy.classpath" location="${groovy-all.jar}"/>
-    
-    <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy" classpathref="groovy.classpath" />
-    <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc" classpathref="groovy.classpath" />
-    
-
     <!-- Build Instructions -->
     <path id="supremica.classpath">
         <pathelement location="${dist}/SupremicaLib.jar"/>
@@ -200,7 +191,6 @@
         <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb1-impl.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>   
-        <unjar src="${groovy-all.jar}" dest="${lib}/${unjared}"/>
     </target>
     
     <target name="clean_build">
@@ -272,7 +262,7 @@
     -->
     <target name="compileAndRun" depends="compile,runLocal"/>
     
-    <target name="compile" depends="compile_manufacturingTables_jaxb,compile_supremica,compile_supremica_groovy,compile_supremica_tests,compile_supremica_tests_groovy"/>
+    <target name="compile" depends="compile_manufacturingTables_jaxb,compile_supremica,compile_supremica_tests"/>
     
     <target name="compile_supremica" depends="-startfiles_local_supremica">
         <javac debug="on"
@@ -311,15 +301,6 @@
             </classpath>
             <compilerarg value="-Xlint"/>
         </javac>
-    </target>
-    
-    <target name="compile_supremica_groovy" depends="compile_supremica" description="Compiles groovy src files that depend on Supremica">
-        <groovyc srcdir="${src}" destdir="${build}">
-            <classpath>    
-                <pathelement location="${build}"/>
-                <pathelement location="${lib}/${unjared}"/>
-            </classpath>
-        </groovyc>
     </target>
     
     <!-- Compile:
@@ -397,39 +378,6 @@
                 <pathelement path="${lib}/${unjared}"/>
             </classpath>
         </javac>
-    </target>
-    
-    <target name="compile_supremica_tests_groovy" description="Compiles groovy test files">
-        <groovyc srcdir="${testssrc}" destdir="${testsbuild}">
-            <classpath>    
-                <pathelement location="${build}"/>
-                <pathelement location="${lib}/${unjared}"/>
-            </classpath>
-        </groovyc>
-    </target>
-    <!-- Compile Supremica Benchmarks
-*       Reuses existing class files, but recompiles those
-*       source files that have changed.
-    -->
-    <target name="compile_benchmarks_supremica">
-        <groovyc
-            srcdir="${benchmarkssrc}"
-            destdir="${benchmarksbuild}"
-            excludes="net/sourceforge/waters/junit/**/*.java"
-            includeJavaRuntime="yes"
-            verbose="false"
-        >
-            <classpath> 
-                <pathelement location="${build}" />
-                <pathelement path="${lib}/${unjared}" />
-            </classpath>
-                <javac
-                        debug="on"                          
-                        source="1.5"
-                        debuglevel="lines,source"
-                        includeantruntime="false"
-                />
-        </groovyc>
     </target>
     
     <!-- Compile:
@@ -757,23 +705,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/JGrafChart.cmd" perm="644"/>
 </target>
 -->
-    
-    <!-- Should probably be divided into several separate benchmarks as new ones appear. -->
-    <target name="run_benchmarks" depends="compile_supremica,compile_benchmarks_supremica">
-        <java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true">
-            <arg value="org.supremica.BenchmarkPackageSupremica"/>
-            <jvmarg value="-Xmx100m"/>
-            <jvmarg value="-Xms100m"/>
-            <jvmarg value="-Djava.library.path=${dist}"/>
-            <classpath> 
-                <pathelement location="${build}" />
-                <pathelement location="${benchmarksbuild}" />
-                <pathelement path="${lib}/${unjared}" />
-                <pathelement path="${java.class.path}" />
-            </classpath>
-        </java>
-    </target>
-    
+   
     <target name="-run_tests" depends="-jar_supremica,-jar_supremica_tests">
         <mkdir dir="${logs.results}"/>
         <delete>
@@ -819,8 +751,6 @@ Class-Path: ${manifest.pathlist}</echo>
                 <fileset dir="${testssrc}">
                     <exclude name="**/*Test.java"/>
                     <exclude name="**/Test*.java"/>
-                    <!--        <include name="**/*Test.groovy"/>
-        <include name="**/Test*.groovy"/>-->
                     <exclude name="org/supremica/testhelpers/**/*.java"/>
                     <exclude name="**/TestPackage*.java"/>
                     <exclude name="**/Abstract*.java"/>

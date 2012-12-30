@@ -30,8 +30,8 @@ public class Module extends ExtendedAutomata{
 	private EFA resourceVariablesEFA;
 	private EFA blockedEventsEFA;
 	
-	public Module(String name, boolean expand){
-		super(name, expand);
+	public Module(String name){
+		super(name);
 		
 		events = new LinkedList<String>();
 		integerVariables = new Hashtable<String,Integer>();
