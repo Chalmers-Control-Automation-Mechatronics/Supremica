@@ -232,7 +232,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "IPC";
-    //runSynthesizer(group, subdir, name, true);// *
+    runSynthesizer(group, subdir, name, true);// *
   }
 
   public void testManufacturingSystem() throws Exception
@@ -240,7 +240,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "manufacturing_system";
-    //runSynthesizer(group, subdir, name, true);// *
+    runSynthesizer(group, subdir, name, true);// *
   }
 
   public void testManWolf() throws Exception

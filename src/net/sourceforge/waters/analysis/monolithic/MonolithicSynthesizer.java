@@ -1281,47 +1281,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public void setUpClasses()
     {
       mStateToClass = new int[mNumStates];
-      mShadowStateToClass = new int[mNumStates];
       mClasses = new IntListBuffer();
-      mShadowClasses = new IntListBuffer();
       for (int s = 0; s < mNumStates; s++) {
         if (mReachableStates.get(s)) {
           final int list1 = mClasses.createList();//
           mClasses.add(list1, s);
           mStateToClass[s] = list1;
-          final int list2 = mShadowClasses.createList();//
-          mShadowClasses.add(list2, s);
-          mShadowStateToClass[s] = list2;
         } else {
           mStateToClass[s] = IntListBuffer.NULL;
-          mShadowStateToClass[s] = IntListBuffer.NULL;
-        }
-      }
-    }
-
-    public void restoreShadowClasses()
-    {
-      mShadowClasses = null;
-      mShadowClasses = new IntListBuffer();
-      for (int i = 0; i < mNumStates; i++) {
-        mShadowStateToClass[i] = IntListBuffer.NULL;
-      }
-      for (int i = 0; i < mNumStates; i++) {
-        final int list = mStateToClass[i];
-        if ((list != IntListBuffer.NULL) && (mClasses.getFirst(list) == i)) {
-          final int newlist = mShadowClasses.copy(list, mClasses);
-          mShadowStateToClass[i] = newlist;
-        }
-      }
-      for (int i = 0; i < mNumStates; i++) {
-        if (mShadowStateToClass[i] != IntListBuffer.NULL) {
-          final int list = mShadowStateToClass[i];
-          final ReadOnlyIterator iter = mShadowClasses.createReadOnlyIterator(list);
-          iter.reset(list);
-          while (iter.advance()) {
-            final int current = iter.getCurrentData();
-            mShadowStateToClass[current] = list;
-          }
         }
       }
     }
@@ -1340,14 +1307,19 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
           mCounter = 0;
           TLongHashSet mergedPairs = new TLongHashSet();
+          mShadowClasses = new IntListBuffer();
+          mShadowStateToClass = new int[mNumStates];
+          for(int s = 0; s < mNumStates; s++){
+            mShadowStateToClass[s] = IntListBuffer.NULL;
+          }
 
           if (checkMergibility(i, j, i, j, mergedPairs)) {
             merge(mergedPairs);
-          } else {
-            restoreShadowClasses();
           }
 
           mergedPairs = null;
+          mShadowClasses = null;
+          mShadowStateToClass = null;
         }
       }
     }
@@ -1358,6 +1330,25 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     {
       if (mCounter++ > LIMIT) {
         return false;
+      }
+
+      if(mShadowStateToClass[x] == IntListBuffer.NULL){
+        final int newlist = mShadowClasses.copy(mStateToClass[x], mClasses);
+        final ReadOnlyIterator iter = mShadowClasses.createReadOnlyIterator(newlist);
+        iter.reset(newlist);
+        while (iter.advance()) {
+          final int current = iter.getCurrentData();
+          mShadowStateToClass[current] = newlist;
+        }
+      }
+      if(mShadowStateToClass[y] == IntListBuffer.NULL){
+        final int newlist = mShadowClasses.copy(mStateToClass[y], mClasses);
+        final ReadOnlyIterator iter = mShadowClasses.createReadOnlyIterator(newlist);
+        iter.reset(newlist);
+        while (iter.advance()) {
+          final int current = iter.getCurrentData();
+          mShadowStateToClass[current] = newlist;
+        }
       }
 
       if (mStateToClass[x] == mStateToClass[y]) {
@@ -1455,12 +1446,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           final int list2 = mStateToClass[lo];
           final int list3 = mergeLists(list1, list2, mClasses);
           updateStateToClass(list3, mStateToClass, mClasses);
-        }
-        if (mShadowStateToClass[hi] != mShadowStateToClass[lo]) {
-          final int list1 = mShadowStateToClass[hi];
-          final int list2 = mShadowStateToClass[lo];
-          final int list3 = mergeLists(list1, list2, mShadowClasses);
-          updateStateToClass(list3, mShadowStateToClass, mShadowClasses);
         }
       }
     }
