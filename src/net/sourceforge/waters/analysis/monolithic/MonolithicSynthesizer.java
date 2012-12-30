@@ -1358,9 +1358,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final int[] listY = mShadowClasses.toArray(newlistY);
 
       //merge shadow-classes [x1]' and [y1]';
-      final int lx = mShadowStateToClass[x];
-      final int ly = mShadowStateToClass[y];
-      final int l = mergeLists(lx, ly, mShadowClasses);
+      final int l = mergeLists(newlistX, newlistY, mShadowClasses);
       updateStateToClass(l, mShadowStateToClass, mShadowClasses);
 
       final long pair = constructPair(x, y);
