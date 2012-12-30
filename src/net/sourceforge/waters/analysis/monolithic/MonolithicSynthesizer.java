@@ -1281,14 +1281,47 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public void setUpClasses()
     {
       mStateToClass = new int[mNumStates];
+      mShadowStateToClass = new int[mNumStates];
       mClasses = new IntListBuffer();
+      mShadowClasses = new IntListBuffer();
       for (int s = 0; s < mNumStates; s++) {
         if (mReachableStates.get(s)) {
-          final int list = mClasses.createList();
-          mClasses.add(list, s);
-          mStateToClass[s] = list;
+          final int list1 = mClasses.createList();//
+          mClasses.add(list1, s);
+          mStateToClass[s] = list1;
+          final int list2 = mShadowClasses.createList();//
+          mShadowClasses.add(list2, s);
+          mShadowStateToClass[s] = list2;
         } else {
-          mStateToClass[s] = IntListBuffer.NULL;// a bad state
+          mStateToClass[s] = IntListBuffer.NULL;
+          mShadowStateToClass[s] = IntListBuffer.NULL;
+        }
+      }
+    }
+
+    public void restoreShadowClasses()
+    {
+      mShadowClasses = null;
+      mShadowClasses = new IntListBuffer();
+      for (int i = 0; i < mNumStates; i++) {
+        mShadowStateToClass[i] = IntListBuffer.NULL;
+      }
+      for (int i = 0; i < mNumStates; i++) {
+        final int list = mStateToClass[i];
+        if ((list != IntListBuffer.NULL) && (mClasses.getFirst(list) == i)) {
+          final int newlist = mShadowClasses.copy(list, mClasses);
+          mShadowStateToClass[i] = newlist;
+        }
+      }
+      for (int i = 0; i < mNumStates; i++) {
+        if (mShadowStateToClass[i] != IntListBuffer.NULL) {
+          final int list = mShadowStateToClass[i];
+          final ReadOnlyIterator iter = mShadowClasses.createReadOnlyIterator(list);
+          iter.reset(list);
+          while (iter.advance()) {
+            final int current = iter.getCurrentData();
+            mShadowStateToClass[current] = list;
+          }
         }
       }
     }
@@ -1306,22 +1339,15 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           }
 
           mCounter = 0;
-          mReRequested = new BitSet();
           TLongHashSet mergedPairs = new TLongHashSet();
-          mShadowClasses = new IntListBuffer();
-          mShadowStateToClass = new int[mNumStates];
-          for (int n = 0; n < mNumStates; n++) {
-            mShadowStateToClass[n] = IntListBuffer.NULL;
-          }
 
           if (checkMergibility(i, j, i, j, mergedPairs)) {
             merge(mergedPairs);
+          } else {
+            restoreShadowClasses();
           }
 
-          mReRequested = null;
           mergedPairs = null;
-          mShadowClasses = null;
-          mShadowStateToClass = null;
         }
       }
     }
@@ -1333,20 +1359,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       if (mCounter++ > LIMIT) {
         return false;
       }
-      int newlistX = 0;
-      int newlistY = 0;
-      if (!mReRequested.get(x)) {
-        mReRequested.set(x);
-        final int list = mStateToClass[x];
-        newlistX = mShadowClasses.copy(list, mClasses);
-        updateStateToClass(newlistX, mShadowStateToClass, mShadowClasses);
-      }
-      if (!mReRequested.get(y)) {
-        mReRequested.set(y);
-        final int list = mStateToClass[y];
-        newlistY = mShadowClasses.copy(list, mClasses);
-        updateStateToClass(newlistY, mShadowStateToClass, mShadowClasses);
-      }
 
       if (mStateToClass[x] == mStateToClass[y]) {
         return true;
@@ -1354,11 +1366,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         return true;
       }
 
-      final int[] listX = mShadowClasses.toArray(newlistX);
-      final int[] listY = mShadowClasses.toArray(newlistY);
+      final int lx = mShadowStateToClass[x];
+      final int ly = mShadowStateToClass[y];
+      final int[] listX = mShadowClasses.toArray(lx);
+      final int[] listY = mShadowClasses.toArray(ly);
 
       //merge shadow-classes [x1]' and [y1]';
-      final int l = mergeLists(newlistX, newlistY, mShadowClasses);
+      final int l = mergeLists(lx, ly, mShadowClasses);
       updateStateToClass(l, mShadowStateToClass, mShadowClasses);
 
       final long pair = constructPair(x, y);
@@ -1368,7 +1382,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         for (final int yy : listY) {
           final long p1 = constructPair(xx, yy);
           final long p2 = constructPair(x0, y0);
-          if (comparePairs(p1, p2) < 0) {
+          if (compare(p1, p2) < 0) {
             return false;
           } else if (!isInRelation(xx, yy)) {
             return false;
@@ -1442,6 +1456,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           final int list3 = mergeLists(list1, list2, mClasses);
           updateStateToClass(list3, mStateToClass, mClasses);
         }
+        if (mShadowStateToClass[hi] != mShadowStateToClass[lo]) {
+          final int list1 = mShadowStateToClass[hi];
+          final int list2 = mShadowStateToClass[lo];
+          final int list3 = mergeLists(list1, list2, mShadowClasses);
+          updateStateToClass(list3, mShadowStateToClass, mShadowClasses);
+        }
       }
     }
 
@@ -1463,10 +1483,30 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     {
       final ReadOnlyIterator iter = classes.createReadOnlyIterator(list);
       iter.reset(list);
-      if (iter.advance()) {
+      while (iter.advance()) {
         final int current = iter.getCurrentData();
         stateToClass[current] = list;
       }
+    }
+
+    public int compare(final long pair1, final long pair2)
+    {
+      final int hiPair1 = (int) (pair1 >>> 32);
+      final int hiPair2 = (int) (pair2 >>> 32);
+      if (hiPair1 < hiPair2) {
+        return -1;
+      } else if (hiPair1 > hiPair2) {
+        return 1;
+      } else {
+        final int loPair1 = (int) (pair1 & 0xffffffff);
+        final int loPair2 = (int) (pair2 & 0xffffffff);
+        if (loPair1 < loPair2) {
+          return -1;
+        } else if (loPair1 > loPair2) {
+          return 1;
+        }
+      }
+      return 0;
     }
 
     public int getMin(final int state)
@@ -1497,6 +1537,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return pair;
     }
 
+    @SuppressWarnings("unused")
+    public int[] showClassList(final IntListBuffer classes, final int list)
+    {
+      final int[] array = classes.toArray(list);
+      return array;
+    }
+
+    @SuppressWarnings("unused")
     public int comparePairs(final long pair1, final long pair2)
     {
       if ((pair1 < 0) && (pair2 > 0)) {
@@ -1683,7 +1731,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private IntListBuffer mShadowClasses;
   private Reduction mReduction;
   private int mCounter;
-  private BitSet mReRequested;
 
   //#########################################################################
   //# Class Constants
