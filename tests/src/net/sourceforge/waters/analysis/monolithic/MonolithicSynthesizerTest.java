@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:   MonolithicSynchronousProductBuilderTest
+//# CLASS:   MonolithicSynthesizerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -17,9 +17,10 @@ import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class MonolithicSynthesizerTest
-  extends AbstractSupervisorSynthesizerTest
+public class MonolithicSynthesizerTest extends
+  AbstractSupervisorSynthesizerTest
 {
+
   //#########################################################################
   //# To be Provided by Subclasses
   /**
@@ -31,15 +32,19 @@ public class MonolithicSynthesizerTest
    * @return An instance of the synthesiser.
    */
   protected SupervisorSynthesizer createSynthesizer
-    (final ProductDESProxyFactory factory){
-      final MonolithicSynthesizer synthesizer =  new MonolithicSynthesizer(factory);
-      synthesizer.setSupervisorReductionEnabled(true);
-      return synthesizer;
+    (final ProductDESProxyFactory factory)
+  {
+    final MonolithicSynthesizer synthesizer =
+      new MonolithicSynthesizer(factory);
+    synthesizer.setSupervisorReductionEnabled(true);
+    return synthesizer;
   }
+
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
-  public static Test suite() {
+  public static Test suite()
+  {
     final TestSuite testSuite =
       new TestSuite(MonolithicSynthesizerTest.class);
     return testSuite;
@@ -48,14 +53,6 @@ public class MonolithicSynthesizerTest
   public static void main(final String[] args)
   {
     junit.textui.TestRunner.run(suite());
-  }
-
-
-  //#########################################################################
-  //# Test Cases --- BIG
-  @Override
-  public void testKoordWspSynth() throws Exception
-  {
   }
 
 }

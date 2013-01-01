@@ -61,6 +61,7 @@ import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
 import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
 import org.supremica.automata.BDD.EFA.TimeInvariantAttributeFactory;
+import org.supremica.gui.ide.DefaultAttributeFactory;
 
 import org.supremica.properties.Config;
 
@@ -505,6 +506,7 @@ class AttributesPanel extends JPanel
   static {
     //=======================================================================
     // Register Attribute Factories
+    ATTRIBUTE_FACTORIES.add(DefaultAttributeFactory.getInstance());
     if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
       ATTRIBUTE_FACTORIES.add(HISCAttributeFactory.getInstance());
     }
