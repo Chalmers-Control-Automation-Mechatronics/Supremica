@@ -1309,7 +1309,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           TLongHashSet mergedPairs = new TLongHashSet();
           mShadowClasses = new IntListBuffer();
           mShadowStateToClass = new int[mNumStates];
-          for(int s = 0; s < mNumStates; s++){
+          for (int s = 0; s < mNumStates; s++) {
             mShadowStateToClass[s] = IntListBuffer.NULL;
           }
 
@@ -1331,29 +1331,31 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       if (mCounter++ > LIMIT) {
         return false;
       }
-
-      if(mShadowStateToClass[x] == IntListBuffer.NULL){
-        final int newlist = mShadowClasses.copy(mStateToClass[x], mClasses);
-        final ReadOnlyIterator iter = mShadowClasses.createReadOnlyIterator(newlist);
-        iter.reset(newlist);
-        while (iter.advance()) {
-          final int current = iter.getCurrentData();
-          mShadowStateToClass[current] = newlist;
-        }
-      }
-      if(mShadowStateToClass[y] == IntListBuffer.NULL){
-        final int newlist = mShadowClasses.copy(mStateToClass[y], mClasses);
-        final ReadOnlyIterator iter = mShadowClasses.createReadOnlyIterator(newlist);
-        iter.reset(newlist);
-        while (iter.advance()) {
-          final int current = iter.getCurrentData();
-          mShadowStateToClass[current] = newlist;
-        }
-      }
-
       if (mStateToClass[x] == mStateToClass[y]) {
         return true;
-      } else if (mShadowStateToClass[x] == mShadowStateToClass[y]) {
+      }
+
+      /*int minX = 0;
+      int minY = 0;
+      if (mShadowStateToClass[x] == IntListBuffer.NULL) {
+        minX = getMin(x);
+      } else {
+        minX = getShadowMin(x);
+      }
+      if (mShadowStateToClass[y] == IntListBuffer.NULL) {
+        minY = getMin(y);
+      } else {
+        minY = getShadowMin(y);
+      }
+      final long p1 = constructPair(minX, minY);
+      final long p2 = constructPair(x0, y0);
+      if (compare(p1, p2) < 0) {
+        return false;
+      }*/
+
+      copyIfShadowNull(x);
+      copyIfShadowNull(y);
+      if (mShadowStateToClass[x] == mShadowStateToClass[y]) {
         return true;
       }
 
@@ -1371,7 +1373,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
       for (final int xx : listX) {
         for (final int yy : listY) {
-          final long p1 = constructPair(xx, yy);
+          final int minX = getMin(xx);
+          final int minY = getMin(yy);
+          final long p1 = constructPair(minX, minY);
           final long p2 = constructPair(x0, y0);
           if (compare(p1, p2) < 0) {
             return false;
@@ -1463,6 +1467,19 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return list1;
     }
 
+    public void copyIfShadowNull(final int state){
+      if (mShadowStateToClass[state] == IntListBuffer.NULL) {
+        final int newlist = mShadowClasses.copy(mStateToClass[state], mClasses);
+        final ReadOnlyIterator iter =
+          mShadowClasses.createReadOnlyIterator(newlist);
+        iter.reset(newlist);
+        while (iter.advance()) {
+          final int current = iter.getCurrentData();
+          mShadowStateToClass[current] = newlist;
+        }
+      }
+    }
+
     public void updateStateToClass(final int list, final int[] stateToClass,
                                    final IntListBuffer classes)
     {
@@ -1496,9 +1513,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
     public int getMin(final int state)
     {
-      final int list = mStateToClass[state];
-      final int min = mClasses.getFirst(list);
-      return min;
+      return mClasses.getFirst(mStateToClass[state]);
+    }
+
+    @SuppressWarnings("unused")
+    public int getShadowMin(final int state){
+      return mShadowClasses.getFirst(mShadowStateToClass[state]);
     }
 
     public int getState(final int position, final long pair)
