@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.THashSet;
 import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
 import gnu.trove.TLongHashSet;
 import gnu.trove.TLongIterator;
 import gnu.trove.TObjectHashingStrategy;
@@ -133,6 +134,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     try {
       setUp();
+      listX1 = 0;
+      listY1 = 0;
+      total = 0;
       // initial search
       while (!mGlobalStack.isEmpty()) {
         final int[] sentinel = new int[1];
@@ -832,7 +836,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   }
 
   @SuppressWarnings("unused")
-  private int[] showDecodedTuple(final int[] encodedTuple)
+  private int[] showTuple(final int[] encodedTuple)
   {
     final int[] tuple = new int[mNumAutomata];
     decode(encodedTuple, tuple);
@@ -1284,9 +1288,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mClasses = new IntListBuffer();
       for (int s = 0; s < mNumStates; s++) {
         if (mReachableStates.get(s)) {
-          final int list1 = mClasses.createList();
-          mClasses.add(list1, s);
-          mStateToClass[s] = list1;
+          final int list = mClasses.createList();
+          mClasses.add(list, s);
+          mStateToClass[s] = list;
         } else {
           mStateToClass[s] = IntListBuffer.NULL;
         }
@@ -1297,14 +1301,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     {
       setUpClasses();
       for (int i = 0; i < mNumStates - 1; i++) {
-        if ((mStateToClass[i] == IntListBuffer.NULL) || (i > getMin(i))) {
+        if ((mStateToClass[i] == IntListBuffer.NULL) || (i > getMinimum(i))) {
           continue;
         }
         for (int j = i + 1; j < mNumStates; j++) {
-          if ((mStateToClass[j] == IntListBuffer.NULL) || (j > getMin(j))) {
+          if ((mStateToClass[j] == IntListBuffer.NULL) || (j > getMinimum(j))) {
             continue;
           }
-
           TLongHashSet mergedPairs = new TLongHashSet();
           mShadowClasses = new IntListBuffer();
           mShadowStateToClass = new int[mNumStates];
@@ -1331,22 +1334,100 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                                     final int y0,
                                     final TLongHashSet mergedPairs)
     {
+      return checkMergibilityNew(x, y, x0, y0, mergedPairs);
+      //return checkMergibilityOld(x, y, x0, y0, mergedPairs);
+    }
+
+    @SuppressWarnings("unused")
+    public boolean checkMergibilityNew(final int x, final int y,
+                                       final int x0, final int y0,
+                                       final TLongHashSet mergedPairs)
+    {
       if (mStateToClass[x] == mStateToClass[y]) {
         return true;
       }
 
-      int minX = 0;
-      int minY = 0;
-      if (mShadowStateToClass[x] == IntListBuffer.NULL) {
-        minX = getMin(x);
-      } else {
-        minX = getShadowMin(x);
+      final int minX = getMinimum(x);
+      final int minY = getMinimum(y);
+      if (minX == minY) {
+        return true;
       }
-      if (mShadowStateToClass[y] == IntListBuffer.NULL) {
-        minY = getMin(y);
-      } else {
-        minY = getShadowMin(y);
+      final long p1 = constructPair(minX, minY);
+      final long p2 = constructPair(x0, y0);
+      if (compare(p1, p2) < 0) {
+        return false;
       }
+
+      copyIfShadowNull(x);
+      copyIfShadowNull(y);
+
+      final int lx = mShadowStateToClass[x];
+      final int ly = mShadowStateToClass[y];
+      final int[] listX = mShadowClasses.toArray(lx);
+      final int[] listY = mShadowClasses.toArray(ly);
+
+      //merge shadow-classes [x1]' and [y1]';
+      final int l = mergeLists(lx, ly, mShadowClasses);
+      updateStateToClass(l, mShadowStateToClass, mShadowClasses);
+
+      final long pair = constructPair(x, y);
+      mergedPairs.add(pair);
+
+      event: for (int event = 0; event < mNumProperEvents; event++) {
+        final TIntHashSet xSuccSet = new TIntHashSet();
+        final TIntHashSet ySuccSet = new TIntHashSet();
+        final TIntArrayList xSuccList = new TIntArrayList();
+        final TIntArrayList ySuccList = new TIntArrayList();
+        for (final int xx : listX) {
+          final int xSucc = getSuccessorState(event, xx);
+          if (xSucc != -1 && mReachableStates.get(xSucc)) {
+            final int xmin = getMinimum(xSucc);
+            if (xSuccSet.add(xmin)) {
+              xSuccList.add(xmin);
+            }
+          }
+        }
+        if(xSuccList.isEmpty()){
+          continue event;
+        }
+        for (final int yy : listY) {
+          final int ySucc = getSuccessorState(event, yy);
+          if (ySucc != -1 && mReachableStates.get(ySucc)) {
+            final int ymin = getMinimum(ySucc);
+            if (ySuccSet.add(ymin)) {
+              ySuccList.add(ymin);
+            }
+          }
+        }
+        for (int i = 0; i < xSuccList.size(); i++) {
+          for (int j = 0; j < ySuccList.size(); j++) {
+            if (!checkMergibilityNew(xSuccList.get(i), ySuccList.get(j), x0, y0, mergedPairs)) {
+              return false;
+            }
+          }
+        }
+      }
+      for (final int xx : listX) {
+        for (final int yy : listY) {
+          if (!isInRelation(xx, yy)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    @SuppressWarnings("unused")
+    public boolean checkMergibilityOld(final int x, final int y,
+                                       final int x0, final int y0,
+                                       final TLongHashSet mergedPairs)
+    {
+      if (mStateToClass[x] == mStateToClass[y]) {
+        return true;
+      }
+
+      final int minX = getMinimum(x);
+      final int minY = getMinimum(y);
       if (minX == minY) {
         return true;
       }
@@ -1382,7 +1463,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             if ((xSucc != -1) && (ySucc != -1)
                 && (mReachableStates.get(xSucc))
                 && (mReachableStates.get(ySucc))) {
-              if (!checkMergibility(xSucc, ySucc, x0, y0, mergedPairs)) {
+              if (!checkMergibilityOld(xSucc, ySucc, x0, y0, mergedPairs)) {
                 return false;
               }
             }
@@ -1498,14 +1579,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
 
-    public int getMin(final int state)
+    public int getMinimum(final int state)
     {
-      return mClasses.getFirst(mStateToClass[state]);
-    }
-
-    public int getShadowMin(final int state)
-    {
-      return mShadowClasses.getFirst(mShadowStateToClass[state]);
+      if (mShadowStateToClass == null || mShadowStateToClass[state] == IntListBuffer.NULL) {
+        return mClasses.getFirst(mStateToClass[state]);
+      } else {
+        return mShadowClasses.getFirst(mShadowStateToClass[state]);
+      }
     }
 
     public int getState(final int position, final long pair)
@@ -1534,24 +1614,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     {
       final int[] array = classes.toArray(list);
       return array;
-    }
-
-    @SuppressWarnings("unused")
-    public int comparePairs(final long pair1, final long pair2)
-    {
-      if ((pair1 < 0) && (pair2 > 0)) {
-        return 1;
-      } else if ((pair1 > 0) && (pair2 > 0)) {
-        return -1;
-      } else {
-        if (pair1 < pair2) {
-          return -1;
-        } else if (pair1 > pair2) {
-          return 1;
-        } else {
-          return 0;
-        }
-      }
     }
 
     private AutomatonProxy createReducedAutomaton()
@@ -1627,7 +1689,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           t += 2;
           continue;
         }
-        min = getMin(code);
+        min = getMinimum(code);
         final StateProxy source = stateArray[min];
         //event
         code = mTransitionBuffer.get(t++);
@@ -1637,7 +1699,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         if (!mReachableStates.get(code)) {
           continue;
         }
-        min = getMin(code);
+        min = getMinimum(code);
         final StateProxy target = stateArray[min];
 
         final TransitionProxy proxy =
@@ -1727,4 +1789,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
   private static final int SIZE_INT = 32;
+
+  @SuppressWarnings("unused")
+  private int listX1;
+  @SuppressWarnings("unused")
+  private int listY1;
+  @SuppressWarnings("unused")
+  private int total;
 }
