@@ -1338,7 +1338,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       //return checkMergibilityOld(x, y, x0, y0, mergedPairs);
     }
 
-    @SuppressWarnings("unused")
     public boolean checkMergibilityNew(final int x, final int y,
                                        final int x0, final int y0,
                                        final TLongHashSet mergedPairs)
