@@ -1283,6 +1283,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   //#########################################################################
   private class Reduction
   {
+    public Reduction()
+    {
+      mEventList = new TIntArrayList();
+    }
+
     public void setUpClasses()
     {
       mStateToClass = new int[mNumStates];
@@ -1298,9 +1303,35 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
 
+    public void setUpEventList()
+    {
+      events: for (int e = mNumUncontrollableEvents + 1; e < mEvents.length; e++) {
+        boolean enabled = false;
+        boolean disabled = false;
+        for (int s = 0; s < mNumStates; s++) {
+          final TransitionIterator iter =
+            mTransitionRelation.createSuccessorsReadOnlyIterator();
+          iter.reset(s, e);
+          if (iter.advance()) {
+            final int target = iter.getCurrentTargetState();
+            if (mReachableStates.get(target)) {
+              enabled = true;
+            } else {
+              disabled = true;
+            }
+            if(enabled && disabled){
+              mEventList.add(e);
+              continue events;
+            }
+          }
+        }
+      }
+    }
+
     public void mainProcedure()
     {
       setUpClasses();
+      setUpEventList();
       for (int i = 0; i < mNumStates - 1; i++) {
         if ((mStateToClass[i] == IntListBuffer.NULL) || (i > getMinimum(i))) {
           continue;
@@ -1316,12 +1347,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             mShadowStateToClass[s] = IntListBuffer.NULL;
           }
 
-          //System.err.print("(" + i + "," + j + ") ... ");
           if (checkMergibility(i, j, i, j, mergedPairs)) {
-            //System.err.println("true");
             merge(mergedPairs);
-          } else {
-            //System.err.println("false");
           }
 
           mergedPairs = null;
@@ -1371,15 +1398,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final TIntArrayList xList = new TIntArrayList();
       final TIntArrayList yList = new TIntArrayList();
 
-      for (int e = mNumUncontrollableEvents + 1; e <= mNumProperEvents; e++) {
+      for (int e = 0; e < mEventList.size(); e++) {
         xSet.clear();
-        ySet.clear();
         xList.clear();
-        yList.clear();
         boolean enabled = false;
         boolean disabled = false;
         for (final int xx : listX) {
-          final int succ = getSuccessorState(xx, e);
+          final int succ = getSuccessorState(xx, mEventList.get(e));
           if (succ != -1) {
             if (xSet.add(xx)) {
               xList.add(xx);
@@ -1393,26 +1418,20 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         }
         if (disabled) {
           for (final int yy : listY) {
-            final int succ = getSuccessorState(yy, e);
+            final int succ = getSuccessorState(yy, mEventList.get(e));
             if (succ != -1) {
               if (mReachableStates.get(succ)) {
                 return false;
-              }
-              if (ySet.add(yy)) {
-                yList.add(yy);
               }
             }
           }
         }
         if (enabled) {
           for (final int yy : listY) {
-            final int succ = getSuccessorState(yy, e);
+            final int succ = getSuccessorState(yy, mEventList.get(e));
             if (succ != -1) {
               if (!mReachableStates.get(succ)) {
                 return false;
-              }
-              if (ySet.add(yy)) {
-                yList.add(yy);
               }
             }
           }
@@ -1425,13 +1444,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final long pair = constructPair(x, y);
       mergedPairs.add(pair);
 
-      for (int event = 1; event <= mNumProperEvents; event++) {
+      for (int e = 1; e <= mNumProperEvents; e++) {
         xSet.clear();
         ySet.clear();
         xList.clear();
         yList.clear();
         for (final int xx : listX) {
-          final int xSucc = getSuccessorState(xx, event);
+          final int xSucc = getSuccessorState(xx, e);
           if (xSucc != -1 && mReachableStates.get(xSucc)) {
             final int xmin = getMinimum(xSucc);
             if (xSet.add(xmin)) {
@@ -1443,7 +1462,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           continue;
         }
         for (final int yy : listY) {
-          final int ySucc = getSuccessorState(yy, event);
+          final int ySucc = getSuccessorState(yy, e);
           if (ySucc != -1 && mReachableStates.get(ySucc)) {
             final int ymin = getMinimum(ySucc);
             if (ySet.add(ymin)) {
@@ -1750,6 +1769,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return factory.createAutomatonProxy(name, kind, events, states,
                                           transitions);
     }
+
+    private final TIntArrayList mEventList;
   }
 
   //#########################################################################
