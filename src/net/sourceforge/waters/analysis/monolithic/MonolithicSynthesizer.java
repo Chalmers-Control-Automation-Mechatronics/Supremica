@@ -1655,7 +1655,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final Collection<EventProxy> events =
         new ArrayList<EventProxy>(numEvents);
       for (final EventProxy event : mEvents) {
-        events.add(event);
+        if (event != null) {
+          events.add(event);
+        }
       }
       events.addAll(mCurrentPropositions);
 
