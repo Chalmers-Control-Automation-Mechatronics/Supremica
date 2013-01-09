@@ -27,10 +27,99 @@
         </EventDecl>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PROPERTY" Name="iface">
+        <SimpleComponent Kind="PROPERTY" Name="iface_case">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="idle">
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-23" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="160" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-20" Y="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="80" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-10" Y="-21"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <PointGeometry>
+                            <Point X="240" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-12" Y="-20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s1" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="err_case"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-31" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point X="240" Y="144"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="complete_case"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-55" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair_case"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="coordinator_case">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -41,158 +130,69 @@
                             <Point X="-30" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="c1">
+                    <SimpleNode Name="s1">
                         <PointGeometry>
-                            <Point X="160" Y="144"/>
+                            <Point X="112" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="-20" Y="-13"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="c2">
+                    <SimpleNode Name="s2">
                         <PointGeometry>
-                            <Point X="80" Y="144"/>
+                            <Point X="208" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-20" Y="-14"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="c3">
-                        <PointGeometry>
-                            <Point X="240" Y="144"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-3" Y="-17"/>
+                            <Point X="-4" Y="-19"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="c1" Target="c3">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="err_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-28" Y="-16"/>
+                                <Point X="-26" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <EndPointGeometry>
-                            <Point X="240" Y="144"/>
+                            <Point X="208" Y="144"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Source="idle" Target="c1">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="start_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="8"/>
+                                <Point X="-34" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="119" Y="94"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Source="c1" Target="c2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-10" Y="-19"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="c2" Target="idle">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="complete_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-58" Y="-20"/>
+                                <Point X="-47" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="112" Y="144"/>
+                        </StartPointGeometry>
                     </Edge>
-                    <Edge Source="c3" Target="idle">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="-21"/>
+                                <Point X="-35" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:Interface"/>
-            </ns2:AttributeMap>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="coordinator">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="idle">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="96" Y="48"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-30" Y="-7"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="c1">
-                        <PointGeometry>
-                            <Point X="96" Y="128"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-25" Y="-7"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="c2">
-                        <PointGeometry>
-                            <Point X="96" Y="192"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-25" Y="-5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="c1" Target="idle">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="err_case"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-15" Y="7"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="107" Y="88"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="idle" Target="c1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="start_case"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-47" Y="-25"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="84" Y="89"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="c1" Target="c2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-9"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="c2" Target="idle">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="complete_case"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-56" Y="31"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="163" Y="117"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="attach_case_to_assembly">
+        <SimpleComponent Kind="PLANT" Name="attach_case">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -200,15 +200,15 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="202" Y="125"/>
+                            <Point X="112" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="11" Y="8"/>
+                            <Point X="-16" Y="2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s2">
                         <PointGeometry>
-                            <Point X="394" Y="126"/>
+                            <Point X="192" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="3" Y="4"/>
@@ -216,10 +216,10 @@
                     </SimpleNode>
                     <SimpleNode Name="s3">
                         <PointGeometry>
-                            <Point X="202" Y="285"/>
+                            <Point X="112" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="1" Y="11"/>
+                            <Point X="-25" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -228,40 +228,40 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="err_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-43" Y="-24"/>
+                                <Point X="-29" Y="-1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="296" Y="102"/>
+                            <Point X="152" Y="88"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="attach_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-134" Y="-27"/>
+                                <Point X="-26" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="380" Y="289"/>
+                            <Point X="165" Y="124"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="start_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-39" Y="-1"/>
+                                <Point X="-33" Y="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="293" Y="146"/>
+                            <Point X="152" Y="71"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="s3" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="complete_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-143" Y="-20"/>
+                                <Point X="-46" Y="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="subsystem" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="simple_manuf_hisccp" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="attach_part_a">
+        <EventDecl Kind="CONTROLLABLE" Name="attach_a">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="attach_part_b">
+        <EventDecl Kind="CONTROLLABLE" Name="attach_b">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
@@ -37,12 +37,12 @@
                 <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="finish_attach_a">
+        <EventDecl Kind="CONTROLLABLE" Name="finish_a">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="finish_attach_b">
+        <EventDecl Kind="CONTROLLABLE" Name="finish_b">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
@@ -64,8 +64,8 @@
         <EventDecl Kind="CONTROLLABLE" Name="part_leave2"/>
         <EventDecl Kind="CONTROLLABLE" Name="part_leave3"/>
         <EventDecl Kind="CONTROLLABLE" Name="part_leave_exit"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="recognize_part_a"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="recognize_part_b"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recognise_a"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recognise_b"/>
         <EventDecl Kind="CONTROLLABLE" Name="start_case">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
@@ -176,7 +176,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="finish_exit"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-38" Y="-19"/>
+                                <Point X="-53" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -184,7 +184,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_arrive3"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="1"/>
+                                <Point X="-34" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -192,7 +192,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_leave3"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="1" Y="3"/>
+                                <Point X="-1" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -200,7 +200,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_leave2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-39" Y="1"/>
+                                <Point X="-37" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -208,16 +208,16 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_arrive2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="0"/>
+                                <Point X="-58" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Source="s6" Target="s7">
                         <LabelBlock>
-                            <SimpleIdentifier Name="recognize_part_a"/>
-                            <SimpleIdentifier Name="recognize_part_b"/>
+                            <SimpleIdentifier Name="recognise_a"/>
+                            <SimpleIdentifier Name="recognise_b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-30" Y="0"/>
+                                <Point X="-38" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -225,7 +225,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_leave_exit"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-63" Y="5"/>
+                                <Point X="-65" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -233,7 +233,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="start_exit"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-23" Y="-22"/>
+                                <Point X="-18" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -241,7 +241,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_arrive1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-34" Y="2"/>
+                                <Point X="-38" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -249,7 +249,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_leave1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-32" Y="2"/>
+                                <Point X="-35" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -257,7 +257,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_enter"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-34" Y="1"/>
+                                <Point X="-26" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -265,7 +265,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="err_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="3"/>
+                                <Point X="-27" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -390,7 +390,7 @@
                             <Point X="256" Y="384"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-10" Y="5"/>
+                            <Point X="-29" Y="-17"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s15">
@@ -431,7 +431,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_leave1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-28" Y="-28"/>
+                                <Point X="-28" Y="-31"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -442,7 +442,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_leave3"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-30" Y="3"/>
+                                <Point X="-34" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -450,7 +450,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="complete_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-61" Y="2"/>
+                                <Point X="-47" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -458,7 +458,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="err_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-23" Y="-18"/>
+                                <Point X="-29" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -472,7 +472,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_arrive3"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-36" Y="-18"/>
+                                <Point X="-40" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -480,7 +480,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_arrive1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-29" Y="5"/>
+                                <Point X="-33" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -488,15 +488,15 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_leave2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="-20"/>
+                                <Point X="-38" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Source="s9" Target="s11">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish_attach_a"/>
+                            <SimpleIdentifier Name="finish_a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-60" Y="-19"/>
+                                <Point X="-59" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -504,7 +504,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="err_attach"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-23" Y="2"/>
+                                <Point X="-28" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -521,9 +521,9 @@
                     </Edge>
                     <Edge Source="s8" Target="s10">
                         <LabelBlock>
-                            <SimpleIdentifier Name="attach_part_b"/>
+                            <SimpleIdentifier Name="attach_b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-56" Y="-22"/>
+                                <Point X="-54" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -535,7 +535,7 @@
                             <SimpleIdentifier Name="part_arrive2"/>
                             <SimpleIdentifier Name="part_leave_exit"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-19" Y="-13"/>
+                                <Point X="-13" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -544,25 +544,25 @@
                     </Edge>
                     <Edge Source="s6" Target="s8">
                         <LabelBlock>
-                            <SimpleIdentifier Name="recognize_part_b"/>
+                            <SimpleIdentifier Name="recognise_b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-39" Y="0"/>
+                                <Point X="-7" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Source="s6" Target="s7">
                         <LabelBlock>
-                            <SimpleIdentifier Name="recognize_part_a"/>
+                            <SimpleIdentifier Name="recognise_a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-67" Y="-18"/>
+                                <Point X="-70" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Source="s10" Target="s11">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish_attach_b"/>
+                            <SimpleIdentifier Name="finish_b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-26" Y="-19"/>
+                                <Point X="13" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -570,7 +570,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="err_attach"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-21" Y="3"/>
+                                <Point X="-28" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -581,7 +581,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_leave1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-26" Y="-20"/>
+                                <Point X="-30" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -598,9 +598,9 @@
                     </Edge>
                     <Edge Source="s7" Target="s9">
                         <LabelBlock>
-                            <SimpleIdentifier Name="attach_part_a"/>
+                            <SimpleIdentifier Name="attach_a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-63" Y="-20"/>
+                                <Point X="-53" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -619,7 +619,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="complete_polish"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-19"/>
+                                <Point X="-39" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -638,7 +638,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_enter"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-32" Y="-17"/>
+                                <Point X="-32" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -646,7 +646,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="finish_exit"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-27" Y="-30"/>
+                                <Point X="-30" Y="-31"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -685,7 +685,7 @@
                             <SimpleIdentifier Name="err_attach"/>
                             <SimpleIdentifier Name="err_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="1" Y="-16"/>
+                                <Point X="0" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -697,7 +697,7 @@
                             <SimpleIdentifier Name="repair_attach"/>
                             <SimpleIdentifier Name="repair_case"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-78" Y="-19"/>
+                                <Point X="-80" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -708,7 +708,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="part_enter"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-31" Y="-18"/>
+                                <Point X="-44" Y="-33"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -736,20 +736,20 @@
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
-            <ParameterBinding Name="attach_part_a">
-                <SimpleIdentifier Name="attach_part_a"/>
+            <ParameterBinding Name="attach_a">
+                <SimpleIdentifier Name="attach_a"/>
             </ParameterBinding>
-            <ParameterBinding Name="attach_part_b">
-                <SimpleIdentifier Name="attach_part_b"/>
+            <ParameterBinding Name="attach_b">
+                <SimpleIdentifier Name="attach_b"/>
             </ParameterBinding>
             <ParameterBinding Name="err_attach">
                 <SimpleIdentifier Name="err_attach"/>
             </ParameterBinding>
-            <ParameterBinding Name="finish_attach_a">
-                <SimpleIdentifier Name="finish_attach_a"/>
+            <ParameterBinding Name="finish_a">
+                <SimpleIdentifier Name="finish_a"/>
             </ParameterBinding>
-            <ParameterBinding Name="finish_attach_b">
-                <SimpleIdentifier Name="finish_attach_b"/>
+            <ParameterBinding Name="finish_b">
+                <SimpleIdentifier Name="finish_b"/>
             </ParameterBinding>
             <ParameterBinding Name="repair_attach">
                 <SimpleIdentifier Name="repair_attach"/>
