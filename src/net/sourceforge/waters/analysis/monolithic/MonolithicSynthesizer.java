@@ -259,11 +259,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           new ListBufferTransitionRelation(
                                            "rel",
                                            ComponentKind.SUPERVISOR,
-                                           mNumProperEvents,
+                                           mNumProperEvents + 1,
                                            mCurrentPropositions.size(),
                                            mNumStates,
                                            ListBufferTransitionRelation.CONFIG_SUCCESSORS);
         mPreTransitionBuffer.addOutgoingTransitions(mTransitionRelation);
+        //mSupervisorReductionEnabled = false;
         if (mSupervisorReductionEnabled) {
           mReduction.mainProcedure();
           aut = mReduction.createReducedAutomaton();
@@ -343,7 +344,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     plants = specs = null;
 
     TObjectIntHashMap<EventProxy> eventToIndex =
-      new TObjectIntHashMap<EventProxy>(mNumEvents);
+      new TObjectIntHashMap<EventProxy>(mNumEvents + 1);
     if (mUsedPropositions == null) {
       mCurrentPropositions = new ArrayList<EventProxy>();
     } else {
@@ -356,8 +357,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         numProperEvents += 1;
       }
     }
-    int unctrlEvents = 0;
-    int ctrlEvents = numProperEvents - 1;
+    int unctrlEvents = 1;
+    int ctrlEvents = numProperEvents;
     for (final EventProxy event : events) {
       if (translator.getEventKind(event) == EventKind.PROPOSITION) {
         if (mUsedPropositions == null) {
@@ -370,9 +371,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
     mNumProperEvents = numProperEvents;
-    mNumUncontrollableEvents = unctrlEvents;
-    mCurrentDeadlock = new boolean[mNumProperEvents];
-    mEvents = new EventProxy[numProperEvents];
+    mNumUncontrollableEvents = unctrlEvents - 1;
+    mCurrentDeadlock = new boolean[mNumProperEvents + 1];
+    mEvents = new EventProxy[mNumProperEvents + 1];
     final TObjectIntIterator<EventProxy> iter = eventToIndex.iterator();
     while (iter.hasNext()) {
       iter.advance();
@@ -389,10 +390,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mDeadlockState = -1;
 
     //transitions indexed first by automaton then by event then by source state
-    mTransitions = new int[mNumAutomata][mNumProperEvents][][];
-    mReverseTransitions = new int[mNumAutomata][mNumProperEvents][][];
-    mEventAutomata = new int[mNumProperEvents][];
-    mReverseEventAutomata = new int[mNumProperEvents][];
+    mTransitions = new int[mNumAutomata][mNumProperEvents + 1][][];
+    mReverseTransitions = new int[mNumAutomata][mNumProperEvents + 1][][];
+    mEventAutomata = new int[mNumProperEvents + 1][];
+    mReverseEventAutomata = new int[mNumProperEvents + 1][];
     mNDTuple = new int[mNumAutomata][];
 
     int a = 0;
@@ -442,9 +443,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
       mNDTuple[a] = initials.toNativeArray();
       final TIntArrayList[][] autTransitionLists =
-        new TIntArrayList[mNumProperEvents][numStates];
+        new TIntArrayList[mNumProperEvents + 1][numStates];
       final TIntArrayList[][] autTransitionListsRvs =
-        new TIntArrayList[mNumProperEvents][numStates];
+        new TIntArrayList[mNumProperEvents + 1][numStates];
       for (final TransitionProxy trans : aut.getTransitions()) {
         final int event = eventToIndex.get(trans.getEvent());
         final int source = stateToIndex.get(trans.getSource());
@@ -487,13 +488,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       a++;
     }
     eventToIndex = null;
-    mEventAutomata = new int[mNumProperEvents][];
-    mReverseEventAutomata = new int[mNumProperEvents][];
+    mEventAutomata = new int[mNumProperEvents + 1][];
+    mReverseEventAutomata = new int[mNumProperEvents + 1][];
     final List<AutomatonEventInfo> list =
       new ArrayList<AutomatonEventInfo>(mNumAutomata);
     final List<AutomatonEventInfo> listRvs =
       new ArrayList<AutomatonEventInfo>(mNumAutomata);
-    for (int e = 0; e < mNumProperEvents; e++) {
+    for (int e = 1; e <= mNumProperEvents; e++) {
       for (a = 0; a < mNumAutomata; a++) {
         if (mTransitions[a][e] != null) {
           final int numStates = mTransitions[a][e].length;
@@ -504,7 +505,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             }
           }
           final double avg = (double) count / (double) numStates;
-          if (e >= mNumUncontrollableEvents) {
+          if (e > mNumUncontrollableEvents) {
             final ControllableAutomatonEventInfo pair =
               new ControllableAutomatonEventInfo(a, avg);
             list.add(pair);
@@ -601,12 +602,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mIndexAutomata[mNumInts] = mNumAutomata;
 
     mPreTransitionBuffer =
-      new PreTransitionBuffer(mNumEvents, getTransitionLimit());////////////////////////////////////////////////
+      new PreTransitionBuffer(mNumProperEvents + 1, getTransitionLimit());////////////////////////////////////
 
     mCtrlInitialReachabilityExplorer =
       new CtrlInitialReachabilityExplorer(mEventAutomata, mTransitions,
-                                          mNDTuple, mNumUncontrollableEvents,
-                                          mNumProperEvents - 1);
+                                          mNDTuple, mNumUncontrollableEvents + 1,
+                                          mNumProperEvents);
 
     mCtrlInitialReachabilityExplorer.permutations(mNumAutomata, null, -1);
     mNDTupleFinal = Arrays.copyOf(mNDTuple, mNumAutomata);
@@ -614,17 +615,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
     mUnctrlInitialReachabilityExplorer =
       new UnctrlInitialReachabilityExplorer(mEventAutomata, mTransitions,
-                                            mNDTuple, 0,
+                                            mNDTuple, 1,
                                             mNumUncontrollableEvents);
     mCoreachabilityExplorer =
       new CoreachabilityExplorer(mReverseEventAutomata, mReverseTransitions,
-                                 mNDTuple, 0, mNumProperEvents - 1);
+                                 mNDTuple, 1, mNumProperEvents);
     mSuccessorStatesExplorer =
       new SuccessorStatesExplorer(mReverseEventAutomata, mReverseTransitions,
-                                  mNDTuple, 0, mNumUncontrollableEvents - 1);
+                                  mNDTuple, 1, mNumUncontrollableEvents);
     mFinalReachabilityExplorer =
       new FinalReachabilityExplorer(mEventAutomata, mTransitions,
-                                    mNDTupleFinal, 0, mNumProperEvents - 1);
+                                    mNDTupleFinal, 1, mNumProperEvents);
     mReduction = new Reduction();
   }
 
@@ -1144,7 +1145,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     @Override
     public boolean explore(final int[] encodedTuple) throws OverflowException
     {
-      events: for (int e = 0; e < mNumUncontrollableEvents; e++) {
+      events: for (int e = 1; e <= mNumUncontrollableEvents; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
@@ -1369,7 +1370,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final TIntArrayList xList = new TIntArrayList();
       final TIntArrayList yList = new TIntArrayList();
 
-      for(int e = mNumUncontrollableEvents; e < mNumProperEvents; e++){
+      for(int e = mNumUncontrollableEvents + 1; e <= mNumProperEvents; e++){
         xSet.clear();
         ySet.clear();
         xList.clear();
@@ -1402,14 +1403,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         }
       }
 
-      //merge shadow-classes [x1]' and [y1]';
       final int l = mergeLists(lx, ly, mShadowClasses);
       updateStateToClass(l, mShadowStateToClass, mShadowClasses);
 
       final long pair = constructPair(x, y);
       mergedPairs.add(pair);
 
-      for (int event = 0; event < mNumProperEvents; event++) {
+      for (int event = 1; event <= mNumProperEvents; event++) {
         xSet.clear();
         ySet.clear();
         xList.clear();
@@ -1488,7 +1488,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           if (!isInRelation(xx, yy)) {
             return false;
           }
-          for (int event = 0; event < mNumProperEvents; event++) {
+          for (int event = 1; event <= mNumProperEvents; event++) {
             final int xSucc = getSuccessorState(xx, event);
             final int ySucc = getSuccessorState(yy, event);
             if ((xSucc != -1) && (ySucc != -1)
@@ -1506,7 +1506,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
     public boolean isInRelation(final int state1, final int state2)
     {
-      for (int e = mNumUncontrollableEvents; e < mNumProperEvents; e++) {
+      for (int e = mNumUncontrollableEvents + 1; e <= mNumProperEvents; e++) {
         final int succ1 = getSuccessorState(state1, e);
         final int succ2 = getSuccessorState(state2, e);
         if (succ1 != -1 && succ2 != -1) {

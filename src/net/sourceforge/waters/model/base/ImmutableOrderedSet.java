@@ -23,23 +23,28 @@ import java.util.Set;
 
 
 /**
- * <P>A immutable set implementation that guarantees the ordering of elements
- * as passed to the constructor.</P>
+ * <P>
+ * A immutable set implementation that guarantees the ordering of elements as
+ * passed to the constructor.
+ * </P>
  *
- * <P>This implementation is based an immutable {@link ArrayList} containing
- * the set elements. An efficient check for duplicates is performed on
- * construction, but no further performance improvements are made.
- * The {@link Set#contains(Object) contains()} operation is of linear time
- * complexity.</P>
+ * <P>
+ * This implementation is based an immutable {@link ArrayList} containing the
+ * set elements. An efficient check for duplicates is performed on
+ * construction, but no further performance improvements are made. The
+ * {@link Set#contains(Object) contains()} operation is of linear time
+ * complexity.
+ * </P>
  *
- * <P>All elements in an <CODE>ImmutableOrderedSet</CODE> must be of
- * type {@link NamedProxy}.</P>
+ * <P>
+ * All elements in an <CODE>ImmutableOrderedSet</CODE> must be of type
+ * {@link NamedProxy}.
+ * </P>
  *
  * @author Robi Malik
  */
 
-public class ImmutableOrderedSet<P extends NamedProxy>
-  extends AbstractSet<P>
+public class ImmutableOrderedSet<P extends NamedProxy> extends AbstractSet<P>
   implements Cloneable, Serializable
 {
 
@@ -55,10 +60,13 @@ public class ImmutableOrderedSet<P extends NamedProxy>
 
   /**
    * Creates and initialises a ordered set.
-   * @param  input       A collection of objects that constitute the initial
-   *                     contents of the new set.
-   * @throws DuplicateNameException to indicate that the input collection
-   *         contains two elements with the same name.
+   *
+   * @param input
+   *          A collection of objects that constitute the initial contents of
+   *          the new set.
+   * @throws DuplicateNameException
+   *           to indicate that the input collection contains two elements
+   *           with the same name.
    */
   public ImmutableOrderedSet(final Collection<? extends P> input)
   {
@@ -69,17 +77,18 @@ public class ImmutableOrderedSet<P extends NamedProxy>
       final Set<String> names = new THashSet<String>(size);
       final List<P> list = new ArrayList<P>(size);
       for (final P proxy : input) {
-        final String name = proxy.getName();
-        if (names.add(name)) {
-          list.add(proxy);
-        } else {
-          throw createDuplicateName(name);
+        if (proxy != null) {
+          final String name = proxy.getName();
+          if (names.add(name)) {
+            list.add(proxy);
+          } else {
+            throw createDuplicateName(name);
+          }
         }
       }
       mProxyList = Collections.unmodifiableList(list);
     }
   }
-
 
   //#########################################################################
   //# Cloning
@@ -97,7 +106,6 @@ public class ImmutableOrderedSet<P extends NamedProxy>
     }
   }
 
-
   //#########################################################################
   //# Interface java.util.Set
   public Iterator<P> iterator()
@@ -109,7 +117,6 @@ public class ImmutableOrderedSet<P extends NamedProxy>
   {
     return mProxyList.size();
   }
-
 
   //#########################################################################
   //# Error Messages
@@ -136,15 +143,13 @@ public class ImmutableOrderedSet<P extends NamedProxy>
     buffer.append("item");
   }
 
-
   //#########################################################################
   //# Data Members
   /**
-   * The contents of this set in the order specified by the constructor.
-   * An immutable list.
+   * The contents of this set in the order specified by the constructor. An
+   * immutable list.
    */
   private List<P> mProxyList;
-
 
   //#########################################################################
   //# Class Constants
