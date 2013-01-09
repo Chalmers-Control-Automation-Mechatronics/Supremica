@@ -606,7 +606,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
     mCtrlInitialReachabilityExplorer =
       new CtrlInitialReachabilityExplorer(mEventAutomata, mTransitions,
-                                          mNDTuple, mNumUncontrollableEvents + 1,
+                                          mNDTuple,
+                                          mNumUncontrollableEvents + 1,
                                           mNumProperEvents);
 
     mCtrlInitialReachabilityExplorer.permutations(mNumAutomata, null, -1);
@@ -1370,34 +1371,49 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final TIntArrayList xList = new TIntArrayList();
       final TIntArrayList yList = new TIntArrayList();
 
-      for(int e = mNumUncontrollableEvents + 1; e <= mNumProperEvents; e++){
+      for (int e = mNumUncontrollableEvents + 1; e <= mNumProperEvents; e++) {
         xSet.clear();
         ySet.clear();
         xList.clear();
         yList.clear();
-        //boolean enabled = false;
-        //boolean disabled = false;
-        for(final int xx : listX){
-          if(getSuccessorState(xx, e) != -1){
-            if(xSet.add(xx)){
+        boolean enabled = false;
+        boolean disabled = false;
+        for (final int xx : listX) {
+          final int succ = getSuccessorState(xx, e);
+          if (succ != -1) {
+            if (xSet.add(xx)) {
               xList.add(xx);
             }
-          }
-        }
-        if (xList.isEmpty()) {
-          continue;
-        }
-        for(final int yy : listY){
-          if(getSuccessorState(yy, e) != -1){
-            if(ySet.add(yy)){
-              yList.add(yy);
+            if (mReachableStates.get(succ)) {
+              enabled = true;
+            } else {
+              disabled = true;
             }
           }
         }
-        for(int i = 0; i < xList.size(); i++){
-          for(int j = 0; j < yList.size(); j++){
-            if (!isInRelation(xList.get(i), yList.get(j))) {
-              return false;
+        if (disabled) {
+          for (final int yy : listY) {
+            final int succ = getSuccessorState(yy, e);
+            if (succ != -1) {
+              if (mReachableStates.get(succ)) {
+                return false;
+              }
+              if (ySet.add(yy)) {
+                yList.add(yy);
+              }
+            }
+          }
+        }
+        if (enabled) {
+          for (final int yy : listY) {
+            final int succ = getSuccessorState(yy, e);
+            if (succ != -1) {
+              if (!mReachableStates.get(succ)) {
+                return false;
+              }
+              if (ySet.add(yy)) {
+                yList.add(yy);
+              }
             }
           }
         }
@@ -1437,14 +1453,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         }
         for (int i = 0; i < xList.size(); i++) {
           for (int j = 0; j < yList.size(); j++) {
-            if (!checkMergibilityNew(xList.get(i), yList.get(j), x0,
-                                     y0, mergedPairs)) {
+            if (!checkMergibilityNew(xList.get(i), yList.get(j), x0, y0,
+                                     mergedPairs)) {
               return false;
             }
           }
         }
       }
-
       return true;
     }
 
