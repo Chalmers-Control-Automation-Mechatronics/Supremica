@@ -232,7 +232,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "IPC";
-    runSynthesizer(group, subdir, name, true);// *
+    runSynthesizer(group, subdir, name, true);
   }
 
   public void testManufacturingSystem() throws Exception
@@ -240,7 +240,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "manufacturing_system";
-    runSynthesizer(group, subdir, name, true);// *
+    runSynthesizer(group, subdir, name, true);
   }
 
   public void testManWolf() throws Exception
@@ -336,7 +336,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "robot_assembly_cell";
-    runSynthesizer(group, subdir, name, true);// *
+    runSynthesizer(group, subdir, name, true);
   }
 
   public void testSajed() throws Exception
@@ -352,7 +352,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "simple_manufacturing_system";
-    runSynthesizer(group, subdir, name, true);// *
+    runSynthesizer(group, subdir, name, true);
   }
 
   public void testSmallFactory2() throws Exception
@@ -448,7 +448,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "three_robot";
-    runSynthesizer(group, subdir, name, true);// *
+    runSynthesizer(group, subdir, name, true);
   }
 
   public void testZeroSup() throws Exception
@@ -467,7 +467,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "aip0sub1p1";
-    runSynthesizer(group, subdir, name, true);// *
+    runSynthesizer(group, subdir, name, true);
   }
 
   public void testKoordWspSynth() throws Exception

@@ -34,6 +34,9 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -134,9 +137,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     try {
       setUp();
-      listX1 = 0;
-      listY1 = 0;
-      total = 0;
       // initial search
       while (!mGlobalStack.isEmpty()) {
         final int[] sentinel = new int[1];
@@ -197,7 +197,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       do {
         // mark non-coreachable states (trim)
         mNonCoreachableStates.set(0, mNumStates);
-        tuples: for (int t = 0; t < mStateTuples.size(); t++) {
+        tuples: for (int t = 0; t < mNumStates; t++) {
           if (!mBadStates.get(t)) {
             final int[] tuple = new int[mNumAutomata];
             final int[] encodedTuple = mStateTuples.get(t);
@@ -224,7 +224,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         // mark uncontrollable states
         mMustContinue = false;
         mUnvisited.clear();
-        for (int state = 0; state < mStateTuples.size(); state++) {
+        for (int state = 0; state < mNumStates; state++) {
           if (!mBadStates.get(state) && mNonCoreachableStates.get(state)) {
             mBadStates.set(state);
             mUnvisited.offer(mStateTuples.get(state));
@@ -255,6 +255,15 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
       if (getConstructsResult()) {
         final AutomatonProxy aut;
+        mTransitionRelation =
+          new ListBufferTransitionRelation(
+                                           "rel",
+                                           ComponentKind.SUPERVISOR,
+                                           mNumProperEvents,
+                                           mCurrentPropositions.size(),
+                                           mNumStates,
+                                           ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        mPreTransitionBuffer.addOutgoingTransitions(mTransitionRelation);
         if (mSupervisorReductionEnabled) {
           mReduction.mainProcedure();
           aut = mReduction.createReducedAutomaton();
@@ -591,6 +600,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
     mIndexAutomata[mNumInts] = mNumAutomata;
 
+    mPreTransitionBuffer =
+      new PreTransitionBuffer(mNumEvents, getTransitionLimit());////////////////////////////////////////////////
+
     mCtrlInitialReachabilityExplorer =
       new CtrlInitialReachabilityExplorer(mEventAutomata, mTransitions,
                                           mNDTuple, mNumUncontrollableEvents,
@@ -613,7 +625,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mFinalReachabilityExplorer =
       new FinalReachabilityExplorer(mEventAutomata, mTransitions,
                                     mNDTupleFinal, 0, mNumProperEvents - 1);
-    mReduction = new Reduction(mTransitions);
+    mReduction = new Reduction();
   }
 
   @Override
@@ -1198,21 +1210,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         source = mGlobalVisited.get(encode(decodedSource));
       }
       final int target = mGlobalVisited.get(encode(mTargetTuple));
-      //if (mBadStates.get(target)) {
-      //return true;
-      //} else if (mReachableStates.get(target)) {
-      //addTransition(source, event, target);
-      //} else {
-      //addTransition(source, event, target);
-      //mUnvisited.offer(mStateTuples.get(target));
-      //mReachableStates.set(target);
-      //}
       if (!mBadStates.get(target) && !mReachableStates.get(target)) {
         mUnvisited.offer(mStateTuples.get(target));
         mReachableStates.set(target);
       }
       if (!isInitial) {
         addTransition(source, event, target);
+        mPreTransitionBuffer.addTransition(source, event, target);
       }
       return true;
     }
@@ -1277,11 +1281,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   //#########################################################################
   private class Reduction
   {
-    public Reduction(final int[][][][] transitions)
-    {
-      this.mmTransitions = transitions;
-    }
-
     public void setUpClasses()
     {
       mStateToClass = new int[mNumStates];
@@ -1338,7 +1337,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       //return checkMergibilityOld(x, y, x0, y0, mergedPairs);
     }
 
-    @SuppressWarnings("unused")
     public boolean checkMergibilityNew(final int x, final int y,
                                        final int x0, final int y0,
                                        final TLongHashSet mergedPairs)
@@ -1366,6 +1364,44 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final int[] listX = mShadowClasses.toArray(lx);
       final int[] listY = mShadowClasses.toArray(ly);
 
+      final TIntHashSet xSet = new TIntHashSet();
+      final TIntHashSet ySet = new TIntHashSet();
+      final TIntArrayList xList = new TIntArrayList();
+      final TIntArrayList yList = new TIntArrayList();
+
+      for(int e = mNumUncontrollableEvents; e < mNumProperEvents; e++){
+        xSet.clear();
+        ySet.clear();
+        xList.clear();
+        yList.clear();
+        //boolean enabled = false;
+        //boolean disabled = false;
+        for(final int xx : listX){
+          if(getSuccessorState(xx, e) != -1){
+            if(xSet.add(xx)){
+              xList.add(xx);
+            }
+          }
+        }
+        if (xList.isEmpty()) {
+          continue;
+        }
+        for(final int yy : listY){
+          if(getSuccessorState(yy, e) != -1){
+            if(ySet.add(yy)){
+              yList.add(yy);
+            }
+          }
+        }
+        for(int i = 0; i < xList.size(); i++){
+          for(int j = 0; j < yList.size(); j++){
+            if (!isInRelation(xList.get(i), yList.get(j))) {
+              return false;
+            }
+          }
+        }
+      }
+
       //merge shadow-classes [x1]' and [y1]';
       final int l = mergeLists(lx, ly, mShadowClasses);
       updateStateToClass(l, mShadowStateToClass, mShadowClasses);
@@ -1373,47 +1409,42 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final long pair = constructPair(x, y);
       mergedPairs.add(pair);
 
-      event: for (int event = 0; event < mNumProperEvents; event++) {
-        final TIntHashSet xSuccSet = new TIntHashSet();
-        final TIntHashSet ySuccSet = new TIntHashSet();
-        final TIntArrayList xSuccList = new TIntArrayList();
-        final TIntArrayList ySuccList = new TIntArrayList();
+      for (int event = 0; event < mNumProperEvents; event++) {
+        xSet.clear();
+        ySet.clear();
+        xList.clear();
+        yList.clear();
         for (final int xx : listX) {
-          final int xSucc = getSuccessorState(event, xx);
+          final int xSucc = getSuccessorState(xx, event);
           if (xSucc != -1 && mReachableStates.get(xSucc)) {
             final int xmin = getMinimum(xSucc);
-            if (xSuccSet.add(xmin)) {
-              xSuccList.add(xmin);
+            if (xSet.add(xmin)) {
+              xList.add(xmin);
             }
           }
         }
-        if(xSuccList.isEmpty()){
-          continue event;
+        if (xList.isEmpty()) {
+          continue;
         }
         for (final int yy : listY) {
-          final int ySucc = getSuccessorState(event, yy);
+          final int ySucc = getSuccessorState(yy, event);
           if (ySucc != -1 && mReachableStates.get(ySucc)) {
             final int ymin = getMinimum(ySucc);
-            if (ySuccSet.add(ymin)) {
-              ySuccList.add(ymin);
+            if (ySet.add(ymin)) {
+              yList.add(ymin);
             }
           }
         }
-        for (int i = 0; i < xSuccList.size(); i++) {
-          for (int j = 0; j < ySuccList.size(); j++) {
-            if (!checkMergibilityNew(xSuccList.get(i), ySuccList.get(j), x0, y0, mergedPairs)) {
+        for (int i = 0; i < xList.size(); i++) {
+          for (int j = 0; j < yList.size(); j++) {
+            if (!checkMergibilityNew(xList.get(i), yList.get(j), x0,
+                                     y0, mergedPairs)) {
               return false;
             }
           }
         }
       }
-      for (final int xx : listX) {
-        for (final int yy : listY) {
-          if (!isInRelation(xx, yy)) {
-            return false;
-          }
-        }
-      }
+
       return true;
     }
 
@@ -1458,8 +1489,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             return false;
           }
           for (int event = 0; event < mNumProperEvents; event++) {
-            final int xSucc = getSuccessorState(event, xx);
-            final int ySucc = getSuccessorState(event, yy);
+            final int xSucc = getSuccessorState(xx, event);
+            final int ySucc = getSuccessorState(yy, event);
             if ((xSucc != -1) && (ySucc != -1)
                 && (mReachableStates.get(xSucc))
                 && (mReachableStates.get(ySucc))) {
@@ -1476,12 +1507,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public boolean isInRelation(final int state1, final int state2)
     {
       for (int e = mNumUncontrollableEvents; e < mNumProperEvents; e++) {
-        final int state1Succ = getSuccessorState(e, state1);
-        final int state2Succ = getSuccessorState(e, state2);
-        if (state1Succ != -1 && state2Succ != -1) {
-          final boolean s1SuccBad = !mReachableStates.get(state1Succ);
-          final boolean s2SuccBad = !mReachableStates.get(state2Succ);
-          if ((s1SuccBad != s2SuccBad)) {
+        final int succ1 = getSuccessorState(state1, e);
+        final int succ2 = getSuccessorState(state2, e);
+        if (succ1 != -1 && succ2 != -1) {
+          if ((mReachableStates.get(succ1) != mReachableStates.get(succ2))) {
             return false;
           }
         }
@@ -1489,25 +1518,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return true;
     }
 
-    public int getSuccessorState(final int event, final int source)
+    public int getSuccessorState(final int source, final int event)
     {
-      final int[] sourceTuple = new int[mNumAutomata];
-      decode(mStateTuples.get(source), sourceTuple);
-      for (int aut = 0; aut < mNumAutomata; aut++) {
-        if (mmTransitions[aut][event] == null) {
-          mTargetTuple[aut] = sourceTuple[aut];
-        } else {
-          if (mmTransitions[aut][event][sourceTuple[aut]] == null) {
-            return -1;
-          } else {
-            mTargetTuple[aut] =
-              mmTransitions[aut][event][sourceTuple[aut]][0];
-          }
-        }
-      }
-      final int[] encoded = encode(mTargetTuple);
-      if (mGlobalVisited.contains(encoded)) {
-        return mGlobalVisited.get(encoded);
+      final TransitionIterator iter =
+        mTransitionRelation.createSuccessorsReadOnlyIterator();
+      iter.reset(source, event);
+      if (iter.advance()) {
+        return iter.getCurrentTargetState();
       } else {
         return -1;
       }
@@ -1581,7 +1598,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
     public int getMinimum(final int state)
     {
-      if (mShadowStateToClass == null || mShadowStateToClass[state] == IntListBuffer.NULL) {
+      if (mShadowStateToClass == null
+          || mShadowStateToClass[state] == IntListBuffer.NULL) {
         return mClasses.getFirst(mStateToClass[state]);
       } else {
         return mShadowClasses.getFirst(mShadowStateToClass[state]);
@@ -1715,8 +1733,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return factory.createAutomatonProxy(name, kind, events, states,
                                           transitions);
     }
-
-    int[][][][] mmTransitions;
   }
 
   //#########################################################################
@@ -1778,6 +1794,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private StateExplorer mFinalReachabilityExplorer;
   private StateExplorer mCoreachabilityExplorer;
   private StateExplorer mSuccessorStatesExplorer;
+  private PreTransitionBuffer mPreTransitionBuffer;
+  private ListBufferTransitionRelation mTransitionRelation;
 
   private int[] mStateToClass;
   private IntListBuffer mClasses;
@@ -1789,11 +1807,4 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
   private static final int SIZE_INT = 32;
-
-  @SuppressWarnings("unused")
-  private int listX1;
-  @SuppressWarnings("unused")
-  private int listY1;
-  @SuppressWarnings("unused")
-  private int total;
 }
