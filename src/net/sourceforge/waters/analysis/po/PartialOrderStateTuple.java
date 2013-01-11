@@ -15,7 +15,7 @@ import java.util.Arrays;
 /**
  * <P>Encoded synchronized state tuple.</P>
  *
- * @author Peter Yunil Park
+ * @author Adrian Shaw
  */
 
 public class PartialOrderStateTuple
@@ -30,6 +30,8 @@ public class PartialOrderStateTuple
   public PartialOrderStateTuple(final int size)
   {
     mStateCodes = new int[size];
+    mMayNeedExpansion = false;
+    mFullyExpand = false;
     mVisited = false;
   }
 
@@ -62,6 +64,30 @@ public class PartialOrderStateTuple
     return mStateCodes[index];
   }
 
+  public void setMayNeedExpansion(final boolean expand){
+    mMayNeedExpansion = expand;
+  }
+
+  public boolean mayNeedExpansion(){
+    return mMayNeedExpansion;
+  }
+
+  public void setFullyExpand(final boolean expand){
+    mFullyExpand = expand;
+  }
+
+  public boolean FullyExpand(){
+    return mFullyExpand;
+  }
+
+  public void setPred(final PartialOrderStateTuple pred){
+    mPred = pred;
+  }
+
+  public PartialOrderStateTuple getPred(){
+    return mPred;
+  }
+
   public void setVisited(final boolean visited){
     mVisited = visited;
   }
@@ -69,7 +95,6 @@ public class PartialOrderStateTuple
   public boolean getVisited(){
     return mVisited;
   }
-
 
   //#########################################################################
   //# Overrides for Baseclass java.lang.Object
@@ -106,6 +131,9 @@ public class PartialOrderStateTuple
   //#########################################################################
   //# Data Members
   private final int mStateCodes[];
+  private boolean mMayNeedExpansion;
+  private boolean mFullyExpand;
   private boolean mVisited;
+  private PartialOrderStateTuple mPred;
 
 }
