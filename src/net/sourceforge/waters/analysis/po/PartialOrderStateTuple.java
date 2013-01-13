@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.po;
 
+import gnu.trove.TIntArrayList;
 import java.util.Arrays;
 
 
@@ -33,6 +34,8 @@ public class PartialOrderStateTuple
     mMayNeedExpansion = false;
     mFullyExpand = false;
     mVisited = false;
+
+    mMark = new TIntArrayList();
   }
 
   /**
@@ -128,6 +131,21 @@ public class PartialOrderStateTuple
   }
 
 
+  public int[] getAmple()
+  {
+    return mAmple;
+  }
+
+  public void setAmple(final int[] ample)
+  {
+    mAmple = ample;
+  }
+
+  public TIntArrayList getMark()
+  {
+    return mMark;
+  }
+
   //#########################################################################
   //# Data Members
   private final int mStateCodes[];
@@ -136,4 +154,6 @@ public class PartialOrderStateTuple
   private boolean mVisited;
   private PartialOrderStateTuple mPred;
 
+  private int[] mAmple;
+  private TIntArrayList mMark;
 }

@@ -413,7 +413,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
       mStateTupleSize = cp + 1;
 
-      if (isControllableReduced(mSystemState)) {
+      if (isControllableReduced2(mSystemState)) {
         return setSatisfiedResult();
       } else {
         convertToBredthFirst();
@@ -546,6 +546,90 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
 
   //#########################################################################
   //# Auxiliary Methods
+  private boolean isControllableReduced2(final int[] sState) throws AnalysisException{
+    mStack = new ArrayList<PartialOrderStateTuple>();
+    final TIntHashSet stackSet = new TIntHashSet();
+    mStateSet = new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
+    mSuccessor = new int[mNumAutomata];
+    mInitialState = new PartialOrderStateTuple(mStateTupleSize);
+    encode(sState, mInitialState);
+
+    mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
+    mStateSet.getOrAdd(mInitialState);
+    mStack.add(mInitialState);
+    stackSet.add(mInitialState.hashCode());
+
+    int[] newAmple;
+    if ((newAmple = ample3(mInitialState)) == null){
+      return false;
+    }
+    mInitialState.setAmple(newAmple);
+
+    PartialOrderStateTuple current;
+
+    int i;
+
+    while(!mStack.isEmpty()){
+      current = mStack.get(mStack.size() - 1);
+
+      final int[] mark = current.getMark().toNativeArray();
+      final TIntHashSet markSet = new TIntHashSet(mark);
+      final TIntHashSet ampleSet = new TIntHashSet(current.getAmple());
+      if (markSet.containsAll(current.getAmple())){
+        final PartialOrderStateTuple temp = mStack.remove(mStack.size() - 1);
+        stackSet.remove(temp.hashCode());
+      }
+      else{
+        ampleSet.removeAll(mark);
+        int event = 0;
+        final int[] ample = current.getAmple();
+        for (i = 0; i < ample.length; i++){
+          if (ampleSet.contains(ample[i])){
+            event = ample[i];
+            break;
+          }
+        }
+        current.getMark().add(event);
+        decode(current,mSystemState);
+        for (i = 0; i < mNumAutomata; i++){
+          final boolean plant = i < mNumPlants;
+          final int si = i - mNumPlants;
+          if ((plant ?
+              mPlantEventList.get(i)[event]:mSpecEventList.get(si)[event]) != 1){
+            mSuccessor[i] = mSystemState[i];
+          }
+          else {
+            mSuccessor[i] = plant ? mPlantTransitionMap.get(i)[mSystemState[i]][event] :
+              mSpecTransitionMap.get(si)[mSystemState[i]][event];
+          }
+        }
+        encode(mSuccessor, mStateTuple);
+        final PartialOrderStateTuple found = mStateSet.getOrAdd(mStateTuple);
+        if (found == null) {
+          mStack.add(mStateTuple);
+          stackSet.add(mStateTuple.hashCode());
+          if ((newAmple = ample3(mStateTuple)) == null){
+            return false;
+          }
+          mStateTuple.setAmple(newAmple);
+          if (mStack.size() > getNodeLimit()) {
+            throw new OverflowException(getNodeLimit());
+          } else {
+            checkAbort();
+          }
+        }
+        else{
+          if (stackSet.contains(found.hashCode())){
+            current.setAmple(enabled(current));
+          }
+        }
+        mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
+      }
+    }
+    return true;
+  }
+
+  @SuppressWarnings("unused")
   private boolean isControllableReduced(final int[] sState) throws AnalysisException{
     mStack = new ArrayList<PartialOrderStateTuple>();
     mStateSet = new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
@@ -741,11 +825,11 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
             encode(mSuccessor, mStateTuple);
             if (localStateSet.getOrAdd(mStateTuple) == null) {
               stack.add(mStateTuple);
-              mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
               if (stack.size() > MAXDEPTH){
                 continue ample;
               }
             }
+            mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
           }
         }
         break;
@@ -803,6 +887,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
 
     return buildIntArray(ample);
   }
+
   private int[] ample3(final PartialOrderStateTuple current){
     final int[] enabled = enabled(current);
     if (enabled == null){
@@ -1149,7 +1234,6 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
 
   //Stacks
   private List<PartialOrderStateTuple> mStack;
-  private List<PartialOrderStateTuple> mBacktrace;
 
   // For encoding/decoding
   private AutomatonProxy[] mAutomata;
