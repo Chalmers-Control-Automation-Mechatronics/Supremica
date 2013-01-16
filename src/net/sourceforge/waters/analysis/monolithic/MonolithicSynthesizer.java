@@ -25,13 +25,13 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Deque;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
@@ -318,7 +318,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                 .createOneStateAutomaton(mReduction.mDisabledEventList);
           } else {
             mReduction.mainProcedure();
-            aut = mReduction.createReducedAutomaton();
+            mReduction.mergeTransitionRelation();
+            Collection<EventProxy> events = new ArrayList<EventProxy>();
+            for (int i = 0; i < mEvents.length; i++) {
+              events.add(mEvents[i]);
+            }
+            EventEncoding eventEnc =
+              new EventEncoding(events, getKindTranslator());
+            aut = mTransitionRelation.createAutomaton(getFactory(), eventEnc);
           }
         } else {
           aut = createAutomaton();
@@ -1622,6 +1629,36 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return pair;
     }
 
+    public void mergeTransitionRelation()
+    {
+      // set initial and reachable states
+      for (int i = 0; i < mNumInitialStates; i++) {
+        mTransitionRelation.setInitial(i, true);
+      }
+      mTransitionRelation.setReachable(mNumGoodStates, false);
+      //remove all transitions that go to the bad state
+      TransitionIterator iter =
+        mTransitionRelation.createAllTransitionsModifyingIterator();
+      while (iter.advance()) {
+        int to = iter.getCurrentTargetState();
+        if (to == mNumGoodStates) {
+          iter.remove();
+        }
+      }
+      // build integer array list of state partition
+      List<int[]> mergedStates = new ArrayList<int[]>();
+      for (int i = 0; i < mNumGoodStates; i++) {
+        int listID = mStateToClass[i];
+        if (mClasses.getFirst(listID) == i) {
+          int[] states = mClasses.toArray(listID);
+          mergedStates.add(states);
+        }
+      }
+
+      mTransitionRelation.merge(mergedStates);
+    }
+
+    @SuppressWarnings("unused")
     private AutomatonProxy createReducedAutomaton()
     {
       final int numEvents = mNumEvents + mCurrentPropositions.size();
@@ -1851,12 +1888,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private int[] mShadowStateToClass;
   private IntListBuffer mShadowClasses;
   private Reduction mReduction;
-  private Collection<AutomatonProxy> mAutomataList;
 
   private int mNumGoodStates;
   private BitSet mGoodStates;
   private int[] mStateMap;
-  private StateProxy mBadState;
 
   //#########################################################################
   //# Class Constants
