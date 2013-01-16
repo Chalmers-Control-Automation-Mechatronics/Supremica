@@ -24,12 +24,11 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Deque;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
@@ -59,6 +58,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.apache.log4j.Logger;
 
 
@@ -1851,12 +1851,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private int[] mShadowStateToClass;
   private IntListBuffer mShadowClasses;
   private Reduction mReduction;
-  private Collection<AutomatonProxy> mAutomataList;
 
   private int mNumGoodStates;
   private BitSet mGoodStates;
   private int[] mStateMap;
-  private StateProxy mBadState;
+
 
   //#########################################################################
   //# Class Constants
