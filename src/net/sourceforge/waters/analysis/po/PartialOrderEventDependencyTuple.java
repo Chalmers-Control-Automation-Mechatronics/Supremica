@@ -14,6 +14,9 @@ public class PartialOrderEventDependencyTuple
    public int getCoupling(){
      return mDependencyCoupling;
    }
+   public String toString(){
+     return String.valueOf(mDependencyCoupling);
+   }
 
   private final int mDependencyCoupling;
   private final PartialOrderEventDependencyKind mDependencyKind;
