@@ -14,7 +14,6 @@ import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TLongHashSet;
 import gnu.trove.TLongIterator;
-import gnu.trove.TObjectHashingStrategy;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
 
@@ -51,7 +50,6 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
@@ -308,9 +306,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       if (getConstructsResult()) {
         AutomatonProxy aut = null;
         ProductDESProxy des = null;
-
-        //mSupervisorReductionEnabled = false;
-
+        
         if (mSupervisorReductionEnabled) {
           mAutomataList = new ArrayList<AutomatonProxy>();
           mReduction.setUpClasses();
@@ -324,7 +320,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             // monolithic reduction
             mReduction.mainProcedure(mReduction.mEventList);
             mReduction.mergeTransitionRelation(mTransitionRelation, true);
-            // modulla reduction
+            mTransitionRelation.removeProperSelfLoopEvents();
+            // modular reduction
             mReduction.setUpEventList();
             for (int i = 0; i < mReduction.mEventList.size(); i++) {
               ListBufferTransitionRelation copy =
@@ -337,7 +334,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
               mReduction.setUpClasses();
               mReduction.mainProcedure(e1);
               mReduction.mergeTransitionRelation(copy, false);
-              copy.setName("Supervisor_" + e1.get(0));
+              copy.removeProperSelfLoopEvents();
+              copy.setName("Supervisor_" + mEvents[e1.get(0)].getName());
               aut = copy.createAutomaton(getFactory(), getEventEncoding());
               mAutomataList.add(aut);
             }
@@ -1699,102 +1697,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
 
-    @SuppressWarnings("unused")
-    private AutomatonProxy createReducedAutomaton(int ctrlEvent)
-    {
-      final int numEvents = mNumEvents + mCurrentPropositions.size();
-      final Collection<EventProxy> events =
-        new ArrayList<EventProxy>(numEvents);
-      for (final EventProxy event : mEvents) {
-        if (event != null) {
-          events.add(event);
-        }
-      }
-      events.addAll(mCurrentPropositions);
-
-      final int numProps = mCurrentPropositions.size();
-      final List<StateProxy> states =
-        new ArrayList<StateProxy>(mNumGoodStates + 1);
-      final StateProxy[] stateArray = new StateProxy[mNumGoodStates + 1];
-      int mini = 0;
-      boolean initial = false;
-
-      for (int i = 0; i < mNumGoodStates; i++) {
-        final ReadOnlyIterator iter =
-          mClasses.createReadOnlyIterator(mStateToClass[i]);
-        iter.reset(mStateToClass[i]);
-        if (iter.advance()) {
-          final int firstElement = iter.getCurrentData();
-          if (firstElement == i) {
-            mini = firstElement;
-            initial = firstElement < mNumInitialStates;
-            final List<EventProxy> marking =
-              new ArrayList<EventProxy>(numProps);
-            do {
-              final int currentState = iter.getCurrentData();
-              for (final EventProxy prop : mCurrentPropositions) {
-                if (!mTransitionRelation.isMarked(currentState,
-                                                  mEventToIndex.get(prop))) {
-                  continue;
-                }
-                marking.add(prop);
-              }
-            } while (iter.advance());
-            Collections.sort(marking);
-            final List<EventProxy> unique = getUniqueMarking(marking);
-            final StateProxy state = new MemStateProxy(mini, unique, initial);
-            states.add(state);
-            stateArray[mini] = state;
-          }
-        }
-
-      }
-
-      final ProductDESProxyFactory factory = getFactory();
-      final ArrayList<TransitionProxy> transitions =
-        new ArrayList<TransitionProxy>(
-                                       mTransitionRelation
-                                         .getNumberOfTransitions());
-      final TransitionIterator iter =
-        mTransitionRelation.createAllTransitionsReadOnlyIterator();
-
-      final TObjectHashingStrategy<TransitionProxy> strategy =
-        ProductDESEqualityVisitor.getInstance().getTObjectHashingStrategy();
-      final THashSet<TransitionProxy> proxyHashSet =
-        new THashSet<TransitionProxy>(strategy);
-
-      while (iter.advance()) {
-        //source
-        int from = iter.getCurrentSourceState();
-        if (from == mNumGoodStates) {
-          continue;
-        }
-        from = getMinimum(from);
-        final StateProxy source = stateArray[from];
-        //event
-        int e = iter.getCurrentEvent();
-        final EventProxy event = mEvents[e];
-        //target
-        int to = iter.getCurrentTargetState();
-        if (to == mNumGoodStates) {
-          continue;
-        }
-        to = getMinimum(to);
-        final StateProxy target = stateArray[to];
-
-        final TransitionProxy proxy =
-          factory.createTransitionProxy(source, event, target);
-        if (proxyHashSet.add(proxy)) {
-          transitions.add(proxy);
-        }
-      }
-
-      final String name = computeOutputName() + "-event" + ctrlEvent;
-      final ComponentKind kind = ComponentKind.SUPERVISOR;
-      return factory.createAutomatonProxy(name, kind, events, states,
-                                          transitions);
-    }
-
     private AutomatonProxy createOneStateAutomaton(TIntArrayList eventList)
     {
       final Collection<EventProxy> events =
@@ -1813,9 +1715,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         new ArrayList<TransitionProxy>(1);
 
       final ProductDESProxyFactory factory = getFactory();
-      String name = "aut-event";
+      String name = "Supervisor_";
       for (int e = 0; e < eventList.size(); e++) {
-        name += mEvents[eventList.get(e)] + ".";
+        name += mEvents[eventList.get(e)].getName() + ";";
       }
       final ComponentKind kind = ComponentKind.SUPERVISOR;
       return factory.createAutomatonProxy(name, kind, events, states,
