@@ -35,7 +35,7 @@ public class PartialOrderStateTuple
     mFullyExpand = false;
     mVisited = false;
 
-    mMark = new TIntArrayList();
+    //mMark = new TIntArrayList();
   }
 
   /**
@@ -131,7 +131,7 @@ public class PartialOrderStateTuple
   }
 
 
-  public int[] getAmple()
+  /*public int[] getAmple()
   {
     return mAmple;
   }
@@ -144,7 +144,7 @@ public class PartialOrderStateTuple
   public TIntArrayList getMark()
   {
     return mMark;
-  }
+  }*/
 
   //#########################################################################
   //# Data Members
@@ -154,6 +154,6 @@ public class PartialOrderStateTuple
   private boolean mVisited;
   private PartialOrderStateTuple mPred;
 
-  private int[] mAmple;
-  private TIntArrayList mMark;
+  //private int[] mAmple;
+  //private TIntArrayList mMark;
 }

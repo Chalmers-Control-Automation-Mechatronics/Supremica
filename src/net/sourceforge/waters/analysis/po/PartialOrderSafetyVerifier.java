@@ -549,7 +549,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
 
   //#########################################################################
   //# Auxiliary Methods
-  @SuppressWarnings("unused")
+  /*@SuppressWarnings("unused")
   private boolean isControllableReduced2(final int[] sState) throws AnalysisException{
     mStack = new ArrayList<PartialOrderStateTuple>();
     final THashSet<PartialOrderStateTuple> stackSet = new THashSet<PartialOrderStateTuple>();
@@ -630,12 +630,14 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
     }
     return true;
-  }
+  }*/
 
   private boolean isControllableReduced(final int[] sState) throws AnalysisException{
     mStack = new ArrayList<PartialOrderStateTuple>();
     mStateSet = new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
+    mLocalSet = new TIntHashSet();
     mSuccessor = new int[mNumAutomata];
+    
     final PartialOrderStateTuple dummy = new PartialOrderStateTuple(0);
     mInitialState = new PartialOrderStateTuple(mStateTupleSize);
     encode(sState, mInitialState);
@@ -648,6 +650,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     backtrace.add(dummy);
     PartialOrderStateTuple pred;
     PartialOrderStateTuple current;
+    //mFullyExpanded = new THashSet<PartialOrderStateTuple>();
 
     while(true){
       if (mStack.isEmpty()){
@@ -722,6 +725,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       else{
         if (found.mayNeedExpansion()){
           found.setFullyExpand(true);
+          //mFullyExpanded.add(found);
         }
       }
     }
@@ -860,16 +864,12 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         continue;
       }
       final TIntArrayList dependentNonEnabled = new TIntArrayList();
-      //final TIntArrayList eventsSetMinusAmple = new TIntArrayList();
+     
       ample.add(enabled[next]);
       ampleSet.add(enabled[next]);
       considered.add(enabled[next]);
       next++;
-      /*for (j = 0; j < mEventCodingList.size(); j++){
-        if (!ampleSet.contains(j)){
-          eventsSetMinusAmple.add(j);
-        }
-      }*/      
+          
       for (j = 0; j < mEventCodingList.size(); j++){
         if (!ampleSet.contains(j)){     
           final BitSet ampleDependencies = new BitSet(mNumEvents);
@@ -901,7 +901,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       for (j = 0; j < ample.size(); j++){
         unionSet.add(ample.get(j));
       }
-      final TIntHashSet eventsSetMinusUnion = new TIntHashSet();
+      final TIntArrayList eventsSetMinusUnion = new TIntArrayList();
       for (j = 0; j < mEventCodingList.size(); j++){
         if (!unionSet.contains(j)){
           eventsSetMinusUnion.add(j);
@@ -929,50 +929,47 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
       return ample.toNativeArray();
     }
+    //mFullyExpanded.add(current);
     return enabled;
   }
 
   private boolean canBecomeEnabled(final PartialOrderStateTuple current,
-                                   final int dependent, final TIntHashSet unionList,
+                                   final int dependent, final TIntArrayList unionList,
                                    final int automatonIndex){
     final boolean plant = automatonIndex < mNumPlants;
     final int si = automatonIndex - mNumPlants;
 
     final int[][] transMap = plant ? mPlantTransitionMap.get(automatonIndex):
       mSpecTransitionMap.get(si);
-    final TIntArrayList stack = new TIntArrayList();
-    final int[] ampleState = new int[mNumAutomata];
-    final TIntHashSet localStateSet = new TIntHashSet();
+    final TIntArrayList stack = new TIntArrayList();    
+    final int[] ampleState = new int[mNumAutomata];   
 
     decode(current,ampleState);
     stack.add(ampleState[automatonIndex]);
+    mLocalSet.add(ampleState[automatonIndex]);
 
-    int e, temp,successor;
+    int e, temp;
 
     while(stack .size() > 0){
       final int stateIndex = stack.remove(stack.size() - 1);
-      events:
-      for (e = 0; e < mNumEvents; e++){
-        if ((temp = transMap[stateIndex][e]) != -1){
-          successor = temp;
-        }
-        else{
-          continue events;
-        }
-        if (e == dependent){
-          return true;
-        }
-        if (!unionList.contains(e)){
-          continue events;
-        }
-        if (localStateSet.add(successor)) {
-          stack.add(successor);
-        }
+      if(transMap[stateIndex][dependent] != -1){
+        mLocalSet.clear();
+        return true;
+      }      
+      for (e = 0; e < unionList.size(); e++){
+        int event = unionList.get(e);
+        if ((temp = transMap[stateIndex][event]) != -1){
+          if (mLocalSet.add(temp)){
+            stack.add(temp);
+          }
+        }       
       }
     }
+    mLocalSet.clear();
     return false;
   }
 
+  @SuppressWarnings("unused")
   private void orderStutterEvents(final int[] events){
     final TIntArrayList stutter = new TIntArrayList();
     final TIntArrayList nonStutter = new TIntArrayList();
@@ -1038,7 +1035,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         mIndexList.add(mStateList.size());
       }
     }
-    assert false;  // could not find error state ???
+    assert false;
   }
 
   private SafetyTraceProxy computePOCounterExample() throws AbortException
@@ -1189,10 +1186,12 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   // Level states storage
   private List<Integer> mIndexList;
   private List<PartialOrderStateTuple> mStateList;
-  private StateHashSet<PartialOrderStateTuple> mStateSet;
+  //private THashSet<PartialOrderStateTuple> mFullyExpanded; 
 
-  //Stacks
+  //Stacks and sets
   private List<PartialOrderStateTuple> mStack;
+  private StateHashSet<PartialOrderStateTuple> mStateSet;
+  private TIntHashSet mLocalSet;
 
   // For encoding/decoding
   private AutomatonProxy[] mAutomata;
