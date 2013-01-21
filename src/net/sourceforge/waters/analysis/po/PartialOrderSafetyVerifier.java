@@ -771,12 +771,14 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     if (enabled == null){
       return null;
     }
-    //orderStutterEvents(enabled);
+    if (enabled.length == 1){
+      return enabled;
+    }
+    
     final TIntArrayList ample = new TIntArrayList();
     final TIntHashSet ampleSet = new TIntHashSet();
     final BitSet ampleDependencies = new BitSet(mNumEvents);
-    //boolean nonStutterAdded = false;
-
+    
     int i, temp, e;
     int next = 0;
     final int[] ampleState = new int[mNumAutomata];
@@ -787,62 +789,58 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       final int ampleCandidate = enabled[next];
       ample.add(ampleCandidate);
       ampleSet.add(ampleCandidate);
+      if (ampleSet.containsAll(enabled)){
+        return enabled;
+      }
       for (final PartialOrderEventDependencyTuple t :
         mReducedEventDependencyMap[ampleCandidate]){
         ampleDependencies.set(t.getCoupling());
       }
       next++;
-      //final int eventIndex = ample.get(ample.size() - 1);
-     /* if (mPartialOrderEvents[eventIndex].getStutter() !=
-        PartialOrderEventStutteringKind.STUTTERING){
-        nonStutterAdded = true;
-        break;
-      }
-      else{*/
-        final List<PartialOrderStateTuple> stack = new ArrayList<PartialOrderStateTuple>();
-        final StateHashSet<PartialOrderStateTuple> localStateSet =
-          new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
-        stack.add(current);
-        while(stack .size() > 0){
-          final PartialOrderStateTuple newCurrent = stack.remove(stack.size() - 1);
-          decode(newCurrent,ampleState);
-          events:
-          for (e = 0; e < mNumEvents; e++){
-            for (i = 0; i < mNumAutomata; i++){
-              final boolean plant = i < mNumPlants;
-              final int si = i - mNumPlants;
-              if ((plant ?
-                mPlantEventList.get(i)[e]:mSpecEventList.get(si)[e]) != 1){
-                mSuccessor[i] = ampleState[i];
-              }
-              else if ((temp = plant ? mPlantTransitionMap.get(i)[ampleState[i]][e] :
-                mSpecTransitionMap.get(si)[ampleState[i]][e]) != -1){
-                mSuccessor[i] = temp;
-              }
-              else{
-                continue events;
-              }
+     
+      final List<PartialOrderStateTuple> stack = new ArrayList<PartialOrderStateTuple>();
+      final StateHashSet<PartialOrderStateTuple> localStateSet =
+        new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
+      stack.add(mInitialState);
+      localStateSet.getOrAdd(mInitialState);
+      while(stack .size() > 0){
+        final PartialOrderStateTuple newCurrent = stack.remove(stack.size() - 1);
+        decode(newCurrent,ampleState);
+        events:
+        for (e = 0; e < mNumEvents; e++){
+          for (i = 0; i < mNumAutomata; i++){
+            final boolean plant = i < mNumPlants;
+            final int si = i - mNumPlants;
+            if ((plant ?
+              mPlantEventList.get(i)[e]:mSpecEventList.get(si)[e]) != 1){
+              mSuccessor[i] = ampleState[i];
             }
-            if (ampleSet.contains(e)){
+            else if ((temp = plant ? mPlantTransitionMap.get(i)[ampleState[i]][e] :
+              mSpecTransitionMap.get(si)[ampleState[i]][e]) != -1){
+              mSuccessor[i] = temp;
+            }
+            else{
               continue events;
             }
-            if (ampleDependencies.get(e)){
+          }
+          if (ampleSet.contains(e)){
+            continue events;
+          }
+          if (ampleDependencies.get(e)){
+            continue ample;
+          }
+          encode(mSuccessor, ampleStateTuple);
+          if (localStateSet.getOrAdd(ampleStateTuple) == null) {
+            stack.add(ampleStateTuple);
+            if (stack.size() > MAXDEPTH){
               continue ample;
             }
-            encode(mSuccessor, ampleStateTuple);
-            if (localStateSet.getOrAdd(ampleStateTuple) == null) {
-              stack.add(ampleStateTuple);
-              if (stack.size() > MAXDEPTH){
-                continue ample;
-              }
-            }
-            ampleStateTuple = new PartialOrderStateTuple(mStateTupleSize);
           }
+          ampleStateTuple = new PartialOrderStateTuple(mStateTupleSize);
         }
-        break;
       }
-    //}
-    //return nonStutterAdded ? enabled : ample.toNativeArray();
+      break;
+    }
     return ample.toNativeArray();
   }
 
