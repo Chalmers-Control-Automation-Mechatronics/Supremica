@@ -321,12 +321,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             // create monolithic supervisor
             mReduction.mainProcedure(mReduction.mEventList);
             mReduction.mergeTransitionRelation(mTransitionRelation, true);
-            //mReduction.mergeTransitionRelation(mTransitionRelation, false);// @@@
-            mTransitionRelation.removeProperSelfLoopEvents();
-            monoAut =
-              mTransitionRelation.createAutomaton(getFactory(),
-                                                  getEventEncoding());
-            //mAutomataList.add(monoAut);// @@@
             // reduce to a smaller supervisor for each important controllable event
             mReduction.setUpEventList();
             int i = 0;
@@ -338,14 +332,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
               TIntArrayList e1 = new TIntArrayList();
               e1.add(mReduction.mEventList.get(i));
               mReduction.setUpClasses();
-              mReduction.mainProcedure(e1);
-              /*if (!mReduction.mainProcedure(e1)) {
+              if (!mReduction.mainProcedure(e1)) {
                 mAutomataList.clear();
+                mReduction.removeBadStateTransitions(mTransitionRelation);
+                mTransitionRelation.setReachable(mNumGoodStates, false);
+                monoAut =
+                  mTransitionRelation.createAutomaton(getFactory(),
+                                                      getEventEncoding());
                 mAutomataList.add(monoAut);
                 break;
-              }*/
+              }
               mReduction.mergeTransitionRelation(copy, false);
-              copy.removeProperSelfLoopEvents();
               copy.setName("Supervisor_" + mEvents[e1.get(0)].getName());
               aut = copy.createAutomaton(getFactory(), getEventEncoding());
               mAutomataList.add(aut);
@@ -1719,7 +1716,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       for (int i = 0; i < mNumInitialStates; i++) {
         rel.setInitial(i, true);
       }
-      rel.setReachable(mNumGoodStates, false);
       if (!isMonolithic) {
         removeBadStateTransitions(rel);
       }
@@ -1739,6 +1735,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         mergedStates.add(states);
       }
       rel.merge(mergedStates);
+      rel.removeProperSelfLoopEvents();
     }
 
     public void removeBadStateTransitions(final ListBufferTransitionRelation rel)
