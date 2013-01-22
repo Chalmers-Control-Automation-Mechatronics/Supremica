@@ -140,7 +140,7 @@ public class IsomorphismChecker
    * @param  aut2   The second automaton to be compared.
    * @throws AnalysisException if the input automata are not isomorphic.
    */
-  public void checkBisimulation(final AutomatonProxy aut1,
+  public boolean checkBisimulation(final AutomatonProxy aut1,
                                 final AutomatonProxy aut2)
     throws AnalysisException
   {
@@ -161,12 +161,14 @@ public class IsomorphismChecker
         (ObservationEquivalenceTRSimplifier.TransitionRemoval.NONE);
       final boolean result = bisimulator.run();
       if (!result) {
-        throw new IsomorphismException
-          ("Bisimulator did not identify any states!");
+        return false;
       }
       final List<int[]> partition = bisimulator.getResultPartition();
-      checkBisimulationPartition(partition, rel, stateEnc);
+      if(!checkBisimulationPartition(partition, rel, stateEnc)){
+        return false;
+      }
     }
+    return true;
   }
 
   /**
@@ -400,7 +402,7 @@ public class IsomorphismChecker
     }
   }
 
-  private void checkBisimulationPartition
+  private boolean checkBisimulationPartition
     (final List<int[]> partition,
      final ListBufferTransitionRelation rel,
      final StateEncoding enc)
@@ -421,13 +423,12 @@ public class IsomorphismChecker
         }
       }
       if (count[0] != count[1]) {
-        throw new IsomorphismException
-          ("Automata contain non-bisimilar states!");
+        return false;
       } else if (initCount[0] != initCount[1]) {
-        throw new IsomorphismException
-          ("Initial states do not match!");
+        return false;
       }
     }
+    return true;
   }
 
   private StateProxy getAltState(final StateProxy state, final int index)

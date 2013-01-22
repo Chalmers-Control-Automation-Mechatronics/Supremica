@@ -40,6 +40,7 @@ import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.ProxyResult;
@@ -304,40 +305,71 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mReachableStates = null;
 
       if (getConstructsResult()) {
+        AutomatonProxy monoAut = null;
         AutomatonProxy aut = null;
         ProductDESProxy des = null;
-        
+
         if (mSupervisorReductionEnabled) {
           mAutomataList = new ArrayList<AutomatonProxy>();
           mReduction.setUpClasses();
-          mReduction.setUpEventList();
-          if (mReduction.mEventList.size() == 0) {
-            aut =
+          if (mReduction.setUpEventList() == 0) {
+            monoAut =
               mReduction
                 .createOneStateAutomaton(mReduction.mDisabledEventList);
-            des = AutomatonTools.createProductDESProxy(aut, getFactory());
+            des = AutomatonTools.createProductDESProxy(monoAut, getFactory());
           } else {
-            // monolithic reduction
+            // create monolithic supervisor
             mReduction.mainProcedure(mReduction.mEventList);
             mReduction.mergeTransitionRelation(mTransitionRelation, true);
+            //mReduction.mergeTransitionRelation(mTransitionRelation, false);// @@@
             mTransitionRelation.removeProperSelfLoopEvents();
-            // modular reduction
+            monoAut =
+              mTransitionRelation.createAutomaton(getFactory(),
+                                                  getEventEncoding());
+            //mAutomataList.add(monoAut);// @@@
+            // reduce to a smaller supervisor for each important controllable event
             mReduction.setUpEventList();
-            for (int i = 0; i < mReduction.mEventList.size(); i++) {
+            int i = 0;
+            for (i = 0; i < mReduction.mEventList.size(); i++) {
               ListBufferTransitionRelation copy =
                 new ListBufferTransitionRelation(
                                                  mTransitionRelation,
                                                  ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-              int e = mReduction.mEventList.get(i);
               TIntArrayList e1 = new TIntArrayList();
-              e1.add(e);
+              e1.add(mReduction.mEventList.get(i));
               mReduction.setUpClasses();
               mReduction.mainProcedure(e1);
+              /*if (!mReduction.mainProcedure(e1)) {
+                mAutomataList.clear();
+                mAutomataList.add(monoAut);
+                break;
+              }*/
               mReduction.mergeTransitionRelation(copy, false);
               copy.removeProperSelfLoopEvents();
               copy.setName("Supervisor_" + mEvents[e1.get(0)].getName());
               aut = copy.createAutomaton(getFactory(), getEventEncoding());
               mAutomataList.add(aut);
+            }
+
+            if (i == mReduction.mEventList.size()) {
+              IsomorphismChecker checker =
+                new IsomorphismChecker(getFactory(), false);
+              THashSet<AutomatonProxy> removeSet =
+                new THashSet<AutomatonProxy>();
+              for (int autom = 0; autom < mAutomataList.size() - 1; autom++) {
+                for (int auto = autom + 1; auto < mAutomataList.size(); auto++) {
+                  if (checker.checkBisimulation(mAutomataList.get(autom),
+                                                mAutomataList.get(auto))) {
+                    removeSet.add(mAutomataList.get(auto));
+                  }
+                }
+              }
+              for (int a = mAutomataList.size() - 1; a >= 0; a--) {
+                if (removeSet.contains(mAutomataList.get(a))) {
+                  removeSet.remove(mAutomataList.get(a));
+                  mAutomataList.remove(a);
+                }
+              }
             }
             des =
               AutomatonTools.createProductDESProxy("SUPERVISOR",
@@ -1371,40 +1403,61 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
 
-    public void setUpEventList()
+    public int setUpEventList()
     {
       mDisabledEventList.clear();
       mEventList.clear();
-      int[] eventMarker = new int[mNumProperEvents + 1];
+      TIntArrayList[] eventToDisabledStates =
+        new TIntArrayList[mNumProperEvents + 1];
+      TIntArrayList[] eventToEnabledStates =
+        new TIntArrayList[mNumProperEvents + 1];
       final TransitionIterator iterator =
         mTransitionRelation.createAllTransitionsReadOnlyIterator();
       iterator.resetEvents(mNumUncontrollableEvents + 1, mNumProperEvents);
       while (iterator.advance()) {
         int currentEvent = iterator.getCurrentEvent();
-        if (eventMarker[currentEvent] != DISABLED_ENABLED) {
-          int succ = iterator.getCurrentTargetState();
-          if (succ == mNumGoodStates) {
-            eventMarker[currentEvent] =
-              eventMarker[currentEvent] == ENABLED ? DISABLED_ENABLED
-                : DISABLED;
-          } else {
-            eventMarker[currentEvent] =
-              eventMarker[currentEvent] == DISABLED ? DISABLED_ENABLED
-                : ENABLED;
+        int succ = iterator.getCurrentTargetState();
+        int pre = iterator.getCurrentSourceState();
+        if (succ == mNumGoodStates) {
+          if (eventToDisabledStates[currentEvent] == null) {
+            eventToDisabledStates[currentEvent] = new TIntArrayList();
           }
+          eventToDisabledStates[currentEvent].add(pre);
+        } else {
+          if (eventToEnabledStates[currentEvent] == null) {
+            eventToEnabledStates[currentEvent] = new TIntArrayList();
+          }
+          eventToEnabledStates[currentEvent].add(pre);
+        }
+
+      }
+      for (int i = 0; i < mNumProperEvents; i++) {
+        for (int j = i + 1; j <= mNumProperEvents; j++) {
+          if (eventToDisabledStates[i] != null
+              && eventToEnabledStates[i] != null
+              && eventToDisabledStates[i].equals(eventToDisabledStates[j])
+              && eventToEnabledStates[i].equals(eventToEnabledStates[j])) {
+            eventToDisabledStates[j] = null;
+            eventToEnabledStates[j] = null;
+          }
+
         }
       }
       for (int e = mNumUncontrollableEvents + 1; e <= mNumProperEvents; e++) {
-        if (eventMarker[e] == DISABLED) {
-          mDisabledEventList.add(e);
-        } else if (eventMarker[e] == DISABLED_ENABLED) {
-          mEventList.add(e);
+        if (eventToDisabledStates[e] != null) {
+          if (eventToEnabledStates[e] != null) {
+            mEventList.add(e);
+          } else {
+            mDisabledEventList.add(e);
+          }
         }
       }
+      return mEventList.size();
     }
 
-    public void mainProcedure(final TIntArrayList ctrlEvents)
+    public boolean mainProcedure(final TIntArrayList ctrlEvents)
     {
+      boolean merged = false;
       for (int i = 0; i < mNumGoodStates - 1; i++) {
         if (i > getMinimum(i)) {
           continue;
@@ -1422,6 +1475,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
           if (checkMergibility(i, j, i, j, mergedPairs, ctrlEvents)) {
             merge(mergedPairs);
+            merged = true;
           }
 
           mergedPairs = null;
@@ -1429,6 +1483,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           mShadowStateToClass = null;
         }
       }
+      return merged;
     }
 
     public boolean checkMergibility(final int x, final int y, final int x0,
@@ -1841,7 +1896,4 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
   private static final int SIZE_INT = 32;
-  private final int DISABLED = 1;
-  private final int ENABLED = 2;
-  private final int DISABLED_ENABLED = 3;
 }
