@@ -350,7 +350,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
             if (i == mReduction.mEventList.size()) {
               IsomorphismChecker checker =
-                new IsomorphismChecker(getFactory(), false);
+                new IsomorphismChecker(getFactory(), false, false);
               THashSet<AutomatonProxy> removeSet =
                 new THashSet<AutomatonProxy>();
               for (int autom = 0; autom < mAutomataList.size() - 1; autom++) {
