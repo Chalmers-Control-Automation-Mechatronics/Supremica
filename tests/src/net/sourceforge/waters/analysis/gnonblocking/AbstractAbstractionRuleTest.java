@@ -50,7 +50,7 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mAbstractionRule = createAbstractionRule(factory);
     mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
-    mIsomorphismChecker = new IsomorphismChecker(factory, false);
+    mIsomorphismChecker = new IsomorphismChecker(factory, false, true);
   }
 
   protected void tearDown() throws Exception
