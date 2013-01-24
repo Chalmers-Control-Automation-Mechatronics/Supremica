@@ -44,9 +44,8 @@ public class NBAbstractionEnabledEventsStandardConflictCheckerTest
   {
     final EnabledEventsCompositionalConflictChecker checker =
       new EnabledEventsCompositionalConflictChecker(factory);
-    final AbstractionProcedure proc =
-      ConflictAbstractionProcedureFactory.NB.createAbstractionProecudure(checker);
-    checker.setAbstractionProcedure(proc);
+    checker.setAbstractionProcedureFactory
+      (ConflictAbstractionProcedureFactory.NB);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

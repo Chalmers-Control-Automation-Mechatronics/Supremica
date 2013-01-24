@@ -15,14 +15,13 @@ import gnu.trove.TIntHashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Arrays;
 
 import net.sourceforge.waters.analysis.monolithic.BlockedArrayList;
 import net.sourceforge.waters.analysis.monolithic.StateHashSet;
@@ -36,16 +35,17 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.apache.log4j.Logger;
 
 
