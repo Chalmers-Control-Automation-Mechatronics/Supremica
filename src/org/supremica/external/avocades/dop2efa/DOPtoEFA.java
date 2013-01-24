@@ -71,7 +71,7 @@ public class DOPtoEFA
 			machine = "no_machine";
 		}
 		
-		return buildModuleFromROP(rop,new Module(machine, false));
+		return buildModuleFromROP(rop,new Module(machine));
 	}
 	
 	/**
@@ -123,11 +123,11 @@ public class DOPtoEFA
 		}
 		
 		if(ropList == null || ropList.size() == 0){
-			return new Module(moduleName, false);
+			return new Module(moduleName);
 		}
 		
 		
-		module = new Module(moduleName, false);
+		module = new Module(moduleName);
 		
 		//does this first so they will be easy to find
 		//in Supremica then many ROP:s are being converted.
@@ -182,7 +182,7 @@ public class DOPtoEFA
 		}
 		
 		if(module == null){
-			module = new Module("module",false);
+			module = new Module("module");
 		}
 		
 		comment = rop.getComment(); 

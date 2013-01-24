@@ -43,10 +43,8 @@ public class NBAbstractionStandardConflictCheckerTest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalConflictChecker checker =
-      new CompositionalConflictChecker(factory);
-    final AbstractionProcedure proc =
-      ConflictAbstractionProcedureFactory.NB.createAbstractionProecudure(checker);
-    checker.setAbstractionProcedure(proc);
+      new CompositionalConflictChecker(factory,
+                                       ConflictAbstractionProcedureFactory.NB);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

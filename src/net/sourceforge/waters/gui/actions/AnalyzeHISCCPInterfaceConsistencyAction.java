@@ -10,11 +10,13 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
+import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCPInterfaceConsistencyChecker;
+import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
 import org.supremica.gui.ide.IDE;
 
 
@@ -25,7 +27,7 @@ import org.supremica.gui.ide.IDE;
  */
 
 public class AnalyzeHISCCPInterfaceConsistencyAction
-  extends WatersAnalyzeAction
+  extends WatersAnalyzeHISCAction
 {
 
   //#########################################################################
@@ -56,7 +58,16 @@ public class AnalyzeHISCCPInterfaceConsistencyAction
     (final ModelVerifierFactory factory,
      final ProductDESProxyFactory desFactory)
   {
-    return new HISCCPInterfaceConsistencyChecker(desFactory);
+    final ConflictChecker checker = factory.createConflictChecker(desFactory);
+    if (checker == null) {
+      return null;
+    } else {
+      final CompositionalSimplifier simplifier =
+        new CompositionalSimplifier(desFactory,
+                                    ConflictAbstractionProcedureFactory.NB);
+      return new HISCCPInterfaceConsistencyChecker
+        (desFactory, checker, simplifier);
+    }
   }
 
   @Override

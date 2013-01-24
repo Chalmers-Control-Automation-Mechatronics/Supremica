@@ -9,6 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntStack;
+
 import java.util.BitSet;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -152,29 +156,42 @@ public class SilentIncomingTRSimplifier
     if (keep.cardinality() == numStates) {
       return false;
     }
-    final TransitionIterator iter = rel.createSuccessorsModifyingIterator();
-    int source = 0;
+    final TransitionIterator reader = rel.createSuccessorsReadOnlyIterator();
+    final TransitionIterator writer = rel.createSuccessorsModifyingIterator();
+    final TIntArrayList targets = new TIntArrayList();
+    final TIntStack stack = new TIntStack();
     boolean modified = false;
-    main:
-      while (source < numStates) {
-        if (rel.isReachable(source)) {
-          checkAbort();
-          iter.reset(source, tauID);
-          while (iter.advance()) {
-            final int target = iter.getCurrentTargetState();
-            if (!keep.get(target)) {
-              iter.remove();
-              rel.copyOutgoingTransitions(target, source);
-              modified = true;
-              // After copying outgoing transitions from target to source,
-              // the source state may receive new tau-transitions. To make sure
-              // these are processed, we start checking the source state again.
-              continue main;
+    for (int source = 0; source < numStates; source++) {
+      if (rel.isReachable(source)) {
+        checkAbort();
+        final TIntHashSet visited = new TIntHashSet();
+        stack.push(source);
+        visited.add(source);
+        while (stack.size() > 0) {
+          final int current = stack.pop();
+          reader.reset(current, tauID);
+          while (reader.advance()) {
+            final int target = reader.getCurrentTargetState();
+            if (!keep.get(target) && visited.add(target)) {
+              stack.push(target);
+              targets.add(target);
             }
           }
         }
-        source++;
+        if (!targets.isEmpty()) {
+          rel.copyOutgoingTransitions(targets, source);
+          writer.reset(source, tauID);
+          while (writer.advance()) {
+            final int target = writer.getCurrentTargetState();
+            if (visited.contains(target)) {
+              writer.remove();
+            }
+          }
+          targets.clear();
+          modified = true;
+        }
       }
+    }
     if (modified) {
       applyResultPartitionAutomatically();
     }

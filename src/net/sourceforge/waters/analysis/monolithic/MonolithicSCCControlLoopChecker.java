@@ -266,29 +266,23 @@ public class MonolithicSCCControlLoopChecker
       final int bits = getBitLength(aProxy);
       mNumBits[counter] = bits;
       mNumBitsMasks[counter] = (1 << bits) - 1;
-      if (totalBits >= bits) { // if current buffer can store this automaton
-        totalBits -= bits;
-      }
-      else {
+      if (totalBits < bits) {
         mNumInts++;
         totalBits = SIZE_INT;
       }
+      totalBits -= bits;
       counter++;
     }
-
     // get index
-    counter = 0;
     totalBits = SIZE_INT;
     mIndexAutomata = new int[mNumInts + 1];
-    mIndexAutomata[0] = counter++;
+    counter = 1;
     for (int i = 0; i < mNumAutomata; i++) {
-      if (totalBits >= mNumBits[i]) {
-        totalBits -= mNumBits[i];
-      }
-      else {
+      if (totalBits < mNumBits[i]) {
         mIndexAutomata[counter++] = i;
         totalBits = SIZE_INT;
       }
+      totalBits -= mNumBits[i];
     }
     mIndexAutomata[mNumInts] = mNumAutomata;
 
@@ -363,7 +357,7 @@ public class MonolithicSCCControlLoopChecker
     }
 
     // create initial state tuple
-    mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
+    mGlobalStateSet = new StateHashSet<EncodedStateTuple>(EncodedStateTuple.class,SIZE_BUFFER);
     mInitialStateTuple = new int[mNumAutomata];
     int i = 0;
     for (final AutomatonProxy aProxy: mAutomataList) {
@@ -954,7 +948,7 @@ public class MonolithicSCCControlLoopChecker
   private ArrayList<ArrayList<TransitionProxy>> mTransitionList;
 
   /** a map of state tuple in synchronised model */
-  private StateHashSet mGlobalStateSet;
+  private StateHashSet<EncodedStateTuple> mGlobalStateSet;
 
   /** a list of unvisited state tuple. */
   private List<EncodedStateTuple> mUnvisitedList;

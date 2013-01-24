@@ -54,6 +54,8 @@ import java.util.*;
 
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.compositional.CompositionalSynthesizer;
+import net.sourceforge.waters.analysis.compositional.SynthesisAbstractionProcedureFactory;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -328,7 +330,66 @@ public class AutomataSynthesizer
 //
 
         }
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
+         else if (synthesizerOptions.getSynthesisAlgorithm() ==
+                  SynthesisAlgorithm.MONOLITHIC_WATERS)
+         {
+
+           final ProductDESProxyFactory factory =
+             ProductDESElementFactory.getInstance();
+           final KindTranslator translator;
+           final EventProxy marking;
+           switch (synthesizerOptions.getSynthesisType()) {
+           case NONBLOCKING:
+             translator = ControllableSynthesisKindTranslator.getInstance();
+             marking = null;
+             break;
+           case CONTROLLABLE:
+             theAutomata = new Automata(theAutomata);
+             translator = IdenticalKindTranslator.getInstance();
+             marking =
+               factory.createEventProxy(":none", EventKind.PROPOSITION);
+             break;
+           case NONBLOCKINGCONTROLLABLE:
+             theAutomata = new Automata(theAutomata);
+             translator = IdenticalKindTranslator.getInstance();
+             marking = null;
+             break;
+           default:
+             throw new IllegalStateException
+               ("Unknown synthesis type " +
+                synthesizerOptions.getSynthesisType() + "!");
+           }
+
+           final AutomataToWaters exporter = new AutomataToWaters(factory);
+           final ProductDESProxy des = exporter.convertAutomata(theAutomata);
+
+           final MonolithicSynthesizer synthesizer =
+             new MonolithicSynthesizer(des, factory, translator);
+           synthesizer.setConfiguredDefaultMarking(marking);
+           final boolean supervisorReduction =
+             synthesizerOptions.getReduceSupervisors();
+           synthesizer.setSupervisorReductionEnabled(supervisorReduction);
+           // set options & marking
+           synthesizer.run();
+           final ProductDESResult watersResult =
+             synthesizer.getAnalysisResult();
+           final ProjectBuildFromWaters importer =
+             new ProjectBuildFromWaters(null);
+           if (watersResult.isSatisfied()) {
+             for (final AutomatonProxy proxy :
+                  watersResult.getComputedAutomata()) {
+               final Automaton aut = importer.build(proxy);
+               result.addAutomaton(aut);
+             }
+           } else {
+             final Automaton aut = new Automaton("sup(Untitled)");
+             aut.setType(AutomatonType.SUPERVISOR);
+             result.addAutomaton(aut);
+           }
+
+         }
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
         else if (synthesizerOptions.getSynthesisAlgorithm() ==
@@ -367,7 +428,8 @@ public class AutomataSynthesizer
           final ProductDESProxy des = exporter.convertAutomata(theAutomata);
 
           final CompositionalSynthesizer synthesizer =
-            new CompositionalSynthesizer(des, factory, translator);
+            new CompositionalSynthesizer(des, factory, translator,
+                                         SynthesisAbstractionProcedureFactory.WSOE);
           synthesizer.setConfiguredDefaultMarking(marking);
           synthesizer.setInternalStateLimit(10000);
            synthesizer.setPreselectingMethod

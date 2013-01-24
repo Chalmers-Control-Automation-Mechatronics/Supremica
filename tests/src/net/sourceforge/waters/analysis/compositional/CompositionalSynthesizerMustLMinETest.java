@@ -12,12 +12,12 @@ package net.sourceforge.waters.analysis.compositional;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractSynthesizerTest;
+import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public class CompositionalSynthesizerMustLMinETest
-  extends AbstractSynthesizerTest
+  extends AbstractSupervisorSynthesizerTest
 {
 
   //#########################################################################
@@ -43,16 +43,11 @@ public class CompositionalSynthesizerMustLMinETest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalSynthesizer synthesizer =
-      new CompositionalSynthesizer(factory);
+      new CompositionalSynthesizer(factory,
+                                   SynthesisAbstractionProcedureFactory.SOE_ONLY);
     synthesizer.setInternalStateLimit(5000);
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);
-    final AbstractionProcedure proc =
-      SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure
-        (synthesizer,
-         SynthesisAbstractionProcedure.USE_BISIMULATION |
-         SynthesisAbstractionProcedure.USE_SOE);
-    synthesizer.setAbstractionProcedure(proc);
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
     synthesizer.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinE);
     return synthesizer;

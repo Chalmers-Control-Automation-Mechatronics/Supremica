@@ -41,7 +41,6 @@ import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -185,9 +184,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     for (int j = 0; j < interfaces.getLength(); j++) {
       final Element interfaceDES = (Element) interfaces.item(j);
       final Element des =
-          (Element) interfaceDES.getElementsByTagName("*").item(0);
+          (Element) interfaceDES.getElementsByTagName("Des").item(0);
       final String name = interfaceDES.getAttribute("name");
-      if ((des != null) && (des.getAttribute("location") != "")) {
+      if (des == null) {
+        interfaceMap.put(name, "");
+      } else {
         final String location = des.getAttribute("location");
         final URI fileURI = uri.resolve(location);
         final File file = new File(fileURI);
@@ -197,8 +198,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           throw new FileNotFoundException("The interface file " + file
               + " could not be located.");
         }
-      } else {
-        interfaceMap.put(name, "");
       }
     }
     final NodeList subsystemList = project.getElementsByTagName("Subsystem");
@@ -208,39 +207,36 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     // sorts the subsystems in order of their level (lowest to highest)
     Collections.sort(subsystems, new LevelComparator());
 
-    for (int j = 0; j < subsystems.size(); j++) {
+    for (final Element subsystem : subsystems) {
       // adds the accepting proposition to the events list
       addAcceptingProp();
-      final Element subsystem = subsystems.get(j);
 
-      final NodeList automaton = subsystem.getElementsByTagName("*");
-      for (int i = 0; i < automaton.getLength(); i++) {
-        final Element aut = (Element) automaton.item(i);
-        if (aut.getTagName().equals("Supervisor")) {
+      final NodeList sections = subsystem.getElementsByTagName("*");
+      for (int i = 0; i < sections.getLength(); i++) {
+        final Element section = (Element) sections.item(i);
+        if (section.getTagName().equals("Supervisor")) {
           // builds all specification automata
-          constructSimpleComponent(aut, ComponentKind.SPEC, uri);
-
-        } else if (aut.getTagName().equals("Plant")) {
+          constructSimpleComponent(section, ComponentKind.SPEC, uri);
+        } else if (section.getTagName().equals("Plant")) {
           // builds all plant automata
-          constructSimpleComponent(aut, ComponentKind.PLANT, uri);
-
-        } else if (aut.getTagName().equals("Implements")) {
-          final Element interfaceRef =
-              (Element) aut.getElementsByTagName("*").item(0);
-          if (interfaceRef != null) {
+          constructSimpleComponent(section, ComponentKind.PLANT, uri);
+        } else if (section.getTagName().equals("Implements")) {
+          final NodeList list = section.getElementsByTagName("*");
+          for (int j = 0; j < list.getLength(); j++) {
+            clearGraphStructures();
+            final Element interfaceRef = (Element) list.item(i);
             final String interfaceNm = interfaceRef.getAttribute("name");
             final String interfaceLocation = interfaceMap.get(interfaceNm);
-            if (interfaceLocation != null && interfaceLocation != "") {
+            if (interfaceLocation == null) {
+              throw new WatersUnmarshalException
+                ("The interface " + interfaceNm + " does not exist.");
+            } else if (!interfaceLocation.equals("")) {
               constructSimpleComponent(interfaceNm, interfaceLocation,
                                        ComponentKind.SPEC, uri);
-            } else if (interfaceLocation != "") {
-              throw new WatersUnmarshalException("The interface " + interfaceNm
-                  + " does not exist.");
             }
           }
-
-        } else if (aut.getTagName().equals("Uses")) {
-          constructModuleInstance(aut);
+        } else if (section.getTagName().equals("Uses")) {
+          constructModuleInstance(section);
         }
         clearGraphStructures();
       }
@@ -348,22 +344,22 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       for (int j = 0; j < eventList.size(); j++) {
         final EventDeclProxy event = eventList.get(j);
         final String eventName = event.getName();
-        final ExpressionProxy identifier =
-            mFactory.createSimpleIdentifierProxy(eventName);
-
         // No binding parameter is created if the event is local
         if (!event.getScope().equals(ScopeKind.LOCAL)) {
-
           // if the parameter is not already used by the module
           // referencing it, add it to the list of events for the module
           // referencing it
           if (!mEvents.containsKey(eventName)) {
+            final IdentifierProxy identifier =
+              mFactory.createSimpleIdentifierProxy(eventName);
             final EventDeclProxy newEvent =
-                mFactory.createEventDeclProxy(event.getIdentifier(), event
-                    .getKind(), true, ScopeKind.LOCAL, null, null, event
-                    .getAttributes());
+                mFactory.createEventDeclProxy(identifier, event.getKind(),
+                                              true, ScopeKind.LOCAL, null,
+                                              null, event.getAttributes());
             mEvents.put(eventName, newEvent);
           }
+          final IdentifierProxy identifier =
+            mFactory.createSimpleIdentifierProxy(eventName);
           bindings.add(mFactory.createParameterBindingProxy(eventName,
                                                             identifier));
         }
@@ -454,20 +450,18 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       clearGraphStructures();
       final Element des = (Element) desList.item(i);
       // final String autName = formatIdentifier(des.getAttribute("name"));
-      final String autFile = des.getAttribute("location");
-      final URI uri = new URI(autFile);
-
+      final String location = des.getAttribute("location");
+      final URI uri = new URI(null, null, location, null);
       final Element root = openDESFile(path.resolve(uri));
       final Element definition =
           (Element) root.getElementsByTagName("Definition").item(0);
       final NodeList allHeaders = definition.getElementsByTagName("Header");
       final Element header = (Element) allHeaders.item(0);
       final String autName = formatIdentifier(header.getAttribute("name"));
-      final GraphProxy graph = constructGraph(autFile, root, false);
+      final GraphProxy graph = constructGraph(location, root, false);
       if (graph != null) {
         final IdentifierProxy identifier =
             mFactory.createSimpleIdentifierProxy(autName);
-
         mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
                                                             graph));
       } else {

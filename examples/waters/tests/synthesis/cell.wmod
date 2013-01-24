@@ -32,6 +32,7 @@ The objective is to control the manufacturing cell in the least restrictive cont
             </RangeList>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="inbuf">
@@ -39,10 +40,10 @@ The objective is to control the manufacturing cell in the least restrictive cont
                 <NodeList>
                     <SimpleNode Name="F">
                         <PointGeometry>
-                            <Point Y="160" X="144"/>
+                            <Point X="144" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-5" X="9"/>
+                            <Point X="9" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="E">
@@ -50,36 +51,36 @@ The objective is to control the manufacturing cell in the least restrictive cont
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="80" X="144"/>
+                            <Point X="144" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-7" X="13"/>
+                            <Point X="13" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="F" Source="E">
+                    <Edge Source="E" Target="F">
                         <LabelBlock>
                             <IndexedIdentifier Name="unload">
                                 <SimpleIdentifier Name="i"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="4"/>
+                                <Point X="4" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="120" X="161"/>
+                            <Point X="161" Y="120"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="E" Source="F">
+                    <Edge Source="F" Target="E">
                         <LabelBlock>
                             <SimpleIdentifier Name="start"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="-38"/>
+                                <Point X="-38" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="119" X="129"/>
+                            <Point X="129" Y="119"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -93,46 +94,46 @@ The objective is to control the manufacturing cell in the least restrictive cont
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="64" X="128"/>
+                            <Point X="128" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-8" X="14"/>
+                            <Point X="14" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="full">
                         <PointGeometry>
-                            <Point Y="128" X="128"/>
+                            <Point X="128" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-6" X="10"/>
+                            <Point X="10" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="full" Source="empty">
+                    <Edge Source="empty" Target="full">
                         <LabelBlock>
                             <IndexedIdentifier Name="advance">
                                 <SimpleIdentifier Name="i"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="3"/>
+                                <Point X="3" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="97" X="142"/>
+                            <Point X="142" Y="97"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="empty" Source="full">
+                    <Edge Source="full" Target="empty">
                         <LabelBlock>
                             <IndexedIdentifier Name="load">
                                 <SimpleIdentifier Name="i"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="-49"/>
+                                <Point X="-49" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="95" X="114"/>
+                            <Point X="114" Y="95"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -146,42 +147,42 @@ The objective is to control the manufacturing cell in the least restrictive cont
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="48" X="96"/>
+                            <Point X="96" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-9" X="12"/>
+                            <Point X="12" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="working">
                         <PointGeometry>
-                            <Point Y="112" X="96"/>
+                            <Point X="96" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-9" X="12"/>
+                            <Point X="12" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="idle" Source="working">
+                    <Edge Source="working" Target="idle">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-10" X="-45"/>
+                                <Point X="-45" Y="-10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="80" X="85"/>
+                            <Point X="85" Y="80"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="working" Source="idle">
+                    <Edge Source="idle" Target="working">
                         <LabelBlock>
                             <SimpleIdentifier Name="start"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="9"/>
+                                <Point X="9" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="81" X="109"/>
+                            <Point X="109" Y="81"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -192,10 +193,10 @@ The objective is to control the manufacturing cell in the least restrictive cont
                 <NodeList>
                     <SimpleNode Name="F">
                         <PointGeometry>
-                            <Point Y="160" X="144"/>
+                            <Point X="144" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-2" X="12"/>
+                            <Point X="12" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="E">
@@ -203,36 +204,36 @@ The objective is to control the manufacturing cell in the least restrictive cont
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="80" X="144"/>
+                            <Point X="144" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-10" X="16"/>
+                            <Point X="16" Y="-10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="E" Source="F">
+                    <Edge Source="F" Target="E">
                         <LabelBlock>
                             <IndexedIdentifier Name="load">
                                 <SimpleIdentifier Name="o"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-49"/>
+                                <Point X="-49" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="119" X="127"/>
+                            <Point X="127" Y="119"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="F" Source="E">
+                    <Edge Source="E" Target="F">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-10" X="12"/>
+                                <Point X="12" Y="-10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="119" X="161"/>
+                            <Point X="161" Y="119"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -246,46 +247,46 @@ The objective is to control the manufacturing cell in the least restrictive cont
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="96" X="128"/>
+                            <Point X="128" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-5" X="10"/>
+                            <Point X="10" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="empty">
                         <PointGeometry>
-                            <Point Y="32" X="128"/>
+                            <Point X="128" Y="32"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-9" X="9"/>
+                            <Point X="9" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="empty" Source="full">
+                    <Edge Source="full" Target="empty">
                         <LabelBlock>
                             <IndexedIdentifier Name="advance">
                                 <SimpleIdentifier Name="o"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-74"/>
+                                <Point X="-74" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="63" X="114"/>
+                            <Point X="114" Y="63"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="full" Source="empty">
+                    <Edge Source="empty" Target="full">
                         <LabelBlock>
                             <IndexedIdentifier Name="unload">
                                 <SimpleIdentifier Name="o"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="6"/>
+                                <Point X="6" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="65" X="142"/>
+                            <Point X="142" Y="65"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -299,83 +300,83 @@ The objective is to control the manufacturing cell in the least restrictive cont
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="96"/>
+                            <Point X="96" Y="112"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="1" X="-43"/>
+                            <Point X="-43" Y="1"/>
                         </InitialArrowGeometry>
                         <LabelGeometry>
-                            <Point Y="-8" X="8"/>
+                            <Point X="8" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="loading">
                         <PointGeometry>
-                            <Point Y="176" X="96"/>
+                            <Point X="96" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-5" X="9"/>
+                            <Point X="9" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="unloading">
                         <PointGeometry>
-                            <Point Y="48" X="96"/>
+                            <Point X="96" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-8" X="12"/>
+                            <Point X="12" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="idle" Source="unloading">
+                    <Edge Source="unloading" Target="idle">
                         <LabelBlock>
                             <IndexedIdentifier Name="unload">
                                 <SimpleIdentifier Name="i"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="4"/>
+                                <Point X="4" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="83" X="112"/>
+                            <Point X="112" Y="83"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="unloading" Source="idle">
+                    <Edge Source="idle" Target="unloading">
                         <LabelBlock>
                             <IndexedIdentifier Name="load">
                                 <SimpleIdentifier Name="i"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="-51"/>
+                                <Point X="-51" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="81" X="80"/>
+                            <Point X="80" Y="81"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="loading" Source="idle">
+                    <Edge Source="idle" Target="loading">
                         <LabelBlock>
                             <IndexedIdentifier Name="load">
                                 <SimpleIdentifier Name="o"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="-52"/>
+                                <Point X="-52" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="143" X="83"/>
+                            <Point X="83" Y="143"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="idle" Source="loading">
+                    <Edge Source="loading" Target="idle">
                         <LabelBlock>
                             <IndexedIdentifier Name="unload">
                                 <SimpleIdentifier Name="o"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="3"/>
+                                <Point X="3" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="143" X="110"/>
+                            <Point X="110" Y="143"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -386,10 +387,10 @@ The objective is to control the manufacturing cell in the least restrictive cont
                 <NodeList>
                     <SimpleNode Name="F">
                         <PointGeometry>
-                            <Point Y="160" X="144"/>
+                            <Point X="144" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-2" X="12"/>
+                            <Point X="12" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="E">
@@ -397,47 +398,47 @@ The objective is to control the manufacturing cell in the least restrictive cont
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="80" X="144"/>
+                            <Point X="144" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-10" X="16"/>
+                            <Point X="16" Y="-10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="E" Source="F">
+                    <Edge Source="F" Target="E">
                         <LabelBlock>
                             <IndexedIdentifier Name="load">
                                 <SimpleIdentifier Name="o"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-49"/>
+                                <Point X="-49" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="119" X="127"/>
+                            <Point X="127" Y="119"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="F" Source="E">
+                    <Edge Source="E" Target="F">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="3"/>
+                                <Point X="3" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="119" X="161"/>
+                            <Point X="161" Y="119"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="E" Source="E">
+                    <Edge Source="E" Target="E">
                         <LabelBlock>
                             <SimpleIdentifier Name="start"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-33" X="-14"/>
+                                <Point X="-14" Y="-33"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="81" X="193"/>
+                            <Point X="193" Y="81"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -451,80 +452,80 @@ The objective is to control the manufacturing cell in the least restrictive cont
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="64" X="176"/>
+                            <Point X="176" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-9" X="9"/>
+                            <Point X="9" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s1">
                         <PointGeometry>
-                            <Point Y="128" X="176"/>
+                            <Point X="176" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-9" X="12"/>
+                            <Point X="12" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s2">
                         <PointGeometry>
-                            <Point Y="192" X="176"/>
+                            <Point X="176" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="-8" X="10"/>
+                            <Point X="10" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <IndexedIdentifier Name="load">
                                 <SimpleIdentifier Name="o"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="-53"/>
+                                <Point X="-53" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="160" X="162"/>
+                            <Point X="162" Y="160"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <IndexedIdentifier Name="load">
                                 <SimpleIdentifier Name="i"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="2"/>
+                                <Point X="2" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="160" X="191"/>
+                            <Point X="191" Y="160"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <IndexedIdentifier Name="load">
                                 <SimpleIdentifier Name="o"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-10" X="-51"/>
+                                <Point X="-51" Y="-10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="96" X="161"/>
+                            <Point X="161" Y="96"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <IndexedIdentifier Name="load">
                                 <SimpleIdentifier Name="i"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="6"/>
+                                <Point X="6" Y="-12"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="96" X="190"/>
+                            <Point X="190" Y="96"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

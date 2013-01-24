@@ -11,26 +11,20 @@ package net.sourceforge.waters.analysis.compositional;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 
+
 /**
- * <P>A collection of abstraction methods to be used for compositional
- * nonblocking verification.</P>
- *
- * <P>To configure a conflict checker, call the method
- * {@link #createAbstractionProecudure(AbstractCompositionalModelAnalyzer)
- * createAbstractionProecudure()} of the desired enumeration member,
- * and pass the result to the conflict checker's {@link
- * AbstractCompositionalModelAnalyzer#setAbstractionProcedure(AbstractionProcedure)
- * setAbstractionProcedure()} method.</P>
- *
- * <PRE>AbstractionProcedure proc =
- * &nbsp;&nbsp;ConflictAbstractionProcedureFactory.{@link #NBA}.{@link #createAbstractionProecudure(AbstractCompositionalModelAnalyzer) createAbstractionProecudure}(analyzer);
- * &nbsp;&nbsp;analyzer.{@link AbstractCompositionalModelAnalyzer#setAbstractionProcedure(AbstractionProcedure) setAbstractionProcedure}(proc);</PRE>
+ * A collection of abstraction methods to be used for compositional
+ * nonblocking verification. The members of this enumeration are passed to the
+ * {@link CompositionalConflictChecker} using its
+ * {@link AbstractCompositionalModelAnalyzer#setAbstractionProcedureFactory(AbstractionProcedureFactory)
+ * setAbstractionProcedureFactory()} method.
  *
  * @see AbstractionProcedure
- * @see CompositionalConflictChecker
+ * @author Robi Malik
  */
 
 public enum ConflictAbstractionProcedureFactory
+  implements AbstractionProcedureFactory
 {
 
   //#########################################################################
@@ -47,7 +41,7 @@ public enum ConflictAbstractionProcedureFactory
    */
   CC {
     @Override
-    public AbstractionProcedure createAbstractionProecudure
+    public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return ThreeStepConflictEquivalenceAbstractionProcedure.
@@ -67,13 +61,19 @@ public enum ConflictAbstractionProcedureFactory
    */
   GNB {
     @Override
-    public AbstractionProcedure createAbstractionProecudure
+    public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return TRConflictEquivalenceAbstractionProcedure.
         createGeneralisedNonblockingProcedure
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
            WEAK_OBSERVATION_EQUIVALENCE);
+    }
+
+    @Override
+    public boolean expectsAllMarkings()
+    {
+      return true;
     }
   },
   /**
@@ -86,7 +86,7 @@ public enum ConflictAbstractionProcedureFactory
    */
   NB {
     @Override
-    public AbstractionProcedure createAbstractionProecudure
+    public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return ThreeStepConflictEquivalenceAbstractionProcedure.
@@ -106,7 +106,7 @@ public enum ConflictAbstractionProcedureFactory
    */
   NBA {
     @Override
-    public AbstractionProcedure createAbstractionProecudure
+    public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return ThreeStepConflictEquivalenceAbstractionProcedure.
@@ -127,7 +127,7 @@ public enum ConflictAbstractionProcedureFactory
    */
   NBC {
     @Override
-    public AbstractionProcedure createAbstractionProecudure
+    public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return ThreeStepConflictEquivalenceAbstractionProcedure.
@@ -141,7 +141,7 @@ public enum ConflictAbstractionProcedureFactory
    */
   OEQ {
     @Override
-    public AbstractionProcedure createAbstractionProecudure
+    public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return TRConflictEquivalenceAbstractionProcedure.
@@ -158,7 +158,7 @@ public enum ConflictAbstractionProcedureFactory
    */
   OP {
     @Override
-    public AbstractionProcedure createAbstractionProecudure
+    public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return ObserverProjectionAbstractionProcedure.
@@ -172,7 +172,7 @@ public enum ConflictAbstractionProcedureFactory
    */
   OPVERIFIER {
     @Override
-    public AbstractionProcedure createAbstractionProecudure
+    public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return OPVerifierAbstractionProcedure.createOPVerifierProcedure
@@ -193,7 +193,7 @@ public enum ConflictAbstractionProcedureFactory
    */
   WOEQ {
     @Override
-    public AbstractionProcedure createAbstractionProecudure
+    public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return TRConflictEquivalenceAbstractionProcedure.
@@ -203,12 +203,20 @@ public enum ConflictAbstractionProcedureFactory
     }
   };
 
+
   //#########################################################################
-  //# Factory Methods
-  /**
-   * Creates an abstraction procedure to be used by the given model analyzer.
-   */
-  public abstract AbstractionProcedure createAbstractionProecudure
-    (AbstractCompositionalModelAnalyzer analyzer);
+  //# Interface
+  //# net.sourceforge.waters.analysis.compositional.AbstractionProcedureFactory
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+  @Override
+  public boolean expectsAllMarkings()
+  {
+    return false;
+  }
 
 }

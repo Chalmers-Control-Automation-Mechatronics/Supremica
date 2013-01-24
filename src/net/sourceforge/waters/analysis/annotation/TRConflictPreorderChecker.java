@@ -26,6 +26,8 @@ import net.sourceforge.waters.analysis.gnonblocking.FindBlockingStates;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.Abortable;
 
 
 /**
@@ -40,6 +42,7 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
  */
 
 public class TRConflictPreorderChecker
+  implements Abortable
 {
 
   //#########################################################################
@@ -71,6 +74,7 @@ public class TRConflictPreorderChecker
     mSecondBlocking = fbs.getBlockingStates();
     mSuccessors = new ArrayList<TIntArrayList>();
     mPredeccessors = new ArrayList<TIntHashSet[]>();
+    mIsAborting = false;
   }
 
 
@@ -89,27 +93,42 @@ public class TRConflictPreorderChecker
    * are related through the conflict preorder.
    * @return <CODE>true</CODE> if the given first transition relation is
    *         less conflicting than the given second transition relation.
-   * @see #CompareLessConflicting(ListBufferTransitionRelation, ListBufferTransitionRelation, int)
-   *      CompareLessConflicting()
+   * @see #TRConflictPreorderChecker(ListBufferTransitionRelation, ListBufferTransitionRelation, int)
+   *      TRConflictPreorderChecker()
    */
   public boolean isLessConflicting()
+    throws AbortException
   {
     final TIntHashSet first = new TIntHashSet();
     final TIntHashSet second = new TIntHashSet();
     for (int s = 0; s < mFirstRelation.getNumberOfStates(); s++) {
       if (mFirstRelation.isInitial(s)) {
         first.add(s);
-        continue;
       }
     }
     for (int s = 0; s < mSecondRelation.getNumberOfStates(); s++) {
       if (mSecondRelation.isInitial(s)) {
         second.add(s);
-        continue;
       }
     }
+    checkAbort();
     return isLessConflicting(createPair(calculateTauReachable(first, mFirstRelation),
                                         calculateTauReachable(second, mSecondRelation)));
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    mIsAborting = true;
+  }
+
+  @Override
+  public boolean isAborting()
+  {
+    return mIsAborting;
   }
 
 
@@ -193,8 +212,10 @@ public class TRConflictPreorderChecker
   }
 
   private void expandStates()
+    throws AbortException
   {
     for (; mExpanded < mStates.size(); mExpanded++) {
+      checkAbort();
       final int state = mExpanded;
       final LCPair tup = mStates.get(state);
       if (tup.mFirstSet.contains(-1) || tup.mSecondSet.contains(-1)) {
@@ -228,6 +249,7 @@ public class TRConflictPreorderChecker
   }
 
   private void calculateLCStates()
+    throws AbortException
   {
     boolean modified = true;
     while (modified) {
@@ -237,6 +259,7 @@ public class TRConflictPreorderChecker
       final List<MCTriple> tobeexpanded = new ArrayList<MCTriple>();
       for (int s = 0; s < mStates.size(); s++) {
         if (!mFirstLC.contains(s)) {
+          checkAbort();
           makelc.add(s);
           final LCPair state = mStates.get(s);
           final TIntHashSet moreset = state.mSecondSet;
@@ -248,6 +271,7 @@ public class TRConflictPreorderChecker
         }
       }
       while (!tobeexpanded.isEmpty()) {
+        checkAbort();
         final MCTriple triple = tobeexpanded.remove(tobeexpanded.size() - 1);
         for (int e = 0; e < mFirstRelation.getNumberOfProperEvents() + 1; e++) {
           if (e == EventEncoding.TAU) {continue;}
@@ -290,12 +314,14 @@ public class TRConflictPreorderChecker
 
   @SuppressWarnings("unused")
   private boolean isLessConflicting(final int s1, final int s2)
+    throws AbortException
   {
     return isLessConflicting(createPair(calculateTauReachable(s1, mFirstRelation),
                                         calculateTauReachable(s2, mSecondRelation)));
   }
 
   private boolean isLessConflicting(final LCPair tuple)
+    throws AbortException
   {
     final int initial = getState(tuple);
     // adds the certain conflict states to the calculation
@@ -307,6 +333,7 @@ public class TRConflictPreorderChecker
     explored.add(initial);
     toexplore.add(initial);
     while (!toexplore.isEmpty()) {
+      checkAbort();
       final int s = toexplore.remove(toexplore.size() -1);
       LCPair state = mStates.get(s);
       if (state.mFirstSet.isEmpty()) {continue;}
@@ -368,6 +395,21 @@ public class TRConflictPreorderChecker
       mSetCache.put(set, set);
     }
     return tset;
+  }
+
+  /**
+   * Checks whether the model analyser has been requested to abort,
+   * and if so, performs the abort by throwing an {@link AbortException}.
+   * This method should be called periodically by any model analyser that
+   * supports being aborted by user request.
+   */
+  private void checkAbort()
+    throws AbortException
+  {
+    if (mIsAborting) {
+      final AbortException exception = new AbortException();
+      throw exception;
+    }
   }
 
 
@@ -468,5 +510,6 @@ public class TRConflictPreorderChecker
   private final TIntHashSet mSecondBlocking;
   private final int mMarking;
   private int mExpanded;
+  private boolean mIsAborting;
 
 }

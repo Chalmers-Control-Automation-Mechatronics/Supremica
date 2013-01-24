@@ -19,24 +19,41 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeSICProperty5Action extends WatersAnalyzeAction
+/**
+ * The action to check Serial Interface Consistency Property V (SIC&nbsp;V) of
+ * a HISC module.
+ *
+ * @author Robi Malik
+ */
+
+public class AnalyzeSICProperty5Action
+  extends WatersAnalyzeHISCAction
 {
 
+  //#########################################################################
+  //# Constructor
   protected AnalyzeSICProperty5Action(final IDE ide)
   {
     super(ide);
   }
 
+
+  //#########################################################################
+  //# Overrides for base class
+  //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
+  @Override
   protected String getCheckName()
   {
     return "SIC Property V";
   }
 
+  @Override
   protected String getFailureDescription()
   {
     return "does not satisfy SIC Property V";
   }
 
+  @Override
   protected ModelVerifier getModelVerifier
     (final ModelVerifierFactory factory,
      final ProductDESProxyFactory desFactory)
@@ -48,10 +65,15 @@ public class AnalyzeSICProperty5Action extends WatersAnalyzeAction
     return verifier;
   }
 
+  @Override
   protected String getSuccessDescription()
   {
     return "satisfies SIC Property V";
   }
 
+
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = -1008097797553564719L;
+
 }

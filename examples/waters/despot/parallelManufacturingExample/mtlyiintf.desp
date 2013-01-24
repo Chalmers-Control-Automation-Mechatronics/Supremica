@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="mtlyiintf" type="HISC" degree="6">
+        <Integrity status="not-verified" date-stamp=""/>
+        <Nonblocking status="not-verified" date-stamp=""/>
+        <Controllable status="not-verified" date-stamp=""/>
+        <I-Consistent status="not-verified" date-stamp=""/>
+        <LW-Nonblocking status="not-verified" date-stamp=""/>
+        <LW-Controllable status="not-verified" date-stamp=""/>
+    </Header>
+    <Subsystem name="Node0" level="0" valid="yes" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements/>
+        <Supervisor>
+            <Des name="Ensure-matFb" location="Ensure-matFb.des"/>
+            <Des name="In-Buff" location="In-Buff.des"/>
+            <Des name="Out-Buff" location="Out-Buff.des"/>
+            <Des name="Package-Buffer" location="Package-Buffer.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="Packaging-System" location="Packaging-System.des"/>
+            <Des name="Sink" location="Sink.des"/>
+            <Des name="Source" location="Source.des"/>
+            <Des name="Test-Unit" location="Test Unit.des"/>
+        </Plant>
+        <Uses>
+            <InterfaceRef name="Interface01" provider="Node1"/>
+            <InterfaceRef name="Interface02" provider="Node2"/>
+            <InterfaceRef name="Interface03" provider="Node3"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="Interface01" valid="yes" i-consist="no">
+        <Parent name="Node0"/>
+        <Des name="Gi01" location="Gi01.des"/>
+    </Interface>
+    <Interface name="Interface02" valid="yes" i-consist="no">
+        <Parent name="Node0"/>
+        <Des name="Gi02" location="Gi02.des"/>
+    </Interface>
+    <Interface name="Interface03" valid="yes" i-consist="no">
+        <Parent name="Node0"/>
+        <Des name="Gi03" location="Gi03.des"/>
+    </Interface>
+    <Subsystem name="Node1" level="1" valid="no" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="Interface01"/>
+        </Implements>
+        <Supervisor>
+            <Des name="Sequence-Tasks-1" location="Sequence-Tasks-1.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="Path-Flow-Model-1" location="Path-Flow-Model-1.des"/>
+        </Plant>
+        <Uses>
+            <InterfaceRef name="Interface14" provider="Node4"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="Interface14" valid="no" i-consist="no">
+        <Parent name="Node1"/>
+        <Des name="Interface-1-4" location="Interface-1-4.des"/>
+    </Interface>
+    <Subsystem name="Node2" level="1" valid="no" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="Interface02"/>
+        </Implements>
+        <Supervisor>
+            <Des name="Sequence-Tasks-2" location="Sequence-Tasks-2.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="Path-Flow-Model-2" location="Path-Flow-Model-2.des"/>
+        </Plant>
+        <Uses>
+            <InterfaceRef name="Interface25" provider="Node5"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="Interface25" valid="no" i-consist="no">
+        <Parent name="Node2"/>
+        <Des name="Interface-2-5" location="Interface-2-5.des"/>
+    </Interface>
+    <Subsystem name="Node3" level="1" valid="no" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="Interface03"/>
+        </Implements>
+        <Supervisor>
+            <Des name="Sequence-Tasks-3" location="Sequence-Tasks-3.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="Path-Flow-Model-3" location="Path-Flow-Model-3.des"/>
+        </Plant>
+        <Uses>
+            <InterfaceRef name="Interface36" provider="Node6"/>
+        </Uses>
+    </Subsystem>
+    <Interface name="Interface36" valid="no" i-consist="no">
+        <Parent name="Node3"/>
+        <Des name="Interface-3-6" location="Interface-3-6.des"/>
+    </Interface>
+    <Subsystem name="Node4" level="2" valid="no" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="Interface14"/>
+        </Implements>
+        <Supervisor>
+            <Des name="Affix-Part-4" location="Affix-Part-4.des"/>
+            <Des name="Polishing-Sequence-4" location="Polishing-Sequence-4.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="Attach-Case-to-Assembly-4" location="Attach-Case-4.des"/>
+            <Des name="Attach-Part-to-Assembly-4" location="Attach-Part-4.des"/>
+            <Des name="Define-New-Events-4" location="Define-New-Events-4.des"/>
+            <Des name="Polish-Part-4" location="Polish-Part-4.des"/>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+    <Subsystem name="Node5" level="2" valid="no" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="Interface25"/>
+        </Implements>
+        <Supervisor>
+            <Des name="Affix-Part-5" location="Affix-Part-5.des"/>
+            <Des name="Polishing-Sequence-5" location="Polishing-Sequence-5.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="Attach-Case-to-Assembly-5" location="Attach-Case-5.des"/>
+            <Des name="Attach-Part-to-Assembly-5" location="Attach-Part-5.des"/>
+            <Des name="Define-New-Events-5" location="Define-New-Events-5.des"/>
+            <Des name="Polish-Part-5" location="Polish-Part-5.des"/>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+    <Subsystem name="Node6" level="2" valid="no" lw-ctrl="no" lw-non-blocking="no" i-consist="no">
+        <Implements>
+            <InterfaceRef name="Interface36"/>
+        </Implements>
+        <Supervisor>
+            <Des name="Affix-Part-6" location="Affix-Part-6.des"/>
+            <Des name="Polishing-Sequence-6" location="Polishing-Sequence-6.des"/>
+        </Supervisor>
+        <Plant>
+            <Des name="Attach-Case-to-Assembly-6" location="Attach-Case-6.des"/>
+            <Des name="Attach-Part-to-Assembly-6" location="Attach-Part-6.des"/>
+            <Des name="Define-New-Events-6" location="Define-New-Events-6.des"/>
+            <Des name="Polish-Part-6" location="Polish-Part-6.des"/>
+        </Plant>
+        <Uses/>
+    </Subsystem>
+</Project>

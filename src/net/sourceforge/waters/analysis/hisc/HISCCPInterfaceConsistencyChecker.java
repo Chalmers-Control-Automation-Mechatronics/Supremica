@@ -15,15 +15,17 @@ import java.util.Collections;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.annotation.TRConflictPreorderChecker;
+import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.CompositionalSimplificationResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
+import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -32,6 +34,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -46,21 +49,33 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   //# Constructors
   public HISCCPInterfaceConsistencyChecker(final ProductDESProxyFactory factory)
   {
-    this(factory, ConflictKindTranslator.getInstance());
+    this(null, factory);
   }
 
   public HISCCPInterfaceConsistencyChecker(final ProductDESProxyFactory factory,
-                                           final KindTranslator translator)
+                                           final ConflictChecker checker,
+                                           final CompositionalSimplifier simplifier)
   {
-    this(null, factory, translator);
+    this(null, factory, checker, simplifier);
+  }
+
+  public HISCCPInterfaceConsistencyChecker(final ProductDESProxy model,
+                                           final ProductDESProxyFactory factory)
+  {
+    this(model, factory,
+         new CompositionalConflictChecker(factory),
+         new CompositionalSimplifier(factory,
+                                     ConflictAbstractionProcedureFactory.OEQ));
   }
 
   public HISCCPInterfaceConsistencyChecker(final ProductDESProxy model,
                                            final ProductDESProxyFactory factory,
-                                           final KindTranslator translator)
+                                           final ConflictChecker checker,
+                                           final CompositionalSimplifier simplifier)
   {
-    super(model, factory, translator);
-    mSimplifier = new CompositionalSimplifier(factory);
+    super(model, factory, HISCConflictKindTranslator.getInstance());
+    mConflictChecker = checker;
+    mSimplifier = simplifier;
     mSynchronousProductBuilder =
       new MonolithicSynchronousProductBuilder(factory);
   }
@@ -97,6 +112,16 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
     return mConfiguredMarking;
   }
 
+  public void setConflictChecker(final ConflictChecker checker)
+  {
+    mConflictChecker = checker;
+  }
+
+  public ConflictChecker getConflictChecker()
+  {
+    return mConflictChecker;
+  }
+
   public void setSimplifier(final CompositionalSimplifier simplifier)
   {
     mSimplifier = simplifier;
@@ -116,6 +141,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   {
     super.setUp();
     final KindTranslator translator = getKindTranslator();
+    mConflictChecker.setKindTranslator(translator);
     mSimplifier.setKindTranslator(translator);
     mSynchronousProductBuilder.setKindTranslator(translator);
     if (mConfiguredMarking == null) {
@@ -124,6 +150,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
     } else {
       mUsedMarking = mConfiguredMarking;
     }
+    mConflictChecker.setConfiguredDefaultMarking(mUsedMarking);
     mSimplifier.setConfiguredDefaultMarking(mUsedMarking);
     final Collection<EventProxy> props = Collections.singletonList(mUsedMarking);
     mSynchronousProductBuilder.setPropositions(props);
@@ -135,25 +162,29 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
     try {
       setUp();
 
+      // Collect interface events ...
       final ProductDESProxy des = getModel();
       final Collection<EventProxy> events = des.getEvents();
       final Collection<EventProxy> interfaceEvents = new ArrayList<EventProxy>();
       final KindTranslator translator = getKindTranslator();
       final EventEncoding eventEnc = new EventEncoding();
+      boolean hasInterface = false;
       for (final EventProxy event : events) {
         final Map<String,String> attribs = event.getAttributes();
         if (translator.getEventKind(event) == EventKind.PROPOSITION) {
           // nothing
-        } else if (HISCAttributeFactory.getEventType(attribs) ==
-                   HISCAttributeFactory.EventType.DEFAULT) {
-          eventEnc.addSilentEvent(event);
-        } else {
+        } else if (HISCAttributeFactory.isParameter(attribs)) {
           interfaceEvents.add(event);
           eventEnc.addEvent(event, translator, true);
+          hasInterface = true;
+        } else {
+          eventEnc.addSilentEvent(event);
         }
       }
       final int markingID = eventEnc.addEvent(mUsedMarking, translator, true);
+      checkAbort();
 
+      // Separate into interface and subsystem automata ...
       final Collection<AutomatonProxy> automata = des.getAutomata();
       final Collection<AutomatonProxy> interfaces =
         new ArrayList<AutomatonProxy>();
@@ -163,11 +194,23 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
         final Map<String,String> attribs = aut.getAttributes();
         if (HISCAttributeFactory.isInterface(attribs)) {
           interfaces.add(aut);
-        } else {
+          hasInterface = true;
+        } else if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
           subsystem.add(aut);
         }
       }
+      checkAbort();
 
+      // If there is no interface, just run a conflict check ...
+      if (!hasInterface) {
+        mConflictChecker.setModel(des);
+        mConflictChecker.run();
+        final VerificationResult result = mConflictChecker.getAnalysisResult();
+        setAnalysisResult(result);
+        return result.isSatisfied();
+      }
+
+      // If there is an interface, we must check the conflict preorder ...
       final ProductDESProxyFactory factory = getFactory();
       final String name = des.getName();
       final ProductDESProxy interfaceDES =
@@ -176,6 +219,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
       ProductDESProxy subsystemDES =
         AutomatonTools.createProductDESProxy(name + ":subsystem",
                                              subsystem, factory);
+      // Minimise the subsystem ...
       if (mSimplifier != null) {
         mSimplifier.setModel(subsystemDES);
         mSimplifier.setPreservedEvents(interfaceEvents);
@@ -190,14 +234,18 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
           }
         }
       }
+      checkAbort();
 
+      // Compose the interface and subsystem to single transition relations ...
       final ListBufferTransitionRelation interfaceRel =
         createTransitionRelation(interfaceDES, eventEnc);
       final ListBufferTransitionRelation subsystemRel =
         createTransitionRelation(subsystemDES, eventEnc);
-      final TRConflictPreorderChecker checker =
+
+      /// Check the conflict preorder ...
+      mConflictPreorderChecker =
         new TRConflictPreorderChecker(subsystemRel, interfaceRel, markingID);
-      final boolean lc = checker.isLessConflicting();
+      final boolean lc = mConflictPreorderChecker.isLessConflicting();
       final VerificationResult result = getAnalysisResult();
       result.setSatisfied(lc);
       return lc;
@@ -210,7 +258,24 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   protected void tearDown()
   {
     mUsedMarking = null;
+    mConflictPreorderChecker = null;
     super.tearDown();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    mConflictChecker.requestAbort();
+    if (mSimplifier != null) {
+      mSimplifier.requestAbort();
+    }
+    if (mConflictPreorderChecker != null) {
+      mConflictPreorderChecker.requestAbort();
+    }
   }
 
 
@@ -230,7 +295,10 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
       aut = mSynchronousProductBuilder.getComputedAutomaton();
     }
     final int config = TRConflictPreorderChecker.getPreferredInputConfiguration();
-    return new ListBufferTransitionRelation(aut, eventEnc, config);
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation(aut, eventEnc, config);
+    checkAbort();
+    return rel;
   }
 
 
@@ -239,7 +307,9 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   private EventProxy mConfiguredMarking;
   private EventProxy mUsedMarking;
 
+  private ConflictChecker mConflictChecker;
   private CompositionalSimplifier mSimplifier;
   private final SynchronousProductBuilder mSynchronousProductBuilder;
+  private TRConflictPreorderChecker mConflictPreorderChecker;
 
 }

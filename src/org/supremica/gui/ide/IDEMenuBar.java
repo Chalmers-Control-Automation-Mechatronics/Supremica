@@ -25,6 +25,7 @@ import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
+import net.sourceforge.waters.gui.actions.AnalyzeHISCCPControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPInterfaceConsistencyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCThree_one_propertyAction;
@@ -369,6 +370,9 @@ public class IDEMenuBar extends JMenuBar
           final Action hisccp =
             actions.getAction(AnalyzeHISCCPInterfaceConsistencyAction.class);
           mVerifyMenu.add(hisccp);
+          final Action hiscco =
+            actions.getAction(AnalyzeHISCCPControllabilityAction.class);
+          mVerifyMenu.add(hiscco);
         }
 	    if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
            mVerifyMenu.addSeparator();

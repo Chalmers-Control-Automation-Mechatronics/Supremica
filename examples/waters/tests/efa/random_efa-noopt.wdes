@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="random_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A test for EFA compilers.
+This tests whether it is possible to perform an undefined assignment to a variable, resulting in nondeterministic transitions for all possible values.</ns2:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="tau"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="v">
+<EventRefList>
+<EventRef Name="tau"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Initial="true" Name="1"/>
+<State Initial="true" Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Event="tau" Source="0" Target="0"/>
+<Transition Event="tau" Source="0" Target="1"/>
+<Transition Event="tau" Source="0" Target="2"/>
+<Transition Event="tau" Source="1" Target="0"/>
+<Transition Event="tau" Source="1" Target="1"/>
+<Transition Event="tau" Source="1" Target="2"/>
+<Transition Event="tau" Source="2" Target="0"/>
+<Transition Event="tau" Source="2" Target="1"/>
+<Transition Event="tau" Source="2" Target="2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="random">
+<EventRefList>
+<EventRef Name="tau"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+</StateList>
+<TransitionList>
+<Transition Event="tau" Source="S0" Target="S0"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>

@@ -74,6 +74,13 @@ public abstract class AbstractSynchronousProductBuilderTest
     runAutomatonBuilder(group, name);
   }
 
+  public void testSmallFactory2u() throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "small_factory_2u";
+    runAutomatonBuilder(group, name);
+  }
+
 
   //#########################################################################
   //# Test Cases --- tests

@@ -296,6 +296,7 @@ public abstract class AbstractTRSimplifierTest
     configureTransitionRelationSimplifier();
     if (mSimplifier.run()) {
       rel = mSimplifier.getTransitionRelation();
+      rel.checkIntegrity();
       rel.setName("result");
       rel.removeTauSelfLoops();
       rel.removeProperSelfLoopEvents();

@@ -21,7 +21,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * This provides access to experimental compositional model verifiers
  * written by Jinjian Shi and Rachel Francis.
  *
- * @see ComposingSafetyVerifier
  * @see CompositionalGeneralisedConflictChecker
  *
  * @author Jinjian Shi, Rachel Francis, Robi Malik

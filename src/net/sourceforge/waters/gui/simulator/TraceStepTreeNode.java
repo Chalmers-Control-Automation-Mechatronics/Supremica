@@ -4,7 +4,7 @@ import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;

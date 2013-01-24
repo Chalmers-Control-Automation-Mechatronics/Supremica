@@ -76,7 +76,6 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 {
     private final ModuleSubjectFactory factory;
     private ModuleSubject module;
-    private boolean expand;
 
     private int nbrOfExAutomata = 0;
     private final ArrayList<ExtendedAutomaton> theExAutomata;
@@ -86,7 +85,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     private boolean negativeValuesIncluded = false;
     public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
-    private List<VariableComponentProxy> clocks;
+    private final List<VariableComponentProxy> clocks;
     int domain = 0;
     private int largestClockDomain = 0;
     private List<VariableComponentProxy> parameters = null;
@@ -96,7 +95,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public HashSet<EventDeclProxy> controllableAlphabet = null;
     public HashSet<EventDeclProxy> forcibleAlphabet = null;
     HashSet<EventDeclProxy> plantAlphabet = null;
-    
+
     final static String LOCAL_VAR_SUFFIX = ".curr";
     final static String CLOCK_PREFIX = "clock:";
     final static String GLOBAL_PREFIX = "global";
@@ -104,9 +103,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
    /**
    * The name to be used for the default forcible property used for timed EFAs.
    */
-    
+
     //Variable that are used when the input model is a Resource Allocation System
-    private List<VariableComponentProxy> stageVars;
+    private final List<VariableComponentProxy> stageVars;
     Map<VariableComponentProxy, List<VariableComponentProxy>> var2relatedVarsMap = null;
     public double theoNbrOfReachableStates = 0;
     public int nbrOfEFAsVars = 0;
@@ -131,24 +130,21 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         stringToExAutomaton = new HashMap<String, ExtendedAutomaton>();
     }
 
-    public ExtendedAutomata(final String name, final boolean expand) {
+    public ExtendedAutomata(final String name) {
         this();
         factory.createSimpleIdentifierProxy(name);
         module = new ModuleSubject(name, null);
-
         // make marking proposition
         final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
         module.getEventDeclListModifiable().add(factory.createEventDeclProxy(ident, EventKind.PROPOSITION));
-
-        this.expand = expand;
     }
 
     public ExtendedAutomata(final ModuleSubject module) {
         this(module, 0);
     }
 
-    public ExtendedAutomata(final ModuleSubject module, int globalClockDomain) {
-        this();        
+    public ExtendedAutomata(final ModuleSubject module, final int globalClockDomain) {
+        this();
 
         this.module = module;
 
@@ -159,8 +155,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                     uncontrollableAlphabet.add(e);
                 } else {
                     controllableAlphabet.add(e);
-                }    
-                if (ForcibleEventAttributeFactory.isForcible(e.getAttributes())) {                    
+                }
+                if (ForcibleEventAttributeFactory.isForcible(e.getAttributes())) {
                     forcibleAlphabet.add(e);
                 }
             }
@@ -172,7 +168,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
         var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
 
-        ArrayList<Proxy> components = new ArrayList<Proxy>(module.getComponentList());
+        final ArrayList<Proxy> components = new ArrayList<Proxy>(module.getComponentList());
         if (globalClockDomain > 0) {
             components.add(VariableHelper.createIntegerVariable(CLOCK_PREFIX + GLOBAL_PREFIX, 0, globalClockDomain, 0, null));
         }
@@ -244,8 +240,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
                 int currDomain = -1;
                 if (negativeValuesIncluded) {
-                    double lb = Math.abs(lowerBound);
-                    double ub = Math.abs(upperBound);
+                    final double lb = Math.abs(lowerBound);
+                    final double ub = Math.abs(upperBound);
 
                     if (ub >= lb) {
                         currDomain = ((int) Math.pow(2, (int) Math.ceil(Math.log(ub + 1) / Math.log(2)) + 1));
@@ -256,15 +252,15 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 } else {
                     currDomain = upperBound + 1;
                 }
-                
+
                 var2domainMap.put(var.getName(), currDomain);
 
                 if (currDomain > domain) {
-                    domain = currDomain;                    
+                    domain = currDomain;
                 }
                 if (clocks.contains(var) && currDomain > largestClockDomain) {
                         largestClockDomain = currDomain;
-                }                
+                }
             }
         }
 
@@ -294,8 +290,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
         nbrOfEFAsVars = variables.size() + theExAutomata.size();
     }
-    
-    public boolean isEventForcible(EventDeclProxy e){
+
+    public boolean isEventForcible(final EventDeclProxy e){
         return forcibleAlphabet.contains(e);
     }
 
@@ -389,7 +385,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         }
 
         throw new IllegalArgumentException("There does not exists a variable in the model with name " + varName + "!");
-    }   
+    }
 
     public List<VariableComponentProxy> getVars() {
         return variables;
@@ -551,11 +547,6 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     }
 
     public void writeToFile(final File file) {
-
-        if (expand) {
-            ExtendedAutomataExpander.expandTransitions(module);
-        }
-
         try {
             final JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());
             marshaller.marshal(module, file);

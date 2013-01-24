@@ -7,8 +7,17 @@ public class PartialOrderEventDependencyTuple
      mDependencyKind = dependencyKind;
    }
 
-   @SuppressWarnings("unused")
+   public PartialOrderEventDependencyKind getKind(){
+     return mDependencyKind;
+   }
+
+   public int getCoupling(){
+     return mDependencyCoupling;
+   }
+   public String toString(){
+     return String.valueOf(mDependencyCoupling);
+   }
+
   private final int mDependencyCoupling;
-   @SuppressWarnings("unused")
   private final PartialOrderEventDependencyKind mDependencyKind;
 }

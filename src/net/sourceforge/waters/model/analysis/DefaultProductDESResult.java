@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.PrintWriter;
 import java.util.Collection;
-
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -58,6 +58,70 @@ public class DefaultProductDESResult
   public void setComputedProductDES(final ProductDESProxy des)
   {
     setComputedProxy(des);
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.DefaultAnalysisResult
+  @Override
+  public void print(final PrintWriter writer)
+  {
+    super.print(writer);
+    final Collection<AutomatonProxy> automata = getComputedAutomata();
+    if (automata != null) {
+      final int numAutomata = automata.size();
+      writer.println("Number of computed automata: " + numAutomata);
+      long total = 0;
+      int max = 0;
+      for (final AutomatonProxy aut : automata) {
+        final int numStates = aut.getStates().size();
+        total += numStates;
+        if (numStates > max) {
+          max = numStates;
+        }
+      }
+      writer.println("Total number of computed states: " + total);
+      writer.println("Maximum number of computed states: " + max);
+    }
+  }
+
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  {
+    super.printCSVHorizontalHeadings(writer);
+    writer.print(',');
+    writer.print("NumOutputAutmata");
+    writer.print(',');
+    writer.print("TotalOutputStates");
+    writer.print(',');
+    writer.print("MaxOutputStates");
+  }
+
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
+  {
+    super.printCSVHorizontal(writer);
+    final Collection<AutomatonProxy> automata = getComputedAutomata();
+    if (automata == null) {
+      writer.print(",,,");
+    } else {
+      final int numAutomata = automata.size();
+      writer.print(",");
+      writer.print(numAutomata);
+      long total = 0;
+      int max = 0;
+      for (final AutomatonProxy aut : automata) {
+        final int numStates = aut.getStates().size();
+        total += numStates;
+        if (numStates > max) {
+          max = numStates;
+        }
+      }
+      writer.print(",");
+      writer.print(total);
+      writer.print(",");
+      writer.print(max);
+    }
   }
 
 }

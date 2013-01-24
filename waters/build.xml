@@ -227,7 +227,7 @@
   </target>
 
   <target name="javah" depends="waters-compile"
-          description="Create JNI headers.">
+          if="native.make" description="Create JNI headers.">
     <mkdir dir="${javah.dir}"/>
     <javah outputFile="${javah.file}" classpath="${waters.classes}">
       <class name="net.sourceforge.waters.cpp.analysis.NativeConflictChecker"/>
@@ -257,7 +257,7 @@
   </target>
 
   <target name="jniglue" depends="jniglue-jar,waters-jar"
-          description="Create JNI Glue C++ files.">
+          if="native.make" description="Create JNI Glue C++ files.">
     <mkdir dir="${jniglue.outdir}"/>
     <java classname="net.sourceforge.waters.build.jniglue.GlueCompiler"
           fork="true" failonerror="true">
@@ -351,8 +351,8 @@
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="net/sourceforge/waters/gui/**/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
-          <exclude name="net/sourceforge/waters/analysis/composing/**/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
+          <exclude name="net/sourceforge/waters/analysis/po/**/*.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Large*.java"/>
           <exclude name="**/Native*.java"/>

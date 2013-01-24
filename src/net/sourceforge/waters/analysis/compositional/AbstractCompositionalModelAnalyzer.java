@@ -86,12 +86,15 @@ public abstract class AbstractCompositionalModelAnalyzer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxyFactory factory,
-     final KindTranslator translator)
+     final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory)
   {
-    this(factory, translator,
+    this(factory, translator, abstractionFactory,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
@@ -101,6 +104,8 @@ public abstract class AbstractCompositionalModelAnalyzer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -111,10 +116,11 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    this(null, factory, translator,
+    this(null, factory, translator, abstractionFactory,
          preselectingMethodFactory, selectingMethodFactory);
   }
 
@@ -126,13 +132,16 @@ public abstract class AbstractCompositionalModelAnalyzer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
-     final KindTranslator translator)
+     final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory)
   {
-    this(model, factory, translator,
+    this(model, factory, translator, abstractionFactory,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
@@ -144,6 +153,8 @@ public abstract class AbstractCompositionalModelAnalyzer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -155,10 +166,12 @@ public abstract class AbstractCompositionalModelAnalyzer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
     super(model, factory, translator);
+    mAbstractionProcedureFactory = abstractionFactory;
     mPreselectingMethodFactory = preselectingMethodFactory;
     mSelectingMethodFactory = selectingMethodFactory;
     // Default for all model analysers---please do not change.
@@ -168,6 +181,8 @@ public abstract class AbstractCompositionalModelAnalyzer
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
     mInternalTransitionLimit = super.getTransitionLimit();
+    mSynchronousProductBuilder =
+      new MonolithicSynchronousProductBuilder(factory);
   }
 
 
@@ -211,14 +226,15 @@ public abstract class AbstractCompositionalModelAnalyzer
     mConfiguredPreconditionMarking = event;
   }
 
-  public void setAbstractionProcedure(final AbstractionProcedure proc)
+  public void setAbstractionProcedureFactory
+    (final AbstractionProcedureFactory factory)
   {
-    mAbstractionProcedure = proc;
+    mAbstractionProcedureFactory = factory;
   }
 
-  public AbstractionProcedure getAbstractionProcedure()
+  public AbstractionProcedureFactory getAbstractionProcedureFactory()
   {
-    return mAbstractionProcedure;
+    return mAbstractionProcedureFactory;
   }
 
   /**
@@ -318,6 +334,23 @@ public abstract class AbstractCompositionalModelAnalyzer
     mSubsumptionEnabled = enable;
   }
 
+  /**
+   * Sets whether deadlock states are pruned in synchronous products.
+   * @see MonolithicSynchronousProductBuilder#setPruningDeadlocks(boolean)
+   */
+  public void setPruningDeadlocks(final boolean pruning)
+  {
+    mSynchronousProductBuilder.setPruningDeadlocks(pruning);
+  }
+
+  /**
+   * Returns whether deadlock states are pruned.
+   * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
+   */
+  public boolean getPruningDeadlocks()
+  {
+    return mSynchronousProductBuilder.getPruningDeadlocks();
+  }
 
   public int getInternalStateLimit()
   {
@@ -394,13 +427,24 @@ public abstract class AbstractCompositionalModelAnalyzer
     mInternalTransitionLimit = limit;
   }
 
+  public void setSynchronousProductBuilder
+    (final MonolithicSynchronousProductBuilder builder)
+  {
+    mSynchronousProductBuilder = builder;
+  }
+
+  public MonolithicSynchronousProductBuilder getSynchronousProductBuilder()
+  {
+    return mSynchronousProductBuilder;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   @Override
   public boolean supportsNondeterminism()
   {
-    return mAbstractionProcedure.supportsNondeterminism();
+    return mAbstractionProcedureFactory.supportsNondeterminism();
   }
 
   @Override
@@ -469,20 +513,19 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
   }
 
-  void setPropositions(final Collection<EventProxy> props)
+  public void setPropositions(final Collection<EventProxy> props)
   {
     mPropositions = props;
   }
 
-  Collection<EventProxy> getPropositions()
+  public Collection<EventProxy> getPropositions()
   {
     return mPropositions;
   }
 
-  protected MonolithicSynchronousProductBuilder
-    getCurrentSynchronousProductBuilder()
+  protected AbstractionProcedure getAbstractionProcedure()
   {
-    return mCurrentSynchronousProductBuilder;
+    return mAbstractionProcedure;
   }
 
   protected List<AutomatonProxy> getCurrentAutomata()
@@ -513,20 +556,11 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   protected void setupSynchronousProductBuilder()
   {
-    if (mCurrentSynchronousProductBuilder == null) {
-      if (mSynchronousProductBuilder == null) {
-        final ProductDESProxyFactory factory = getFactory();
-        mCurrentSynchronousProductBuilder =
-          new MonolithicSynchronousProductBuilder(factory);
-      } else {
-        mCurrentSynchronousProductBuilder = mSynchronousProductBuilder;
-      }
-      mCurrentSynchronousProductBuilder.setPropositions(mPropositions);
-      final KindTranslator translator = getKindTranslator();
-      mCurrentSynchronousProductBuilder.setKindTranslator(translator);
-      final int tlimit = getInternalTransitionLimit();
-      mCurrentSynchronousProductBuilder.setTransitionLimit(tlimit);
-    }
+    mSynchronousProductBuilder.setPropositions(mPropositions);
+    final KindTranslator translator = getKindTranslator();
+    mSynchronousProductBuilder.setKindTranslator(translator);
+    final int tlimit = getInternalTransitionLimit();
+    mSynchronousProductBuilder.setTransitionLimit(tlimit);
   }
 
 
@@ -539,9 +573,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (mAbstractionProcedure != null) {
       mAbstractionProcedure.requestAbort();
     }
-    if (mCurrentSynchronousProductBuilder != null) {
-      mCurrentSynchronousProductBuilder.requestAbort();
-    }
+    mSynchronousProductBuilder.requestAbort();
   }
 
 
@@ -555,6 +587,8 @@ public abstract class AbstractCompositionalModelAnalyzer
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.setNumberOfStates(0.0);
     result.setNumberOfTransitions(0.0);
+    mAbstractionProcedure =
+      mAbstractionProcedureFactory.createAbstractionProcedure(this);
     mAbstractionProcedure.storeStatistics();
     mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
     mSelectingHeuristic = mSelectingMethod.createHeuristic(this);
@@ -573,7 +607,6 @@ public abstract class AbstractCompositionalModelAnalyzer
     mPropositions = null;
     mPreselectingHeuristic = null;
     mSelectingHeuristic = null;
-    mCurrentSynchronousProductBuilder = null;
     mCurrentAutomata = null;
     mEventInfoMap = null;
     mDirtyAutomata = null;
@@ -1481,32 +1514,31 @@ public abstract class AbstractCompositionalModelAnalyzer
      final EventProxy tau)
     throws AnalysisException
   {
-    mCurrentSynchronousProductBuilder.setModel(des);
+    mSynchronousProductBuilder.setModel(des);
     final Collection<EventProxy> events = des.getEvents();
     int expectedNumberOfEvents = events.size() - hidden.size();
     if (tau != null) {
-      mCurrentSynchronousProductBuilder.addMask(hidden, tau);
+      mSynchronousProductBuilder.addMask(hidden, tau);
       expectedNumberOfEvents++;
     }
-    mCurrentSynchronousProductBuilder.setConstructsResult(true);
-    mCurrentSynchronousProductBuilder.setNodeLimit(mCurrentInternalStateLimit);
-    mCurrentSynchronousProductBuilder.setTransitionLimit
-      (mInternalTransitionLimit);
-    mCurrentSynchronousProductBuilder.setStateCallback(null);
-    mCurrentSynchronousProductBuilder.setPropositions(null);
+    mSynchronousProductBuilder.setConstructsResult(true);
+    mSynchronousProductBuilder.setNodeLimit(mCurrentInternalStateLimit);
+    mSynchronousProductBuilder.setTransitionLimit(mInternalTransitionLimit);
+    mSynchronousProductBuilder.setStateCallback(null);
+    mSynchronousProductBuilder.setPropositions(null);
     try {
-      mCurrentSynchronousProductBuilder.run();
+      mSynchronousProductBuilder.run();
       final AutomatonProxy sync =
-        mCurrentSynchronousProductBuilder.getComputedAutomaton();
+        mSynchronousProductBuilder.getComputedAutomaton();
       mMayBeSplit |= sync.getEvents().size() < expectedNumberOfEvents;
       final Collection<AutomatonProxy> automata = des.getAutomata();
       return createSynchronousProductStep(automata, sync, hidden, tau);
     } finally {
       final CompositionalAnalysisResult stats = getAnalysisResult();
       final AutomatonResult result =
-        mCurrentSynchronousProductBuilder.getAnalysisResult();
+        mSynchronousProductBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
-      mCurrentSynchronousProductBuilder.clearMask();
+      mSynchronousProductBuilder.clearMask();
     }
   }
 
@@ -2447,26 +2479,26 @@ public abstract class AbstractCompositionalModelAnalyzer
       final Comparator<Candidate> comparator = getComparator();
       Collections.sort(list, comparator);
       int limit = mCurrentInternalStateLimit;
-      mCurrentSynchronousProductBuilder.setNodeLimit(limit);
-      mCurrentSynchronousProductBuilder.setConstructsResult(false);
-      mCurrentSynchronousProductBuilder.setStateCallback(null);
+      mSynchronousProductBuilder.setNodeLimit(limit);
+      mSynchronousProductBuilder.setConstructsResult(false);
+      mSynchronousProductBuilder.setStateCallback(null);
       Candidate best = null;
       final List<EventProxy> empty = Collections.emptyList();
-      mCurrentSynchronousProductBuilder.setPropositions(empty);
+      mSynchronousProductBuilder.setPropositions(empty);
       for (final Candidate candidate : list) {
         final List<AutomatonProxy> automata = candidate.getAutomata();
         final ProductDESProxy des = createProductDESProxy(automata);
-        mCurrentSynchronousProductBuilder.setModel(des);
+        mSynchronousProductBuilder.setModel(des);
         try {
-          mCurrentSynchronousProductBuilder.run();
+          mSynchronousProductBuilder.run();
           final AnalysisResult result =
-            mCurrentSynchronousProductBuilder.getAnalysisResult();
+            mSynchronousProductBuilder.getAnalysisResult();
           final double dsize = result.getTotalNumberOfStates();
           final int size = (int) Math.round(dsize);
           if (size < limit || best == null) {
             best = candidate;
             limit = size;
-            mCurrentSynchronousProductBuilder.setNodeLimit(limit);
+            mSynchronousProductBuilder.setNodeLimit(limit);
           }
         } catch (final OutOfMemoryError error) {
           getLogger().debug("<out of memory>");
@@ -2476,7 +2508,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         } finally {
           final CompositionalAnalysisResult stats = getAnalysisResult();
           final AutomatonResult result =
-            mCurrentSynchronousProductBuilder.getAnalysisResult();
+            mSynchronousProductBuilder.getAnalysisResult();
           stats.addSynchronousProductAnalysisResult(result);
         }
       }
@@ -2684,12 +2716,12 @@ public abstract class AbstractCompositionalModelAnalyzer
    */
   private Collection<EventProxy> mPropositions;
 
+  private AbstractionProcedureFactory mAbstractionProcedureFactory;
   private final PreselectingMethodFactory mPreselectingMethodFactory;
   private PreselectingMethod mPreselectingMethod;
   private final SelectingMethodFactory mSelectingMethodFactory;
   private SelectingMethod mSelectingMethod;
   private boolean mSubsumptionEnabled;
-  private MonolithicSynchronousProductBuilder mSynchronousProductBuilder;
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;
@@ -2755,11 +2787,10 @@ public abstract class AbstractCompositionalModelAnalyzer
   private Set<List<AutomatonProxy>> mOverflowCandidates;
   private int mCurrentInternalStateLimit;
 
+  private MonolithicSynchronousProductBuilder mSynchronousProductBuilder;
   private AbstractionProcedure mAbstractionProcedure;
   private PreselectingHeuristic mPreselectingHeuristic;
   private SelectingHeuristic mSelectingHeuristic;
-  private MonolithicSynchronousProductBuilder
-    mCurrentSynchronousProductBuilder;
 
 
   //#########################################################################

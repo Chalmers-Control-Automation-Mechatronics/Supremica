@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.util.Arrays;
+
 
 /**
  * <P>Encoded synchronized state tuple.</P>
@@ -85,6 +87,10 @@ public class StateTuple
     } else {
       return false;
     }
+  }
+
+  public String toString(){
+    return Arrays.toString(mStateCodes);
   }
 
 

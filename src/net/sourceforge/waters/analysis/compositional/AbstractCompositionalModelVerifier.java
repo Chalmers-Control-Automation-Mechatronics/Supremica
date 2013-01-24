@@ -64,11 +64,15 @@ public abstract class AbstractCompositionalModelVerifier
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   protected AbstractCompositionalModelVerifier
-    (final ProductDESProxyFactory factory, final KindTranslator translator)
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory)
   {
-    super(factory, translator);
+    super(factory, translator, abstractionFactory);
   }
 
   /**
@@ -77,6 +81,8 @@ public abstract class AbstractCompositionalModelVerifier
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -87,10 +93,11 @@ public abstract class AbstractCompositionalModelVerifier
   protected AbstractCompositionalModelVerifier
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    super(factory, translator,
+    super(factory, translator, abstractionFactory,
           preselectingMethodFactory, selectingMethodFactory);
   }
 
@@ -102,13 +109,16 @@ public abstract class AbstractCompositionalModelVerifier
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   protected AbstractCompositionalModelVerifier
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
-     final KindTranslator translator)
+     final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory)
   {
-    super(model, factory, translator);
+    super(model, factory, translator, abstractionFactory);
   }
 
   /**
@@ -119,6 +129,8 @@ public abstract class AbstractCompositionalModelVerifier
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -130,10 +142,11 @@ public abstract class AbstractCompositionalModelVerifier
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    super(model, factory, translator,
+    super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory, selectingMethodFactory);
   }
 
@@ -313,8 +326,7 @@ public abstract class AbstractCompositionalModelVerifier
      final Collection<EventProxy> hidden,
      final EventProxy tau)
   {
-    final SynchronousProductBuilder builder =
-      getCurrentSynchronousProductBuilder();
+    final SynchronousProductBuilder builder = getSynchronousProductBuilder();
     final SynchronousProductStateMap stateMap =  builder.getStateMap();
     return new HidingStep(this, sync, hidden, tau, stateMap);
   }

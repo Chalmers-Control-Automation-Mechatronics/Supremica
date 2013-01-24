@@ -384,7 +384,8 @@ public abstract class TransitionListBuffer
    * originally are associated with at least one of the two states.
    * Duplicates are suppressed, and ordering is preserved such that
    * transitions originally associated with the source state appear
-   * earlier in the resultant list.
+   * earlier in the resultant list. The operation is implemented as a
+   * merge operation using a priority queue.
    * @param  source   From-state containing transitions to be copied.
    * @param  dest     From-state to receive transitions.
    * @param  reverse  Another transition list buffer containing the reverse
@@ -401,65 +402,139 @@ public abstract class TransitionListBuffer
     if (source == dest) {
       return false;
     }
-    int list1 = mStateTransitions[source];
+    final int list1 = mStateTransitions[source];
     if (list1 == NULL) {
       return false;
     }
-    final TIntHashSet existing = new TIntHashSet();
-    boolean result = false;
-    list1 = getNext(list1);
-    if (list1 != NULL) {
-      int[] block1 = mBlocks.get(list1 >>> mBlockShift);
-      int offset1 = list1 & mBlockMask;
-      int data1 = block1[offset1 + OFFSET_DATA];
-      int event = data1 & mEventMask;
-      do {
-        int list2 = createList(dest, event);
-        int next2 = getNext(list2);
-        while (next2 != NULL) {
-          final int[] block2 = mBlocks.get(next2 >>> mBlockShift);
-          final int offset2 = next2 & mBlockMask;
-          final int data2 = block2[offset2 + OFFSET_DATA];
-          if ((data2 & mEventMask) != event) {
-            break;
-          }
-          existing.add(data2 >>> mStateShift);
-          list2 = next2;
-          next2 = block2[offset2 + OFFSET_NEXT];
-        }
-        boolean added = false;
-        do {
-          final int state1 = data1 >>> mStateShift;
-          if (existing.add(state1)) {
-            list2 = prepend(list2, data1);
-            added = true;
-            if (reverse != null) {
-              reverse.addTransition(state1, event, dest);
-            }
-          }
-          list1 = block1[offset1 + OFFSET_NEXT];
-          if (list1 == NULL) {
-            break;
-          }
-          block1 = mBlocks.get(list1 >>> mBlockShift);
-          offset1 = list1 & mBlockMask;
-          data1 = block1[offset1 + OFFSET_DATA];
-        } while ((data1 & mEventMask) == event);
-        event = data1 & mEventMask;
-        existing.clear();
-        if (added) {
-          if (next2 != NULL) {
-            final int nextEvent = getEvent(next2);
-            final int nextCode = (dest << mStateShift) | nextEvent;
-            mStateEventTransitions.put(nextCode, list2);
-          }
-          result = true;
-        }
-      } while (list1 != NULL);
-    }
-    return result;
+    final TIntArrayList list = new TIntArrayList(1);
+    list.add(source);
+    return copyTransitions(list, dest, reverse);
   }
 
+  /**
+   * Copies all transitions associated with the given source states to
+   * the given destination state. This method rebuilds the transition list
+   * of the destination state so it contains any event-to-state pairs that
+   * originally are associated with at least one of the two states.
+   * Duplicates are suppressed, and ordering is preserved such that
+   * transitions originally associated with the source state appear
+   * earlier in the resultant list. The operation is implemented as a
+   * merge operation using a priority queue.
+   * @param  sources  List of from-states containing transitions to be copied.
+   * @param  dest     From-state to receive transitions.
+   * @param  reverse  Another transition list buffer containing the reverse
+   *                  of this buffer's transitions. If non-<CODE>null</CODE>
+   *                  any transitions added during this operation will also
+   *                  be added to the reverse buffer, in reversed form.
+   * @return <CODE>true</CODE> if at least one transition was copied;
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean copyTransitions(final TIntArrayList sources,
+                                 final int dest,
+                                 final TransitionListBuffer reverse)
+  {
+    if (sources.size() == 0 ||
+        sources.size() == 1 && sources.get(0) == dest) {
+      return false;
+    }
+    final int size = sources.size() + 1;
+    final int[] lists = new int[size];
+    final int list0 = mStateTransitions[dest];
+    if (list0 != NULL) {
+      lists[0] = getNext(list0);
+    }
+    boolean allNull = true;
+    for (int i = 1; i < size; i++) {
+      final int source = sources.get(i-1);
+      final int list1 = mStateTransitions[source];
+      if (list1 != NULL) {
+        lists[i] = getNext(list1);
+        allNull = false;
+      }
+    }
+    if (allNull) {
+      return false;
+    }
+    final WatersIntComparator comparator = new WatersIntComparator() {
+      @Override
+      public int compare(final int index1, final int index2)
+      {
+        final int list1 = lists[index1];
+        final int data1 = getData(list1);
+        final int event1 = data1 & mEventMask;
+        final int list2 = lists[index2];
+        final int data2 = getData(list2);
+        final int event2 = data2 & mEventMask;
+        if (event1 != event2) {
+          return event1 - event2;
+        } else if (data1 < data2) {
+          return -1;
+        } else if (data1 > data2) {
+          return 1;
+        } else {
+          return index1 - index2;
+        }
+      }
+    };
+    final WatersIntHeap heap = new WatersIntHeap(size, comparator);
+    for (int i = 0; i < size; i++) {
+      if (lists[i] != NULL) {
+        heap.add(i);
+      }
+    }
+    int prevData = 0;
+    final int newList = createList();
+    int tail = newList;
+    boolean addition = false;
+    while (!heap.isEmpty()) {
+      final int i = heap.removeFirst();
+      final int list = lists[i];
+      final int data = getData(list); // next item!!!
+      final int next = getNext(list);
+      lists[i] = next;
+      if (next != NULL) {
+        heap.add(i);
+      }
+      if (prevData != data || newList == tail) {
+        final int pair = allocatePair();
+        setNext(tail, pair);
+        tail = pair;
+        setDataAndNext(pair, data, NULL);
+        prevData = data;
+        if (i > 0) {
+          addition = true;
+          if (reverse != null) {
+            final int state = data >>> mStateShift;
+            final int event = data & mEventMask;
+            reverse.addTransition(state, event, dest);
+          }
+        }
+      }
+    }
+    if (addition) {
+      mStateTransitions[dest] = newList;
+      dispose(lists[0]);
+      final int destCode = dest << mStateShift;
+      int prevEvent = -1;
+      int current = newList;
+      while (true) {
+        final int next = getNext(current);
+        if (next == NULL) {
+          break;
+        }
+        final int event = getEvent(next);
+        if (event != prevEvent) {
+          final int code = destCode | event;
+          mStateEventTransitions.put(code, current);
+          prevEvent = event;
+        }
+        current = next;
+      }
+    } else {
+      dispose(newList);
+    }
+    return addition;
+  }
 
   /**
    * Removes all transitions associated with the given from-state.
@@ -869,7 +944,7 @@ public abstract class TransitionListBuffer
 
   /**
    * Gets the from-state for the given transition. This method is used by
-   * {@link #setUpTransitions(List,EventEncoding,StateEncoding)
+   * {@link #setUpTransitions(Set,List,EventEncoding,StateEncoding)
    * setUpTransitions()} to interpret transitions. It is overridden by
    * subclasses to handle forward and backward transition buffers uniformly.
    */
@@ -877,7 +952,7 @@ public abstract class TransitionListBuffer
 
   /**
    * Gets the to-state for the given transition. This method is used by
-   * {@link #setUpTransitions(List,EventEncoding,StateEncoding)
+   * {@link #setUpTransitions(Set,List,EventEncoding,StateEncoding)
    * setUpTransitions()} to interpret transitions. It is overridden by
    * subclasses to handle forward and backward transition buffers uniformly.
    */
@@ -1039,25 +1114,30 @@ public abstract class TransitionListBuffer
           current = next;
         }
       }
-      final int[] transarray = transitions.toArray();
-      transitions.clear();
-      Arrays.sort(transarray);
-      newStateTransitions[code] = list = createList();
-      int event0 = -1;
-      for (final int trans : transarray) {
-        final int event = (trans >>> eventShift);
-        final int target = trans & stateMask;
-        if (event0 != event) {
-          final int fromCode = (code << mStateShift) | event;
-          mStateEventTransitions.put(fromCode, list);
-          event0 = event;
+      if (transitions.isEmpty()) {
+        newStateTransitions[code] = NULL;
+      } else {
+        final int[] transarray = transitions.toArray();
+        transitions.clear();
+        Arrays.sort(transarray);
+        newStateTransitions[code] = list = createList();
+        int event0 = -1;
+        for (final int trans : transarray) {
+          final int event = (trans >>> eventShift);
+          final int target = trans & stateMask;
+          if (event0 != event) {
+            final int fromCode = (code << mStateShift) | event;
+            mStateEventTransitions.put(fromCode, list);
+            event0 = event;
+          }
+          final int data = (target << mStateShift) | event;
+          list = prepend(list, data);
         }
-        final int data = (target << mStateShift) | event;
-        list = prepend(list, data);
       }
       code++;
     }
     mStateTransitions = newStateTransitions;
+    mNumStates = numClasses;
   }
 
 
@@ -1772,7 +1852,6 @@ public abstract class TransitionListBuffer
   private final int mBlockMask;
   private final int mBlockSize;
 
-  private final int mNumStates;
   private final int mNumEvents;
   private final int mStateShift;
   private final int mEventMask;
@@ -1780,6 +1859,7 @@ public abstract class TransitionListBuffer
   private int[] mStateTransitions;
   private final TIntIntHashMap mStateEventTransitions;
 
+  private int mNumStates;
   private int mRecycleStart;
   private int mNextFreeIndex;
 

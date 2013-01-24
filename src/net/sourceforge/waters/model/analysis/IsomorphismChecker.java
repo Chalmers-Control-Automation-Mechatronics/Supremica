@@ -65,10 +65,12 @@ public class IsomorphismChecker
    *                     object identity.
    */
   public IsomorphismChecker(final ProductDESProxyFactory factory,
-                            final boolean matchNames)
+                            final boolean matchNames, 
+                            final boolean throwingExceptions)
   {
     mFactory = factory;
     mMatchingNames = matchNames;
+    mThrowingExceptions = throwingExceptions;
   }
 
 
@@ -93,6 +95,25 @@ public class IsomorphismChecker
   public void setMatchingNames(final boolean matchNames)
   {
     mMatchingNames = matchNames;
+  }
+  /**
+   * Gets the <I>throwing exceptions</I> setting of this isomorphism checker.
+   * @return <CODE>true</CODE> if the method checkBisimulation throw exceptions,
+   *         <CODE>false</CODE> if the method checkBisimulation does not throw exceptions
+   */
+  public boolean isThrowingExceptions()
+  {
+    return mThrowingExceptions;
+  }
+
+  /**
+   * Sets the <I>throwing exceptions</I> setting of this isomorphism checker.
+   * @param  throwingExceptions  <CODE>true</CODE> if the method checkBisimulation is to throw exceptions,
+   *                     <CODE>false</CODE> if the method checkBisimulation is not to throw exceptions
+   */
+  public void setThrowingExceptions(final boolean throwingExceptions)
+  {
+    mThrowingExceptions = throwingExceptions;
   }
 
 
@@ -138,9 +159,10 @@ public class IsomorphismChecker
    * Checks whether the two given automata are bisimilar.
    * @param  aut1   The first automaton to be compared.
    * @param  aut2   The second automaton to be compared.
+   * @return 
    * @throws AnalysisException if the input automata are not isomorphic.
    */
-  public void checkBisimulation(final AutomatonProxy aut1,
+  public boolean checkBisimulation(final AutomatonProxy aut1,
                                 final AutomatonProxy aut2)
     throws AnalysisException
   {
@@ -161,12 +183,19 @@ public class IsomorphismChecker
         (ObservationEquivalenceTRSimplifier.TransitionRemoval.NONE);
       final boolean result = bisimulator.run();
       if (!result) {
-        throw new IsomorphismException
+        if(mThrowingExceptions){
+          throw new IsomorphismException
           ("Bisimulator did not identify any states!");
+        } else{
+          return false;
+        }
       }
       final List<int[]> partition = bisimulator.getResultPartition();
-      checkBisimulationPartition(partition, rel, stateEnc);
+      if(!checkBisimulationPartition(partition, rel, stateEnc)){
+        return false;
+      }
     }
+    return true;
   }
 
   /**
@@ -400,7 +429,7 @@ public class IsomorphismChecker
     }
   }
 
-  private void checkBisimulationPartition
+  private boolean checkBisimulationPartition
     (final List<int[]> partition,
      final ListBufferTransitionRelation rel,
      final StateEncoding enc)
@@ -421,13 +450,22 @@ public class IsomorphismChecker
         }
       }
       if (count[0] != count[1]) {
-        throw new IsomorphismException
+        if(mThrowingExceptions){
+          throw new IsomorphismException
           ("Automata contain non-bisimilar states!");
+        } else{
+          return false;
+        }
       } else if (initCount[0] != initCount[1]) {
-        throw new IsomorphismException
+        if(mThrowingExceptions){
+          throw new IsomorphismException
           ("Initial states do not match!");
+        } else{
+          return false;
+        }
       }
     }
+    return true;
   }
 
   private StateProxy getAltState(final StateProxy state, final int index)
@@ -504,6 +542,7 @@ public class IsomorphismChecker
   private final ProductDESProxyFactory mFactory;
 
   private boolean mMatchingNames;
+  private boolean mThrowingExceptions;
 
   private Map<EventProxy,EventProxy> mEventMap;
   private Collection<EventProxy> mSelfloops1;

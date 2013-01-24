@@ -28,6 +28,7 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 
 /**
  * An open addressed hashing implementation for Object types.
@@ -37,24 +38,25 @@ import java.io.Serializable;
  * @author Eric D. Friedman
  * @version $Id$
  */
-abstract class StateObjectHash
-  extends StateHash
-  implements Serializable, StateObjectHashingStrategy
+abstract class StateObjectHash<E>
+  extends StateHash<E>
+  implements Serializable, StateObjectHashingStrategy<E>
 {
     private static final long serialVersionUID = 1L;
 
     /** the set of Objects */
-    protected transient EncodedStateTuple[] _set;
-    
+    protected transient E[] _set;
+
     /** the strategy used to hash objects in this collection. */
-    protected StateObjectHashingStrategy _hashingStrategy;
+    protected StateObjectHashingStrategy<E> _hashingStrategy;
+
 
     /**
      * Creates a new <code>StateObjectHash</code> instance with the
      * default capacity and load factor.
      */
-    public StateObjectHash() {
-        super();
+    public StateObjectHash(final Class<? extends E> clazz) {
+        super(clazz);
         this._hashingStrategy = this;
     }
 
@@ -65,8 +67,9 @@ abstract class StateObjectHash
      *
      * @param initialCapacity an <code>int</code> value
      */
-    public StateObjectHash(int initialCapacity) {
-        super(initialCapacity);
+    public StateObjectHash(final Class<? extends E> clazz,
+                           final int initialCapacity) {
+        super(clazz,initialCapacity);
         this._hashingStrategy = this;
     }
 
@@ -76,11 +79,12 @@ abstract class StateObjectHash
      * @param initialCapacity an <code>int</code> value
      * @return an <code>int</code> value
      */
-    protected int setUp(int initialCapacity) {
+    @SuppressWarnings("unchecked")
+    protected int setUp(final int initialCapacity) {
         int capacity;
 
         capacity = super.setUp(initialCapacity);
-        _set = new EncodedStateTuple[capacity];
+        _set = (E[]) Array.newInstance(_clazz, capacity);
         return capacity;
     }
 
@@ -94,23 +98,23 @@ abstract class StateObjectHash
      * @param obj an <code>Object</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean contains(EncodedStateTuple obj) {
+    public boolean contains(final E obj) {
         return index(obj) >= 0;
     }
-    
+
     /**
      * Return <tt>obj</tt> from the set
      *
      * @param obj an <code>Object</code> value
      * @return an <code>Object</code> value. if not exists, return null
      */
-    public EncodedStateTuple get(EncodedStateTuple obj) {
-	int i = index(obj);
+    public E get(final E obj) {
+	final int i = index(obj);
 
 	if(i >= 0){
 	    return _set[i];
 	}
-	
+
         return null;
     }
 
@@ -120,18 +124,18 @@ abstract class StateObjectHash
      * @param obj an <code>Object</code> value
      * @return null if the set was modified by the add operation, the found value if it is found.
      */
-    public EncodedStateTuple getOrAdd(EncodedStateTuple obj) {
+    public E getOrAdd(final E obj) {
 	int i = index(obj);
 
 	if(i >= 0){
 	    return _set[i];
 	}
-	
+
         i = insertionIndex(obj);
 
-        EncodedStateTuple old = _set[i];
+        final E old = _set[i];
         _set[i] = obj;
-	
+
         postInsertHook(old == null);
         return null;            // yes, we added something
     }
@@ -143,10 +147,10 @@ abstract class StateObjectHash
      * @param obj an <code>Object</code> value
      * @return the index of <tt>obj</tt> or -1 if it isn't in the set.
      */
-    protected int index(EncodedStateTuple obj) {
+    protected int index(final E obj) {
         int hash, probe, index, length;
-        EncodedStateTuple[] set;
-        EncodedStateTuple cur;
+        E[] set;
+        E cur;
 
         set = _set;
         length = set.length;
@@ -158,7 +162,7 @@ abstract class StateObjectHash
             && (! _hashingStrategy.equals(cur, obj))) {
             // see Knuth, p. 529
             probe = 1 + (hash % (length - 2));
-	    
+
             do {
                 index -= probe;
                 if (index < 0) {
@@ -182,10 +186,10 @@ abstract class StateObjectHash
      * or, if obj is already stored in the hash, the negative value of
      * that index, minus 1: -index -1.
      */
-    protected int insertionIndex(EncodedStateTuple obj) {
+    protected int insertionIndex(final E obj) {
         int hash, probe, index, length;
-        EncodedStateTuple[] set;
-        EncodedStateTuple cur;
+        E[] set;
+        E cur;
 
         set = _set;
         length = set.length;
@@ -212,7 +216,7 @@ abstract class StateObjectHash
             // is possible.
             // finding a matching value means that we've found that our desired
             // key is already in the table
-	    
+
 	    // starting at the natural offset, probe until we find an
 	    // offset that isn't full.
 	    do {
@@ -222,12 +226,12 @@ abstract class StateObjectHash
 		}
 		cur = set[index];
 	    } while (cur != null && ! _hashingStrategy.equals(cur, obj));
-	    
+
             // if it's full, the key is already stored
             return (cur != null) ? -index -1 : index;
 	}
     }
-    
+
     /**
      * This is the default implementation of StateObjectHashingStrategy:
      * it delegates hashing to the Object's hashCode method.
@@ -236,7 +240,7 @@ abstract class StateObjectHash
      * @return the hashCode
      * @see Object#hashCode()
      */
-    public final int computeHashCode(EncodedStateTuple o) {
+    public final int computeHashCode(final E o) {
         return o == null ? 0 : o.hashCode();
     }
 
@@ -250,7 +254,7 @@ abstract class StateObjectHash
      * @return true if the objects are equal
      * @see Object#equals(Object)
      */
-    public final boolean equals(EncodedStateTuple o1, EncodedStateTuple o2) {
+    public final boolean equals(final E o1, final E o2) {
         return o1 == null ? o2 == null : o1.equals(o2);
     }
 
@@ -265,7 +269,7 @@ abstract class StateObjectHash
      * @param o2 the second of the equal elements with unequal hash codes.
      * @exception IllegalArgumentException the whole point of this method.
      */
-    protected final void throwObjectContractViolation(EncodedStateTuple o1, EncodedStateTuple o2) 
+    protected final void throwObjectContractViolation(final E o1, final E o2)
         throws IllegalArgumentException {
         throw new IllegalArgumentException("Equal objects must have equal hashcodes. "
                                            + "During rehashing, Trove discovered that "

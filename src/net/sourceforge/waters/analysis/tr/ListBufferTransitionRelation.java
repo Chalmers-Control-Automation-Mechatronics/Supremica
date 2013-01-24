@@ -1520,6 +1520,40 @@ public class ListBufferTransitionRelation
 
   /**
    * <P>
+   * Copies all outgoing transitions from each of the given 'from' states
+   * to the given 'to' state.
+   * </P>
+   * <P>
+   * This method copies all markings and regular transitions from the 'from'
+   * states to the 'to' state. It suppresses duplicates, and ordering is
+   * preserved such that outgoing transitions originally associated with the
+   * 'from' state appear earlier in the resultant list.
+   * </P>
+   *
+   * @param from
+   *          List of IDs of state containing transitions and markings
+   *          to be copied.
+   * @param to
+   *          ID of state receiving transitions and markings.
+   * @throws IllegalStateException
+   *           if the transition relation is not configured to use an outgoing
+   *           transition buffer.
+   */
+  public void copyOutgoingTransitions(final TIntArrayList from, final int to)
+  {
+    if (!from.isEmpty()) {
+      if (mSuccessorBuffer == null) {
+        throw createNoBufferException(CONFIG_SUCCESSORS);
+      }
+      for (int i = 0; i < from.size(); i++) {
+        copyMarkings(from.get(i), to);
+      }
+      mSuccessorBuffer.copyTransitions(from, to, mPredecessorBuffer);
+    }
+  }
+
+  /**
+   * <P>
    * Moves all outgoing transitions from the given 'from' state to the given
    * 'to' state.
    * </P>

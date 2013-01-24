@@ -37,8 +37,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.ProductDESBuilder;
 import net.sourceforge.waters.model.analysis.ProductDESResult;
+import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.SupervisorTooBigException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -71,7 +71,7 @@ import org.apache.log4j.Logger;
 
 public class CompositionalSynthesizer
   extends AbstractCompositionalModelAnalyzer
-  implements ProductDESBuilder
+  implements SupervisorSynthesizer
 {
 
   //#########################################################################
@@ -81,24 +81,23 @@ public class CompositionalSynthesizer
    * @param factory
    *          Factory used for trace construction.
    */
-  public CompositionalSynthesizer
-    (final ProductDESProxyFactory factory)
+  public CompositionalSynthesizer(final ProductDESProxyFactory factory)
   {
-    this(factory, IdenticalKindTranslator.getInstance());
+    this(factory, SynthesisAbstractionProcedureFactory.WSOE);
   }
 
   /**
    * Creates a compositional synthesiser without a model.
    * @param factory
    *          Factory used for trace construction.
-   * @param translator
-   *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalSynthesizer
     (final ProductDESProxyFactory factory,
-     final KindTranslator translator)
+     final SynthesisAbstractionProcedureFactory abstractionFactory)
   {
-    this(null, factory, translator);
+    this(factory, IdenticalKindTranslator.getInstance(), abstractionFactory);
   }
 
   /**
@@ -107,6 +106,25 @@ public class CompositionalSynthesizer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
+   */
+  public CompositionalSynthesizer
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final SynthesisAbstractionProcedureFactory abstractionFactory)
+  {
+    this(null, factory, translator, abstractionFactory);
+  }
+
+  /**
+   * Creates a compositional synthesiser without a model.
+   * @param factory
+   *          Factory used for trace construction.
+   * @param translator
+   *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -117,10 +135,11 @@ public class CompositionalSynthesizer
   public CompositionalSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final SynthesisAbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    this(null, factory, translator,
+    this(null, factory, translator, abstractionFactory,
          preselectingMethodFactory, selectingMethodFactory);
   }
 
@@ -133,13 +152,16 @@ public class CompositionalSynthesizer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
-     final KindTranslator translator)
+     final KindTranslator translator,
+     final SynthesisAbstractionProcedureFactory abstractionFactory)
   {
-    this(model, factory, translator,
+    this(model, factory, translator, abstractionFactory,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
@@ -152,6 +174,8 @@ public class CompositionalSynthesizer
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
@@ -163,15 +187,13 @@ public class CompositionalSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
+     final SynthesisAbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
      final SelectingMethodFactory selectingMethodFactory)
   {
-    super(model, factory, translator,
+    super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory, selectingMethodFactory);
-    final AbstractionProcedure proc =
-      SynthesisAbstractionProcedure.createSynthesisAbstractionProcedure
-        (this, SynthesisAbstractionProcedure.CHAIN_WSOE);
-    setAbstractionProcedure(proc);
+    setPruningDeadlocks(true);
   }
 
 
@@ -277,15 +299,6 @@ public class CompositionalSynthesizer
 
   //#########################################################################
   //# Hooks
-  @Override
-  protected void setupSynchronousProductBuilder()
-  {
-    super.setupSynchronousProductBuilder();
-    final MonolithicSynchronousProductBuilder builder =
-      getCurrentSynchronousProductBuilder();
-    builder.setPruningDeadlocks(true);
-  }
-
   @Override
   protected AutomatonProxy plantify(final AutomatonProxy spec)
     throws OverflowException
@@ -494,7 +507,7 @@ public class CompositionalSynthesizer
                      " automata, estimated " + estimate + " states.");
       }
       final MonolithicSynchronousProductBuilder syncBuilder =
-        getCurrentSynchronousProductBuilder();
+        getSynchronousProductBuilder();
       final ProductDESProxy des = createProductDESProxy(automata);
 
       syncBuilder.setModel(des);
@@ -985,7 +998,7 @@ public class CompositionalSynthesizer
       automata.add(distinguisher);
       final ProductDESProxy model = createProductDESProxy (automata);
       final MonolithicSynchronousProductBuilder builder =
-        getCurrentSynchronousProductBuilder();
+        getSynchronousProductBuilder();
       builder.setNodeLimit(getMonolithicStateLimit());
       builder.setTransitionLimit(getMonolithicTransitionLimit());
       builder.setConstructsResult(true);

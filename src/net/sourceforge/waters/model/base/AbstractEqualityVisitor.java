@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.base;
 
+import gnu.trove.TObjectHashingStrategy;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -197,6 +199,19 @@ public abstract class AbstractEqualityVisitor
     return false;
   }
 
+  /**
+   * Returns a hashing strategy for use with GNU Trove,
+   * using the equality defined by this visitor.
+   */
+  public <P extends Proxy>
+  TObjectHashingStrategy<P> getTObjectHashingStrategy()
+  {
+    return new ProxyHashingStrategy<P>();
+  }
+
+
+  //#########################################################################
+  //# Diagnostics
   /**
    * Gets diagnostics information.
    * @return A string explaining why the last equality test performed by
@@ -822,6 +837,34 @@ public abstract class AbstractEqualityVisitor
       map.put(key, value);
     }
     return map;
+  }
+
+
+  //#########################################################################
+  //# Inner Class ProxyHashingStrategy
+  private class ProxyHashingStrategy<P extends Proxy>
+    implements TObjectHashingStrategy<P>
+  {
+
+    //#######################################################################
+    //# Interface gnu.trove.TObjectHashingStrategy<Proxy>
+     @Override
+    public int computeHashCode(final P proxy)
+    {
+      final AbstractHashCodeVisitor visitor = getHashCodeVisitor();
+      return visitor.hashCode(proxy);
+    }
+
+    @Override
+    public boolean equals(final P proxy0, final P proxy1)
+    {
+      return AbstractEqualityVisitor.this.equals(proxy0, proxy1);
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+
   }
 
 

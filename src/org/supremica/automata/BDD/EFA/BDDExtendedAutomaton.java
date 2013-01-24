@@ -4,7 +4,7 @@ package org.supremica.automata.BDD.EFA;
  *
  * @author Sajed Miremadi, Zhennan Fei
  */
-import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -50,8 +51,10 @@ public class BDDExtendedAutomaton {
     private BDD edgesWithoutDestLWBDD;
     HashMap<Integer, String> bddIndex2SourceStateName;
     public HashMap<String, HashSet<Integer>> enablingSigmaMap;
+    BDD edgeForwardBDDWithoutSelfLoops; // The DFA partitioning approach needs this BDD.
     BDD selfLoopsBDD;
-    TIntArrayList caredEventsIndex;
+    TIntHashSet caredEventsIndex;
+    TIntHashSet caredUncontrollableEventsIndex;
     String OR = " | ";
     String AND = " & ";
     String O_PAR = "(";
@@ -89,8 +92,10 @@ public class BDDExtendedAutomaton {
         edgesWithoutDestClocksBDD = manager.getZeroBDD();
         edgesWithoutDestLWBDD = manager.getZeroBDD();
 
+        edgeForwardBDDWithoutSelfLoops = manager.getZeroBDD();
         selfLoopsBDD = manager.getZeroBDD();
-        caredEventsIndex = new TIntArrayList();
+        caredEventsIndex = new TIntHashSet();
+        caredUncontrollableEventsIndex = new TIntHashSet();
     }
 
     public void initialize() {
@@ -111,7 +116,7 @@ public class BDDExtendedAutomaton {
 
         System.err.println(theExAutomaton.getName());
         for (final NodeProxy currLocation : theExAutomaton.getNodes()) {
-            if (!(bddExAutomata.synType.equals(SynthesisAlgorithm.MONOLITHICBDD) || bddExAutomata.synType.equals(SynthesisAlgorithm.MINIMALITY))) {
+            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
                 // Add the node proxy in the map
                 for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {
                     final EdgeSubject currEdge = edgeIt.next();
@@ -268,19 +273,36 @@ public class BDDExtendedAutomaton {
 
     private void addNodeProxy(final EdgeSubject theEdge) {
 
+        BDD theEdgeBDD = manager.getOneBDD();
+        BDD edgeEventsBDD = manager.getZeroBDD();
+        
+        if (bddExAutomata.orgExAutomata.getVars().isEmpty()) { // for the DFA partitioning method
+            int sourceLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, theEdge.getSource());
+            int destLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, theEdge.getTarget());
+            BDD sourceLocationBDD = manager.getFactory().buildCube(sourceLocationIndex, sourceLocationDomain.vars());
+            BDD destLocationBDD = manager.getFactory().buildCube(destLocationIndex, destLocationDomain.vars());
+            theEdgeBDD.andWith(sourceLocationBDD.andWith(destLocationBDD));
+        }
+
         final Iterator<Proxy> eventIterator = theEdge.getLabelBlock().getEventIdentifierList().iterator();
         while (eventIterator.hasNext()) {
 
-            final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
+            final String eventName = ((SimpleIdentifierProxy) eventIterator.next()).getName();
             final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
             final int eventIndex = bddExAutomata.getEventIndex(theEvent);
+            
+            if (bddExAutomata.orgExAutomata.getVars().isEmpty()) { // for the DFA partitioning method
+                edgeEventsBDD.orWith(manager.getFactory().buildCube(eventIndex, bddExAutomata.getEventDomain().vars()));
+            }
 
             caredEventsIndex.add(eventIndex);
 
-            if (theEvent.getKind() == EventKind.UNCONTROLLABLE) {
-                if (theExAutomaton.isSpecification()) {
+            if(theEvent.getKind() == EventKind.UNCONTROLLABLE){
+                caredUncontrollableEventsIndex.add(eventIndex);
+                if(theExAutomaton.isSpecification()) {
                     bddExAutomata.specUncontrollableEventIndexList.add(eventIndex);
-                } else {
+                }
+                else if(!bddExAutomata.plantUncontrollableEventIndexList.contains(eventIndex)){
                     bddExAutomata.plantUncontrollableEventIndexList.add(eventIndex);
                 }
             }
@@ -294,14 +316,23 @@ public class BDDExtendedAutomaton {
                 currentEventsAutEdgeMap.put(theExAutomaton, edgeList);
             }
         }
+        edgeForwardBDDWithoutSelfLoops.orWith(theEdgeBDD.andWith(edgeEventsBDD));
     }
 
-    public TIntArrayList getCaredEventsIndex() {
+    public TIntHashSet getCaredEventsIndex() {
         return caredEventsIndex;
+    }
+    
+    public TIntHashSet getCaredUncontrollableEventsIndex() {
+        return caredUncontrollableEventsIndex;
     }
 
     public BDD getSelfLoopsBDD() {
         return selfLoopsBDD;
+    }
+    
+    public BDD getEdgeForwardWithoutSelfLoops () {
+        return edgeForwardBDDWithoutSelfLoops;
     }
 
     public BDD getForbiddenStateSet() {

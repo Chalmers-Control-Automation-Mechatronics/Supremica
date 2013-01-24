@@ -183,6 +183,14 @@ public abstract class AbstractControllabilityCheckerTest
 
   //#########################################################################
   //# Test Cases --- tests
+  public void test_AmpleCandidateTrue() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "ample_candidate_true.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void test_BallTimer() throws Exception
   {
     final String group = "tests";

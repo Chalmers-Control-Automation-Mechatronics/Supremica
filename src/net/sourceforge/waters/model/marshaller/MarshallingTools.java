@@ -99,7 +99,7 @@ public class MarshallingTools
    * Saves a collection of automata into a product DES (<CODE>.wdes</CODE>)
    * file. This methods creates a product DES containing the events of the
    * given automata and the automata, and saves it into a file.
-   * @param  aut       The automaton to be saved.
+   * @param  automata  The automata to be saved.
    * @param  filename  The name of the output file,
    *                   should have <CODE>.wdes</CODE> extension.
    */
@@ -185,7 +185,7 @@ public class MarshallingTools
    * Saves a collection of automata into a Waters module (<CODE>.wmod</CODE>)
    * file. This methods creates a product DES containing the events of the
    * given automata and the automata, and saves it into a file.
-   * @param  aut       The automaton to be saved.
+   * @param  automata  The automata to be saved.
    * @param  filename  The name of the output file,
    *                   should have <CODE>.wmod</CODE> extension.
    */

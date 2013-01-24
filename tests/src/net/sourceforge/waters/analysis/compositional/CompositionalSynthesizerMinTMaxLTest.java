@@ -12,12 +12,12 @@ package net.sourceforge.waters.analysis.compositional;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractSynthesizerTest;
+import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public class CompositionalSynthesizerMinTMaxLTest
-  extends AbstractSynthesizerTest
+  extends AbstractSupervisorSynthesizerTest
 {
 
   //#########################################################################
@@ -43,7 +43,8 @@ public class CompositionalSynthesizerMinTMaxLTest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalSynthesizer synthesizer =
-      new CompositionalSynthesizer(factory);
+      new CompositionalSynthesizer(factory,
+                                   SynthesisAbstractionProcedureFactory.WSOE);
     synthesizer.setInternalStateLimit(5000);
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);

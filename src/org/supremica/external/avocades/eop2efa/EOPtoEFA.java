@@ -23,7 +23,7 @@ public class EOPtoEFA {
 	 * Constructor
 	 */
 	public EOPtoEFA(){
-		module = new Module("EOPs", false);
+		module = new Module("EOPs");
 	}
 	
 	/**

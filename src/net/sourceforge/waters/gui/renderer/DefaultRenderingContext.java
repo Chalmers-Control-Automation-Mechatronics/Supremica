@@ -14,8 +14,8 @@ import java.util.List;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.GraphPanel;
-import net.sourceforge.waters.gui.PropositionIcon;
-import net.sourceforge.waters.gui.PropositionIcon.ColorInfo;
+import net.sourceforge.waters.gui.util.PropositionIcon;
+import net.sourceforge.waters.gui.util.PropositionIcon.ColorInfo;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;

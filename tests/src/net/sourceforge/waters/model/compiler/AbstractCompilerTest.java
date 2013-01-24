@@ -409,6 +409,12 @@ public abstract class AbstractCompilerTest
     compile("tests", "efa", "profisafe_islave_pfork");
   }
 
+  public void testCompile_randomEFA()
+    throws IOException, WatersException
+  {
+    compile("tests", "efa", "random_efa");
+  }
+
   public void testCompile_sahar1()
     throws IOException, WatersException
   {
