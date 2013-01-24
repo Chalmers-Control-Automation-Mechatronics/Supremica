@@ -400,6 +400,13 @@ public abstract class AbstractTRSimplifierTest
   {
   }
 
+  protected void configureTransitionRelationSimplifier(final EventEncoding EventEnc)
+  {
+      //Will be used to keep track of which Events are the always enabled events.
+
+  }
+
+
   /**
    * Provides the IDs of alpha and omega propositions to the transition
    * relation simplifier. This method is provided as a convenience to
