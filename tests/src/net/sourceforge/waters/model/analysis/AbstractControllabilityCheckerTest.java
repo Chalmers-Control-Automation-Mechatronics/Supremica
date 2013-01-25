@@ -238,6 +238,14 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "ample_hypercube_444.wmod";
     runModelVerifier(group, dir, name, false);
   }
+  
+  public void test_AmpleHypercubeCont() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "ample_hypercube_cont.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
 
   public void test_BallTimer() throws Exception
   {
