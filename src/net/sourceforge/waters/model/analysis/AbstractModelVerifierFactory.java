@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -60,6 +61,7 @@ public abstract class AbstractModelVerifierFactory
   {
     addArgument(new EndArgument());
     addArgument(new HelpArgument());
+    addArgument(new HISCArgument());
     addArgument(new LimitArgument());
     addArgument(new MarkingArgument());
     addArgument(new NoOptimisationArgument());
@@ -78,24 +80,28 @@ public abstract class AbstractModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  @Override
   public ConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
     throw createUnsupportedOperationException("conflict");
   }
 
+  @Override
   public ControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
     throw createUnsupportedOperationException("controllability");
   }
 
+  @Override
   public ControlLoopChecker createControlLoopChecker
     (final ProductDESProxyFactory factory)
   {
     throw createUnsupportedOperationException("control-loop");
   }
 
+  @Override
   public LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
@@ -103,6 +109,7 @@ public abstract class AbstractModelVerifierFactory
   }
 
 
+  @Override
   public void parse(final Iterator<String> iter)
   {
     mArgumentMap.clear();
@@ -123,6 +130,7 @@ public abstract class AbstractModelVerifierFactory
     checkRequiredArguments();
   }
 
+  @Override
   public void configure(final ModelVerifier verifier)
   {
     for (final CommandLineArgument arg : mArgumentList) {
@@ -132,6 +140,7 @@ public abstract class AbstractModelVerifierFactory
     }
   }
 
+  @Override
   public void configure(final ModuleCompiler compiler)
   {
     for (final CommandLineArgument arg : mArgumentList) {
@@ -141,6 +150,7 @@ public abstract class AbstractModelVerifierFactory
     }
   }
 
+  @Override
   public void postConfigure(final ModelVerifier checker)
   throws AnalysisException
   {
@@ -239,6 +249,33 @@ public abstract class AbstractModelVerifierFactory
 
 
   //#########################################################################
+  //# Inner Class HISCArgument
+  private static class HISCArgument
+    extends CommandLineArgumentFlag
+  {
+    //#######################################################################
+    //# Constructors
+    private HISCArgument()
+    {
+      super("-hisc",
+            "Compile as HISC module, only including interfaces of low levels");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    protected void configure(final ModuleCompiler compiler)
+    {
+      if (getValue()) {
+        compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
+        compiler.setEnabledPropertyNames(null);
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class LimitArgument
   private static class LimitArgument extends CommandLineArgumentInteger
   {
@@ -253,6 +290,7 @@ public abstract class AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
@@ -495,6 +533,7 @@ public abstract class AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
     protected void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
@@ -517,6 +556,7 @@ public abstract class AbstractModelVerifierFactory
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       final ComponentKind kind = aut.getKind();
@@ -536,6 +576,7 @@ public abstract class AbstractModelVerifierFactory
       }
     }
 
+    @Override
     public EventKind getEventKind(final EventProxy event)
     {
       final EventKind kind = event.getKind();

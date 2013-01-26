@@ -18,9 +18,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Set;
 
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
@@ -29,23 +29,22 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
-import net.sourceforge.waters.model.compiler.context.
-  UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
+import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -75,7 +74,6 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -216,6 +214,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public SimpleExpressionProxy visitConstantAliasProxy
     (final ConstantAliasProxy alias)
     throws VisitorException
@@ -242,6 +241,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
     throws VisitorException
   {
@@ -293,6 +293,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public CompiledEvent visitEventAliasProxy(final EventAliasProxy alias)
     throws VisitorException
   {
@@ -313,6 +314,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public CompiledEvent visitEventDeclProxy(final EventDeclProxy decl)
     throws VisitorException
   {
@@ -382,6 +384,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public CompiledEventList visitEventListExpressionProxy
     (final EventListExpressionProxy proxy)
     throws VisitorException
@@ -403,6 +406,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public Object visitForeachProxy(final ForeachProxy foreach)
     throws VisitorException
   {
@@ -440,6 +444,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public GraphProxy visitGraphProxy(final GraphProxy graph)
     throws VisitorException
   {
@@ -475,6 +480,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
     throws VisitorException
   {
@@ -500,6 +506,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     return compiled;
   }
 
+  @Override
   public GuardActionBlockProxy visitGuardActionBlockProxy
     (final GuardActionBlockProxy ga)
     throws VisitorException
@@ -555,6 +562,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public Object visitIdentifierProxy(final IdentifierProxy ident)
     throws VisitorException
   {
@@ -593,6 +601,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public Object visitInstanceProxy(final InstanceProxy inst)
     throws VisitorException
   {
@@ -642,6 +651,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public CompiledEventList visitLabelBlockProxy(final LabelBlockProxy block)
     throws VisitorException
   {
@@ -662,6 +672,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public Object visitModuleProxy(final ModuleProxy module)
     throws VisitorException
   {
@@ -702,6 +713,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     return null;
   }
 
+  @Override
   public CompiledParameterBinding visitParameterBindingProxy
     (final ParameterBindingProxy binding)
     throws VisitorException
@@ -715,6 +727,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     return compiled;
   }
 
+  @Override
   public SimpleComponentProxy visitSimpleComponentProxy
     (final SimpleComponentProxy comp)
     throws VisitorException
@@ -726,9 +739,6 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final IdentifierProxy fullname =
         mNameSpace.getPrefixedIdentifier(suffix, mFactory);
       ComponentKind kind = comp.getKind();
-      if (isDisabledProperty(kind, fullname)) {
-        return null;
-      }
       Map<String,String> attribs = comp.getAttributes();
       if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
         if (HISCAttributeFactory.isInterface(attribs)) {
@@ -737,6 +747,9 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         } else {
           return null;
         }
+      }
+      if (isDisabledProperty(kind, fullname)) {
+        return null;
       }
       final GraphProxy graph = comp.getGraph();
       final GraphProxy newgraph = visitGraphProxy(graph);
@@ -754,6 +767,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public SimpleExpressionProxy visitSimpleExpressionProxy
     (final SimpleExpressionProxy expr)
     throws VisitorException
@@ -765,6 +779,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
     throws VisitorException
   {
@@ -785,6 +800,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     return compiled;
   }
 
+  @Override
   public VariableComponentProxy visitVariableComponentProxy
     (final VariableComponentProxy var)
     throws VisitorException
@@ -1008,6 +1024,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
       throws VisitorException
     {
@@ -1016,6 +1033,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return containsPrime(lhs) || containsPrime(rhs);
     }
 
+    @Override
     public Boolean visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
@@ -1029,6 +1047,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return false;
     }
 
+    @Override
     public Boolean visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -1038,11 +1057,13 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return containsPrime(base) || containsPrime(comp);
     }
 
+    @Override
     public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
     {
       return false;
     }
 
+    @Override
     public Boolean visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
       throws VisitorException
     {
@@ -1080,6 +1101,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public IndexedIdentifierProxy visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
@@ -1107,6 +1129,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -1126,6 +1149,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     public SimpleIdentifierProxy visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
     {
@@ -1168,6 +1192,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public IndexedIdentifierProxy visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
     {
@@ -1181,6 +1206,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return mFactory.createIndexedIdentifierProxy(name, mIndexes);
     }
 
+    @Override
     public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -1192,6 +1218,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return mFactory.createQualifiedIdentifierProxy(base, comp1);
     }
 
+    @Override
     public IndexedIdentifierProxy visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
     {
@@ -1212,6 +1239,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+    @Override
     public SimpleExpressionProxy getBoundExpression
       (final SimpleExpressionProxy expr)
     {
@@ -1229,11 +1257,13 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return null;
     }
 
+    @Override
     public boolean isEnumAtom(final IdentifierProxy ident)
     {
       return mContext.isEnumAtom(ident);
     }
 
+    @Override
     public ModuleBindingContext getModuleBindingContext()
     {
       return mContext.getModuleBindingContext();
@@ -1254,6 +1284,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+    @Override
     public SimpleExpressionProxy getBoundExpression
       (final SimpleExpressionProxy expr)
     {
@@ -1264,6 +1295,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     public boolean isEnumAtom(final IdentifierProxy ident)
     {
       if (mEquality.equals(ident, mSuffix)) {
@@ -1273,6 +1305,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     public ModuleBindingContext getModuleBindingContext()
     {
       return mContext.getModuleBindingContext();
