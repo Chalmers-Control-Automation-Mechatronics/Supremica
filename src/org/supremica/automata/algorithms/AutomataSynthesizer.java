@@ -371,6 +371,9 @@ public class AutomataSynthesizer
            final boolean supervisorReduction =
              synthesizerOptions.getReduceSupervisors();
            synthesizer.setSupervisorReductionEnabled(supervisorReduction);
+           final boolean supervisorLocalization = 
+             synthesizerOptions.getLocalizeSupervisors();
+           synthesizer.setSupervisorLocalizationEnabled(supervisorLocalization);
            // set options & marking
            synthesizer.run();
            final ProductDESResult watersResult =

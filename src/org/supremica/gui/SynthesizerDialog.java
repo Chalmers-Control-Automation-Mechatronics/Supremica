@@ -340,6 +340,7 @@ class SynthesizerDialogAdvancedPanel
 {
     private static final long serialVersionUID = 1L;
     private final JCheckBox reduceSupervisorsBox;
+    private final JCheckBox localizeSupervisorsBox;
     private final JCheckBox oneEventAtATimeBox;
     private final JCheckBox maximallyPermissiveBox;
     private final JCheckBox maximallyPermissiveIncrementalBox;
@@ -368,12 +369,17 @@ class SynthesizerDialogAdvancedPanel
         reduceSupervisorsBox.setToolTipText("Remove redundant states and events from " +
             "synthesized supervisors");
         reduceSupervisorsBox.addActionListener(this);
+        
+        localizeSupervisorsBox = new JCheckBox("localize supervisors (experimental)");
+        localizeSupervisorsBox.setToolTipText("Apply localization to synthesized supervisors");
+        localizeSupervisorsBox.addActionListener(this);
 
         advancedBox.add(oneEventAtATimeBox);
         advancedBox.add(maximallyPermissiveBox);
         advancedBox.add(maximallyPermissiveIncrementalBox);
         advancedBox.add(maximallyPermissiveOnePlantAtATimeBox);
         advancedBox.add(reduceSupervisorsBox);
+        advancedBox.add(localizeSupervisorsBox);
 
         note = new JTextArea("Note:\n" + "'Purge result' must be selected for supervisor\n" +
             "reduction to work.\n");
@@ -387,6 +393,7 @@ class SynthesizerDialogAdvancedPanel
     public void update(final SynthesizerOptions synthesizerOptions)
     {
         reduceSupervisorsBox.setSelected(synthesizerOptions.getReduceSupervisors());
+        localizeSupervisorsBox.setSelected(synthesizerOptions.getLocalizeSupervisors());
         maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
         maximallyPermissiveIncrementalBox.setSelected(synthesizerOptions.getMaximallyPermissiveIncremental());
     }
@@ -406,6 +413,7 @@ class SynthesizerDialogAdvancedPanel
     public void regain(final SynthesizerOptions options)
     {
         options.setReduceSupervisors(reduceSupervisorsBox.isSelected());
+        options.setLocalizeSupervisors(localizeSupervisorsBox.isSelected());
         options.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
         options.setMaximallyPermissiveIncremental(maximallyPermissiveIncrementalBox.isSelected());
         options.addOnePlantAtATime = maximallyPermissiveOnePlantAtATimeBox.isSelected();
@@ -419,6 +427,7 @@ class SynthesizerDialogAdvancedPanel
 
         // Display note?
         note.setVisible(reduceSupervisorsBox.isSelected());
+        note.setVisible(localizeSupervisorsBox.isSelected());
 
         updatePanel();
     }

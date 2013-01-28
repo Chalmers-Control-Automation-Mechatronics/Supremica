@@ -290,6 +290,7 @@ public final class Config
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissive", true, "Synthesize a maximally permissive supervisor");
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissiveIncremental", true, "Use incremental algorithm when synthesizing");
     public static final BooleanProperty SYNTHESIS_REDUCE_SUPERVISORS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisReduceSupervisors", false, "Try to minimize supervisors");
+    public static final BooleanProperty SYNTHESIS_LOCALIZE_SUPERVISORS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisLocalizeSupervisors", false, "Try to localize supervisors");
     public static final BooleanProperty SYNTHESIS_PRINT_GUARD = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "generateGuard", false, "Generate guards for the controllable events");
     public static final BooleanProperty SYNTHESIS_ADD_GUARDS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "addGuards", false, "Add the guards to the model");
     public static final BooleanProperty SYNTHESIS_SAVE_IN_FILE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "saveInFile", false, "Save the guard-event pairs in a file");

@@ -107,6 +107,16 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return mSupervisorReductionEnabled;
   }
 
+  public void setSupervisorLocalizationEnabled(final boolean enable)
+  {
+    mSupervisorLocalizationEnabled = enable;
+  }
+
+  public boolean getSupervisorLocalizationEnabled()
+  {
+    return mSupervisorLocalizationEnabled;
+  }
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
   public Collection<EventProxy> getPropositions()
@@ -324,28 +334,36 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             // reduce to a smaller supervisor for each important controllable event
             mReduction.setUpEventList();
             int i = 0;
-            for (i = 0; i < mReduction.mEventList.size(); i++) {
-              ListBufferTransitionRelation copy =
-                new ListBufferTransitionRelation(
-                                                 mTransitionRelation,
-                                                 ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-              TIntArrayList e1 = new TIntArrayList();
-              e1.add(mReduction.mEventList.get(i));
-              mReduction.setUpClasses();
-              if (!mReduction.mainProcedure(e1)) {
-                mAutomataList.clear();
-                mReduction.removeBadStateTransitions(mTransitionRelation);
-                mTransitionRelation.setReachable(mNumGoodStates, false);
-                monoAut =
-                  mTransitionRelation.createAutomaton(getFactory(),
-                                                      getEventEncoding());
-                mAutomataList.add(monoAut);
-                break;
+            if (mSupervisorLocalizationEnabled) {
+              for (i = 0; i < mReduction.mEventList.size(); i++) {
+                ListBufferTransitionRelation copy =
+                  new ListBufferTransitionRelation(
+                                                   mTransitionRelation,
+                                                   ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+                TIntArrayList e1 = new TIntArrayList();
+                e1.add(mReduction.mEventList.get(i));
+                mReduction.setUpClasses();
+                if (!mReduction.mainProcedure(e1)) {
+                  mAutomataList.clear();
+                  mReduction.removeBadStateTransitions(mTransitionRelation);
+                  mTransitionRelation.setReachable(mNumGoodStates, false);
+                  monoAut =
+                    mTransitionRelation.createAutomaton(getFactory(),
+                                                        getEventEncoding());
+                  mAutomataList.add(monoAut);
+                  break;
+                }
+                mReduction.mergeTransitionRelation(copy, false);
+                copy.setName("Supervisor_" + mEvents[e1.get(0)].getName());
+                aut = copy.createAutomaton(getFactory(), getEventEncoding());
+                mAutomataList.add(aut);
               }
-              mReduction.mergeTransitionRelation(copy, false);
-              copy.setName("Supervisor_" + mEvents[e1.get(0)].getName());
-              aut = copy.createAutomaton(getFactory(), getEventEncoding());
-              mAutomataList.add(aut);
+            } else{
+              mTransitionRelation.setReachable(mNumGoodStates, false);
+              monoAut =
+                mTransitionRelation.createAutomaton(getFactory(),
+                                                    getEventEncoding());
+              des = AutomatonTools.createProductDESProxy(monoAut, getFactory());
             }
 
             if (i == mReduction.mEventList.size()) {
@@ -367,14 +385,18 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                   mAutomataList.remove(a);
                 }
               }
+              des =
+                AutomatonTools.createProductDESProxy("SUPERVISOR",
+                                                     mAutomataList,
+                                                     getFactory());
             }
-            des =
-              AutomatonTools.createProductDESProxy("SUPERVISOR",
-                                                   mAutomataList,
-                                                   getFactory());
           }
         } else {
-          //aut = createAutomaton();
+          mTransitionRelation.setReachable(mNumGoodStates, false);
+          monoAut =
+            mTransitionRelation.createAutomaton(getFactory(),
+                                                getEventEncoding());
+          des = AutomatonTools.createProductDESProxy(monoAut, getFactory());
         }
         return setProxyResult(des);
       } else {
@@ -839,79 +861,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       events.add(mEvents[i]);
     }
     return new EventEncoding(events, getKindTranslator());
-  }
-
-  @SuppressWarnings("unused")
-  private AutomatonProxy createAutomaton()
-  {
-    final int numEvents = mNumEvents + mCurrentPropositions.size();
-    final Collection<EventProxy> events =
-      new ArrayList<EventProxy>(numEvents);
-    for (final EventProxy event : mEvents) {
-      if (event != null) {
-        events.add(event);
-      }
-    }
-    events.addAll(mCurrentPropositions);
-
-    final int numProps = mCurrentPropositions.size();
-    final List<StateProxy> states =
-      new ArrayList<StateProxy>(mNumGoodStates + 1);
-    final StateProxy[] stateArray = new StateProxy[mNumGoodStates + 1];
-    for (int code = 0; code < mNumStates; code++) {
-      if (mGoodStates.get(code)) {
-        final boolean initial = code < mNumInitialStates;
-        final int[] tuple = new int[mNumAutomata];
-        decode(mStateTuples.get(code), tuple);
-        final List<EventProxy> marking = new ArrayList<EventProxy>(numProps);
-        props: for (final EventProxy prop : mCurrentPropositions) {
-          for (int a = 0; a < mNumAutomata; a++) {
-            final List<EventProxy> stateMarking =
-              getStateMarking(a, tuple[a]);
-            if (Collections.binarySearch(stateMarking, prop) < 0) {
-              continue props;
-            }
-          }
-          marking.add(prop);
-        }
-        Collections.sort(marking);
-        final List<EventProxy> unique = getUniqueMarking(marking);
-        final StateProxy state =
-          new MemStateProxy(mStateMap[code], unique, initial);
-        states.add(state);
-        stateArray[mStateMap[code]] = state;
-      }
-    }
-
-    final ProductDESProxyFactory factory = getFactory();
-    final int bufferSize = mTransitionBuffer.size();
-    final ArrayList<TransitionProxy> transitions =
-      new ArrayList<TransitionProxy>(bufferSize / 3);
-    int t = 0;
-    while (t < bufferSize) {
-      // source
-      int code = mTransitionBuffer.get(t++);
-      if (code == mNumGoodStates) {
-        t += 2;
-        continue;
-      }
-      final StateProxy source = stateArray[code];
-      // event
-      code = mTransitionBuffer.get(t++);
-      final EventProxy event = mEvents[code];
-      // target
-      code = mTransitionBuffer.get(t++);
-      if (code == mNumGoodStates) {
-        continue;
-      }
-      final StateProxy target = stateArray[code];
-      transitions.add(factory.createTransitionProxy(source, event, target));
-    }
-
-    final String name = computeOutputName();
-    final ComponentKind kind = ComponentKind.SUPERVISOR;
-    return factory.createAutomatonProxy(name, kind, events, states,
-                                        transitions);
   }
 
   private List<EventProxy> getUniqueMarking(final List<EventProxy> marking)
@@ -1814,17 +1763,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
   //#########################################################################
   //# Data Members
-  private boolean mSupervisorReductionEnabled = false;
   //# Variables used for encoding/decoding
   /** a list contains number of bits needed for each automaton */
   private int mNumBits[];
-
   /** a list contains masks needed for each automaton */
   private int mNumBitsMasks[];
-
   /** a number of integers used to encode synchronized state */
   private int mNumInts;
-
   /** an index of first automaton in each integer buffer */
   private int mIndexAutomata[];
 
@@ -1878,6 +1823,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private StateExplorer mFinalStateExplorer;
   private ListBufferTransitionRelation mTransitionRelation;
 
+  private boolean mSupervisorReductionEnabled = false;
+  private boolean mSupervisorLocalizationEnabled = false;
   private int[] mStateToClass;
   private IntListBuffer mClasses;
   private int[] mShadowStateToClass;
