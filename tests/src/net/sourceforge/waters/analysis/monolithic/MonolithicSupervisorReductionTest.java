@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class MonolithicSynthesizerTest extends
+public class MonolithicSupervisorReductionTest extends
   AbstractSupervisorSynthesizerTest
 {
 
@@ -37,7 +37,7 @@ public class MonolithicSynthesizerTest extends
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionEnabled(false);
+    synthesizer.setSupervisorReductionEnabled(true);
     synthesizer.setSupervisorLocalizationEnabled(false);
     return synthesizer;
   }
@@ -48,7 +48,7 @@ public class MonolithicSynthesizerTest extends
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(MonolithicSynthesizerTest.class);
+      new TestSuite(MonolithicSupervisorReductionTest.class);
     return testSuite;
   }
 
