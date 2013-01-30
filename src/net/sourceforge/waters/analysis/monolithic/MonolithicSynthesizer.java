@@ -326,6 +326,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           mAutomataList = new ArrayList<AutomatonProxy>();
           mReduction.setUpClasses();
           if (mReduction.setUpEventList() == 0) {
+            mReduction.removeUncontrollableSelfloops(mTransitionRelation);
             aut =
               mReduction
                 .createOneStateAutomaton(mReduction.mDisabledEventList);
@@ -350,13 +351,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                   mAutomataList.clear();
                   mReduction.removeBadStateTransitions(mTransitionRelation);
                   mTransitionRelation.setReachable(mNumGoodStates, false);
+                  mReduction
+                    .removeUncontrollableSelfloops(mTransitionRelation);
                   aut =
                     mTransitionRelation.createAutomaton(getFactory(),
                                                         getEventEncoding());
-                  des = AutomatonTools.createProductDESProxy(aut, getFactory());
+                  des =
+                    AutomatonTools.createProductDESProxy(aut, getFactory());
                   break;
                 }
                 mReduction.mergeTransitionRelation(copy, false);
+                mReduction.removeUncontrollableSelfloops(copy);
                 copy.setName("Supervisor:<" + mEvents[e1.get(0)].getName()
                              + ">");
                 aut = copy.createAutomaton(getFactory(), getEventEncoding());
@@ -364,12 +369,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
               }
             } else {
               mReduction.removeBadStateTransitions(mTransitionRelation);
+              mReduction.removeUncontrollableSelfloops(mTransitionRelation);
               mTransitionRelation.setReachable(mNumGoodStates, false);
               aut =
                 mTransitionRelation.createAutomaton(getFactory(),
                                                     getEventEncoding());
-              des =
-                AutomatonTools.createProductDESProxy(aut, getFactory());
+              des = AutomatonTools.createProductDESProxy(aut, getFactory());
             }
 
             if (i == mReduction.mEventList.size()) {
@@ -399,6 +404,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           }
         } else {
           mReduction.removeBadStateTransitions(mTransitionRelation);
+          mReduction.removeUncontrollableSelfloops(mTransitionRelation);
           mTransitionRelation.setReachable(mNumGoodStates, false);
           aut =
             mTransitionRelation.createAutomaton(getFactory(),
@@ -1724,6 +1730,24 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
     }
 
+    public void removeUncontrollableSelfloops(final ListBufferTransitionRelation rel)
+    {
+      for (int e = 1; e <= mNumUncontrollableEvents; e++) {
+        final TransitionIterator iter =
+          rel.createAllTransitionsReadOnlyIterator(e);
+        boolean isSelfloopOnly = true;
+        while (iter.advance()) {
+          if (iter.getCurrentSourceState() != iter.getCurrentTargetState()) {
+            isSelfloopOnly = false;
+            break;
+          }
+        }
+        if(isSelfloopOnly){
+          rel.removeEvent(e);
+        }
+      }
+    }
+
     private AutomatonProxy createOneStateAutomaton(final TIntArrayList eventList)
     {
       final Collection<EventProxy> events =
@@ -1747,7 +1771,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         name += "<";
         for (int e = 0; e < eventList.size(); e++) {
           name += mEvents[eventList.get(e)].getName();
-          if(e < eventList.size() - 1){
+          if (e < eventList.size() - 1) {
             name += ", ";
           }
         }

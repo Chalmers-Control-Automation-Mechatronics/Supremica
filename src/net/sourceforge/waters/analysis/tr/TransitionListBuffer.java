@@ -846,7 +846,8 @@ public abstract class TransitionListBuffer
   public TransitionIterator createAllTransitionsModifyingIterator
     (final int event)
   {
-    final TransitionIterator inner = createModifyingIterator(event);
+    final TransitionIterator inner = createModifyingIterator();
+    inner.resetEvent(event);
     return new AllTransitionsIterator(inner, event);
   }
 
@@ -1457,6 +1458,7 @@ public abstract class TransitionListBuffer
 
     //#######################################################################
     //# Interface net.sourceforge.waters.tr.TransitionIterator
+    @Override
     public void reset()
     {
       if (mFromState >= 0) {
@@ -1476,6 +1478,7 @@ public abstract class TransitionListBuffer
       }
     }
 
+    @Override
     public void resetEvent(final int event)
     {
       if (event < 0) {
@@ -1487,6 +1490,7 @@ public abstract class TransitionListBuffer
       reset();
     }
 
+    @Override
     public void resetEvents(final int first, final int last)
     {
       mFirstEvent = first < 0 ? 0 : first;
@@ -1494,23 +1498,27 @@ public abstract class TransitionListBuffer
       reset();
     }
 
+    @Override
     public void resetState(final int state)
     {
       mFromState = state;
       reset();
     }
 
+    @Override
     public void reset(final int state, final int event)
     {
       mFromState = state;
       resetEvent(event);
     }
 
+    @Override
     public void resume(final int state)
     {
       resetState(state);
     }
 
+    @Override
     public boolean advance()
     {
       if (mCurrent == NULL || mNext == NULL) {
@@ -1526,33 +1534,39 @@ public abstract class TransitionListBuffer
       }
     }
 
+    @Override
     public int getCurrentSourceState()
     {
       return getIteratorSourceState(this);
     }
 
+    @Override
     public int getCurrentFromState()
     {
       return mFromState;
     }
 
+    @Override
     public int getCurrentEvent()
     {
       assert mCurrent != NULL;
       return mCurrentData & mEventMask;
     }
 
+    @Override
     public int getCurrentTargetState()
     {
       return getIteratorTargetState(this);
     }
 
+    @Override
     public int getCurrentToState()
     {
       assert mCurrent != NULL;
       return mCurrentData >>> mStateShift;
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -1603,12 +1617,14 @@ public abstract class TransitionListBuffer
 
     //#######################################################################
     //# Interface net.sourceforge.waters.tr.TransitionIterator
+    @Override
     public boolean advance()
     {
       mPrevious = getCurrent();
       return super.advance();
     }
 
+    @Override
     public void remove()
     {
       if (mPrevious == NULL) {
@@ -1683,17 +1699,20 @@ public abstract class TransitionListBuffer
 
     //#########################################################################
     //# Interface net.sourceforge.waters.tr.TransitionIterator
+    @Override
     public void reset()
     {
       mCurrentFromState = -1;
     }
 
+    @Override
     public void resetEvent(final int event)
     {
       mInnerIterator.reset(-1, event);
       reset();
     }
 
+    @Override
     public void resetEvents(final int first, final int last)
     {
       mInnerIterator.resetState(-1);
@@ -1701,6 +1720,7 @@ public abstract class TransitionListBuffer
       reset();
     }
 
+    @Override
     public void resetState(final int from)
     {
       throw new UnsupportedOperationException
@@ -1708,16 +1728,19 @@ public abstract class TransitionListBuffer
          "over only a part of the states!");
     }
 
+    @Override
     public void reset(final int from, final int event)
     {
       resetState(from);
     }
 
+    @Override
     public void resume(final int state)
     {
       resetState(state);
     }
 
+    @Override
     public boolean advance()
     {
       while (!mInnerIterator.advance()) {
@@ -1732,11 +1755,13 @@ public abstract class TransitionListBuffer
       return true;
     }
 
+    @Override
     public int getCurrentSourceState()
     {
       return getIteratorSourceState(this);
     }
 
+    @Override
     public int getCurrentFromState()
     {
       if (mCurrentFromState < 0) {
@@ -1751,21 +1776,25 @@ public abstract class TransitionListBuffer
       }
     }
 
+    @Override
     public int getCurrentEvent()
     {
       return mInnerIterator.getCurrentEvent();
     }
 
+    @Override
     public int getCurrentTargetState()
     {
       return getIteratorTargetState(this);
     }
 
+    @Override
     public int getCurrentToState()
     {
       return mInnerIterator.getCurrentToState();
     }
 
+    @Override
     public void remove()
     {
       mInnerIterator.remove();
@@ -1795,6 +1824,7 @@ public abstract class TransitionListBuffer
 
     //#######################################################################
     //# Interface java.util.Comparator<TransitionProxy>
+    @Override
     public int compare(final TransitionProxy trans1,
                        final TransitionProxy trans2)
     {
@@ -1834,6 +1864,7 @@ public abstract class TransitionListBuffer
 
     //#######################################################################
     //# Interface gnu.trove.TIntHashingStrategy
+    @Override
     public int computeHashCode(final int key)
     {
       return key;
