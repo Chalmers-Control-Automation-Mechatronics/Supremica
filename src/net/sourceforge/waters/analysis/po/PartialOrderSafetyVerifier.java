@@ -983,7 +983,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         mIndexList.add(mStateList.size());
       }
     }
-    assert false;
+    //assert false;
   }
 
   private SafetyTraceProxy computePOCounterExample() throws AbortException
