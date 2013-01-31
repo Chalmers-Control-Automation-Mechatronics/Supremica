@@ -15,14 +15,13 @@ import gnu.trove.TIntHashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.Arrays;
 
 import net.sourceforge.waters.analysis.monolithic.BlockedArrayList;
 import net.sourceforge.waters.analysis.monolithic.StateHashSet;
@@ -36,16 +35,17 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.apache.log4j.Logger;
 
 
@@ -102,6 +102,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   //#########################################################################
   //# Invocation
 
+  @Override
   @SuppressWarnings("unchecked")
   public boolean run() throws AnalysisException
   {
@@ -122,7 +123,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       mNumEvents = 0;
       mNumPlants = 0;
       mStateTupleSize = 0;
-      
+
       mLoopCount = 0;
 
       final Collection<AutomatonProxy> automata =
@@ -158,7 +159,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       mNumEvents = mEventCodingList.size();
       mNumAutomata = automata.size();
       mAutomata = new AutomatonProxy[mNumAutomata];
-      
+
       mEnabledUnionList = new TIntArrayList(mNumEvents);
 
       // Empty case
@@ -174,7 +175,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       final List<AutomatonProxy>[] automataContainingEvents = new ArrayList[mNumEvents];
       for (i = 0; i < mNumEvents; i++){
         automataContainingEvents[i] = new ArrayList<AutomatonProxy>();
-      }      
+      }
 
       // Separate the automatons by kind
       AutomatonProxy initUncontrollable = null;
@@ -363,7 +364,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         final ArrayList<PartialOrderEventDependencyTuple> temp =
           new ArrayList<PartialOrderEventDependencyTuple>();
         for (j = 0; j < mNumEvents; j++) {
-          if (i != j){          
+          if (i != j){
             if (mEventDependencyMap[i][j] == PartialOrderEventDependencyKind.NONCOMMUTING) {
             temp.add(new PartialOrderEventDependencyTuple
                      (j, mEventDependencyMap[i][j]));
@@ -530,6 +531,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -537,6 +539,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  @Override
   public void setKindTranslator(final KindTranslator translator)
   {
     super.setKindTranslator(translator);
@@ -560,13 +563,13 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
 
   //#########################################################################
   //# Auxiliary Methods
-  
+
   private boolean isControllableReduced(final int[] sState) throws AnalysisException{
     mStack = new ArrayList<PartialOrderStateTuple>();
     mStateSet = new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
     mLocalSet = new TIntHashSet();
     mSuccessor = new int[mNumAutomata];
-    
+
     final PartialOrderStateTuple dummy = new PartialOrderStateTuple(0);
     mInitialState = new PartialOrderStateTuple(mStateTupleSize);
     encode(sState, mInitialState);
@@ -704,11 +707,11 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     if (enabled.length == 1){
       return enabled;
     }
-    
+
     final TIntArrayList ample = new TIntArrayList();
     final TIntHashSet ampleSet = new TIntHashSet();
     final BitSet ampleDependencies = new BitSet(mNumEvents);
-    
+
     int i, temp, e;
     int next = 0;
     final int[] ampleState = new int[mNumAutomata];
@@ -727,7 +730,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         ampleDependencies.set(t.getCoupling());
       }
       next++;
-     
+
       final List<PartialOrderStateTuple> stack = new ArrayList<PartialOrderStateTuple>();
       final StateHashSet<PartialOrderStateTuple> localStateSet =
         new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
@@ -795,14 +798,14 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         continue;
       }
       final TIntArrayList dependentNonEnabled = new TIntArrayList();
-     
+
       ample.add(enabled[next]);
       ampleSet.add(enabled[next]);
       considered.add(enabled[next]);
       next++;
-          
+
       for (j = 0; j < mEventCodingList.size(); j++){
-        if (!ampleSet.contains(j)){     
+        if (!ampleSet.contains(j)){
           final BitSet ampleDependencies = new BitSet(mNumEvents);
           for (final PartialOrderEventDependencyTuple t :
             mReducedEventDependencyMap[j]){
@@ -818,10 +821,10 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
               }
               else{
                 dependentNonEnabled.add(j);
-              }              
+              }
               break;
             }
-          }     
+          }
         }
       }
       final TIntHashSet unionSet =
@@ -833,7 +836,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         unionSet.add(ample.get(j));
       }
       if (unionSet.size() == mEventCodingList.size()){
-        return ample.toNativeArray(); 
+        return ample.toNativeArray();
       }
       final TIntHashSet eventsSetMinusUnion = new TIntHashSet();
       for (j = 0; j < mEventCodingList.size(); j++){
@@ -878,22 +881,22 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       mSpecTransitionMap.get(si);
     final int[] eventArray = plant? mPlantEventHash.get(automatonIndex) :
       mSpecEventHash.get(si);
-    
+
     for (i = 0; i < eventArray.length; i++){
       e = eventArray[i];
       if (unionList.contains(e)){
         mEnabledUnionList.add(e);
       }
     }
-    
-    if (mEnabledUnionList.size() > 0){      
-      final TIntArrayList stack = new TIntArrayList();    
-      final int[] ampleState = new int[mNumAutomata];   
-  
+
+    if (mEnabledUnionList.size() > 0){
+      final TIntArrayList stack = new TIntArrayList();
+      final int[] ampleState = new int[mNumAutomata];
+
       decode(current,ampleState);
       stack.add(ampleState[automatonIndex]);
-      mLocalSet.add(ampleState[automatonIndex]);    
-  
+      mLocalSet.add(ampleState[automatonIndex]);
+
       while(stack .size() > 0){
         final int stateIndex = stack.remove(stack.size() - 1);
         if(transMap[stateIndex][dependent] != -1){
@@ -903,12 +906,12 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         }
         i = mEnabledUnionList.size();
         for (e = 0; e < i; e++){
-          int event = mEnabledUnionList.get(e);
+          final int event = mEnabledUnionList.get(e);
           if ((temp = transMap[stateIndex][event]) != -1){
             if (mLocalSet.add(temp)){
               stack.add(temp);
             }
-          }       
+          }
         }
       }
       mEnabledUnionList.clear();
@@ -1135,7 +1138,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   private List<Integer> mIndexList;
   private List<PartialOrderStateTuple> mStateList;
   private TIntArrayList mEnabledUnionList;
-  //private THashSet<PartialOrderStateTuple> mFullyExpanded; 
+  //private THashSet<PartialOrderStateTuple> mFullyExpanded;
 
   //Stacks and sets
   private List<PartialOrderStateTuple> mStack;
@@ -1167,7 +1170,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   private PartialOrderStateTuple mErrorState;
   private int mErrorEvent;
   private int mErrorAutomaton;
-  
+
   //Statistics
+  @SuppressWarnings("unused")
   private int mLoopCount;
 }

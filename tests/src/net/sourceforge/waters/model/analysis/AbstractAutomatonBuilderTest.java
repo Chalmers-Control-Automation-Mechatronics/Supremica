@@ -44,7 +44,7 @@ public abstract class AbstractAutomatonBuilderTest
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mAutomatonBuilder = createAutomatonBuilder(factory);
-    mIsomorphismChecker = new IsomorphismChecker(factory, true);
+    mIsomorphismChecker = new IsomorphismChecker(factory, true, true);
     setNodeLimit();
   }
 

@@ -64,6 +64,7 @@ public final class SynthesizerOptions
     private boolean maximallyPermissive;
     private boolean maximallyPermissiveIncremental;
     private boolean reduceSupervisors;
+    private boolean localizeSupervisors;
     private boolean rememberDisabledUncontrollableEvents;
 
     private boolean bddExtractSupervisor;
@@ -84,6 +85,7 @@ public final class SynthesizerOptions
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
             Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
+            Config.SYNTHESIS_LOCALIZE_SUPERVISORS.get(),
             Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get());
     }
 
@@ -95,7 +97,8 @@ public final class SynthesizerOptions
      */
     private SynthesizerOptions(final SynthesisType synthesisType, final SynthesisAlgorithm synthesisAlgorithm,
     		final boolean purge, final boolean removeUnnecessarySupervisors, final boolean maximallyPermissive,
-    		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors, final boolean bddExtractSupervisor)
+    		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors, 
+    		final boolean localizeSupervisors, final boolean bddExtractSupervisor)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -104,6 +107,7 @@ public final class SynthesizerOptions
         this.maximallyPermissive = maximallyPermissive;
         this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
         this.reduceSupervisors = reduceSupervisors;
+        this.localizeSupervisors = localizeSupervisors;
         this.bddExtractSupervisor = bddExtractSupervisor;
     }
 
@@ -245,6 +249,16 @@ public final class SynthesizerOptions
     {
         return reduceSupervisors;
     }
+    
+    public void setLocalizeSupervisors(final boolean bool)
+    {
+        localizeSupervisors = bool;
+    }
+
+    public boolean getLocalizeSupervisors()
+    {
+        return localizeSupervisors;
+    }
 
 
     /**
@@ -259,6 +273,7 @@ public final class SynthesizerOptions
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
         Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
+        Config.SYNTHESIS_LOCALIZE_SUPERVISORS.set(localizeSupervisors);
         Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.set(bddExtractSupervisor);
 
     }
@@ -268,7 +283,8 @@ public final class SynthesizerOptions
      */
     public static SynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR, true, true, true, true, true, false);
+        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR, 
+                                      true, true, true, true, true, true, false);
     }
 
 
@@ -277,7 +293,8 @@ public final class SynthesizerOptions
     public static SynthesizerOptions getDefaultSynthesizerOptionsS()
     {
 
-        return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.SYNTHESISA, true, true, true, false, false, false);
+        return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.SYNTHESISA, 
+                                      true, true, true, false, false, true, false);
     }
     /**
      * Returns the default options for synthesis.
@@ -289,6 +306,7 @@ public final class SynthesizerOptions
         options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
         options.removeUnnecessarySupervisors = true;
         options.reduceSupervisors = true;
+        options.localizeSupervisors = true;
 
         return options;
     }

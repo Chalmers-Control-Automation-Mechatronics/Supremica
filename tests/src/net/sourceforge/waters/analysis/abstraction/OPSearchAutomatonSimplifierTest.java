@@ -50,7 +50,7 @@ public class OPSearchAutomatonSimplifierTest
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     mSimplifier = new OPSearchAutomatonSimplifier(factory, translator);
     mSimplifier.setOutputName("result");
-    mIsomorphismChecker = new IsomorphismChecker(factory, true);
+    mIsomorphismChecker = new IsomorphismChecker(factory, true, true);
   }
 
   protected void tearDown() throws Exception

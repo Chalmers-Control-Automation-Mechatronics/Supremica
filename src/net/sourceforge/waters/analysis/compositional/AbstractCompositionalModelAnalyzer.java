@@ -2187,7 +2187,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-    private void removeAutomata(final Collection<AutomatonProxy> victims)
+     void removeAutomata(final Collection<AutomatonProxy> victims)
     {
       for (final AutomatonProxy aut : victims) {
         final byte code = mAutomataMap.remove(aut);
@@ -2198,7 +2198,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-    private boolean replaceAutomaton(final AutomatonProxy oldAut,
+     boolean replaceAutomaton(final AutomatonProxy oldAut,
                                      final AutomatonProxy newAut)
     {
       final byte code = mAutomataMap.remove(oldAut);
@@ -2797,9 +2797,9 @@ public abstract class AbstractCompositionalModelAnalyzer
   //# Class Constants
   private static final String ALPHA = ":alpha";
 
-  private static final byte UNKNOWN_SELFLOOP = 0;
-  private static final byte ONLY_SELFLOOP = 1;
-  private static final byte NOT_ONLY_SELFLOOP = 2;
-  private static final byte BLOCKED = 3;
+  static final byte UNKNOWN_SELFLOOP = 0;
+  static final byte ONLY_SELFLOOP = 1;
+  static final byte NOT_ONLY_SELFLOOP = 2;
+  static final byte BLOCKED = 3;
 
 }

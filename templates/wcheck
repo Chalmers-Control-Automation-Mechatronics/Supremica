@@ -37,7 +37,7 @@ for F in "$@"; do
         ;;
     -po)
         FACTORY="$WPACK.analysis.po.PartialOrderModelVerifierFactory"
-        ;;    
+        ;;
     -proj)
         FACTORY="$WPACK.analysis.modular.ProjectingModelVerifierFactory"
         ;;

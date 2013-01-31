@@ -56,7 +56,7 @@ public abstract class AbstractTRSimplifierTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSimplifier = createTransitionRelationSimplifier();
     mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
-    mIsomorphismChecker = new IsomorphismChecker(factory, false);
+    mIsomorphismChecker = new IsomorphismChecker(factory, false, true);
   }
 
   @Override
@@ -400,6 +400,13 @@ public abstract class AbstractTRSimplifierTest
   protected void configureTransitionRelationSimplifier()
   {
   }
+
+  protected void configureTransitionRelationSimplifier(final EventEncoding EventEnc)
+  {
+      //Will be used to keep track of which Events are the always enabled events.
+
+  }
+
 
   /**
    * Provides the IDs of alpha and omega propositions to the transition
