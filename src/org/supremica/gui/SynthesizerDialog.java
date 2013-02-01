@@ -495,6 +495,7 @@ public class SynthesizerDialog implements ActionListener
         .getMaximallyPermissive());
       maximallyPermissiveIncrementalBox.setSelected(synthesizerOptions
         .getMaximallyPermissiveIncremental());
+      updatePanel();
     }
 
     private void updatePanel()
