@@ -145,7 +145,7 @@ public class EnabledEventsCompositionalConflictChecker extends
   @Override
   protected EventInfo createEventInfo(final EventProxy event)
   {
-    //Put something here?
+    
     return new EnabledEventsEventInfo(event);
   }
 
@@ -156,13 +156,13 @@ public class EnabledEventsCompositionalConflictChecker extends
   }
 
 
-  private static class EnabledEventsEventInfo extends EventInfo
+  static class EnabledEventsEventInfo extends EventInfo
   {
     private final Set<AutomatonProxy> mDisablingAutomata;
 
     private EnabledEventsEventInfo(final EventProxy event)
     {
-      //Make a constructor somehow
+      
       super(event);
       mDisablingAutomata = new THashSet<AutomatonProxy>();
 
@@ -184,14 +184,17 @@ public class EnabledEventsCompositionalConflictChecker extends
     }
 
     //Returns true if the automaton passed in is the only automaton disabling this event.
-    @SuppressWarnings("unused")
-    private boolean isSingleDisablingAutomaton(final AutomatonProxy aut)
+     boolean isSingleDisablingAutomaton(final AutomatonProxy aut)
     {
 
-      return mDisablingAutomata.size() == 1
-             && mDisablingAutomata.contains(aut);
+      return mDisablingAutomata.size() == 0 || (mDisablingAutomata.size() == 1   
+             && mDisablingAutomata.contains(aut));
 
     }
+    
+    
+    
+    
 
     @Override
      void removeAutomata(final Collection<AutomatonProxy> victims)
