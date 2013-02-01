@@ -83,6 +83,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public void setModel(final ProductDESProxy model)
   {
     super.setModel(model);
@@ -251,6 +252,8 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
       return lc;
     } finally {
       tearDown();
+      //final VerificationResult result = getAnalysisResult();
+      //System.out.println(result.getRunTime());
     }
   }
 

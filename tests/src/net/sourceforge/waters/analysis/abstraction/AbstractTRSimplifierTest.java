@@ -56,7 +56,7 @@ public abstract class AbstractTRSimplifierTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSimplifier = createTransitionRelationSimplifier();
     mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
-    mIsomorphismChecker = new IsomorphismChecker(factory, false);
+    mIsomorphismChecker = new IsomorphismChecker(factory, false, true);
   }
 
   @Override
