@@ -319,7 +319,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mBadStates = null;
       mSafeStates = null;
       mReachableStates = null;
-
+      System.err.println("non reduction: " + mNumGoodStates);/////////////////////////////////////////////////
       if (getConstructsResult()) {
         AutomatonProxy aut = null;
         ProductDESProxy des = null;
@@ -333,11 +333,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             aut =
               mReduction
                 .createOneStateAutomaton(mReduction.mDisabledEventList);
+            System.err.println("monolithic: " + 1);/////////////////////////////////////////////////////////
             des = AutomatonTools.createProductDESProxy(aut, getFactory());
           } else {
             // create monolithic supervisor
             mReduction.mainProcedure(mReduction.mEventList);
             mReduction.mergeTransitionRelation(mTransitionRelation, true);
+            System.err.println("monolithic: " + mNumGoodStates);//////////////////////////////////////////////
             // reduce to a smaller supervisor for each important controllable event
             mReduction.setUpEventList();
             int i = 0;
@@ -366,6 +368,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                 mReduction.removeUncontrollableSelfloops(copy);
                 copy.setName("Supervisor:<" + mEvents[e1.get(0)].getName()
                              + ">");
+                System.err.println("modular: " + mEvents[e1.get(0)].getName()
+                                   + " " + (copy.getNumberOfStates()));//////////////////////////////////////
                 aut = copy.createAutomaton(getFactory(), getEventEncoding());
                 mAutomataList.add(aut);
               }

@@ -449,11 +449,6 @@ public abstract class AbstractSupervisorSynthesizerTest
     checkTransferline(3);
   }
 
-  public void testTransferLine4() throws Exception
-  {
-    checkTransferline(4);
-  }
-
   public void testTictactoe() throws Exception
   {
     final String group = "tests";

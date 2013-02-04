@@ -461,7 +461,7 @@ public class SynthesizerDialog implements ActionListener
       reduceSupervisorsBox.addActionListener(this);
 
       localizeSupervisorsBox =
-        new JCheckBox("localize supervisors (experimental)");
+        new JCheckBox("Localize supervisors (experimental)");
       localizeSupervisorsBox
         .setToolTipText("Apply localization to synthesized supervisors");
       localizeSupervisorsBox.addActionListener(this);
