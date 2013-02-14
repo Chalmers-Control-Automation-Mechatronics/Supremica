@@ -10,8 +10,14 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import gnu.trove.THashSet;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,7 +61,7 @@ public class EnabledEventsCompositionalConflictChecker extends
    */
   public EnabledEventsCompositionalConflictChecker(final ProductDESProxyFactory factory)
   {
-    super(factory);
+    this(null, factory);
   }
 
   /**
@@ -72,7 +78,7 @@ public class EnabledEventsCompositionalConflictChecker extends
   public EnabledEventsCompositionalConflictChecker(final ProductDESProxy model,
                                                    final ProductDESProxyFactory factory)
   {
-    super(model, factory);
+    this(model, null, factory);
   }
 
   /**
@@ -96,9 +102,42 @@ public class EnabledEventsCompositionalConflictChecker extends
                                                    final EventProxy marking,
                                                    final ProductDESProxyFactory factory)
   {
-    super(model, marking, factory);
-
+    this(model, marking, factory, ConflictAbstractionProcedureFactory.OEQ);
   }
+
+  /**
+   * Creates a new conflict checker to check whether the given model is
+   * nonblocking.
+   * @param model
+   *          The model to be checked by this conflict checker.
+   * @param marking
+   *          The proposition event that defines which states are marked.
+   *          Every state has a list of propositions attached to it; the
+   *          conflict checker considers only those states as marked that are
+   *          labelled by <CODE>marking</CODE>, i.e., their list of
+   *          propositions must contain this event (exactly the same object).
+   * @param factory
+   *          Factory used for trace construction.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
+   */
+  public EnabledEventsCompositionalConflictChecker
+    (final ProductDESProxy model,
+     final EventProxy marking,
+     final ProductDESProxyFactory factory,
+     final ConflictAbstractionProcedureFactory abstractionFactory)
+  {
+    super(model,
+          marking,
+          factory,
+          abstractionFactory,
+          new PreselectingMethodFactory(),
+          new SelectingMethodFactory());
+  }
+
+
+
+
 
   @Override
   protected void addEventsToAutomata(final AutomatonProxy aut)
@@ -145,7 +184,7 @@ public class EnabledEventsCompositionalConflictChecker extends
   @Override
   protected EventInfo createEventInfo(final EventProxy event)
   {
-    
+
     return new EnabledEventsEventInfo(event);
   }
 
@@ -155,18 +194,228 @@ public class EnabledEventsCompositionalConflictChecker extends
     return (EnabledEventsEventInfo) super.getEventInfo(event);
   }
 
+  /**
+   * The preselecting method that considers every set of automata with at
+   * least one local event as a candidate.
+   */
+  public static final PreselectingMethod MustLE =
+      new PreselectingMethod("MustLE")
+  {
+    @Override
+    PreselectingHeuristic createHeuristic
+      (final AbstractCompositionalModelAnalyzer verifier)
+    {
+      final EnabledEventsCompositionalConflictChecker everifier =
+        (EnabledEventsCompositionalConflictChecker) verifier;
+      return everifier.new HeuristicMustLE();
+    }
+  };
 
+  /**
+   * The selecting method that chooses the candidate with the highest
+   * proportion of local events.
+   */
+  public static final SelectingMethod MaxLE = new SelectingMethod("MaxLE")
+  {
+    @Override
+    Comparator<Candidate> createComparator
+      (final AbstractCompositionalModelAnalyzer verifier)
+    {
+      final EnabledEventsCompositionalConflictChecker everifier =
+        (EnabledEventsCompositionalConflictChecker) verifier;
+      return everifier.new ComparatorMaxLE();
+    }
+  };
+
+  /**
+   * The selecting method that chooses the candidate with the minimum
+   * estimated number of states in the synchronous product.
+   */
+  public static final SelectingMethod MinSE = new SelectingMethod("MinSE")
+  {
+    @Override
+    Comparator<Candidate> createComparator
+      (final AbstractCompositionalModelAnalyzer verifier)
+    {
+      final EnabledEventsCompositionalConflictChecker everifier =
+        (EnabledEventsCompositionalConflictChecker) verifier;
+      return everifier.new ComparatorMinSE();
+    }
+  };
+
+
+  //# Inner Class PreselectingMethodFactory
+  protected static class PreselectingMethodFactory
+    extends CompositionalConflictChecker.PreselectingMethodFactory
+  {
+    //#######################################################################
+    //# Constructors
+    protected PreselectingMethodFactory()
+    {
+      register(MustLE);
+    }
+  }
+
+  //#########################################################################
+  //# Inner Class SelectingMethodFactory
+  protected static class SelectingMethodFactory
+    extends AbstractCompositionalModelVerifier.SelectingMethodFactory
+  {
+    //#######################################################################
+    //# Constructors
+    protected SelectingMethodFactory()
+    {
+      register(MaxLE);
+      register(MinSE);
+    }
+  }
+
+  //#########################################################################
+  //# Inner Class HeuristicMustLE
+  private class HeuristicMustLE
+    implements PreselectingHeuristic
+  {
+
+    //#######################################################################
+    //# Interface PreselectingHeuristic
+    @Override
+    public Collection<Candidate> findCandidates()
+    {
+      final Collection<Candidate> candidates = new LinkedList<Candidate>(); //Create collection to store candidates to return
+      final Collection<EventProxy> events = getCurrentEvents();             //Get all events and put into a collection
+
+      final Collection<List<AutomatonProxy>> found =            //This is the automaton combinations we have already found
+        new THashSet<List<AutomatonProxy>>(events.size());
+
+      for(final EventProxy event : events)                      //For all events
+      {
+        final EnabledEventsEventInfo info = getEventInfo(event);        //Get the event info
+        assert info.getNumberOfAutomata() > 0;                          //Make sure that this event is being used by an automaton
+        if (info.getNumberOfAutomata() > 1) {                           //If the event is being used by more than one automaton
+          List<AutomatonProxy> list = null;
+          if(info.mDisablingAutomata.size() >1)        //If there is more than one automata disabling the event
+          {
+          list =  info.getDisablingAutomataList();       //Get the list of automaton that the event is disabled in
+          }
+          else //if(info.mDisablingAutomata.size() == 1)  //If only one automata disables the event
+          {
+            list = info.getSortedAutomataList();        //Get the list of all automata using the event
+
+          }
+          if (isPermissibleCandidate(list) && found.add(list)) {            //Checks to see if it is a possible candidate, adds it to the found list and checks if it was already in the list
+            final Set<EventProxy> localEvents = identifyLocalEvents(list);      //When the automata are combined, some events will become local, list all of these
+            final Candidate candidate = new Candidate(list, localEvents);   //creates a candidate by giving it the list of automaton and the events that will be local
+            candidates.add(candidate);
+        }
+        }
+
+      }
+      return candidates;
+    }
+  }
+
+  //#########################################################################
+  //# Inner Class ComparatorMaxLE
+  private class ComparatorMaxLE extends SelectingComparator
+  {
+
+    //#######################################################################
+    //# Overrides for SelectingComparator
+    @Override
+    double getHeuristicValue(final Candidate candidate)
+    {
+      double alwaysEnabledEvents = 0;
+
+      final List<AutomatonProxy> automataList = candidate.getAutomata();
+
+      for(final EventProxy event : candidate.getOrderedEvents())  //For each event in the candidate
+      {
+        final EnabledEventsEventInfo info = getEventInfo(event);
+
+        if(info != null)                            //when would info be null? Right at start?
+        if(info.getDisablingAutomata() != null)
+        //If the event is never disabled, or only disabled in one automaton, or all the automaton it is disabled in are getting merged
+        if(info.mDisablingAutomata.size() == 0 || info.mDisablingAutomata.size() == 1 || automataList.containsAll(info.getDisablingAutomata()))
+          alwaysEnabledEvents++;
+      }
+
+
+
+      return - (double) candidate.getLocalEventCount() + alwaysEnabledEvents /
+               candidate.getNumberOfEvents();
+    }
+
+  }
+
+//#########################################################################
+  //# Inner Class ComparatorMinSE
+  private class ComparatorMinSE extends SelectingComparator
+  {
+
+    //#######################################################################
+    //# Overrides for SelectingComparator
+    @Override
+    double getHeuristicValue(final Candidate candidate)
+    {
+      double product = 1.0;
+      for (final AutomatonProxy aut : candidate.getAutomata()) {    //for all automata in the candidate
+        product *= aut.getStates().size();                          //multiply the number of each of states together.
+      }
+      final double totalEvents = candidate.getNumberOfEvents();
+      final double localEvents = candidate.getLocalEventCount();
+      double alwaysEnabledEvents = 0;
+
+      final List<AutomatonProxy> automataList = candidate.getAutomata();
+
+      for(final EventProxy event : candidate.getOrderedEvents())  //For each event in the candidate
+      {
+        final EnabledEventsEventInfo info = getEventInfo(event);
+
+        if(info != null)                            //propositions
+        if(info.getDisablingAutomata() != null)
+        //If the event is never disabled, or only disabled in one automaton, or all the automaton it is disabled in are getting merged
+        if(info.mDisablingAutomata.size() == 0 || info.mDisablingAutomata.size() == 1 || automataList.containsAll(info.getDisablingAutomata()))
+          {
+          alwaysEnabledEvents++;
+
+          }
+
+
+      }
+
+      return product * (totalEvents - localEvents - alwaysEnabledEvents) / totalEvents;
+    }
+
+  }
+
+
+
+  //INNER CLASS
   static class EnabledEventsEventInfo extends EventInfo
   {
+    //List of automata the disable this event
     private final Set<AutomatonProxy> mDisablingAutomata;
 
     private EnabledEventsEventInfo(final EventProxy event)
     {
-      
+
       super(event);
       mDisablingAutomata = new THashSet<AutomatonProxy>();
 
     }
+
+    public Set<AutomatonProxy> getDisablingAutomata()
+    {
+      return mDisablingAutomata;
+    }
+    public List<AutomatonProxy> getDisablingAutomataList()
+    {
+      //This seems to be needed because some methods want the disabling automata as a list.
+      final List<AutomatonProxy> disablingList = new ArrayList<AutomatonProxy>(mDisablingAutomata);
+      Collections.sort(disablingList);
+      return disablingList;
+    }
+
 
     private void addDisablingAutomaton(final AutomatonProxy aut)
     {
@@ -187,14 +436,14 @@ public class EnabledEventsCompositionalConflictChecker extends
      boolean isSingleDisablingAutomaton(final AutomatonProxy aut)
     {
 
-      return mDisablingAutomata.size() == 0 || (mDisablingAutomata.size() == 1   
+      return mDisablingAutomata.size() == 0 || (mDisablingAutomata.size() == 1
              && mDisablingAutomata.contains(aut));
 
     }
-    
-    
-    
-    
+
+
+
+
 
     @Override
      void removeAutomata(final Collection<AutomatonProxy> victims)

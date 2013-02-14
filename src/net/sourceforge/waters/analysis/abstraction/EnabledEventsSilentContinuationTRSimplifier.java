@@ -9,12 +9,12 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.HashFunctions;
+import gnu.trove.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-
-import gnu.trove.HashFunctions;
-import gnu.trove.TIntHashSet;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -54,6 +54,9 @@ public class EnabledEventsSilentContinuationTRSimplifier
   {
     super(rel);
   }
+
+
+
 
 
   //#########################################################################
@@ -101,16 +104,24 @@ public class EnabledEventsSilentContinuationTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
+  @Override
   public boolean isPartitioning()
   {
     return true;
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
-    final TRSimplifierStatistics stats =
-      new TRSimplifierStatistics(this, true, false);
+    final EnabledEventsStatistics stats =
+      new EnabledEventsStatistics(this, true, false);
     return setStatistics(stats);
+  }
+
+  @Override
+  public EnabledEventsStatistics getStatistics()
+  {
+    return (EnabledEventsStatistics) super.getStatistics();
   }
 
 
@@ -188,6 +199,19 @@ public class EnabledEventsSilentContinuationTRSimplifier
     }
   }
 
+
+
+  @Override
+  protected void recordStart()
+  {
+    super.recordStart();
+    final EnabledEventsStatistics stats = getStatistics();
+    if (stats != null) {
+      stats.recordNumEnabledEvents(mNumberOfEnabledEvents);
+    }
+  }
+
+
   @Override
   protected void applyResultPartition()
     throws AnalysisException
@@ -197,6 +221,8 @@ public class EnabledEventsSilentContinuationTRSimplifier
     rel.removeTauSelfLoops();
     rel.removeProperSelfLoopEvents();
   }
+
+
 
 
   //#########################################################################
@@ -221,6 +247,7 @@ public class EnabledEventsSilentContinuationTRSimplifier
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.abstraction.WatersIntHashingStrategy
+    @Override
     public int computeHashCode(final int root)
     {
       if (root == mPreviousRoot) {
@@ -268,6 +295,7 @@ public class EnabledEventsSilentContinuationTRSimplifier
       }
     }
 
+    @Override
     public boolean equals(final int root1, final int root2) //checks if two states can be merged by rule
     {
       try {

@@ -50,6 +50,19 @@ public enum ConflictAbstractionProcedureFactory
            OBSERVATION_EQUIVALENCE, false, false, true);
     }
   },
+
+  EENB {
+    @Override
+    public AbstractionProcedure createAbstractionProcedure
+      (final AbstractCompositionalModelAnalyzer analyzer)
+    {
+      return EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure.
+        createThreeStepConflictEquivalenceAbstractionProcedure
+          (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
+           WEAK_OBSERVATION_EQUIVALENCE, false, true, false);
+    }
+  },
+
   /**
     * <P>Minimisation is performed according to a sequence of abstraction
    * rules for generalised nonblocking proposed, but using weak observation

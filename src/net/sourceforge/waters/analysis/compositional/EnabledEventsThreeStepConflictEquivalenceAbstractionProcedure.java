@@ -76,15 +76,16 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     preChain.add(silentOutRemover);
-    EnabledEventsSilentContinuationTRSimplifier enabledEventsSimplifier =
-      new EnabledEventsSilentContinuationTRSimplifier();
-    preChain.add(enabledEventsSimplifier);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
     final int limit = analyzer.getInternalTransitionLimit();
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     preChain.add(incomingEquivalenceSimplifier);
-    
+
+    final EnabledEventsSilentContinuationTRSimplifier enabledEventsSimplifier =
+      new EnabledEventsSilentContinuationTRSimplifier();
+    preChain.add(enabledEventsSimplifier);
+
     final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
     if (useLimitedCertainConflicts) {
       limitedCertainConflictsRemover =
@@ -168,67 +169,67 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
       final StateEncoding inputStateEnc = new StateEncoding(aut);       //can always access compisitionalconflictechcker
       final int config = mPreChain.getPreferredInputConfiguration();    //use that to find mNumberofEnabledEvents
-     
-      EnabledEventsCompositionalConflictChecker enabledEventsAnalyzer = (EnabledEventsCompositionalConflictChecker)getAnalyzer();
-     
-      List<EventProxy> eventsList = new ArrayList<EventProxy>(aut.getEvents().size());
-      
-      
+
+      final EnabledEventsCompositionalConflictChecker enabledEventsAnalyzer = (EnabledEventsCompositionalConflictChecker)getAnalyzer();
+
+      final List<EventProxy> eventsList = new ArrayList<EventProxy>(aut.getEvents().size());
+
+
       //mCurrentAutomaton where is it
-      
+
       //maybe only let it do the next bit if it's already looked at all the auts to get enabledEvent info?
-      
-      
+
+
       int numEnabledEvents = 0;
       //for all the events
-      for(EventProxy events : aut.getEvents())
+      for(final EventProxy events : aut.getEvents())
       {
-        
+
         //Get event info somewhere
-        EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
-        
+        final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
+
         if(eventInfo != null)
         //check if event is always enabled or this automaton is only disabler
         if(eventInfo.isSingleDisablingAutomaton(aut))
         {
-        
+
           eventsList.add(events);
-          
+
       //count how many enabled events there are
           if(events != tau)
-         numEnabledEvents++; 
+         numEnabledEvents++;
         }
-        
+
       }
-      
-      for(EventProxy events : aut.getEvents())
+
+      for(final EventProxy events : aut.getEvents())
       {
         //Get event info somewhere
-        EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);    
+        final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
         //check if event is always enabled or this automaton is only disabler
-        
-        if(eventInfo == null || !eventInfo.isSingleDisablingAutomaton(aut) )      
-          eventsList.add(events);       
-        
+
+        if(eventInfo == null || !eventInfo.isSingleDisablingAutomaton(aut) )
+          eventsList.add(events);
+
       }
-      
-     
-      
-      
+
+
+
+
       //Tell the simplifier how many enabled events there are
       mEnabledEventsSimplifier.setNumberOfEnabledEvents(numEnabledEvents);
-      
+
       //If there are none, don't do anything
-      
-      
+
+
       //create Event Encoding in right order with all enabled events at front of list
       final EventEncoding eventEnc = new EventEncoding(eventsList,
                                                        enabledEventsAnalyzer.getKindTranslator(),
                                                        tau);
-      
-      
-      
-      
+     // System.out.println(numEnabledEvents);
+
+
+
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, eventEnc,
                                          inputStateEnc, config);
@@ -354,11 +355,13 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
   public void requestAbort()
   {
     mCompleteChain.requestAbort();
   }
 
+  @Override
   public boolean isAborting()
   {
     return mCompleteChain.isAborting();

@@ -152,12 +152,44 @@ public class CompositionalConflictChecker
      final ProductDESProxyFactory factory,
      final ConflictAbstractionProcedureFactory abstractionFactory)
   {
+    this(model,
+         marking,
+         factory,
+         abstractionFactory,
+         new PreselectingMethodFactory(),
+         new SelectingMethodFactory());
+  }
+
+  /**
+   * Creates a new conflict checker to check whether the given model is
+   * nonblocking.
+   * @param model
+   *          The model to be checked by this conflict checker.
+   * @param marking
+   *          The proposition event that defines which states are marked.
+   *          Every state has a list of propositions attached to it; the
+   *          conflict checker considers only those states as marked that are
+   *          labelled by <CODE>marking</CODE>, i.e., their list of
+   *          propositions must contain this event (exactly the same object).
+   * @param factory
+   *          Factory used for trace construction.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
+   */
+  public CompositionalConflictChecker
+    (final ProductDESProxy model,
+     final EventProxy marking,
+     final ProductDESProxyFactory factory,
+     final ConflictAbstractionProcedureFactory abstractionFactory,
+     final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory preselectingMethodFactory,
+     final AbstractCompositionalModelAnalyzer.SelectingMethodFactory selectingMethodFactory)
+  {
     super(model,
           factory,
           ConflictKindTranslator.getInstance(),
           abstractionFactory,
-          new PreselectingMethodFactory(),
-          new SelectingMethodFactory());
+          preselectingMethodFactory,
+          selectingMethodFactory);
     setPruningDeadlocks(true);
     setConfiguredDefaultMarking(marking);
   }
@@ -1007,6 +1039,7 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Interface java.util.Comparator<AutomatonProxy>
+    @Override
     public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
     {
       final int numalpha1 =
@@ -1052,6 +1085,7 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Overrides for SelectingHeuristic
+    @Override
     Candidate selectCandidate(final Collection<Candidate> candidates)
     throws AnalysisException
     {
@@ -1097,6 +1131,7 @@ public class CompositionalConflictChecker
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.monolithic.
     //# MonolithicSynchronousProductBuilder.StateCounter
+    @Override
     public void countState(final int[] tuple)
       throws OverflowException
     {
@@ -1121,6 +1156,7 @@ public class CompositionalConflictChecker
       }
     }
 
+    @Override
     public void recordStatistics(final AutomatonResult result)
     {
       result.setPeakNumberOfNodes(mCount);
@@ -1143,6 +1179,7 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;

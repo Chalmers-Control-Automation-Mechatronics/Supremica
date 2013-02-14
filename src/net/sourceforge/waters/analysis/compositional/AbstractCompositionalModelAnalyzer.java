@@ -1103,7 +1103,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   /**
    * Finds the set of events that are local to the given automata.
    */
-  private Set<EventProxy> identifyLocalEvents
+  Set<EventProxy> identifyLocalEvents
     (final Collection<AutomatonProxy> automata)
   {
     final Set<EventProxy> events = Candidate.getAllEvents(automata);
@@ -2003,6 +2003,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparable<SubSystem>
+    @Override
     public int compareTo(final SubSystem other)
     {
       final int aut1 = mAutomata.size();
@@ -2154,12 +2155,12 @@ public abstract class AbstractCompositionalModelAnalyzer
       return true;
     }
 
-    private int getNumberOfAutomata()
+    int getNumberOfAutomata()
     {
       return mAutomataMap.size();
     }
 
-    private List<AutomatonProxy> getSortedAutomataList()
+    List<AutomatonProxy> getSortedAutomataList()
     {
       if (mSortedAutomataList == null) {
         final int size = mAutomataMap.size();
@@ -2258,6 +2259,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface PreselectingHeuristic
+    @Override
     public Collection<Candidate> findCandidates()
     {
       if (mCurrentAutomata.isEmpty()) {
@@ -2321,6 +2323,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparator<AutomatonProxy>
+    @Override
     public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
     {
       final int numtrans1 = aut1.getTransitions().size();
@@ -2352,6 +2355,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparator<AutomatonProxy>
+    @Override
     public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
     {
       final int numstates1 = aut1.getStates().size();
@@ -2378,6 +2382,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface PreselectingHeuristic
+    @Override
     public Collection<Candidate> findCandidates()
     {
       final Collection<Candidate> candidates = new LinkedList<Candidate>();
@@ -2439,6 +2444,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparator<Candidate>
+    @Override
     public int compare(final Candidate cand1, final Candidate cand2)
     {
       final double heu1 = getHeuristicValue(cand1);
@@ -2472,6 +2478,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingHeuristic
+    @Override
     Candidate selectCandidate(final Collection<Candidate> candidates)
     throws AnalysisException
     {
@@ -2525,10 +2532,11 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       return - (double) candidate.getLocalEventCount() /
-               (double) candidate.getNumberOfEvents();
+               candidate.getNumberOfEvents();
     }
 
   }
@@ -2541,10 +2549,11 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       return - (double) candidate.getCommonEventCount() /
-               (double) candidate.getNumberOfEvents();
+               candidate.getNumberOfEvents();
     }
 
   }
@@ -2557,6 +2566,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       final int unionAlphabetSize = candidate.getNumberOfEvents();
@@ -2580,6 +2590,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;
@@ -2609,6 +2620,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparator<Candidate>
+    @Override
     public int compare(final Candidate cand1, final Candidate cand2)
     {
       for (final Comparator<Candidate> heu : mHeuristics) {
@@ -2652,11 +2664,13 @@ public abstract class AbstractCompositionalModelAnalyzer
     //#######################################################################
     //# Interface
     //# net.sourceforge.waters.model.analysis.SynchronousProductStateMap
+    @Override
     public Collection<AutomatonProxy> getInputAutomata()
     {
       return Collections.singletonList(mOriginalAutomaton);
     }
 
+    @Override
     public StateProxy getOriginalState(final StateProxy tuple,
                                        final AutomatonProxy aut)
     {

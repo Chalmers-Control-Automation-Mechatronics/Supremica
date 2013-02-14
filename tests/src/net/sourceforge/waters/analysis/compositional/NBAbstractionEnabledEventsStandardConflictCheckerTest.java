@@ -39,13 +39,14 @@ public class NBAbstractionEnabledEventsStandardConflictCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ConflictChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
     final EnabledEventsCompositionalConflictChecker checker =
       new EnabledEventsCompositionalConflictChecker(factory);
     checker.setAbstractionProcedureFactory
-      (ConflictAbstractionProcedureFactory.NB);
+      (ConflictAbstractionProcedureFactory.EENB);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
