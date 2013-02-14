@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -443,11 +444,40 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testTransferLine3() throws Exception
+  {
+    checkTransferline(3);
+  }
+
+  public void testTictactoe() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "tictactoe";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testThreeRobot() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "three_robot";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void test2LinkAlt() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "2linkalt";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testIMS() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "ims";
+    final String name = "ims_uncont";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -470,12 +500,37 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+
+  public void test2LinkAltBatch() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "2linkalt_batch";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+
   public void testKoordWspSynth() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "koordwsp_synth";
     runSynthesizer(group, subdir, name, true);
+  }
+
+
+  //#########################################################################
+  //# Parametrised tests
+  private void checkTransferline(final int n) throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "transferline_N";
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("N", n);
+    bindings.add(binding);
+    runSynthesizer(group, subdir, name, bindings, true);
   }
 
 
@@ -771,6 +826,7 @@ public abstract class AbstractSupervisorSynthesizerTest
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       switch (aut.getKind()) {
@@ -788,6 +844,7 @@ public abstract class AbstractSupervisorSynthesizerTest
       }
     }
 
+    @Override
     public EventKind getEventKind(final EventProxy event)
     {
       switch (event.getKind()) {
