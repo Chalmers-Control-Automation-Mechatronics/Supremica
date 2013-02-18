@@ -20,6 +20,7 @@ import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.automata.FlowerEFABuilder;
 import org.supremica.properties.Config;
+import org.supremica.util.BDD.graphs.BDDNodeGrow;
 
 public class BDDExtendedManager extends BDDAbstractManager {
 
@@ -53,18 +54,32 @@ public class BDDExtendedManager extends BDDAbstractManager {
     /** Return a set of initial uncontrollable states. */
     public BDD getInitiallyUncontrollableStates() {
         final BDDMonolithicEdges edges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
-
+        BDD uncontrollableStates = getZeroBDD();
         if (bddExAutomata.orgExAutomata.modelHasNoPlants()
                 || bddExAutomata.orgExAutomata.modelHasNoSpecs()) {
             return getZeroBDD();
         } else {
-            final BDD t1 = bddExAutomata.getReachableStates().and(edges.getPlantMonolithicUncontrollableEdgesForwardBDD());
+            final BDD t1 = edges.getPlantMonolithicUncontrollableEdgesForwardBDD();
             final BDD t2 = edges.getSpecMonolithicUncontrollableEdgesForwardBDD().and(t1).exist(bddExAutomata.getDestStatesVarSet());
-            return t1.and(t2.not()).exist(bddExAutomata.getDestStatesVarSet()).exist(bddExAutomata.getEventVarSet());
+            uncontrollableStates =  t1.and(t2.not()).exist(bddExAutomata.getDestStatesVarSet()).exist(bddExAutomata.getEventVarSet());
         }
+//        if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
+//            uncontrollableStates = uncontrollableStates.or(getInitiallyTimedUncontrollableStates());
+//        }
+        
+        return uncontrollableStates;
 
     }
-
+    
+    public BDD getInitiallyTimedUncontrollableStates()
+    {
+        final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
+        BDD statesEnablingForc = (bddEdges.getMonolithicForcibleSpecEdgesForwardBDD()).exist(bddExAutomata.getDestStatesVarSet());
+        return statesEnablingForc.not().and(
+                bddEdges.getStatesTickDisabled(bddEdges.getPlantMonolithicEdgesForwardBDD(), bddExAutomata.getPlantSourceLocationInvariants()).not()).and(
+                bddEdges.getStatesTickDisabled(bddEdges.getSpecMonolithicEdgesForwardBDD(), bddExAutomata.getSpecSourceLocationInvariants()));        
+    }
+        
     public BDD uncontrollableBackward(final BDD forbidden) {
         System.err.println("UncontrollableBackward entered.");
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
@@ -72,52 +87,65 @@ public class BDDExtendedManager extends BDDAbstractManager {
         final BDD backwardTime = bddEdges.getBackwardClocksWithTheSameRate();
         final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();
 
+        
 //        System.out.println("forbidden");
 //        forbidden.printDot();
         BDD Qk = null;
         BDD newUCstates = null;
         BDD newCstates = null;
         BDD Qkn = forbidden.id();
-        if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
-            Qkn = timeEvolSource(Qkn, backwardTime);
-            newCstates = Qkn.and(bddEdges.getMonolithicForcibleEdgesForwardBDD().exist(bddExAutomata.getDestStatesVarSet()));
-            newCstates = timeEvolSource(newCstates, backwardTime);
-            Qkn = Qkn.and(newCstates.not());
-            Qkn = timeEvolSource(Qkn, forwardTime);
-
-//        System.out.println("Qknnnnnnn: "+(Qkn.isOne()?"one":""));
-//        Qkn.printDot();
-
-            Qkn = Qkn.or(forbidden);
-            bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(Qkn);
-        }
-
+//        if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
+//            BDD ucDueToTime = timeEvolSource(Qkn, backwardTime).and(Qkn.not());
+//            newCstates = Qkn.and(bddEdges.getMonolithicForcibleEdgesForwardBDD().exist(bddExAutomata.getDestStatesVarSet()));
+//            newCstates = timeEvolSource(newCstates, backwardTime);
+//            ucDueToTime = ucDueToTime.and(newCstates.not());
+////            Qkn = timeEvolSource(Qkn, forwardTime);
+//
+////        System.out.println("Qknnnnnnn: "+(Qkn.isOne()?"one":""));
+////        Qkn.printDot();
+//
+//            Qkn = Qkn.or(ucDueToTime);
+/////            bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(Qkn);
+//        }
+        int i = 0;
         do {
-//            System.out.println("UBackward: "+iteration++);
+            System.err.println("ub: "+(i++));
             Qk = Qkn.id();
             newUCstates = image_preImage(Qk, t_u);
             Qkn = Qk.or(newUCstates); 
-            BDD ucDueToTime = getZeroBDD();
-            if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
-                ucDueToTime = timeEvolSource(newUCstates, backwardTime).and(newUCstates.not());
-                newCstates = ucDueToTime.and(bddEdges.getMonolithicForcibleEdgesForwardBDD().exist(bddExAutomata.getDestStatesVarSet()));
-                newCstates = timeEvolSource(newCstates, backwardTime);
-                ucDueToTime = ucDueToTime.and(newCstates.not());
-                ucDueToTime = timeEvolSource(ucDueToTime, forwardTime);
-                bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(ucDueToTime);
-            }
-            Qkn = Qkn.or(ucDueToTime);
+//            Qkn = timeEvolSource(Qkn, backwardTime);
+//            Qkn = timeEvolSource(Qkn, forwardTime);            
+//            Qkn = timeEvolSource(bddExAutomata.getReachableStates().and(Qkn), forwardTime);
+
+//            if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
+//                BDD ucDueToTime = timeEvolSource(Qkn, backwardTime).and(Qkn.not());
+//                newCstates = ucDueToTime.and(bddEdges.getMonolithicForcibleEdgesForwardBDD().exist(bddExAutomata.getDestStatesVarSet()));
+//                newCstates = timeEvolSource(newCstates, backwardTime);
+//                ucDueToTime = ucDueToTime.and(newCstates.not());
+////                ucDueToTime = timeEvolSource(ucDueToTime, forwardTime);
+/////                bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(ucDueToTime);
+//                Qkn = Qkn.or(ucDueToTime);
+//            }            
         } while (!Qkn.equals(Qk));
 
         System.err.println("UncontrollableBackward exited.");
         return Qkn;
     }
 
-    public BDD restrictedBackward(final BDD markedStates, final BDD forbidden) {
+    public BDD restrictedBackward(final BDD markedStates, final BDD forb) {
         System.err.println("RestrictedBackward entered.");
-        final BDD delta_all = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesBackwardBDD();
-        final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getBackwardClocksWithTheSameRate();
+        
+        final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
+        BDD trans = bddEdges.getMonolithicEdgesBackwardBDD();
+        final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();                   
+        final BDD backwardTime = bddEdges.getBackwardClocksWithTheSameRate();
 
+        BDD forbidden = forb.id();
+        if(!bddExAutomata.orgExAutomata.getClocks().isEmpty())
+        {
+           forbidden = timeEvolSource(forb,forwardTime);
+        }        
+        
         BDD Qkn = markedStates.and(forbidden.not());
         BDD Qk = null;
         BDD Qm = null;
@@ -131,9 +159,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
         } catch (final Exception e){}
         final BufferedWriter out = new BufferedWriter(fstream);
          */
-
+        int i = 0;
         do {
-//            System.out.println("RBackward "+iteration++);
+            System.err.println("rb "+(i++));
 /*            try
             {
             out.write((iteration++) + "\t" + Qkn.nodeCount());
@@ -142,7 +170,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
             } catch (final Exception e){}
              */
             Qk = Qkn.id();
-            Qm = image_preImage(Qk, delta_all, clocks).and(bddExAutomata.getReachableStates());
+            Qm = image_preImage(Qk, trans, backwardTime);//.and(bddExAutomata.getReachableStates());
 
 //            BDD clockBDD = Qm.exist(bddExAutomata.sourceLocationVarSet);
 //            String nameOfClock = bddExAutomata.getAutVarName(clockBDD.var());
@@ -166,18 +194,25 @@ public class BDDExtendedManager extends BDDAbstractManager {
         System.err.println("RestrictedBackward exited.");
 
         return Qkn;
-    }
+    }   
 
-    public BDD restrictedForward(final BDD initialStates, final BDD forbidden) {
-        System.err.println("RestrictedForward entered.");
-        final BDD trans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesForwardBDD();
-        final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getForwardClocksWithTheSameRate();
+    public BDD restrictedForward(final BDD initialStates, final BDD forb) {
+        System.err.println("RestrictedForward entered.");        
+        final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
+        BDD trans = bddEdges.getMonolithicEdgesForwardBDD();
+        final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();            
 
 //        System.out.println("restrictedForward");
 
+        BDD forbidden = forb.id();
+//        if(!bddExAutomata.orgExAutomata.getClocks().isEmpty())
+//        {
+//           forbidden = timeEvolSource(forb,forwardTime);
+//        }
+        
         BDD Qkn = initialStates.and(forbidden.not());
-        BDD Qk = null;
-        BDD Qm = null;
+        BDD Qk;
+        BDD Qm;
 
 
 //        FileWriter fstream = null;
@@ -186,9 +221,10 @@ public class BDDExtendedManager extends BDDAbstractManager {
 //            fstream = new FileWriter("/Users/sajed/Desktop/fxdPoint.txt");
 //        } catch (final Exception e){}
 //        out = new BufferedWriter(fstream);
+        int iteration = 0;
 
         do {
-//            System.err.println("RForward "+(iteration++) + "\t" + Qkn.nodeCount());
+            System.err.println("RForward "+(iteration++) + "\t" + Qkn.nodeCount());
 
 //            try
 //            {
@@ -201,8 +237,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
 //                out.write((iteration++) + "\t");
 //            } catch (final Exception e){}
 
+//            System.err.println("("+(iteration++)+","+Qkn.nodeCount()+")");
             Qk = Qkn.id();
-            Qm = image_preImage(Qk, trans, clocks);
+            Qm = image_preImage(Qk, trans, forwardTime);
 
 //            BDD clockBDD = Qm.exist(bddExAutomata.sourceLocationVarSet);
 //            String nameOfClock = bddExAutomata.getAutVarName(clockBDD.var());
@@ -221,27 +258,35 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
 //        System.err.println("number of iterations in restrictedForward: "+iteration);
 
+//        System.out.println("RestrictedForward exited.");
         System.err.println("RestrictedForward exited.");
         return Qkn;
     }
 
-    public BDD nonblockingControllable(final BDD forbidden, final boolean reachable) {
+    public BDD nonblockingControllable(final BDD forb, final boolean reachable) {
         System.err.println("NonblockingControllable entered.");
-        final BDD clocks = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getForwardClocksWithTheSameRate();
+        final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
+        final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();        
 
+        BDD forbidden = forb.id();
+
+        if(!bddExAutomata.orgExAutomata.getClocks().isEmpty())
+        {
+           forbidden = timeEvolSource(forb,forwardTime);
+        }        
+        
         BDD Qkn = forbidden;
-        BDD Qk = null;
-        BDD Q1 = null;
-        BDD Q2 = null;
-
-        do {
-//            System.out.println("nbc: "+(iteration++));
-            Qk = Qkn.id();
-            Q1 = restrictedBackward(bddExAutomata.getMarkedStates(), Qk);
-            BDD forbiddenStates = Q1.not().and(bddExAutomata.getReachableStates());
+        BDD Qk;
+        BDD Q1;
+        BDD Q2;
+        int i = 0;
+        do {            
+            System.err.println("nbc i: "+(i++));
+            Qk = Qkn.id();            
+            Q1 = restrictedBackward(bddExAutomata.getMarkedStates(), Qk);   
+            BDD forbiddenStates = Q1.not();//.and(bddExAutomata.getReachableStates());
             if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
-                forbiddenStates = bddExAutomata.fitIntoClockDomains(forbiddenStates).and(
-                    (timeEvolSource(bddExAutomata.getMarkedStates(), clocks)).not());
+                forbiddenStates = bddExAutomata.fitIntoClockDomains(forbiddenStates).and(bddExAutomata.getMarkedStates().not());
             }
             Q2 = uncontrollableBackward(forbiddenStates);
 //            Q2 =  Q2.and((timeEvolSource(bddExAutomata.getMarkedStates(),clocks)).not());
@@ -250,7 +295,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         System.err.println("NonblockingControllable exited.");
 
-        if (reachable) {
+        if (reachable) {            
             return restrictedForward(bddExAutomata.getInitialState(), Qkn);
         } else {
             return Qkn.not();
@@ -312,6 +357,193 @@ public class BDDExtendedManager extends BDDAbstractManager {
         }
         return nonblockingControllableStates;
     }
+    
+    /*
+     * On-the-fly synthesis based on forward reachability
+     */        
+    public BDD onTheFlySynthesis(final BDD initialStates, final BDD forb) {
+        final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
+        BDD frwdTrans = bddEdges.getMonolithicEdgesForwardBDD().id();               
+        BDD bkwdUnconTrans = bddEdges.getMonolithicUncontrollableEdgesBackwardBDD();                               
+        BDD forbidden = forb.id().or(backwardReachability(bkwdUnconTrans, forb.id()));
+        pruneTrans(frwdTrans, forbidden);       
+//        pruneTrans(bkwdUnconTrans, forbidden);       
+                
+        /*
+         * The transition relations that are incrementally created during the
+         * fixed point computations
+         */
+//        BDD localFrwdTrans = getZeroBDD();
+       
+        BDD localBadStates;
+        BDD localBadStatesExt;
+        BDD localUnconStates;
+        BDD unconStates = getZeroBDD();     
+        
+        BDD Qkn = initialStates.and(forbidden.not());
+        BDD Qk;
+        BDD Qm;
+       
+        BDD nextStates;
+        BDD nextTrans;
+        BDD nextBlockingStates;
+        int i = 0;
+        int j;
+        do {
+            System.err.println("i: "+i);
+            Qk = Qkn.id();
+            nextTrans = frwdTrans.and(Qk);
+//            localFrwdTrans = localFrwdTrans.or(nextTrans);
+           
+            /*
+             * Image operator
+             */
+            System.err.println("Performing the image operator...");
+            nextStates = nextTrans.exist(bddExAutomata.getSourceStatesVarSet());           
+            Qm = bddExAutomata.destToSource(nextStates);            
+            Qkn = Qk.or(Qm);
+            System.err.println("Image computed.");
+            
+            /*
+             * Perform a local analysis (synthesis):
+             *     - find all blocking and uncontrollable states starting
+             *       from the localBadStates
+             *     - find states that are on the edge between the locally good
+             *       and bad states
+             */
+            System.err.println("Procedure: finding new blocking states...");
+            localBadStates = getBlockingStates(frwdTrans, Qm);      
+            System.err.println("Procedure done.");
+            localBadStatesExt = getZeroBDD();
+            localUnconStates = getZeroBDD();
+            j = 0;            
+            while(!localBadStates.equals(localBadStatesExt))
+            {                
+                System.err.println("j: "+j);
+                localBadStatesExt = localBadStates.id();
+                /*
+                 * Compute the local uncontrollable states
+                 */
+                
+//                //Initialize the uncontrollable backward transitions
+//                if(j == 0)
+//                {
+//                    localUnconBkwdTrans = bddExAutomata.sourceTooTdest(localFrwdTrans.and(
+//                    bddEdges.getMonolithicEdgesForwardWithEventsBDD()).and(
+//                    bddExAutomata.uncontrollableEventsBDD)).exist(bddExAutomata.getEventVarSet());
+//
+//                }
+                System.err.println("compute local uncon states...");
+                localUnconStates = backwardReachability(bkwdUnconTrans, localBadStates);                   
+                System.err.println("local uncon states computed.");
+
+                localBadStates = localBadStates.or(localUnconStates);
+//                localBadStates.printDot();
+                
+                System.err.println("local prune...");
+                pruneTrans(frwdTrans, localBadStates);
+//                localFrwdTrans = localFrwdTrans.and(bddExAutomata.sourceToDest(localBadStates).not());
+               
+//                unconStates = unconStates.or(localUnconStates);                                        
+               
+                Qkn = Qkn.and(localBadStates.not());      
+                System.err.println("computing next local bad states...");                
+                nextBlockingStates = getBlockingStates(frwdTrans, Qkn);    
+                System.err.println("next local bad states comoputed.");                                
+                localBadStates = localBadStates.or(nextBlockingStates);  
+                j++;
+            }
+           
+            /*
+             * Remove unnecessary visited states, visited thorugh local
+             * uncontrollable states and do not continue traversing from those states
+             */
+            /*
+            if(!unconStates.isZero())
+            {                
+                Qkn = Qkn.and(unnecessaryVisitedStates(localFrwdTrans, 
+                                                   frwdTrans, 
+                                                   unconStates).not());             
+                
+            }
+            */
+            i++;                                
+        } while (!Qkn.equals(Qk));
+        
+//        Qkn.printDot();
+ 
+        return Qkn;
+    }
+    
+    /*
+     * Remove transitions that includden forbidden states
+     */
+    private void pruneTrans(BDD trans, BDD forbiddenStates)
+    {
+        trans.andWith(forbiddenStates.not());            
+        trans.andWith(bddExAutomata.sourceToDest(forbiddenStates).not());
+    }
+    
+    /*
+     * Perform a forward reachability from each state in unconStates. For a state
+     * in unconStates, the traversing is stopped when a state is reached that has
+     * at least an incoming transition
+     */    
+    private BDD unnecessaryVisitedStates(BDD localFrwdTrans, BDD frwdTrans, BDD states)
+    {
+        BDD Qkn = states.id();
+        BDD Qk;
+        BDD incStates;
+        BDD tmpLocalFrwdTrans = localFrwdTrans.id();
+        BDD tmpFrwdTrans = frwdTrans.id();
+        BDD nextStates;
+        /*
+         * Remove the states that have incoming transitions
+         */
+        int i = 0;
+        do
+        {
+            System.err.println("unnVS: "+i);
+            Qk = Qkn.id();
+            nextStates = image_preImage(Qkn, tmpLocalFrwdTrans);
+            tmpFrwdTrans = tmpFrwdTrans.and(Qkn.not());            
+            incStates = statesWithIncomingTrans(nextStates, tmpFrwdTrans);
+            nextStates = nextStates.and(incStates.not());
+            tmpLocalFrwdTrans = tmpLocalFrwdTrans.and(bddExAutomata.sourceToDest(incStates).not());
+            Qkn = Qkn.or(nextStates);                      
+            i++;
+        }while(!Qkn.equals(Qk));
+        
+        return Qkn;
+    }
+    
+    private BDD statesWithIncomingTrans(BDD states, BDD frwdTrans)
+    {
+        BDD incomingTrans = frwdTrans.and(bddExAutomata.sourceToDest(states));
+        return bddExAutomata.destToSource(incomingTrans.exist(bddExAutomata.getSourceStatesVarSet()));                
+    }
+    
+    private BDD backwardReachability(BDD trans, BDD forbidden) {
+       
+        BDD Qk;
+        BDD unconStates;
+        BDD Qkn = forbidden.id();
+        do {
+            Qk = Qkn.id();
+            unconStates = image_preImage(Qk, trans);
+            Qkn = Qk.or(unconStates); 
+        } while (!Qkn.equals(Qk));
+
+        return Qkn.and(forbidden.not());
+    }    
+        
+    private BDD getBlockingStates(BDD forwardTrans, BDD states)
+    {        
+        BDD notBlocking = forwardTrans.and(states).exist(bddExAutomata.getDestStatesVarSet());   
+        return (states.and(bddExAutomata.getMarkedStates().not()).and(notBlocking.not()));        
+    }
+    
+    
 
     /* Implementeation for Resource Allocation Systems*/
     /** Computation of unsafe states including all minimal unsafe states.

@@ -535,11 +535,9 @@ public abstract class BDDAbstractManager {
         BDD nextStates = transitions.relprod(states.id(), bddExAutomata.getSourceStatesVarSet());
         if (!bddExAutomata.orgExAutomata.getClocks().isEmpty() && !clocks.isZero()) {
             nextStates = timeEvolDest(nextStates, clocks);
-        }
-
+        }                
         nextStates.replaceWith(bddExAutomata.getDestToSourceLocationPairing());
         nextStates.replaceWith(bddExAutomata.getDestToSourceVariablePairing());
-
         return nextStates;
     }
     
@@ -558,9 +556,7 @@ public abstract class BDDAbstractManager {
         output = output.and(clocksEvol);
         output = output.exist(bddExAutomata.getDestClockVarSet());
         output = output.replace(bddExAutomata.tempClock1ToDestClockPairing).exist(bddExAutomata.tempClock1Varset);
-        BDD destInvariants = bddExAutomata.getLocationInvariants().replace(bddExAutomata.getSourceToDestLocationPairing());
-        destInvariants = destInvariants.replace(bddExAutomata.getSourceToDestVariablePairing());
-        return output.and(destInvariants);
+        return output.and(bddExAutomata.getDestLocationInvariants());
     }
 
     BDD timeEvolSource(final BDD states, final BDD clocksEvol) {
@@ -572,6 +568,6 @@ public abstract class BDDAbstractManager {
 
         output.replaceWith(bddExAutomata.getDestToSourceLocationPairing());
         output.replaceWith(bddExAutomata.getDestToSourceVariablePairing());
-        return output.and(bddExAutomata.getLocationInvariants());
+        return output;
     }
 }
