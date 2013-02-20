@@ -454,26 +454,22 @@ public final class BDDExtendedGuardGenerator {
         final String symbol = automataBDD.getLocVarSuffix();
         final boolean flag = allowedForbidden ^ isComp;
 
-        ArrayList<String> incrementalSeq = new ArrayList<String>();
+        ArrayList<String> incrementalSeq;
         final ArrayList<String> setTemp = new ArrayList<String>(set);
-        String inEq = "";
-        int inEqLength = Integer.MAX_VALUE;
+        String inEq;
         if (!isAutomaton) {
             boolean firstTime = true;
             do {
-                final int setSize = setTemp.size();
                 incrementalSeq = isIncrementalSeq(setTemp);
                 setTemp.removeAll(incrementalSeq);
                 inEq = seq2inEqual(incrementalSeq, variable, theAutomata.getMinValueofVar(variable), theAutomata.getMaxValueofVar(variable), flag);
                 if (!inEq.isEmpty()) {
                     if (inEq.contains(AND) || inEq.contains(OR)) {
-                        inEqLength = 2 + setTemp.size();
+                        localNbrOfTerms += 2;
                     } else {
-                        inEqLength = 1 + setTemp.size();
+                        localNbrOfTerms += 1;
                     }
-                }
-
-                if (inEqLength < setSize) {
+                    
                     set = new ArrayList<String>(setTemp);
                     if (firstTime) {
                         expr = inEq;
@@ -481,9 +477,8 @@ public final class BDDExtendedGuardGenerator {
                     } else {
                         expr += ((flag ? OR : AND) + inEq);
                     }
-
-                    localNbrOfTerms += (inEqLength - setTemp.size());
                 }
+
             } while (!inEq.isEmpty() && !setTemp.isEmpty());
 
             if (!expr.isEmpty()) {
