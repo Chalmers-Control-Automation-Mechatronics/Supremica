@@ -50,7 +50,7 @@ public class EditorSynthesizerAction
 
         setEditorActiveRequired(true);
 
-        putValue(Action.NAME, "Symbolic Synthesis/Optimization on TEFAs...");
+        putValue(Action.NAME, "Symbolic (BDD) Synthesis/Optimization on TEFAs...");
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SHORT_DESCRIPTION, "Synthesize a modular supervisor by adding guards to the original automata");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
