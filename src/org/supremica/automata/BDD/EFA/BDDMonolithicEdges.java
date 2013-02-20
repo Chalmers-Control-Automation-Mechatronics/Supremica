@@ -28,6 +28,16 @@ public class BDDMonolithicEdges
     private BDD specUncontrollableEdgesForwardBDD = null;
     private BDD forwardClocksWithTheSameRate = null;
     private BDD backwardClocksWithTheSameRate = null;
+    private BDD oneStepTickBDD = null;
+    private BDD forcibleSpecEdgesForwardBDD = null;
+    
+    private BDD plantEdgesForwardBDD = null;
+    private BDD specEdgesForwardBDD = null;
+    
+    private BDD deadlockStatesBDD = null;
+    
+    private BDD currentFrwdGoodTransBDD = null;
+
 
 //    private BDD plantUncontrollableEdgesBackwardBDD = null;
 //    private BDD specUncontrollableEdgesBackwardBDD = null;
@@ -44,7 +54,13 @@ public class BDDMonolithicEdges
         specUncontrollableEdgesForwardBDD = manager.getOneBDD();
         forwardClocksWithTheSameRate = manager.getOneBDD();
         backwardClocksWithTheSameRate = manager.getOneBDD();
+        oneStepTickBDD = manager.getOneBDD();
         forcibleEdgesForwardBDD = manager.getZeroBDD();
+        forcibleSpecEdgesForwardBDD = manager.getZeroBDD();
+        
+        plantEdgesForwardBDD = manager.getOneBDD();
+        specEdgesForwardBDD = manager.getOneBDD();
+        
 
 //        edgesBackwardBDD = manager.getOneBDD();
 //        uncontrollableEdgesBackwardBDD = manager.getZeroBDD();
@@ -67,21 +83,19 @@ public class BDDMonolithicEdges
             edgesForwardWithoutDestBDD = edgesForwardWithoutDestBDD.and(currAutomaton.getEdgeForwardWithoutDestBDD());
 
             if (currAutomaton.getExAutomaton().isSpecification()) {
-                specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
+                
+                specEdgesForwardBDD = specEdgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
             } else {
-                plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
+                plantEdgesForwardBDD = plantEdgesForwardBDD.and(currAutomaton.getEdgeForwardBDD());
             }
-        }
+        }        
         if (bddExAutomata.getExtendedAutomata().modelHasNoPlants()) {
             plantUncontrollableEdgesForwardBDD = manager.getZeroBDD();
         }
 
         if (bddExAutomata.getExtendedAutomata().modelHasNoSpecs()) {
             specUncontrollableEdgesForwardBDD = manager.getZeroBDD();
-        }
-
-        specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
-        plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
+        }                
 
         System.err.println("Synchronizing actions...");
         BDD actionsBDD = synchronizedActions(bddExAutomata.forwardTransWhereVisUpdated, bddExAutomata.forwardTransAndNextValsForV);
@@ -92,8 +106,15 @@ public class BDDMonolithicEdges
         
 //        edgesForwardBDD.printDot();
 
-        specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(actionsBDD);
-        plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(actionsBDD);
+        specEdgesForwardBDD = specEdgesForwardBDD.and(actionsBDD);
+        plantEdgesForwardBDD = plantEdgesForwardBDD.and(actionsBDD);
+        
+        
+        
+        specUncontrollableEdgesForwardBDD = specEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
+        plantUncontrollableEdgesForwardBDD = plantEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
+        
+        
 
 //        System.out.println("number of nodes in the forward BDD: "+edgesForwardBDD.nodeCount());
         edgesBackwardBDD = bddExAutomata.sourceTooTdest(edgesForwardBDD);
@@ -103,13 +124,14 @@ public class BDDMonolithicEdges
             System.err.println("Clock extenstion computed.");
             forwardClocksWithTheSameRate = saturateForwardClocks(clocksWithTheSameRate[0]);
             backwardClocksWithTheSameRate = clocksWithTheSameRate[1];
+            oneStepTickBDD = saturateForwardClocks(clocksWithTheSameRate[2]);
 //            BDD c1 = manager.createBDD((2), bddExAutomata.destVarDomains[0]);
 //            BDD c2 = manager.createBDD((2), bddExAutomata.destVarDomains[1]);
 //            BDD c3 = manager.createBDD((2), bddExAutomata.destVarDomains[2]);
 //            (backwardClocksWithTheSameRate.and(c1).and(c2).and(c3)).printDot();
 
-            BDD sourceInvariant = bddExAutomata.getLocationInvariants();
-            BDD destInvariant = sourceInvariant.replace(bddExAutomata.getSourceToDestLocationPairing()).replace(bddExAutomata.getSourceToDestVariablePairing());
+            BDD sourceInvariant = bddExAutomata.getSourceLocationInvariants();
+            BDD destInvariant = bddExAutomata.getDestLocationInvariants();
 
 //            edgesForwardBDD = edgesForwardBDD.and(forwardClocksWithTheSameRate);
 //            edgesForwardBDD = edgesForwardBDD.exist(bddExAutomata.getDestClockVarSet());
@@ -128,7 +150,9 @@ public class BDDMonolithicEdges
 
             System.err.println("Timing stuffs created.");
 
-        }
+        }                
+        
+        
         //edgesBackwardBDD.printDot();
         //edgesForwardBDD.printDot();
         uncontrollableEdgesForwardBDD = edgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
@@ -138,7 +162,9 @@ public class BDDMonolithicEdges
         uncontrollableEdgesBackwardBDD = uncontrollableEdgesBackwardBDD.exist(bddExAutomata.getEventVarSet());
 
         forcibleEdgesForwardBDD = edgesForwardBDD.and(bddExAutomata.forcibleEventsBDD);
+        forcibleSpecEdgesForwardBDD = specEdgesForwardBDD.and(bddExAutomata.forcibleEventsBDD);
 //        forcibleEdgesForwardBDD.printDot();
+        forcibleSpecEdgesForwardBDD = forcibleSpecEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());
         forcibleEdgesForwardBDD = forcibleEdgesForwardBDD.exist(bddExAutomata.getEventVarSet());
 
 //        if(!uncontrollableEdgesForwardBDD.isZero())
@@ -153,6 +179,7 @@ public class BDDMonolithicEdges
         edgesBackwardWithEventsBDD = edgesBackwardBDD.id();
 
         edgesForwardBDD = edgesForwardBDD.exist(bddExAutomata.getEventVarSet());
+        currentFrwdGoodTransBDD = edgesForwardBDD.id();
         System.err.println("BDD represeting forward edges without events is created.");
         System.err.println("The number of nodes in the forward edge BDD: " + edgesForwardBDD.nodeCount());
         edgesBackwardBDD = edgesBackwardBDD.exist(bddExAutomata.getEventVarSet());
@@ -167,9 +194,8 @@ public class BDDMonolithicEdges
         if (bddExAutomata.orgExAutomata.size() == 1) {
             for (VariableComponentProxy var : bddExAutomata.orgExAutomata.getVars()) {
                 int varIndex = bddExAutomata.theIndexMap.getVariableIndex(var);
-                BDD noneUpdateVar = manager.getOneBDD();
 
-                noneUpdateVar = bddExAutomata.getBDDBitVecTarget(varIndex).equ(bddExAutomata.getBDDBitVecSource(varIndex));
+                BDD noneUpdateVar = bddExAutomata.getBDDBitVecTarget(varIndex).equ(bddExAutomata.getBDDBitVecSource(varIndex));
                 autTransAndNextValsForV[varIndex] = autTransWhereVisUpdated[varIndex].ite(autTransAndNextValsForV[varIndex], noneUpdateVar);
             }
         }
@@ -219,6 +245,31 @@ public class BDDMonolithicEdges
             newEdgesBDD.andWith(autTransAndNextValsForV[varIndex]);
         }
         return newEdgesBDD;
+    }
+    
+    private void computeDeadlocks()
+    {        
+        System.err.println("Compute deadlocks...");
+        BDD notDeadlocks = edgesForwardBDD.exist(bddExAutomata.getDestStatesVarSet());
+        deadlockStatesBDD = notDeadlocks.not();
+        System.err.println("Deadlocks computed.");
+    }
+    
+    public BDD getDeadlockStatesBDD()
+    {
+        return deadlockStatesBDD;
+    }
+    
+    public void pruneCurrentGoodFrwdTransBDD(BDD badStates)
+    {
+        BDD targetBadStates = badStates.replace(bddExAutomata.getSourceToDestLocationPairing());
+        targetBadStates = targetBadStates.replace(bddExAutomata.getSourceToDestVariablePairing());
+        currentFrwdGoodTransBDD = currentFrwdGoodTransBDD.and(targetBadStates.not());
+    }
+    
+    public BDD getCurrentGoodFrwdTransBDD()
+    {
+        return currentFrwdGoodTransBDD;
     }
     
     public void makeTheEdgesReachable()
@@ -472,6 +523,7 @@ public class BDDMonolithicEdges
         System.err.println("Synchronizining clocks...");
         BDD frwdClocksWithTheSameRate = manager.getOneBDD();
         BDD bckwdClocksWithTheSameRate = manager.getOneBDD();
+        BDD oneTickForward = manager.getOneBDD();
         VariableComponentProxy gClockComponent = bddExAutomata.orgExAutomata.getClocks().get(0);
         int gclockIndex = bddExAutomata.theIndexMap.getVariableIndex(gClockComponent);
 
@@ -536,7 +588,7 @@ public class BDDMonolithicEdges
 
                             BDD greaterThanJBDD = clockBDDBitVector.gte(vector_j);
 
-                            BDD diff = null;
+                            BDD diff;
                             if (i >= j) {
                                 diff = gclockBDDBitVector.sub(clockBDDBitVector).equ(vector_i.sub(vector_j)).and(gclockBDDBitVector.gte(clockBDDBitVector));
                             } else {
@@ -544,11 +596,12 @@ public class BDDMonolithicEdges
                             }
 
                             BDD tForward = greaterThanIBDD.and(greaterThanJBDD).and(diff);
+                            BDD lessThanJplus1BDD = clockBDDBitVector.lte( manager.createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, clockTempDomain.varNum(), j+1));
+                            oneTickForward = tForward.and(lessThanJplus1BDD);
+                            
                             BDD tBackward = lessThanIBDD.and(lessThanJBDD).and(diff);
-
-
+                            
                             if (i == (gClockDomain - 1)) {
-
                                 BDD slessThanIBDD = gclockBDDBitVector.lth(vector_i);
                                 for (int k = 0; k < j; k++) {
                                     SupremicaBDDBitVector vector_k = manager.createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, clockTempDomain.varNum(), k);
@@ -556,13 +609,13 @@ public class BDDMonolithicEdges
                                     BDD iANDk = manager.createBDD((i + k + 1), gclockTempDomain).and(manager.createBDD(k, clockTempDomain));
 
                                     // vector_i: defined before
-                                    BDD bInner = null;
+                                    BDD bInner;
                                     if (i >= k) {
                                         bInner = gclockBDDBitVector.sub(clockBDDBitVector).equ(vector_i.sub(vector_k)).and(gclockBDDBitVector.gte(clockBDDBitVector));
                                     } else {
                                         bInner = clockBDDBitVector.sub(gclockBDDBitVector).equ(vector_k.sub(vector_i)).and(clockBDDBitVector.gth(gclockBDDBitVector));
                                     }
-
+                                    
                                     tBackward = tBackward.or((bInner.and(slessThanIBDD)).or(iANDk));
 
                                     if (j == (clockDomain - 1)) {
@@ -578,7 +631,7 @@ public class BDDMonolithicEdges
                                     SupremicaBDDBitVector vector_k = manager.createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, gclockTempDomain.varNum(), k);
 
                                     BDD lessThanKBDD = gclockBDDBitVector.lte(vector_k);
-                                    BDD bInner = null;
+                                    BDD bInner;
                                     if (j >= k) {
                                         bInner = clockBDDBitVector.sub(gclockBDDBitVector).equ(vector_j.sub(vector_k)).and(clockBDDBitVector.gte(gclockBDDBitVector));
                                     } else {
@@ -608,11 +661,13 @@ public class BDDMonolithicEdges
             bckwdClocksWithTheSameRate = bckwdClocksWithTheSameRate.or(upperBoundBDD);
         }
 
-        BDD[] output = new BDD[2];
+        BDD[] output = new BDD[3];
 //        forwardClocksWithTheSameRate = bddExAutomata.fitIntoClockDomains(forwardClocksWithTheSameRate);
         output[0] = frwdClocksWithTheSameRate;
 //        backwardClocksWithTheSameRate = bddExAutomata.fitIntoClockDomains(backwardClocksWithTheSameRate);
         output[1] = bckwdClocksWithTheSameRate;
+        
+        output[2] = oneTickForward;
 
         return output;
     }
@@ -750,6 +805,18 @@ public class BDDMonolithicEdges
         }
         return output;
     }
+    
+    public BDD getStatesTickDisabled(BDD transitions, BDD invariants)
+    {
+        BDD B1 = transitions.exist(bddExAutomata.getEventVarSet()).and(invariants);
+        BDD Bstt = B1.and(oneStepTickBDD);
+        BDD Btt = Bstt.exist(bddExAutomata.getSourceStatesVarSet()); 
+        BDD B1tt = Btt.replace(bddExAutomata.getDestToSourceVariablePairing());
+        B1tt = B1tt.replace(bddExAutomata.getDestToSourceLocationPairing());
+        BDD B2 = B1tt.replace(bddExAutomata.tempClock1ToDestClockPairing).exist(bddExAutomata.tempClock1Varset);        
+        BDD B1Dest = B1.exist(bddExAutomata.getSourceStatesVarSet());
+        return (B2.and(B1Dest.not())).exist(bddExAutomata.getDestStatesVarSet());
+    }
 
     public BDD getForwardClocksWithTheSameRate() {
         return forwardClocksWithTheSameRate;
@@ -758,6 +825,10 @@ public class BDDMonolithicEdges
     public BDD getBackwardClocksWithTheSameRate() {
         return backwardClocksWithTheSameRate;
     }
+    
+    public BDD getOneStepTickBDD() {
+        return oneStepTickBDD;
+    }    
 
     public BDD getMonolithicEdgesForwardWithoutDestBDD() {
         return edgesForwardWithoutDestBDD;
@@ -794,10 +865,22 @@ public class BDDMonolithicEdges
     public BDD getSpecMonolithicUncontrollableEdgesForwardBDD() {
         return specUncontrollableEdgesForwardBDD;
     }
+    
+    public BDD getPlantMonolithicEdgesForwardBDD() {
+        return plantEdgesForwardBDD;
+    }
+
+    public BDD getSpecMonolithicEdgesForwardBDD() {
+        return specEdgesForwardBDD;
+    }    
 
     public BDD getMonolithicForcibleEdgesForwardBDD() {
         return forcibleEdgesForwardBDD;
     }
+    
+    public BDD getMonolithicForcibleSpecEdgesForwardBDD() {
+        return forcibleSpecEdgesForwardBDD;
+    }    
 
     public void removeFromMonolithicForcibleEdgesForwardBDD(BDD sourceStates) {
         BDD destStates = sourceStates.replace(bddExAutomata.getSourceToDestLocationPairing());

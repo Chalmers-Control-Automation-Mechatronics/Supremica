@@ -75,33 +75,28 @@ public class BDDExtendedSynthesizer {
 
         synthesisTimer = new ActionTimer();
 
-        if(options.getOptimization())
-        {
-            synthesisTimer.start();
-            bddAutomata.computeOptimalTimeBDD();
-        }
-
         if(options.getSynthesisType().equals(SynthesisType.CONTROLLABLE))
         {
-            if(!options.getOptimization()) synthesisTimer.start();
+            synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getControllableStates(options.getReachability());
             nbrOfStates = bddAutomata.nbrOfControllableStates;
             synthesisTimer.stop();
         }
         else if(options.getSynthesisType().equals(SynthesisType.NONBLOCKING))
         {
-            if(!options.getOptimization()) synthesisTimer.start();
+            synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getNonblockingStates();
             nbrOfStates = bddAutomata.nbrOfNonblockingStates;
             synthesisTimer.stop();
         }
         else if(options.getSynthesisType().equals(SynthesisType.NONBLOCKINGCONTROLLABLE))
         {
-            if(!options.getOptimization()) synthesisTimer.start();
+            synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getNonblockingControllableStates(options.getReachability());
             nbrOfStates = bddAutomata.nbrOfNonblockingControllableStates;
             synthesisTimer.stop();
         }
+        
         else if(options.getSynthesisType().equals(SynthesisType.UNSAFETY))
         {
             synthesisTimer.start();

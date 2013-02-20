@@ -97,8 +97,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     HashSet<EventDeclProxy> plantAlphabet = null;
 
     final static String LOCAL_VAR_SUFFIX = ".curr";
-    final static String CLOCK_PREFIX = "clock:";
-    final static String GLOBAL_PREFIX = "global";
+    final static String CLOCK_PREFIX = "c";
+    final static String GLOBAL_PREFIX = "global:";
     final static String PARAM_PREFIX = "param:";
    /**
    * The name to be used for the default forcible property used for timed EFAs.
