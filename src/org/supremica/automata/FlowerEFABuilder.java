@@ -26,19 +26,19 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class FlowerEFABuilder {
 
-    private final int nbrOfJobs;
-    private final int nbrOfResources;
+    private int nbrOfJobs;
+    private int nbrOfResources;
 
-    private final int[] resourceCapacities;
-    private final int[] nbrOfTransitionsForJob;
-    private final int[] nbrOfStagesForJob;
-    private final int[][][] demandAtStage;
-    private final int[][] maxInstancesAtStage;
+    private int[] resourceCapacities;
+    private int[] nbrOfTransitionsForJob;
+    private int[] nbrOfStagesForJob;
+    private int[][][] demandAtStage;
+    private int[][] maxInstancesAtStage;
 
-    private final Map<Integer,Set<Pair>> resourceToUsedInStages;
-    private final Map<Integer, Set<Pair>> jobToTransitions;
-    private final Map<Integer, Set<Integer>> jobToInitialStages;
-    private final Map<Integer, Set<Integer>> jobToLastStages;
+    private Map<Integer,Set<Pair>> resourceToUsedInStages;
+    private Map<Integer, Set<Pair>> jobToTransitions;
+    private Map<Integer, Set<Integer>> jobToInitialStages;
+    private Map<Integer, Set<Integer>> jobToLastStages;
 
     public static String STAGE_PREFIX = "s";
     public static String RESOURCE_PREFIX = "r";
@@ -49,88 +49,84 @@ public class FlowerEFABuilder {
     private final ModuleSubject module;
 
     public FlowerEFABuilder (final File rasFile, final ModuleSubject module)
-            throws IOException
     {
         this.module = module;
-        // TODO Close this file!!!
-        @SuppressWarnings("resource")
-        final BufferedReader br = new BufferedReader(new FileReader(rasFile));
-        nbrOfJobs = Integer.parseInt(br.readLine());
-        nbrOfTransitionsForJob = new int[nbrOfJobs];
-        nbrOfStagesForJob = new int[nbrOfJobs];
-        demandAtStage = new int[nbrOfJobs][][];
-        maxInstancesAtStage = new int [nbrOfJobs][];
-        jobToTransitions = new HashMap<Integer, Set<Pair>>();
-        jobToInitialStages = new HashMap<Integer, Set<Integer>>();
-        jobToLastStages = new HashMap<Integer, Set<Integer>>();
-        nbrOfResources = Integer.parseInt(br.readLine());
 
-        resourceToUsedInStages = new HashMap<Integer, Set<Pair>>();
-        resourceCapacities = new int[nbrOfResources];
+        BufferedReader br = null;
+        
+        try {
+            br = new BufferedReader(new FileReader(rasFile));
+            nbrOfJobs = Integer.parseInt(br.readLine());
+            nbrOfTransitionsForJob = new int[nbrOfJobs];
+            nbrOfStagesForJob = new int[nbrOfJobs];
+            demandAtStage = new int[nbrOfJobs][][];
+            maxInstancesAtStage = new int[nbrOfJobs][];
+            jobToTransitions = new HashMap<Integer, Set<Pair>>();
+            jobToInitialStages = new HashMap<Integer, Set<Integer>>();
+            jobToLastStages = new HashMap<Integer, Set<Integer>>();
+            nbrOfResources = Integer.parseInt(br.readLine());
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
+            resourceToUsedInStages = new HashMap<Integer, Set<Pair>>();
+            resourceCapacities = new int[nbrOfResources];
 
-        int i = 0;
-        while(st.hasMoreTokens())
-        {
-            resourceToUsedInStages.put(i, new HashSet<Pair>());
-            resourceCapacities[i++] = Integer.parseInt(st.nextToken());
-        }
+            StringTokenizer st = new StringTokenizer(br.readLine());
 
-        for(i = 0; i < nbrOfJobs; i++)
-        {
-            nbrOfStagesForJob[i] = Integer.parseInt(br.readLine());
-            maxInstancesAtStage[i] = new int[nbrOfStagesForJob[i]];
+            int i = 0;
+            while (st.hasMoreTokens()) {
+                resourceToUsedInStages.put(i, new HashSet<Pair>());
+                resourceCapacities[i++] = Integer.parseInt(st.nextToken());
+            }
 
-            demandAtStage[i] = new int[nbrOfStagesForJob[i]][];
+            for (i = 0; i < nbrOfJobs; i++) {
+                nbrOfStagesForJob[i] = Integer.parseInt(br.readLine());
+                maxInstancesAtStage[i] = new int[nbrOfStagesForJob[i]];
 
-            final Set<Integer> initialStages = new HashSet<Integer>();
-            final Set<Integer> lastStages = new HashSet<Integer>();
-            for(int j = 0; j < nbrOfStagesForJob[i]; j++)
-            {
-                maxInstancesAtStage[i][j] = Integer.MAX_VALUE;
-                initialStages.add(j);
-                lastStages.add(j);
-                demandAtStage[i][j] = new int[nbrOfResources];
-                st = new StringTokenizer(br.readLine());
-                int k = 0;
-                int maxInstances;
-                while(st.hasMoreTokens())
-                {
-                    final int nbrOfNeededResources = Integer.parseInt(st.nextToken());
-                    if(nbrOfNeededResources > 0)
-                    {
-                        maxInstances = resourceCapacities[k] /
-                                                        nbrOfNeededResources;
-                        if(maxInstances < maxInstancesAtStage[i][j])
-                            maxInstancesAtStage[i][j] = maxInstances;
+                demandAtStage[i] = new int[nbrOfStagesForJob[i]][];
+
+                final Set<Integer> initialStages = new HashSet<Integer>();
+                final Set<Integer> lastStages = new HashSet<Integer>();
+                for (int j = 0; j < nbrOfStagesForJob[i]; j++) {
+                    maxInstancesAtStage[i][j] = Integer.MAX_VALUE;
+                    initialStages.add(j);
+                    lastStages.add(j);
+                    demandAtStage[i][j] = new int[nbrOfResources];
+                    st = new StringTokenizer(br.readLine());
+                    int k = 0;
+                    int maxInstances;
+                    while (st.hasMoreTokens()) {
+                        final int nbrOfNeededResources = Integer.parseInt(st.nextToken());
+                        if (nbrOfNeededResources > 0) {
+                            maxInstances = resourceCapacities[k]
+                                    / nbrOfNeededResources;
+                            if (maxInstances < maxInstancesAtStage[i][j]) {
+                                maxInstancesAtStage[i][j] = maxInstances;
+                            }
+                        }
+
+                        demandAtStage[i][j][k] = nbrOfNeededResources;
+                        resourceToUsedInStages.get(k).add(new Pair(i, j));
+                        k++;
                     }
-
-                    demandAtStage[i][j][k] = nbrOfNeededResources;
-                    resourceToUsedInStages.get(k).add(new Pair(i,j));
-                    k++;
                 }
+
+                nbrOfTransitionsForJob[i] = Integer.parseInt(br.readLine());
+                final Set<Pair> trans = new HashSet<Pair>();
+
+                for (int j = 0; j < nbrOfTransitionsForJob[i]; j++) {
+                    st = new StringTokenizer(br.readLine());
+                    final int sourceStage = Integer.parseInt(st.nextToken());
+                    final int targetStage = Integer.parseInt(st.nextToken());
+                    trans.add(new Pair(sourceStage, targetStage));
+                    initialStages.remove(targetStage);
+                    lastStages.remove(sourceStage);
+                }
+                jobToTransitions.put(i, trans);
+                jobToInitialStages.put(i, initialStages);
+                jobToLastStages.put(i, lastStages);
+
             }
-
-            nbrOfTransitionsForJob[i] = Integer.parseInt(br.readLine());
-            final Set<Pair> trans = new HashSet<Pair>();
-
-            for(int j = 0; j < nbrOfTransitionsForJob[i]; j++)
-            {
-                st = new StringTokenizer(br.readLine());
-                final int sourceStage = Integer.parseInt(st.nextToken());
-                final int targetStage = Integer.parseInt(st.nextToken());
-                trans.add(new Pair(sourceStage,targetStage));
-                initialStages.remove(targetStage);
-                lastStages.remove(sourceStage);
-            }
-            jobToTransitions.put(i, trans);
-            jobToInitialStages.put(i, initialStages);
-            jobToLastStages.put(i, lastStages);
-
-        }
-
-        //Compute the equations the represents the feasible states in the model
+            
+            //Compute the equations the represents the feasible states in the model
         for(i = 0; i < nbrOfResources; i++)
         {
             String resourceGuard = "";
@@ -159,7 +155,16 @@ public class FlowerEFABuilder {
             }
 
         }
-
+        } catch(IOException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                if(br != null) 
+                    br.close();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
 //        System.err.println(feasibleEquation);
     }
 
@@ -190,7 +195,7 @@ public class FlowerEFABuilder {
             ExtendedAutomaton efa = new ExtendedAutomaton("Job"+i,
                                                           exAutomata,
                                                           true);
-            efa.addState("J"+i, true, true, false);
+            efa.addState("J"+i, false, true, false);
 
             exAutomata.addEvent(LOAD_EVENT_PREFIX+i);
 

@@ -45,9 +45,7 @@ public class OpenRASAction extends net.sourceforge.waters.gui.actions.IDEAction 
            final File selectedRAS = chooser.getSelectedFile();
 
            FlowerEFABuilder flbuilder = null;
-           try{
-                flbuilder = new FlowerEFABuilder(selectedRAS, ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject());
-           }catch(final IOException e){e.printStackTrace();};
+           flbuilder = new FlowerEFABuilder(selectedRAS, ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject());
            flbuilder.buildEFA();
         }
     }
