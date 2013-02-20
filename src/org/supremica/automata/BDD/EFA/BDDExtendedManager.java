@@ -266,7 +266,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
     public BDD nonblockingControllable(final BDD forb, final boolean reachable) {
         System.err.println("NonblockingControllable entered.");
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
-        final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();        
+        final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();     
+        
+        bddExAutomata.computeReachableStates();
 
         BDD forbidden = forb.id();
 

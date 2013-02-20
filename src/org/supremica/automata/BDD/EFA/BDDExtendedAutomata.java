@@ -116,7 +116,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     BDD uncontrollableEventsBDD = null;
     BDD forcibleEventsBDD = null;
     BDD plantAlphabetBDD = null;
-    long nbrOfReachableStates = -1;
+    private long nbrOfReachableStates = -1;
     long nbrOfCoreachableStates = -1;
     long nbrOfNonblockingStates = -1;
     long nbrOfBlockingStates = -1;
@@ -962,8 +962,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         if (reachableStatesBDD == null) {
             computeReachableStates();
         }
-        
-        nbrOfReachableStates = nbrOfStatesIDD(generateIDD(reachableStatesBDD, reachableStatesBDD)).longValue();
+        if(nbrOfReachableStates == -1)
+            nbrOfReachableStates = nbrOfStatesIDD(generateIDD(reachableStatesBDD, reachableStatesBDD)).longValue();
         
         return nbrOfReachableStates;
     }
@@ -1157,7 +1157,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return minValueOfVarBDD;
     }    
 
-    private void computeReachableStates() {
+    public void computeReachableStates() {
         if (reachableStatesBDD == null) {
             System.err.println("Computing reachable states...");
             if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
@@ -1179,16 +1179,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             
 //            reachableStatesBDD.printDot();
             
-
-            System.err.println(numberOfReachableStates() + " reachable states found.");
-            
-            
             if (!options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD)) {
                 ((BDDMonolithicEdges) getBDDEdges()).makeTheEdgesReachable();
-            }
-            
+            }            
 
-//            nbrOfReachableStates = -1;
+
+            System.err.println(numberOfReachableStates() + " reachable states found.");           
 
 
 //            logger.info("Number of reachable states in the closed-loop system: "+nbrOfReachableStates);
