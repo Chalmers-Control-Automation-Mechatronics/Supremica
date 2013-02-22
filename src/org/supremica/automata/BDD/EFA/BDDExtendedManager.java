@@ -319,7 +319,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
         }
         return nonblockingControllableStates;
     }
-
+    
+    // ##################################################################################
     /* Implementeation for Resource Allocation Systems*/
     public BDD uComputeUnsafeStates() {
         
@@ -375,7 +376,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
             
             tauTrans = tauTrans.or(newTauTrans1);
             
-            pair = extractUnsafeStatesFromLargerTau_U(newTauTrans1);
+            System.err.println("the bottleneck");
+            pair = extractUnsafeStatesFromLargerTau_U(tauTrans);
             
             BDD newIneUnsafeStates2 = pair[0];
             
@@ -384,36 +386,49 @@ public class BDDExtendedManager extends BDDAbstractManager {
             tauTrans = tauTrans.and(newIneUnsafeStates2.not());
             
             tauTrans = tauTrans.or(newTauTrans2);
+            //tauTrans = newTauTrans2;
             
             upUnsafeStates = newIneUnsafeStates1.or(newIneUnsafeStates2);
             
-            unsafeStates.orWith(upUnsafeStates);
+            unsafeStates = unsafeStates.or(upUnsafeStates);
             
-        } while(upUnsafeStates.isZero());
+        } while(!upUnsafeStates.isZero());
         
         // ### The following code is used to check the correctness of the algorithm
         // ### with the benchamrk example results from Ahmed's paper.
+        System.err.println("Minimizing unsafe states...");
         unsafeStates = unsafeStates
                 .and(getLarger(unsafeStates.id(), unsafeStates.id()).not());
+        
         
         unsafeStates = unsafeStates.and(bddExAutomata.getReachableStates()
                 .exist(bddExAutomata.getSourceLocationVarSet()))
                 .exist(bddExAutomata.getSourceResourceVarSet());
-        
-        System.err.println("The number of reachable states is " + 
-                bddExAutomata.getReachableStates()
-                .satCount(bddExAutomata.getSourceStatesVarSet()));
-        
         System.err.println("Done.");
+        
+        BDD reachableStates = bddExAutomata.getReachableStates()
+                .exist(bddExAutomata.getSourceLocationVarSet())
+                .exist(bddExAutomata.getSourceResourceVarSet());
+        
+        BDD nonblockingStates = bddExAutomata.getNonblockingStates()
+                .exist(bddExAutomata.getSourceLocationVarSet())
+                .exist(bddExAutomata.getSourceResourceVarSet());
+        
+        BDD blockingStates = reachableStates.and(nonblockingStates.not());
+        blockingStates = blockingStates.and(getLarger(blockingStates.id(), 
+                blockingStates.id()).not());
+        
+        System.err.println(unsafeStates.equals(blockingStates));
         
         return unsafeStates;
     }
     
-    private BDD[] computeElements_U(BDD unUnsafeStates) {
+    
+    private BDD[] computeElements_U(BDD upUnsafeStates) {
                 
-        BDD bTransFromUnsafe = unUnsafeStates.and(bckwdTransEvents);
+        BDD bTransFromUnsafe = upUnsafeStates.and(bckwdTransEvents);
         
-        bckwdTransEvents = bckwdTransEvents.and(bTransFromUnsafe);
+        bckwdTransEvents = bckwdTransEvents.and(bTransFromUnsafe.not());
         
         BDD fTrans = bTransFromUnsafe
                 .exist(bddExAutomata.getSourceVariablesVarSet())
@@ -482,7 +497,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         // # deadlock states but these states lead to deadlock states only through 
         // # loading events.
         
-        deadlocks = deadlocks.and(getLarger(deadlocks.id(), deadlocks.id()).not());
+        //deadlocks = deadlocks.and(getLarger(deadlocks.id(), deadlocks.id()).not());
         
         /*bddExAutomata.getReachableStates()
                 .exist(bddExAutomata.getSourceLocationVarSet())
@@ -543,10 +558,10 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
             unsafeStates = unsafeStates.or(upUnsafeStates);
         } while (!upUnsafeStates.isZero());
-
+        
         return unsafeStates;
     }
-
+    
     /**
      *
      * @param unsafeStates
