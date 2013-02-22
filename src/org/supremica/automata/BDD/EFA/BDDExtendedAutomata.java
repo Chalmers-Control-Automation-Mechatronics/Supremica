@@ -72,6 +72,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     /// For RAS models
     private BDDVarSet sourceStagesVarSet = null;
     private BDDVarSet sourceResourceVarSet = null;
+    private BDDVarSet destResourceVarSet = null;
     public BDD loadEventsBDD = null;
     //Related to all variables including regular variables and clocks
     BDDDomain[] tempVarDomains = null;
@@ -248,6 +249,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         sourceStagesVarSet = manager.createEmptyVarSet();
         sourceResourceVarSet = manager.createEmptyVarSet();
+        destResourceVarSet = manager.createEmptyVarSet();
 
         sourceLocationDomains = new BDDDomain[orgExAutomata.size()];
         destLocationDomains = new BDDDomain[orgExAutomata.size()];
@@ -675,6 +677,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             sourceStagesVarSet.unionWith(sourceDomain.set());
         } else {
             sourceResourceVarSet.unionWith(sourceDomain.set());
+            destResourceVarSet.unionWith(destDomain.set());
         }
 
         numberOfUsedBDDVariables += destDomain.varNum();
@@ -826,6 +829,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     public BDDVarSet getSourceResourceVarSet() {
         return sourceResourceVarSet;
+    }
+    
+    public BDDVarSet getDestResourceVarSet() {
+        return destResourceVarSet;
     }
 
     public BDDVarSet getSourceStagesVarSet() {
@@ -1281,13 +1288,13 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        System.err.println("compute reachable states --- begin");
 //        computeReachableStates();
 //        System.err.println("compute reachable states --- end");
-        final BDD unsafeStates = manager.computeUnsafeStates();
+        final BDD unsafeStates = manager.uComputeUnsafeStates();
 
 //        unsafeStates.printDot();
 
         //       final IDD idd = generateIDD(unsafeStates, unsafeStates);
         // printDOT(idd);
-        nbrOfUnsafeStates = (long) unsafeStates.satCount(sourceVariablesVarSet);
+        nbrOfUnsafeStates = (long) unsafeStates.satCount(sourceStagesVarSet);
         System.err.println("Number of unsafe states: " + nbrOfUnsafeStates);
 
         return unsafeStates;

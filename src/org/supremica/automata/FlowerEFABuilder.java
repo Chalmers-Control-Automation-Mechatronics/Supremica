@@ -127,6 +127,7 @@ public class FlowerEFABuilder {
             }
             
             //Compute the equations the represents the feasible states in the model
+            feasibleEquation = "";
         for(i = 0; i < nbrOfResources; i++)
         {
             String resourceGuard = "";
