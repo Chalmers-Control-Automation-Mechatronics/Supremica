@@ -31,7 +31,7 @@ public class FlowerEFABuilder {
 
     private int[] resourceCapacities;
     private int[] nbrOfTransitionsForJob;
-    private int[] nbrOfStagesForJob;
+    public static int[] nbrOfStagesForJob;
     private int[][][] demandAtStage;
     private int[][] maxInstancesAtStage;
 
@@ -166,7 +166,7 @@ public class FlowerEFABuilder {
                 e.printStackTrace();
             }
         }
-//        System.err.println(feasibleEquation);
+        System.err.println(feasibleEquation);
     }
 
     public void buildEFA()
@@ -188,7 +188,7 @@ public class FlowerEFABuilder {
                                           resourceCapacities[i],
                                           resourceCapacities[i]);
         }
-
+        
         for(i = 0; i < nbrOfJobs; i++)
         {
             @SuppressWarnings("deprecation")
@@ -291,7 +291,7 @@ public class FlowerEFABuilder {
                                               0);
             }
         }
-
+        
     }
 
     class Pair

@@ -142,7 +142,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public ExtendedAutomata(final ModuleSubject module) {
         this(module, 0);
     }
-
+    
     public ExtendedAutomata(final ModuleSubject module, final int globalClockDomain) {
         this();
 
@@ -583,7 +583,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             module.getEventDeclListModifiable().add(decl);
         }
     }
-
+    
     class MinMax {
 
         private int min;

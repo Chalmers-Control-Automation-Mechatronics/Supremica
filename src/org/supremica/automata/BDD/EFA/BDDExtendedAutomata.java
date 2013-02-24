@@ -7,7 +7,6 @@ package org.supremica.automata.BDD.EFA;
 import gnu.trove.TIntArrayList;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntObjectHashMap;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.math.BigInteger;
@@ -19,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDPairing;
@@ -31,13 +29,12 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import org.supremica.automata.ExtendedAutomata;
-import org.supremica.automata.ExtendedAutomataIndexMap;
-import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.TCSupremicaBDDBitVector;
+import org.supremica.automata.ExtendedAutomata;
+import org.supremica.automata.ExtendedAutomataIndexMap;
+import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.FlowerEFABuilder;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
@@ -73,7 +70,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     private BDDVarSet sourceStagesVarSet = null;
     private BDDVarSet sourceResourceVarSet = null;
     private BDDVarSet destResourceVarSet = null;
+    TIntObjectHashMap<List<VariableComponentProxy>> jobID2StageVars;
+    BDDVarSet[][] jobStageVarSet;
+    HashMap<VariableComponentProxy, BDDVarSet> stageVar2BDDVarSetMap;
     public BDD loadEventsBDD = null;
+    
     //Related to all variables including regular variables and clocks
     BDDDomain[] tempVarDomains = null;
     BDDDomain[] sourceVarDomains = null;
@@ -223,7 +224,17 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         {
             optVarName = options.getOptVaribale();
         }
+        
+        if (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MINIMALITY) {
+            stageVar2BDDVarSetMap = new HashMap<VariableComponentProxy, BDDVarSet>();
+            jobID2StageVars = new TIntObjectHashMap<List<VariableComponentProxy>>(orgExAutomata.size());
 
+            jobStageVarSet = new BDDVarSet[orgExAutomata.size()][];
+            for (int i = 0; i < orgExAutomata.size(); i++) {
+                jobStageVarSet[i] = new BDDVarSet[FlowerEFABuilder.nbrOfStagesForJob[i] - 1];
+            }
+        }
+        
         initialize();
     }
 
@@ -407,7 +418,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             }
 
         }
-
+        
         destToSourceLocationPairing = manager.makePairing(destLocationDomains, sourceLocationDomains);
         sourceToDestLocationPairing = manager.makePairing(sourceLocationDomains, destLocationDomains);
 
@@ -502,7 +513,38 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         } else if (options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD)) {
             parAlgoWorker = getParAlgoWorker();
         }
+        
+        if (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MINIMALITY) {
+            List<VariableComponentProxy> stageVarList = orgExAutomata.getStageVars();
+            int svIndex = 0;
+            int accJobSize = 0;
+            for (int jIndex = 0; jIndex < orgExAutomata.size(); jIndex++) {
 
+                int jStageSize = jobStageVarSet[jIndex].length;
+
+                while (svIndex - accJobSize < jStageSize) {
+
+                    VariableComponentProxy var = stageVarList.get(svIndex);
+
+                    List<VariableComponentProxy> s = null;
+
+                    if (!jobID2StageVars.containsKey(jIndex)) {
+                        s = new ArrayList<VariableComponentProxy>();
+                    } else {
+                        s = jobID2StageVars.get(jIndex);
+                    }
+
+                    s.add(var);
+                    jobID2StageVars.put(jIndex, s);
+
+                    jobStageVarSet[jIndex][svIndex - accJobSize] = stageVar2BDDVarSetMap.get(var);
+
+                    svIndex++;
+                }
+
+                accJobSize += jStageSize;
+            }
+        }      
         computeMarkedValues();
 
 //                try
@@ -675,6 +717,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         if (orgExAutomata.getStageVars().contains(var)) {
             sourceStagesVarSet.unionWith(sourceDomain.set());
+            stageVar2BDDVarSetMap.put(var, sourceDomain.set());
         } else {
             sourceResourceVarSet.unionWith(sourceDomain.set());
             destResourceVarSet.unionWith(destDomain.set());
