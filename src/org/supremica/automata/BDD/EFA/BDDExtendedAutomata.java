@@ -83,6 +83,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     BDDDomain[] tempClockDomains2 = null;
     private BDDVarSet sourceVariablesVarSet = null;
     private BDDVarSet destVariablesVarSet = null;
+    BDDVarSet tempVariablesVarSet = null;
     private BDDVarSet sourceClockVarSet = null;
     private BDDVarSet destClockVarSet = null;
     BDDVarSet tempClock1Varset = null;
@@ -257,6 +258,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         sourceVariablesVarSet = manager.createEmptyVarSet();
         destVariablesVarSet = manager.createEmptyVarSet();
+        tempVariablesVarSet = manager.createEmptyVarSet();
 
         sourceStagesVarSet = manager.createEmptyVarSet();
         sourceResourceVarSet = manager.createEmptyVarSet();
@@ -680,6 +682,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        reversedTempVarOrderings.put(varIndex, new TIntArrayList(reversedTempVarOrdering));
         tempVarDomains[varIndex] = tempDomain;
         System.err.println("tempVar variables: " + tempDomain.set().toString());
+        
+        tempVariablesVarSet.unionWith(tempDomain.set());
 
         final BDDDomain sourceDomain = manager.createDomain(domain);
         //manager.getFactory().buildCube(1, sourceDomain.vars()).printDot();
@@ -687,7 +691,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        int[] reversedSourceVarOrdering = manager.partialReverseVarOrdering(sourceDomain.vars());
 //        reversedSourceVarOrderings.put(varIndex, new TIntArrayList(reversedSourceVarOrdering));
         System.err.println("sourceVar variables: " + sourceDomain.set().toString());
-
+        
         numberOfUsedBDDVariables += sourceDomain.varNum();
 
         final int[] sourceVars = sourceDomain.vars();

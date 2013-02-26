@@ -7,6 +7,7 @@ package org.supremica.automata.BDD.EFA;
 import gnu.trove.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDFactory;
@@ -34,11 +35,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
     
     BDD[] globalOneStepLargerJobBDDs = null;
     
-    HashMap<VariableComponentProxy, BDD> globalOneStepLargerStatgeBDDMap = null;
-    
-    TIntObjectHashMap<BDDVarSet> jobToOtherVarSet = null;
-    
-    HashMap<VariableComponentProxy, BDDVarSet> stageToOtherVarSet = null;
+    BDD globalOneStepLargerBDD = null;
     
     BDD feasibleSourceStates = null;
     BDD feasibleDestStates = null;
@@ -390,7 +387,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
         
         do {
             
+            System.err.println("1");
             pair = computeElements_U(upUnsafeStates);
+            System.err.println("1 done");
             
             BDD newIneUnsafeStates1 = pair[0]; 
             
@@ -398,8 +397,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
             
             tauTrans = tauTrans.or(newTauTrans1);
             
-            // This method contains the bottleneck
+            System.err.println("2");
             pair = extractUnsafeStatesFromLargerTau_U(tauTrans);
+            System.err.println("2 done");
             
             BDD newIneUnsafeStates2 = pair[0];
             
@@ -408,10 +408,13 @@ public class BDDExtendedManager extends BDDAbstractManager {
             tauTrans = newTauTrans2;
             
             upUnsafeStates = newIneUnsafeStates1.or(newIneUnsafeStates2);
-            
+          
             unsafeStates = unsafeStates.or(upUnsafeStates);
             
         } while(!upUnsafeStates.isZero());
+        
+        System.err.println("nbr of unsafe states found: " + unsafeStates
+                .satCount(bddExAutomata.getSourceStagesVarSet()));
         
         // ### The following code is used to check the correctness of the algorithm
         // ### with the benchamrk example results from Ahmed's paper.
@@ -437,33 +440,45 @@ public class BDDExtendedManager extends BDDAbstractManager {
         blockingStates = blockingStates.and(getLarger(blockingStates.id(), 
                 blockingStates.id()).not());
         
-        System.err.println(unsafeStates.equals(blockingStates));*/
+        System.err.println("Is it correct? " + unsafeStates.equals(blockingStates));*/
         
         return unsafeStates;
     }
     
     
-    private BDD[] computeElements_U(BDD upUnsafeStates) {
-                
-        BDD bTransFromUnsafe = upUnsafeStates.and(bckwdTransEvents);
+    private BDD[] computeElements_U(BDD unsafeStates) {
+              
+        BDD inevitableStates = getZeroBDD();
         
-        bckwdTransEvents = bckwdTransEvents.and(bTransFromUnsafe.not());
+        BDD tauTrans = getZeroBDD();
         
-        BDD fTrans = bTransFromUnsafe
-                .exist(bddExAutomata.getSourceVariablesVarSet())
-                .replace(bddExAutomata.getDestToSourceVariablePairing());
+        BDD upUnsafeStates = unsafeStates.id();
         
-        frwdTransEvents = frwdTransEvents.and(fTrans.not());
+        do {
+            
+            BDD bTransFromUnsafe = upUnsafeStates.and(bckwdTransEvents);
         
-        BDD nonUnsafeStates = frwdTransEvents.exist(bddExAutomata.getEventVarSet());
-        
-        BDD inevitableStates = fTrans.exist(bddExAutomata.getEventVarSet())
-                .and(nonUnsafeStates.not());
-        
-        frwdTransEvents = frwdTransEvents.and(inevitableStates.not());
-        
-        BDD tauTrans = nonUnsafeStates.and(fTrans);
-        
+            bckwdTransEvents = bckwdTransEvents.and(bTransFromUnsafe.not());
+
+            BDD fTrans = bTransFromUnsafe
+                    .exist(bddExAutomata.getSourceVariablesVarSet())
+                    .replace(bddExAutomata.getDestToSourceVariablePairing());
+
+            frwdTransEvents = frwdTransEvents.and(fTrans.not());
+
+            BDD nonUnsafeStates = frwdTransEvents.exist(bddExAutomata.getEventVarSet());
+
+            upUnsafeStates = fTrans.exist(bddExAutomata.getEventVarSet())
+                    .and(nonUnsafeStates.not());
+            
+            tauTrans.andWith(upUnsafeStates.not());
+            
+            inevitableStates = inevitableStates.or(upUnsafeStates);
+
+            tauTrans.orWith(nonUnsafeStates.and(fTrans));
+            
+        } while(!upUnsafeStates.isZero());
+               
         BDD[] elements = {inevitableStates, tauTrans};
         
         return elements;
@@ -472,147 +487,23 @@ public class BDDExtendedManager extends BDDAbstractManager {
     private BDD[] extractUnsafeStatesFromLargerTau_U(BDD tauTrans) {
         
         // find larger tau trans in forward transitions - bottleneck
-        // BDD largerTau = getLarger(tauTrans.id(), tauTrans.id());
-        
-        //BDD onestepLargerTau = getOneStepLargerJobTau(tauTrans);
-        BDD onestepLargerTau = getOneStepLargerStageTau(tauTrans);
-        
-        frwdTransEvents = frwdTransEvents.and(onestepLargerTau.not());
+        //BDD oneStepLargerTau = getLarger(frwdTransEvents, tauTrans.id());
+
+        BDD oneStepLargerTau = getOneStepLarger(tauTrans);
+
+        frwdTransEvents = frwdTransEvents.and(oneStepLargerTau.not());
         
         BDD nonUnsafeStates = frwdTransEvents
                 .exist(bddExAutomata.getEventVarSet());
         
-        BDD newInevitableStates = onestepLargerTau.exist(bddExAutomata.getEventVarSet())
+        BDD newInevitableStates = oneStepLargerTau.exist(bddExAutomata.getEventVarSet())
                 .and(nonUnsafeStates.not());
         
-        BDD newTauTrans = nonUnsafeStates.and(onestepLargerTau);
+        BDD newTauTrans = nonUnsafeStates.and(oneStepLargerTau);
         
         BDD[] elements = {newInevitableStates, newTauTrans};
         
         return elements;
-    }
-    
-    private BDD getOneStepLargerStageTau(BDD tauTrans) {
-        
-        BDD oneStepLargerTau = getZeroBDD();
-        
-        BDD possibleLargerTau = frwdTransEvents;
-        
-        List<VariableComponentProxy> stageVarList = bddExAutomata
-                .orgExAutomata.getStageVars();
-        
-        for (VariableComponentProxy var : stageVarList) {
-            
-            BDD ivar = tauTrans.exist(getStageToOtherVarSet().get(var));
-            
-            BDD oneStepLargerThanIVar = ivar
-                    .and(getglobalOneStepLargerStatgeBDDMap().get(var))
-                    .exist(bddExAutomata.getSourceVariablesVarSet())
-                    .replace(bddExAutomata.tempToSourceVariablePairing);
-            
-            possibleLargerTau = possibleLargerTau.and(oneStepLargerThanIVar);
-            
-            if (possibleLargerTau.isZero())
-                return getZeroBDD();
-        }
-        
-        frwdTransEvents = frwdTransEvents.and(possibleLargerTau.not());
-        
-        return oneStepLargerTau.orWith(possibleLargerTau);
-    }
-    
-    private BDD getOneStepLargerJobTau(BDD tauTrans) {
-        
-        BDD oneStepLargerTau = getZeroBDD();
-        
-        BDDVarSet[][] jobStageVarSet = bddExAutomata.jobStageVarSet;
-        
-        BDD possibleLargerTau = frwdTransEvents;
-        
-        for (int ji = 0; ji < jobStageVarSet.length; ji++) {
-            
-            BDD jisvarsBDD = tauTrans.exist(getJobToOtherVarSet().get(ji));
-            
-            BDD oneStaepLargerThanJisVars = jisvarsBDD
-                    .and(getGlobalOneStepLargerJobBDDs()[ji])
-                    .exist(bddExAutomata.getSourceVariablesVarSet())
-                    .replace(bddExAutomata.tempToSourceVariablePairing);
-            
-            possibleLargerTau = possibleLargerTau.and(oneStaepLargerThanJisVars);
-            
-            if (possibleLargerTau.isZero())
-                return getZeroBDD();
-        }
-        
-        oneStepLargerTau.orWith(possibleLargerTau);
-        
-        return oneStepLargerTau;
-    }
-    
-    private HashMap<VariableComponentProxy, BDDVarSet> getStageToOtherVarSet() {
-        
-        if (stageToOtherVarSet == null) {
-            
-            List<VariableComponentProxy> stageVars 
-                = bddExAutomata.orgExAutomata.getStageVars();
-            
-            stageToOtherVarSet 
-                    = new HashMap<VariableComponentProxy, BDDVarSet>(stageVars.size());
-            
-            for (VariableComponentProxy sv: stageVars) {
-                
-                BDDVarSet unionedVarSet = createEmptyVarSet();
-                
-                int svIndex = bddExAutomata.theIndexMap.getVariableIndex(sv);
-                
-                for (VariableComponentProxy sv2: stageVars) {
-                    
-                    if (!sv.equals(sv2)) {
-                        
-                        unionedVarSet = unionedVarSet
-                                .union(bddExAutomata.sourceVarDomains[svIndex].set());
-                        
-                    }
-                }
-                
-                stageToOtherVarSet.put(sv, unionedVarSet);
-            }
-        }
-
-        return stageToOtherVarSet;
-    }
-
-    private TIntObjectHashMap<BDDVarSet> getJobToOtherVarSet () {
-        
-        if (jobToOtherVarSet == null) {
-
-            jobToOtherVarSet = new TIntObjectHashMap<BDDVarSet>();
-
-            BDDVarSet[][] jobStageVarSet = bddExAutomata.jobStageVarSet;
-            
-            for (int ji = 0; ji < jobStageVarSet.length; ji++) {
-                
-                BDDVarSet unionedVarSet = createEmptyVarSet();
-                
-                for (int aji = 0; aji < jobStageVarSet.length; aji++) {
-                    
-                    if (ji != aji) {
-
-                        for (int svi = 0; svi < jobStageVarSet[aji].length; svi++) {
-                            //System.err.println(jobStageVarSet[aji][svi]);
-                            unionedVarSet = unionedVarSet.union(jobStageVarSet[aji][svi]); 
-                        }
-                        
-                    }
-                }
-                
-                // System.err.println();
-                jobToOtherVarSet.put(ji, unionedVarSet);
-            }
-
-        }
-        
-        return jobToOtherVarSet;
     }
     
     private BDD getDeadlocks_U() {
@@ -641,7 +532,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
         // # loading events.
         
         //deadlocks = deadlocks.and(getLarger(deadlocks.id(), deadlocks.id()).not());
+        /*deadlocks = deadlocks.and(bddExAutomata.getReachableStates()
+                .exist(bddExAutomata.getSourceLocationVarSet())
+                .exist(bddExAutomata.getSourceResourceVarSet()));
         
+        System.err.println("The number of minimal deadlocks is " + 
+                deadlocks.satCount(bddExAutomata.getSourceStagesVarSet()));
         /*bddExAutomata.getReachableStates()
                 .exist(bddExAutomata.getSourceLocationVarSet())
                 .exist(bddExAutomata.getSourceResourceVarSet())
@@ -650,14 +546,28 @@ public class BDDExtendedManager extends BDDAbstractManager {
         return deadlocks;
     }
     
-    private HashMap<VariableComponentProxy, BDD> getglobalOneStepLargerStatgeBDDMap() {
+    private BDD getOneStepLarger(BDD tauTrans) {
         
-        if (globalOneStepLargerStatgeBDDMap == null) {
+        BDD tempTauTrans = tauTrans.replace(bddExAutomata.sourceToTempVariablePairing);
+        
+        System.err.println("bottle neck");
+        BDD tempTauTransToPossibleTauTrans = tempTauTrans.and(frwdTransEvents);
+        
+        BDD oneStepLargerTauTrans = tempTauTransToPossibleTauTrans
+                .and(getGlobalOneStepLargerBDD())
+                .exist(bddExAutomata.tempVariablesVarSet);
+                System.err.println("done");
+        return oneStepLargerTauTrans;
+    }
+    
+    private BDD getGlobalOneStepLargerBDD() {
+        
+        if (globalOneStepLargerBDD == null) {
             
             List<VariableComponentProxy> stageList = 
                     bddExAutomata.orgExAutomata.getStageVars();
             
-            globalOneStepLargerStatgeBDDMap = new HashMap<VariableComponentProxy, BDD>();
+            globalOneStepLargerBDD = getOneBDD();
             
             for (VariableComponentProxy var : stageList) {
          
@@ -671,68 +581,29 @@ public class BDDExtendedManager extends BDDAbstractManager {
                 for (int j = 0; j < varDomain; j++) {
 
                     BDD jSource = createBDD(j,
-                            bddExAutomata.getSourceVariableDomain(varIndex));
+                            bddExAutomata.getTempVariableDomain(varIndex));
 
-                    BDD equalAndPlusOneBDD = createBDD(j,
-                            bddExAutomata.getTempVariableDomain(varIndex))
-                            .and(createBDD(j + 1,
-                            bddExAutomata.getTempVariableDomain(varIndex)));
+                    BDD equalAndPlusOneBDD = null; 
+                    
+                    if (j < varDomain - 1) {
+                        equalAndPlusOneBDD = createBDD(j,
+                                bddExAutomata.getSourceVariableDomain(varIndex))
+                                .or(createBDD(j + 1,
+                                bddExAutomata.getSourceVariableDomain(varIndex)));
+                    }
+                    else {
+                        equalAndPlusOneBDD = createBDD(j,
+                                bddExAutomata.getSourceVariableDomain(varIndex));
+                    }
 
                     t.orWith(jSource.andWith(equalAndPlusOneBDD));
                 }
                 
-                globalOneStepLargerStatgeBDDMap.put(var, t);
+                globalOneStepLargerBDD.andWith(t);
             }
         }
         
-        return globalOneStepLargerStatgeBDDMap;
-    }
-    
-    private BDD[] getGlobalOneStepLargerJobBDDs() {
-        
-        if (globalOneStepLargerJobBDDs == null) {
-            
-            int[] jobs = jobToOtherVarSet.keys(); 
-            
-            globalOneStepLargerJobBDDs = new BDD[jobs.length];
-            
-            for (int ji = 0; ji < jobs.length; ji++) 
-                globalOneStepLargerJobBDDs[ji] = getOneBDD();
-            
-            TIntObjectHashMap<List<VariableComponentProxy>> jobIDToStageVars = 
-                    bddExAutomata.jobID2StageVars;
-
-            for (int ji = 0; ji < jobs.length; ji++) {
-
-                for (VariableComponentProxy var : jobIDToStageVars.get(ji)) {
-
-                    int varIndex = bddExAutomata.theIndexMap.getVariableIndex(var);
-
-                    int varDomain = bddExAutomata.orgExAutomata
-                            .getVarDomain(var.getName());
-
-                    BDD t = getZeroBDD();
-                    
-                    for (int j = 0; j < varDomain; j++) {
-                        
-                        BDD jSource = createBDD(j,
-                                bddExAutomata.getSourceVariableDomain(varIndex));
-                        
-                        BDD equalAndPlusOneBDD = createBDD(j, 
-                                bddExAutomata.getTempVariableDomain(varIndex))
-                                .and(createBDD(j+1, 
-                                bddExAutomata.getTempVariableDomain(varIndex)));
-                        
-                        t.orWith(jSource.andWith(equalAndPlusOneBDD));
-                    }
-
-                    globalOneStepLargerJobBDDs[ji].andWith(t);
-                }
-            }
-            
-        }
-        
-        return globalOneStepLargerJobBDDs;
+        return globalOneStepLargerBDD;
     }
 
     private BDD getGlobalLargerBDD() {

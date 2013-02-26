@@ -319,7 +319,7 @@ public abstract class BDDAbstractManager {
                 } else {
                     throw new IllegalArgumentException("Divisor is not constant");
                 }
-            } else {
+                } else {
                 throw new IllegalArgumentException(bexpr + ":" + bexpr.getOperator() + " is not known!");
             }
             //I have added the other operators to SupremicaBDDBitVector... they should be verified though.
