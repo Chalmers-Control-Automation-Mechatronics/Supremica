@@ -372,7 +372,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         BDD frwdTrans = bddEdges.getMonolithicEdgesForwardBDD().id();               
         BDD bkwdUnconTrans = bddEdges.getMonolithicUncontrollableEdgesBackwardBDD();                               
-        BDD forbidden = forb.id().or(backwardReachability(bkwdUnconTrans, forb.id()));
+        BDD forbidden = forb.id().or(coreachability(bkwdUnconTrans, forb.id()));
         pruneTrans(frwdTrans, forbidden);       
 //        pruneTrans(bkwdUnconTrans, forbidden);       
                 
@@ -389,13 +389,21 @@ public class BDDExtendedManager extends BDDAbstractManager {
         
         BDD Qkn = initialStates.and(forbidden.not());
         BDD Qk;
-        BDD Qm;
+        BDD Qm = Qkn.id();
        
         BDD nextStates;
         BDD nextTrans;
         BDD nextBlockingStates;
         int i = 0;
         int j;
+        
+//        BDD backTrans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesBackwardBDD();
+//        System.err.println("computing coreachable states...");
+//        BDD coreachable = coreachability(backTrans, bddExAutomata.getMarkedStates());
+//        System.err.println("coreachable states computed.");   
+        
+//        frwdTrans = frwdTrans.and(coreachable);
+        
         do {
             System.err.println("i: "+i);
             Qk = Qkn.id();
@@ -441,7 +449,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
 //
 //                }
                 System.err.println("compute local uncon states...");
-                localUnconStates = backwardReachability(bkwdUnconTrans, localBadStates);                   
+                localUnconStates = coreachability(bkwdUnconTrans, localBadStates);  
+                localUnconStates = localUnconStates.and(localBadStates.not());
                 System.err.println("local uncon states computed.");
 
                 localBadStates = localBadStates.or(localUnconStates);
@@ -476,7 +485,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
             */
             i++;                                
         } while (!Qkn.equals(Qk));
-        
+                
+    
 //        Qkn.printDot();
  
         return Qkn;
@@ -530,23 +540,23 @@ public class BDDExtendedManager extends BDDAbstractManager {
         return bddExAutomata.destToSource(incomingTrans.exist(bddExAutomata.getSourceStatesVarSet()));                
     }
     
-    private BDD backwardReachability(BDD trans, BDD forbidden) {
+    private BDD coreachability(BDD trans, BDD states) {
        
         BDD Qk;
-        BDD unconStates;
-        BDD Qkn = forbidden.id();
+        BDD Qkn = states.id();
         do {
             Qk = Qkn.id();
-            unconStates = image_preImage(Qk, trans);
-            Qkn = Qk.or(unconStates); 
+            Qkn = Qk.or(image_preImage(Qk, trans)); 
         } while (!Qkn.equals(Qk));
 
-        return Qkn.and(forbidden.not());
+        return Qkn;
     }    
         
     private BDD getBlockingStates(BDD forwardTrans, BDD states)
-    {        
+    {                
+        System.err.println("computing nonblocking states...");
         BDD notBlocking = forwardTrans.and(states).exist(bddExAutomata.getDestStatesVarSet());   
+        System.err.println("nonblocking states computed.");
         return (states.and(bddExAutomata.getMarkedStates().not()).and(notBlocking.not()));        
     }
     

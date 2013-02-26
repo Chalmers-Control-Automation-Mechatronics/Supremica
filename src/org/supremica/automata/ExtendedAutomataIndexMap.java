@@ -130,7 +130,7 @@ public class ExtendedAutomataIndexMap {
             final String range = var.getType().toString();
 
             if (range.contains(",")) {
-                final StringTokenizer token = new StringTokenizer(range, ", { }");
+                final StringTokenizer token = new StringTokenizer(range, ", [ ]");
                 while (token.hasMoreTokens()) {
                     final String val = token.nextToken();
                     while (integerDomain.contains(index)) {

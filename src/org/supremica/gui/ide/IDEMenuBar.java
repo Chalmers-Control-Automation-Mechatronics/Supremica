@@ -420,7 +420,7 @@ public class IDEMenuBar extends JMenuBar
         mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
         mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
         mEdAnalyzeMenu.add(actions.editorReachabilityGraphAction.getMenuItem());
-        mEdAnalyzeMenu.add(actions.editorTransitionProjectionAction.getMenuItem());
+//        mEdAnalyzeMenu.add(actions.editorTransitionProjectionAction.getMenuItem());
       }
 
       // Simulate
