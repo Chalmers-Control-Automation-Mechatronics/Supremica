@@ -378,12 +378,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
      */
     public BDD onTheFlySynthesis(final BDD initialStates, final BDD forb) {
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
-        BDD frwdTrans = bddEdges.getMonolithicEdgesForwardBDD().id();               
-        BDD bkwdUnconTrans = bddEdges.getMonolithicUncontrollableEdgesBackwardBDD();                               
-        BDD forbidden = forb.id().or(coreachability(bkwdUnconTrans, forb.id()));
-        pruneTrans(frwdTrans, forbidden);       
-//        pruneTrans(bkwdUnconTrans, forbidden);       
-                
+        final BDD frwdTrans = bddEdges.getMonolithicEdgesForwardBDD().id();
+        final BDD bkwdUnconTrans = bddEdges.getMonolithicUncontrollableEdgesBackwardBDD();
+        final BDD forbidden = forb.id().or(coreachability(bkwdUnconTrans, forb.id()));
+        pruneTrans(frwdTrans, forbidden);
+//        pruneTrans(bkwdUnconTrans, forbidden);
+
         /*
          * The transition relations that are incrementally created during the
          * fixed point computations
@@ -400,20 +400,20 @@ public class BDDExtendedManager extends BDDAbstractManager {
         BDD Qkn = initialStates.and(forbidden.not());
         BDD Qk;
         BDD Qm = Qkn.id();
-       
+
         BDD nextStates;
         BDD nextTrans;
         BDD nextBlockingStates;
         int i = 0;
         int j;
-        
+
 //        BDD backTrans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges()).getMonolithicEdgesBackwardBDD();
 //        System.err.println("computing coreachable states...");
 //        BDD coreachable = coreachability(backTrans, bddExAutomata.getMarkedStates());
-//        System.err.println("coreachable states computed.");   
-        
+//        System.err.println("coreachable states computed.");
+
 //        frwdTrans = frwdTrans.and(coreachable);
-        
+
         do {
             System.err.println("i: "+i);
             Qk = Qkn.id();
@@ -459,7 +459,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 //
 //                }
                 System.err.println("compute local uncon states...");
-                localUnconStates = coreachability(bkwdUnconTrans, localBadStates);  
+                localUnconStates = coreachability(bkwdUnconTrans, localBadStates);
                 localUnconStates = localUnconStates.and(localBadStates.not());
                 System.err.println("local uncon states computed.");
 
@@ -495,8 +495,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
             */
             i++;
         } while (!Qkn.equals(Qk));
-                
-    
+
+
 //        Qkn.printDot();
 
         return Qkn;
@@ -550,19 +550,17 @@ public class BDDExtendedManager extends BDDAbstractManager {
         final BDD incomingTrans = frwdTrans.and(bddExAutomata.sourceToDest(states));
         return bddExAutomata.destToSource(incomingTrans.exist(bddExAutomata.getSourceStatesVarSet()));
     }
-    
-    private BDD coreachability(BDD trans, BDD states) {
-       
+
+    private BDD coreachability(final BDD trans, final BDD states) {
+
         BDD Qk;
         BDD Qkn = states.id();
         do {
             Qk = Qkn.id();
-            Qkn = Qk.or(image_preImage(Qk, trans)); 
+            Qkn = Qk.or(image_preImage(Qk, trans));
         } while (!Qkn.equals(Qk));
 
         return Qkn;
-    }    
-        
     }
 
     private BDD getBlockingStates(final BDD forwardTrans, final BDD states)
