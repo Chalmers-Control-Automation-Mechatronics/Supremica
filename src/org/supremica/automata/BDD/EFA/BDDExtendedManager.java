@@ -571,7 +571,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
 
 
-    /* Implementeation for Resource Allocation Systems*/
+    /* Implementation for Resource Allocation Systems*/
     /** Computation of unsafe states including all minimal unsafe states.
      *
      * @return
