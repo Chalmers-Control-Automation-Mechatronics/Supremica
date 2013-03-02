@@ -97,6 +97,19 @@ public class MonolithicSynchronousProductBuilderTest
     }
   }
 
+  public void testTip3Pruning() throws Exception
+  {
+    try {
+      mPruningDeadlocks = true;
+      final String group = "tests";
+      final String subdir = "nasty";
+      final String name = "tip3pruning";
+      runAutomatonBuilder(group, subdir, name);
+    } finally {
+      mPruningDeadlocks = false;
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
