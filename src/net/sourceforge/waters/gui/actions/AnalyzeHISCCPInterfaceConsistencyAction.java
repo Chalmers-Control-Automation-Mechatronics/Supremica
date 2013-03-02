@@ -63,15 +63,11 @@ public class AnalyzeHISCCPInterfaceConsistencyAction
     if (checker == null) {
       return null;
     } else {
-      try {
-        final CompositionalSimplifier simplifier =
-          new CompositionalSimplifier(desFactory,
-                                      ConflictAbstractionProcedureFactory.NB);
-        return new HISCCPInterfaceConsistencyChecker
-          (desFactory, checker, simplifier);
-      } catch (final NoClassDefFoundError error) {
-        return null;
-      }
+      final CompositionalSimplifier simplifier =
+        new CompositionalSimplifier(desFactory,
+                                    ConflictAbstractionProcedureFactory.NB);
+      return new HISCCPInterfaceConsistencyChecker
+        (desFactory, checker, simplifier);
     }
   }
 

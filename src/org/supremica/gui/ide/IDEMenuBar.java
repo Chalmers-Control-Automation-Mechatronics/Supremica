@@ -17,6 +17,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -28,9 +29,17 @@ import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPInterfaceConsistencyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
+import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
+import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCThree_one_propertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDNSLActivityLoopAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
@@ -79,21 +88,12 @@ import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.ImportAction;
 import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
+import org.supremica.gui.ide.actions.OpenRASAction;
 import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
-
-import  net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
-import org.supremica.gui.ide.actions.OpenRASAction;
 
 /**
  * <P>
@@ -367,9 +367,13 @@ public class IDEMenuBar extends JMenuBar
           final Action sic6 =
             actions.getAction(AnalyzeSICProperty6Action.class);
           mVerifyMenu.add(sic6);
-          final Action hisccp =
-            actions.getAction(AnalyzeHISCCPInterfaceConsistencyAction.class);
-          mVerifyMenu.add(hisccp);
+          try {
+            final Action hisccp =
+              actions.getAction(AnalyzeHISCCPInterfaceConsistencyAction.class);
+            mVerifyMenu.add(hisccp);
+          } catch (final NoClassDefFoundError error) {
+            // skip this if it can't be loaded
+          }
           final Action hiscco =
             actions.getAction(AnalyzeHISCCPControllabilityAction.class);
           mVerifyMenu.add(hiscco);
@@ -653,6 +657,7 @@ public class IDEMenuBar extends JMenuBar
       item.setToolTipText(path);
     }
     final ActionListener listener = new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent event)
       {
         final DocumentContainerManager manager =
@@ -671,6 +676,7 @@ public class IDEMenuBar extends JMenuBar
   {
     // #######################################################################
     // # Interface net.sourceforge.waters.gui.observer.Observer
+    @Override
     public void update(final EditorChangedEvent event)
     {
       switch (event.getKind()) {
@@ -694,6 +700,7 @@ public class IDEMenuBar extends JMenuBar
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mFileMenu = null;
@@ -708,6 +715,7 @@ public class IDEMenuBar extends JMenuBar
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mCreateMenu = null;
@@ -722,6 +730,7 @@ public class IDEMenuBar extends JMenuBar
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mToolsMenu = null;
@@ -735,6 +744,7 @@ public class IDEMenuBar extends JMenuBar
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mVerifyMenu = null;
@@ -757,6 +767,7 @@ public class IDEMenuBar extends JMenuBar
 
     // #######################################################################
     // # Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       try {
