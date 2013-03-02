@@ -218,12 +218,6 @@ public class GraphEditorPanel
     return mRoot;
   }
 
-  @Override
-  public ModuleSubject getModule()
-  {
-    return super.getModule();
-  }
-
   /**
    * Returns the position where items can be pasted in this panel.
    * This is either the current position of the mouse cursor,
@@ -3819,28 +3813,44 @@ public class GraphEditorPanel
           replaceSelection(mSource);
         }
       } else {
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(false);
-        if (mAnchor == null
-            && eq.equals(mOrigEdge.getSource(), mCopiedEdge.getSource())
-            && eq.equals(mOrigEdge.getTarget(), mCopiedEdge.getTarget()) ||
-            mCopiedEdge == null) {
-          //dont create a bogus command
-          return;
+        if (mAnchor == null) {
+          final ProxySubject oldNode =
+            (mIsSource ? mOrigEdge.getSource() : mOrigEdge.getTarget());
+          final ProxySubject copiedNode =
+            (mIsSource ? mCopiedEdge.getSource() : mCopiedEdge.getTarget());
+          final ProxySubject newNode = getOriginal(copiedNode);
+          if (oldNode == newNode) {
+            // Don't create a bogus command
+            if (oldNode instanceof SimpleNodeSubject) {
+              return;
+            } else {
+              final PointGeometrySubject oldGeo =
+                (mIsSource ?
+                 mOrigEdge.getStartPoint() : mOrigEdge.getEndPoint());
+              final PointGeometrySubject newGeo =
+                (mIsSource ?
+                 mCopiedEdge.getStartPoint() : mCopiedEdge.getEndPoint());
+              final ModuleEqualityVisitor eq =
+                ModuleEqualityVisitor.getInstance(true);
+              if (eq.equals(oldGeo, newGeo)) {
+                return;
+              }
+            }
+          }
         }
-        if (!GeometryTools.isSelfloop(mCopiedEdge)){
-          if( mCopiedEdge.getSource() instanceof SimpleNodeSubject
-            && mCopiedEdge.getTarget() instanceof SimpleNodeSubject) {
+        if (!GeometryTools.isSelfloop(mCopiedEdge) &&
+            mCopiedEdge.getSource() instanceof SimpleNodeSubject &&
+            mCopiedEdge.getTarget() instanceof SimpleNodeSubject) {
           // Make overlapping straight edges automatically spread apart ...
           final List<EdgeSubject> edges =
             getSecondaryGraph().getEdgesModifiable();
           for (final EdgeSubject edge : edges) {
-            if ((edge.getSource() == mCopiedEdge.getTarget()
-                 && edge.getTarget() == mCopiedEdge.getSource() || edge
-              .getSource() == mCopiedEdge.getSource()
-                              && edge.getTarget() == mCopiedEdge.getTarget()
-                              && edge != mCopiedEdge)
-                && edge.getGeometry() == null) {
+            if ((edge.getSource() == mCopiedEdge.getTarget() &&
+                 edge.getTarget() == mCopiedEdge.getSource() ||
+                 edge.getSource() == mCopiedEdge.getSource() &&
+                 edge.getTarget() == mCopiedEdge.getTarget() &&
+                 edge != mCopiedEdge) &&
+                edge.getGeometry() == null) {
               final Point2D mid1 = getNewMidPointOfEdge(edge, false);
               GeometryTools.setSpecifiedMidPoint(edge, mid1,
                                                  SplineKind.INTERPOLATING);
@@ -3853,7 +3863,6 @@ public class GraphEditorPanel
               break;
             }
           }
-         }
         }
         super.commitSecondaryGraph();
       }

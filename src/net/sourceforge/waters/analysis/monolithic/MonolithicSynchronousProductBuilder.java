@@ -168,7 +168,7 @@ public class MonolithicSynchronousProductBuilder
 
   /**
    * Returns whether deadlock states are pruned.
-   * @see #setPruningDeadlocks(Collection) setPruningDeadlocks()
+   * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
    */
   public boolean getPruningDeadlocks()
   {
