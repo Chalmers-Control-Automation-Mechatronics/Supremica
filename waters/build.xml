@@ -344,7 +344,7 @@
 
   <target name="runtest" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -374,7 +374,7 @@
 
   <target name="runtest1" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}" if="native.make">
         <fileset dir="${supremica.testsrc}">
@@ -393,7 +393,7 @@
 
   <target name="runtest2" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -414,7 +414,7 @@
   
   <target name="runtest3" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -433,7 +433,7 @@
   
   <target name="runtest4" depends="test-jar">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -451,7 +451,7 @@
   
   <target name="runtest5" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -469,7 +469,7 @@
   </target>
   
   <target name="runtest6">
-    <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="512m">
+    <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="1024m">
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
@@ -481,7 +481,7 @@
   
   <target name="runtest7" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -499,7 +499,7 @@
 
   <target name="runtest8" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -517,7 +517,7 @@
 
   <target name="runtest9" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -536,7 +536,7 @@
 
   <target name="runtest10" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -555,7 +555,7 @@
 
   <target name="runtest11" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
