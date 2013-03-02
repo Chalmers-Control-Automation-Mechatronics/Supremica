@@ -17,6 +17,7 @@ import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -62,11 +63,15 @@ public class AnalyzeHISCCPInterfaceConsistencyAction
     if (checker == null) {
       return null;
     } else {
-      final CompositionalSimplifier simplifier =
-        new CompositionalSimplifier(desFactory,
-                                    ConflictAbstractionProcedureFactory.NB);
-      return new HISCCPInterfaceConsistencyChecker
-        (desFactory, checker, simplifier);
+      try {
+        final CompositionalSimplifier simplifier =
+          new CompositionalSimplifier(desFactory,
+                                      ConflictAbstractionProcedureFactory.NB);
+        return new HISCCPInterfaceConsistencyChecker
+          (desFactory, checker, simplifier);
+      } catch (final NoClassDefFoundError error) {
+        return null;
+      }
     }
   }
 
