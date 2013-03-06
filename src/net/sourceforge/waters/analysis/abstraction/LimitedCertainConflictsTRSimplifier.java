@@ -9,14 +9,14 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.TIntArrayList;
+import gnu.trove.TIntHashSet;
+import gnu.trove.TIntStack;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -235,17 +235,18 @@ public class LimitedCertainConflictsTRSimplifier
       }
       // check for proper event transitions to certain conflicts
       nextlevel++;
+      mPredecessorsIterator.resetEvents(EventEncoding.NONTAU, numEvents);
       for (int state = 0; state < numStates; state++) {
         if (mStateInfo[state] >= level && rel.isReachable(state)) {
           checkAbort();
-          mPredecessorsIterator.reset(state, -1);
+          mPredecessorsIterator.resetState(state);
           while (mPredecessorsIterator.advance()) {
-            final int event = mPredecessorsIterator.getCurrentEvent();
             final int pred = mPredecessorsIterator.getCurrentSourceState();
-            if (event != tauID && mStateInfo[pred] == COREACHABLE) {
+            if (mStateInfo[pred] == COREACHABLE) {
               closureIter.resetState(pred);
               while (closureIter.advance()) {
                 final int ppred = closureIter.getCurrentSourceState();
+                final int event = mPredecessorsIterator.getCurrentEvent();
                 succIter.reset(ppred, event);
                 while (succIter.advance()) {
                   if (ppred != pred) {
@@ -561,6 +562,7 @@ public class LimitedCertainConflictsTRSimplifier
         }
       }
     }
+    mPredecessorsIterator.resetEvent(-1);
     int coreachable = 0;
     for (int state = 0; state < numStates; state++) {
       if (rel.isMarked(state, defaultID) &&
