@@ -324,7 +324,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     @Override
     double getHeuristicValue(final Candidate candidate)
     {
-      double alwaysEnabledEvents = 0;
+      int alwaysEnabledEvents = 0;
 
       final List<AutomatonProxy> automataList = candidate.getAutomata();
 
@@ -333,16 +333,16 @@ public class EnabledEventsCompositionalConflictChecker extends
         final EnabledEventsEventInfo info = getEventInfo(event);
 
         if(info != null)                            //when would info be null? Right at start?
-        if(info.getDisablingAutomata() != null)
-        //If the event is never disabled, or only disabled in one automaton, or all the automaton it is disabled in are getting merged
-        if(info.mDisablingAutomata.size() == 0 || info.mDisablingAutomata.size() == 1 || automataList.containsAll(info.getDisablingAutomata()))
-          alwaysEnabledEvents++;
+          if(info.getDisablingAutomata() != null)
+            //If the event is never disabled, or only disabled in one automaton, or all the automaton it is disabled in are getting merged
+            if(info.mDisablingAutomata.size() == 0 || info.mDisablingAutomata.size() == 1 || automataList.containsAll(info.getDisablingAutomata()))
+              alwaysEnabledEvents++;
       }
 
 
 
-      return - (double) candidate.getLocalEventCount() + alwaysEnabledEvents /
-               candidate.getNumberOfEvents();
+      return - (candidate.getLocalEventCount() + 0.5 * alwaysEnabledEvents) /
+        candidate.getNumberOfEvents();
     }
 
   }
@@ -363,7 +363,7 @@ public class EnabledEventsCompositionalConflictChecker extends
       }
       final double totalEvents = candidate.getNumberOfEvents();
       final double localEvents = candidate.getLocalEventCount();
-      double alwaysEnabledEvents = 0;
+      int alwaysEnabledEvents = 0;
 
       final List<AutomatonProxy> automataList = candidate.getAutomata();
 
@@ -383,7 +383,7 @@ public class EnabledEventsCompositionalConflictChecker extends
 
       }
 
-      return product * (totalEvents - localEvents - alwaysEnabledEvents) / totalEvents;
+      return product * (totalEvents - localEvents - 0.5*alwaysEnabledEvents) / totalEvents;
     }
 
   }

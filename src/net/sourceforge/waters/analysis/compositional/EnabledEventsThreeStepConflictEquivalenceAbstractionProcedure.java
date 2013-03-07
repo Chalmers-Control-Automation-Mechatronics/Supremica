@@ -16,9 +16,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.EnabledEventsLimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.EnabledEventsSilentContinuationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
@@ -86,10 +86,14 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       new EnabledEventsSilentContinuationTRSimplifier();
     preChain.add(enabledEventsSimplifier);
 
-    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
+
+
+
+
+    final EnabledEventsLimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
     if (useLimitedCertainConflicts) {
       limitedCertainConflictsRemover =
-        new LimitedCertainConflictsTRSimplifier();
+        new EnabledEventsLimitedCertainConflictsTRSimplifier();
     } else {
       limitedCertainConflictsRemover = null;
     }
@@ -130,7 +134,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   private EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     (final AbstractCompositionalModelAnalyzer analyzer,
      final ChainTRSimplifier preChain,
-     final LimitedCertainConflictsTRSimplifier limitedCCSimplifier,
+     final EnabledEventsLimitedCertainConflictsTRSimplifier limitedCCSimplifier,
      final CertainConflictsTRSimplifier ccSimplifier,
      final EnabledEventsSilentContinuationTRSimplifier enabledEventsSimplifier,
      final ChainTRSimplifier postChain)
@@ -218,14 +222,13 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
       //Tell the simplifier how many enabled events there are
       mEnabledEventsSimplifier.setNumberOfEnabledEvents(numEnabledEvents);
-
-      //If there are none, don't do anything
-
+      mLimitedCertainConflictsSimplifier.setNumberOfEnabledEvents(numEnabledEvents) ;
 
       //create Event Encoding in right order with all enabled events at front of list
-      final EventEncoding eventEnc = new EventEncoding(eventsList,
-                                                       enabledEventsAnalyzer.getKindTranslator(),
-                                                       tau);
+      final EventEncoding eventEnc = createEventEncoding(eventsList, tau);
+      //Give EventEncoding Marking
+
+
      // System.out.println(numEnabledEvents);
 
 
@@ -268,9 +271,9 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           final AutomatonProxy outputAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
           if (mLimitedCertainConflictsSimplifier.hasCertainConflictTransitions()) {
-            lccStep = new LimitedCertainConflictsStep
-              (analyzer, mLimitedCertainConflictsSimplifier, outputAut,
-               lastAut, tau, lastStateEnc, outputStateEnc);
+            lccStep = new LimitedCertainConflictsStep                       //Give this lots of info
+              (analyzer, mLimitedCertainConflictsSimplifier, outputAut,     //this creates the trace expander, so will get it this info
+               lastAut, tau, lastStateEnc, outputStateEnc, eventEnc, numEnabledEvents);
           } else {
             final List<int[]> ccPart =
               mLimitedCertainConflictsSimplifier.getResultPartition();
@@ -373,12 +376,19 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   protected EventEncoding createEventEncoding(final AutomatonProxy aut,
                                               final EventProxy tau)
   {
+    final Collection<EventProxy> events = aut.getEvents();
+    return createEventEncoding(events, tau);
+  }
+
+  protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
+                                              final EventProxy tau)
+  {
     final KindTranslator translator = getKindTranslator();
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final Collection<EventProxy> filter =
       Collections.singletonList(defaultMarking);
     final EventEncoding enc =
-      new EventEncoding(aut, translator, tau, filter,
+      new EventEncoding(events, translator, tau, filter,
                         EventEncoding.FILTER_PROPOSITIONS);
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
@@ -421,7 +431,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   //#########################################################################
   //# Data Members
   private final ChainTRSimplifier mPreChain;
-  private final LimitedCertainConflictsTRSimplifier
+  private final EnabledEventsLimitedCertainConflictsTRSimplifier
     mLimitedCertainConflictsSimplifier;
   private final CertainConflictsTRSimplifier
     mCertainConflictsSimplifier;
