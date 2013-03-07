@@ -434,11 +434,11 @@ public class AutomataSynthesizer
             new CompositionalSynthesizer(des, factory, translator,
                                          SynthesisAbstractionProcedureFactory.WSOE);
           synthesizer.setConfiguredDefaultMarking(marking);
-          synthesizer.setInternalStateLimit(10000);
+          synthesizer.setInternalStateLimit(5000);
            synthesizer.setPreselectingMethod
              (AbstractCompositionalModelAnalyzer.MustL);
            synthesizer.setSelectingMethod
-             (AbstractCompositionalModelAnalyzer.MinSync);
+             (AbstractCompositionalModelAnalyzer.MinS);
           synthesizer.run();
           final ProductDESResult watersResult =
             synthesizer.getAnalysisResult();

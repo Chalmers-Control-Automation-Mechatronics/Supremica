@@ -218,11 +218,6 @@ public class GraphEditorPanel
     return mRoot;
   }
 
-  public ModuleSubject getModule()
-  {
-    return (ModuleSubject) super.getModule();
-  }
-
   /**
    * Returns the position where items can be pasted in this panel.
    * This is either the current position of the mouse cursor,
@@ -246,12 +241,14 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Repaint Support
+  @Override
   public void registerSupremicaPropertyChangeListeners()
   {
     super.registerSupremicaPropertyChangeListeners();
     Config.GUI_EDITOR_GRID_SIZE.addPropertyChangeListener(this);
   }
 
+  @Override
   public void unregisterSupremicaPropertyChangeListeners()
   {
     super.registerSupremicaPropertyChangeListeners();
@@ -261,16 +258,19 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
+  @Override
   public UndoInterface getUndoInterface(final Action action)
   {
     return getUndoInterface();
   }
 
+  @Override
   public boolean hasNonEmptySelection()
   {
     return !mSelection.isEmpty();
   }
 
+  @Override
   public boolean canSelectMore()
   {
     final GraphSubject graph = getGraph();
@@ -291,16 +291,19 @@ public class GraphEditorPanel
     return false;
   }
 
+  @Override
   public boolean isSelected(final Proxy proxy)
   {
     return mSelection.contains(proxy);
   }
 
+  @Override
   public List<ProxySubject> getCurrentSelection()
   {
     return mSelection.getCurrentSelection();
   }
 
+  @Override
   public List<ProxySubject> getAllSelectableItems()
   {
     final GraphSubject graph = getGraph();
@@ -317,6 +320,7 @@ public class GraphEditorPanel
     return result;
   }
 
+  @Override
   public ProxySubject getSelectionAnchor()
   {
     if (mSelection.size() == 1) {
@@ -333,16 +337,19 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   public void clearSelection(final boolean propagate)
   {
     clearSelection();
   }
 
+  @Override
   public Proxy getSelectableAncestor(final Proxy item)
   {
     return mSelectableAncestorVisitor.getSelectableAncestor(item);
   }
 
+  @Override
   public void replaceSelection(final List<? extends Proxy> items)
   {
 
@@ -353,6 +360,7 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
     if (mSelection.add(items)) {
@@ -360,6 +368,7 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   public void removeFromSelection(final List<? extends Proxy> items)
   {
     if (mSelection.remove(items)) {
@@ -509,6 +518,7 @@ public class GraphEditorPanel
     return inserts;
   }
 
+  @Override
   public boolean canDelete(final List<? extends Proxy> items)
   {
     for (final Proxy proxy : items) {
@@ -519,6 +529,7 @@ public class GraphEditorPanel
     return false;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
@@ -536,7 +547,7 @@ public class GraphEditorPanel
       else if(subject.getParent().getParent() instanceof ForeachSubject){
         final ForeachSubject foreach = (ForeachSubject)subject.getParent().getParent();
         final ListSubject<AbstractSubject> eventlist =
-          (ListSubject<AbstractSubject>) foreach.getBodyModifiable();
+          foreach.getBodyModifiable();
         eventlists.put(eventlist, true);
       }
     }
@@ -595,6 +606,7 @@ public class GraphEditorPanel
     return inserts;
   }
 
+  @Override
   public void insertItems(final List<InsertInfo> inserts)
   {
     final GraphSubject graph = getGraph();
@@ -650,6 +662,7 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   public void deleteItems(final List<InsertInfo> inserts)
   {
     final GraphSubject graph = getGraph();
@@ -696,6 +709,7 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   public void scrollToVisible(final List<? extends Proxy> list)
   {
     if (!list.isEmpty()) {
@@ -734,6 +748,7 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   public void activate()
   {
     if (!isFocusOwner()) {
@@ -749,6 +764,7 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   public void close()
   {
     super.close();
@@ -767,6 +783,7 @@ public class GraphEditorPanel
 
   //#######################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
+  @Override
   public void attach(final Observer observer)
   {
     if (mObservers == null) {
@@ -775,6 +792,7 @@ public class GraphEditorPanel
     mObservers.add(observer);
   }
 
+  @Override
   public void detach(final Observer observer)
   {
     mObservers.remove(observer);
@@ -783,6 +801,7 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     if (mObservers != null) {
@@ -798,6 +817,7 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
@@ -817,6 +837,7 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Interfacenet.sourceforge.waters.gui.springembedder.EmbedderObserver
+  @Override
   public void embedderChanged(final EmbedderEvent event)
   {
     switch (event.getType()) {
@@ -843,6 +864,7 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Repaint Support
+  @Override
   protected void graphChanged(final ModelChangeEvent event)
   {
     checkGroupNodeHierarchyUpdate(event);
@@ -855,6 +877,7 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Interface java.awt.event.FocusListener
+  @Override
   public void focusGained(final FocusEvent event)
   {
     if (!event.isTemporary()) {
@@ -863,6 +886,7 @@ public class GraphEditorPanel
     }
   }
 
+  @Override
   public void focusLost(final FocusEvent event)
   {
     if (!event.isTemporary()) {
@@ -1180,6 +1204,7 @@ public class GraphEditorPanel
   }
 
 
+  @Override
   public List<MiscShape> getDrawnObjects()
   {
     if (mInternalDragAction == null) {
@@ -1490,6 +1515,7 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Secondary Graph
+  @Override
   protected void commitSecondaryGraph(final String description)
   {
     commitSecondaryGraph(description, false, false);
@@ -1560,6 +1586,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
+    @Override
     public RenderingInformation getRenderingInformation(final Proxy proxy)
     {
       final ProxySubject item = (ProxySubject) proxy;
@@ -1599,6 +1626,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED) {
@@ -1606,6 +1634,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.RENDERING_PRIORITY;
@@ -1836,7 +1865,6 @@ public class GraphEditorPanel
                                    mFocusedObject);
     }
 
-
     //#######################################################################
     //# Additional Callbacks
     /**
@@ -1850,6 +1878,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.awt.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       final ProxySubject item = mItem;
@@ -1905,13 +1934,16 @@ public class GraphEditorPanel
       mItem = null;
     }
 
+    @Override
     public void mousePressed(final MouseEvent event)
     {
+      // System.err.println("ToolController.mousePressed() - " + mIsPermanentFocusOwner);
       if (mIsPermanentFocusOwner) {
         mousePressedWhenInFocus(event);
       } else {
         requestFocusInWindow();
         SwingUtilities.invokeLater(new Runnable() {
+          @Override
           public void run()
           {
             if (mIsPermanentFocusOwner) {
@@ -1922,6 +1954,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public void mouseReleased(final MouseEvent event)
     {
       mStartPoint = null;
@@ -1941,6 +1974,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public void mouseDragged(final MouseEvent event)
     {
       final Point point = event.getPoint();
@@ -1950,6 +1984,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public void mouseEntered(final MouseEvent event)
     {
       abortExternalDrag(event);
@@ -1957,6 +1992,7 @@ public class GraphEditorPanel
       updateHighlighting(point);
     }
 
+    @Override
     public void mouseExited(final MouseEvent event)
     {
       if (mInternalDragAction != null) {
@@ -1971,6 +2007,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.awt.MouseMotionListener
+    @Override
     public void mouseMoved(final MouseEvent event)
     {
       abortExternalDrag(event);
@@ -1998,6 +2035,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.awt.MouseListener
+    @Override
     public void mousePressed(final MouseEvent event)
     {
       abortExternalDrag(event);
@@ -2005,6 +2043,7 @@ public class GraphEditorPanel
       // No popup!
     }
 
+    @Override
     public void mouseReleased(final MouseEvent event)
     {
       // No popup!
@@ -2021,6 +2060,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
+    @Override
     int getHighlightPriority(final Proxy item)
     {
       if (item instanceof LabelGeometryProxy) {
@@ -2043,6 +2083,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.awt.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       super.mouseClicked(event);
@@ -2127,6 +2168,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
+    @Override
     int getHighlightPriority(final Proxy item)
     {
       if (item instanceof LabelGeometryProxy) {
@@ -2144,6 +2186,7 @@ public class GraphEditorPanel
      * this methods checks whether there is a simple node at the nearest
      * grid point, and if so, changes focus to that node.
      */
+    @Override
     void updateHighlighting()
     {
       super.updateHighlighting();
@@ -2172,6 +2215,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.awt.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       final boolean noSelections = mSelection.isEmpty();
@@ -2209,6 +2253,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public void mouseDragged(final MouseEvent event)
     {
       if (mInternalDragAction == null) {
@@ -2250,6 +2295,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
+    @Override
     int getHighlightPriority(final Proxy item)
     {
       if (item instanceof GroupNodeProxy) {
@@ -2261,6 +2307,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.awt.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       super.mouseClicked(event);
@@ -2274,6 +2321,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public void mousePressed(final MouseEvent event)
     {
       abortExternalDrag(event);
@@ -2311,6 +2359,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
+    @Override
     int getHighlightPriority(final Proxy item)
     {
       if (item instanceof SimpleNodeProxy) {
@@ -2329,6 +2378,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     boolean canBeSelected(final ProxySubject item)
     {
       return
@@ -2340,6 +2390,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.awt.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       super.mouseClicked(event);
@@ -2654,6 +2705,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Dragging
+    @Override
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
@@ -2664,6 +2716,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     void commitDrag(final Point point)
     {
       super.commitDrag(point);
@@ -2674,6 +2727,7 @@ public class GraphEditorPanel
       updateError();
     }
 
+    @Override
     void cancelDrag(final Point point)
     {
       super.cancelDrag(point);
@@ -2707,6 +2761,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Dragging
+    @Override
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
@@ -2737,6 +2792,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Rendering
+    @Override
     List<MiscShape> getDrawnObjects()
     {
       final Rectangle rect = getDragRectangle();
@@ -2866,11 +2922,13 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Simple Access
+    @Override
     boolean shouldSnapToGrid()
     {
       return mSnapPoint != null;
     }
 
+    @Override
     boolean createSecondaryGraph()
     {
       if (super.createSecondaryGraph()) {
@@ -2928,6 +2986,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Dragging
+    @Override
     boolean continueDrag(final Point point)
     {
       final Point start = getDragStart();
@@ -2955,6 +3014,7 @@ public class GraphEditorPanel
       return true;
     }
 
+    @Override
     void commitSecondaryGraph()
     {
       if(mShouldCommit){
@@ -2963,6 +3023,7 @@ public class GraphEditorPanel
        mMoveVisitor = null;
     }
 
+    @Override
     void cancelDrag(final Point point)
     {
       super.cancelDrag(point);
@@ -3142,6 +3203,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
+    @Override
     int getHighlightPriority(final Proxy item)
     {
       if (item instanceof EdgeProxy ||
@@ -3154,6 +3216,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     DragOverStatus getExternalDragStatus()
     {
       return mExternalDragStatus;
@@ -3182,7 +3245,7 @@ public class GraphEditorPanel
                                              final List<ProxySubject> result)
     {
       for(int i = 0; i < list.size(); i++){
-        final ProxySubject subject = (ProxySubject)list.get(i);
+        final ProxySubject subject = list.get(i);
         if(subject instanceof IdentifierSubject){
           if(isSelected(subject)){
             result.add(subject);
@@ -3296,6 +3359,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Rendering
+    @Override
     List<MiscShape> getDrawnObjects()
     {
       if (mLine == null && mRect == null) {
@@ -3348,6 +3412,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Dragging
+    @Override
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
@@ -3403,6 +3468,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Simple Access
+    @Override
     boolean shouldSnapToGrid()
     {
       return Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get();
@@ -3410,6 +3476,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Dragging
+    @Override
     void commitDrag(final Point point)
     {
       super.commitDrag(point);
@@ -3422,6 +3489,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Rendering
+    @Override
     List<MiscShape> getDrawnObjects()
     {
       final Rectangle rect = getDragRectangle();
@@ -3498,6 +3566,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Simple Access
+    @Override
     boolean shouldSnapToGrid()
     {
       return Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get();
@@ -3505,6 +3574,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Simple Access
+    @Override
     boolean createSecondaryGraph()
     {
       if (super.createSecondaryGraph()) {
@@ -3521,6 +3591,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     void commitSecondaryGraph()
     {
       final Rectangle2D rect = getCurrentRectangle();
@@ -3538,6 +3609,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Dragging
+    @Override
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
@@ -3683,6 +3755,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Dragging
+    @Override
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
@@ -3740,28 +3813,44 @@ public class GraphEditorPanel
           replaceSelection(mSource);
         }
       } else {
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(false);
-        if (mAnchor == null
-            && eq.equals(mOrigEdge.getSource(), mCopiedEdge.getSource())
-            && eq.equals(mOrigEdge.getTarget(), mCopiedEdge.getTarget()) ||
-            mCopiedEdge == null) {
-          //dont create a bogus command
-          return;
+        if (mAnchor == null) {
+          final ProxySubject oldNode =
+            (mIsSource ? mOrigEdge.getSource() : mOrigEdge.getTarget());
+          final ProxySubject copiedNode =
+            (mIsSource ? mCopiedEdge.getSource() : mCopiedEdge.getTarget());
+          final ProxySubject newNode = getOriginal(copiedNode);
+          if (oldNode == newNode) {
+            // Don't create a bogus command
+            if (oldNode instanceof SimpleNodeSubject) {
+              return;
+            } else {
+              final PointGeometrySubject oldGeo =
+                (mIsSource ?
+                 mOrigEdge.getStartPoint() : mOrigEdge.getEndPoint());
+              final PointGeometrySubject newGeo =
+                (mIsSource ?
+                 mCopiedEdge.getStartPoint() : mCopiedEdge.getEndPoint());
+              final ModuleEqualityVisitor eq =
+                ModuleEqualityVisitor.getInstance(true);
+              if (eq.equals(oldGeo, newGeo)) {
+                return;
+              }
+            }
+          }
         }
-        if (!GeometryTools.isSelfloop(mCopiedEdge)){
-          if( mCopiedEdge.getSource() instanceof SimpleNodeSubject
-            && mCopiedEdge.getTarget() instanceof SimpleNodeSubject) {
+        if (!GeometryTools.isSelfloop(mCopiedEdge) &&
+            mCopiedEdge.getSource() instanceof SimpleNodeSubject &&
+            mCopiedEdge.getTarget() instanceof SimpleNodeSubject) {
           // Make overlapping straight edges automatically spread apart ...
           final List<EdgeSubject> edges =
             getSecondaryGraph().getEdgesModifiable();
           for (final EdgeSubject edge : edges) {
-            if ((edge.getSource() == mCopiedEdge.getTarget()
-                 && edge.getTarget() == mCopiedEdge.getSource() || edge
-              .getSource() == mCopiedEdge.getSource()
-                              && edge.getTarget() == mCopiedEdge.getTarget()
-                              && edge != mCopiedEdge)
-                && edge.getGeometry() == null) {
+            if ((edge.getSource() == mCopiedEdge.getTarget() &&
+                 edge.getTarget() == mCopiedEdge.getSource() ||
+                 edge.getSource() == mCopiedEdge.getSource() &&
+                 edge.getTarget() == mCopiedEdge.getTarget() &&
+                 edge != mCopiedEdge) &&
+                edge.getGeometry() == null) {
               final Point2D mid1 = getNewMidPointOfEdge(edge, false);
               GeometryTools.setSpecifiedMidPoint(edge, mid1,
                                                  SplineKind.INTERPOLATING);
@@ -3774,7 +3863,6 @@ public class GraphEditorPanel
               break;
             }
           }
-         }
         }
         super.commitSecondaryGraph();
       }
@@ -3826,6 +3914,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Highlighting
+    @Override
     int getHighlightPriority(final Proxy item)
     {
       final int prio;
@@ -3983,6 +4072,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
     {
       final EdgeSubject edge0 = (EdgeSubject) edge;
@@ -3996,6 +4086,7 @@ public class GraphEditorPanel
       return null;
     }
 
+    @Override
     public Object visitGroupNodeProxy(final GroupNodeProxy group)
     {
       final GroupNodeSubject group0 = (GroupNodeSubject) group;
@@ -4003,11 +4094,13 @@ public class GraphEditorPanel
       return null;
     }
 
+    @Override
     public Object visitForeachProxy(final ForeachProxy foreach)
     {
       return null;
     }
 
+    @Override
     public Object visitGuardActionBlockProxy
       (final GuardActionBlockProxy block)
     {
@@ -4018,11 +4111,13 @@ public class GraphEditorPanel
       return null;
     }
 
+    @Override
     public Object visitIdentifierProxy(final IdentifierProxy ident)
     {
       return null;
     }
 
+    @Override
     public Object visitLabelBlockProxy(final LabelBlockProxy block)
     {
       if (!isParentMoved(block)) {
@@ -4032,6 +4127,7 @@ public class GraphEditorPanel
       return null;
     }
 
+    @Override
     public Object visitLabelGeometryProxy(final LabelGeometryProxy label)
     {
       if (!isParentMoved(label)) {
@@ -4041,6 +4137,7 @@ public class GraphEditorPanel
       return null;
     }
 
+    @Override
     public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
     {
       final SimpleNodeSubject node0 = (SimpleNodeSubject) node;
@@ -4163,6 +4260,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.util.Comparator
+    @Override
     public int compare(final Proxy item1, final Proxy item2)
     {
       final boolean sel1 = isRenderedSelected((ProxySubject) item1);
@@ -4472,7 +4570,7 @@ public class GraphEditorPanel
                                            final List<ProxySubject> proxies)
     {
       for (int i = 0; i < proxies.size(); i++) {
-        if (SubjectTools.isAncestor((ProxySubject) proxies.get(i), proxy)) {
+        if (SubjectTools.isAncestor(proxies.get(i), proxy)) {
           if (proxies.get(i) instanceof ForeachSubject
               && proxies.get(i) != proxy) {
             return true;
@@ -4484,6 +4582,7 @@ public class GraphEditorPanel
 
   private class PositionComparator implements Comparator<ProxySubject>{
 
+    @Override
     public int compare(final ProxySubject proxy1, final ProxySubject proxy2)
     {
       final SubjectShapeProducer prod = getShapeProducer();
@@ -4546,6 +4645,7 @@ public class GraphEditorPanel
       final Action enter = new AbstractAction("<enter>") {
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void actionPerformed(final ActionEvent event)
           {
             try {
@@ -4559,6 +4659,7 @@ public class GraphEditorPanel
       addEnterAction(enter);
       final Action escape = new AbstractAction("<escape>") {
           private static final long serialVersionUID = 1L;
+          @Override
           public void actionPerformed(final ActionEvent event)
           {
             cancel();
@@ -4589,6 +4690,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Overrides for Superclass javax.swing.JFormattedTextField
+    @Override
     public void commitEdit()
       throws java.text.ParseException
     {
@@ -4612,10 +4714,12 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface java.awt.event.FocusListener
+    @Override
     public void focusGained(final FocusEvent event)
     {
     }
 
+    @Override
     public void focusLost(final FocusEvent event)
     {
       cancel();
@@ -4646,6 +4750,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    @Override
     public SimpleIdentifierProxy parse(final String text)
       throws ParseException
     {
@@ -4685,6 +4790,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       return null;
@@ -4692,16 +4798,19 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
     {
       return edge;
     }
 
+    @Override
     public Proxy visitForeachProxy(final ForeachProxy foreach)
     {
       return visitEventListMember(foreach);
     }
 
+    @Override
     public Object visitGeometryProxy(final GeometryProxy proxy)
       throws VisitorException
     {
@@ -4710,17 +4819,20 @@ public class GraphEditorPanel
       return parent.acceptVisitor(this);
     }
 
+    @Override
     public GuardActionBlockProxy visitGuardActionBlockProxy
       (final GuardActionBlockProxy block)
     {
       return block;
     }
 
+    @Override
     public Proxy visitIdentifierProxy(final IdentifierProxy ident)
     {
       return visitEventListMember(ident);
     }
 
+    @Override
     public Proxy visitLabelBlockProxy(final LabelBlockProxy block)
     {
       if (block.getEventIdentifierList().isEmpty()) {
@@ -4736,12 +4848,14 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public LabelGeometryProxy visitLabelGeometryProxy
       (final LabelGeometryProxy geo)
     {
       return geo;
     }
 
+    @Override
     public NodeProxy visitNodeProxy(final NodeProxy node)
     {
       return node;
@@ -4937,6 +5051,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public EventListExpressionProxy visitProxy(final Proxy proxy)
     {
       return null;
@@ -4946,12 +5061,14 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public EventListExpressionProxy visitEdgeProxy(final EdgeProxy edge)
     {
       final LabelBlockProxy block = edge.getLabelBlock();
       return visitLabelBlockProxy(block);
     }
 
+    @Override
     public EventListExpressionProxy visitGuardActionBlockProxy
       (final GuardActionBlockProxy block)
     {
@@ -4960,6 +5077,7 @@ public class GraphEditorPanel
       return visitEdgeProxy(edge);
     }
 
+    @Override
     public EventListExpressionProxy visitLabelBlockProxy
       (final LabelBlockProxy block)
     {
@@ -4978,6 +5096,7 @@ public class GraphEditorPanel
       }
     }
 
+    @Override
     public EventListExpressionProxy visitLabelGeometryProxy
       (final LabelGeometryProxy geo)
     {
@@ -4986,6 +5105,7 @@ public class GraphEditorPanel
       return visitSimpleNodeProxy(node);
     }
 
+    @Override
     public EventListExpressionProxy visitPlainEventListProxy
       (final PlainEventListProxy elist)
     {
@@ -4996,6 +5116,7 @@ public class GraphEditorPanel
         elist : null;
     }
 
+    @Override
     public EventListExpressionProxy visitSimpleNodeProxy
       (final SimpleNodeProxy node)
     {

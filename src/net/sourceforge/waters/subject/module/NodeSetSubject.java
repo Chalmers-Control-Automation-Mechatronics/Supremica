@@ -49,7 +49,7 @@ import net.sourceforge.waters.subject.base.UndoInfo;
 
 class NodeSetSubject
   extends AbstractSet<NodeSubject>
-  implements IndexedSetSubject<NodeSubject>, ModelObserver
+  implements IndexedSetSubject<NodeSubject>
 {
 
   //#########################################################################
@@ -72,22 +72,24 @@ class NodeSetSubject
     @SuppressWarnings("unchecked")
     final Collection<NodeSubject> downcast = (Collection<NodeSubject>) input;
     insertAllUnique(downcast);
-    addModelObserver(this);
   }
 
 
   //#########################################################################
   //# Interface java.util.Set
+  @Override
   public boolean add(final NodeSubject node)
   {
     return insert(node) == node;
   }
 
+  @Override
   public boolean addAll(final Collection<? extends NodeSubject> items)
   {
     return insertAll(items);
   }
 
+  @Override
   public boolean contains(final Object item)
   {
     if (item instanceof NodeSubject) {
@@ -98,11 +100,13 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public Iterator<NodeSubject> iterator()
   {
     return new NodeSetIterator();
   }
 
+  @Override
   public boolean remove(final Object item)
   {
     if (item instanceof NodeSubject) {
@@ -113,6 +117,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public int size()
   {
     return mNameMap.size();
@@ -121,6 +126,7 @@ class NodeSetSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.IndexedCollectionProxy
+  @Override
   public void checkAllUnique
     (final Collection<? extends NodeSubject> collection)
   {
@@ -129,6 +135,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public void checkUnique(final NamedProxy node)
   {
     final String name = node.getName();
@@ -138,11 +145,13 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public boolean containsName(final String name)
   {
     return mNameMap.containsKey(name);
   }
 
+  @Override
   public NodeSubject find(final String name)
   {
     final NodeSubject found = get(name);
@@ -152,11 +161,13 @@ class NodeSetSubject
     return found;
   }
 
+  @Override
   public NodeSubject get(final String name)
   {
     return mNameMap.get(name);
   }
 
+  @Override
   public NodeSubject insert(final NodeSubject node)
   {
     final Collection<NodeSubject> nodes = Collections.singletonList(node);
@@ -168,6 +179,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public boolean insertAll(final Collection<? extends NodeSubject> collection)
   {
     boolean changed = false;
@@ -196,6 +208,7 @@ class NodeSetSubject
     return changed;
   }
 
+  @Override
   public void insertAllUnique
     (final Collection<? extends NodeSubject> collection)
   {
@@ -219,12 +232,14 @@ class NodeSetSubject
     insertGroupNodes(groups);
   }
 
+  @Override
   public void insertUnique(final NodeSubject node)
   {
     final Collection<NodeSubject> nodes = Collections.singletonList(node);
     insertAllUnique(nodes);
   }
 
+  @Override
   public void reinsert(final NamedProxy proxy, final String newname)
   {
     final String oldname = proxy.getName();
@@ -240,6 +255,7 @@ class NodeSetSubject
     map.put(newname, proxy);
   }
 
+  @Override
   public NodeSubject removeName(final String name)
   {
     final NodeSubject victim = get(name);
@@ -277,27 +293,10 @@ class NodeSetSubject
     rearrangeGroupNodes(empty);
   }
 
-  //#########################################################################
-  //# Interface net.sourceforge.waters.subject.base.ModelObserver;
-  public void modelChanged(final ModelChangeEvent event)
-  {
-    if(event.getKind() == ModelChangeEvent.NAME_CHANGED){
-      if(event.getSource() instanceof NodeSubject){
-        final NodeSubject node = (NodeSubject)event.getSource();
-        //make sure the key and value are updated in mNameMap
-        mNameMap.remove(event.getValue());
-        mNameMap.put(node.getName(), node);
-      }
-    }
-  }
-
-  public int getModelObserverPriority()
-  {
-    return ModelObserver.CLEANUP_PRIORITY_0;
-  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
+  @Override
   public UndoInfo createUndoInfo(final Set<? extends NodeSubject> newState,
                                  final Set<? extends Subject> boundary)
   {
@@ -313,6 +312,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public ModelChangeEvent assignMember(final int index,
                                        final Object oldValue,
                                        final Object newValue)
@@ -324,11 +324,13 @@ class NodeSetSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
+  @Override
   public Subject getParent()
   {
     return mParent;
   }
 
+  @Override
   public DocumentSubject getDocument()
   {
     if (mParent != null) {
@@ -338,12 +340,14 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public void setParent(final Subject parent)
   {
     checkSetParent(parent);
     mParent = parent;
   }
 
+  @Override
   public void checkSetParent(final Subject parent)
   {
     if (parent != null && mParent != null) {
@@ -356,6 +360,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public void addModelObserver(final ModelObserver observer)
   {
     if (mObservers == null) {
@@ -364,6 +369,7 @@ class NodeSetSubject
     mObservers.add(observer);
   }
 
+  @Override
   public void removeModelObserver(final ModelObserver observer)
   {
     if (mObservers != null &&
@@ -373,6 +379,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public Collection<ModelObserver> getModelObservers()
   {
     return mObservers;
@@ -564,6 +571,7 @@ class NodeSetSubject
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       if (mIterator.hasNext()) {
@@ -577,6 +585,7 @@ class NodeSetSubject
       }
     }
 
+    @Override
     public NodeSubject next()
     {
       if (!mIterator.hasNext() && mSimplePart) {
@@ -587,6 +596,7 @@ class NodeSetSubject
       return mVictim;
     }
 
+    @Override
     public void remove()
     {
       mIterator.remove();
@@ -635,6 +645,7 @@ class NodeSetSubject
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
       throws CyclicGroupNodeException
     {
@@ -642,6 +653,7 @@ class NodeSetSubject
       return mNextNode != null;
     }
 
+    @Override
     public GroupNodeSubject next()
     {
       advance();
@@ -655,6 +667,7 @@ class NodeSetSubject
       }
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException

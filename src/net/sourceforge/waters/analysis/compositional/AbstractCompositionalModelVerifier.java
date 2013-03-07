@@ -32,6 +32,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+
 import org.apache.log4j.Logger;
 
 
@@ -213,6 +214,7 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run() throws AnalysisException
   {
     try {
@@ -250,6 +252,7 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  @Override
   public boolean isSatisfied()
   {
     final VerificationResult result = getAnalysisResult();
@@ -260,6 +263,7 @@ public abstract class AbstractCompositionalModelVerifier
     }
   }
 
+  @Override
   public TraceProxy getCounterExample()
   {
     if (isSatisfied()) {

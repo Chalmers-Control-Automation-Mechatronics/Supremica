@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -154,10 +155,11 @@ public class MonolithicSynchronousProductBuilder
   /**
    * Sets whether deadlock states are pruned. If enabled, the synchronous
    * product builder checks for deadlock states in the input automata, i.e.,
-   * for states that are not marked and which do not have any outgoing
-   * transitions. Synchronous product states, of which at least one state
-   * component is a deadlock state, are not expanded and instead merged into
-   * a single state.
+   * for states that are not marked by any of the configured propositions,
+   * and which do not have any outgoing transitions. Synchronous product
+   * states, of which at least one state component is a deadlock state, are
+   * not expanded and instead merged into a single state.
+   * @see #getPropositions()
    */
   public void setPruningDeadlocks(final boolean pruning)
   {
@@ -176,27 +178,32 @@ public class MonolithicSynchronousProductBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
+  @Override
   public Collection<EventProxy> getPropositions()
   {
     return mUsedPropositions;
   }
 
+  @Override
   public void setPropositions(final Collection<EventProxy> props)
   {
     mUsedPropositions = props;
   }
 
+  @Override
   public void addMask(final Collection<EventProxy> hidden,
                       final EventProxy replacement)
   {
     addMask(hidden, replacement, false);
   }
 
+  @Override
   public void clearMask()
   {
     mMaskingPairs = null;
   }
 
+  @Override
   public SynchronousProductStateMap getStateMap()
   {
     final ProductDESProxy model = getModel();
@@ -208,6 +215,7 @@ public class MonolithicSynchronousProductBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -250,6 +258,7 @@ public class MonolithicSynchronousProductBuilder
     }
   }
 
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
@@ -312,6 +321,14 @@ public class MonolithicSynchronousProductBuilder
     }
     mNumForbiddenEvents = nextForbidden;
     mNumInputEvents = nextNormal;
+    final boolean pruning;
+    if (!mPruningDeadlocks) {
+      pruning = false;
+    } else if (mUsedPropositions != null) {
+      pruning = mUsedPropositions.containsAll(mCurrentPropositions);
+    } else {
+      pruning = !mCurrentPropositions.isEmpty();
+    }
     if (mMaskingPairs != null) {
       mProjectionMask = new int[mNumInputEvents];
       for (int e = 0; e < mNumInputEvents; e++) {
@@ -335,7 +352,7 @@ public class MonolithicSynchronousProductBuilder
       for (int e = 0; e < nextNormal; e++) {
         mCurrentSuccessors[e] = new TIntHashSet();
       }
-    } else if (mPruningDeadlocks) {
+    } else if (pruning) {
       mCurrentDeadlock = new boolean[mNumInputEvents];
     }
     mNumEvents = nextNormal;
@@ -354,7 +371,7 @@ public class MonolithicSynchronousProductBuilder
     mStateMarkings = new List<?>[mNumAutomata][];
     // transitions indexed first by automaton then by event then by source state
     mTransitions = new int[mNumAutomata][mNumInputEvents][][];
-    if (mPruningDeadlocks) {
+    if (pruning) {
       mDeadlock = new boolean[mNumAutomata][];
     }
     mTargetTuple = new int[mNumAutomata];
@@ -380,7 +397,7 @@ public class MonolithicSynchronousProductBuilder
       int snum = 0;
       mOriginalStates[a] = new StateProxy[numStates];
       mStateMarkings[a] = new List<?>[numStates];
-      if (mPruningDeadlocks) {
+      if (mDeadlock != null) {
         mDeadlock[a] = new boolean[numStates];
       }
       for (final StateProxy state : states) {
@@ -404,7 +421,7 @@ public class MonolithicSynchronousProductBuilder
           Collections.sort(stateProps);
         }
         mStateMarkings[a][snum] = getUniqueMarking(stateProps);
-        if (mPruningDeadlocks) {
+        if (mDeadlock != null) {
           mDeadlock[a][snum] = stateProps.isEmpty();
         }
         snum++;
@@ -431,7 +448,7 @@ public class MonolithicSynchronousProductBuilder
             final TIntArrayList list = autTransitionLists[e][source];
             if (list != null) {
               mTransitions[a][e][source] = list.toNativeArray();
-              if (mPruningDeadlocks) {
+              if (mDeadlock != null) {
                 mDeadlock[a][source] = false;
               }
             }
@@ -580,7 +597,7 @@ public class MonolithicSynchronousProductBuilder
     final int target;
     if (mStates.containsKey(mTargetTuple)) {
       target = mStates.get(mTargetTuple);
-    } else if (mPruningDeadlocks && isDeadlockTuple()) {
+    } else if (mDeadlock != null && isDeadlockTuple()) {
       if (mDeadlockState < 0) {
         mDeadlockState = getNewState();
         final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
@@ -844,11 +861,13 @@ public class MonolithicSynchronousProductBuilder
     //#######################################################################
     //# Interface
     //# net.sourceforge.waters.model.analysis.SynchronousProductStateMap
+    @Override
     public Collection<AutomatonProxy> getInputAutomata()
     {
       return mInputAutomata;
     }
 
+    @Override
     public StateProxy getOriginalState(final StateProxy state,
                                        final AutomatonProxy aut)
     {
@@ -904,16 +923,19 @@ public class MonolithicSynchronousProductBuilder
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.des.StateProxy
+    @Override
     public Collection<EventProxy> getPropositions()
     {
       return mProps;
     }
 
+    @Override
     public boolean isInitial()
     {
       return mIsInitial;
     }
 
+    @Override
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName, mStateTuple, mProps, mIsInitial);
@@ -924,6 +946,7 @@ public class MonolithicSynchronousProductBuilder
       return mName;
     }
 
+    @Override
     public String getName()
     {
       return "S:" + mName;
@@ -934,6 +957,7 @@ public class MonolithicSynchronousProductBuilder
       return mStateTuple;
     }
 
+    @Override
     public boolean refequals(final NamedProxy o)
     {
       if (o instanceof MemStateProxy) {
@@ -944,11 +968,13 @@ public class MonolithicSynchronousProductBuilder
       }
     }
 
+    @Override
     public int refHashCode()
     {
       return mName;
     }
 
+    @Override
     public Object acceptVisitor(final ProxyVisitor visitor)
         throws VisitorException
     {
@@ -957,16 +983,19 @@ public class MonolithicSynchronousProductBuilder
       return desvisitor.visitStateProxy(this);
     }
 
+    @Override
     public Class<StateProxy> getProxyInterface()
     {
       return StateProxy.class;
     }
 
+    @Override
     public int compareTo(final NamedProxy n)
     {
       return n.getName().compareTo(getName());
     }
 
+    @Override
     public String toString()
     {
       return getName();
@@ -991,6 +1020,7 @@ public class MonolithicSynchronousProductBuilder
       mDouble = d;
     }
 
+    @Override
     public int compareTo(final IntDouble pair)
     {
       if (mDouble < pair.mDouble) {
