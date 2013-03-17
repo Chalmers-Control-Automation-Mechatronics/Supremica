@@ -502,7 +502,7 @@ public class ModelAssess
 
   private void printMarks(final float marks)
   {
-    final int round = (int) Math.round(marks);
+    final int round = Math.round(marks);
     if (Math.abs(marks - round) >= 0.01f) {
       mOutput.print(marks);
       mOutput.print(" marks");
@@ -703,6 +703,7 @@ public class ModelAssess
 
     //#######################################################################
     //# Override for java.lang.Object
+    @Override
     public String toString()
     {
       return mModule.getName();
@@ -1210,6 +1211,7 @@ public class ModelAssess
 
     //#########################################################################
     //# Overrides for AbstractTest
+    @Override
     boolean check(final ProductDESProxy des)
     {
       final Solution sol = getSolution();
@@ -1233,6 +1235,7 @@ public class ModelAssess
 
     //#########################################################################
     //# Overrides for AbstractTest
+    @Override
     boolean check(final ProductDESProxy des)
     {
       mSpec = null;
@@ -1251,6 +1254,7 @@ public class ModelAssess
       return true;
     }
 
+    @Override
     void printDiagnostics()
     {
       mOutput.print("--- specification ");
@@ -1302,6 +1306,7 @@ public class ModelAssess
 
     //#########################################################################
     //# Overrides for AbstractTest
+    @Override
     boolean check(final ProductDESProxy des)
       throws AnalysisException
     {
@@ -1310,6 +1315,7 @@ public class ModelAssess
     }
 
 
+    @Override
     void printDiagnostics()
     {
       final TraceProxy trace = mVerifier.getCounterExample();
@@ -1393,6 +1399,7 @@ public class ModelAssess
 
     //#######################################################################
     //# Overrides for AbstractModelVerifierTest
+    @Override
     boolean check(final ProductDESProxy des)
       throws AnalysisException
     {
@@ -1454,6 +1461,7 @@ public class ModelAssess
 
     //#######################################################################
     //# Overrides for AbstractModelVerifierTest
+    @Override
     boolean check(final ProductDESProxy des)
       throws AnalysisException
     {
@@ -1490,6 +1498,7 @@ public class ModelAssess
 
     //#######################################################################
     //# Overrides for AbstractModelVerifierTest
+    @Override
     boolean check(final ProductDESProxy des)
       throws AnalysisException
     {
@@ -1522,15 +1531,16 @@ public class ModelAssess
       while (name.charAt(++splitpos) == ' ') {
       }
       mFirstName = name.substring(splitpos);
-      mFilterBegin = mFirstName + ' ' + mLastName + '_';
-      // mFilterBegin = uid + "-";
+      mPattern = Pattern.compile("^[^0-9_]+_" + mStudentID + "-.*$");
     }
 
     //#######################################################################
     //# Interface java.io.FilenameFilter
+    @Override
     public boolean accept(final File dir, final String name)
     {
-      return name.startsWith(mFilterBegin);
+      final Matcher matcher = mPattern.matcher(name);
+      return matcher.matches();
     }
 
     //#######################################################################
@@ -1555,7 +1565,7 @@ public class ModelAssess
     private final String mUserID;
     private final String mFirstName;
     private final String mLastName;
-    private final String mFilterBegin;
+    private final Pattern mPattern;
 
   }
 
