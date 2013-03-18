@@ -78,6 +78,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
 import org.xml.sax.SAXException;
 
 
@@ -91,6 +92,8 @@ public class ModelAssess
   //# Main Program Entry Point
   public static void main(final String[] args)
   {
+    Config.GUI_EDITOR_EDGEARROW_AT_END.set(false);
+
     if (args.length != 4) {
       usage();
     }
@@ -349,11 +352,9 @@ public class ModelAssess
     Solution result = mDefaultSolution;
     for (final Solution solution : mSolutions) {
       final int count = solution.getNumberOfMatches(attempt);
-      if (count > 0) {
+      if (count > best) {
         best = count;
         result = solution;
-      } else if (count == best) {
-        result = mDefaultSolution;
       }
     }
     return result;
@@ -1338,7 +1339,7 @@ public class ModelAssess
             if (matcher.find()) {
               final int end = matcher.end();
               final String rest = name.substring(end);
-              mOutput.print("$\\langle$expecting ");
+              mOutput.print("$\\langle$ex\\-pect\\-ing ");
               printLaTeXString(rest, false);
               mOutput.print("$\\rangle$");
             } else {
