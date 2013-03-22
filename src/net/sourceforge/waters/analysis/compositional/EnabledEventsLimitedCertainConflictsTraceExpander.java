@@ -261,7 +261,7 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
         } else {
           origCode = ccState;
         }
-        assert origCode >= 0;         //What is origCode, if you try to getState(negative number) you get ArrayIndex out of bounds
+        assert origCode >= 0;
         final StateProxy origState = getOriginalAutomatonState(origCode);
         origMap.put(origAut, origState);
       } else {
@@ -302,7 +302,6 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     final StateProxy initState = stepMap.get(origAut);
     int scode = getOriginalAutomatonStateCode(initState);
 
-    final int tau = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
     final int size = rel.getNumberOfStates();
@@ -322,9 +321,10 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
         scode = iter.getCurrentTargetState();
         // iter.getCurrentEvent();
         if (visited.add(scode)) {
+          final int event = iter.getCurrentEvent();
           final SearchRecord newRecord =
-            new SearchRecord(scode, 0, tau, record);
-          if (mSimplifier.getLevel(scode) <= level) {
+            new SearchRecord(scode, 0, event, record);
+          if (mSimplifier.getLevel(scode) >=0 && mSimplifier.getLevel(scode) <= level) {
             record = newRecord;
             break search;
           }

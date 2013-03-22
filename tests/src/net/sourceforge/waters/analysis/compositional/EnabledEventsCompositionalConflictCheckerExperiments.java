@@ -220,7 +220,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   void runAllTests() throws Exception
   {
 
-
+    testFailedTrafficLights();
     /*
     synthesisTransferline(100);
     synthesisTransferline(200);
@@ -254,7 +254,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     testProfisafeO4();
     //testRhoneAlps();      //failed to find file
     //testRhoneTough();     //Failed to find file
-    testTbedCTCT();
+
     testTbedUncont();
     testTbedValid();
     testTbedNoderail();
@@ -269,8 +269,10 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     testProfisafeO5Host();
     testProfisafeI6Host();
     testProfisafeO6Host();
-    testTip3();                 //This file is giving errors.
+    testTip3();
     testTip3Bad();
+
+
   }
 
 
@@ -282,6 +284,17 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
 
   // #########################################################################
   // # Test Cases --- incremental suite
+
+  public void testFailedTrafficLights() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "sdh7.wmod";
+    runModel(group, dir, name, false);
+
+  }
+
+
   public void testBigBmw() throws Exception
   {
     final String group = "tests";

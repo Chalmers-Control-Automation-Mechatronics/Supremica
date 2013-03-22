@@ -11,11 +11,11 @@
         </ConstantAlias>
     </ConstantAliasList>
     <EventDeclList>
-        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="DrwArvCL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="DrwArvEL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="DrwAtCL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="DrwAtEL"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="CONTROLLABLE" Name="DrwArvCL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="DrwArvEL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="DrwAtCL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="DrwAtEL"/>
         <EventDecl Kind="CONTROLLABLE" Name="GClosesCL"/>
         <EventDecl Kind="CONTROLLABLE" Name="GClosesEL"/>
         <EventDecl Kind="CONTROLLABLE" Name="GOpensCL"/>
@@ -23,12 +23,12 @@
         <EventDecl Kind="CONTROLLABLE" Name="LibPallet"/>
         <EventDecl Kind="CONTROLLABLE" Name="MvDrwToCL"/>
         <EventDecl Kind="CONTROLLABLE" Name="MvDrwToEL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvDrwCL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvDrwEL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvGCL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvGEL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvTUAtCL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvTUAtEL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PalletArvDrwCL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PalletArvDrwEL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PalletLvGCL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PalletLvGEL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PalletLvTUAtCL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PalletLvTUAtEL"/>
         <EventDecl Kind="CONTROLLABLE" Name="PalletRlsd"/>
         <EventDecl Kind="CONTROLLABLE" Name="PalletRlsd_d"/>
         <EventDecl Kind="CONTROLLABLE" Name="PStopClosesCL"/>
@@ -50,327 +50,327 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="160"/>
+                            <Point X="160" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-18" X="6"/>
+                            <Point X="6" Y="-18"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s01">
                         <PointGeometry>
-                            <Point Y="272" X="320"/>
+                            <Point X="320" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="6" X="-7"/>
+                            <Point X="-7" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s02">
                         <PointGeometry>
-                            <Point Y="192" X="384"/>
+                            <Point X="384" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s03">
                         <PointGeometry>
-                            <Point Y="352" X="448"/>
+                            <Point X="448" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s04">
                         <PointGeometry>
-                            <Point Y="272" X="608"/>
+                            <Point X="608" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s07">
                         <PointGeometry>
-                            <Point Y="512" X="448"/>
+                            <Point X="448" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-17" X="5"/>
+                            <Point X="5" Y="-17"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s08">
                         <PointGeometry>
-                            <Point Y="432" X="448"/>
+                            <Point X="448" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="-29"/>
+                            <Point X="-29" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s09">
                         <PointGeometry>
-                            <Point Y="192" X="640"/>
+                            <Point X="640" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s10">
                         <PointGeometry>
-                            <Point Y="192" X="576"/>
+                            <Point X="576" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s11">
                         <PointGeometry>
-                            <Point Y="272" X="672"/>
+                            <Point X="672" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s13">
                         <PointGeometry>
-                            <Point Y="512" X="352"/>
+                            <Point X="352" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s14">
                         <PointGeometry>
-                            <Point Y="432" X="528"/>
+                            <Point X="528" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="7"/>
+                            <Point X="7" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s15">
                         <PointGeometry>
-                            <Point Y="112" X="608"/>
+                            <Point X="608" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s16">
                         <PointGeometry>
-                            <Point Y="192" X="704"/>
+                            <Point X="704" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s17">
                         <PointGeometry>
-                            <Point Y="192" X="512"/>
+                            <Point X="512" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s19">
                         <PointGeometry>
-                            <Point Y="576" X="256"/>
+                            <Point X="256" Y="576"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s20">
                         <PointGeometry>
-                            <Point Y="576" X="352"/>
+                            <Point X="352" Y="576"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s21">
                         <PointGeometry>
-                            <Point Y="512" X="256"/>
+                            <Point X="256" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s22">
                         <PointGeometry>
-                            <Point Y="112" X="528"/>
+                            <Point X="528" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s23">
                         <PointGeometry>
-                            <Point Y="112" X="672"/>
+                            <Point X="672" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s26">
                         <PointGeometry>
-                            <Point Y="640" X="256"/>
+                            <Point X="256" Y="640"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="10"/>
+                            <Point X="10" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s27">
                         <PointGeometry>
-                            <Point Y="512" X="160"/>
+                            <Point X="160" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s28">
                         <PointGeometry>
-                            <Point Y="448" X="256"/>
+                            <Point X="256" Y="448"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-12" X="10"/>
+                            <Point X="10" Y="-12"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s29">
                         <PointGeometry>
-                            <Point Y="112" X="448"/>
+                            <Point X="448" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s30">
                         <PointGeometry>
-                            <Point Y="48" X="528"/>
+                            <Point X="528" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-11" X="9"/>
+                            <Point X="9" Y="-11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s32">
                         <PointGeometry>
-                            <Point Y="432" X="160"/>
+                            <Point X="160" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s33">
                         <PointGeometry>
-                            <Point Y="576" X="160"/>
+                            <Point X="160" Y="576"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s34">
                         <PointGeometry>
-                            <Point Y="192" X="448"/>
+                            <Point X="448" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s35">
                         <PointGeometry>
-                            <Point Y="432" X="224"/>
+                            <Point X="224" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-17" X="9"/>
+                            <Point X="9" Y="-17"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s36">
                         <PointGeometry>
-                            <Point Y="352" X="160"/>
+                            <Point X="160" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="4" X="2"/>
+                            <Point X="2" Y="4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s37">
                         <PointGeometry>
-                            <Point Y="352" X="224"/>
+                            <Point X="224" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="7"/>
+                            <Point X="7" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s38">
                         <PointGeometry>
-                            <Point Y="272" X="160"/>
+                            <Point X="160" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s39">
                         <PointGeometry>
-                            <Point Y="272" X="240"/>
+                            <Point X="240" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-19" X="-15"/>
+                            <Point X="-15" Y="-19"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s12">
                         <PointGeometry>
-                            <Point Y="496" X="576"/>
+                            <Point X="576" Y="496"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-3" X="7"/>
+                            <Point X="7" Y="-3"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s18">
                         <PointGeometry>
-                            <Point Y="544" X="576"/>
+                            <Point X="576" Y="544"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="-39"/>
+                            <Point X="-39" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s24">
                         <PointGeometry>
-                            <Point Y="592" X="608"/>
+                            <Point X="608" Y="592"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="8"/>
+                            <Point X="8" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s25">
                         <PointGeometry>
-                            <Point Y="592" X="544"/>
+                            <Point X="544" Y="592"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="-36"/>
+                            <Point X="-36" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s31">
                         <PointGeometry>
-                            <Point Y="640" X="576"/>
+                            <Point X="576" Y="640"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="9"/>
+                            <Point X="9" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s05">
                         <PointGeometry>
-                            <Point Y="192" X="320"/>
+                            <Point X="320" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s06">
                         <PointGeometry>
-                            <Point Y="352" X="384"/>
+                            <Point X="384" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="6" X="-24"/>
+                            <Point X="-24" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s00" Source="s00">
+                    <Edge Source="s00" Target="s00">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwArvCL"/>
                             <SimpleIdentifier Name="DrwArvEL"/>
@@ -394,553 +394,553 @@
                             <SimpleIdentifier Name="PStopOpensEL"/>
                             <SimpleIdentifier Name="QDrwLoc"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-54" X="-65"/>
+                                <Point X="-65" Y="-54"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="73" X="118"/>
+                            <Point X="118" Y="73"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s01" Source="s00">
+                    <Edge Source="s00" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-28" X="-59"/>
+                                <Point X="-59" Y="-28"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s02" Source="s00">
+                    <Edge Source="s00" Target="s02">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-3"/>
+                                <Point X="-3" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s03" Source="s00">
+                    <Edge Source="s00" Target="s03">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-52" X="-94"/>
+                                <Point X="-94" Y="-52"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="220" X="336"/>
+                            <Point X="336" Y="220"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s01" Source="s01">
+                    <Edge Source="s01" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="GOpensCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="-65"/>
+                                <Point X="-65" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="315" X="324"/>
+                            <Point X="324" Y="315"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s04" Source="s01">
+                    <Edge Source="s01" Target="s04">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletLvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="8"/>
+                                <Point X="8" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s05" Source="s01">
+                    <Edge Source="s01" Target="s05">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-5" X="-30"/>
+                                <Point X="-30" Y="-5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <EndPointGeometry>
-                            <Point Y="192" X="320"/>
+                            <Point X="320" Y="192"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="s06" Source="s01">
+                    <Edge Source="s01" Target="s06">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-3" X="-9"/>
+                                <Point X="-9" Y="-3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <EndPointGeometry>
-                            <Point Y="352" X="384"/>
+                            <Point X="384" Y="352"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="s15" Source="s10">
+                    <Edge Source="s10" Target="s15">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="-77"/>
+                                <Point X="-77" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s17" Source="s10">
+                    <Edge Source="s10" Target="s17">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-25" X="-39"/>
+                                <Point X="-39" Y="-25"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s19" Source="s13">
+                    <Edge Source="s13" Target="s19">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s20" Source="s13">
+                    <Edge Source="s13" Target="s20">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="0"/>
+                                <Point X="0" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s21" Source="s13">
+                    <Edge Source="s13" Target="s21">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-45"/>
+                                <Point X="-45" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s15" Source="s15">
+                    <Edge Source="s15" Target="s15">
                         <LabelBlock>
                             <SimpleIdentifier Name="PStopOpensCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-17" X="-8"/>
+                                <Point X="-8" Y="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="65" X="609"/>
+                            <Point X="609" Y="65"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s22" Source="s15">
+                    <Edge Source="s15" Target="s22">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletLvTUAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-41"/>
+                                <Point X="-41" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s23" Source="s15">
+                    <Edge Source="s15" Target="s23">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-23" X="0"/>
+                                <Point X="0" Y="-23"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s26" Source="s19">
+                    <Edge Source="s19" Target="s26">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="4"/>
+                                <Point X="4" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s27" Source="s19">
+                    <Edge Source="s19" Target="s27">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-29"/>
+                                <Point X="-29" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s02">
+                    <Edge Source="s02" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="3"/>
+                                <Point X="3" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="237" X="363"/>
+                            <Point X="363" Y="237"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s05" Source="s02">
+                    <Edge Source="s02" Target="s05">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-29"/>
+                                <Point X="-29" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <EndPointGeometry>
-                            <Point Y="192" X="320"/>
+                            <Point X="320" Y="192"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="s27" Source="s21">
+                    <Edge Source="s21" Target="s27">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-25"/>
+                                <Point X="-25" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s28" Source="s21">
+                    <Edge Source="s21" Target="s28">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-58"/>
+                                <Point X="-58" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s29" Source="s22">
+                    <Edge Source="s22" Target="s29">
                         <LabelBlock>
                             <SimpleIdentifier Name="PStopClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-59"/>
+                                <Point X="-59" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s30" Source="s22">
+                    <Edge Source="s22" Target="s30">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-37"/>
+                                <Point X="-37" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s27" Source="s27">
+                    <Edge Source="s27" Target="s27">
                         <LabelBlock>
                             <SimpleIdentifier Name="MvDrwToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-3" X="-65"/>
+                                <Point X="-65" Y="-3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="513" X="120"/>
+                            <Point X="120" Y="513"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s32" Source="s27">
+                    <Edge Source="s27" Target="s32">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwArvEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="-62"/>
+                                <Point X="-62" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s33" Source="s27">
+                    <Edge Source="s27" Target="s33">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-58"/>
+                                <Point X="-58" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s00" Source="s29">
+                    <Edge Source="s29" Target="s00">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsd"/>
                             <SimpleIdentifier Name="PalletRlsd_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-29" X="-30"/>
+                                <Point X="-30" Y="-29"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s34" Source="s29">
+                    <Edge Source="s29" Target="s34">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-67"/>
+                                <Point X="-67" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s03" Source="s03">
+                    <Edge Source="s03" Target="s03">
                         <LabelBlock>
                             <SimpleIdentifier Name="QDrwLoc"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-34" X="-29"/>
+                                <Point X="-29" Y="-34"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="353" X="487"/>
+                            <Point X="487" Y="353"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s06" Source="s03">
+                    <Edge Source="s03" Target="s06">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-28"/>
+                                <Point X="-28" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <EndPointGeometry>
-                            <Point Y="352" X="384"/>
+                            <Point X="384" Y="352"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="s07" Source="s03">
+                    <Edge Source="s03" Target="s07">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-25" X="-55"/>
+                                <Point X="-55" Y="-25"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="433" X="415"/>
+                            <Point X="415" Y="433"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s08" Source="s03">
+                    <Edge Source="s03" Target="s08">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="2"/>
+                                <Point X="2" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s32" Source="s32">
+                    <Edge Source="s32" Target="s32">
                         <LabelBlock>
                             <SimpleIdentifier Name="PStopOpensEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-66"/>
+                                <Point X="-66" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="431" X="122"/>
+                            <Point X="122" Y="431"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s35" Source="s32">
+                    <Edge Source="s32" Target="s35">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-26"/>
+                                <Point X="-26" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s36" Source="s32">
+                    <Edge Source="s32" Target="s36">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletLvTUAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-63"/>
+                                <Point X="-63" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s02" Source="s34">
+                    <Edge Source="s34" Target="s02">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsd"/>
                             <SimpleIdentifier Name="PalletRlsd_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-29" X="-35"/>
+                                <Point X="-35" Y="-29"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s03" Source="s34">
+                    <Edge Source="s34" Target="s03">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsd"/>
                             <SimpleIdentifier Name="PalletRlsd_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-57" X="-42"/>
+                                <Point X="-42" Y="-57"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s37" Source="s36">
+                    <Edge Source="s36" Target="s37">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="-24"/>
+                                <Point X="-24" Y="-24"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s38" Source="s36">
+                    <Edge Source="s36" Target="s38">
                         <LabelBlock>
                             <SimpleIdentifier Name="PStopClosesEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-49"/>
+                                <Point X="-49" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s00" Source="s38">
+                    <Edge Source="s38" Target="s00">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToEL"/>
                             <SimpleIdentifier Name="TrnsfCplToEL_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s39" Source="s38">
+                    <Edge Source="s38" Target="s39">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-26" X="-33"/>
+                                <Point X="-33" Y="-26"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s39">
+                    <Edge Source="s39" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToEL"/>
                             <SimpleIdentifier Name="TrnsfCplToEL_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="-55"/>
+                                <Point X="-55" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s10" Source="s04">
+                    <Edge Source="s04" Target="s10">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="-97"/>
+                                <Point X="-97" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="231" X="589"/>
+                            <Point X="589" Y="231"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s11" Source="s04">
+                    <Edge Source="s04" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-4"/>
+                                <Point X="-4" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s09" Source="s04">
+                    <Edge Source="s04" Target="s09">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="7"/>
+                                <Point X="7" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s12" Source="s07">
+                    <Edge Source="s07" Target="s12">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-33"/>
+                                <Point X="-33" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="510" X="514"/>
+                            <Point X="514" Y="510"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s13" Source="s07">
+                    <Edge Source="s07" Target="s13">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletLvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-44"/>
+                                <Point X="-44" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s07" Source="s07">
+                    <Edge Source="s07" Target="s07">
                         <LabelBlock>
                             <SimpleIdentifier Name="GOpensCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-33"/>
+                                <Point X="-33" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="551" X="447"/>
+                            <Point X="447" Y="551"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s14" Source="s08">
+                    <Edge Source="s08" Target="s14">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-25"/>
+                                <Point X="-25" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s07" Source="s08">
+                    <Edge Source="s08" Target="s07">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwArvCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="1"/>
+                                <Point X="1" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s08" Source="s08">
+                    <Edge Source="s08" Target="s08">
                         <LabelBlock>
                             <SimpleIdentifier Name="MvDrwToCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="-13"/>
+                                <Point X="-13" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="407" X="475"/>
+                            <Point X="475" Y="407"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s15" Source="s09">
+                    <Edge Source="s09" Target="s15">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="12"/>
+                                <Point X="12" Y="-12"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s16" Source="s09">
+                    <Edge Source="s09" Target="s16">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="-11"/>
+                                <Point X="-11" Y="-24"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s12" Source="s12">
+                    <Edge Source="s12" Target="s12">
                         <LabelBlock>
                             <SimpleIdentifier Name="GOpensCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="7" X="-11"/>
+                                <Point X="-11" Y="7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="464" X="598"/>
+                            <Point X="598" Y="464"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s18" Source="s12">
+                    <Edge Source="s12" Target="s18">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletLvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="2"/>
+                                <Point X="2" Y="-4"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s24" Source="s18">
+                    <Edge Source="s18" Target="s24">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="6"/>
+                                <Point X="6" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s25" Source="s18">
+                    <Edge Source="s18" Target="s25">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="-72"/>
+                                <Point X="-72" Y="-6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="568" X="558"/>
+                            <Point X="558" Y="568"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s31" Source="s24">
+                    <Edge Source="s24" Target="s31">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-3" X="3"/>
+                                <Point X="3" Y="-3"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s31" Source="s25">
+                    <Edge Source="s25" Target="s31">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="-65"/>
+                                <Point X="-65" Y="-4"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s30" Source="s00">
+                    <Edge Source="s00" Target="s30">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwArvCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="-7"/>
+                                <Point X="-7" Y="-24"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="64" X="316"/>
+                            <Point X="316" Y="64"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -954,207 +954,207 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="160"/>
+                            <Point X="160" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-18" X="6"/>
+                            <Point X="6" Y="-18"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:1">
                         <PointGeometry>
-                            <Point Y="272" X="320"/>
+                            <Point X="320" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="-7"/>
+                            <Point X="-7" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:2">
                         <PointGeometry>
-                            <Point Y="192" X="384"/>
+                            <Point X="384" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:3">
                         <PointGeometry>
-                            <Point Y="352" X="448"/>
+                            <Point X="448" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:4">
                         <PointGeometry>
-                            <Point Y="272" X="608"/>
+                            <Point X="608" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:7">
                         <PointGeometry>
-                            <Point Y="512" X="448"/>
+                            <Point X="448" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-17" X="5"/>
+                            <Point X="5" Y="-17"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:8">
                         <PointGeometry>
-                            <Point Y="432" X="448"/>
+                            <Point X="448" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-21" X="-23"/>
+                            <Point X="-23" Y="-21"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:9">
                         <PointGeometry>
-                            <Point Y="192" X="640"/>
+                            <Point X="640" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:10">
                         <PointGeometry>
-                            <Point Y="192" X="576"/>
+                            <Point X="576" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:13">
                         <PointGeometry>
-                            <Point Y="512" X="352"/>
+                            <Point X="352" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:15">
                         <PointGeometry>
-                            <Point Y="112" X="608"/>
+                            <Point X="608" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:19">
                         <PointGeometry>
-                            <Point Y="576" X="256"/>
+                            <Point X="256" Y="576"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-4" X="7"/>
+                            <Point X="7" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:21">
                         <PointGeometry>
-                            <Point Y="512" X="256"/>
+                            <Point X="256" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:22">
                         <PointGeometry>
-                            <Point Y="112" X="528"/>
+                            <Point X="528" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:27">
                         <PointGeometry>
-                            <Point Y="512" X="160"/>
+                            <Point X="160" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:29">
                         <PointGeometry>
-                            <Point Y="112" X="448"/>
+                            <Point X="448" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:32">
                         <PointGeometry>
-                            <Point Y="432" X="160"/>
+                            <Point X="160" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:34">
                         <PointGeometry>
-                            <Point Y="192" X="448"/>
+                            <Point X="448" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:36">
                         <PointGeometry>
-                            <Point Y="352" X="160"/>
+                            <Point X="160" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="4" X="2"/>
+                            <Point X="2" Y="4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:38">
                         <PointGeometry>
-                            <Point Y="272" X="160"/>
+                            <Point X="160" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:39">
                         <PointGeometry>
-                            <Point Y="272" X="240"/>
+                            <Point X="240" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-19" X="-15"/>
+                            <Point X="-15" Y="-19"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="dump">
                         <PointGeometry>
-                            <Point Y="512" X="624"/>
+                            <Point X="624" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="S:27"/>
                         <NodeRef Name="S:21"/>
-                        <NodeRef Name="S:7"/>
+                        <NodeRef Name="S:13"/>
+                        <NodeRef Name="S:27"/>
                         <NodeRef Name="S:8"/>
-                        <NodeRef Name="S:3"/>
+                        <NodeRef Name="S:7"/>
                         <NodeRef Name="S:36"/>
+                        <NodeRef Name="S:3"/>
                         <NodeRef Name="S:19"/>
                         <NodeRef Name="S:32"/>
-                        <NodeRef Name="S:13"/>
                         <BoxGeometry>
-                            <Box Y="336" X="96" Width="448" Height="256"/>
+                            <Box Height="256" Width="448" X="96" Y="336"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G1">
-                        <NodeRef Name="S:9"/>
-                        <NodeRef Name="S:4"/>
-                        <NodeRef Name="S:10"/>
-                        <NodeRef Name="S:15"/>
                         <NodeRef Name="S:22"/>
+                        <NodeRef Name="S:4"/>
+                        <NodeRef Name="S:9"/>
+                        <NodeRef Name="S:15"/>
+                        <NodeRef Name="S:10"/>
                         <BoxGeometry>
-                            <Box Y="48" X="512" Width="144" Height="256"/>
+                            <Box Height="256" Width="144" X="512" Y="48"/>
                         </BoxGeometry>
                     </GroupNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S:0" Source="S:0">
+                    <Edge Source="S:0" Target="S:0">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwArvEL"/>
                             <SimpleIdentifier Name="DrwAtCL"/>
@@ -1177,398 +1177,398 @@
                             <SimpleIdentifier Name="PStopOpensEL"/>
                             <SimpleIdentifier Name="QDrwLoc"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-54" X="-65"/>
+                                <Point X="-65" Y="-54"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="73" X="118"/>
+                            <Point X="118" Y="73"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:1" Source="S:0">
+                    <Edge Source="S:0" Target="S:1">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-28" X="-59"/>
+                                <Point X="-59" Y="-28"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:2" Source="S:0">
+                    <Edge Source="S:0" Target="S:2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-3"/>
+                                <Point X="-3" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:3" Source="S:0">
+                    <Edge Source="S:0" Target="S:3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-27" X="-44"/>
+                                <Point X="-44" Y="-27"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="207" X="309"/>
+                            <Point X="309" Y="207"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:1" Source="S:1">
+                    <Edge Source="S:1" Target="S:1">
                         <LabelBlock>
                             <SimpleIdentifier Name="GOpensCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-2" X="-37"/>
+                                <Point X="-37" Y="-2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="315" X="324"/>
+                            <Point X="324" Y="315"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:4" Source="S:1">
+                    <Edge Source="S:1" Target="S:4">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletLvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-14" X="-101"/>
+                                <Point X="-101" Y="-14"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="dump" Source="S:1">
+                    <Edge Source="S:1" Target="dump">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-28" X="-48"/>
+                                <Point X="-48" Y="-28"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="344" X="505"/>
+                            <Point X="505" Y="344"/>
                         </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="512" X="624"/>
+                            <Point X="624" Y="512"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="S:15" Source="S:10">
+                    <Edge Source="S:10" Target="S:15">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="-77"/>
+                                <Point X="-77" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:19" Source="S:13">
+                    <Edge Source="S:13" Target="S:19">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:21" Source="S:13">
+                    <Edge Source="S:13" Target="S:21">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-45"/>
+                                <Point X="-45" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:15" Source="S:15">
+                    <Edge Source="S:15" Target="S:15">
                         <LabelBlock>
                             <SimpleIdentifier Name="PStopOpensCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-17" X="-8"/>
+                                <Point X="-8" Y="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="65" X="609"/>
+                            <Point X="609" Y="65"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:22" Source="S:15">
+                    <Edge Source="S:15" Target="S:22">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletLvTUAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-41"/>
+                                <Point X="-41" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:27" Source="S:19">
+                    <Edge Source="S:19" Target="S:27">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-29"/>
+                                <Point X="-29" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:1" Source="S:2">
+                    <Edge Source="S:2" Target="S:1">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-36"/>
+                                <Point X="-36" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="dump" Source="S:2">
+                    <Edge Source="S:2" Target="dump">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-28"/>
+                                <Point X="-28" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="307" X="541"/>
+                            <Point X="541" Y="307"/>
                         </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="512" X="624"/>
+                            <Point X="624" Y="512"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="S:27" Source="S:21">
+                    <Edge Source="S:21" Target="S:27">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-25"/>
+                                <Point X="-25" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:29" Source="S:22">
+                    <Edge Source="S:22" Target="S:29">
                         <LabelBlock>
                             <SimpleIdentifier Name="PStopClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-59"/>
+                                <Point X="-59" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:27" Source="S:27">
+                    <Edge Source="S:27" Target="S:27">
                         <LabelBlock>
                             <SimpleIdentifier Name="MvDrwToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="-61"/>
+                                <Point X="-61" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="513" X="120"/>
+                            <Point X="120" Y="513"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:32" Source="S:27">
+                    <Edge Source="S:27" Target="S:32">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwArvEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="-62"/>
+                                <Point X="-62" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:0" Source="S:29">
+                    <Edge Source="S:29" Target="S:0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsd"/>
                             <SimpleIdentifier Name="PalletRlsd_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-29" X="-30"/>
+                                <Point X="-30" Y="-29"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:34" Source="S:29">
+                    <Edge Source="S:29" Target="S:34">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-67"/>
+                                <Point X="-67" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:3" Source="S:3">
+                    <Edge Source="S:3" Target="S:3">
                         <LabelBlock>
                             <SimpleIdentifier Name="QDrwLoc"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="-62"/>
+                                <Point X="-62" Y="-6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="352" X="413"/>
+                            <Point X="413" Y="352"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:7" Source="S:3">
+                    <Edge Source="S:3" Target="S:7">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-58"/>
+                                <Point X="-58" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="445" X="426"/>
+                            <Point X="426" Y="445"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:8" Source="S:3">
+                    <Edge Source="S:3" Target="S:8">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="1"/>
+                                <Point X="1" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:32" Source="S:32">
+                    <Edge Source="S:32" Target="S:32">
                         <LabelBlock>
                             <SimpleIdentifier Name="PStopOpensEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-15" X="-72"/>
+                                <Point X="-72" Y="-15"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="431" X="122"/>
+                            <Point X="122" Y="431"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:36" Source="S:32">
+                    <Edge Source="S:32" Target="S:36">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletLvTUAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-63"/>
+                                <Point X="-63" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:2" Source="S:34">
+                    <Edge Source="S:34" Target="S:2">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsd"/>
                             <SimpleIdentifier Name="PalletRlsd_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-29" X="-35"/>
+                                <Point X="-35" Y="-29"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:3" Source="S:34">
+                    <Edge Source="S:34" Target="S:3">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsd"/>
                             <SimpleIdentifier Name="PalletRlsd_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-48" X="-60"/>
+                                <Point X="-60" Y="-48"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:38" Source="S:36">
+                    <Edge Source="S:36" Target="S:38">
                         <LabelBlock>
                             <SimpleIdentifier Name="PStopClosesEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-49"/>
+                                <Point X="-49" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:0" Source="S:38">
+                    <Edge Source="S:38" Target="S:0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToEL"/>
                             <SimpleIdentifier Name="TrnsfCplToEL_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:39" Source="S:38">
+                    <Edge Source="S:38" Target="S:39">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-26" X="-33"/>
+                                <Point X="-33" Y="-26"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:1" Source="S:39">
+                    <Edge Source="S:39" Target="S:1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToEL"/>
                             <SimpleIdentifier Name="TrnsfCplToEL_d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="-55"/>
+                                <Point X="-55" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:10" Source="S:4">
+                    <Edge Source="S:4" Target="S:10">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-5" X="38"/>
+                                <Point X="38" Y="-5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="231" X="589"/>
+                            <Point X="589" Y="231"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="dump" Source="G1">
+                    <Edge Source="G1" Target="dump">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-35" X="5"/>
+                                <Point X="5" Y="-35"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="304" X="624"/>
+                            <Point X="624" Y="304"/>
                         </StartPointGeometry>
                         <EndPointGeometry>
-                            <Point Y="512" X="624"/>
+                            <Point X="624" Y="512"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="S:9" Source="S:4">
+                    <Edge Source="S:4" Target="S:9">
                         <LabelBlock>
                             <SimpleIdentifier Name="GClosesCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="-107"/>
+                                <Point X="-107" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:13" Source="S:7">
+                    <Edge Source="S:7" Target="S:13">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletLvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-44"/>
+                                <Point X="-44" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:7" Source="S:7">
+                    <Edge Source="S:7" Target="S:7">
                         <LabelBlock>
                             <SimpleIdentifier Name="GOpensCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-33"/>
+                                <Point X="-33" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="551" X="447"/>
+                            <Point X="447" Y="551"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:7" Source="S:8">
+                    <Edge Source="S:8" Target="S:7">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwArvCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="1"/>
+                                <Point X="1" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:8" Source="S:8">
+                    <Edge Source="S:8" Target="S:8">
                         <LabelBlock>
                             <SimpleIdentifier Name="MvDrwToCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-2" X="-30"/>
+                                <Point X="-30" Y="-2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="434" X="486"/>
+                            <Point X="486" Y="434"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:15" Source="S:9">
+                    <Edge Source="S:9" Target="S:15">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvDrwCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="12"/>
+                                <Point X="12" Y="-12"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="dump" Source="G0">
+                    <Edge Source="G0" Target="dump">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPallet"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-18"/>
+                                <Point X="-18" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="512" X="544"/>
+                            <Point X="544" Y="512"/>
                         </StartPointGeometry>
                     </Edge>
-                    <Edge Target="dump" Source="S:0">
+                    <Edge Source="S:0" Target="dump">
                         <LabelBlock>
                             <SimpleIdentifier Name="DrwArvCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-62" X="-135"/>
+                                <Point X="-135" Y="-62"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="90" X="443"/>
+                            <Point X="443" Y="90"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

@@ -59,7 +59,7 @@ public enum ConflictAbstractionProcedureFactory
       return EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure.
         createThreeStepConflictEquivalenceAbstractionProcedure
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, false, true, false);
+           WEAK_OBSERVATION_EQUIVALENCE, false, true, true);
     }
   },
 

@@ -108,6 +108,7 @@ public class EnabledEventsCompositionalConflictChecker extends
   /**
    * Creates a new conflict checker to check whether the given model is
    * nonblocking.
+   *
    * @param model
    *          The model to be checked by this conflict checker.
    * @param marking
@@ -121,64 +122,77 @@ public class EnabledEventsCompositionalConflictChecker extends
    * @param abstractionFactory
    *          Factory to define the abstraction sequence to be used.
    */
-  public EnabledEventsCompositionalConflictChecker
-    (final ProductDESProxy model,
-     final EventProxy marking,
-     final ProductDESProxyFactory factory,
-     final ConflictAbstractionProcedureFactory abstractionFactory)
+  public EnabledEventsCompositionalConflictChecker(final ProductDESProxy model,
+                                                   final EventProxy marking,
+                                                   final ProductDESProxyFactory factory,
+                                                   final ConflictAbstractionProcedureFactory abstractionFactory)
   {
-    super(model,
-          marking,
-          factory,
-          abstractionFactory,
-          new PreselectingMethodFactory(),
-          new SelectingMethodFactory());
+    super(model, marking, factory, abstractionFactory,
+          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
-
-
-
-
 
   @Override
   protected void addEventsToAutomata(final AutomatonProxy aut)
   {
     super.addEventsToAutomata(aut);
 
-    //Set<EventProxy> foundEvents = new THashSet<EventProxy>();
-    final Map<EventProxy,Set<StateProxy>> foundEvents = new HashMap<EventProxy, Set<StateProxy>>();
-    for(final TransitionProxy trans :aut.getTransitions())
-    {
-      final EventProxy event = trans.getEvent();
+    final EventProxy marking = getUsedDefaultMarking();
+    final Boolean markingUsed = aut.getEvents().contains(marking);
 
-      Set<StateProxy> set = foundEvents.get(event);
-      if(set == null)
-      {
+    //Set<EventProxy> foundEvents = new THashSet<EventProxy>();
+    final Map<EventProxy,Set<StateProxy>> foundEvents =
+      new HashMap<EventProxy,Set<StateProxy>>();
+
+    //put something that detects if a state is a dump state
+    final Set<StateProxy> nonDumpStates =
+      new THashSet<StateProxy>(aut.getStates().size());
+
+    for (final TransitionProxy trans : aut.getTransitions()) {
+      //go through transitions
+
+      if (markingUsed)
+        nonDumpStates.add(trans.getSource());   //List of states with with outgoing transitions
+
+      final EventProxy event = trans.getEvent();        //get event of this transition
+
+      Set<StateProxy> set = foundEvents.get(event); //create for each event, remember which states that event is enabled
+      if (set == null) {            //if set not created yet
         set = new THashSet<StateProxy>();
         foundEvents.put(event, set);
 
-
       }
       final StateProxy state = trans.getSource();
-      set.add(state);
+      set.add(state);           //adds the event
 
     }
-    final int numStates = aut.getStates().size();
+
+    if (markingUsed) {
+      for (final StateProxy state : aut.getStates()) {
+        //add those with marking
+        if (state.getPropositions().contains(marking)) {
+          nonDumpStates.add(state);             //It is not a dump state if it is marked
+        }
+      }
+    }
+
+    int numStates;
+    if (markingUsed) {
+      numStates = nonDumpStates.size();     //only care about non dump states
+    } else {
+      numStates = aut.getStates().size();
+    }
     //Check if each event is enabled
-    for(final EventProxy event : aut.getEvents())
-    {
+    for (final EventProxy event : aut.getEvents()) {
       final EnabledEventsEventInfo eventInfo = getEventInfo(event);
-      if(eventInfo != null)
-      {
+      if (eventInfo != null) {
 
-      final Set<StateProxy> set = foundEvents.get(event);
-      if(set == null || set.size() != numStates)
-      {
-        eventInfo.addDisablingAutomaton(aut);
-      }
+        final Set<StateProxy> set = foundEvents.get(event);
+        //event is not in automaton or it is not enabled in all nondump states
+        if (set == null || set.size() != numStates) {
+          eventInfo.addDisablingAutomaton(aut);
+        }
       }
     }
-
-
   }
 
   @Override
@@ -198,12 +212,10 @@ public class EnabledEventsCompositionalConflictChecker extends
    * The preselecting method that considers every set of automata with at
    * least one local event as a candidate.
    */
-  public static final PreselectingMethod MustLE =
-      new PreselectingMethod("MustLE")
-  {
+  public static final PreselectingMethod MustLE = new PreselectingMethod(
+    "MustLE") {
     @Override
-    PreselectingHeuristic createHeuristic
-      (final AbstractCompositionalModelAnalyzer verifier)
+    PreselectingHeuristic createHeuristic(final AbstractCompositionalModelAnalyzer verifier)
     {
       final EnabledEventsCompositionalConflictChecker everifier =
         (EnabledEventsCompositionalConflictChecker) verifier;
@@ -215,11 +227,9 @@ public class EnabledEventsCompositionalConflictChecker extends
    * The selecting method that chooses the candidate with the highest
    * proportion of local events.
    */
-  public static final SelectingMethod MaxLE = new SelectingMethod("MaxLE")
-  {
+  public static final SelectingMethod MaxLE = new SelectingMethod("MaxLE") {
     @Override
-    Comparator<Candidate> createComparator
-      (final AbstractCompositionalModelAnalyzer verifier)
+    Comparator<Candidate> createComparator(final AbstractCompositionalModelAnalyzer verifier)
     {
       final EnabledEventsCompositionalConflictChecker everifier =
         (EnabledEventsCompositionalConflictChecker) verifier;
@@ -231,11 +241,9 @@ public class EnabledEventsCompositionalConflictChecker extends
    * The selecting method that chooses the candidate with the minimum
    * estimated number of states in the synchronous product.
    */
-  public static final SelectingMethod MinSE = new SelectingMethod("MinSE")
-  {
+  public static final SelectingMethod MinSE = new SelectingMethod("MinSE") {
     @Override
-    Comparator<Candidate> createComparator
-      (final AbstractCompositionalModelAnalyzer verifier)
+    Comparator<Candidate> createComparator(final AbstractCompositionalModelAnalyzer verifier)
     {
       final EnabledEventsCompositionalConflictChecker everifier =
         (EnabledEventsCompositionalConflictChecker) verifier;
@@ -245,8 +253,8 @@ public class EnabledEventsCompositionalConflictChecker extends
 
 
   //# Inner Class PreselectingMethodFactory
-  protected static class PreselectingMethodFactory
-    extends CompositionalConflictChecker.PreselectingMethodFactory
+  protected static class PreselectingMethodFactory extends
+    CompositionalConflictChecker.PreselectingMethodFactory
   {
     //#######################################################################
     //# Constructors
@@ -256,10 +264,11 @@ public class EnabledEventsCompositionalConflictChecker extends
     }
   }
 
+
   //#########################################################################
   //# Inner Class SelectingMethodFactory
-  protected static class SelectingMethodFactory
-    extends AbstractCompositionalModelVerifier.SelectingMethodFactory
+  protected static class SelectingMethodFactory extends
+    AbstractCompositionalModelVerifier.SelectingMethodFactory
   {
     //#######################################################################
     //# Constructors
@@ -270,10 +279,10 @@ public class EnabledEventsCompositionalConflictChecker extends
     }
   }
 
+
   //#########################################################################
   //# Inner Class HeuristicMustLE
-  private class HeuristicMustLE
-    implements PreselectingHeuristic
+  private class HeuristicMustLE implements PreselectingHeuristic
   {
 
     //#######################################################################
@@ -282,37 +291,37 @@ public class EnabledEventsCompositionalConflictChecker extends
     public Collection<Candidate> findCandidates()
     {
       final Collection<Candidate> candidates = new LinkedList<Candidate>(); //Create collection to store candidates to return
-      final Collection<EventProxy> events = getCurrentEvents();             //Get all events and put into a collection
+      final Collection<EventProxy> events = getCurrentEvents(); //Get all events and put into a collection
 
-      final Collection<List<AutomatonProxy>> found =            //This is the automaton combinations we have already found
+      final Collection<List<AutomatonProxy>> found = //This is the automaton combinations we have already found
         new THashSet<List<AutomatonProxy>>(events.size());
 
-      for(final EventProxy event : events)                      //For all events
+      for (final EventProxy event : events) //For all events
       {
-        final EnabledEventsEventInfo info = getEventInfo(event);        //Get the event info
-        assert info.getNumberOfAutomata() > 0;                          //Make sure that this event is being used by an automaton
-        if (info.getNumberOfAutomata() > 1) {                           //If the event is being used by more than one automaton
+        final EnabledEventsEventInfo info = getEventInfo(event); //Get the event info
+        assert info.getNumberOfAutomata() > 0; //Make sure that this event is being used by an automaton
+        if (info.getNumberOfAutomata() > 1) { //If the event is being used by more than one automaton
           List<AutomatonProxy> list = null;
-          if(info.mDisablingAutomata.size() >1)        //If there is more than one automata disabling the event
+          if (info.mDisablingAutomata.size() > 1) //If there is more than one automata disabling the event
           {
-          list =  info.getDisablingAutomataList();       //Get the list of automaton that the event is disabled in
-          }
-          else //if(info.mDisablingAutomata.size() == 1)  //If only one automata disables the event
+            list = info.getDisablingAutomataList(); //Get the list of automaton that the event is disabled in
+          } else //if(info.mDisablingAutomata.size() == 1)  //If only one automata disables the event
           {
-            list = info.getSortedAutomataList();        //Get the list of all automata using the event
+            list = info.getSortedAutomataList(); //Get the list of all automata using the event
 
           }
-          if (isPermissibleCandidate(list) && found.add(list)) {            //Checks to see if it is a possible candidate, adds it to the found list and checks if it was already in the list
-            final Set<EventProxy> localEvents = identifyLocalEvents(list);      //When the automata are combined, some events will become local, list all of these
-            final Candidate candidate = new Candidate(list, localEvents);   //creates a candidate by giving it the list of automaton and the events that will be local
+          if (isPermissibleCandidate(list) && found.add(list)) { //Checks to see if it is a possible candidate, adds it to the found list and checks if it was already in the list
+            final Set<EventProxy> localEvents = identifyLocalEvents(list); //When the automata are combined, some events will become local, list all of these
+            final Candidate candidate = new Candidate(list, localEvents); //creates a candidate by giving it the list of automaton and the events that will be local
             candidates.add(candidate);
-        }
+          }
         }
 
       }
       return candidates;
     }
   }
+
 
   //#########################################################################
   //# Inner Class ComparatorMaxLE
@@ -328,26 +337,27 @@ public class EnabledEventsCompositionalConflictChecker extends
 
       final List<AutomatonProxy> automataList = candidate.getAutomata();
 
-      for(final EventProxy event : candidate.getOrderedEvents())  //For each event in the candidate
+      for (final EventProxy event : candidate.getOrderedEvents()) //For each event in the candidate
       {
         final EnabledEventsEventInfo info = getEventInfo(event);
 
-        if(info != null)                            //when would info be null? Right at start?
-          if(info.getDisablingAutomata() != null)
+        if (info != null) //when would info be null? Right at start?
+          if (info.getDisablingAutomata() != null)
             //If the event is never disabled, or only disabled in one automaton, or all the automaton it is disabled in are getting merged
-            if(info.mDisablingAutomata.size() == 0 || info.mDisablingAutomata.size() == 1 || automataList.containsAll(info.getDisablingAutomata()))
+            if (info.mDisablingAutomata.size() == 0
+                || info.mDisablingAutomata.size() == 1
+                || automataList.containsAll(info.getDisablingAutomata()))
               alwaysEnabledEvents++;
       }
 
-
-
-      return - (candidate.getLocalEventCount() + 0.5 * alwaysEnabledEvents) /
-        candidate.getNumberOfEvents();
+      return -(candidate.getLocalEventCount() + 0.5 * alwaysEnabledEvents)
+             / candidate.getNumberOfEvents();
     }
 
   }
 
-//#########################################################################
+
+  //#########################################################################
   //# Inner Class ComparatorMinSE
   private class ComparatorMinSE extends SelectingComparator
   {
@@ -358,8 +368,8 @@ public class EnabledEventsCompositionalConflictChecker extends
     double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;
-      for (final AutomatonProxy aut : candidate.getAutomata()) {    //for all automata in the candidate
-        product *= aut.getStates().size();                          //multiply the number of each of states together.
+      for (final AutomatonProxy aut : candidate.getAutomata()) { //for all automata in the candidate
+        product *= aut.getStates().size(); //multiply the number of each of states together.
       }
       final double totalEvents = candidate.getNumberOfEvents();
       final double localEvents = candidate.getLocalEventCount();
@@ -367,27 +377,28 @@ public class EnabledEventsCompositionalConflictChecker extends
 
       final List<AutomatonProxy> automataList = candidate.getAutomata();
 
-      for(final EventProxy event : candidate.getOrderedEvents())  //For each event in the candidate
+      for (final EventProxy event : candidate.getOrderedEvents()) //For each event in the candidate
       {
         final EnabledEventsEventInfo info = getEventInfo(event);
 
-        if(info != null)                            //propositions
-        if(info.getDisablingAutomata() != null)
-        //If the event is never disabled, or only disabled in one automaton, or all the automaton it is disabled in are getting merged
-        if(info.mDisablingAutomata.size() == 0 || info.mDisablingAutomata.size() == 1 || automataList.containsAll(info.getDisablingAutomata()))
-          {
-          alwaysEnabledEvents++;
+        if (info != null) //propositions
+          if (info.getDisablingAutomata() != null)
+            //If the event is never disabled, or only disabled in one automaton, or all the automaton it is disabled in are getting merged
+            if (info.mDisablingAutomata.size() == 0
+                || info.mDisablingAutomata.size() == 1
+                || automataList.containsAll(info.getDisablingAutomata())) {
+              alwaysEnabledEvents++;
 
-          }
-
+            }
 
       }
 
-      return product * (totalEvents - localEvents - 0.5*alwaysEnabledEvents) / totalEvents;
+      return product
+             * (totalEvents - localEvents - 0.5 * alwaysEnabledEvents)
+             / totalEvents;
     }
 
   }
-
 
 
   //INNER CLASS
@@ -408,14 +419,15 @@ public class EnabledEventsCompositionalConflictChecker extends
     {
       return mDisablingAutomata;
     }
+
     public List<AutomatonProxy> getDisablingAutomataList()
     {
       //This seems to be needed because some methods want the disabling automata as a list.
-      final List<AutomatonProxy> disablingList = new ArrayList<AutomatonProxy>(mDisablingAutomata);
+      final List<AutomatonProxy> disablingList =
+        new ArrayList<AutomatonProxy>(mDisablingAutomata);
       Collections.sort(disablingList);
       return disablingList;
     }
-
 
     private void addDisablingAutomaton(final AutomatonProxy aut)
     {
@@ -433,28 +445,25 @@ public class EnabledEventsCompositionalConflictChecker extends
     }
 
     //Returns true if the automaton passed in is the only automaton disabling this event.
-     boolean isSingleDisablingAutomaton(final AutomatonProxy aut)
+    boolean isSingleDisablingAutomaton(final AutomatonProxy aut)
     {
 
-      return mDisablingAutomata.size() == 0 || (mDisablingAutomata.size() == 1
-             && mDisablingAutomata.contains(aut));
+      return mDisablingAutomata.size() == 0
+             || (mDisablingAutomata.size() == 1 && mDisablingAutomata
+               .contains(aut));
 
     }
 
-
-
-
-
     @Override
-     void removeAutomata(final Collection<AutomatonProxy> victims)
+    void removeAutomata(final Collection<AutomatonProxy> victims)
     {
       super.removeAutomata(victims);
       mDisablingAutomata.removeAll(victims);
     }
 
     @Override
-     boolean replaceAutomaton(final AutomatonProxy oldAut,
-                                     final AutomatonProxy newAut)
+    boolean replaceAutomaton(final AutomatonProxy oldAut,
+                             final AutomatonProxy newAut)
     {
 
       boolean result = super.replaceAutomaton(oldAut, newAut);
@@ -463,7 +472,7 @@ public class EnabledEventsCompositionalConflictChecker extends
         result = true;
       }
 
-        return result;
+      return result;
     }
 
   }

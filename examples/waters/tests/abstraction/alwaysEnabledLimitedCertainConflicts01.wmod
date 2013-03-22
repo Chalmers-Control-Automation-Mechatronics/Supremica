@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="limitedCertainConflicts_3" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="alwaysEnabledLimitedCertainConflicts01" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A simple test for the Certain Conflicts Rule. This tests whether states with a tau-transition to a blocking states is correctly recognised as a state of certain conflicts.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
-        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="c"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="before">
@@ -82,7 +82,7 @@
                     <Edge Source="S1" Target="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="5" Y="-13"/>
                             </LabelGeometry>
@@ -107,6 +107,12 @@
         </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="after">
             <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name="c"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point X="138" Y="44"/>
+                    </LabelGeometry>
+                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>

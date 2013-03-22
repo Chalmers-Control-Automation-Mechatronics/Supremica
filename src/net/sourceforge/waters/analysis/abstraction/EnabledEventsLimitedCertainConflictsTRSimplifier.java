@@ -90,15 +90,15 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
   }
 
   @Override
-  public CertainConflictsStatistics getStatistics()
+  public EnabledEventsCertainConflictsStatistics getStatistics()
   {
-    return (CertainConflictsStatistics) super.getStatistics();      //Possibly create EnabledEventsCertainConflict Statistics
+    return (EnabledEventsCertainConflictsStatistics) super.getStatistics();      //Possibly create EnabledEventsCertainConflict Statistics
   }
 
   @Override
   public TRSimplifierStatistics createStatistics()
   {
-    final TRSimplifierStatistics stats = new CertainConflictsStatistics(this);
+    final TRSimplifierStatistics stats = new EnabledEventsCertainConflictsStatistics(this);
     return setStatistics(stats);
   }
 
@@ -199,7 +199,6 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
       return false;
     }
     mMaxLevel = BLOCKING;
-    final int tauID = EventEncoding.TAU;
     final int numStates = rel.getNumberOfStates();
     final int shift = AutomatonTools.log2(numStates);
     final int mask = (1 << shift) - 1;
@@ -250,20 +249,26 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
       }
       // check for proper event transitions to certain conflicts
       nextlevel++;
-      final int numProperEvents = rel.getNumberOfProperEvents();
+
+
+      mPredecessorsIterator.resetEvents(mNumberOfEnabledEvents , numEvents);
+
+
       for (int state = 0; state < numStates; state++) {
         if (mStateInfo[state] >= level && rel.isReachable(state)) {
           checkAbort();
 
           mPredecessorsIterator.resetState(state);
-          mPredecessorsIterator.resetEvents(mNumberOfEnabledEvents, numProperEvents-1); //Removed +1 from mNumberOfEnabledEvents
+
+
           while (mPredecessorsIterator.advance()) {
-            final int event = mPredecessorsIterator.getCurrentEvent();
+            //final int event = mPredecessorsIterator.getCurrentEvent();
             final int pred = mPredecessorsIterator.getCurrentSourceState();
-            if (event != tauID &&  mStateInfo[pred] == COREACHABLE) {
+            if (mStateInfo[pred] == COREACHABLE) {
               closureIter.resetState(pred);
               while (closureIter.advance()) {
                 final int ppred = closureIter.getCurrentSourceState();
+                final int event = mPredecessorsIterator.getCurrentEvent();
                 succIter.reset(ppred, event);
                 while (succIter.advance()) {
                   if (ppred != pred) {
@@ -434,9 +439,10 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
   protected void recordFinish(final boolean success)
   {
     super.recordFinish(success);
-    final CertainConflictsStatistics stats = getStatistics();   //Change stats to include enabled events
+    final EnabledEventsCertainConflictsStatistics stats = getStatistics();   //Change stats to include enabled events
     if (stats != null) {
       stats.recordMaxCertainConflictsLevel(mMaxLevel);
+      stats.recordNumEnabledEvents(mNumberOfEnabledEvents);
     }
   }
 
@@ -581,6 +587,7 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
         }
       }
     }
+    mPredecessorsIterator.resetEvent(-1);
     int coreachable = 0;
     for (int state = 0; state < numStates; state++) {
       if (rel.isMarked(state, defaultID) &&         //Find all marked, reachable and still interested in

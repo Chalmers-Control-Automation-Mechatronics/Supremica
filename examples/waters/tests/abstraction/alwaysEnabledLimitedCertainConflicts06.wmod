@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="limitedCertainConflicts_13" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="alwaysEnabledLimitedCertainConflicts06" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A simple test for the Certain Conflicts Rule. This tests whether an all-blocking automaton is correctly created with its blocked events.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name=":symbols">
@@ -11,7 +11,7 @@
         </ConstantAlias>
     </ConstantAliasList>
     <EventDeclList>
-        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="c"/>
         <EventDecl Kind="CONTROLLABLE" Name="NoPalletCL"/>
         <EventDecl Kind="CONTROLLABLE" Name="NoPalletEL"/>
         <EventDecl Kind="CONTROLLABLE" Name="PalletArvGCL"/>
@@ -260,7 +260,7 @@
                     </Edge>
                     <Edge Source="S:0" Target="S:3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -293,7 +293,7 @@
                     </Edge>
                     <Edge Source="S:11" Target="S:19">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -323,7 +323,7 @@
                     </Edge>
                     <Edge Source="S:12" Target="S:19">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -367,7 +367,7 @@
                     </Edge>
                     <Edge Source="S:17" Target="S:25">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -400,7 +400,7 @@
                     </Edge>
                     <Edge Source="S:18" Target="S:25">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -455,7 +455,7 @@
                     </Edge>
                     <Edge Source="S:19" Target="S:29">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -466,7 +466,7 @@
                     </Edge>
                     <Edge Source="S:19" Target="S:30">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -499,7 +499,7 @@
                     </Edge>
                     <Edge Source="S:2" Target="S:7">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -532,7 +532,7 @@
                     </Edge>
                     <Edge Source="S:20" Target="S:27">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -573,7 +573,7 @@
                     </Edge>
                     <Edge Source="S:25" Target="S:40">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -584,7 +584,7 @@
                     </Edge>
                     <Edge Source="S:25" Target="S:41">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -617,7 +617,7 @@
                     </Edge>
                     <Edge Source="S:26" Target="S:37">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -650,7 +650,7 @@
                     </Edge>
                     <Edge Source="S:27" Target="S:43">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -661,7 +661,7 @@
                     </Edge>
                     <Edge Source="S:27" Target="S:44">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -694,7 +694,7 @@
                     </Edge>
                     <Edge Source="S:29" Target="S:42">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -713,7 +713,7 @@
                     </Edge>
                     <Edge Source="S:3" Target="S:11">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -721,7 +721,7 @@
                     </Edge>
                     <Edge Source="S:3" Target="S:12">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -776,7 +776,7 @@
                     </Edge>
                     <Edge Source="S:30" Target="S:42">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -820,7 +820,7 @@
                     </Edge>
                     <Edge Source="S:37" Target="S:56">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -831,7 +831,7 @@
                     </Edge>
                     <Edge Source="S:37" Target="S:57">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -864,7 +864,7 @@
                     </Edge>
                     <Edge Source="S:40" Target="S:55">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -908,7 +908,7 @@
                     </Edge>
                     <Edge Source="S:41" Target="S:55">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -985,7 +985,7 @@
                     </Edge>
                     <Edge Source="S:43" Target="S:58">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -1018,7 +1018,7 @@
                     </Edge>
                     <Edge Source="S:44" Target="S:58">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -1084,7 +1084,7 @@
                     </Edge>
                     <Edge Source="S:56" Target="S:69">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -1117,7 +1117,7 @@
                     </Edge>
                     <Edge Source="S:57" Target="S:69">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -1172,7 +1172,7 @@
                     </Edge>
                     <Edge Source="S:7" Target="S:17">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -1183,7 +1183,7 @@
                     </Edge>
                     <Edge Source="S:7" Target="S:18">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
@@ -1223,6 +1223,7 @@
                     <SimpleIdentifier Name="PalletArvGCL"/>
                     <SimpleIdentifier Name="QPalletAtCL"/>
                     <SimpleIdentifier Name="QPalletAtEL"/>
+                    <SimpleIdentifier Name="c"/>
                     <LabelGeometry Anchor="NW">
                         <Point X="125" Y="47"/>
                     </LabelGeometry>
