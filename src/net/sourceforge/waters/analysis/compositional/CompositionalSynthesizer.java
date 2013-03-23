@@ -1132,7 +1132,7 @@ public class CompositionalSynthesizer
     //#######################################################################
     //# Event Status
     @Override
-    protected boolean isTau()
+    protected boolean canBeTau()
     {
       return false;
     }

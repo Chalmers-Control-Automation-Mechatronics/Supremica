@@ -244,16 +244,16 @@ public class CompositionalSimplifier
     //# Overrides for net.sourceforge.waters.analysis.abstraction.
     //# AbstractCompositionalModelVerifier.EventInfo
     @Override
-    protected boolean isTau()
+    protected boolean canBeTau()
     {
       final EventProxy event = getEvent();
       return !mPreservedEvents.contains(event);
     }
 
     @Override
-    protected boolean isLocal()
+    protected boolean canBeLocal()
     {
-      return isTau();
+      return canBeTau();
     }
   }
 

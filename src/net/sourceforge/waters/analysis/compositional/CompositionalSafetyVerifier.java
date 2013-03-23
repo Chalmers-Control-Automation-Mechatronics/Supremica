@@ -364,14 +364,14 @@ public class CompositionalSafetyVerifier
     //# Overrides for net.sourceforge.waters.analysis.abstraction.
     //# AbstractCompositionalModelVerifier.EventInfo
     @Override
-    protected boolean isTau()
+    protected boolean canBeTau()
     {
       final EventProxy event = getEvent();
       return !mPropertyEventsMap.containsKey(event);
     }
 
     @Override
-    protected boolean isLocal()
+    protected boolean canBeLocal()
     {
       final EventProxy event = getEvent();
       return mPropertyEventsMap.get(event) != REGULAR;
@@ -380,7 +380,7 @@ public class CompositionalSafetyVerifier
     @Override
     protected boolean isSubjectToSelfloopRemoval()
     {
-      return isTau();
+      return canBeTau();
     }
   }
 

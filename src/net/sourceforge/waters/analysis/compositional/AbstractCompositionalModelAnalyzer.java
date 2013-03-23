@@ -1111,7 +1111,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     while (iter.hasNext()) {
       final EventProxy event = iter.next();
       final EventInfo info = mEventInfoMap.get(event);
-      if (info == null || !info.isLocal() || !info.containedIn(automata)) {
+      if (info == null || !info.isLocal(automata)) {
         iter.remove();
       }
     }
@@ -1382,7 +1382,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       new ArrayList<EventProxy>(numLocal);
     for (final EventProxy event : local) {
       final EventInfo info = mEventInfoMap.get(event);
-      if (info.isLocal() && !info.isTau()) {
+      if (info.canBeLocal() && !info.canBeTau()) {
         notReallyHidden.add(event);
       }
     }
@@ -1444,7 +1444,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     final Collection<EventProxy> hidden = new ArrayList<EventProxy>(numLocal);
     for (final EventProxy event : local) {
       final EventInfo info = mEventInfoMap.get(event);
-      if (info.isTau()) {
+      if (info.canBeTau()) {
         hidden.add(event);
       }
     }
@@ -2087,7 +2087,7 @@ public abstract class AbstractCompositionalModelAnalyzer
      * {@link EventEncoding#TAU TAU}. Events treated as TAU are removed
      * during synchronous composition.
      */
-    protected boolean isTau()
+    protected boolean canBeTau()
     {
       return true;
     }
@@ -2098,9 +2098,33 @@ public abstract class AbstractCompositionalModelAnalyzer
      * compositions are passed to the abstraction procedure for special
      * treatment.
      */
-    protected boolean isLocal()
+    protected boolean canBeLocal()
     {
       return true;
+    }
+
+    /**
+     * Returns whether this event is used at most by the given automata,
+     * and thus can be hidden after composition of these automata.
+     * @param  automata  Collection of automata to be composed or to
+     *                   form a candidate.
+     */
+    protected boolean isLocal(final Collection<AutomatonProxy> automata)
+    {
+      if (canBeLocal()) {
+        final TObjectByteIterator<AutomatonProxy> iter =
+          mAutomataMap.iterator();
+        while (iter.hasNext()) {
+          iter.advance();
+          final AutomatonProxy aut = iter.key();
+          if (!automata.contains(aut)) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return false;
+      }
     }
 
     /**
@@ -2110,7 +2134,7 @@ public abstract class AbstractCompositionalModelAnalyzer
      */
     protected boolean isSubjectToSelfloopRemoval()
     {
-      return isTau();
+      return canBeTau();
     }
 
     /**
@@ -2140,19 +2164,6 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
         mIsBlocked |= status == BLOCKED;
       }
-    }
-
-    private boolean containedIn(final Collection<AutomatonProxy> automata)
-    {
-      final TObjectByteIterator<AutomatonProxy> iter = mAutomataMap.iterator();
-      while (iter.hasNext()) {
-        iter.advance();
-        final AutomatonProxy aut = iter.key();
-        if (!automata.contains(aut)) {
-          return false;
-        }
-      }
-      return true;
     }
 
     int getNumberOfAutomata()
