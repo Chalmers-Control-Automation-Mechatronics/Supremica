@@ -145,7 +145,7 @@ class ConflictHidingStep extends HidingStep
         final Map.Entry<EventProxy,DumpStateSearchData> entry = iter.next();
         final EventProxy event = entry.getKey();
         final DumpStateSearchData data = entry.getValue();
-        if (!alphabet.contains(event)) {
+        if (event != null && !alphabet.contains(event)) {
           final StateProxy state = previousMapOrig.get(aut);
           final boolean dump =
             nonDumpStates != null &&
@@ -168,7 +168,6 @@ class ConflictHidingStep extends HidingStep
         break;
       }
     }
-    assert event != null;
     final AutomatonProxy resultAutomaton = getResultAutomaton();
     final Map<AutomatonProxy,StateProxy> nextMapOrig =
       new HashMap<AutomatonProxy,StateProxy>(nextMapResult);

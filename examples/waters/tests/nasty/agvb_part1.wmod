@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="agvb_part" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Subsystem of the Automated Guided Vehicle system by J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120, which exhibits a strange bug in counterexample expansion during compositional nonblocking verification.
+<Module Name="agvb_part1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Part of blocking version of AGV model, producing error in compositional nonblocking verification.
+Original example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120.
 The model is not controllable and blocking, and has 61056 reachable states.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>

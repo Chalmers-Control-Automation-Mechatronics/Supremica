@@ -184,54 +184,40 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
       int numEnabledEvents = 0;
       //for all the events
-      for(final EventProxy events : aut.getEvents())
-      {
-
+      for(final EventProxy events : aut.getEvents()) {
         //Get event info somewhere
-        final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
-
+        final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo
+          eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
         if(eventInfo != null)
         //check if event is always enabled or this automaton is only disabler
-        if(eventInfo.isSingleDisablingAutomaton(aut))
-        {
-
+        if(eventInfo.isSingleDisablingAutomaton(aut)) {
           eventsList.add(events);
-
-      //count how many enabled events there are
-          if(events != tau)
-         numEnabledEvents++;
+          // Count how many enabled events there are
+          if(events != tau) {
+            numEnabledEvents++;
+          }
         }
-
       }
 
-      for(final EventProxy events : aut.getEvents())
-      {
+      for(final EventProxy events : aut.getEvents()) {
         //Get event info somewhere
         final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
         //check if event is always enabled or this automaton is only disabler
-
-        if(eventInfo == null || !eventInfo.isSingleDisablingAutomaton(aut) )
+        if (eventInfo == null || !eventInfo.isSingleDisablingAutomaton(aut)) {
           eventsList.add(events);
-
+        }
       }
 
-
-
-
-      //Tell the simplifier how many enabled events there are
-      mEnabledEventsSilentContinuationSimplifier.setNumberOfEnabledEvents(numEnabledEvents);
-      mEnabledEventsLimitedCertainConflictsSimplifier.setNumberOfEnabledEvents(numEnabledEvents) ;
-
+      //Tell the simplifiers how many enabled events there are
+      mEnabledEventsSilentContinuationSimplifier.
+        setNumberOfEnabledEvents(numEnabledEvents);
+      if (mEnabledEventsLimitedCertainConflictsSimplifier != null) {
+        mEnabledEventsLimitedCertainConflictsSimplifier.
+          setNumberOfEnabledEvents(numEnabledEvents);
+      }
 
       //create Event Encoding in right order with all enabled events at front of list
       final EventEncoding eventEnc = createEventEncoding(eventsList, tau);
-      //Give EventEncoding Marking
-
-
-     // System.out.println(numEnabledEvents);
-
-
-
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, eventEnc,
                                          inputStateEnc, config);

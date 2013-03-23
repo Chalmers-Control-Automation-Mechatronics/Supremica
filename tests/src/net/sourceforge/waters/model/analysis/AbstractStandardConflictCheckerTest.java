@@ -214,11 +214,11 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- nasty
-  public void testAgvbPart() throws Exception
+  public void testAgvbPart1() throws Exception
   {
     final String group = "tests";
     final String dir = "nasty";
-    final String name = "agvb_part.wmod";
+    final String name = "agvb_part1.wmod";
     runModelVerifier(group, dir, name, false);
   }
 
@@ -324,6 +324,14 @@ public abstract class AbstractStandardConflictCheckerTest
     final String dir = "nasty";
     final String name = "twoinit.wmod";
     runModelVerifier(group, dir, name, true);
+  }
+
+  public void testTwoInitBlock() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "twoinit_block.wmod";
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testVerriegel4Counter2() throws Exception

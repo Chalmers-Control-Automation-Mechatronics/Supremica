@@ -302,13 +302,18 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     while (true) {
       record = queue.remove();
       scode = record.getState();
+      final int slevel = mSimplifier.getLevel(scode);
       iter.reset(scode, tau);
       while (iter.advance()) {
-        scode = iter.getCurrentTargetState();
-        if (visited.add(scode)) {
+        final int tcode = iter.getCurrentTargetState();
+        if (visited.add(tcode)) {
+          final int tlevel = mSimplifier.getLevel(tcode);
+          if (tlevel < 0 || tlevel > slevel) {
+            continue;
+          }
           final SearchRecord newRecord =
-            new SearchRecord(scode, 0, tau, record);
-          if (mSimplifier.getLevel(scode) <= level) {
+            new SearchRecord(tcode, 0, tau, record);
+          if (tlevel <= level) {
             record = newRecord;
             break search;
           }
@@ -627,6 +632,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
 
     //#######################################################################
     //# Data Members
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       if (aut == mPropertyAutomaton) {
@@ -636,6 +642,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
       }
     }
 
+    @Override
     public EventKind getEventKind(final EventProxy event)
     {
       if (mParentKindTranslator.getEventKind(event) == EventKind.PROPOSITION) {
