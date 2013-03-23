@@ -500,7 +500,6 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
-
   public void test2LinkAltBatch() throws Exception
   {
     final String group = "tests";
@@ -509,7 +508,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
-
+  /* This one is too big for monolithic synthesis.
   public void testKoordWspSynth() throws Exception
   {
     final String group = "tests";
@@ -517,6 +516,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String name = "koordwsp_synth";
     runSynthesizer(group, subdir, name, true);
   }
+  */
 
 
   //#########################################################################
