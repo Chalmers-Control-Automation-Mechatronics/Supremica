@@ -398,16 +398,6 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
 
   // #########################################################################
   // # Test Cases --- profisafe
-  /*public void testProfisafeI3HostEFA() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_ihost_efa.wmod";
-    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
-    final List<ParameterBindingProxy> bindings =
-        Collections.singletonList(binding);
-    runModel(group, dir, name, bindings, true);
-  }*/
 
   public void testProfisafeI4Host() throws Exception
   {

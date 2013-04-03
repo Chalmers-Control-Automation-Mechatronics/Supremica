@@ -15,18 +15,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TauClosure;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 
 
 /**
@@ -130,70 +132,100 @@ public class EnabledEventsCompositionalConflictChecker extends
     super(model, marking, factory, abstractionFactory,
           new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
+  @Override
+  protected void initialiseEventsToAutomata()
+    throws OverflowException
+  {
+    super.initialiseEventsToAutomata();
+    for(final AutomatonProxy aut : getCurrentAutomata())
+    {
+      addDisablingAutomaton(aut);
+    }
+  }
 
   @Override
-  protected void addEventsToAutomata(final AutomatonProxy aut)
+  protected void updateEventsToAutomata
+  (final AutomatonProxy autToAdd,
+   final List<AutomatonProxy> autToRemove)
+  throws OverflowException
   {
-    super.addEventsToAutomata(aut);
+    super.updateEventsToAutomata(autToAdd, autToRemove);
+    addDisablingAutomaton(autToAdd);
+  }
 
-    final EventProxy marking = getUsedDefaultMarking();
-    final Boolean markingUsed = aut.getEvents().contains(marking);
+  private void addDisablingAutomaton(final AutomatonProxy aut)
+    throws OverflowException
+  {
+    final KindTranslator translator = getKindTranslator();
+    int markingID = -1;
 
-    //Set<EventProxy> foundEvents = new THashSet<EventProxy>();
-    final Map<EventProxy,Set<StateProxy>> foundEvents =
-      new HashMap<EventProxy,Set<StateProxy>>();
+    //create event encoding to check for tau (local events)
 
-    //put something that detects if a state is a dump state
-    final Set<StateProxy> nonDumpStates =
-      new THashSet<StateProxy>(aut.getStates().size());
-
-    for (final TransitionProxy trans : aut.getTransitions()) {
-      //go through transitions
-
-      if (markingUsed)
-        nonDumpStates.add(trans.getSource());   //List of states with with outgoing transitions
-
-      final EventProxy event = trans.getEvent();        //get event of this transition
-
-      Set<StateProxy> set = foundEvents.get(event); //create for each event, remember which states that event is enabled
-      if (set == null) {            //if set not created yet
-        set = new THashSet<StateProxy>();
-        foundEvents.put(event, set);
-
-      }
-      final StateProxy state = trans.getSource();
-      set.add(state);           //adds the event
-
-    }
-
-    if (markingUsed) {
-      for (final StateProxy state : aut.getStates()) {
-        //add those with marking
-        if (state.getPropositions().contains(marking)) {
-          nonDumpStates.add(state);             //It is not a dump state if it is marked
-        }
-      }
-    }
-
-    int numStates;
-    if (markingUsed) {
-      numStates = nonDumpStates.size();     //only care about non dump states
-    } else {
-      numStates = aut.getStates().size();
-    }
-    //Check if each event is enabled
+    //go through all events in aut, ask for event info, ask if it is local only here
+    final Collection<AutomatonProxy> collection =
+      Collections.singletonList(aut);
+    final EventEncoding encoding = new EventEncoding();
     for (final EventProxy event : aut.getEvents()) {
-      final EnabledEventsEventInfo eventInfo = getEventInfo(event);
-      if (eventInfo != null) {
+      final EventInfo info = getEventInfo(event);
+      if (info == null) {
+        final int code = encoding.addEvent(event, translator, false);
+        if (event == getUsedDefaultMarking()) {
+          markingID = code;
+        }    super.addEventsToAutomata(aut);
 
-        final Set<StateProxy> set = foundEvents.get(event);
-        //event is not in automaton or it is not enabled in all nondump states
-        if (set == null || set.size() != numStates) {
-          eventInfo.addDisablingAutomaton(aut);
+
+      } else if (info.isLocal(collection)) {
+        encoding.addSilentEvent(event);
+      } else {
+        encoding.addEvent(event, translator, false);
+      }
+    }
+    if (markingID == -1) {
+      return;
+    }
+
+    final ListBufferTransitionRelation transrel =
+      new ListBufferTransitionRelation(aut,
+                                       encoding,
+                                       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final TauClosure tauClosure =
+      transrel.createSuccessorsTauClosure(getInternalTransitionLimit());
+    final TransitionIterator preClosureIterator =
+      tauClosure.createPreEventClosureIterator();
+    final TransitionIterator normalTransIterator =
+      transrel.createSuccessorsReadOnlyIterator();
+
+    //for each event e
+    //for each state
+    //if state canNOT execute tauchain followed by event
+    //and not a dump state
+    //then it is a disabling aut
+    //add aut to info
+    //break
+
+    for (int e = EventEncoding.NONTAU; e < encoding
+      .getNumberOfProperEvents(); e++) {
+      for (int s = 0; s < transrel.getNumberOfStates(); s++) {
+        if (transrel.isReachable(s)) {
+          preClosureIterator.reset(s, e);
+          if (preClosureIterator.advance()) {
+            //it has outgoing transitions
+          } else {
+            normalTransIterator.resetState(s);
+            if (normalTransIterator.advance()
+                || transrel.isMarked(s, markingID)) {
+              //it's not a dump state
+              //record we have found disabling automaton
+              final EventProxy event = encoding.getProperEvent(e);
+              getEventInfo(event).addDisablingAutomaton(aut);
+              break;
+            }
+          }
         }
       }
     }
   }
+
 
   @Override
   protected EventInfo createEventInfo(final EventProxy event)
@@ -343,10 +375,7 @@ public class EnabledEventsCompositionalConflictChecker extends
 
         if (info != null) //when would info be null? Right at start?
           if (info.getDisablingAutomata() != null)
-            //If the event is never disabled, or only disabled in one automaton, or all the automaton it is disabled in are getting merged
-            if (info.mDisablingAutomata.size() == 0
-                || info.mDisablingAutomata.size() == 1
-                || automataList.containsAll(info.getDisablingAutomata()))
+            if (automataList.containsAll(info.getDisablingAutomata()))
               alwaysEnabledEvents++;
       }
 
@@ -383,10 +412,7 @@ public class EnabledEventsCompositionalConflictChecker extends
 
         if (info != null) //propositions
           if (info.getDisablingAutomata() != null)
-            //If the event is never disabled, or only disabled in one automaton, or all the automaton it is disabled in are getting merged
-            if (info.mDisablingAutomata.size() == 0
-                || info.mDisablingAutomata.size() == 1
-                || automataList.containsAll(info.getDisablingAutomata())) {
+            if (automataList.containsAll(info.getDisablingAutomata())) {
               alwaysEnabledEvents++;
 
             }

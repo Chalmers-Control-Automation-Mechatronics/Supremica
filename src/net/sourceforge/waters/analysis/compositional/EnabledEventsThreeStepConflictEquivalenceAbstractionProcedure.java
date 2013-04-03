@@ -285,7 +285,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           eelccStep = new LimitedCertainConflictsStep                       //Give this lots of info
             (analyzer, mEnabledEventsLimitedCertainConflictsSimplifier, outputAut,     //this creates the trace expander, so will get it this info
              lastAut, tau, lastStateEnc, outputStateEnc, eventEnc, numEnabledEvents);
-          System.out.println(numEnabledEvents);
+          //System.out.println(numEnabledEvents);
           }
           else
           {
