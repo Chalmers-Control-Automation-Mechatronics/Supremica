@@ -1000,6 +1000,14 @@ public abstract class AbstractCompositionalModelAnalyzer
     mProcessedSubsystems = new LinkedList<SubSystem>();
   }
 
+  protected void addEventsToAllAutomata()
+    throws OverflowException
+  {
+    for (final AutomatonProxy aut : mCurrentAutomata) {
+      addEventsToAutomata(aut);
+    }
+  }
+
   protected void updateEventsToAutomata
     (final AutomatonProxy autToAdd,
      final List<AutomatonProxy> autToRemove)
@@ -1252,9 +1260,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     mCurrentAutomata = task.getAutomata();
     mCurrentInternalStateLimit = task.getStateLimit();
     mEventInfoMap.clear();
-    for (final AutomatonProxy aut : mCurrentAutomata) {
-      addEventsToAutomata(aut);
-    }
+    addEventsToAllAutomata();
   }
 
   private void restoreAutomata()

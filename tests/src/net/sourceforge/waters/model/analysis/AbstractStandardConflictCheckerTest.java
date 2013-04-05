@@ -87,6 +87,8 @@ public abstract class AbstractStandardConflictCheckerTest
   }
 
 
+
+
   //#########################################################################
   //# Test Cases --- nondeterministic
   public void testNondeterministicCombinations() throws Exception

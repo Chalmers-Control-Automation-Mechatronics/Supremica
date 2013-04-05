@@ -153,6 +153,18 @@ public class EnabledEventsCompositionalConflictChecker extends
     addDisablingAutomaton(autToAdd);
   }
 
+  @Override
+  protected void addEventsToAllAutomata()
+  throws OverflowException
+  {
+    super.addEventsToAllAutomata();
+    for(final AutomatonProxy aut: getCurrentAutomata())
+    {
+    addDisablingAutomaton(aut);
+    }
+  }
+
+
   private void addDisablingAutomaton(final AutomatonProxy aut)
     throws OverflowException
   {
@@ -204,7 +216,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     //break
 
     for (int e = EventEncoding.NONTAU; e < encoding
-      .getNumberOfProperEvents(); e++) {
+                                        .getNumberOfProperEvents(); e++) {
       for (int s = 0; s < transrel.getNumberOfStates(); s++) {
         if (transrel.isReachable(s)) {
           preClosureIterator.reset(s, e);
@@ -477,7 +489,6 @@ public class EnabledEventsCompositionalConflictChecker extends
       return mDisablingAutomata.size() == 0
              || (mDisablingAutomata.size() == 1 && mDisablingAutomata
                .contains(aut));
-
     }
 
     @Override

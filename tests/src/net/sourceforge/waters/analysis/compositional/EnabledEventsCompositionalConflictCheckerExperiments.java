@@ -219,14 +219,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   //# Invocation
   void runAllTests() throws Exception
   {
-
     testFailedTrafficLights();
-    /*
-    synthesisTransferline(100);
-    synthesisTransferline(200);
-    synthesisTransferline(300);
-    */
-
 
     synthesiseTbedNoderailB();                                //
     synthesisAGV();
@@ -240,7 +233,6 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     synthesiseIPC();
     synthesiseCentralLockingKoordwspBlock();
     synthesiseTbedCtct();     //
-    synthesiseTbedNoderailUncont();
     synthesiseTbedNoderailB();
     synthesiseCentralLockingVerriegel3b();//
 
@@ -252,8 +244,6 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     testFZelle();
     testProfisafeI4();
     testProfisafeO4();
-    //testRhoneAlps();      //failed to find file
-    //testRhoneTough();     //Failed to find file
 
     testTbedUncont();
     testTbedValid();
@@ -508,10 +498,6 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   }
 
   // Train testbed
-  private void synthesiseTbedNoderailUncont() throws Exception
-  {
-    runModel("tests", "incremental_suite", "tbed_uncont.wmod",true);
-  }
 
   private void synthesiseTbedNoderailB() throws Exception
   {

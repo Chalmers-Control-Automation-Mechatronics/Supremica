@@ -175,25 +175,21 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       final EnabledEventsCompositionalConflictChecker enabledEventsAnalyzer = (EnabledEventsCompositionalConflictChecker)getAnalyzer();
 
       final List<EventProxy> eventsList = new ArrayList<EventProxy>(aut.getEvents().size());
-
-
-      //mCurrentAutomaton where is it
-
-      //maybe only let it do the next bit if it's already looked at all the auts to get enabledEvent info?
-
+      //Creates an event encoding with always enabled events at start
+//i think this could be where the bug is
 
       int numEnabledEvents = 0;
       //for all the events
-      for(final EventProxy events : aut.getEvents()) {
+      for(final EventProxy event : aut.getEvents()) {
         //Get event info somewhere
         final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo
-          eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
+          eventInfo  = enabledEventsAnalyzer.getEventInfo(event);
         if(eventInfo != null)
         //check if event is always enabled or this automaton is only disabler
         if(eventInfo.isSingleDisablingAutomaton(aut)) {
-          eventsList.add(events);
+          eventsList.add(event);
           // Count how many enabled events there are
-          if(events != tau) {
+          if(event != tau) {   //Tau is added to the list here but not counted as always Enabled.
             numEnabledEvents++;
           }
         }
@@ -202,10 +198,11 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       for(final EventProxy events : aut.getEvents()) {
         //Get event info somewhere
         final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
-        //check if event is always enabled or this automaton is only disabler
+        //Adds the prepositions and other events.
         if (eventInfo == null || !eventInfo.isSingleDisablingAutomaton(aut)) {
           eventsList.add(events);
         }
+
       }
 
       //Tell the simplifiers how many enabled events there are
