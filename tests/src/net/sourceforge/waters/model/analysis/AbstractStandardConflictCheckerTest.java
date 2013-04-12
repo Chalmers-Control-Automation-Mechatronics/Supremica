@@ -304,6 +304,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testPrimeSieve2b() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "prime_sieve2b.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void testRhoneTU34() throws Exception
   {
     final String group = "tests";
