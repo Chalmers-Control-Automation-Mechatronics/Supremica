@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:   MonolithicConflictCheckerTest
+//# CLASS:   MonolithicStandardConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -40,29 +40,19 @@ public class MonolithicStandardConflictCheckerTest extends
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ConflictChecker createModelVerifier(
-      final ProductDESProxyFactory factory)
+  @Override
+  protected ConflictChecker createModelVerifier
+    (final ProductDESProxyFactory factory)
   {
     final ConflictChecker checker = new MonolithicConflictChecker(factory);
-    checker.setNodeLimit(2000000);
+    checker.setNodeLimit(3000000);
     return checker;
   }
 
 
   //#########################################################################
   //# Overridden Test Cases
-  public void test_BallTSorter1() throws Exception
-  {
-    try {
-      super.test_BallTSorter1();
-    } catch (final OverflowException exception) {
-      // Model has a very shallow deadlock (found after exploring 7 states),
-      // but MonolithicConflictChecker fails with OutOfMemoryError ...
-      // Number of reachable states is 3000000+ ...
-      // Maybe implement deadlock detection?
-    }
-  }
-
+  @Override
   public void testHISCRhoneSubsystem1Patch0() throws Exception
   {
     try {
@@ -72,6 +62,7 @@ public class MonolithicStandardConflictCheckerTest extends
     }
   }
 
+  @Override
   public void testHISCRhoneSubsystem1Patch1() throws Exception
   {
     try {
@@ -81,6 +72,7 @@ public class MonolithicStandardConflictCheckerTest extends
     }
   }
 
+  @Override
   public void testHISCRhoneSubsystem1Patch2() throws Exception
   {
     try {
