@@ -94,7 +94,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     (final List<TraceStepProxy> traceSteps)
     throws AnalysisException
   {
-    final int numTraceSteps = traceSteps.size();
+    int numTraceSteps = traceSteps.size();
     final ListIterator<TraceStepProxy> iter =
       traceSteps.listIterator(numTraceSteps);
     final TraceStepProxy lastStep = iter.previous();
@@ -102,32 +102,42 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     final Map<AutomatonProxy,StateProxy> lastStepMap = lastStep.getStateMap();
     mReferenceAutomata = new ArrayList<AutomatonProxy>(lastStepMap.keySet());
     final StateProxy lastState = lastStepMap.get(resultAut);
-    List<TraceStepProxy> newTraceSteps =
-      new ArrayList<TraceStepProxy>(traceSteps);
-    final int initResult;
+    List<TraceStepProxy> newTraceSteps;
+    int initResult;
     if (isDumpState(resultAut, lastState)) {
       // Trace goes into certain conflicts.
-      if (iter.hasPrevious()) {
-        // Remove the last step of the trace, so it can be replaced
-        // by something in the real certain conflicts ...
-        // Searching starts from the step before this ...
-        mLastTraceStep = iter.previous();
-        final Map<AutomatonProxy,StateProxy> predMap =
-          mLastTraceStep.getStateMap();
+      // Searching starts from the step before entering certain conflicts.
+      // Everything afterwards gets removed so it can be replaced
+      // by something in the real certain conflicts.
+      // Exception is the initial state, when it is certain conflict:
+      // then searching starts from all initial states.
+      numTraceSteps--;
+      initResult = -1;
+      mLastTraceStep = null;
+      while (iter.hasPrevious()) {
+        final TraceStepProxy predStep = iter.previous();
+        final Map<AutomatonProxy,StateProxy> predMap = predStep.getStateMap();
         final StateProxy predState = predMap.get(resultAut);
-        initResult = getResultAutomatonStateCode(predState);
-      } else {
-        // Starting from initial state, which is certain conflict ...
-        // Searching starts from all initial states ...
-        mLastTraceStep = null;
-        initResult = -1;
+        if (!isDumpState(resultAut, predState)) {
+          initResult = getResultAutomatonStateCode(predState);
+          mLastTraceStep = predStep;
+          break;
+        }
+        numTraceSteps--;
       }
-      newTraceSteps.remove(numTraceSteps - 1);
+      newTraceSteps = new ArrayList<TraceStepProxy>(numTraceSteps);
+      for (final TraceStepProxy step : traceSteps) {
+        if (numTraceSteps-- == 0) {
+          break;
+        }
+        newTraceSteps.add(step);
+      }
     } else {
       // Trace does not go into certain conflicts.
       // We still must try to extend it into certain conflicts ...
       mLastTraceStep = lastStep;
       initResult = getResultAutomatonStateCode(lastState);
+      newTraceSteps = new ArrayList<TraceStepProxy>(traceSteps);
     }
 
     // Rerun certain conflicts simplifier

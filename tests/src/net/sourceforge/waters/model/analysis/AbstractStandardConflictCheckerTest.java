@@ -309,7 +309,7 @@ public abstract class AbstractStandardConflictCheckerTest
     final String group = "tests";
     final String dir = "nasty";
     final String name = "prime_sieve2b.wmod";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testRhoneTU34() throws Exception

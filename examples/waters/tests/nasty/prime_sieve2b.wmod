@@ -38,7 +38,7 @@ loop</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
             <ConstantAliasExpression>
-                <IntConstant Value="24"/>
+                <IntConstant Value="8"/>
             </ConstantAliasExpression>
         </ConstantAlias>
     </ConstantAliasList>
