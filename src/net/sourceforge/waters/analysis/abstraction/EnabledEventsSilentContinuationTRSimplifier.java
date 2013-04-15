@@ -83,6 +83,11 @@ public class EnabledEventsSilentContinuationTRSimplifier
     return mTransitionLimit;
   }
 
+  /**
+   * Sets the number of always enabled events. Always enabled events are events
+   * that are not disabled by any other current automaton.
+   * @param numEnabledEvents
+   */
   public void setNumberOfEnabledEvents(final int numEnabledEvents)
   {
 
@@ -138,21 +143,17 @@ public class EnabledEventsSilentContinuationTRSimplifier
     final int numStates = rel.getNumberOfStates();
     final BitSet candidates = new BitSet(numStates);
 
-    //The old stuff
-    //final TransitionIterator iter =                                 //This is typical transition relation
-    //  rel.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);      //loop over all TAU TAU TAU transitions in  tr buffer
-
     final TransitionIterator iter =
       rel.createAllTransitionsReadOnlyIterator();
     iter.resetEvents(0, mNumberOfEnabledEvents);        //Iterating over events with outgoing Tau or always enabled events.
 
-    while (iter.advance()) {        //for each transition
+    while (iter.advance()) {                                //for each transition
       final int source = iter.getCurrentSourceState();      //find source state
-      candidates.set(source);                       //candidates will have one bit for each state with outgoing transition
+      candidates.set(source);                               //candidates will have one bit for each state with outgoing transition
     }           //great big string of 0s and 1s which say if state has an outgoing transition or not
     final int numCandidates = candidates.cardinality();
-    if (numCandidates == 0) {           //if there are no outgoing transitions
-      return false;                     //can't simplify
+    if (numCandidates == 0) {                               //if there are no outgoing transitions
+      return false;                                         //can't simplify
     }
     final WatersIntHashingStrategy strategy = //something in hashingstrategy does the rule //group together incoming equivalence states
       new IncomingEquivalenceStateHash();

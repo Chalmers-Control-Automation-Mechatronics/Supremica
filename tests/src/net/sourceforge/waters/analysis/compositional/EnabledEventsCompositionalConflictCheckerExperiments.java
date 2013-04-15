@@ -219,6 +219,8 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   //# Invocation
   void runAllTests() throws Exception
   {
+
+    testprime_sieve5();
     testFailedTrafficLights();
 
     synthesiseTbedNoderailB();                                //
@@ -275,6 +277,17 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   // #########################################################################
   // # Test Cases --- incremental suite
 
+  //large again
+  public void testprime_sieve5() throws Exception
+  {
+    final String group = "efa";
+    final String dir = null;
+    final String name = "prime_sieve5.wmod";
+    runModel(group, dir, name, false);
+
+  }
+
+  //tiny
   public void testFailedTrafficLights() throws Exception
   {
     final String group = "tests";

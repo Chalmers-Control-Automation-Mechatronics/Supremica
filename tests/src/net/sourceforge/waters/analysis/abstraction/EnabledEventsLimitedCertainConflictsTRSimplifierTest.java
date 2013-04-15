@@ -316,6 +316,14 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifierTest
       final String name = "alwaysEnabledLimitedCertainConflicts06.wmod";
       runTransitionRelationSimplifier(group, subdir, name);
     }
+  public void test_alwaysEnabledLimitedCertainConflicts07()
+    throws Exception
+    {
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "alwaysEnabledLimitedCertainConflicts07.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
 
   public void test_certainConflicts_15()
   throws Exception

@@ -118,6 +118,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
 
   // #########################################################################
   // # Invocation
+  @Override
   public boolean run() throws AnalysisException
   {
     setUp();
@@ -215,11 +216,13 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
      */
   }
 
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
   }
 
+  @Override
   public ConflictTraceProxy getCounterExample()
   {
     return null;
@@ -246,6 +249,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  @Override
   public void setNodeLimit(final int limit)
   {
     super.setNodeLimit(limit);
@@ -654,6 +658,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
   private static class AutomataComparator implements
       Comparator<SortedSet<AutomatonProxy>>
   {
+    @Override
     public int compare(final SortedSet<AutomatonProxy> s1,
                        final SortedSet<AutomatonProxy> s2)
     {
@@ -1239,7 +1244,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
                                             EventKind.UNCONTROLLABLE);
             final EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(),tauproxy);
             if (!minAutomaton.getEvents().contains(mAlpha)) {
-              ee.addEvent(mAlpha, getKindTranslator(), true);
+              ee.addEvent(mAlpha, getKindTranslator(), EventEncoding.STATUS_EXTRA_SELFLOOP);
             }
             final ListBufferTransitionRelation tr =
               new ListBufferTransitionRelation(minAutomaton, ee,
@@ -1269,7 +1274,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
             }
             //System.out.println("initial tr:" + tr);
             if (mCompautomata.size() == 1) {
-              ee.addEvent(mCont, getKindTranslator(), false);
+              ee.addEvent(mCont, getKindTranslator(), (byte)0);
             }
 
             //System.out.println("initial tr:" + tr);
@@ -1585,11 +1590,13 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
         return events;
       }
 
+      @Override
       public int compareTo(final Place other)
       {
         return other.mIndex - mIndex;
       }
 
+      @Override
       public int hashCode()
       {
         int hash = 7;
@@ -1598,6 +1605,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
         return hash;
       }
 
+      @Override
       public boolean equals(final Object o)
       {
         final Place p = (Place) o;
@@ -1622,11 +1630,13 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
         mHash = hash;
       }
 
+      @Override
       public int hashCode()
       {
         return mHash;
       }
 
+      @Override
       public boolean equals(final Object other)
       {
         if (other != null && other.getClass() == getClass()) {
@@ -1642,6 +1652,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
   private static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
+    @Override
     public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
@@ -1661,6 +1672,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       mHidden = hidden;
     }
 
+    @Override
     public int hashCode()
     {
       int code = 31 + mAutomata.hashCode();
@@ -1668,6 +1680,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       return code;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       if (o instanceof AutomataHidden) {
@@ -1691,6 +1704,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       mSize = size;
     }
 
+    @Override
     public int compareTo(final Tuple t)
     {
       if (mSize < t.mSize) {

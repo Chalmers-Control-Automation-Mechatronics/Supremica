@@ -1488,7 +1488,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         eventEnc.addSilentEvent(event);
       } else if (translator.getEventKind(event) != EventKind.PROPOSITION ||
                  (mPropositions != null && mPropositions.contains(event))) {
-        eventEnc.addEvent(event, translator, false);
+        eventEnc.addEvent(event, translator, (byte)0);
       }
     }
     final StateEncoding stateEnc = new StateEncoding(aut);
@@ -2220,8 +2220,8 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-     boolean replaceAutomaton(final AutomatonProxy oldAut,
-                                     final AutomatonProxy newAut)
+    boolean replaceAutomaton(final AutomatonProxy oldAut,
+                             final AutomatonProxy newAut)
     {
       final byte code = mAutomataMap.remove(oldAut);
       if (code == UNKNOWN_SELFLOOP) {
@@ -2231,6 +2231,15 @@ public abstract class AbstractCompositionalModelAnalyzer
         mAutomataMap.put(newAut, code);
         mSortedAutomataList = null;
         return true;
+      }
+    }
+
+    boolean isOnlyNonSelfLoopAutomaton(final AutomatonProxy aut)
+    {
+      if (mNumNonSelfloopAutomata + 1 < mAutomataMap.size()) {
+        return false;
+      } else { //If there is only one automata that is not self loop for this event
+        return mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP; //And it is this one, return true
       }
     }
 

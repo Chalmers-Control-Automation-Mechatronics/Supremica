@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 import gnu.trove.HashFunctions;
 import gnu.trove.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -127,7 +128,7 @@ public abstract class TRTraceExpander
           mEventEncoding.getEventCode(preconditionMarking);
         if (mPreconditionMarkingID < 0) {
           mPreconditionMarkingID =
-            mEventEncoding.addEvent(preconditionMarking, translator, true);
+            mEventEncoding.addEvent(preconditionMarking, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
         }
       }
     }

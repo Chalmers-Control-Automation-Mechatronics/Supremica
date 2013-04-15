@@ -413,11 +413,13 @@ public class CompareLessConflicting
       state = s;
     }
 
+    @Override
     public int hashCode()
     {
       return tuple.hashCode() * 13 + state;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final Triple other = (Triple)o;
@@ -449,17 +451,20 @@ public class CompareLessConflicting
       secondset = second;
     }
 
+    @Override
     public int hashCode()
     {
       return firstset.hashCode() * 13 + secondset.hashCode();
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final Tuple other = (Tuple)o;
       return firstset == other.firstset && secondset == other.secondset;
     }
 
+    @Override
     public String toString()
     {
       return Arrays.toString(firstset.toArray()) + " : " + Arrays.toString(secondset.toArray());
@@ -493,7 +498,7 @@ public class CompareLessConflicting
       final EventEncoding ee = new EventEncoding(lprox,
                                 ConflictKindTranslator.getInstance(), tauproxy);
       if (!lprox.getEvents().contains(mproxy)) {
-        ee.addEvent(mproxy, ConflictKindTranslator.getInstance(), true);
+        ee.addEvent(mproxy, ConflictKindTranslator.getInstance(), EventEncoding.STATUS_EXTRA_SELFLOOP);
       }
       final ListBufferTransitionRelation lessbuff =
         new ListBufferTransitionRelation(lprox, ee,

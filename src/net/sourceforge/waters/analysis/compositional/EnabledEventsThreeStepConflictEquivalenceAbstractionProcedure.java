@@ -18,6 +18,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.EnabledEventsLimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.EnabledEventsSilentContinuationTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.EnabledEventsSilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
@@ -73,6 +74,13 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
     preChain.add(silentInRemover);
+
+    final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier =
+      new EnabledEventsSilentIncomingTRSimplifier();
+    enabledEventsSilentIncomingSimplifier.setRestrictsToUnreachableStates(true);
+    preChain.add(enabledEventsSilentIncomingSimplifier);
+
+
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     preChain.add(silentOutRemover);
@@ -123,7 +131,10 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     postChain.add(saturator);
     return new EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       (analyzer, preChain, limitedCertainConflictsRemover,          //Change this so limited is first, enabled events limited is second
-        enabledEventsLimitedCertainConflictsRemover, enabledEventsSilentContinuationSimplifier, postChain);
+        enabledEventsLimitedCertainConflictsRemover,
+        enabledEventsSilentContinuationSimplifier,
+        enabledEventsSilentIncomingSimplifier,
+        postChain);
   }
 
 
@@ -135,6 +146,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
      final LimitedCertainConflictsTRSimplifier limitedCCSimplifier,
      final EnabledEventsLimitedCertainConflictsTRSimplifier alwaysEnabledLimitedCCSimplifier,
      final EnabledEventsSilentContinuationTRSimplifier enabledEventsSilentContinuationSimplifier,
+     final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier,
      final ChainTRSimplifier postChain)
   {
     super(analyzer);
@@ -142,6 +154,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     mEnabledEventsLimitedCertainConflictsSimplifier = alwaysEnabledLimitedCCSimplifier;
     mLimitedCertainConflictsSimplifier = limitedCCSimplifier;
     mEnabledEventsSilentContinuationSimplifier = enabledEventsSilentContinuationSimplifier;
+    mEnabledEventsSilentIncomingSimplifier = enabledEventsSilentIncomingSimplifier;
     mPostChain = postChain;
     mCompleteChain = new ChainTRSimplifier();
     mCompleteChain.add(preChain);
@@ -176,7 +189,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
       final List<EventProxy> eventsList = new ArrayList<EventProxy>(aut.getEvents().size());
       //Creates an event encoding with always enabled events at start
-//i think this could be where the bug is
 
       int numEnabledEvents = 0;
       //for all the events
@@ -207,6 +219,8 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
       //Tell the simplifiers how many enabled events there are
       mEnabledEventsSilentContinuationSimplifier.
+        setNumberOfEnabledEvents(numEnabledEvents);
+      mEnabledEventsSilentIncomingSimplifier.
         setNumberOfEnabledEvents(numEnabledEvents);
       if (mEnabledEventsLimitedCertainConflictsSimplifier != null) {
         mEnabledEventsLimitedCertainConflictsSimplifier.
@@ -388,7 +402,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
                         EventEncoding.FILTER_PROPOSITIONS);
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
-      enc.addEvent(defaultMarking, translator, true);
+      enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
     }
     mCompleteChain.setDefaultMarkingID(defaultMarkingID);
     return enc;
@@ -433,6 +447,8 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     mLimitedCertainConflictsSimplifier;
   private final EnabledEventsSilentContinuationTRSimplifier
     mEnabledEventsSilentContinuationSimplifier;
+  private final EnabledEventsSilentIncomingTRSimplifier
+    mEnabledEventsSilentIncomingSimplifier;
   private final ChainTRSimplifier mPostChain;
   private final ChainTRSimplifier mCompleteChain;
 

@@ -17,14 +17,12 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -77,16 +75,16 @@ public class IntStateBuffer
       setReachable(state, false);
     }
     int tags0 = TAG_REACHABLE;
-    final List<EventProxy> extra = eventEnc.getExtraSelfloops();
-    if (extra != null) {
-      for (final EventProxy event : extra) {
-        if (event.getKind() == EventKind.PROPOSITION &&
-            (events == null || !events.contains(event))) {
-          final int code = eventEnc.getEventCode(event);
-          tags0 |= (1 << code);
+    for (int e = 0; e < eventEnc.getNumberOfPropositions(); e++) {
+      final byte status = eventEnc.getPropositionStatus(e);
+      if ((status & EventEncoding.STATUS_EXTRA_SELFLOOP) != 0) {
+        final EventProxy event = eventEnc.getProposition(e);
+        if (events == null || !events.contains(event)) {
+          tags0 |= (1 << e);
         }
       }
     }
+
     int i = 0;
     for (final StateProxy state : stateEnc.getStates()) {
       int tags;

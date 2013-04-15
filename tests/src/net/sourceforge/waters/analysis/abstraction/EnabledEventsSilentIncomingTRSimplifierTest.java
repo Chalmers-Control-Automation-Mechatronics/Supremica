@@ -30,7 +30,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik
  */
 
-public class EnabledEventsSilentContinuationTRSimplifierTest
+public class EnabledEventsSilentIncomingTRSimplifierTest
   extends AbstractTRSimplifierTest
 {
 
@@ -39,7 +39,7 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(EnabledEventsSilentContinuationTRSimplifierTest.class);
+      new TestSuite(EnabledEventsSilentIncomingTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -53,9 +53,9 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest
   @Override
-  protected EnabledEventsSilentContinuationTRSimplifier createTransitionRelationSimplifier()
+  protected EnabledEventsSilentIncomingTRSimplifier createTransitionRelationSimplifier()
   {
-    return new EnabledEventsSilentContinuationTRSimplifier();
+    return new EnabledEventsSilentIncomingTRSimplifier();
   }
 
   @Override
@@ -98,105 +98,113 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     }
     //returns a list where all uncontrollable events are first
 
-    final EnabledEventsSilentContinuationTRSimplifier simplifier = getTransitionRelationSimplifier();
+    final EnabledEventsSilentIncomingTRSimplifier simplifier = getTransitionRelationSimplifier();
     simplifier.setNumberOfEnabledEvents(uncontrollableCount);
 
     return new EventEncoding(events, translator, tau);
 
   }
   @Override
-  protected EnabledEventsSilentContinuationTRSimplifier getTransitionRelationSimplifier()
+  protected EnabledEventsSilentIncomingTRSimplifier getTransitionRelationSimplifier()
   {
 
-    return (EnabledEventsSilentContinuationTRSimplifier) super.getTransitionRelationSimplifier();
+    return (EnabledEventsSilentIncomingTRSimplifier) super.getTransitionRelationSimplifier();
 
   }
 
 
   //#########################################################################
   //# Test Cases
-  public void test_silentContinuation_1()
+  public void test_silentIncoming01()
   throws Exception
   {
 
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "silentContinuation_1.wmod";
+    final String name = "silentIncoming01.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
-
-  public void test_silentContinuation_2()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "silentContinuation_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
-  }
-  public void test_alwaysEnabledSilentContinuation01()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "alwaysEnabledSilentContinuation01.wmod";
-    runTransitionRelationSimplifier(group,subdir,name);
-  }
-  public void test_alwaysEnabledSilentContinuation02()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "alwaysEnabledSilentContinuation02.wmod";
-    runTransitionRelationSimplifier(group,subdir,name);
-  }
-  public void test_alwaysEnabledSilentContinuation03()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "alwaysEnabledSilentContinuation03.wmod";
-    runTransitionRelationSimplifier(group,subdir,name);
-  }
-  public void test_alwaysEnabledSilentContinuation04()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "alwaysEnabledSilentContinuation04.wmod";
-    runTransitionRelationSimplifier(group,subdir,name);
-  }
-  public void test_alwaysEnabledSilentContinuation05()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "alwaysEnabledSilentContinuation05.wmod";
-    runTransitionRelationSimplifier(group,subdir,name);
-  }
-  public void test_alwaysEnabledSilentContinuation06()
+  public void test_silentIncoming02()
     throws Exception
     {
+
       final String group = "tests";
       final String subdir = "abstraction";
-      final String name = "alwaysEnabledSilentContinuation06.wmod";
-      runTransitionRelationSimplifier(group,subdir,name);
+      final String name = "silentIncoming02.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
     }
-  public void test_alwaysEnabledSilentContinuation07()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "alwaysEnabledSilentContinuation07.wmod";
-    runTransitionRelationSimplifier(group,subdir,name);
-  }
-  public void test_alwaysEnabledSilentContinuation08()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "alwaysEnabledSilentContinuation08.wmod";
-    runTransitionRelationSimplifier(group,subdir,name);
-  }
+  public void test_silentIncoming03()
+    throws Exception
+    {
+
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "silentIncoming03.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
+  public void test_silentIncoming04()
+    throws Exception
+    {
+
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "silentIncoming04.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
+  public void test_silentIncoming05()
+    throws Exception
+    {
+
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "silentIncoming05.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
+  public void test_alwaysEnabledSilentIncoming01()
+    throws Exception
+    {
+
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "alwaysEnabledSilentIncoming01.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
+  public void test_alwaysEnabledSilentIncoming02()
+    throws Exception
+    {
+
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "alwaysEnabledSilentIncoming02.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
+  public void test_alwaysEnabledSilentIncoming03()
+    throws Exception
+    {
+
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "alwaysEnabledSilentIncoming03.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
+  public void test_alwaysEnabledSilentIncoming04()
+    throws Exception
+    {
+
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "alwaysEnabledSilentIncoming04.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
+  public void test_alwaysEnabledSilentIncoming05()
+    throws Exception
+    {
+
+      final String group = "tests";
+      final String subdir = "abstraction";
+      final String name = "alwaysEnabledSilentIncoming05.wmod";
+      runTransitionRelationSimplifier(group, subdir, name);
+    }
 
   /**
    * A test to see whether a single abstraction rule object can perform multiple
@@ -204,10 +212,13 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
    */
   public void testReentrant() throws Exception
   {
-    test_silentContinuation_1();
-    test_silentContinuation_2();
-    test_silentContinuation_1();
-    test_silentContinuation_2();
+    test_silentIncoming01();
+    test_silentIncoming02();
+    test_silentIncoming03();
+    test_silentIncoming04();
+    test_silentIncoming05();
+
+    test_alwaysEnabledSilentIncoming04();
   }
 
 }

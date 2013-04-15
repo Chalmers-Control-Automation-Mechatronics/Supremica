@@ -9,13 +9,14 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.TByteArrayList;
+import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -222,21 +223,27 @@ public class EventEncoding
     final int numEvents = events.size();
     mProperEvents = new ArrayList<EventProxy>(numEvents);
     mPropositions = new ArrayList<EventProxy>(numEvents);
+    mProperEventStatus = new TByteArrayList(numEvents);
+    mPropositionStatus = new TByteArrayList(numEvents);
     mEventCodeMap = new TObjectIntHashMap<EventProxy>(numEvents);
     mProperEvents.add(tau);
+    mProperEventStatus.add((byte)0);
     if (tau != null) {
       mEventCodeMap.put(tau, TAU);
     }
     for (final EventProxy event : events) {
       if (event != tau) {
+        byte status = 0;
         switch (translator.getEventKind(event)) {
         case CONTROLLABLE:
+          status = STATUS_CONTROLLABLE;
         case UNCONTROLLABLE:
           if ((filterMode & FILTER_PROPER_EVENTS) == 0 ||
               filter.contains(event)) {
             final int e = mProperEvents.size();
             mEventCodeMap.put(event, e);
             mProperEvents.add(event);
+            mProperEventStatus.add(status);
           }
           break;
         case PROPOSITION:
@@ -245,6 +252,7 @@ public class EventEncoding
             final int p = mPropositions.size();
             mEventCodeMap.put(event, p);
             mPropositions.add(event);
+            mPropositionStatus.add((byte) 0);
           }
           break;
         default:
@@ -252,12 +260,12 @@ public class EventEncoding
         }
       }
     }
-    mExtraSelfLoops = null;
   }
 
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     final StringBuffer buffer = new StringBuffer("{");
@@ -273,9 +281,10 @@ public class EventEncoding
         buffer.append(ecode++);
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
-        if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
-          buffer.append('+');
-        }
+        //Replace with complete status info
+      //  if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
+      //   buffer.append('+');
+      //  }
       }
     }
     final TObjectIntIterator<EventProxy> iter = mEventCodeMap.iterator();
@@ -293,9 +302,9 @@ public class EventEncoding
         buffer.append(code);
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
-        if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
-          buffer.append('+');
-        }
+      //  if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
+      //    buffer.append('+');
+      //  }
       }
     }
     if (mPropositions != null) {
@@ -309,9 +318,9 @@ public class EventEncoding
         buffer.append(pcode++);
         buffer.append('=');
         buffer.append(prop == null ? "(null)" : prop.getName());
-        if (mExtraSelfLoops != null && mExtraSelfLoops.contains(prop)) {
-          buffer.append('+');
-        }
+       // if (mExtraSelfLoops != null && mExtraSelfLoops.contains(prop)) {
+       //   buffer.append('+');
+       // }
       }
     }
     buffer.append('}');
@@ -437,47 +446,49 @@ public class EventEncoding
    */
   public int addEvent(final EventProxy event,
                       final KindTranslator translator,
-                      final boolean selfloop)
+                      byte status)
   {
     final int code;
     switch (translator.getEventKind(event)) {
     case CONTROLLABLE:
+      status |= STATUS_CONTROLLABLE;
     case UNCONTROLLABLE:
       code = mProperEvents.size();
       mEventCodeMap.put(event, code);
       mProperEvents.add(event);
+      mProperEventStatus.add(status);
       break;
     case PROPOSITION:
       code = mPropositions.size();
       mEventCodeMap.put(event, code);
       mPropositions.add(event);
+      mPropositionStatus.add(status);
       break;
     default:
       throw new IllegalArgumentException
         ("Unknown event kind " + event.getKind() + "!");
     }
-    if (selfloop) {
-      if (mExtraSelfLoops == null) {
-        mExtraSelfLoops = new ArrayList<EventProxy>();
-      }
-      mExtraSelfLoops.add(event);
-    }
     return code;
   }
 
-  /**
-   * Gets the list of all events that are considered selflooped in all states
-   * by this encoding. Procedures building up transition relations query this
-   * method to add additional selfloops.
-   * @return The list of events and propositions passed into the
-   *         {@link #addEvent(EventProxy,KindTranslator,boolean) addEvent()}
-   *         with the selfloop parameter set to true.
-   * @see #addEvent(EventProxy,KindTranslator,boolean) addEvent()
-   */
-  public List<EventProxy> getExtraSelfloops()
+  public byte getPropositionStatus(final int event)
   {
-    return mExtraSelfLoops;
+    return mPropositionStatus.get(event);
   }
+  public void setPropositionStatus(final int event, final byte status)
+  {
+    mPropositionStatus.set(event, status);
+  }
+
+  public byte getProperEventStatus(final int event)
+  {
+    return mProperEventStatus.get(event);
+  }
+  public void setProperEventStatus(final int event, final byte status)
+  {
+    mProperEventStatus.set(event, status);
+  }
+
 
   /**
    * <P>Adds a silent event to this event encoding.</P>
@@ -505,8 +516,8 @@ public class EventEncoding
   private final List<EventProxy> mProperEvents;
   private final List<EventProxy> mPropositions;
   private final TObjectIntHashMap<EventProxy> mEventCodeMap;
-  private List<EventProxy> mExtraSelfLoops;
-
+  private final TByteArrayList mProperEventStatus;
+  private final TByteArrayList mPropositionStatus;
 
   //#########################################################################
   //# Class Constants
@@ -548,6 +559,10 @@ public class EventEncoding
   public static final int FILTER_ALL =
     FILTER_PROPER_EVENTS | FILTER_PROPOSITIONS;
 
+  public static final byte STATUS_EXTRA_SELFLOOP = 0x01;
+  public static final byte STATUS_CONTROLLABLE = 0x02;
+  public static final byte STATUS_OUTSIDE_ONLY_SELFLOOP = 0x04;
+  public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x08;
 
   private static final Collection<EventProxy> NO_EVENTS =
     Collections.emptySet();

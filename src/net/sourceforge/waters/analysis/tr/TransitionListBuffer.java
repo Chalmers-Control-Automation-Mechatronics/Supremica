@@ -31,7 +31,6 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -928,13 +927,13 @@ public abstract class TransitionListBuffer
         list = prepend(list, data);
       }
     }
-    final List<EventProxy> extra = eventEnc.getExtraSelfloops();
-    if (extra != null) {
-      final int numStates = getNumberOfStates();
-      for (final EventProxy event : extra) {
-        if (event.getKind() != EventKind.PROPOSITION &&
-            !events.contains(event)) {
-          final int e = eventEnc.getEventCode(event);
+
+    final int numStates = getNumberOfStates();
+    for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
+      final byte status = eventEnc.getProperEventStatus(e);
+      if ((status & EventEncoding.STATUS_EXTRA_SELFLOOP) != 0) {
+        final EventProxy event = eventEnc.getProperEvent(e);
+        if (!events.contains(event)) {
           for (int s = 0; s < numStates; s++) {
             addTransition(s, e, s);
           }

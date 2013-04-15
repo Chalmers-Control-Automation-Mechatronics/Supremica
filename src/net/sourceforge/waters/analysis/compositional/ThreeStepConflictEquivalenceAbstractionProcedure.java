@@ -286,11 +286,13 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
   public void requestAbort()
   {
     mCompleteChain.requestAbort();
   }
 
+  @Override
   public boolean isAborting()
   {
     return mCompleteChain.isAborting();
@@ -311,7 +313,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
                         EventEncoding.FILTER_PROPOSITIONS);
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
-      enc.addEvent(defaultMarking, translator, true);
+      enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
     }
     mCompleteChain.setDefaultMarkingID(defaultMarkingID);
     return enc;

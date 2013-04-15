@@ -180,7 +180,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     for (final EventProxy event : aut.getEvents()) {
       final EventInfo info = getEventInfo(event);
       if (info == null) {
-        final int code = encoding.addEvent(event, translator, false);
+        final int code = encoding.addEvent(event, translator, (byte)0);
         if (event == getUsedDefaultMarking()) {
           markingID = code;
         }    super.addEventsToAutomata(aut);
@@ -189,7 +189,7 @@ public class EnabledEventsCompositionalConflictChecker extends
       } else if (info.isLocal(collection)) {
         encoding.addSilentEvent(event);
       } else {
-        encoding.addEvent(event, translator, false);
+        encoding.addEvent(event, translator, (byte)0);
       }
     }
     if (markingID == -1) {

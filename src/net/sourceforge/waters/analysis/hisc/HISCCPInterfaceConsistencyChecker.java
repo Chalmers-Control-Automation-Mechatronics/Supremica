@@ -176,13 +176,13 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
           // nothing
         } else if (HISCAttributeFactory.isParameter(attribs)) {
           interfaceEvents.add(event);
-          eventEnc.addEvent(event, translator, true);
+          eventEnc.addEvent(event, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
           hasInterface = true;
         } else {
           eventEnc.addSilentEvent(event);
         }
       }
-      final int markingID = eventEnc.addEvent(mUsedMarking, translator, true);
+      final int markingID = eventEnc.addEvent(mUsedMarking, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
       checkAbort();
 
       // Separate into interface and subsystem automata ...

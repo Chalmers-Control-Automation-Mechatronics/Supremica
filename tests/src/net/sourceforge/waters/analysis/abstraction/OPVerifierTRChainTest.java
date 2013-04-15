@@ -210,7 +210,7 @@ public class OPVerifierTRChainTest
       if (hidden.contains(event)) {
         eventEnc.addSilentEvent(event);
       } else {
-        eventEnc.addEvent(event, translator, false);
+        eventEnc.addEvent(event, translator, (byte)0);
       }
     }
     final StateEncoding stateEnc = new StateEncoding(aut);

@@ -173,7 +173,7 @@ class TRConflictEquivalenceAbstractionProcedure
     final EventProxy defaultMarking = getUsedDefaultMarking();
     int defaultMarkingID = eventEnc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0 && mForceMarkings) {
-      defaultMarkingID = eventEnc.addEvent(defaultMarking, translator, true);
+      defaultMarkingID = eventEnc.addEvent(defaultMarking, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
     }
     final EventProxy preconditionMarking = getUsedPreconditionMarking();
     mPreconditionMarkingID = -1;
@@ -181,7 +181,7 @@ class TRConflictEquivalenceAbstractionProcedure
       mPreconditionMarkingID = eventEnc.getEventCode(preconditionMarking);
       if (mPreconditionMarkingID < 0 && mForceMarkings) {
         mPreconditionMarkingID =
-          eventEnc.addEvent(preconditionMarking, translator, true);
+          eventEnc.addEvent(preconditionMarking, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
       }
     }
     final TransitionRelationSimplifier simplifier = getSimplifier();

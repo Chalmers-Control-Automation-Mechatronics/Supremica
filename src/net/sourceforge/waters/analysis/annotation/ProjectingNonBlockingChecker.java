@@ -111,6 +111,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
 
   // #########################################################################
   // # Invocation
+  @Override
   public boolean run() throws AnalysisException
   {
     clearStats();
@@ -185,6 +186,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
      */
   }
 
+  @Override
   public ConflictTraceProxy getCounterExample()
   {
     return null;
@@ -255,6 +257,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
@@ -264,6 +267,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  @Override
   public void setNodeLimit(final int limit)
   {
     super.setNodeLimit(limit);
@@ -604,6 +608,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   private static class AutomataComparator implements
       Comparator<SortedSet<AutomatonProxy>>
   {
+    @Override
     public int compare(final SortedSet<AutomatonProxy> s1,
                        final SortedSet<AutomatonProxy> s2)
     {
@@ -1133,7 +1138,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
                                             EventKind.UNCONTROLLABLE);
           final EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(), tauproxy);
           if (!minAutomaton.getEvents().contains(getConfiguredDefaultMarking())) {
-            ee.addEvent(getConfiguredDefaultMarking(), getKindTranslator(), true);
+            ee.addEvent(getConfiguredDefaultMarking(), getKindTranslator(), EventEncoding.STATUS_EXTRA_SELFLOOP);
           }
           final ListBufferTransitionRelation orig =
             new ListBufferTransitionRelation(minAutomaton, ee,
@@ -1595,11 +1600,13 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
         return events;
       }
 
+      @Override
       public int compareTo(final Place other)
       {
         return other.mIndex - mIndex;
       }
 
+      @Override
       public int hashCode()
       {
         int hash = 7;
@@ -1608,6 +1615,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
         return hash;
       }
 
+      @Override
       public boolean equals(final Object o)
       {
         final Place p = (Place) o;
@@ -1632,11 +1640,13 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
         mHash = hash;
       }
 
+      @Override
       public int hashCode()
       {
         return mHash;
       }
 
+      @Override
       public boolean equals(final Object other)
       {
         if (other != null && other.getClass() == getClass()) {
@@ -1652,6 +1662,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   private static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
+    @Override
     public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
@@ -1671,6 +1682,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       mHidden = hidden;
     }
 
+    @Override
     public int hashCode()
     {
       int code = 31 + mAutomata.hashCode();
@@ -1678,6 +1690,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       return code;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       if (o instanceof AutomataHidden) {
@@ -1701,6 +1714,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       mSize = size;
     }
 
+    @Override
     public int compareTo(final Tuple t)
     {
       if (mSize < t.mSize) {
