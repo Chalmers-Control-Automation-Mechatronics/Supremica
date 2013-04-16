@@ -25,7 +25,7 @@ import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 

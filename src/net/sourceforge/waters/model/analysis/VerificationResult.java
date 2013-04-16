@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import net.sourceforge.waters.model.analysis.des.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.TraceProxy;
 

@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.des.AnalysisResult;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;

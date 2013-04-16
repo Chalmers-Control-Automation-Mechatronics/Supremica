@@ -15,12 +15,12 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
-import net.sourceforge.waters.model.analysis.des.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;

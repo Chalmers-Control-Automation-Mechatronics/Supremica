@@ -31,7 +31,7 @@ import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;

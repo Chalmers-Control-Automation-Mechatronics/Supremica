@@ -13,8 +13,10 @@ import java.util.Collection;
 
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;

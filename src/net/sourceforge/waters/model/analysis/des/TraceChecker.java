@@ -21,6 +21,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;

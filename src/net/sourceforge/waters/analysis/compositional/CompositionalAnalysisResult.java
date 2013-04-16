@@ -18,8 +18,8 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
-import net.sourceforge.waters.model.analysis.des.AnalysisResult;
 
 
 /**

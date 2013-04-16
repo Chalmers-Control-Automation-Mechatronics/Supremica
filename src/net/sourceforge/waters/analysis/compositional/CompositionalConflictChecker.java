@@ -23,14 +23,14 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBu
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.analysis.des.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;

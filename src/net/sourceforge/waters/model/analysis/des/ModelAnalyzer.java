@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;

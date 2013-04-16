@@ -13,7 +13,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Formatter;
 
-import net.sourceforge.waters.model.analysis.des.AnalysisResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 

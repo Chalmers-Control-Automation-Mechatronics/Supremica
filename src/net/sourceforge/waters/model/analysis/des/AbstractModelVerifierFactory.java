@@ -29,6 +29,7 @@ import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentStringList;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;

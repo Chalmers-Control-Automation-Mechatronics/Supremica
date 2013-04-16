@@ -11,7 +11,7 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.io.PrintWriter;
 
-import net.sourceforge.waters.model.analysis.des.AnalysisResult;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 
 
 /**

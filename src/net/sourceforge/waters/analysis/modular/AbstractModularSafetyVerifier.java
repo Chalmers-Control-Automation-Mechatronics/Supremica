@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;

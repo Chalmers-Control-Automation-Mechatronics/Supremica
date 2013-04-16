@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;

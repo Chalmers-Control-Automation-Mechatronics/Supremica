@@ -19,8 +19,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
-import net.sourceforge.waters.model.analysis.des.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;

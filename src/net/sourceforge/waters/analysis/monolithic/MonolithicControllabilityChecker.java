@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
-import net.sourceforge.waters.model.analysis.des.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

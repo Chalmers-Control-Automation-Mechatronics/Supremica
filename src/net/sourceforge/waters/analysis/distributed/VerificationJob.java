@@ -2,7 +2,7 @@ package net.sourceforge.waters.analysis.distributed;
 
 import java.io.Serializable;
 import net.sourceforge.waters.analysis.distributed.application.Job;
-import net.sourceforge.waters.model.analysis.des.SerializableKindTranslator;
+import net.sourceforge.waters.model.analysis.SerializableKindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 public class VerificationJob extends Job

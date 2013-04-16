@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 

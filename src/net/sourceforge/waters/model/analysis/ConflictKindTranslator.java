@@ -2,12 +2,12 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   ControllabilityKindTranslator
+//# CLASS:   ConflictKindTranslator
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.des;
+package net.sourceforge.waters.model.analysis;
 
 import java.io.Serializable;
 
@@ -18,51 +18,73 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>A kind translator used for controllability checking.
- * This translator relabels supervisors as specifications and otherwise
- * returns all component and event types as they are in the original
- * model.</P>
+ * <P>A kind translator used for conflict checking.
+ * This translator remaps all plants and specifications as plants,
+ * and all controllable and uncontrollable events as uncontrollable.
+ * The use of kind translators is optional in conflict checking,
+ * but the unification of types may make things easier for some
+ * implementations.</P>
  *
  * @author Robi Malik
  */
 
-public class ControllabilityKindTranslator
+public class ConflictKindTranslator
   implements KindTranslator, Serializable
 {
 
   //#########################################################################
   //# Singleton Pattern
-  public static ControllabilityKindTranslator getInstance()
+  public static ConflictKindTranslator getInstance()
   {
     return SingletonHolder.theInstance;
   }
 
   private static class SingletonHolder {
-    private static final ControllabilityKindTranslator theInstance =
-      new ControllabilityKindTranslator();
+    private static final ConflictKindTranslator theInstance =
+      new ConflictKindTranslator();
   }
 
-  private ControllabilityKindTranslator()
+  private ConflictKindTranslator()
   {
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+  /**
+   * Returns the component kind of the given automaton in a conflict
+   * check.
+   * @return {@link ComponentKind#PLANT}, if the given automaton is
+   *         a plant, spec, or supervisor.
+   */
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
     final ComponentKind kind = aut.getKind();
     switch (kind) {
+    case PLANT:
+    case SPEC:
     case SUPERVISOR:
-      return ComponentKind.SPEC;
+      return ComponentKind.PLANT;
     default:
       return kind;
     }
   }
 
+  /**
+   * Returns the event kind of the given event in a language
+   * inclusion check.
+   * @return {@link EventKind#UNCONTROLLABLE}.
+   */
   public EventKind getEventKind(final EventProxy event)
   {
-    return event.getKind();
+    final EventKind kind = event.getKind();
+    switch (kind) {
+    case CONTROLLABLE:
+    case UNCONTROLLABLE:
+      return EventKind.UNCONTROLLABLE;
+    default:
+      return kind;
+    }
   }
 
 

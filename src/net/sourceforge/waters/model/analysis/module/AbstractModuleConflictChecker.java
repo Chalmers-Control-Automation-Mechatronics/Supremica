@@ -1,0 +1,205 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.model.analysis.module
+//# CLASS:   AbstractModuleConflictChecker
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.model.analysis.module;
+
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+
+
+/**
+ * An abstract base class that can be used for all module conflict checker
+ * implementations. In addition to the model and factory members inherited
+ * from {@link AbstractModuleVerifier}, this class provides some support to
+ * get and set the default marking, and to return an error trace of the
+ * appropriate kind.
+ *
+ * @author Robi Malik, Sahar Mohajerani
+ */
+
+public abstract class AbstractModuleConflictChecker
+  extends AbstractModuleVerifier
+  implements ModuleConflictChecker
+{
+
+  //#########################################################################
+  //# Constructors
+  /**
+   * Creates a new conflict checker without a model or marking
+   * proposition.
+   */
+  public AbstractModuleConflictChecker(final ModuleProxyFactory factory)
+  {
+    this(null, factory);
+  }
+
+  /**
+   * Creates a new conflict checker to check whether the given model
+   * nonconflicting with respect to the default marking proposition.
+   * @param  model      The model to be checked by this conflict checker.
+   * @param  factory    Factory used for trace construction.
+   */
+  public AbstractModuleConflictChecker(final ModuleProxy model,
+                                       final ModuleProxyFactory factory)
+  {
+    this(model, null, factory);
+  }
+
+  /**
+   * Creates a new conflict checker to check a particular model.
+   *
+   * @param model
+   *          The model to be checked by this conflict checker.
+   * @param marking
+   *          The name of the proposition event that defines which states are
+   *          marked. Every state has a list of propositions attached to it;
+   *          the conflict checker considers only those states as marked that
+   *          are labelled by <CODE>marking</CODE>, i.e., their list of
+   *          propositions must contain this event (exactly the same object).
+   * @param factory
+   *          Factory used for trace construction.
+   */
+  public AbstractModuleConflictChecker(final ModuleProxy model,
+                                       final IdentifierProxy marking,
+                                       final ModuleProxyFactory factory)
+  {
+    this(model, marking, null, factory);
+  }
+
+  /**
+   * Creates a new conflict checker to check a particular model.
+   *
+   * @param model
+   *          The model to be checked by this conflict checker.
+   * @param marking
+   *          The name of the proposition event that defines which states are
+   *          marked. Every state has a list of propositions attached to it;
+   *          the conflict checker considers only those states as marked that
+   *          are labelled by <CODE>marking</CODE>, i.e., their list of
+   *          propositions must contain this event (exactly the same object).
+   * @param preMarking
+   *          The name of the proposition event that defines which states have
+   *          alpha (precondition) markings for a generalised nonblocking
+   *          check.
+   * @param factory
+   *          Factory used for trace construction.
+   */
+    public AbstractModuleConflictChecker(final ModuleProxy model,
+                                         final IdentifierProxy marking,
+                                         final IdentifierProxy preMarking,
+                                         final ModuleProxyFactory factory)
+    {
+      super(model, factory, ConflictKindTranslator.getInstance());
+      mMarking = marking;
+      mPreconditionMarking = preMarking;
+      mUsedMarking = null;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModuleAnalyser
+  @Override
+  public void setModel(final ModuleProxy model)
+  {
+    super.setModel(model);
+    mUsedMarking = null;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModuleConflictChecker
+  @Override
+  public void setConfiguredDefaultMarking(final IdentifierProxy marking)
+  {
+    mMarking = marking;
+    mUsedMarking = null;
+  }
+
+  @Override
+  public IdentifierProxy getConfiguredDefaultMarking()
+  {
+    return mMarking;
+  }
+
+  @Override
+  public void setConfiguredPreconditionMarking(final IdentifierProxy marking){
+    mPreconditionMarking = marking;
+  }
+
+  @Override
+  public IdentifierProxy getConfiguredPreconditionMarking(){
+    return mPreconditionMarking;
+  }
+
+  @Override
+  public ConflictTraceProxy getCounterExample()
+  {
+    return (ConflictTraceProxy) super.getCounterExample();
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.ModuleAnalyser
+  @Override
+  protected void tearDown()
+  {
+    mUsedMarking = null;
+    super.tearDown();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Gets the marking proposition to be used.
+   * This method returns the marking proposition specified by the {@link
+   * #setConfiguredDefaultMarking(IdentifierProxy) setMarkingProposition()}
+   * method, if non-null, or the default marking proposition of the input model.
+   * @throws IllegalArgumentException to indicate that the a
+   *         <CODE>null</CODE> marking was specified, but input model does
+   *         not contain any proposition with the default marking name.
+   */
+  protected IdentifierProxy getUsedDefaultMarking()
+  {
+    if (mUsedMarking == null) {
+      final String name = EventDeclProxy.DEFAULT_MARKING_NAME;
+      mUsedMarking = getFactory().createSimpleIdentifierProxy(name);
+    }
+    return mUsedMarking;
+  }
+
+  /**
+   * Gets a name that can be used for a counterexample for the current model.
+   */
+  protected String getTraceName()
+  {
+    final ModuleProxy model = getModel();
+    return getTraceName(model);
+  }
+
+  /**
+   * Gets a name that can be used for a counterexample for the given model.
+   */
+  public static String getTraceName(final ModuleProxy model)
+  {
+    final String modelname = model.getName();
+    return modelname + "-conflicting";
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private IdentifierProxy mMarking;
+  private IdentifierProxy mUsedMarking;
+  private IdentifierProxy mPreconditionMarking;
+}

@@ -15,8 +15,8 @@ import java.util.Map;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractLanguageInclusionKindTranslator;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;

@@ -32,9 +32,9 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;

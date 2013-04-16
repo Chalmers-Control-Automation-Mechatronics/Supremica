@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;

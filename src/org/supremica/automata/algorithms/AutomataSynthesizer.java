@@ -56,9 +56,9 @@ import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelA
 import net.sourceforge.waters.analysis.compositional.CompositionalSynthesizer;
 import net.sourceforge.waters.analysis.compositional.SynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
-import net.sourceforge.waters.model.analysis.des.ConflictKindTranslator;
-import net.sourceforge.waters.model.analysis.des.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;

@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.des.AnalysisResult;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 

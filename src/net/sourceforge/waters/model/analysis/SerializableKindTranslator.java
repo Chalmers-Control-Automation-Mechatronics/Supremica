@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.des;
+package net.sourceforge.waters.model.analysis;
 
 import java.io.Serializable;
 import java.util.Collection;

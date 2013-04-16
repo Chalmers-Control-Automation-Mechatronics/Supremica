@@ -29,11 +29,11 @@ import java.util.Queue;
 
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.NamedProxy;

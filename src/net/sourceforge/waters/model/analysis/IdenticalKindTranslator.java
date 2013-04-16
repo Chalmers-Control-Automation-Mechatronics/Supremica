@@ -2,51 +2,50 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   LanguageInclusionKindTranslator
+//# CLASS:   IdenticalKindTranslator
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.des;
+package net.sourceforge.waters.model.analysis;
 
 import java.io.Serializable;
 
+import net.sourceforge.waters.model.analysis.des.AbstractKindTranslator;
+
 
 /**
- * <P>A kind translator used for language inclusion checking.
- * This translator remaps all events to be uncontrollable,
- * all specs and supervisors are considered as plants, and all properties are
- * considered as specs. Such a remapping makes it possible to
- * implement language inclusion checking using a controllability
- * checker.</P>
+ * <P>A kind translator that does not change component and event
+ * attributes. This simple kind translator implementation is used
+ * for simple controllability checks.</P>
  *
  * @author Robi Malik
  */
 
-public class LanguageInclusionKindTranslator
-  extends AbstractLanguageInclusionKindTranslator
+public class IdenticalKindTranslator
+  extends AbstractKindTranslator
   implements Serializable
 {
 
   //#########################################################################
   //# Singleton Implementation
-  public static LanguageInclusionKindTranslator getInstance()
+  public static IdenticalKindTranslator getInstance()
   {
     return SingletonHolder.theInstance;
   }
 
   private static class SingletonHolder {
-    private static final LanguageInclusionKindTranslator theInstance =
-      new LanguageInclusionKindTranslator();
+    private static final IdenticalKindTranslator theInstance =
+      new IdenticalKindTranslator();
   }
 
-  private LanguageInclusionKindTranslator()
+  private IdenticalKindTranslator()
   {
   }
 
 
   //#########################################################################
-  //# Class Constants
+  //# Singleton Implementation
   private static final long serialVersionUID = 1L;
 
 }

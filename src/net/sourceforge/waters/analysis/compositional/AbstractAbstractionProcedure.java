@@ -11,7 +11,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.model.analysis.des.KindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
