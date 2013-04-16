@@ -7,7 +7,7 @@ package net.sourceforge.waters.analysis.sd;
 
 import java.io.Serializable;
 
-import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;

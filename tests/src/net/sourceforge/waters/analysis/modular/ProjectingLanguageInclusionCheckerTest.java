@@ -15,7 +15,7 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.
        AbstractLanguageInclusionCheckerTest;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

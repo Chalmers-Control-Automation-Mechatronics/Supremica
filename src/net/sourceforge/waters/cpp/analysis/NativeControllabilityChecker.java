@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ControllabilityDiagnostics;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
-import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
+import net.sourceforge.waters.model.analysis.des.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
+import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

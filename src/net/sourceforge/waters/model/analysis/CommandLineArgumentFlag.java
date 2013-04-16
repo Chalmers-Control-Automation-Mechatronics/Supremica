@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+
 
 /**
  * A flag command line argument passed to a {@link ModelVerifierFactory}.
@@ -52,7 +54,8 @@ public abstract class CommandLineArgumentFlag
 
   //#######################################################################
   //# Parsing
-  protected void parse(final Iterator<String> iter)
+  @Override
+  public void parse(final Iterator<String> iter)
   {
     setUsed(true);
   }

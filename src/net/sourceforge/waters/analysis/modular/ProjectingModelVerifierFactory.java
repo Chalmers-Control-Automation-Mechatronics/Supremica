@@ -11,11 +11,11 @@ package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -67,6 +67,7 @@ public class ProjectingModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  @Override
   public ProjectingControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
@@ -105,7 +106,8 @@ public class ProjectingModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       verifier.setNodeLimit(limit);
@@ -131,7 +133,8 @@ public class ProjectingModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       verifier.setNodeLimit(limit);
@@ -157,7 +160,8 @@ public class ProjectingModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       verifier.setTransitionLimit(limit);
@@ -183,7 +187,8 @@ public class ProjectingModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       verifier.setTransitionLimit(limit);

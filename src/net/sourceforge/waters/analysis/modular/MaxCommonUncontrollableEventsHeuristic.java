@@ -6,7 +6,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import java.util.Set;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.KindTranslator;
+
 import java.util.Collections;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import java.util.Collection;

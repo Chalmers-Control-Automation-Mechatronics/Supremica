@@ -15,14 +15,15 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+
 import net.sourceforge.waters.analysis.distributed.application.DistributedNode;
 import net.sourceforge.waters.analysis.distributed.application.DistributedServer;
 import net.sourceforge.waters.analysis.distributed.application.Server;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -151,7 +152,8 @@ public class DistributedModelVerifierFactory
       return getValue();
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
       final String value = getValue();
@@ -168,7 +170,8 @@ public class DistributedModelVerifierFactory
 	    "File to dump job result into");
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier)verifier;
       final String value = getValue();
@@ -191,7 +194,8 @@ public class DistributedModelVerifierFactory
       return getValue();
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
       final int value = getValue();
@@ -213,7 +217,8 @@ public class DistributedModelVerifierFactory
       return getValue();
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
       final int value = getValue();
@@ -230,7 +235,8 @@ public class DistributedModelVerifierFactory
 	    "Shut down the distributed checker after verification");
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
       dsv.setShutdownAfter(true);
@@ -246,7 +252,8 @@ public class DistributedModelVerifierFactory
 	    "Sets the time limit for the job.");
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
       dsv.setWalltimeLimit(getValue());
@@ -263,7 +270,8 @@ public class DistributedModelVerifierFactory
 	    "Number of processing threads to run");
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
       dsv.setProcessingThreadCount(getValue());
@@ -280,7 +288,8 @@ public class DistributedModelVerifierFactory
 	    "State distribution method to use");
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
       dsv.setStateDistribution(getValue());

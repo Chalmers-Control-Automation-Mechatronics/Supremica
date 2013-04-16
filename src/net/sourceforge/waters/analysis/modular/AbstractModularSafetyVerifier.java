@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -20,7 +20,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 /**
  * <P>A common superclass for all modular verifiers. This class provides
  * common implementations for the {@link
- * net.sourceforge.waters.model.analysis.SafetyVerifier SafetyVerifier}
+ * net.sourceforge.waters.model.analysis.des.SafetyVerifier SafetyVerifier}
  * interface and enables uniform access to set the heuristic ({@link
  * ModularHeuristic}).</P>
  *

@@ -59,7 +59,7 @@ package org.supremica.properties;
 
 import java.awt.Color;
 
-import net.sourceforge.waters.model.analysis.ModelVerifierFactoryLoader;
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactoryLoader;
 
 import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.BDDPartitioningType;

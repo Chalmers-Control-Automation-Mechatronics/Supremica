@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
 import net.sourceforge.waters.model.analysis.AbortException;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.analysis.ControlLoopChecker;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -85,12 +85,12 @@ public class MonolithicControlLoopChecker
    * as parameter to the constructor of this object. On termination,
    * the result of checking the property is known and can be queried
    * using the {@link
-   * net.sourceforge.waters.model.analysis.ModelVerifier#isSatisfied()
+   * net.sourceforge.waters.model.analysis.des.ModelVerifier#isSatisfied()
    * isSatisfied()} and {@link #getCounterExample()} methods.
    * @return <CODE>true</CODE> if the model is control-loop free, or
    *         <CODE>false</CODE> if it is not.
    *         The same value can be queried using the {@link
-   *         net.sourceforge.waters.model.analysis.ModelVerifier#isSatisfied()
+   *         net.sourceforge.waters.model.analysis.des.ModelVerifier#isSatisfied()
    *         isSatisfied()} method.
    */
   public boolean run()

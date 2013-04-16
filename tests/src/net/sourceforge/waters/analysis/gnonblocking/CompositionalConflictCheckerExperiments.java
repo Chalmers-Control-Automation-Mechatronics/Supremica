@@ -9,8 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
-import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;

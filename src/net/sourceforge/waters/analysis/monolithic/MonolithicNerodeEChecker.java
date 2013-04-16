@@ -19,11 +19,11 @@ import net.sourceforge.waters.analysis.sd.NerodeDiagnostics;
 import net.sourceforge.waters.analysis.sd.NerodeEquVerificationResult;
 import net.sourceforge.waters.analysis.sd.NerodeKindTranslator;
 import net.sourceforge.waters.model.analysis.AbortException;
-import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -72,12 +72,12 @@ public class MonolithicNerodeEChecker
    * as parameter to the constructor of this object. On termination,
    * the result of checking the property is known and can be queried
    * using the {@link
-   * net.sourceforge.waters.model.analysis.ModelVerifier#isSatisfied()
+   * net.sourceforge.waters.model.analysis.des.ModelVerifier#isSatisfied()
    * isSatisfied()} and {@link #getCounterExample()} methods.
    * @return <CODE>true</CODE> if the model satisfied Nerode equivalence, or
    *         <CODE>false</CODE> if it does not.
    *         The same value can be queried using the {@link
-   *         net.sourceforge.waters.model.analysis.ModelVerifier#isSatisfied()
+   *         net.sourceforge.waters.model.analysis.des.ModelVerifier#isSatisfied()
    *         isSatisfied()} method.
    */
   public boolean run()

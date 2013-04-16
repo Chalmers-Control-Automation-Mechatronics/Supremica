@@ -12,10 +12,10 @@ package net.sourceforge.waters.analysis.modular;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -53,6 +53,7 @@ public class ModularModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  @Override
   public ModularControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
@@ -63,12 +64,14 @@ public class ModularModelVerifierFactory
        false);
   }
 
+  @Override
   public ModularControlLoopChecker createControlLoopChecker
     (final ProductDESProxyFactory factory)
   {
     return new ModularControlLoopChecker(factory);
   }
 
+  @Override
   public ModularLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
@@ -108,7 +111,8 @@ public class ModularModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final AutomataGroup.MergeVersion method = getValue();
       if (verifier instanceof ModularControlLoopChecker) {
@@ -139,7 +143,8 @@ public class ModularModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final AutomataGroup.SelectVersion method = getValue();
       if (verifier instanceof ModularControlLoopChecker) {
@@ -170,7 +175,8 @@ public class ModularModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final MonolithicSCCControlLoopChecker.CLDetector method = getValue();
       if (verifier instanceof ModularControlLoopChecker) {

@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.analysis;
 import java.util.List;
 import java.util.LinkedList;
 
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 

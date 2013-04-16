@@ -14,8 +14,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgument;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 

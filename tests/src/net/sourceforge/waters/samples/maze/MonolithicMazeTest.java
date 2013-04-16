@@ -11,7 +11,7 @@ package net.sourceforge.waters.samples.maze;
 
 import net.sourceforge.waters.analysis.monolithic.
   MonolithicLanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

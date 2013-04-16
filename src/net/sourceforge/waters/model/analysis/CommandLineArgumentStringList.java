@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+
 
 /**
  * A command line argument passed to a {@link ModelVerifierFactory} to specify
@@ -79,7 +81,7 @@ public abstract class CommandLineArgumentStringList
   //#######################################################################
   //# Parsing
   @Override
-  protected void parse(final Iterator<String> iter)
+  public void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
       final String value = iter.next();

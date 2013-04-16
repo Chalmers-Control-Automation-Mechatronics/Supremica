@@ -74,7 +74,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler
  * ModuleInstanceCompiler}).</P>
  *
- * <P>Th EFA compiler ensures that the resultant module only contains
+ * <P>The EFA compiler ensures that the resultant module only contains
  * nodes of the following types.</P>
  * <UL>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
@@ -153,7 +153,7 @@ public class EFACompiler
       computeEventPartitions();
       // Pass 4 ...
       final Pass4Visitor pass4 = new Pass4Visitor();
-      return (ModuleProxy) pass4.visitModuleProxy(mInputModule);
+      return pass4.visitModuleProxy(mInputModule);
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -385,6 +385,7 @@ public class EFACompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public List<SimpleIdentifierProxy> visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -399,6 +400,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public Object visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
@@ -407,11 +409,13 @@ public class EFACompiler
       return null;
     }
 
+    @Override
     public Object visitNodeProxy(final NodeProxy node)
     {
       return null;
     }
 
+    @Override
     public CompiledRange visitSimpleComponentProxy
       (final SimpleComponentProxy comp)
       throws VisitorException
@@ -427,6 +431,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public IdentifierProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
       throws VisitorException
     {
@@ -442,6 +447,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public CompiledRange visitVariableComponentProxy
       (final VariableComponentProxy var)
       throws VisitorException
@@ -484,6 +490,7 @@ public class EFACompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -508,6 +515,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public EFAEventDecl visitEventDeclProxy(final EventDeclProxy decl)
       throws VisitorException
     {
@@ -521,6 +529,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -533,6 +542,7 @@ public class EFACompiler
       return null;
     }
 
+    @Override
     public ConstraintList visitGuardActionBlockProxy
       (final GuardActionBlockProxy ga)
       throws VisitorException
@@ -550,6 +560,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public EFAEventDecl visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
@@ -572,6 +583,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public Object visitLabelBlockProxy(final LabelBlockProxy block)
       throws VisitorException
     {
@@ -580,6 +592,7 @@ public class EFACompiler
       return null;
     }
 
+    @Override
     public Object visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
@@ -595,6 +608,7 @@ public class EFACompiler
       return null;
     }
 
+    @Override
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
       throws VisitorException
     {
@@ -636,6 +650,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public Object visitVariableComponentProxy(final VariableComponentProxy var)
     {
       return null;
@@ -732,6 +747,7 @@ public class EFACompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEventDeclProxy(final EventDeclProxy decl)
       throws VisitorException
     {
@@ -754,6 +770,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -769,6 +786,7 @@ public class EFACompiler
       return result;
     }
 
+    @Override
     public GraphProxy visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -817,6 +835,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
       throws VisitorException
     {
@@ -842,6 +861,7 @@ public class EFACompiler
       return result;
     }
 
+    @Override
     public Object visitIdentifierProxy(final IdentifierProxy ident)
     {
       Collection<EFAEvent> events = mEFAEventMap.get(ident);
@@ -868,6 +888,7 @@ public class EFACompiler
       return null;
     }
 
+    @Override
     public LabelBlockProxy visitLabelBlockProxy(final LabelBlockProxy block)
       throws VisitorException
     {
@@ -881,6 +902,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public ModuleProxy visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
@@ -903,6 +925,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public SimpleComponentProxy visitSimpleComponentProxy
       (final SimpleComponentProxy comp)
       throws VisitorException
@@ -926,6 +949,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
       throws VisitorException
     {
@@ -944,6 +968,7 @@ public class EFACompiler
       return result;
     }
 
+    @Override
     public SimpleComponentProxy visitVariableComponentProxy
       (final VariableComponentProxy comp)
       throws VisitorException
