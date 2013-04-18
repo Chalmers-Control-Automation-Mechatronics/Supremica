@@ -33,7 +33,7 @@ public interface VariableContext extends BindingContext {
    *                   next-state value of EFA variables.
    * @return The evaluated range determined for the variable with the given
    *         name, or <CODE>null</CODE> if the name is not associated with
-   *         ant variable, or the range has not yet been determined.
+   *         any variable, or the range has not yet been determined.
    */
   public CompiledRange getVariableRange(SimpleExpressionProxy varname);
 
