@@ -16,6 +16,7 @@ import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 
 /**
@@ -29,6 +30,15 @@ class EFSMVariable implements Comparable<EFSMVariable> {
 
   //#########################################################################
   //# Constructors
+  EFSMVariable(final VariableComponentProxy var,
+               final CompiledRange range)
+  {
+    mIsNext = false;
+    mComponent = var;
+    mRange = range;
+    mVariableName = var.getIdentifier();
+  }
+
   EFSMVariable(final boolean isnext,
                final ComponentProxy comp,
                final CompiledRange range,
