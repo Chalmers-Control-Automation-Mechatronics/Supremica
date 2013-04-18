@@ -68,7 +68,7 @@ public class IsomorphismChecker
    *                     object identity.
    */
   public IsomorphismChecker(final ProductDESProxyFactory factory,
-                            final boolean matchNames, 
+                            final boolean matchNames,
                             final boolean throwingExceptions)
   {
     mFactory = factory;
@@ -162,11 +162,12 @@ public class IsomorphismChecker
    * Checks whether the two given automata are bisimilar.
    * @param  aut1   The first automaton to be compared.
    * @param  aut2   The second automaton to be compared.
-   * @return 
+   * @return <CODE>true</CODE> if the automata have been found to be
+   *         bisimilar, <CODE>false</CODE> otherwise.
    * @throws AnalysisException if the input automata are not isomorphic.
    */
   public boolean checkBisimulation(final AutomatonProxy aut1,
-                                final AutomatonProxy aut2)
+                                   final AutomatonProxy aut2)
     throws AnalysisException
   {
     if (aut1.getStates().size() != 0 || aut2.getStates().size() != 0) {

@@ -72,8 +72,6 @@ public class EnabledEventsCompositionalConflictChecker extends
    *
    * @param model
    *          The model to be checked by this conflict checker.
-   * @param method
-   *          Abstraction procedure used for simplification.
    * @param factory
    *          Factory used for trace construction.
    */
@@ -95,8 +93,6 @@ public class EnabledEventsCompositionalConflictChecker extends
    *          conflict checker considers only those states as marked that are
    *          labelled by <CODE>marking</CODE>, i.e., their list of
    *          propositions must contain this event (exactly the same object).
-   * @param method
-   *          Abstraction procedure used for simplification.
    * @param factory
    *          Factory used for trace construction.
    */

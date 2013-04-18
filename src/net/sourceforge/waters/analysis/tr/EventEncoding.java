@@ -133,7 +133,7 @@ public class EventEncoding
    * Creates an empty encoding.
    * This method creates an event encoding without any events or
    * propositions. Events can be added using {@link
-   * #addEvent(EventProxy,KindTranslator,boolean) addEvent()} or {@link
+   * #addEvent(EventProxy,KindTranslator,byte) addEvent()} or {@link
    * #addSilentEvent(EventProxy) addSilentEvent()}.
    */
   public EventEncoding()
@@ -435,14 +435,9 @@ public class EventEncoding
    *                     or a proposition.
    * @param  translator  Kind translator to distinguish propositions from
    *                     proper events.
-   * @param  selfloop    A flag, indicating whether the additional event should
-   *                     be selflooped (or marked, for propositions) in all
-   *                     states of an automaton using this encoding. This
-   *                     information is stored on the event encoding and needs
-   *                     to be read by any procedures creating transition
-   *                     relations using the encoding.
+   * @param  status      Collection of status flags providing additional
+   *                     information about the event.
    * @return The event (or proposition) code that was assigned to the event.
-   * @see #getExtraSelfloops()
    */
   public int addEvent(final EventProxy event,
                       final KindTranslator translator,

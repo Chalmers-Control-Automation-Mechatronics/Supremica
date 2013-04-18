@@ -42,11 +42,45 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
+/**
+ * <P>A constraint propagator used to simplify expressions found in
+ * guard/action blocks.</P>
+ *
+ * <P>The constraint propagator is initialised with a list of formulas
+ * understood as a conjunction of constraints, and a context providing
+ * values bound to symbols and ranges of variables. It attempts to simplify
+ * these constraints to produce a simpler list of expressions.</P>
+ *
+ * <P>The constraint propagator is not complete. It can handle equality
+ * substitutions, some linear arithmetic, and some Boolean normalisation.
+ * More complex formulas, for example involving disjunctions or non-linear
+ * arithmetic, are not simplified.</P>
+ *
+ * <P>The basic usage pattern of the constraint propagator is as follows.</P>
+ *
+ * <PRE>  {@link ModuleProxyFactory} factory = {@link net.sourceforge.waters.plain.module.ModuleElementFactory#getInstance() ModuleElementFactory.getInstance()};
+ *  {@link CompilerOperatorTable} optable = {@link CompilerOperatorTable#getInstance()};
+ *  ConstraintPropagator propagator =
+ *    new {@link #ConstraintPropagator(ModuleProxyFactory, CompilerOperatorTable, VariableContext) ConstraintPropagator}(factory, optable, context);
+ *  propagator.{@link #addConstraints(ConstraintList) addConstraints}(constraints);  // load constraints
+ *  propagator.{@link #propagate()};  // simplify
+ *  {@link ConstraintList} result = propagator.{@link #getAllConstraints()};  // get result</PRE>
+ *
+ * @author Robi Malik
+ */
+
 public class ConstraintPropagator
 {
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new constraint propagator.
+   * @param factory  Factory used to create expressions.
+   * @param optable  Operator table to provide operators.
+   * @param root     Context providing values of bound symbols and
+   *                 ranges of EFA variables.
+   */
   public ConstraintPropagator
     (final ModuleProxyFactory factory,
      final CompilerOperatorTable optable,
@@ -92,6 +126,13 @@ public class ConstraintPropagator
     mIsUnsatisfiable = false;
   }
 
+  /**
+   * Duplicates a constraint propagator.
+   * This constructor creates a new constraint propagator, which is
+   * initialised to exactly the same state as the given constraint
+   * propagator. It has the same context and starts with the same
+   * bindings and formulas.
+   */
   public ConstraintPropagator(final ConstraintPropagator propagator)
   {
     mFactory = propagator.mFactory;
@@ -138,12 +179,22 @@ public class ConstraintPropagator
 
   //#########################################################################
   //# Loading
+  /**
+   * Initialises this constraint propagator.
+   * This method clears any constraints and bindings,
+   * and replaces them by the contents of the given list.
+   * @param clist  New list of constraints to replace previous state.
+   */
   public void init(final ConstraintList clist)
   {
     reset();
     addConstraints(clist);
   }
 
+  /**
+   * Resets this constraint propagator.
+   * This method clears all constraints and bindings.
+   */
   public void reset()
   {
     mContext.reset();
@@ -152,11 +203,29 @@ public class ConstraintPropagator
     mIsUnsatisfiable = false;
   }
 
+  /**
+   * <P>Adds the given constraints to this constraint propagator.</P>
+   * <P>This method does not clear any constraints or bindings already
+   * present. It merely adds the new constraints to its list unprocessed
+   * constraints, further restricting the present state.</P>
+   * <P>The additional constraints are not automatically simplified.
+   * To simplify, {@link #propagate()} should be called.</P>
+   * @param clist  List of constraints to be added.
+   */
   public void addConstraints(final ConstraintList clist)
   {
     addConstraints(clist.getConstraints());
   }
 
+  /**
+   * <P>Adds the given constraints to this constraint propagator.</P>
+   * <P>This method does not clear any constraints or bindings already
+   * present. It merely adds the new constraints to its list unprocessed
+   * constraints, further restricting the present state.</P>
+   * <P>The additional constraints are not automatically simplified.
+   * To simplify, {@link #propagate()} should be called.</P>
+   * @param constraints  List of constraints to be added.
+   */
   public void addConstraints
     (final Collection<SimpleExpressionProxy> constraints)
   {
@@ -165,6 +234,15 @@ public class ConstraintPropagator
     }
   }
 
+  /**
+   * <P>Adds the given constraint to this constraint propagator.</P>
+   * <P>This method does not clear any constraints or bindings already
+   * present. It merely adds the new constraint to its list unprocessed
+   * constraints, further restricting the present state.</P>
+   * <P>The additional constraint is not automatically simplified.
+   * To simplify, {@link #propagate()} should be called.</P>
+   * @param constraint  Constraint to be added.
+   */
   public void addConstraint(final SimpleExpressionProxy constraint)
   {
     assert constraint != null;
@@ -173,6 +251,19 @@ public class ConstraintPropagator
     }
   }
 
+  /**
+   * <P>Adds the negation of the given constraint list to this constraint
+   * propagator.</P>
+   * <P>This method does not clear any constraints or bindings
+   * already present. It merely adds the new constraint to its list
+   * unprocessed constraints, further restricting the present state.</P>
+   * <P>The additional constraints are not automatically simplified.
+   * To simplify, {@link #propagate()} should be called.</P>
+   * @param clist  List of constraints to be negated and added.
+   *               If the constraint list contains multiple constraints
+   *               in conjunction, this results in a disjunctive constraint
+   *               added to this constraint propagator.
+   */
   public void addNegation(final ConstraintList clist)
     throws EvalException
   {
@@ -196,6 +287,15 @@ public class ConstraintPropagator
 
   //#########################################################################
   //# Invocation
+  /**
+   * Simplifies the current set of constraints.
+   * This method attempts to simplify the given set of constraints under
+   * the current bindings as much as possible. It applies all available
+   * simplifications rules until no further simplification is possible.
+   * It changes the state of the constraint propagator to reflect any
+   * changes, and the results can be retrieved using the methods
+   * {@link #isUnsatisfiable()} and {@link #getAllConstraints()}.
+   */
   public void propagate()
     throws EvalException
   {
@@ -252,17 +352,50 @@ public class ConstraintPropagator
 
   //#########################################################################
   //# Result Retrieval
+  /**
+   * Returns whether the current set of constraints has been found to be
+   * false.
+   * @return <CODE>true</CODE> if it has been found that the given
+   *         constraints cannot be simultaneously true in the current
+   *         context. Otherwise <CODE>false</CODE> is returned, indicating
+   *         the the constraints may be simultaneously true, or it is not
+   *         known whether they are satisfiable.
+   */
   public boolean isUnsatisfiable()
   {
     return mIsUnsatisfiable;
   }
 
+  /**
+   * <P>Returns a constraint list representing the current state of this
+   * constraint propagator. The returned list of expressions describes
+   * all constraints given as formulas as well as any inferred range
+   * constraints, as concisely as possible.</P>
+   * <P>This method calls {@link #getAllConstraints(boolean)} with the
+   * <CODE>pretty</CODE> argument set to&nbsp;<CODE>true</CODE>.
+   * @return List of constraints, or <CODE>null</CODE> if the current
+   *         constraints have been found to be unsatisfiable.
+   */
   public ConstraintList getAllConstraints()
     throws EvalException
   {
     return getAllConstraints(true);
   }
 
+  /**
+   * Returns a constraint list representing the current state of this
+   * constraint propagator. The returned list of expressions describes
+   * all constraints given as formulas as well as any inferred range
+   * constraints, as concisely as possible.
+   * @param  pretty   Whether enumeration constraints should be shortened
+   *                  using inequalities. For example, if a
+   *                  variable&nbsp;<CODE>x</CODE> can take all values from
+   *                  a ten-valued enumeration except <CODE>b</CODE>
+   *                  or&nbsp;<CODE>c</CODE>, this may be represented as
+   *                  <CODE>x&nbsp;!=&nbsp;b&nbsp;& x&nbsp;!=&nbsp;c</CODE>.
+   * @return List of constraints, or <CODE>null</CODE> if the current
+   *         constraints have been found to be unsatisfiable.
+   */
   public ConstraintList getAllConstraints(final boolean pretty)
     throws EvalException
   {
