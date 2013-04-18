@@ -412,7 +412,7 @@ public class ConstraintPropagator
     ConstraintContext(final ConstraintContext context)
     {
       mRootContext = context.mRootContext;
-      final int size = mRootContext.getVariableNames().size();
+      final int size = 2 * mRootContext.getNumberOfVariables();
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
       mBindings =
@@ -443,7 +443,7 @@ public class ConstraintPropagator
       mRootContext = root;
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
-      final int size = root.getVariableNames().size();
+      final int size = 2 * root.getNumberOfVariables();
       mBindings =
         new ProxyAccessorHashMap<SimpleExpressionProxy,AbstractBinding>
           (eq, size);
@@ -451,6 +451,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+    @Override
     public SimpleExpressionProxy getBoundExpression
       (final SimpleExpressionProxy ident)
     {
@@ -464,11 +465,13 @@ public class ConstraintPropagator
       return mRootContext.getBoundExpression(ident);
     }
 
+    @Override
     public boolean isEnumAtom(final IdentifierProxy ident)
     {
       return mRootContext.isEnumAtom(ident);
     }
 
+    @Override
     public ModuleBindingContext getModuleBindingContext()
     {
       return mRootContext.getModuleBindingContext();
@@ -476,6 +479,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.VariableContext
+    @Override
     public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
     {
       final AbstractBinding binding = mBindings.getByProxy(varname);
@@ -486,9 +490,10 @@ public class ConstraintPropagator
       }
     }
 
-    public Collection<SimpleExpressionProxy> getVariableNames()
+    @Override
+    public int getNumberOfVariables()
     {
-      return mRootContext.getVariableNames();
+      return mRootContext.getNumberOfVariables();
     }
 
     //#######################################################################
@@ -653,6 +658,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Overrides for Base Class java.lang.Object
+    @Override
     public String toString()
     {
       final StringBuffer buffer = new StringBuffer();
@@ -884,6 +890,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Constraint Retrieval
+    @Override
     void addEquationConstraint(final Collection<SimpleExpressionProxy> result)
     {
       if (isAtomic()) {
@@ -911,6 +918,7 @@ public class ConstraintPropagator
       super.addEquationConstraint(result);
     }
 
+    @Override
     void addRangeConstraints(final Collection<SimpleExpressionProxy> result,
                              final CompiledRange orig,
                              final boolean pretty)
@@ -974,6 +982,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Constraint Retrieval
+    @Override
     void addRangeConstraints(final Collection<SimpleExpressionProxy> result,
                              final CompiledRange orig,
                              final boolean pretty)

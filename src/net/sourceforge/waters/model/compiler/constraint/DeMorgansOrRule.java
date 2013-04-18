@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * <P>A simplification simplify a negated disjunction.</P>
+ * <P>A simplification rule to simplify a negated disjunction.</P>
  *
  * <PRE>
  *   !(LHS | RHS)
@@ -68,11 +68,13 @@ class DeMorgansOrRule extends SimplificationRule
 
   //#########################################################################
   //# Invocation Interface
+  @Override
   boolean isMakingReplacement()
   {
     return true;
   }
 
+  @Override
   void execute(final ConstraintPropagator propagator)
     throws EvalException
   {

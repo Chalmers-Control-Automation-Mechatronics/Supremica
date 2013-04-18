@@ -13,14 +13,14 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
 /**
- * <P>A simplification to restrict the range of a variable in an
+ * <P>A simplification rule to restrict the range of a variable in an
  * inequation.</P>
  *
  * <PRE>
@@ -73,6 +73,7 @@ class LeftNotEqualsRestrictionRule extends RangeRestrictionRule
 
   //#########################################################################
   //# Overrides for Abstract Base Class RangeRestrictionRule
+  @Override
   CompiledRange getRestrictedRange()
     throws EvalException
   {
