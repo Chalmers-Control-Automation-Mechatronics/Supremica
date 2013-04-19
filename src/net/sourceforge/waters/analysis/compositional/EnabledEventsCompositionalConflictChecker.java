@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   CompositionalConflictChecker
+//# CLASS:   EnabledEventsCompositionalConflictChecker
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -32,23 +32,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * <P>
- * A compositional conflict checker that can be configured to use different
- * abstraction sequences for its simplification steps.
- * </P>
- *
- * <P>
- * <I>References:</I><BR>
- * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory
- * Control. SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
- * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
- * Nonblocking, Proc. 7th International Conference on Control and Automation,
- * ICCA'09, 448-453, Christchurch, New Zealand, 2009.
- * </P>
- *
- * @author Robi Malik, Rachel Francis
- */
-
+  * @author Colin Pilbrow
+  */
 public class EnabledEventsCompositionalConflictChecker extends
   CompositionalConflictChecker
 {
@@ -156,7 +141,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     super.addEventsToAllAutomata();
     for(final AutomatonProxy aut: getCurrentAutomata())
     {
-    addDisablingAutomaton(aut);
+      addDisablingAutomaton(aut);
     }
   }
 
@@ -166,10 +151,6 @@ public class EnabledEventsCompositionalConflictChecker extends
   {
     final KindTranslator translator = getKindTranslator();
     int markingID = -1;
-
-    //create event encoding to check for tau (local events)
-
-    //go through all events in aut, ask for event info, ask if it is local only here
     final Collection<AutomatonProxy> collection =
       Collections.singletonList(aut);
     final EventEncoding encoding = new EventEncoding();
@@ -179,22 +160,17 @@ public class EnabledEventsCompositionalConflictChecker extends
         final int code = encoding.addEvent(event, translator, (byte)0);
         if (event == getUsedDefaultMarking()) {
           markingID = code;
-        }    super.addEventsToAutomata(aut);
-
-
+        }
+        super.addEventsToAutomata(aut);
       } else if (info.isLocal(collection)) {
         encoding.addSilentEvent(event);
       } else {
         encoding.addEvent(event, translator, (byte)0);
       }
     }
-    if (markingID == -1) {
-      return;
-    }
 
     final ListBufferTransitionRelation transrel =
-      new ListBufferTransitionRelation(aut,
-                                       encoding,
+      new ListBufferTransitionRelation(aut, encoding,
                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final TauClosure tauClosure =
       transrel.createSuccessorsTauClosure(getInternalTransitionLimit());
@@ -211,19 +187,19 @@ public class EnabledEventsCompositionalConflictChecker extends
     //add aut to info
     //break
 
-    for (int e = EventEncoding.NONTAU; e < encoding
-                                        .getNumberOfProperEvents(); e++) {
+    for (int e = EventEncoding.NONTAU;
+         e < encoding.getNumberOfProperEvents(); e++) {
       for (int s = 0; s < transrel.getNumberOfStates(); s++) {
         if (transrel.isReachable(s)) {
           preClosureIterator.reset(s, e);
           if (preClosureIterator.advance()) {
-            //it has outgoing transitions
+            // It has outgoing transitions.
           } else {
             normalTransIterator.resetState(s);
-            if (normalTransIterator.advance()
-                || transrel.isMarked(s, markingID)) {
-              //it's not a dump state
-              //record we have found disabling automaton
+            if (normalTransIterator.advance() ||
+                markingID < 0 || transrel.isMarked(s, markingID)) {
+              // It's not a dump state.
+              // Record that we have found a disabling automaton.
               final EventProxy event = encoding.getProperEvent(e);
               getEventInfo(event).addDisablingAutomaton(aut);
               break;
