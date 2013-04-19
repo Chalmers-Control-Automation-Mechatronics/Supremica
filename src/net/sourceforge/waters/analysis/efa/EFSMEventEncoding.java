@@ -42,6 +42,11 @@ class EFSMEventEncoding
 
   //#########################################################################
   //# Simple Access
+  public int size ()
+  {
+    return mEventMap.size();
+  }
+
   public int getEventId(final ConstraintList update)
   {
     return mEventMap.get(update);
