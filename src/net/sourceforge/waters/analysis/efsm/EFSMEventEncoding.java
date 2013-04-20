@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa;
+package net.sourceforge.waters.analysis.efsm;
 
 import gnu.trove.TObjectIntHashMap;
 
@@ -40,6 +40,7 @@ class EFSMEventEncoding
     mUpdateList.add(empty);
   }
 
+
   //#########################################################################
   //# Simple Access
   public int size ()
@@ -68,6 +69,7 @@ class EFSMEventEncoding
       return event;
     }
   }
+
 
   //#########################################################################
   //# Data Members

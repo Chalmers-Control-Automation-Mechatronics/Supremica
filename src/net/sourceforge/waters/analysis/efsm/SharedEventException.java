@@ -6,7 +6,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa;
+package net.sourceforge.waters.analysis.efsm;
 
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;

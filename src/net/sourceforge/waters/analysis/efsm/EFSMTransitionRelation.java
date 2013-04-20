@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa;
+package net.sourceforge.waters.analysis.efsm;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
@@ -27,6 +27,7 @@ class EFSMTransitionRelation
     mEventEncoding = events;
   }
 
+
   //#########################################################################
   //# Simple Access
   public ListBufferTransitionRelation getTransitionRelation()
@@ -38,6 +39,7 @@ class EFSMTransitionRelation
   {
     return mEventEncoding;
   }
+
 
   //#########################################################################
   //# Data Members

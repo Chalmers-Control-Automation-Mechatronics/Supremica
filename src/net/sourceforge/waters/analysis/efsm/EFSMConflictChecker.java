@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa;
+package net.sourceforge.waters.analysis.efsm;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;

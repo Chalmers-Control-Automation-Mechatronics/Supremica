@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa;
+package net.sourceforge.waters.analysis.efsm;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
@@ -106,6 +106,7 @@ class EFSMVariable implements Comparable<EFSMVariable> {
   {
     return mRange;
   }
+
 
   //#########################################################################
   //# Data Members

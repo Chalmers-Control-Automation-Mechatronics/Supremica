@@ -7,10 +7,11 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa;
+package net.sourceforge.waters.analysis.efsm;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * @author Robi Malik, Sahar Mohajerani
@@ -20,9 +21,15 @@ class EFSMSystem
 
   //#########################################################################
   //# Constructors
-  public EFSMSystem() {
-    mTransitionRelations = new ArrayList<EFSMTransitionRelation>();
-    mVariables = new ArrayList<EFSMVariable>();
+  public EFSMSystem()
+  {
+    this(DEFAULT_SIZE);
+  }
+
+  public EFSMSystem(final int size)
+  {
+    mTransitionRelations = new ArrayList<EFSMTransitionRelation>(size);
+    mVariables = new ArrayList<EFSMVariable>(size);
   }
 
   public EFSMSystem(final List<EFSMVariable> variables,
@@ -31,7 +38,6 @@ class EFSMSystem
     mTransitionRelations = transitionRelations;
     mVariables = variables;
   }
-
 
   //#########################################################################
   //# Simple Access
@@ -57,4 +63,10 @@ class EFSMSystem
   //# Data Members
   private final List<EFSMTransitionRelation> mTransitionRelations;
   private final List<EFSMVariable> mVariables;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final int DEFAULT_SIZE = 16;
+
 }
