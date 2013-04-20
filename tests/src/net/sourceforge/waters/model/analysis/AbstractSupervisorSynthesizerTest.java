@@ -499,6 +499,7 @@ public abstract class AbstractSupervisorSynthesizerTest
 
   //#########################################################################
   //# Test Cases --- BIG
+  /* Too slow (20min) for supervisor reduction
   public void testAip0Sub1P1() throws Exception
   {
     final String group = "tests";
@@ -506,6 +507,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String name = "aip0sub1p1";
     runSynthesizer(group, subdir, name, true);
   }
+  */
 
   public void test2LinkAltBatch() throws Exception
   {
