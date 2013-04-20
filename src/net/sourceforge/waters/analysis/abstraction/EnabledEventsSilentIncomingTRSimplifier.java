@@ -139,7 +139,7 @@ public class EnabledEventsSilentIncomingTRSimplifier
   {
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (!rel.isUsedEvent(tauID)){ //&& mNumberOfEnabledEvents == 0) {
+    if ((rel.getProperEventStatus(tauID) & EventEncoding.STATUS_UNUSED) != 0) {
       return false;
     } else if (getPreconditionMarkingID() < 0) {        //what is the precondition marking alpha
       mTauTestIterator = rel.createSuccessorsReadOnlyIterator();

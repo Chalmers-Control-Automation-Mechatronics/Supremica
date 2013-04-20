@@ -137,7 +137,9 @@ public class EnabledEventsSilentContinuationTRSimplifier
   throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (!rel.isUsedEvent(EventEncoding.TAU) && mNumberOfEnabledEvents == 0) {
+    if ((rel.getProperEventStatus(EventEncoding.TAU) &
+         EventEncoding.STATUS_UNUSED) != 0 &&
+        mNumberOfEnabledEvents == 0) {
       return false;
     }
     final int numStates = rel.getNumberOfStates();

@@ -81,10 +81,12 @@ public class CanonizeAbstractionRule
       ee.addEvent(mCont, getKindTranslator(), (byte)0);
     }
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
-      ee.addEvent(mAlphaMarking, getKindTranslator(), EventEncoding.STATUS_EXTRA_SELFLOOP);
+      ee.addEvent(mAlphaMarking, getKindTranslator(),
+                  EventEncoding.STATUS_UNUSED);
     }
     if (!autToAbstract.getEvents().contains(mOmegaMarking)) {
-      ee.addEvent(mOmegaMarking, getKindTranslator(), EventEncoding.STATUS_EXTRA_SELFLOOP);
+      ee.addEvent(mOmegaMarking, getKindTranslator(),
+                  EventEncoding.STATUS_UNUSED);
     }
     final ListBufferTransitionRelation tr =
       new ListBufferTransitionRelation(autToAbstract, ee,

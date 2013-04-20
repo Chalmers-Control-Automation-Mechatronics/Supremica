@@ -99,10 +99,11 @@ public class AlphaNonBlockingChecker
     for (final AutomatonProxy aut : model) {
       final EventEncoding ee = new EventEncoding(aut, getKindTranslator());
       if (!ee.getEvents().contains(getUsedDefaultMarking())) {
-        ee.addEvent(getUsedDefaultMarking(), getKindTranslator(), EventEncoding.STATUS_EXTRA_SELFLOOP);
+        ee.addEvent(getUsedDefaultMarking(), getKindTranslator(),
+                    EventEncoding.STATUS_UNUSED);
       }
-      ee.addEvent(mAlpha, getKindTranslator(), EventEncoding.STATUS_EXTRA_SELFLOOP);
-      ee.addEvent(mCont, getKindTranslator(), (byte)0);
+      ee.addEvent(mAlpha, getKindTranslator(), EventEncoding.STATUS_UNUSED);
+      ee.addEvent(mCont, getKindTranslator(), EventEncoding.STATUS_NONE);
       final ListBufferTransitionRelation tr =
         new ListBufferTransitionRelation(aut, ee,
                                          ListBufferTransitionRelation.CONFIG_SUCCESSORS);

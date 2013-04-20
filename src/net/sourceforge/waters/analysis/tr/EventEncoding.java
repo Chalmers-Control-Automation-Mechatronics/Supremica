@@ -227,8 +227,10 @@ public class EventEncoding
     mPropositionStatus = new TByteArrayList(numEvents);
     mEventCodeMap = new TObjectIntHashMap<EventProxy>(numEvents);
     mProperEvents.add(tau);
-    mProperEventStatus.add((byte)0);
-    if (tau != null) {
+    if (tau == null) {
+      mProperEventStatus.add((byte) (STATUS_LOCAL | STATUS_UNUSED));
+    } else {
+      mProperEventStatus.add(STATUS_LOCAL);
       mEventCodeMap.put(tau, TAU);
     }
     for (final EventProxy event : events) {
@@ -278,13 +280,11 @@ public class EventEncoding
         } else {
           tau = event;
         }
-        buffer.append(ecode++);
+        buffer.append(ecode);
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
-        //Replace with complete status info
-      //  if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
-      //   buffer.append('+');
-      //  }
+        final byte status = mProperEventStatus.get(ecode++);
+        appendStatusInfo(buffer, status);
       }
     }
     final TObjectIntIterator<EventProxy> iter = mEventCodeMap.iterator();
@@ -302,9 +302,8 @@ public class EventEncoding
         buffer.append(code);
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
-      //  if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
-      //    buffer.append('+');
-      //  }
+        final byte status = mProperEventStatus.get(code);
+        appendStatusInfo(buffer, status);
       }
     }
     if (mPropositions != null) {
@@ -315,16 +314,32 @@ public class EventEncoding
         } else if (ecode > 0) {
           buffer.append("; ");
         }
-        buffer.append(pcode++);
+        buffer.append(pcode);
         buffer.append('=');
         buffer.append(prop == null ? "(null)" : prop.getName());
-       // if (mExtraSelfLoops != null && mExtraSelfLoops.contains(prop)) {
-       //   buffer.append('+');
-       // }
+        final byte status = mPropositionStatus.get(pcode++);
+        appendStatusInfo(buffer, status);
       }
     }
     buffer.append('}');
     return buffer.toString();
+  }
+
+  private void appendStatusInfo(final StringBuffer buffer, final byte status)
+  {
+    if (status != STATUS_NONE) {
+      char sep = '<';
+      byte bit = 1;
+      for (final String name : STATUS_NAMES) {
+        if ((status & bit) != 0) {
+          buffer.append(sep);
+          sep = ',';
+          buffer.append(name);
+        }
+        bit <<= 1;
+      }
+      buffer.append('>');
+    }
   }
 
 
@@ -386,7 +401,7 @@ public class EventEncoding
    * Gets the proper event, i.e., non-proposition event, with the given code.
    * @param  code   Code of proper event to be looked up.
    *                Must be in the range from 0 to
-   *                {@link #getNumberOfProperEvents()}-1.
+   *                {@link #getNumberOfProperEvents()-1}.
    * @return The proper event assigned to the given code, or <CODE>null</CODE>
    *         if the code is {@link #TAU}, and no silent event was specified.
    */
@@ -436,7 +451,12 @@ public class EventEncoding
    * @param  translator  Kind translator to distinguish propositions from
    *                     proper events.
    * @param  status      Collection of status flags providing additional
-   *                     information about the event.
+   *                     information about the event. Should be a combination
+   *                     of the bits {@link #STATUS_CONTROLLABLE},
+   *                     {@link #STATUS_LOCAL},
+   *                     {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                     {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                     {@link #STATUS_UNUSED}.
    * @return The event (or proposition) code that was assigned to the event.
    */
   public int addEvent(final EventProxy event,
@@ -466,22 +486,66 @@ public class EventEncoding
     return code;
   }
 
-  public byte getPropositionStatus(final int event)
-  {
-    return mPropositionStatus.get(event);
-  }
-  public void setPropositionStatus(final int event, final byte status)
-  {
-    mPropositionStatus.set(event, status);
-  }
-
+  /**
+   * Retrieves the status flags for the given proper event.
+   * @param  code   Code of the proper event to be looked up.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfProperEvents()-1}.
+   * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
+   *         {@link #STATUS_LOCAL}, {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *         {@link #STATUS_UNUSED}.
+   */
   public byte getProperEventStatus(final int event)
   {
     return mProperEventStatus.get(event);
   }
-  public void setProperEventStatus(final int event, final byte status)
+
+  /**
+   * Assigns new status flags to the given proper event.
+   * @param  code   Code of the proper event to be modified.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfProperEvents()-1}.
+   * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
+   *                {@link #STATUS_LOCAL},
+   *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link #STATUS_UNUSED}.
+   */
+  public void setProperEventStatus(final int code, final byte status)
   {
-    mProperEventStatus.set(event, status);
+    mProperEventStatus.set(code, status);
+  }
+
+  /**
+   * Retrieves the status flags for the given proposition.
+   * @param  code   Code of the proposition to be looked up.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfPropositions()}-1.
+   * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
+   *         {@link #STATUS_LOCAL}, {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *         {@link #STATUS_UNUSED}.
+   */
+  public byte getPropositionStatus(final int code)
+  {
+    return mPropositionStatus.get(code);
+  }
+
+  /**
+   * Assigns new status flags to the given proposition.
+   * @param  code   Code of the proposition to be modified.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfPropositions()}-1.
+   * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
+   *                {@link #STATUS_LOCAL},
+   *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link #STATUS_UNUSED}.
+   */
+  public void setPropositionStatus(final int event, final byte status)
+  {
+    mPropositionStatus.set(event, status);
   }
 
 
@@ -501,6 +565,8 @@ public class EventEncoding
   {
     if (mProperEvents.get(TAU) == null) {
       mProperEvents.set(TAU, event);
+      final byte status = mProperEventStatus.get(TAU);
+      mProperEventStatus.set(TAU, (byte) (status & ~STATUS_UNUSED));
     }
     mEventCodeMap.put(event, TAU);
   }
@@ -513,6 +579,7 @@ public class EventEncoding
   private final TObjectIntHashMap<EventProxy> mEventCodeMap;
   private final TByteArrayList mProperEventStatus;
   private final TByteArrayList mPropositionStatus;
+
 
   //#########################################################################
   //# Class Constants
@@ -554,10 +621,43 @@ public class EventEncoding
   public static final int FILTER_ALL =
     FILTER_PROPER_EVENTS | FILTER_PROPOSITIONS;
 
-  public static final byte STATUS_EXTRA_SELFLOOP = 0x01;
-  public static final byte STATUS_CONTROLLABLE = 0x02;
+  /**
+   * An empty status byte to define an event with none of the available
+   * status bits sets.
+   */
+  public static final byte STATUS_NONE = 0x00;
+  /**
+   * A status flag indicating a controllable event.
+   */
+  public static final byte STATUS_CONTROLLABLE = 0x01;
+  /**
+   * A status flag indicating a local event.
+   * A local event is assumed not to be used in any other automaton
+   * except the current one.
+   */
+  public static final byte STATUS_LOCAL = 0x02;
+  /**
+   * A status flag indicating an event that outside of the current automaton
+   * only appears in selfloop transitions.
+   */
   public static final byte STATUS_OUTSIDE_ONLY_SELFLOOP = 0x04;
+  /**
+   * A status flag indicating an event that outside of the current automaton
+   * is always enabled. The only automaton ever disabling this event is the
+   * current automaton.
+   */
   public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x08;
+  /**
+   * A status flag indicating an event not in the alphabet of the current
+   * transition relation. This event is assumed to be implicitly selflooped
+   * in all states.
+   */
+  public static final byte STATUS_UNUSED = 0x10;
+
+  private static final String[] STATUS_NAMES = {
+    "CONTROLLABLE", "LOCAL", "OUTSIDE_ONLY_SELFLOOP",
+    "OUTSIDE_ALWAYS_ENABLED", "UNUSED"
+  };
 
   private static final Collection<EventProxy> NO_EVENTS =
     Collections.emptySet();

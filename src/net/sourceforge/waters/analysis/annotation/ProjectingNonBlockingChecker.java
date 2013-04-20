@@ -1138,7 +1138,8 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
                                             EventKind.UNCONTROLLABLE);
           final EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(), tauproxy);
           if (!minAutomaton.getEvents().contains(getConfiguredDefaultMarking())) {
-            ee.addEvent(getConfiguredDefaultMarking(), getKindTranslator(), EventEncoding.STATUS_EXTRA_SELFLOOP);
+            ee.addEvent(getConfiguredDefaultMarking(), getKindTranslator(),
+                        EventEncoding.STATUS_UNUSED);
           }
           final ListBufferTransitionRelation orig =
             new ListBufferTransitionRelation(minAutomaton, ee,

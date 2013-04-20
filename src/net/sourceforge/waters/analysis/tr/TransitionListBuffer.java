@@ -929,9 +929,10 @@ public abstract class TransitionListBuffer
     }
 
     final int numStates = getNumberOfStates();
-    for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
+    final int numEvents = eventEnc.getNumberOfProperEvents();
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = eventEnc.getProperEventStatus(e);
-      if ((status & EventEncoding.STATUS_EXTRA_SELFLOOP) != 0) {
+      if ((status & EventEncoding.STATUS_UNUSED) != 0) {
         final EventProxy event = eventEnc.getProperEvent(e);
         if (!events.contains(event)) {
           for (int s = 0; s < numStates; s++) {

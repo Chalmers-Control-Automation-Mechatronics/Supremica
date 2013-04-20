@@ -253,6 +253,7 @@ public class ObservationEquivalenceTRSimplifier
     setPropositionMask(mask);
   }
 
+  @Override
   public boolean isPartitioning()
   {
     return true;
@@ -264,6 +265,7 @@ public class ObservationEquivalenceTRSimplifier
     return true;
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
@@ -538,6 +540,7 @@ public class ObservationEquivalenceTRSimplifier
    * performs a second pass to remove redundant transitions.
    * @see TransitionRemoval
    */
+  @Override
   protected void applyResultPartition()
   throws AnalysisException
   {
@@ -687,7 +690,8 @@ public class ObservationEquivalenceTRSimplifier
       trans:
       while (iter0.advance()) {
         final int e = iter0.getCurrentEvent();
-        if (!rel.isUsedEvent(e) || e == skipped) {
+        if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) != 0 ||
+            e == skipped) {
           continue;
         }
         checkAbort();
@@ -843,6 +847,7 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface java.util.Comparable<Splitter>
+    @Override
     public int compareTo(final Splitter splitter)
     {
       return mSize - splitter.getSize();
@@ -850,11 +855,13 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface Splitter
+    @Override
     public int getSize()
     {
       return mSize;
     }
 
+    @Override
     public void collect(final TIntArrayList states)
     {
       reset(mClassReadIterator);
@@ -1005,6 +1012,7 @@ public class ObservationEquivalenceTRSimplifier
       return writer.toString();
     }
 
+    @Override
     public void dump(final PrintWriter printer)
     {
       mClassLists.dumpList(printer, mList);
@@ -1049,24 +1057,29 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface Splitter
+    @Override
     public ComplexEquivalenceClass getParent()
     {
       return null;
     }
 
+    @Override
     public void setParent(final ComplexEquivalenceClass parent)
     {
     }
 
+    @Override
     public InfoMap getInfo()
     {
       return null;
     }
 
+    @Override
     public void setInfo(final InfoMap info)
     {
     }
 
+    @Override
     public void splitOn()
     {
       mIsOpenSplitter = false;
@@ -1106,6 +1119,7 @@ public class ObservationEquivalenceTRSimplifier
       final Collection<EquivalenceClass> splitClasses =
         new THashSet<EquivalenceClass>();
       events.forEach(new TIntProcedure() {
+        @Override
         public boolean execute(final int event)
         {
           final TransitionIterator transIter =
@@ -1133,6 +1147,7 @@ public class ObservationEquivalenceTRSimplifier
       mTempClass.clear();
     }
 
+    @Override
     public void enqueue(final boolean force)
     {
       if (!mIsOpenSplitter) {
@@ -1143,6 +1158,7 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Overrides for EquivalenceClass
+    @Override
     void doSimpleSplit(final int overflowList,
                        final int overflowSize,
                        final boolean preds)
@@ -1201,6 +1217,7 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface java.util.Comparable<Splitter>
+    @Override
     public int compareTo(final Splitter splitter)
     {
       if (mInfo == null) {
@@ -1217,26 +1234,31 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface Splitter
+    @Override
     public ComplexEquivalenceClass getParent()
     {
       return mParent;
     }
 
+    @Override
     public void setParent(final ComplexEquivalenceClass parent)
     {
       mParent = parent;
     }
 
+    @Override
     public InfoMap getInfo()
     {
       return mInfo;
     }
 
+    @Override
     public void setInfo(final InfoMap info)
     {
       mInfo = info;
     }
 
+    @Override
     public void splitOn()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -1249,7 +1271,7 @@ public class ObservationEquivalenceTRSimplifier
       final int size = getSize();
       final int first = mEquivalence.getFirstSplitEvent();
       for (int event = first; event < mNumEvents; event++) {
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           for (int i = 0; i < size; i++) {
@@ -1278,6 +1300,7 @@ public class ObservationEquivalenceTRSimplifier
       mMaxInfoSize = Math.max(mMaxInfoSize, info.size());
     }
 
+    @Override
     public void enqueue(final boolean force)
     {
       mParent = null;
@@ -1464,6 +1487,7 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface java.util.Comparable<Splitter>
+    @Override
     public int compareTo(final Splitter splitter)
     {
       if (mInfo == null) {
@@ -1480,37 +1504,44 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface Splitter
+    @Override
     public int getSize()
     {
       return mSize;
     }
 
+    @Override
     public ComplexEquivalenceClass getParent()
     {
       return mParent;
     }
 
+    @Override
     public void setParent(final ComplexEquivalenceClass parent)
     {
       mParent = parent;
     }
 
+    @Override
     public InfoMap getInfo()
     {
       return mInfo;
     }
 
+    @Override
     public void setInfo(final InfoMap info)
     {
       mInfo = info;
     }
 
+    @Override
     public void collect(final TIntArrayList states)
     {
       mLittleChild.collect(states);
       mBigChild.collect(states);
     }
 
+    @Override
     public void splitOn()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -1526,7 +1557,7 @@ public class ObservationEquivalenceTRSimplifier
       final TIntHashSet visited = new TIntHashSet();
       final int first = mEquivalence.getFirstSplitEvent();
       for (int event = first; event < mNumEvents; event++) {
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           for (int i = 0; i < tempSize; i++) {
@@ -1585,6 +1616,7 @@ public class ObservationEquivalenceTRSimplifier
       mMaxInfoSize = Math.max(mMaxInfoSize, littleInfo.size());
     }
 
+    @Override
     public void enqueue(final boolean force)
     {
       mParent = null;
@@ -1616,6 +1648,7 @@ public class ObservationEquivalenceTRSimplifier
       return writer.toString();
     }
 
+    @Override
     public void dump(final PrintWriter printer)
     {
       printer.write('<');

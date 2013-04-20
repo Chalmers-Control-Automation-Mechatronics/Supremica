@@ -382,12 +382,12 @@ public abstract class AbstractTRSimplifierTest
     final EventProxy alpha = getEvent(des, ALPHA);
     mAlphaID = enc.getEventCode(alpha);
     if (alpha != null && mAlphaID < 0) {
-      mAlphaID = enc.addEvent(alpha, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
+      mAlphaID = enc.addEvent(alpha, translator, EventEncoding.STATUS_UNUSED);
     }
     final EventProxy omega = getEvent(des, OMEGA);
     mOmegaID = enc.getEventCode(omega);
     if (omega != null && mOmegaID < 0) {
-      mOmegaID = enc.addEvent(omega, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
+      mOmegaID = enc.addEvent(omega, translator, EventEncoding.STATUS_UNUSED);
     }
     return enc;
   }
@@ -400,13 +400,6 @@ public abstract class AbstractTRSimplifierTest
   protected void configureTransitionRelationSimplifier()
   {
   }
-
-  protected void configureTransitionRelationSimplifier(final EventEncoding EventEnc)
-  {
-      //Will be used to keep track of which Events are the always enabled events.
-
-  }
-
 
   /**
    * Provides the IDs of alpha and omega propositions to the transition

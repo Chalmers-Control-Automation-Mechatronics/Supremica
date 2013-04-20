@@ -9,10 +9,12 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.BitSet;
 import gnu.trove.TIntHashSet;
 import gnu.trove.TIntStack;
 
+import java.util.BitSet;
+
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbortException;
@@ -298,7 +300,9 @@ public class HalfWaySynthesisTRSimplifier
       }
       final int numEvents = rel.getNumberOfProperEvents();
       for (int event = 0; event < numEvents; event++) {
-        rel.setUsedEvent(event, false);
+        final byte status = rel.getProperEventStatus(event);
+        rel.setProperEventStatus
+          (event, (byte) (status | EventEncoding.STATUS_UNUSED));
       }
       rel.removeRedundantPropositions();
       mPseudoSupervisor =

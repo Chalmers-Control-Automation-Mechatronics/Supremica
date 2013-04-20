@@ -77,7 +77,7 @@ public class IntStateBuffer
     int tags0 = TAG_REACHABLE;
     for (int e = 0; e < eventEnc.getNumberOfPropositions(); e++) {
       final byte status = eventEnc.getPropositionStatus(e);
-      if ((status & EventEncoding.STATUS_EXTRA_SELFLOOP) != 0) {
+      if ((status & EventEncoding.STATUS_UNUSED) != 0) {
         final EventProxy event = eventEnc.getProposition(e);
         if (events == null || !events.contains(event)) {
           tags0 |= (1 << e);

@@ -70,7 +70,7 @@ public class OnlySilentOutgoingTRSimplifier
     final int omegaID = getDefaultMarkingID();
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (!rel.isUsedEvent(tauID)) {
+    if ((rel.getProperEventStatus(tauID) & EventEncoding.STATUS_UNUSED) != 0) {
       return false;
     }
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();

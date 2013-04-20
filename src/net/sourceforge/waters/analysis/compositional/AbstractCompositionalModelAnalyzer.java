@@ -830,6 +830,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (removed.isEmpty()) {
       return null;
     } else {
+      showRemovedEvents(removed);
       final int numAutomata = mCurrentAutomata.size();
       final List<AutomatonProxy> originals =
         new ArrayList<AutomatonProxy>(numAutomata);
@@ -1104,6 +1105,21 @@ public abstract class AbstractCompositionalModelAnalyzer
       logger.debug(rel.getNumberOfReachableStates() + " states, " +
                    rel.getNumberOfTransitions() + " transitions, " +
                    rel.getNumberOfMarkings() + " markings.");
+    }
+  }
+
+  private void showRemovedEvents(final Collection<EventProxy> events)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final StringBuffer buffer = new StringBuffer();
+      String sep = "Removing events: ";
+      for (final EventProxy event : events) {
+        buffer.append(sep);
+        buffer.append(event.getName());
+        sep = ", ";
+      }
+      logger.debug(buffer);
     }
   }
 
@@ -1482,13 +1498,15 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     final KindTranslator translator = getKindTranslator();
     final EventEncoding eventEnc = new EventEncoding();
-    eventEnc.addSilentEvent(tau);
+    if (tau != null) {
+      eventEnc.addSilentEvent(tau);
+    }
     for (final EventProxy event : aut.getEvents()) {
       if (hidden.contains(event)) {
         eventEnc.addSilentEvent(event);
       } else if (translator.getEventKind(event) != EventKind.PROPOSITION ||
                  (mPropositions != null && mPropositions.contains(event))) {
-        eventEnc.addEvent(event, translator, (byte)0);
+        eventEnc.addEvent(event, translator, EventEncoding.STATUS_NONE);
       }
     }
     final StateEncoding stateEnc = new StateEncoding(aut);

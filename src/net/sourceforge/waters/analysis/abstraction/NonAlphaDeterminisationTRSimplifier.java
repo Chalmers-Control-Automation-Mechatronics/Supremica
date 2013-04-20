@@ -185,7 +185,9 @@ public class NonAlphaDeterminisationTRSimplifier
   private boolean hasNonPreconditionMarkedStates()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (getPreconditionMarkingID() < 0 && !rel.isUsedEvent(EventEncoding.TAU)) {
+    if (getPreconditionMarkingID() < 0 &&
+        (rel.getProperEventStatus(EventEncoding.TAU) &
+         EventEncoding.STATUS_UNUSED) != 0) {
       return false;
     }
     final int numStates = rel.getNumberOfStates();

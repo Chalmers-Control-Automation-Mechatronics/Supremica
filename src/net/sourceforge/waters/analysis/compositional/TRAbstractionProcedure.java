@@ -62,7 +62,6 @@ abstract class TRAbstractionProcedure
         new ListBufferTransitionRelation(aut, eventEnc,
                                          inputStateEnc, config);
       getAnalyzer().showDebugLog(rel);
-      mSimplifier.setTransitionRelation(rel);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = rel.getNumberOfTransitions();
       final int numMarkings = rel.getNumberOfMarkings();
@@ -70,8 +69,8 @@ abstract class TRAbstractionProcedure
       if (mSimplifier.run()) {
         rel = mSimplifier.getTransitionRelation();
         if (rel.getNumberOfReachableStates() == numStates &&
-          rel.getNumberOfTransitions() == numTrans &&
-          rel.getNumberOfMarkings() == numMarkings) {
+            rel.getNumberOfTransitions() == numTrans &&
+            rel.getNumberOfMarkings() == numMarkings) {
           return false;
         }
         rel.removeRedundantPropositions();
@@ -107,11 +106,13 @@ abstract class TRAbstractionProcedure
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
   public void requestAbort()
   {
     mSimplifier.requestAbort();
   }
 
+  @Override
   public boolean isAborting()
   {
     return mSimplifier.isAborting();

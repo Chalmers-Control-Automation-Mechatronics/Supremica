@@ -313,7 +313,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
                         EventEncoding.FILTER_PROPOSITIONS);
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
-      enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
+      enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_UNUSED);
     }
     mCompleteChain.setDefaultMarkingID(defaultMarkingID);
     return enc;

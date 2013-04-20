@@ -18,6 +18,7 @@ import gnu.trove.TLongObjectHashMap;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
@@ -37,7 +38,6 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -187,10 +187,14 @@ public class ListBufferTransitionRelation
         new IncomingTransitionListBuffer(numEvents, numStates, numTrans);
       mPredecessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
     }
-    mUsedEvents = new BitSet(numEvents);
-    final int tau = EventEncoding.TAU;
-    final int first = eventEnc.getProperEvent(tau) == null ? tau + 1 : tau;
-    mUsedEvents.set(first, numEvents, true);
+    mEventStatus = new byte[numEvents];
+    for (int e = 0; e < numEvents; e++) {
+      byte status = eventEnc.getProperEventStatus(e);
+      if (e != EventEncoding.TAU) {
+        status &= ~EventEncoding.STATUS_UNUSED;
+      }
+      mEventStatus[e] = status;
+    }
   }
 
   /**
@@ -238,10 +242,11 @@ public class ListBufferTransitionRelation
       mPredecessorBuffer =
         new IncomingTransitionListBuffer(numEvents, numStates, 0);
     }
-    mUsedEvents = new BitSet(numEvents);
-    final int tau = EventEncoding.TAU;
-    final int first = eventEnc.getProperEvent(tau) == null ? tau + 1 : tau;
-    mUsedEvents.set(first, numEvents, true);
+    mEventStatus = new byte[numEvents];
+    for (int e = 0; e < numEvents; e++) {
+      final byte status = eventEnc.getProperEventStatus(e);
+      mEventStatus[e] = (byte) (status & ~EventEncoding.STATUS_UNUSED);
+    }
   }
 
   /**
@@ -287,8 +292,7 @@ public class ListBufferTransitionRelation
       mPredecessorBuffer =
         new IncomingTransitionListBuffer(numProperEvents, numStates, 0);
     }
-    mUsedEvents = new BitSet(numProperEvents);
-    mUsedEvents.set(0, numProperEvents);
+    mEventStatus = new byte[numProperEvents];
   }
 
   /**
@@ -301,8 +305,8 @@ public class ListBufferTransitionRelation
    *          The transition relation to be copied.
    * @param config
    *          Configuration flags defining which transition buffers are to be
-   *          created in the copy. Should be one of {@link #CONFIG_SUCCESSORS}
-   *          , {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   *          created in the copy. Should be one of {@link #CONFIG_SUCCESSORS},
+   *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
    */
   public ListBufferTransitionRelation(final ListBufferTransitionRelation rel,
                                       final int config)
@@ -312,12 +316,7 @@ public class ListBufferTransitionRelation
     mKind = rel.getKind();
     mStateBuffer = new IntStateBuffer(rel.mStateBuffer);
     final int numEvents = rel.getNumberOfProperEvents();
-    mUsedEvents = new BitSet(numEvents);
-    for (int event = 0; event < numEvents; event++) {
-      if (rel.isUsedEvent(event)) {
-        mUsedEvents.set(event);
-      }
-    }
+    mEventStatus = Arrays.copyOf(rel.mEventStatus, numEvents);
     final int numStates = mStateBuffer.getNumberOfStates();
     try {
       if ((config & CONFIG_SUCCESSORS) != 0) {
@@ -1653,30 +1652,39 @@ public class ListBufferTransitionRelation
     setReachable(from, false);
   }
 
+
   /**
-   * Returns whether the given event is used in this transition relation.
-   * Events can be marked as unused by various operations to signify that the
-   * event is always selflooped and should be suppressed when generating an
-   * automaton.
-   *
-   * @param event
-   *          The ID of the event to be tested.
-   * @return <CODE>true</CODE> if the given event is still used, i.e., it is
-   *         not marked as unused.
+   * Retrieves the status flags for the given proper event.
+   * @param  code   Code of the proper event to be looked up.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfProperEvents()}.
+   * @return A combination of the bits
+   *         {@link EventEncoding#STATUS_CONTROLLABLE},
+   *         {@link EventEncoding#STATUS_LOCAL},
+   *         {@link EventEncoding#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *         {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *         {@link EventEncoding#STATUS_UNUSED}.
    */
-  public boolean isUsedEvent(final int event)
+  public byte getProperEventStatus(final int event)
   {
-    return mUsedEvents.get(event);
+    return mEventStatus[event];
   }
 
   /**
-   * Sets whether the given event is used in this transition relation.
-   *
-   * @see #isUsedEvent(int) isUsedEvent()
+   * Assigns new status flags to the given proper event.
+   * @param  code   Code of the proper event to be modified.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfProperEvents()}.
+   * @param  status A combination of the bits
+   *                {@link EventEncoding#STATUS_CONTROLLABLE},
+   *                {@link EventEncoding#STATUS_LOCAL},
+   *                {@link EventEncoding#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link EventEncoding#STATUS_UNUSED}.
    */
-  public void setUsedEvent(final int event, final boolean used)
+  public void setProperEventStatus(final int event, final byte status)
   {
-    mUsedEvents.set(event, used);
+    mEventStatus[event] = status;
   }
 
   /**
@@ -1746,8 +1754,9 @@ public class ListBufferTransitionRelation
    */
   public void removeEvent(final int event)
   {
-    if (mUsedEvents.get(event)) {
-      mUsedEvents.clear(event);
+    final byte status = mEventStatus[event];
+    if ((status & EventEncoding.STATUS_UNUSED) == 0) {
+      mEventStatus[event] = (byte) (status | EventEncoding.STATUS_UNUSED);
       if (mSuccessorBuffer != null) {
         mSuccessorBuffer.removeEventTransitions(event);
       }
@@ -1778,8 +1787,8 @@ public class ListBufferTransitionRelation
     if (mPredecessorBuffer != null) {
       mPredecessorBuffer.replaceEvent(oldID, newID);
     }
-    if (mUsedEvents.get(oldID)) {
-      mUsedEvents.set(newID);
+    if ((mEventStatus[oldID] & EventEncoding.STATUS_UNUSED) == 0) {
+      mEventStatus[newID] &= ~EventEncoding.STATUS_UNUSED;
     }
   }
 
@@ -1918,7 +1927,7 @@ public class ListBufferTransitionRelation
    */
   public boolean removeTauSelfLoops()
   {
-    if (mUsedEvents.get(EventEncoding.TAU)) {
+    if ((mEventStatus[EventEncoding.TAU] & EventEncoding.STATUS_UNUSED) == 0) {
       boolean removable = false;
       if (mSuccessorBuffer != null) {
         removable = mSuccessorBuffer.removeTauSelfloops();
@@ -1927,7 +1936,7 @@ public class ListBufferTransitionRelation
         removable = mPredecessorBuffer.removeTauSelfloops();
       }
       if (removable) {
-        mUsedEvents.clear(EventEncoding.TAU);
+        mEventStatus[EventEncoding.TAU] |= EventEncoding.STATUS_UNUSED;
       }
       return removable;
     } else {
@@ -1949,7 +1958,8 @@ public class ListBufferTransitionRelation
     final int numEvents = getNumberOfProperEvents();
     boolean modified = false;
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-      if (mUsedEvents.get(e) && isPureSelfloopEvent(e)) {
+      if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0 &&
+          isPureSelfloopEvent(e)) {
         removeEvent(e);
         modified = true;
       }
@@ -2161,7 +2171,7 @@ public class ListBufferTransitionRelation
     final Collection<EventProxy> events =
       new ArrayList<EventProxy>(numEvents);
     for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
-      if (mUsedEvents.get(e)) {
+      if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0) {
         final EventProxy event = eventEnc.getProperEvent(e);
         if (event != null) {
           events.add(event);
@@ -2301,7 +2311,7 @@ public class ListBufferTransitionRelation
     }
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventProxy tau;
-    if (isUsedEvent(EventEncoding.TAU)) {
+    if ((mEventStatus[EventEncoding.TAU] & EventEncoding.STATUS_UNUSED) == 0) {
       tau = factory.createEventProxy("tau", EventKind.UNCONTROLLABLE, false);
     } else {
       tau = null;
@@ -2354,8 +2364,9 @@ public class ListBufferTransitionRelation
   private IntStateBuffer mStateBuffer;
   private OutgoingTransitionListBuffer mSuccessorBuffer;
   private IncomingTransitionListBuffer mPredecessorBuffer;
-  private final BitSet mUsedEvents;
+  private final byte[] mEventStatus;
   private int mExtraStates;
+
 
   //#########################################################################
   //# Class Constants

@@ -366,7 +366,7 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
       succIter.reset(bstate, -1);
       result |= succIter.advance();
       for (int event = EventEncoding.NONTAU; event < numEvents; event++) {  //Used to choose the dump state?
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           rel.addTransition(bstate, event, bstate);
         }
       }
@@ -426,7 +426,7 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
     if (bstate > 0) {
       final int numEvents = rel.getNumberOfProperEvents();
       for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           rel.addTransition(bstate, event, bstate);
         }
       }
@@ -468,7 +468,7 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
     final int numEvents = eventEnc.getNumberOfEvents();
     final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
     for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
-      if (rel.isUsedEvent(e)) {
+      if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) == 0) {
         final EventProxy event = eventEnc.getProperEvent(e);
         if (event != null) {
           events.add(event);

@@ -9,12 +9,12 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.HashFunctions;
+import gnu.trove.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-
-import gnu.trove.HashFunctions;
-import gnu.trove.TIntHashSet;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -90,11 +90,13 @@ public class SilentContinuationTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
+  @Override
   public boolean isPartitioning()
   {
     return true;
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
@@ -110,7 +112,8 @@ public class SilentContinuationTRSimplifier
   throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (!rel.isUsedEvent(EventEncoding.TAU)) {
+    if ((rel.getProperEventStatus(EventEncoding.TAU) &
+         EventEncoding.STATUS_UNUSED) != 0) {
       return false;
     }
     final int numStates = rel.getNumberOfStates();
@@ -203,6 +206,7 @@ public class SilentContinuationTRSimplifier
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.abstraction.WatersIntHashingStrategy
+    @Override
     public int computeHashCode(final int root)
     {
       if (root == mPreviousRoot) {
@@ -250,6 +254,7 @@ public class SilentContinuationTRSimplifier
       }
     }
 
+    @Override
     public boolean equals(final int root1, final int root2)
     {
       try {

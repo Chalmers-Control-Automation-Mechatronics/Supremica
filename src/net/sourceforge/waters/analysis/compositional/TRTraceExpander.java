@@ -127,8 +127,8 @@ public abstract class TRTraceExpander
         mPreconditionMarkingID =
           mEventEncoding.getEventCode(preconditionMarking);
         if (mPreconditionMarkingID < 0) {
-          mPreconditionMarkingID =
-            mEventEncoding.addEvent(preconditionMarking, translator, EventEncoding.STATUS_EXTRA_SELFLOOP);
+          mPreconditionMarkingID = mEventEncoding.addEvent
+            (preconditionMarking, translator, EventEncoding.STATUS_UNUSED);
         }
       }
     }

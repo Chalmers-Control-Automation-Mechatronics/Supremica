@@ -1244,7 +1244,8 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
                                             EventKind.UNCONTROLLABLE);
             final EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(),tauproxy);
             if (!minAutomaton.getEvents().contains(mAlpha)) {
-              ee.addEvent(mAlpha, getKindTranslator(), EventEncoding.STATUS_EXTRA_SELFLOOP);
+              ee.addEvent(mAlpha, getKindTranslator(),
+                          EventEncoding.STATUS_UNUSED);
             }
             final ListBufferTransitionRelation tr =
               new ListBufferTransitionRelation(minAutomaton, ee,
