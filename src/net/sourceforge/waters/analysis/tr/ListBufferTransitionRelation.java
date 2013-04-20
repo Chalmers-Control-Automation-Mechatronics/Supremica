@@ -1655,7 +1655,7 @@ public class ListBufferTransitionRelation
 
   /**
    * Retrieves the status flags for the given proper event.
-   * @param  code   Code of the proper event to be looked up.
+   * @param  event  Code of the proper event to be looked up.
    *                Must be in the range from 0 to
    *                {@link #getNumberOfProperEvents()}.
    * @return A combination of the bits
@@ -1672,7 +1672,7 @@ public class ListBufferTransitionRelation
 
   /**
    * Assigns new status flags to the given proper event.
-   * @param  code   Code of the proper event to be modified.
+   * @param  event  Code of the proper event to be modified.
    *                Must be in the range from 0 to
    *                {@link #getNumberOfProperEvents()}.
    * @param  status A combination of the bits

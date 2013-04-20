@@ -401,7 +401,7 @@ public class EventEncoding
    * Gets the proper event, i.e., non-proposition event, with the given code.
    * @param  code   Code of proper event to be looked up.
    *                Must be in the range from 0 to
-   *                {@link #getNumberOfProperEvents()-1}.
+   *                {@link #getNumberOfProperEvents()}-1.
    * @return The proper event assigned to the given code, or <CODE>null</CODE>
    *         if the code is {@link #TAU}, and no silent event was specified.
    */
@@ -488,9 +488,9 @@ public class EventEncoding
 
   /**
    * Retrieves the status flags for the given proper event.
-   * @param  code   Code of the proper event to be looked up.
+   * @param  event  Code of the proper event to be looked up.
    *                Must be in the range from 0 to
-   *                {@link #getNumberOfProperEvents()-1}.
+   *                {@link #getNumberOfProperEvents()}-1.
    * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
    *         {@link #STATUS_LOCAL}, {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
    *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
@@ -503,23 +503,23 @@ public class EventEncoding
 
   /**
    * Assigns new status flags to the given proper event.
-   * @param  code   Code of the proper event to be modified.
+   * @param  event  Code of the proper event to be modified.
    *                Must be in the range from 0 to
-   *                {@link #getNumberOfProperEvents()-1}.
+   *                {@link #getNumberOfProperEvents()}-1.
    * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
    *                {@link #STATUS_LOCAL},
    *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
    *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
    *                {@link #STATUS_UNUSED}.
    */
-  public void setProperEventStatus(final int code, final byte status)
+  public void setProperEventStatus(final int event, final byte status)
   {
-    mProperEventStatus.set(code, status);
+    mProperEventStatus.set(event, status);
   }
 
   /**
    * Retrieves the status flags for the given proposition.
-   * @param  code   Code of the proposition to be looked up.
+   * @param  prop   Code of the proposition to be looked up.
    *                Must be in the range from 0 to
    *                {@link #getNumberOfPropositions()}-1.
    * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
@@ -527,14 +527,14 @@ public class EventEncoding
    *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
    *         {@link #STATUS_UNUSED}.
    */
-  public byte getPropositionStatus(final int code)
+  public byte getPropositionStatus(final int prop)
   {
-    return mPropositionStatus.get(code);
+    return mPropositionStatus.get(prop);
   }
 
   /**
    * Assigns new status flags to the given proposition.
-   * @param  code   Code of the proposition to be modified.
+   * @param  prop   Code of the proposition to be modified.
    *                Must be in the range from 0 to
    *                {@link #getNumberOfPropositions()}-1.
    * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
@@ -543,9 +543,9 @@ public class EventEncoding
    *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
    *                {@link #STATUS_UNUSED}.
    */
-  public void setPropositionStatus(final int event, final byte status)
+  public void setPropositionStatus(final int prop, final byte status)
   {
-    mPropositionStatus.set(event, status);
+    mPropositionStatus.set(prop, status);
   }
 
 
