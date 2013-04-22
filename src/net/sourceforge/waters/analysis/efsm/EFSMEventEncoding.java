@@ -20,7 +20,7 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-class EFSMEventEncoding
+public class EFSMEventEncoding
 {
 
   //#########################################################################

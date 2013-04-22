@@ -26,7 +26,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-class EFSMVariable implements Comparable<EFSMVariable> {
+public class EFSMVariable implements Comparable<EFSMVariable> {
 
   //#########################################################################
   //# Constructors
@@ -82,6 +82,12 @@ class EFSMVariable implements Comparable<EFSMVariable> {
 
   //#########################################################################
   //# Simple Access
+
+  public String getName()
+  {
+    return mVariableName.toString();
+  }
+
   ComponentProxy getComponent()
   {
     return mComponent;
@@ -102,7 +108,7 @@ class EFSMVariable implements Comparable<EFSMVariable> {
     return mIsNext != var.mIsNext && mComponent == var.mComponent;
   }
 
-  CompiledRange getRange()
+  public CompiledRange getRange()
   {
     return mRange;
   }

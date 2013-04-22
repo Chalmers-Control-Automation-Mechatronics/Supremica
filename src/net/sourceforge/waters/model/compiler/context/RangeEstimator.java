@@ -20,11 +20,12 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
@@ -232,6 +233,7 @@ public class RangeEstimator
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public CompiledRange visitBinaryExpressionProxy
     (final BinaryExpressionProxy expr)
     throws VisitorException
@@ -257,16 +259,19 @@ public class RangeEstimator
   }
 
 
+  @Override
   public CompiledRange visitIdentifierProxy(final IdentifierProxy ident)
   {
     if (mContext.isEnumAtom(ident)) {
-      final List<IdentifierProxy> list = Collections.singletonList(ident);
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      final List<SimpleIdentifierProxy> list = Collections.singletonList(simple);
       return new CompiledEnumRange(list);
     } else {
       return mContext.getVariableRange(ident);
     }
   }
 
+  @Override
   public CompiledIntRange visitIntConstantProxy
     (final IntConstantProxy intconst)
   {
@@ -274,6 +279,7 @@ public class RangeEstimator
     return new CompiledIntRange(value, value);
   }
 
+  @Override
   public CompiledRange visitUnaryExpressionProxy
     (final UnaryExpressionProxy expr)
     throws VisitorException
@@ -310,6 +316,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -336,6 +343,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -375,7 +383,8 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
-    CompiledRange eval(UnaryExpressionProxy expr)
+    @Override
+    CompiledRange eval(final UnaryExpressionProxy expr)
       throws VisitorException
     {
       try {
@@ -404,6 +413,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledRange range)
       throws EvalException
@@ -425,6 +435,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledRange range)
       throws EvalException
@@ -446,6 +457,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -471,6 +483,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -518,7 +531,7 @@ public class RangeEstimator
         } else { // rightlower < 0 && rightupper > 0
           upper = -leftlower > leftupper ? -leftlower : leftupper;
           lower = -upper;
-        }        
+        }
       }
       return new CompiledIntRange(lower, upper);
     }
@@ -532,6 +545,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -557,6 +571,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -580,6 +595,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -603,6 +619,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -626,6 +643,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -649,6 +667,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -668,13 +687,14 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
-      int leftlower = leftrange.getLower();
-      int leftupper = leftrange.getUpper();
+      final int leftlower = leftrange.getLower();
+      final int leftupper = leftrange.getUpper();
       int rightlower = rightrange.getLower();
       int rightupper = rightrange.getUpper();
       if (rightlower == 0) {
@@ -735,6 +755,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -760,6 +781,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -785,6 +807,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -804,6 +827,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
                           final CompiledIntRange leftrange,
                           final SimpleExpressionProxy rightexpr,
@@ -848,6 +872,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledIntRange range)
     {
@@ -865,6 +890,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledRange eval(final UnaryExpressionProxy expr)
       throws VisitorException
     {
@@ -872,7 +898,8 @@ public class RangeEstimator
         final SimpleExpressionProxy subterm = expr.getSubTerm();
         final IdentifierProxy ident = checkIdentifier(subterm);
         if (mContext.isEnumAtom(ident)) {
-          final List<IdentifierProxy> list = Collections.singletonList(ident);
+          final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+          final List<SimpleIdentifierProxy> list = Collections.singletonList(simple);
           return new CompiledEnumRange(list);
         } else {
           return mContext.getVariableRange(expr);
@@ -892,6 +919,7 @@ public class RangeEstimator
 
     //#######################################################################
     //# Evaluation
+    @Override
     CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledIntRange range)
     {

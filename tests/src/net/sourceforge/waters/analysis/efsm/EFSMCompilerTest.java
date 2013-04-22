@@ -24,7 +24,6 @@ import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -35,7 +34,6 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
@@ -190,6 +188,7 @@ public class EFSMCompilerTest
     compileError(dirname, subdirname, name, bindings, exclass, culprits);
   }
 
+  @SuppressWarnings("unused")
   private void compileError(final String dirname,
                             final String name,
                             final List<ParameterBindingProxy> bindings,
@@ -213,6 +212,7 @@ public class EFSMCompilerTest
     compileError(dirname, subdirname, name, bindings, exclass, culprits);
   }
 
+  @SuppressWarnings("unused")
   private void compileError(final String dirname,
                             final String name,
                             final List<ParameterBindingProxy> bindings,
@@ -275,7 +275,6 @@ public class EFSMCompilerTest
     try {
       final String inextname = name + mModuleMarshaller.getDefaultExtension();
       final File infilename = new File(dir, inextname);
-      final String outextname = name;
       compile(infilename, bindings);
       fail("Expected " + exclass.getName() + " not caught!");
     } catch (final WatersException exception) {
@@ -303,6 +302,7 @@ public class EFSMCompilerTest
     }
   }
 
+  @SuppressWarnings("unused")
   private void compile(final String dirname, final String name)
     throws IOException, WatersException
   {
@@ -396,6 +396,7 @@ public class EFSMCompilerTest
 //    assertProductDESProxyEquals(proxy1, proxy2);
 //  }
 
+  @SuppressWarnings("unused")
   private ParameterBindingProxy createBinding(final String name,
                                               final int value)
   {
@@ -413,7 +414,6 @@ public class EFSMCompilerTest
     super.setUp();
     mOutputDirectory = getOutputDirectory();
     mModuleFactory = ModuleElementFactory.getInstance();
-    mProductDESFactory = ProductDESElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
     mDocumentManager = new DocumentManager();
@@ -427,7 +427,6 @@ public class EFSMCompilerTest
   {
     mOutputDirectory = null;
     mModuleFactory = null;
-    mProductDESFactory = null;
     mModuleMarshaller = null;
     mDocumentManager = null;
     super.tearDown();
@@ -436,9 +435,9 @@ public class EFSMCompilerTest
 
   //#########################################################################
   //# Data Members
+  @SuppressWarnings("unused")
   private File mOutputDirectory;
   private ModuleProxyFactory mModuleFactory;
-  private ProductDESProxyFactory mProductDESFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
 

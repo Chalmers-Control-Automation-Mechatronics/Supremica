@@ -14,10 +14,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
 public class CompiledEnumRange implements CompiledRange
@@ -25,7 +28,7 @@ public class CompiledEnumRange implements CompiledRange
 
   //#########################################################################
   //# Constructors
-  public CompiledEnumRange(final List<? extends IdentifierProxy> atoms)
+  public CompiledEnumRange(final List<? extends SimpleIdentifierProxy> atoms)
   {
     mAtoms = Collections.unmodifiableList(atoms);
   }
@@ -33,12 +36,13 @@ public class CompiledEnumRange implements CompiledRange
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public boolean equals(final Object other)
   {
     if (other != null && getClass() == other.getClass()) {
       final CompiledEnumRange range = (CompiledEnumRange) other;
-      final Iterator<IdentifierProxy> iter1 = mAtoms.iterator();
-      final Iterator<IdentifierProxy> iter2 = range.mAtoms.iterator();
+      final Iterator<SimpleIdentifierProxy> iter1 = mAtoms.iterator();
+      final Iterator<SimpleIdentifierProxy> iter2 = range.mAtoms.iterator();
       while (iter1.hasNext()) {
         if (!iter2.hasNext()) {
           return false;
@@ -57,6 +61,7 @@ public class CompiledEnumRange implements CompiledRange
     }
   }
 
+  @Override
   public int hashCode()
   {
     final ModuleHashCodeVisitor hash =
@@ -69,10 +74,11 @@ public class CompiledEnumRange implements CompiledRange
     return result;
   }
 
+  @Override
   public String toString()
   {
     final StringBuffer result = new StringBuffer("{");
-    final Iterator<IdentifierProxy> iter = mAtoms.iterator();
+    final Iterator<SimpleIdentifierProxy> iter = mAtoms.iterator();
     while (iter.hasNext()) {
       final IdentifierProxy atom = iter.next();
       result.append(atom.toString());
@@ -87,16 +93,19 @@ public class CompiledEnumRange implements CompiledRange
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.expr.RangeValue
+  @Override
   public int size()
   {
     return mAtoms.size();
   }
 
+  @Override
   public boolean isEmpty()
   {
     return mAtoms.isEmpty();
   }
 
+  @Override
   public int indexOf(final SimpleExpressionProxy value)
   {
     if (value instanceof IdentifierProxy) {
@@ -107,6 +116,7 @@ public class CompiledEnumRange implements CompiledRange
     }
   }
 
+  @Override
   public boolean contains(final SimpleExpressionProxy value)
   {
     if (value instanceof IdentifierProxy) {
@@ -117,6 +127,7 @@ public class CompiledEnumRange implements CompiledRange
     }
   }
 
+  @Override
   public boolean intersects(final CompiledRange range)
   {
     if (range instanceof CompiledEnumRange) {
@@ -138,6 +149,7 @@ public class CompiledEnumRange implements CompiledRange
     return false;
   }
 
+  @Override
   public CompiledEnumRange intersection(final CompiledRange range)
   {
     if (range instanceof CompiledEnumRange) {
@@ -148,6 +160,7 @@ public class CompiledEnumRange implements CompiledRange
     }
   }
 
+  @Override
   public CompiledEnumRange remove(final SimpleExpressionProxy value)
   {
     if (value instanceof IdentifierProxy) {
@@ -158,7 +171,8 @@ public class CompiledEnumRange implements CompiledRange
     }
   }
 
-  public List<IdentifierProxy> getValues()
+  @Override
+  public List<SimpleIdentifierProxy> getValues()
   {
     return mAtoms;
   }
@@ -196,9 +210,9 @@ public class CompiledEnumRange implements CompiledRange
     }
     if (change) {
       final int newsize = size() - 1;
-      final List<IdentifierProxy> newlist =
-        new ArrayList<IdentifierProxy>(newsize);
-      for (final IdentifierProxy atom : mAtoms) {
+      final List<SimpleIdentifierProxy> newlist =
+        new ArrayList<SimpleIdentifierProxy>(newsize);
+      for (final SimpleIdentifierProxy atom : mAtoms) {
         if (range.contains(atom)) {
           newlist.add(atom);
         }
@@ -215,9 +229,9 @@ public class CompiledEnumRange implements CompiledRange
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
       final int newsize = size() - 1;
-      final List<IdentifierProxy> newlist =
-        new ArrayList<IdentifierProxy>(newsize);
-      for (final IdentifierProxy atom : mAtoms) {
+      final List<SimpleIdentifierProxy> newlist =
+        new ArrayList<SimpleIdentifierProxy>(newsize);
+      for (final SimpleIdentifierProxy atom : mAtoms) {
         if (!eq.equals(atom, value)) {
           newlist.add(atom);
         }
@@ -228,9 +242,16 @@ public class CompiledEnumRange implements CompiledRange
     }
   }
 
+  @Override
+  public SimpleExpressionProxy createExpression(final ModuleProxyFactory factory,
+                                                final CompilerOperatorTable optable)
+  {
+    return factory.createEnumSetExpressionProxy(mAtoms);
+  }
+
 
   //#########################################################################
   //# Data Members
-  private final List<IdentifierProxy> mAtoms;
+  private final List<SimpleIdentifierProxy> mAtoms;
 
 }

@@ -15,7 +15,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-class EFSMTransitionRelation
+public class EFSMTransitionRelation
 {
 
   //#########################################################################
