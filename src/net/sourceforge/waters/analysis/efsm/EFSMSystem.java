@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-class EFSMSystem
+public class EFSMSystem
 {
 
   //#########################################################################
