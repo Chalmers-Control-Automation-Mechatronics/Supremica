@@ -33,10 +33,10 @@ public class SourceInfoBuilder
     this(null);
   }
 
-  public SourceInfoBuilder(final Map<Proxy,SourceInfo> parentmap)
+  public SourceInfoBuilder(final Map<Object,SourceInfo> parentmap)
   {
     mParentMap = parentmap;
-    mResultMap = new HashMap<Proxy,SourceInfo>();
+    mResultMap = new HashMap<Object,SourceInfo>();
   }
 
 
@@ -47,14 +47,14 @@ public class SourceInfoBuilder
     reset(null);
   }
 
-  public void reset(final Map<Proxy,SourceInfo> parentmap)
+  public void reset(final Map<Object,SourceInfo> parentmap)
   {
     mParentMap = parentmap;
     if (parentmap == null) {
-      mResultMap = new HashMap<Proxy,SourceInfo>();
+      mResultMap = new HashMap<Object,SourceInfo>();
     } else {
       final int size = parentmap.size();
-      mResultMap = new HashMap<Proxy,SourceInfo>(size);
+      mResultMap = new HashMap<Object,SourceInfo>(size);
     }
   }
 
@@ -63,12 +63,12 @@ public class SourceInfoBuilder
     reset(mResultMap);
   }
 
-  public SourceInfo add(final Proxy target, final Proxy source)
+  public SourceInfo add(final Object target, final Proxy source)
   {
     return add(target, source, null);
   }
 
-  public SourceInfo add(final Proxy target,
+  public SourceInfo add(final Object target,
                         final Proxy source,
                         final BindingContext context)
   {
@@ -88,13 +88,13 @@ public class SourceInfoBuilder
     }
   }
 
-  public SourceInfo add(final Proxy target, final SourceInfo info)
+  public SourceInfo add(final Object target, final SourceInfo info)
   {
     mResultMap.put(target, info);
     return info;
   }
 
-  public Map<Proxy,SourceInfo> getResultMap()
+  public Map<Object,SourceInfo> getResultMap()
   {
     return mResultMap;
   }
@@ -102,8 +102,8 @@ public class SourceInfoBuilder
 
   //#########################################################################
   //# Data Members
-  private Map<Proxy,SourceInfo> mParentMap;
-  private Map<Proxy,SourceInfo> mResultMap;
+  private Map<Object,SourceInfo> mParentMap;
+  private Map<Object,SourceInfo> mResultMap;
 
 }
 

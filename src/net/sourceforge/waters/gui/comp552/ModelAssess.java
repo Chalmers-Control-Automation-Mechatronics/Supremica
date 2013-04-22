@@ -461,7 +461,7 @@ public class ModelAssess
       final ModuleProxy module = compiler.getInputModule();
       final ModuleContext mcontext = new ModuleContext(module);
       final RenderingContext rcontext = new ModuleRenderingContext(mcontext);
-      final Map<Proxy,SourceInfo> infomap = compiler.getSourceInfoMap();
+      final Map<Object,SourceInfo> infomap = compiler.getSourceInfoMap();
       for (final AutomatonProxy aut : automata) {
         final SourceInfo info = infomap.get(aut);
         final SimpleComponentProxy comp =

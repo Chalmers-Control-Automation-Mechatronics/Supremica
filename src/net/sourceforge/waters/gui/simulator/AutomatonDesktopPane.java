@@ -51,26 +51,31 @@ public class AutomatonDesktopPane
     container.attach(this);
     sim.attach(this);
     addMouseListener(new MouseListener(){
+      @Override
       public void mouseClicked(final MouseEvent e)
       {
         // Do nothing
       }
 
+      @Override
       public void mouseEntered(final MouseEvent e)
       {
         // Do nothing
       }
 
+      @Override
       public void mouseExited(final MouseEvent e)
       {
         // Do nothing
       }
 
+      @Override
       public void mousePressed(final MouseEvent event)
       {
         mPopupFactory.maybeShowPopup(AutomatonDesktopPane.this, event, null);
       }
 
+      @Override
       public void mouseReleased(final MouseEvent event)
       {
         mPopupFactory.maybeShowPopup(AutomatonDesktopPane.this, event, null);
@@ -93,7 +98,7 @@ public class AutomatonDesktopPane
       return;
     if (!mOpenAutomata.containsKey(aut)) {
       if (clicks == 2) {
-        final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
+        final Map<Object,SourceInfo> infomap = container.getSourceInfoMap();
         final AutomatonProxy realAuto = sim.getAutomatonFromName(aut);
         if (realAuto == null)
           return;
@@ -395,6 +400,7 @@ public class AutomatonDesktopPane
 
   //#########################################################################
   //# Interface SimulationObserver
+  @Override
   public void simulationChanged(final SimulationChangeEvent event)
   {
     if (event.getKind() == SimulationChangeEvent.MODEL_CHANGED) {
@@ -435,6 +441,7 @@ public class AutomatonDesktopPane
 
   //#########################################################################
   //# Interface ModelObserver
+  @Override
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH &&

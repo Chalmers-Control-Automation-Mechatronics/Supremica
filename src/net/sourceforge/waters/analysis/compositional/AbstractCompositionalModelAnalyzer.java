@@ -1616,6 +1616,21 @@ public abstract class AbstractCompositionalModelAnalyzer
 
 
   //#########################################################################
+  //# Debugging
+  @SuppressWarnings("unused")
+  private EventInfo getEventInfo(final String name)
+  {
+    for (final Map.Entry<EventProxy,EventInfo> entry : mEventInfoMap.entrySet()) {
+      final EventProxy event = entry.getKey();
+      if (event.getName().equals(name)) {
+        return entry.getValue();
+      }
+    }
+    return null;
+  }
+
+
+  //#########################################################################
   //# Inner Class PreselectingMethod
   /**
    * The configuration setting to determine the {@link

@@ -10,12 +10,13 @@
 
 package net.sourceforge.waters.gui.simulator;
 
+import gnu.trove.THashSet;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +32,6 @@ import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.util.PropositionIcon;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
@@ -412,7 +412,7 @@ public class Simulation implements ModelObserver, Observer
         return PropositionIcon.getNeutralColors();
       }
     } else {
-      final Map<Proxy,SourceInfo> infomap =
+      final Map<Object,SourceInfo> infomap =
         mModuleContainer.getSourceInfoMap();
       if (infomap == null) {
         return PropositionIcon.getNeutralColors();
@@ -421,7 +421,7 @@ public class Simulation implements ModelObserver, Observer
       final Set<Color> colorset;
       final List<Color> colorlist;
       if (hasNonForbiddenPropositions(automaton)) {
-        colorset = new HashSet<Color>(size);
+        colorset = new THashSet<Color>(size);
         colorlist = new ArrayList<Color>(size);
       } else {
         colorset = null;
@@ -542,6 +542,7 @@ public class Simulation implements ModelObserver, Observer
    * Invalidates the current compiled DES; it will be recompiled later when
    * the simulator tab is activated.
    */
+  @Override
   public void modelChanged(final ModelChangeEvent event)
   {
     final int kind = event.getKind();
@@ -560,6 +561,7 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
+  @Override
   public int getModelObserverPriority()
   {
     return ModelObserver.RENDERING_PRIORITY;
@@ -574,6 +576,7 @@ public class Simulation implements ModelObserver, Observer
   // DES from the module container. After storing the new simulation
   // state in the simulator, all registered views are notified to
   // update themselves.
+  @Override
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH &&

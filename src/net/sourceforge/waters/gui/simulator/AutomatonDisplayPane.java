@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.sourceforge.waters.gui.BackupGraphPanel;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.GraphPanel;
@@ -104,7 +105,7 @@ public class AutomatonDisplayPane
     mTransform = mInverseTransform = null;
     final ModuleSubject module = container.getModule();
     final RenderingContext context = new SimulatorRenderingContext();
-    final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+    final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
     final SourceInfo sInfo = infomap.get(aut);
     final SimpleExpressionCompiler compiler = sim.getSimpleExpressionCompiler();
     final BindingContext bindings = sInfo.getBindingContext();
@@ -150,6 +151,7 @@ public class AutomatonDisplayPane
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.simulator.SimulatorObserver
+  @Override
   public void simulationChanged(final SimulationChangeEvent event)
   {
     if (event.getKind() == SimulationChangeEvent.STATE_CHANGED) {
@@ -161,6 +163,7 @@ public class AutomatonDisplayPane
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.springembedder.EmbedderObserver
+  @Override
   public void embedderChanged(final EmbedderEvent event)
   {
     super.embedderChanged(event);
@@ -194,7 +197,7 @@ public class AutomatonDisplayPane
     if (proxyToFire != null) {
       final RenderingStatus status = getRenderingStatus(mFocusedItem);
       if (status != null && status.isEnabled()) {
-        final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+        final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
         final List<SimulatorStep> possibleSteps =
           new ArrayList<SimulatorStep>();
         if (proxyToFire instanceof IdentifierProxy) {
@@ -231,6 +234,7 @@ public class AutomatonDisplayPane
 
   //#########################################################################
   //# Repainting
+  @Override
   public void paint(final Graphics g)
   {
     g.setColor(getBackground());
@@ -245,6 +249,7 @@ public class AutomatonDisplayPane
     g2d.setTransform(old);
   }
 
+  @Override
   protected void paintGrid(final Graphics g)
   {
   }
@@ -422,7 +427,7 @@ public class AutomatonDisplayPane
         mAutomaton.getTransitions();
       final int size = states.size() + 2 * transitions.size();
       mRenderingStatusMap = new HashMap<Proxy,RenderingStatus>(size);
-      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
       if (infomap != null) {
         final StateProxy currentState = mSim.getCurrentState(mAutomaton);
         for (final StateProxy state : states) {
@@ -465,7 +470,7 @@ public class AutomatonDisplayPane
                 }
               }
               final Subject subject = (Subject) source;
-              source = (Proxy) SubjectTools.getProxyParent(subject);
+              source = SubjectTools.getProxyParent(subject);
             } while (!(source instanceof GraphProxy));
             if (active) {
               prevState = null;
@@ -485,6 +490,7 @@ public class AutomatonDisplayPane
 
     //#######################################################################
     //# Interface java.awt.event.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       if (event.getButton() == MouseEvent.BUTTON1 &&
@@ -493,22 +499,26 @@ public class AutomatonDisplayPane
       }
     }
 
+    @Override
     public void mouseEntered(final MouseEvent event)
     {
       updateFocusedItem(event);
     }
 
+    @Override
     public void mouseExited(final MouseEvent event)
     {
       updateFocusedItem(event);
     }
 
+    @Override
     public void mousePressed(final MouseEvent event)
     {
       mPopupFactory.maybeShowPopup(AutomatonDisplayPane.this,
                                    event, mFocusedItem);
     }
 
+    @Override
     public void mouseReleased(final MouseEvent event)
     {
       mPopupFactory.maybeShowPopup(AutomatonDisplayPane.this,
@@ -517,11 +527,13 @@ public class AutomatonDisplayPane
 
     //#######################################################################
     //# Interface java.awt.event.MouseMotionListener
+    @Override
     public void mouseDragged(final MouseEvent event)
     {
       updateFocusedItem(event);
     }
 
+    @Override
     public void mouseMoved(final MouseEvent event)
     {
       updateFocusedItem(event);
@@ -536,6 +548,7 @@ public class AutomatonDisplayPane
 
     //#######################################################################
     //# Inner Class ResizeHandler
+    @Override
     public void componentResized(final ComponentEvent event)
     {
       mTransform = mInverseTransform = null;
@@ -553,7 +566,7 @@ public class AutomatonDisplayPane
     private SimulatorRenderingContext()
     {
       super(mContainer.getModuleContext());
-      final Map<Proxy,SourceInfo> infomap = mContainer.getSourceInfoMap();
+      final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
       final Collection<StateProxy> states = mAutomaton.getStates();
       final int size = states.size();
       mStateMap = new HashMap<SimpleNodeProxy,StateProxy>(size);
@@ -666,6 +679,7 @@ public class AutomatonDisplayPane
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public String visitProxy(final Proxy proxy)
     {
       return null;
@@ -673,6 +687,7 @@ public class AutomatonDisplayPane
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+    @Override
     public String visitEdgeProxy(final EdgeProxy edge)
     {
       final RenderingStatus status = getRenderingStatus(edge);
@@ -683,11 +698,13 @@ public class AutomatonDisplayPane
       }
     }
 
+    @Override
     public String visitIdentifierProxy(final IdentifierProxy ident)
     {
       return getTransitionToolTip(ident);
     }
 
+    @Override
     public String visitSimpleNodeProxy(final SimpleNodeProxy node)
     {
       final RenderingStatus status = getRenderingStatus(node);
