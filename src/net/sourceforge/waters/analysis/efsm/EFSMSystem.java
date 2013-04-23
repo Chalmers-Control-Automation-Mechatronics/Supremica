@@ -32,17 +32,30 @@ public class EFSMSystem
     mVariables = new ArrayList<EFSMVariable>(size);
   }
 
+  public EFSMSystem(final int size, final String name)
+  {
+    mTransitionRelations = new ArrayList<EFSMTransitionRelation>(size);
+    mVariables = new ArrayList<EFSMVariable>(size);
+    mName = name;
+  }
+
   public EFSMSystem(final List<EFSMVariable> variables,
-                    final List<EFSMTransitionRelation> transitionRelations)
+                    final List<EFSMTransitionRelation> transitionRelations,
+                    final String name)
   {
     mTransitionRelations = transitionRelations;
     mVariables = variables;
+    mName = name;
   }
 
   //#########################################################################
   //# Simple Access
   public List<EFSMTransitionRelation> getTransitionRelations() {
     return mTransitionRelations;
+  }
+
+  public String getName() {
+    return mName;
   }
 
   public List<EFSMVariable> getVariables() {
@@ -58,6 +71,9 @@ public class EFSMSystem
     mVariables.add(variable);
   }
 
+  public void setName(final String name) {
+    mName = name;
+  }
 
   //#########################################################################
   //# Data Members
@@ -68,5 +84,6 @@ public class EFSMSystem
   //#########################################################################
   //# Class Constants
   private static final int DEFAULT_SIZE = 16;
+  private String mName;
 
 }

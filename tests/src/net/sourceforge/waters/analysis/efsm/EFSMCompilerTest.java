@@ -22,14 +22,14 @@ import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -95,7 +95,6 @@ public class EFSMCompilerTest
 
   //#########################################################################
   //# Successful Test Cases using EFA
-
   public void testEFSMCompiler1()
     throws IOException, WatersException
   {
@@ -156,12 +155,35 @@ public class EFSMCompilerTest
     compile("tests", "efsm", "efsm10");
   }
 
-  //#########################################################################
-  //# Customisation
-  void configure(final ModuleCompiler compiler)
+  public void testEFSMCompiler11()
+    throws IOException, WatersException
   {
+    compile("tests", "efsm", "efsm11");
   }
 
+  public void testEFSMCompiler12()
+    throws IOException, WatersException
+  {
+    compile("tests", "efsm", "efsm12");
+  }
+
+  public void testEFSMCompiler13()
+    throws IOException, WatersException
+  {
+    compile("tests", "efsm", "efsm13");
+  }
+
+  //#########################################################################
+  //# Customisation
+  void configure(final EFSMCompiler compiler)
+  {
+    compiler.setSourceInfoEnabled(true);
+  }
+
+  String getTestSuffix()
+  {
+    return "result";
+  }
 
   //#########################################################################
   //# Utilities
@@ -273,9 +295,7 @@ public class EFSMCompilerTest
     throws IOException, WatersException
   {
     try {
-      final String inextname = name + mModuleMarshaller.getDefaultExtension();
-      final File infilename = new File(dir, inextname);
-      compile(infilename, bindings);
+      compile(dir, name, bindings, true);
       fail("Expected " + exclass.getName() + " not caught!");
     } catch (final WatersException exception) {
       if (exception.getClass() == exclass) {
@@ -337,36 +357,38 @@ public class EFSMCompilerTest
         buffer.append(binding.getExpression().toString());
       }
     }
-//    final String ext = mProductDESMarshaller.getDefaultExtension();
-//    final int pos = buffer.length();
-//    buffer.append(ext);
-//    final String outextname = buffer.toString();
-//    final File outfilename = new File(mOutputDirectory, outextname);
-    compile(infilename, bindings);
-//    final String suffix = getTestSuffix();
-//    buffer.setLength(pos);
-//    buffer.append('-');
-//    buffer.append(suffix);
-//    buffer.append(ext);
-//    final String suffixedname = buffer.toString();
-//    final File suffixedfilename = new File(dir, suffixedname);
-//    if (suffixedfilename.exists()) {
-//      compare(outfilename, suffixedfilename);
-//    } else {
-//      final File compfilename = new File(dir, outextname);
-//      compare(outfilename, compfilename);
-//    }
+    final String ext = mModuleMarshaller.getDefaultExtension();
+    final int pos = buffer.length();
+    buffer.append(ext);
+    final String outextname = buffer.toString();
+    final File outfilename = new File(mOutputDirectory, outextname);
+    ensureParentDirectoryExists(outfilename);
+    final ModuleProxy outputModule = compile(infilename, outfilename, bindings);
+    final String suffix = getTestSuffix();
+    buffer.setLength(pos);
+    buffer.append('-');
+    buffer.append(suffix);
+    buffer.append(ext);
+    final String suffixedname = buffer.toString();
+    final File suffixedfilename = new File(dir, suffixedname);
+    if (suffixedfilename.exists()) {
+      compare(outputModule, suffixedfilename);
+    }
   }
 
-  private EFSMSystem compile(final File infilename,
+  private ModuleProxy compile(final File infilename,
+                             final File outfilename,
                              final List<ParameterBindingProxy> bindings)
     throws IOException, WatersException
   {
     final URI uri = infilename.toURI();
-    final ModuleProxy module = mModuleMarshaller.unmarshal(uri);
-    final EFSMSystem des = compile(module, bindings);
-    //ensureParentDirectoryExists(outfilename);
-    return des;
+    final ModuleProxy inputModule = mModuleMarshaller.unmarshal(uri);
+    final EFSMSystem system = compile(inputModule, bindings);
+    final String name = system.getName() + "-" + getTestSuffix();
+    system.setName(name);
+    final ModuleProxy outputModule = mImporter.importModule(system);
+    mModuleMarshaller.marshal(outputModule, outfilename);
+    return outputModule;
   }
 
 
@@ -376,6 +398,7 @@ public class EFSMCompilerTest
   {
     final EFSMCompiler compiler =
       new EFSMCompiler(mDocumentManager, module);
+    configure(compiler);
     return compiler.compile(bindings);
   }
 
@@ -385,6 +408,14 @@ public class EFSMCompilerTest
     return compile(module, null);
   }
 
+  private void compare(final ModuleProxy module, final File expectedFile)
+    throws WatersUnmarshalException, IOException
+  {
+    final URI uri = expectedFile.toURI();
+    final ModuleProxy expectedModule = mModuleMarshaller.unmarshal(uri);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true, false);
+    assertProxyEquals(eq, "Unexpected module in output", module, expectedModule);
+  }
 
 //  private void compare(final File filename1, final File filename2)
 //    throws IOException, WatersUnmarshalException
@@ -414,11 +445,12 @@ public class EFSMCompilerTest
     super.setUp();
     mOutputDirectory = getOutputDirectory();
     mModuleFactory = ModuleElementFactory.getInstance();
-    final OperatorTable optable = CompilerOperatorTable.getInstance();
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
+    mImporter  = new EFSMSystemImporter(mModuleFactory, optable);
   }
 
   @Override
@@ -435,11 +467,11 @@ public class EFSMCompilerTest
 
   //#########################################################################
   //# Data Members
-  @SuppressWarnings("unused")
   private File mOutputDirectory;
   private ModuleProxyFactory mModuleFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
+  private EFSMSystemImporter mImporter;
 
 }
 

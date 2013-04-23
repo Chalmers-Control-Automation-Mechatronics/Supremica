@@ -14,6 +14,7 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
@@ -31,19 +32,24 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
   //#########################################################################
   //# Constructors
   EFSMVariable(final VariableComponentProxy var,
-               final CompiledRange range)
+               final CompiledRange range,
+               final ModuleProxyFactory factory)
   {
     mIsNext = false;
     mComponent = var;
     mRange = range;
-    mVariableName = var.getIdentifier();
+    final ModuleProxyCloner cloner = factory.getCloner();
+    mVariableName = (SimpleExpressionProxy) cloner.getClone(var.getIdentifier());
+    mInitialStatePredicate =
+      (SimpleExpressionProxy) cloner.getClone(var.getInitialStatePredicate());
   }
 
   EFSMVariable(final boolean isnext,
                final ComponentProxy comp,
                final CompiledRange range,
                final ModuleProxyFactory factory,
-               final CompilerOperatorTable optable)
+               final CompilerOperatorTable optable,
+               final SimpleExpressionProxy initialStatePredicate)
   {
     mIsNext = isnext;
     mComponent = comp;
@@ -55,6 +61,9 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
     } else {
       mVariableName = ident;
     }
+    final ModuleProxyCloner cloner = factory.getCloner();
+    mInitialStatePredicate = (SimpleExpressionProxy)
+      cloner.getClone(initialStatePredicate);
   }
 
 
@@ -113,6 +122,11 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
     return mRange;
   }
 
+  public SimpleExpressionProxy getInitialStatePredicate()
+  {
+    return mInitialStatePredicate;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -120,5 +134,6 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
   private final ComponentProxy mComponent;
   private final CompiledRange mRange;
   private final SimpleExpressionProxy mVariableName;
+  private final SimpleExpressionProxy mInitialStatePredicate;
 
 }

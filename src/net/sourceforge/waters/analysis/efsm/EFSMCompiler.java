@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.efsm;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,8 @@ import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -57,17 +60,29 @@ public class EFSMCompiler
   public EFSMSystem compile(final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    initSourceInfo();
     final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
+    final IdentifierProxy marking;
+    if (mMarking == null) {
+      marking =
+        modfactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+    } else {
+      marking = mMarking;
+    }
+    final Collection<String> propositions =
+      Collections.singletonList(marking.toString());
+    initSourceInfo();
     ModuleInstanceCompiler pass1 = new ModuleInstanceCompiler
       (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
     pass1.setOptimizationEnabled(mIsOptimizationEnabled);
     pass1.setEnabledPropertyNames(mEnabledPropertyNames);
-    pass1.setEnabledPropositionNames(mEnabledPropositionNames);
+    pass1.setEnabledPropositionNames(propositions);
     final ModuleProxy intermediate = pass1.compile(bindings);
-    pass1 = null;shiftSourceInfo();
+    pass1 = null;
+    shiftSourceInfo();
     final EFSMSystemBuilder pass2= new EFSMSystemBuilder
       (modfactory, mSourceInfoBuilder, intermediate);
+    pass2.setOptimizationEnabled(mIsOptimizationEnabled);
+    pass2.setConfiguredDefaultMarking(marking);
     return pass2.compile();
   }
 
@@ -133,15 +148,16 @@ public class EFSMCompiler
     mEnabledPropertyNames = names;
   }
 
-  public Collection<String> getEnabledPropositionNames()
+  public void setConfiguredDefaultMarking(final IdentifierProxy marking)
   {
-    return mEnabledPropositionNames;
+    mMarking = marking;
   }
 
-  public void setEnabledPropositionNames(final Collection<String> names)
+  public IdentifierProxy getConfiguredDefaultMarking()
   {
-    mEnabledPropositionNames = names;
+    return mMarking;
   }
+
 
 
   //#########################################################################
@@ -173,5 +189,6 @@ public class EFSMCompiler
   private boolean mIsUsingEventAlphabet = true;
   private boolean mIsSourceInfoEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;
-  private Collection<String> mEnabledPropositionNames = null;
+  private IdentifierProxy mMarking;
+
 }
