@@ -114,9 +114,13 @@ public class EFSMSystemImporter
               Collections.singletonList(ident);
             props = mModuleFactory.createPlainEventListProxy(identList);
         }
-        final SimpleNodeProxy nodeFromEFSM = nodeListFromEFSM.get(i);
-
-        final String nodeName = nodeFromEFSM.getName();
+        final String nodeName;
+        if (nodeListFromEFSM == null) {
+          nodeName = "S" + i;
+        } else {
+          final SimpleNodeProxy nodeFromEFSM = nodeListFromEFSM.get(i);
+          nodeName = nodeFromEFSM.getName();
+        }
         final SimpleNodeProxy node =
           mModuleFactory.createSimpleNodeProxy(nodeName, props, null,
                                                isInitial, null, null, null);

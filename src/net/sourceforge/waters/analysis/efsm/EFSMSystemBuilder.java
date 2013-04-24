@@ -88,7 +88,7 @@ public class EFSMSystemBuilder
     mGlobalVariableMap =
       new ProxyAccessorHashMap<IdentifierProxy,EFSMVariable>(eq);
     final int size = module.getComponentList().size();
-    mResultEFSMSystem = new EFSMSystem(size, moduleName);
+    mResultEFSMSystem = new EFSMSystem(moduleName, mVariableContext,size);
   }
 
   //#########################################################################

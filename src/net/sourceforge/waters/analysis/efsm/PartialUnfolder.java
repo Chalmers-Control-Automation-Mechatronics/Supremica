@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
+import net.sourceforge.waters.model.compiler.context.OccursChecker;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
@@ -34,7 +35,6 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
@@ -47,38 +47,46 @@ public class PartialUnfolder
   //#########################################################################
   //# Constructors
   public PartialUnfolder(final ModuleProxyFactory factory,
-                         final CompilerOperatorTable op,
-                         final VariableContext binding)
+                         final CompilerOperatorTable op)
   {
     mFactory = factory;
-    mRootContext = binding;
     mOperatorTable = op;
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, op);
     mUnfoldingVariableContext = new UnfoldingVariableContext();
-    mConstraintPropagator =
-      new ConstraintPropagator(mFactory, mOperatorTable,
-                               mUnfoldingVariableContext);
+    mOccursChecker = OccursChecker.getInstance();
   }
 
   //#########################################################################
 
-  EFSMTransitionRelation unfold(final EFSMTransitionRelation EFSMRel,
-                                final EFSMVariable var) throws EvalException,
+  EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
+                                final EFSMVariable var,
+                                final VariableContext rootContext)
+    throws EvalException,
     OverflowException
   {
-    final List<SimpleNodeProxy> nodeList = EFSMRel.getNodeList();
+    mInputTransitionRelation = efsmRel;
+    mUnfoldVariable = var;
+    mRootContext = rootContext;
+    mConstraintPropagator =
+      new ConstraintPropagator(mFactory, mOperatorTable,
+                               mUnfoldingVariableContext);
+
     final SimpleExpressionProxy initStatePredicate =
       var.getInitialStatePredicate();
     final CompiledRange range = var.getRange();
-    final EFSMEventEncoding efsmEvents = EFSMRel.getEventEncoding();
+    mEFSMEvents = efsmRel.getEventEncoding();
+    final ListBufferTransitionRelation rel = efsmRel.getTransitionRelation();
+    final int numOfStates = rel.getNumberOfStates();
     final SimpleExpressionProxy varName = var.getVariableName();
+    mPrimedUnfoldVariable =
+      mFactory.createUnaryExpressionProxy(mOperatorTable.getNextOperator(),
+                                          varName);
     final TIntArrayList initialValues = new TIntArrayList(range.size());
     mVarBindingContextMap = new ArrayList<BindingContext>(range.size());
-    final TIntArrayList initialStates = new TIntArrayList(nodeList.size());
+    final TIntArrayList initialStates = new TIntArrayList(numOfStates);
     int variableCounter = 0;
-    final List<? extends SimpleExpressionProxy> rangeValues =
-      range.getValues();
-    for (final SimpleExpressionProxy rangeValue : rangeValues) {
+    mRangeValues = range.getValues();
+    for (final SimpleExpressionProxy rangeValue : mRangeValues) {
       final BindingContext context =
         new SingleBindingContext(varName, rangeValue, mRootContext);
       final SimpleExpressionProxy simpleEval =
@@ -91,108 +99,138 @@ public class PartialUnfolder
       mVarBindingContextMap.add(variableCounter, context);
       variableCounter++;
     }
-    final ListBufferTransitionRelation rel = EFSMRel.getTransitionRelation();
     final int stateNumber = rel.getNumberOfStates();
     for (int i = 0; i < stateNumber; i++) {
       if (rel.isInitial(i)) {
         initialStates.add(i);
       }
     }
-    final TLongArrayList unfoldedStates = new TLongArrayList(nodeList.size());
-    final TLongIntHashMap stateMap = new TLongIntHashMap(nodeList.size());
-    int unfoldedStateCounter = 0;
+    mUnfoldedStates = new TLongArrayList(numOfStates);
+    mStateMap = new TLongIntHashMap(numOfStates);
+    mUnfoldedStateCounter = 0;
     for (int lowState = 0; lowState < initialStates.size(); lowState++) {
       for (int highValue = 0; highValue < initialValues.size(); highValue++) {
         final long initialPair =
           initialStates.get(lowState)
             | ((long) initialValues.get(highValue) << 32);
-        unfoldedStates.add(initialPair);
-        stateMap.put(initialPair, unfoldedStateCounter);
-        unfoldedStateCounter++;
+        mUnfoldedStates.add(initialPair);
+        mStateMap.put(initialPair, mUnfoldedStateCounter);
+        mUnfoldedStateCounter++;
       }
     }
-    final int numOfInitialState = unfoldedStateCounter;
+    final int numOfInitialState = mUnfoldedStateCounter;
     int currentState = 0;
-    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    final EFSMEventEncoding outputEventEncoding =
+    mOutputEventEncoding =
       new EFSMEventEncoding(rel.getNumberOfProperEvents());
 
-    while (currentState < unfoldedStates.size()) {
-      final long pair = unfoldedStates.get(currentState);
-      final int EFSMState = (int) (pair & 0xffffffffL);
-      final int value = (int) (pair >> 32);
-      mUnfoldingVariableContext.setCurrentValue(rangeValues.get(value));
-      iter.resetState(EFSMState);
-      while (iter.advance()) {
-        final int event = iter.getCurrentEvent();
-        final int target = iter.getCurrentTargetState();
-        final ConstraintList update = efsmEvents.getUpdate(event);
-        int primeValue = 0;
-        for (final SimpleExpressionProxy rangeValue : rangeValues) {
-          mUnfoldingVariableContext.setPrimedValue(rangeValue);
-          mConstraintPropagator.init(update);
-          mConstraintPropagator.propagate();
-          if (!mConstraintPropagator.isUnsatisfiable()) {
-            final ConstraintList allConstraints =
-              mConstraintPropagator.getAllConstraints();
-            outputEventEncoding.createEventId(allConstraints);
-            final long newPair = target | ((long) primeValue << 32);
-            if (!stateMap.contains(newPair)) {
-              unfoldedStates.add(newPair);
-              stateMap.put(newPair, unfoldedStateCounter);
-              unfoldedStateCounter++;
-            }
-          }
-          primeValue++;
+    final StateExpander expander1 = new StateExpander() {
+      @Override
+      void newTransition(final int event, final int targetState, final int targetValue)
+      {
+        final long newPair = targetState | ((long) targetValue << 32);
+        if (!mStateMap.contains(newPair)) {
+          mUnfoldedStates.add(newPair);
+          mStateMap.put(newPair, mUnfoldedStateCounter);
+          mUnfoldedStateCounter++;
         }
       }
+    };
+
+    while (currentState < mUnfoldedStates.size()) {
+      expander1.expandState(currentState);
       currentState++;
     }
     final ListBufferTransitionRelation newRel =
       new ListBufferTransitionRelation(rel.getName(), rel.getKind(),
-                                       outputEventEncoding.size(),
+                                       mOutputEventEncoding.size(),
                                        rel.getNumberOfPropositions(),
-                                       unfoldedStateCounter,
+                                       mUnfoldedStateCounter,
                                        rel.getConfiguration());
-
-    for (int i = 0; i < unfoldedStateCounter; i++) {
+    final StateExpander expander2 = new StateExpander() {
+      @Override
+      void newTransition(final int event, final int targetState, final int targetValue)
+      {
+        final long newPair = targetState | ((long) targetValue << 32);
+        final int newTarget= mStateMap.get(newPair);
+        newRel.addTransition(mCurrentState, event, newTarget);
+      }
+    };
+    for (int i = 0; i < mUnfoldedStateCounter; i++) {
       if (i < numOfInitialState) {
         newRel.setInitial(i, true);
       }
-      final long pair = unfoldedStates.get(i);
+      final long pair = mUnfoldedStates.get(i);
       final int EFSMState = (int) (pair & 0xffffffffL);
       if (rel.isMarked(EFSMState, 0)) {
         newRel.setMarked(i, 0, true);
       }
+      mCurrentState = i;
+      expander2.expandState(i);
+    }
+    return new EFSMTransitionRelation(newRel, mOutputEventEncoding);
+  }
+
+
+  //#########################################################################
+  //# Inner Class StateExpander
+  private abstract class StateExpander {
+    private StateExpander()
+    {
+      final ListBufferTransitionRelation rel =
+        mInputTransitionRelation.getTransitionRelation();
+      mIterator = rel.createSuccessorsReadOnlyIterator();
+    }
+
+    private void expandState(final int source)
+      throws EvalException
+    {
+      final long pair = mUnfoldedStates.get(source);
+      final int EFSMState = (int) (pair & 0xffffffffL);
       final int value = (int) (pair >> 32);
-      mUnfoldingVariableContext.setCurrentValue(rangeValues.get(value));
-      iter.resetState(EFSMState);
-      while (iter.advance()) {
-        final int event = iter.getCurrentEvent();
-        final int target = iter.getCurrentTargetState();
-        final ConstraintList update = efsmEvents.getUpdate(event);
-        int primeValue = 0;
-        for (final SimpleExpressionProxy rangeValue : rangeValues) {
-          mUnfoldingVariableContext.setPrimedValue(rangeValue);
+      mUnfoldingVariableContext.setCurrentValue(mRangeValues.get(value));
+      mIterator.resetState(EFSMState);
+      while (mIterator.advance()) {
+        final int event = mIterator.getCurrentEvent();
+        final int target = mIterator.getCurrentTargetState();
+        final ConstraintList update = mEFSMEvents.getUpdate(event);
+        if (mOccursChecker.occurs(mPrimedUnfoldVariable, update)) {
+          int primeValue = 0;
+          for (final SimpleExpressionProxy rangeValue : mRangeValues) {
+            mUnfoldingVariableContext.setPrimedValue(rangeValue);
+            mConstraintPropagator.init(update);
+            mConstraintPropagator.propagate();
+            if (!mConstraintPropagator.isUnsatisfiable()) {
+              final ConstraintList allConstraints =
+                mConstraintPropagator.getAllConstraints();
+              final int newEvent =
+                mOutputEventEncoding.createEventId(allConstraints);
+              newTransition(newEvent, target, primeValue);
+            }
+            primeValue++;
+          }
+        } else {
           mConstraintPropagator.init(update);
           mConstraintPropagator.propagate();
           if (!mConstraintPropagator.isUnsatisfiable()) {
             final ConstraintList allConstraints =
               mConstraintPropagator.getAllConstraints();
-            final int newEvent = outputEventEncoding.getEventId(allConstraints);
-            final long newPair = target | ((long) primeValue << 32);
-            final int newTarget = stateMap.get(newPair);
-              newRel.addTransition(i, newEvent, newTarget);
+            final int newEvent =
+              mOutputEventEncoding.createEventId(allConstraints);
+            newTransition(newEvent, target, value);
           }
-          primeValue++;
         }
       }
-      currentState++;
+
     }
-    return new EFSMTransitionRelation(newRel, outputEventEncoding);
+
+
+
+    abstract void newTransition(int event, int targetState, int targetValue);
+
+    //#######################################################################
+    //# Instance Variables
+    private final TransitionIterator mIterator;
   }
-
-
   //#########################################################################
   //# Inner Class EFSMVariableContext
   /**
@@ -267,13 +305,22 @@ public class PartialUnfolder
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
-  private final VariableContext mRootContext;
+  private VariableContext mRootContext;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private List<BindingContext> mVarBindingContextMap;
   private final UnfoldingVariableContext mUnfoldingVariableContext;
 
-  private final ConstraintPropagator mConstraintPropagator;
+  private EFSMTransitionRelation mInputTransitionRelation;
+  private ConstraintPropagator mConstraintPropagator;
   private EFSMVariable mUnfoldVariable;
-
+  private TLongArrayList mUnfoldedStates;
+  private TLongIntHashMap mStateMap;
+  private EFSMEventEncoding mOutputEventEncoding;
+  private List<? extends SimpleExpressionProxy> mRangeValues;
+  private EFSMEventEncoding mEFSMEvents;
+  private int mUnfoldedStateCounter;
+  private int mCurrentState;
+  private final OccursChecker mOccursChecker;
+  private SimpleExpressionProxy mPrimedUnfoldVariable;
 }
