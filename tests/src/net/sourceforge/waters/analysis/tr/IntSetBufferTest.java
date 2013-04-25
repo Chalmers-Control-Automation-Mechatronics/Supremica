@@ -11,8 +11,8 @@ package net.sourceforge.waters.analysis.tr;
 
 import java.util.Random;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -224,3 +224,4 @@ public class IntSetBufferTest extends AbstractWatersTest
   }
 
 }
+

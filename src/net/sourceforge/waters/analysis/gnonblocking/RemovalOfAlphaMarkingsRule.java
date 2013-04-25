@@ -9,12 +9,14 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.Collection;
+
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -62,11 +64,13 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
   public void requestAbort()
   {
     mIsAborting = true;
   }
 
+  @Override
   public boolean isAborting()
   {
     return mIsAborting;
@@ -75,6 +79,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
 
   //#######################################################################
   // # Rule Application
+  @Override
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
     throws AbortException
@@ -95,7 +100,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     }
 
     final TIntHashSet reachableStates = new TIntHashSet();
-    final TIntStack unvisitedStates = new TIntStack();
+    final TIntStack unvisitedStates = new TIntArrayStack();
 
     // performs a backwards search to remove alpha markings from states which
     // satisfy the rule conditions
@@ -137,6 +142,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
     }
   }
 
+  @Override
   CompositionalGeneralisedConflictChecker.Step createStep
     (final CompositionalGeneralisedConflictChecker checker,
      final AutomatonProxy abstractedAut)
@@ -146,6 +152,7 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
                                                mResultingStateToIntMap);
   }
 
+  @Override
   public void cleanup()
   {
     mOriginalIntToStateMap = null;
@@ -183,3 +190,4 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
   private OldTransitionRelation mTR = null;
 
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.lang.Comparable;
 import java.util.ArrayList;
@@ -953,3 +953,4 @@ public class ProjectingSafetyVerifier
     LoggerFactory.createLogger(ProjectingSafetyVerifier.class);
 
 }
+

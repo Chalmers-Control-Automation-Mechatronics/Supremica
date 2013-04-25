@@ -1,19 +1,20 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntArrayList;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 
 public class FindBlockingStates
 {
-  public FindBlockingStates(ListBufferTransitionRelation automaton,
-                            int marking)
+  public FindBlockingStates(final ListBufferTransitionRelation automaton,
+                            final int marking)
   {
     mAutomaton = automaton;
     mBlockingStates = new TIntHashSet();
     if (marking != -1) {
-      TIntArrayList reaches = new TIntArrayList();
+      final TIntArrayList reaches = new TIntArrayList();
       for (int s = 0; s < mAutomaton.getNumberOfStates(); s++) {
         if (!mAutomaton.isMarked(s, marking)) {
           mBlockingStates.add(s);
@@ -23,8 +24,8 @@ public class FindBlockingStates
       }
       mAutomaton.reconfigure(ListBufferTransitionRelation.CONFIG_ALL);
       while (!reaches.isEmpty()) {
-        int state = reaches.remove(reaches.size() - 1);
-        TransitionIterator ti = mAutomaton.createPredecessorsReadOnlyIterator(state);
+        final int state = reaches.removeAt(reaches.size() - 1);
+        final TransitionIterator ti = mAutomaton.createPredecessorsReadOnlyIterator(state);
         while (ti.advance()) {
           if (mBlockingStates.remove(ti.getCurrentSourceState())) {
             reaches.add(ti.getCurrentSourceState());
@@ -33,12 +34,13 @@ public class FindBlockingStates
       }
     }
   }
-  
+
   public TIntHashSet getBlockingStates()
   {
     return mBlockingStates;
   }
-  
-  private ListBufferTransitionRelation mAutomaton;
-  private TIntHashSet mBlockingStates;
+
+  private final ListBufferTransitionRelation mAutomaton;
+  private final TIntHashSet mBlockingStates;
 }
+

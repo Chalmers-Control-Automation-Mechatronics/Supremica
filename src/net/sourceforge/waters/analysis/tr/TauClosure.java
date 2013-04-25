@@ -9,9 +9,10 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.NoSuchElementException;
 
@@ -113,7 +114,7 @@ public class TauClosure
         if (list.isEmpty()) {
           trans[state] = EMPTY_ARRAY;
         } else {
-          trans[state] = list.toNativeArray();
+          trans[state] = list.toArray();
           list.clear();
         }
       }
@@ -342,6 +343,7 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
     public void resetEvent(final int event)
     {
       if (event == EventEncoding.TAU) {
@@ -351,6 +353,7 @@ public class TauClosure
       }
     }
 
+    @Override
     public void resetEvents(final int first, final int last)
     {
       if (first == EventEncoding.TAU && last == EventEncoding.TAU) {
@@ -360,33 +363,39 @@ public class TauClosure
       }
     }
 
+    @Override
     public void resetState(final int from)
     {
       mFrom = from;
       reset();
     }
 
+    @Override
     public void reset(final int from, final int event)
     {
       mFrom = from;
       resetEvent(event);
     }
 
+    @Override
     public void resume(final int state)
     {
       resetState(state);
     }
 
+    @Override
     public int getCurrentEvent()
     {
       return EventEncoding.TAU;
     }
 
+    @Override
     public int getCurrentFromState()
     {
       return mFrom;
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -432,7 +441,7 @@ public class TauClosure
     {
       super(from);
       mTransitionBuffer = buffer;
-      mStack = new TIntStack();
+      mStack = new TIntArrayStack();
       mInner = mTransitionBuffer.createReadOnlyIterator();
       mInner.resetEvents(firstLocal, lastLocal);
       mVisited = new TIntHashSet();
@@ -441,6 +450,7 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
     public void reset()
     {
       mStack.clear();
@@ -453,6 +463,7 @@ public class TauClosure
       mCurrentState = -1;
     }
 
+    @Override
     public boolean advance()
     {
       if (mCurrentState < 0) {
@@ -480,11 +491,13 @@ public class TauClosure
       }
     }
 
+    @Override
     public int getCurrentSourceState()
     {
       return mTransitionBuffer.getIteratorSourceState(this);
     }
 
+    @Override
     public int getCurrentToState()
     {
       if (mCurrentState >= 0) {
@@ -495,11 +508,13 @@ public class TauClosure
       }
     }
 
+    @Override
     public int getCurrentTargetState()
     {
       return mTransitionBuffer.getIteratorTargetState(this);
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -542,6 +557,7 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
     public void reset()
     {
       final int from = getCurrentFromState();
@@ -551,16 +567,19 @@ public class TauClosure
       }
     }
 
+    @Override
     public boolean advance()
     {
       return ++mIndex < mCurrentArray.length;
     }
 
+    @Override
     public int getCurrentSourceState()
     {
       return mTransitionBuffer.getIteratorSourceState(this);
     }
 
+    @Override
     public int getCurrentToState()
     {
       if (mIndex == -1) {
@@ -574,6 +593,7 @@ public class TauClosure
       }
     }
 
+    @Override
     public int getCurrentTargetState()
     {
       return mTransitionBuffer.getIteratorTargetState(this);
@@ -611,6 +631,7 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
     public void reset()
     {
       if (mFromState >= 0) {
@@ -620,6 +641,7 @@ public class TauClosure
       }
     }
 
+    @Override
     public void resetEvent(final int event)
     {
       if (mFromState >= 0) {
@@ -631,29 +653,34 @@ public class TauClosure
       }
     }
 
+    @Override
     public void resetEvents(final int first, final int last)
     {
       mEventIterator.resetEvents(first, last);
       reset();
     }
 
+    @Override
     public void resetState(final int from)
     {
       mFromState = from;
       reset();
     }
 
+    @Override
     public void reset(final int from, final int event)
     {
       mFromState = from;
       resetEvent(event);
     }
 
+    @Override
     public void resume(final int state)
     {
       resetState(state);
     }
 
+    @Override
     public boolean advance()
     {
       if (mEventIterator.advance()) {
@@ -670,31 +697,37 @@ public class TauClosure
       }
     }
 
+    @Override
     public int getCurrentEvent()
     {
       return mEventIterator.getCurrentEvent();
     }
 
+    @Override
     public int getCurrentSourceState()
     {
       return mTransitionBuffer.getIteratorSourceState(this);
     }
 
+    @Override
     public int getCurrentToState()
     {
       return mEventIterator.getCurrentToState();
     }
 
+    @Override
     public int getCurrentTargetState()
     {
       return mTransitionBuffer.getIteratorTargetState(this);
     }
 
+    @Override
     public int getCurrentFromState()
     {
       return mFromState;
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -738,41 +771,48 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
     public void reset()
     {
       mEventIterator.resetState(mFromState);
       mStart = true;
     }
 
+    @Override
     public void resetEvent(final int event)
     {
       mEventIterator.reset(mFromState, event);
       mStart = true;
     }
 
+    @Override
     public void resetEvents(final int first, final int last)
     {
       mEventIterator.resetEvents(first, last);
       reset();
     }
 
+    @Override
     public void resetState(final int from)
     {
       mFromState = from;
       reset();
     }
 
+    @Override
     public void reset(final int from, final int event)
     {
       mFromState = from;
       resetEvent(event);
     }
 
+    @Override
     public void resume(final int state)
     {
       resetState(state);
     }
 
+    @Override
     public boolean advance()
     {
       if (mStart) {
@@ -789,31 +829,37 @@ public class TauClosure
       }
     }
 
+    @Override
     public int getCurrentEvent()
     {
       return mEventIterator.getCurrentEvent();
     }
 
+    @Override
     public int getCurrentSourceState()
     {
       return mTransitionBuffer.getIteratorSourceState(this);
     }
 
+    @Override
     public int getCurrentToState()
     {
       return mTauIterator.getCurrentToState();
     }
 
+    @Override
     public int getCurrentTargetState()
     {
       return mTransitionBuffer.getIteratorTargetState(this);
     }
 
+    @Override
     public int getCurrentFromState()
     {
       return mFromState;
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -856,41 +902,48 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
     public void reset()
     {
       mTauIterator1.resetState(mFromState);
       mStart = true;
     }
 
+    @Override
     public void resetEvent(final int event)
     {
       mEventIterator.resetEvent(event);
       reset();
     }
 
+    @Override
     public void resetEvents(final int first, final int last)
     {
       mEventIterator.resetEvents(first, last);
       reset();
     }
 
+    @Override
     public void resetState(final int from)
     {
       mFromState = from;
       reset();
     }
 
+    @Override
     public void reset(final int from, final int event)
     {
       mFromState = from;
       resetEvent(event);
     }
 
+    @Override
     public void resume(final int state)
     {
       resetState(state);
     }
 
+    @Override
     public boolean advance()
     {
       if (mStart) {
@@ -914,16 +967,19 @@ public class TauClosure
       return false;
     }
 
+    @Override
     public int getCurrentEvent()
     {
       return mEventIterator.getCurrentEvent();
     }
 
+    @Override
     public int getCurrentSourceState()
     {
       return mTransitionBuffer.getIteratorSourceState(this);
     }
 
+    @Override
     public int getCurrentToState()
     {
       if (mStart) {
@@ -934,16 +990,19 @@ public class TauClosure
       }
     }
 
+    @Override
     public int getCurrentTargetState()
     {
       return mTransitionBuffer.getIteratorTargetState(this);
     }
 
+    @Override
     public int getCurrentFromState()
     {
       return mFromState;
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -993,3 +1052,4 @@ public class TauClosure
   private static final int[] EMPTY_ARRAY = new int[0];
 
 }
+

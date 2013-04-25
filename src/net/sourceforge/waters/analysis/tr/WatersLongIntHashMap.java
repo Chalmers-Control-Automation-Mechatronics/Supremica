@@ -9,11 +9,10 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.HashFunctions;
-import gnu.trove.TIntFunction;
-import gnu.trove.TIntProcedure;
-import gnu.trove.TLongIntProcedure;
-import gnu.trove.TLongProcedure;
+import gnu.trove.function.TIntFunction;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.procedure.TLongIntProcedure;
+import gnu.trove.procedure.TLongProcedure;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -164,10 +163,11 @@ public class WatersLongIntHashMap
   /**
    * @return a deep clone of this collection
    */
+  @Override
   public Object clone()
   {
     final WatersLongIntHashMap m = (WatersLongIntHashMap) super.clone();
-    m.mValues = (int[]) this.mValues.clone();
+    m.mValues = this.mValues.clone();
     return m;
   }
 
@@ -256,6 +256,7 @@ public class WatersLongIntHashMap
    * @param newCapacity
    *          a <code>long</code> value
    */
+  @Override
   protected void rehash(final int newCapacity)
   {
     final int oldCapacity = _set.length;
@@ -296,11 +297,12 @@ public class WatersLongIntHashMap
    * Empties the map.
    *
    */
+  @Override
   public void clear()
   {
     super.clear();
-    Arrays.fill(_set, 0, _set.length, (long) 0);
-    Arrays.fill(mValues, 0, mValues.length, (int) 0);
+    Arrays.fill(_set, 0, _set.length, 0);
+    Arrays.fill(mValues, 0, mValues.length, 0);
     Arrays.fill(_states, 0, _states.length, FREE);
   }
 
@@ -330,6 +332,7 @@ public class WatersLongIntHashMap
    *          an <code>Object</code> value
    * @return a <code>boolean</code> value
    */
+  @Override
   public boolean equals(final Object other)
   {
     if (!(other instanceof WatersLongIntHashMap)) {
@@ -342,6 +345,7 @@ public class WatersLongIntHashMap
     return forEachEntry(new EqProcedure(that));
   }
 
+  @Override
   public int hashCode()
   {
     final HashProcedure p = new HashProcedure();
@@ -359,6 +363,7 @@ public class WatersLongIntHashMap
       return h;
     }
 
+    @Override
     public final boolean execute(final long key, final int value)
     {
       h += (_hashingStrategy.computeHashCode(key) ^ HashFunctions.hash(value));
@@ -376,6 +381,7 @@ public class WatersLongIntHashMap
       _otherMap = otherMap;
     }
 
+    @Override
     public final boolean execute(final long key, final int value)
     {
       final int index = _otherMap.index(key);
@@ -401,6 +407,7 @@ public class WatersLongIntHashMap
    * @param index
    *          an <code>int</code> value
    */
+  @Override
   protected void removeAt(final int index)
   {
     mValues[index] = mDefaultValue;
@@ -459,7 +466,7 @@ public class WatersLongIntHashMap
     if (a.length < size) {
       a = (long[]) Array.newInstance(a.getClass().getComponentType(), size);
     }
-    final long[] k = (long[]) _set;
+    final long[] k = _set;
     final byte[] states = _states;
     for (int i = k.length, j = 0; i-- > 0;) {
       if (states[i] == FULL) {
@@ -609,7 +616,7 @@ public class WatersLongIntHashMap
    */
   public boolean increment(final long key)
   {
-    return adjustValue(key, (int) 1);
+    return adjustValue(key, 1);
   }
 
   /**
@@ -667,12 +674,14 @@ public class WatersLongIntHashMap
     return newValue;
   }
 
+  @Override
   public String toString()
   {
     final StringBuilder buf = new StringBuilder("{");
     forEachEntry(new TLongIntProcedure() {
       private boolean first = true;
 
+      @Override
       public boolean execute(final long key, final int value)
       {
         if (first)
@@ -709,6 +718,7 @@ public class WatersLongIntHashMap
   private static final long serialVersionUID = 1L;
 
   private final TLongIntProcedure PUT_ALL_PROC = new TLongIntProcedure() {
+    @Override
     public boolean execute(final long key, final int value)
     {
       put(key, value);
@@ -717,3 +727,4 @@ public class WatersLongIntHashMap
   };
 
 }
+

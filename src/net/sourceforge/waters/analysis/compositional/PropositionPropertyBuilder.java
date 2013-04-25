@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -380,3 +380,4 @@ public class PropositionPropertyBuilder
   private PropositionKindTranslator mKindTranslator;
 
 }
+

@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectByteHashMap;
-import gnu.trove.TObjectByteIterator;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.iterator.TObjectByteIterator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2880,3 +2880,4 @@ public abstract class AbstractCompositionalModelAnalyzer
   static final byte BLOCKED = 3;
 
 }
+

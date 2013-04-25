@@ -1,8 +1,8 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.iterator.TIntIterator;
 
 import java.util.Set;
 
@@ -165,3 +165,4 @@ public class AnnotateGraph
     TIME += System.currentTimeMillis();
   }*/
 }
+

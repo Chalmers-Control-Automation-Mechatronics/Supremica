@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -5442,3 +5442,4 @@ public class GraphEditorPanel
   private static final int STATE_INPUT_WIDTH = 128;
 
 }
+

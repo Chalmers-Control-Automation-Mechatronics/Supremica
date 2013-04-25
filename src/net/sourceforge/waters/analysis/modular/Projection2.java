@@ -9,9 +9,10 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -68,21 +69,25 @@ public class Projection2
 
   //#########################################################################
   //# Configuration
+  @Override
   public Set<EventProxy> getHidden()
   {
     return mHide;
   }
 
+  @Override
   public void setHidden(final Set<EventProxy> hidden)
   {
     mHide = hidden;
   }
 
+  @Override
   public Set<EventProxy> getForbidden()
   {
     return mForbidden;
   }
 
+  @Override
   public void setForbidden(final Set<EventProxy> forbidden)
   {
     mForbidden = forbidden;
@@ -92,6 +97,7 @@ public class Projection2
   //#########################################################################
   //# Invocation
   // @Override -- @Override gives compiler error???
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -100,7 +106,7 @@ public class Projection2
       final ProductDESProxy model = getModel();
       final int limit = getNodeLimit();
       final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
-      mStates = new TObjectIntHashMap<int[]>(strategy);
+      mStates = new TObjectIntCustomHashMap<int[]>(strategy);
       mTransitions = new ArrayList<TransitionProxy>();
       mEvents = model.getEvents().toArray(new EventProxy[model.getEvents().size()]);
       mPossible = new boolean[mEvents.length];
@@ -187,7 +193,7 @@ public class Projection2
                 list[j].mDouble++;
               }
             }
-            list[j].mDouble /= (double)mTransitionTable[j][i].length;
+            list[j].mDouble /= mTransitionTable[j][i].length;
           } else {
             list[j].mDouble = Double.POSITIVE_INFINITY;
           }
@@ -267,6 +273,7 @@ public class Projection2
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
@@ -470,21 +477,25 @@ public class Projection2
       mName = name;
     }
 
+    @Override
     public Collection<EventProxy> getPropositions()
     {
       return Collections.emptySet();
     }
 
+    @Override
     public boolean isInitial()
     {
       return mName == 0;
     }
 
+    @Override
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName);
     }
 
+    @Override
     public String getName()
     {
       return Integer.toString(mName);
@@ -499,6 +510,7 @@ public class Projection2
       return false;
     }
 
+    @Override
     public boolean refequals(final NamedProxy o)
     {
       if (o instanceof MemStateProxy) {
@@ -509,11 +521,13 @@ public class Projection2
       }
     }
 
+    @Override
     public int refHashCode()
     {
       return mName;
     }
 
+    @Override
     public Object acceptVisitor(final ProxyVisitor visitor)
       throws VisitorException
     {
@@ -522,11 +536,13 @@ public class Projection2
       return desvisitor.visitStateProxy(this);
     }
 
+    @Override
     public Class<StateProxy> getProxyInterface()
     {
       return StateProxy.class;
     }
 
+    @Override
     public int compareTo(final NamedProxy n)
     {
       return n.getName().compareTo(getName());
@@ -606,11 +622,13 @@ public class Projection2
       mValues = new int[mInitialSize][];
     }
 
+    @Override
     public boolean isEmpty()
     {
       return mLength == 0;
     }
 
+    @Override
     public void offer(final int[] a)
     {
       if (mLength == mValues.length) {
@@ -625,6 +643,7 @@ public class Projection2
       mLength++;
     }
 
+    @Override
     public int[] take()
     {
       mLength--;
@@ -666,16 +685,19 @@ public class Projection2
       mMap = new HashMap<IntArray, StateProxy>(num);
     }
 
+    @Override
     public int size()
     {
       return mMap.size();
     }
 
+    @Override
     public Set<Map.Entry<int[],StateProxy>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
 
+    @Override
     public StateProxy get(final Object o)
     {
       final int[] a = (int[]) o;
@@ -688,11 +710,13 @@ public class Projection2
       return mMap.get(new IntArray(a));
     }
 
+    @Override
     public StateProxy put(final int[] a, final StateProxy s)
     {
       return mMap.put(new IntArray(a), s);
     }
 
+    @Override
     public Collection<StateProxy> values()
     {
       return mMap.values();
@@ -711,11 +735,13 @@ public class Projection2
       mArray = array;
     }
 
+    @Override
     public int hashCode()
     {
       return Arrays.hashCode(mArray);
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final IntArray oth = (IntArray)o;
@@ -730,6 +756,7 @@ public class Projection2
       return true;
     }
 
+    @Override
     public String toString()
     {
       return Arrays.toString(mArray);
@@ -748,6 +775,7 @@ public class Projection2
       mDouble = d;
     }
 
+    @Override
     public int compareTo(final IntDouble id)
     {
       if (mDouble < id.mDouble) {
@@ -763,7 +791,7 @@ public class Projection2
   private Set<EventProxy> mHide;
   private Set<EventProxy> mForbidden;
   private Set<EventProxy> mDisabled;
-  private TObjectIntHashMap<int[]> mStates;
+  private TObjectIntCustomHashMap<int[]> mStates;
   private Collection<TransitionProxy> mTransitions;
   private EventProxy[] mEvents;
   private int[][][] mTransitionTable;
@@ -773,3 +801,4 @@ public class Projection2
   private Bag mUnvisited;
   private int[][] mEventAutomaton;
 }
+

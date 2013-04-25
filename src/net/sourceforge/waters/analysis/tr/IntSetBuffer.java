@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntProcedure;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.procedure.TIntProcedure;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -638,3 +638,4 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   private static final long serialVersionUID = 1L;
 
 }
+

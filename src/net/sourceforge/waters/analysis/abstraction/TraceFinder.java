@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -254,3 +254,4 @@ public class TraceFinder
   private StateProxy[] mPath;
 
 }
+

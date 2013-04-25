@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.marshaller;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -588,3 +588,4 @@ public class ProductDESImporter
   private Map<StateProxy,SimpleNodeProxy> mCurrentNodeMap;
 
 }
+

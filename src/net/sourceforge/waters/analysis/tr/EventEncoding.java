@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.TByteArrayList;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.list.array.TByteArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -663,3 +663,4 @@ public class EventEncoding
     Collections.emptySet();
 
 }
+

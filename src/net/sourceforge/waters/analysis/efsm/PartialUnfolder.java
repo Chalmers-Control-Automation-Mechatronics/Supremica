@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TLongArrayList;
-import gnu.trove.TLongIntHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.hash.TLongIntHashMap;
 
 import java.util.List;
 
@@ -327,3 +327,4 @@ public class PartialUnfolder
   private ConstraintPropagator mConstraintPropagator;
 
 }
+

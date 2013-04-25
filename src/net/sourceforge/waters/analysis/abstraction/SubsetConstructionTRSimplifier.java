@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.BitSet;
 
@@ -439,3 +439,4 @@ public class SubsetConstructionTRSimplifier
   private PreTransitionBuffer mTransitionBuffer;
 
 }
+

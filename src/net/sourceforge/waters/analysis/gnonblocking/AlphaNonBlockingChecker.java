@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -1035,3 +1035,4 @@ public class AlphaNonBlockingChecker
       LoggerFactory.createLogger(AlphaNonBlockingChecker.class);
 
 }
+

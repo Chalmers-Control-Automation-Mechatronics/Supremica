@@ -9,11 +9,12 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
-import gnu.trove.TLongObjectHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -2070,7 +2071,7 @@ public class ListBufferTransitionRelation
   {
     if (mSuccessorBuffer != null) {
       final int numStates = getNumberOfStates();
-      final TIntStack stack = new TIntStack();
+      final TIntStack stack = new TIntArrayStack();
       final BitSet reached = new BitSet(numStates);
       for (int s = 0; s < numStates; s++) {
         if (isInitial(s)) {
@@ -2388,3 +2389,4 @@ public class ListBufferTransitionRelation
                                        | CONFIG_PREDECESSORS;
 
 }
+

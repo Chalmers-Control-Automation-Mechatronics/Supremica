@@ -9,9 +9,10 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.HashFunctions;
-import gnu.trove.TLongProcedure;
-import gnu.trove.TPrimitiveHash;
+import gnu.trove.impl.hash.TPrimitiveHash;
+import gnu.trove.procedure.TLongProcedure;
+
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
@@ -113,10 +114,16 @@ abstract public class WatersLongHash
   /**
    * @return a deep clone of this collection
    */
+  @Override
   public Object clone() {
-    final WatersLongHash h = (WatersLongHash)super.clone();
-    h._set = (long[])this._set.clone();
-    return h;
+    WatersLongHash h;
+    try {
+      h = (WatersLongHash)super.clone();
+      h._set = this._set.clone();
+      return h;
+    } catch (final CloneNotSupportedException exception) {
+      throw new WatersRuntimeException(exception);
+    }
   }
 
   /**
@@ -169,6 +176,7 @@ abstract public class WatersLongHash
    *
    * @param index an <code>int</code> value
    */
+  @Override
   protected void removeAt(final int index) {
     _set[index] = 0;
     super.removeAt(index);
@@ -280,6 +288,7 @@ abstract public class WatersLongHash
    * Default implementation of TLongHashingStrategy:
    * delegates hashing to HashFunctions.hash(long).
    */
+  @Override
   public final int computeHashCode(final long val)
   {
     return HashFunctions.hash(val);
@@ -289,6 +298,7 @@ abstract public class WatersLongHash
    * Default implementation of TIntHashingStrategy:
    * considers primitive values equal if they are the same number.
    */
+  @Override
   public boolean equals(final long val1, final long val2)
   {
     return val1 == val2;
@@ -308,11 +318,13 @@ abstract public class WatersLongHash
 
     //######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.WatersLongIterator
+    @Override
     public void reset()
     {
       mIndex = -1;
     }
 
+    @Override
     public boolean advance()
     {
       while (mIndex < _states.length) {
@@ -324,11 +336,13 @@ abstract public class WatersLongHash
       return false;
     }
 
+    @Override
     public long getCurrentData()
     {
       return _set[mIndex];
     }
 
+    @Override
     public void remove()
     {
       removeAt(mIndex);
@@ -340,3 +354,4 @@ abstract public class WatersLongHash
   }
 
 }
+

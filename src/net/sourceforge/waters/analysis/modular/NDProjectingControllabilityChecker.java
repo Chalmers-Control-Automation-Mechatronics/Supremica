@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1038,3 +1038,4 @@ public class NDProjectingControllabilityChecker
     LoggerFactory.createLogger(ProjectingControllabilityChecker.class);
 
 }
+

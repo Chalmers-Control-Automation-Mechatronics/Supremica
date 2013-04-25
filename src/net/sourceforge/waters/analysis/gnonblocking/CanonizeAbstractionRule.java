@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.Collection;
 
@@ -123,7 +123,7 @@ public class CanonizeAbstractionRule
         }
       }
       while (!tovisit.isEmpty()) {
-        final int state = tovisit.remove(tovisit.size() -1);
+        final int state = tovisit.removeAt(tovisit.size() -1);
         canon.setReachable(state, true);
         final TransitionIterator it = canon.createSuccessorsReadOnlyIterator(state);
         while (it.advance()) {
@@ -191,3 +191,4 @@ public class CanonizeAbstractionRule
 
   private boolean mIsAborting = false;
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.Collection;
 import java.util.Set;
@@ -115,3 +115,4 @@ public class MonolithicSCCControlLoopCheckerTest
   }
 
 }
+

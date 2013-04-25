@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.external.ttct;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -252,3 +252,4 @@ public class TTCTImporter
   private Collection<EventProxy> mMarkings;
 
 }
+

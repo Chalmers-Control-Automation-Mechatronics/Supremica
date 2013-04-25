@@ -10,7 +10,7 @@
 package net.sourceforge.waters.analysis.tr;
 
 import net.sourceforge.waters.model.base.ProxyTools;
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -151,3 +151,4 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
   private int mEvent;
 
 }
+

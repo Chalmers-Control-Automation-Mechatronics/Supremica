@@ -9,16 +9,16 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TLongArrayList;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
-import gnu.trove.TLongArrayList;
-import gnu.trove.TLongHashingStrategy;
-import gnu.trove.TLongIntHashMap;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.analysis.tr.WatersLongHashingStrategy;
+import net.sourceforge.waters.analysis.tr.WatersLongIntHashMap;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
@@ -137,7 +137,7 @@ public class OPVerifierTRSimplifier
     final int numStates = rel.getNumberOfStates();
     mVerifierStatePairs = new TLongArrayList(numStates);
     mVerifierStateMap =
-      new TLongIntHashMap(numStates, VerifierPairHashingStrategy.INSTANCE);
+      new WatersLongIntHashMap(numStates, VerifierPairHashingStrategy.INSTANCE);
     mTransitionIterator1 = rel.createSuccessorsReadOnlyIterator();
     mTransitionIterator2 = rel.createSuccessorsReadOnlyIterator();
     mOPResult = true;
@@ -370,11 +370,12 @@ public class OPVerifierTRSimplifier
   //#########################################################################
   //# Inner Class VerifierPairHashingStrategy
   private static class VerifierPairHashingStrategy
-    implements TLongHashingStrategy
+    implements WatersLongHashingStrategy
   {
 
     //#######################################################################
     //# Interface gnu.trove.TLongHashingStrategy
+    @Override
     public int computeHashCode(final long val)
     {
       final int h0 = -2128831035;
@@ -382,6 +383,12 @@ public class OPVerifierTRSimplifier
       final int lo = (int) (val & 0xffffffffL);
       final int hi = (int) (val >> 32);
       return ((h0 * h1) ^ hi) * h1 ^ lo;
+    }
+
+    @Override
+    public boolean equals(final long val1, final long val2)
+    {
+      return val1 == val2;
     }
 
     //#######################################################################
@@ -398,7 +405,7 @@ public class OPVerifierTRSimplifier
   private int mStateLimit = Integer.MAX_VALUE;
 
   private TLongArrayList mVerifierStatePairs;
-  private TLongIntHashMap mVerifierStateMap;
+  private WatersLongIntHashMap mVerifierStateMap;
   private TransitionIterator mTransitionIterator1;
   private TransitionIterator mTransitionIterator2;
   private boolean mOPResult;

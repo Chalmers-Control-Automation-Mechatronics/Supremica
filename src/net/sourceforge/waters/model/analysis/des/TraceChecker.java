@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -577,3 +577,4 @@ public class TraceChecker
   }
 
 }
+

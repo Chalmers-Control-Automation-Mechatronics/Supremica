@@ -10,11 +10,12 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -223,7 +224,7 @@ public class MonolithicSynchronousProductBuilder
       setUp();
       final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
       final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
-      mStates = new TObjectIntHashMap<int[]>(strategy);
+      mStates = new TObjectIntCustomHashMap<int[]>(strategy);
       mStates.ensureCapacity(tableSize);
       mStateTuples = new ArrayList<int[]>();
       mTransitionBuffer = new TIntArrayList();
@@ -426,7 +427,7 @@ public class MonolithicSynchronousProductBuilder
         }
         snum++;
       }
-      mNDTuple[a] = initials.toNativeArray();
+      mNDTuple[a] = initials.toArray();
       final TIntArrayList[][] autTransitionLists =
         new TIntArrayList[mNumInputEvents][numStates];
       for (final TransitionProxy trans : aut.getTransitions()) {
@@ -447,7 +448,7 @@ public class MonolithicSynchronousProductBuilder
           for (int source = 0; source < numStates; source++) {
             final TIntArrayList list = autTransitionLists[e][source];
             if (list != null) {
-              mTransitions[a][e][source] = list.toNativeArray();
+              mTransitions[a][e][source] = list.toArray();
               if (mDeadlock != null) {
                 mDeadlock[a][source] = false;
               }
@@ -1060,7 +1061,7 @@ public class MonolithicSynchronousProductBuilder
 
   private int mNumStates;
   private int mNumInitialStates;
-  private TObjectIntHashMap<int[]> mStates;
+  private TObjectIntCustomHashMap<int[]> mStates;
   private List<int[]> mStateTuples;
   private Queue<int[]> mUnvisited;
   private TIntArrayList mTransitionBuffer;
@@ -1078,3 +1079,4 @@ public class MonolithicSynchronousProductBuilder
   private static final int MAX_TABLE_SIZE = 500000;
 
 }
+

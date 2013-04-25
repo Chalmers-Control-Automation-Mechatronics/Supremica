@@ -9,8 +9,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.BitSet;
 
@@ -236,7 +237,7 @@ public class HalfWaySynthesisTRSimplifier
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     final int defaultID = getDefaultMarkingID();
     final int numStates = rel.getNumberOfStates();
-    final TIntStack unvisited = new TIntStack();
+    final TIntStack unvisited = new TIntArrayStack();
     // Creates a hash set of all states which can reach a marked state.
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (rel.isMarked(sourceID, defaultID) && rel.isReachable(sourceID)
@@ -269,7 +270,7 @@ public class HalfWaySynthesisTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     iterateLocalUncontrollable(iter);
-    final TIntStack unvisited = new TIntStack();
+    final TIntStack unvisited = new TIntArrayStack();
     for (int state = oldBadStates.nextSetBit(0); state >= 0;
          state = oldBadStates.nextSetBit(state+1)) {
       unvisited.push(state);
@@ -331,3 +332,4 @@ public class HalfWaySynthesisTRSimplifier
   private ListBufferTransitionRelation mPseudoSupervisor;
 
 }
+

@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -650,3 +650,4 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
   private ListBufferTransitionRelation mCertainConfRel;
   private int mOriginalTraceEndState;
 }
+

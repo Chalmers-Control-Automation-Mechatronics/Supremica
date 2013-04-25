@@ -1,6 +1,6 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 import java.util.Random;
 import net.sf.javabdd.BDD;
 import static org.supremica.automata.BDD.EFA.BDDPartitionReachabilityUti.restrictedPreImage;
@@ -197,3 +197,4 @@ public class BDDPartitionAlgoWorkerRan extends  BDDPartitionAlgoWorker {
     }
     
 }
+

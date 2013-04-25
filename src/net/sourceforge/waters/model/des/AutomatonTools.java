@@ -9,13 +9,13 @@
 
 package net.sourceforge.waters.model.des;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectHashingStrategy;
+import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.strategy.HashingStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 
 /**
@@ -147,10 +147,10 @@ public final class AutomatonTools
         }
       }
     }
-    final Set<TransitionProxy> transitions =
-      new THashSet<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
+    final TObjectByteCustomHashMap<TransitionProxy> transitions =
+      new TObjectByteCustomHashMap<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
     for (final TransitionProxy trans : aut.getTransitions()) {
-      if (!transitions.add(trans)) {
+      if (transitions.putIfAbsent(trans, (byte) 1) != 0) {
         return false;
       }
     }
@@ -161,16 +161,18 @@ public final class AutomatonTools
   //#########################################################################
   //# Inner Class TransitionHashingStrategy
   private static class TransitionHashingStrategy
-    implements TObjectHashingStrategy<TransitionProxy>
+    implements HashingStrategy<TransitionProxy>
   {
     //#######################################################################
     //# Interface gnu.trove.TObjectHashingStrategy
+    @Override
     public int computeHashCode(final TransitionProxy trans)
     {
       return trans.getSource().hashCode() + 5 * trans.getEvent().hashCode();
     }
 
 
+    @Override
     public boolean equals(final TransitionProxy trans1,
                           final TransitionProxy trans2)
     {
@@ -187,3 +189,4 @@ public final class AutomatonTools
   }
 
 }
+

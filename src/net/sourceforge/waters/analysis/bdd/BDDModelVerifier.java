@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.iterator.TObjectIntIterator;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -954,3 +954,4 @@ public abstract class BDDModelVerifier
   private static final int START_REORDER_INDEX = 8;
 
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.TIntProcedure;
+import gnu.trove.procedure.TIntProcedure;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -490,3 +490,4 @@ public class WatersIntHashSet
   private static final long serialVersionUID = 1L;
 
 }
+

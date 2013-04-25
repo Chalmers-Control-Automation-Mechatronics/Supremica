@@ -1,7 +1,7 @@
 
 package org.supremica.automata.algorithms.TransitionProjection;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 import java.util.StringTokenizer;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -453,3 +453,4 @@ public class ExtendedAutomataIndexFormHelper {
     }
 
 }
+

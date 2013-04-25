@@ -1,8 +1,9 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,23 +19,23 @@ public class TauLoopRemoval
   private final boolean[] mOnstack;
   private final TIntStack mStack;
   private final Collection<TIntHashSet> mToBeMerged;
-  
+
   public static int STATESMERGED = 0;
   public static int TIME = 0;
-  
+
   public static void clearStats()
   {
     STATESMERGED = 0;
     TIME = 0;
   }
-  
+
   public static String stats()
   {
     return "TauLoopRemoval: STATESMERGED = " + STATESMERGED +
             " TIME = " + TIME;
   }
-  
-  public TauLoopRemoval(TransitionRelation transitionrelation, int tau)
+
+  public TauLoopRemoval(final TransitionRelation transitionrelation, final int tau)
   {
     mTransitionRelation = transitionrelation;
     mTau = tau;
@@ -42,22 +43,22 @@ public class TauLoopRemoval
     mTarjan = new int[mTransitionRelation.numberOfStates()];
     mLowLink = new int[mTransitionRelation.numberOfStates()];
     mOnstack = new boolean[mTransitionRelation.numberOfStates()];
-    mStack = new TIntStack();
+    mStack = new TIntArrayStack();
     mToBeMerged = new ArrayList<TIntHashSet>();
   }
-  
-  private void tarjan(int state)
+
+  private void tarjan(final int state)
   {
     mTarjan[state] = mIndex;
     mLowLink[state] = mIndex;
     mIndex++;
-    TIntHashSet successors = mTransitionRelation.getSuccessors(state, mTau);
+    final TIntHashSet successors = mTransitionRelation.getSuccessors(state, mTau);
     if (successors == null) {return;}
     mOnstack[state] = true;
     mStack.push(state);
-    TIntIterator targets = successors.iterator();
+    final TIntIterator targets = successors.iterator();
     while (targets.hasNext()) {
-      int suc = targets.next();
+      final int suc = targets.next();
       if(mOnstack[suc]) {
         mLowLink[state] = mTarjan[suc] < mLowLink[state] ? mTarjan[suc]
                                                          : mLowLink[state];
@@ -71,9 +72,9 @@ public class TauLoopRemoval
       }
     }
     if (mTarjan[state] == mLowLink[state]) {
-      TIntHashSet merge = new TIntHashSet();
+      final TIntHashSet merge = new TIntHashSet();
       while (true) {
-        int pop = mStack.pop();
+        final int pop = mStack.pop();
         merge.add(pop);
         mOnstack[pop] = false;
         if (pop == state) {
@@ -85,7 +86,7 @@ public class TauLoopRemoval
       }
     }
   }
-  
+
   public void run()
   {
     TIME -= System.currentTimeMillis();
@@ -95,7 +96,7 @@ public class TauLoopRemoval
         tarjan(s);
       }
     }
-    for (TIntHashSet merge : mToBeMerged) {
+    for (final TIntHashSet merge : mToBeMerged) {
       STATESMERGED += merge.size() - 1;
       mTransitionRelation.mergewithannotations(merge.toArray());
     }
@@ -104,3 +105,4 @@ public class TauLoopRemoval
     TIME += System.currentTimeMillis();
   }
 }
+

@@ -1,6 +1,6 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 public class RemoveAllTau
@@ -89,3 +89,4 @@ public class RemoveAllTau
     TIME += System.currentTimeMillis();
   }
 }
+

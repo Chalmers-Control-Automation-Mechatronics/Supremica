@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,7 +148,7 @@ public class TRConflictPreorderChecker
     final TIntHashSet taureach = new TIntHashSet(set.toArray());
     final TIntArrayList togo = new TIntArrayList(set.toArray());
     while (!togo.isEmpty()) {
-      final int state = togo.remove(togo.size() - 1);
+      final int state = togo.removeAt(togo.size() - 1);
       final TransitionIterator ti = trans.createSuccessorsReadOnlyIterator(state,
                                                                      EventEncoding.TAU);
       while (ti.advance()) {
@@ -334,7 +334,7 @@ public class TRConflictPreorderChecker
     toexplore.add(initial);
     while (!toexplore.isEmpty()) {
       checkAbort();
-      final int s = toexplore.remove(toexplore.size() -1);
+      final int s = toexplore.removeAt(toexplore.size() -1);
       LCPair state = mStates.get(s);
       if (state.mFirstSet.isEmpty()) {continue;}
       if (state.mFirstSet.size() > 1) {
@@ -355,7 +355,7 @@ public class TRConflictPreorderChecker
         visited2.add(s);
         states.add(s);
         while (!states.isEmpty()) {
-          final int snum = states.remove(0);
+          final int snum = states.removeAt(0);
           state = mStates.get(snum);
           for (int e = 0; e < mSuccessors.get(snum).size(); e++) {
             if (e == EventEncoding.TAU) {continue;}
@@ -513,3 +513,4 @@ public class TRConflictPreorderChecker
   private boolean mIsAborting;
 
 }
+

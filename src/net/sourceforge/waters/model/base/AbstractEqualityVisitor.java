@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   AbstractEqualityVisitor
 //###########################################################################
@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.base;
 
-import gnu.trove.TObjectHashingStrategy;
+import gnu.trove.strategy.HashingStrategy;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -203,8 +203,7 @@ public abstract class AbstractEqualityVisitor
    * Returns a hashing strategy for use with GNU Trove,
    * using the equality defined by this visitor.
    */
-  public <P extends Proxy>
-  TObjectHashingStrategy<P> getTObjectHashingStrategy()
+  public <P extends Proxy> HashingStrategy<P> getTObjectHashingStrategy()
   {
     return new ProxyHashingStrategy<P>();
   }
@@ -280,6 +279,7 @@ public abstract class AbstractEqualityVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.base.ProxyVisitor
+  @Override
   public Boolean visitProxy(final Proxy proxy)
   {
     if (proxy.getProxyInterface() == mSecondProxy.getProxyInterface()) {
@@ -289,11 +289,13 @@ public abstract class AbstractEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitGeometryProxy(final GeometryProxy proxy)
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public Boolean visitNamedProxy(final NamedProxy proxy)
     throws VisitorException
   {
@@ -310,6 +312,7 @@ public abstract class AbstractEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitDocumentProxy(final DocumentProxy proxy)
     throws VisitorException
   {
@@ -843,7 +846,7 @@ public abstract class AbstractEqualityVisitor
   //#########################################################################
   //# Inner Class ProxyHashingStrategy
   private class ProxyHashingStrategy<P extends Proxy>
-    implements TObjectHashingStrategy<P>
+    implements HashingStrategy<P>
   {
 
     //#######################################################################
@@ -892,6 +895,7 @@ public abstract class AbstractEqualityVisitor
 
     //#######################################################################
     //# Message Generation
+    @Override
     void write(final Writer writer)
       throws IOException
     {
@@ -923,6 +927,7 @@ public abstract class AbstractEqualityVisitor
 
     //#######################################################################
     //# Message Generation
+    @Override
     void write(final Writer writer)
       throws IOException
     {
@@ -958,6 +963,7 @@ public abstract class AbstractEqualityVisitor
 
     //#######################################################################
     //# Message Generation
+    @Override
     void write(final Writer writer)
       throws IOException
     {
@@ -992,6 +998,7 @@ public abstract class AbstractEqualityVisitor
 
     //#######################################################################
     //# Message Generation
+    @Override
     void write(final Writer writer)
       throws IOException
     {
@@ -1021,6 +1028,7 @@ public abstract class AbstractEqualityVisitor
 
     //#######################################################################
     //# Message Generation
+    @Override
     void write(final Writer writer)
       throws IOException
     {
@@ -1053,6 +1061,7 @@ public abstract class AbstractEqualityVisitor
 
     //#######################################################################
     //# Message Generation
+    @Override
     void write(final Writer writer)
       throws IOException
     {
@@ -1092,6 +1101,7 @@ public abstract class AbstractEqualityVisitor
 
     //#######################################################################
     //# Message Generation
+    @Override
     void write(final Writer writer)
       throws IOException
     {
@@ -1128,6 +1138,7 @@ public abstract class AbstractEqualityVisitor
 
     //#######################################################################
     //# Overrides for net.sourceforge.water.model.base.IndexedArraySet
+    @Override
     protected void appendContainerName(final StringBuffer buffer)
     {
       final Proxy container = mDiagnosticPath.peekLast();

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.gui.command;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.File;
 import java.io.IOException;
@@ -400,3 +400,4 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
   private ProxyCollector mCollector;
 
 }
+

@@ -9,8 +9,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -67,7 +68,7 @@ public class CoreachabilityTRSimplifier
     final int defaultID = getDefaultMarkingID();
     final int numStates = rel.getNumberOfStates();
     final TIntHashSet reachableStates = new TIntHashSet(numStates);
-    final TIntStack unvisitedStates = new TIntStack();
+    final TIntStack unvisitedStates = new TIntArrayStack();
     // Creates a hash set of all states which can reach an omega marked or alpha
     // marked state.
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
@@ -118,3 +119,4 @@ public class CoreachabilityTRSimplifier
   }
 
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.gui.comp552;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1591,3 +1591,4 @@ public class ModelAssess
   private int mAutomatonIndex;
 
 }
+

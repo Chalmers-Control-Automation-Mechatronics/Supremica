@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.iterator.TObjectIntIterator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -560,3 +560,4 @@ public class EFSMSystemBuilder
   private final EFSMSystem mResultEFSMSystem;
 
 }
+

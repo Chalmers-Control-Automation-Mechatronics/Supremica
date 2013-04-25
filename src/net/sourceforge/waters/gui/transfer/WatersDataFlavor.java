@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.transfer;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

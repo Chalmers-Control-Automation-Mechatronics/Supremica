@@ -1,6 +1,7 @@
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -25,10 +27,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntArrayList;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class ObserverProjection
@@ -152,7 +151,7 @@ public class ObserverProjection
               list[j].mDouble++;
             }
           }
-          list[j].mDouble /= (double)transitions[j][i].length;
+          list[j].mDouble /= transitions[j][i].length;
         } else {
           list[j].mDouble = Double.POSITIVE_INFINITY;
         }
@@ -325,7 +324,7 @@ public class ObserverProjection
         if (mBackTransitions[i][cs] == null) {
           continue;
         }
-        final int[] sucs = mBackTransitions[i][cs].toNativeArray();
+        final int[] sucs = mBackTransitions[i][cs].toArray();
         for (int j = 0; j < sucs.length; j++) {
           final int suc = sucs[j];
           if (!reachable[suc]) {
@@ -345,7 +344,7 @@ public class ObserverProjection
             if (mBackTransitions[i][k] == null) {
               continue;
             }
-            final int[] sucs = mBackTransitions[i][k].toNativeArray();
+            final int[] sucs = mBackTransitions[i][k].toArray();
             for (int j = 0; j < sucs.length; j++) {
               final int suc = sucs[j];
               // that which use to point to this state now points to the dump state
@@ -617,6 +616,7 @@ public class ObserverProjection
       this(name, null);
     }
 
+    @Override
     public Collection<EventProxy> getPropositions()
     {
       if (mEvent == null) {
@@ -626,6 +626,7 @@ public class ObserverProjection
       }
     }
 
+    @Override
     public boolean isInitial()
     {
       return mName == 0;
@@ -636,11 +637,13 @@ public class ObserverProjection
       return mName;
     }
 
+    @Override
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName, mEvent);
     }
 
+    @Override
     public String getName()
     {
       return Integer.toString(mName);
@@ -655,6 +658,7 @@ public class ObserverProjection
       return false;
     }
 
+    @Override
     public boolean refequals(final NamedProxy o)
     {
       if (o instanceof MemStateProxy) {
@@ -665,11 +669,13 @@ public class ObserverProjection
       }
     }
 
+    @Override
     public int refHashCode()
     {
       return mName;
     }
 
+    @Override
     public Object acceptVisitor(final ProxyVisitor visitor)
       throws VisitorException
     {
@@ -677,16 +683,19 @@ public class ObserverProjection
       return desvisitor.visitStateProxy(this);
     }
 
+    @Override
     public Class<StateProxy> getProxyInterface()
     {
       return StateProxy.class;
     }
 
+    @Override
     public int compareTo(final NamedProxy n)
     {
       return n.getName().compareTo(getName());
     }
 
+    @Override
     public String toString()
     {
       return "S:" + mName;
@@ -766,11 +775,13 @@ public class ObserverProjection
       mValues = new int[mInitialSize][];
     }
 
+    @Override
     public boolean isEmpty()
     {
       return mLength == 0;
     }
 
+    @Override
     public void offer(final int[] a)
     {
       if (mLength == mValues.length) {
@@ -785,6 +796,7 @@ public class ObserverProjection
       mLength++;
     }
 
+    @Override
     public int[] take()
     {
       mLength--;
@@ -826,11 +838,13 @@ public class ObserverProjection
       mMap = new HashMap<IntArray, MemStateProxy>(num);
     }
 
+    @Override
     public Set<Map.Entry<int[],MemStateProxy>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
 
+    @Override
     public MemStateProxy get(final Object o)
     {
       final int[] a = (int[]) o;
@@ -849,16 +863,19 @@ public class ObserverProjection
       return mMap.put(new IntArray((int[])o), s);
     }
 
+    @Override
     public MemStateProxy put(final int[] a, final MemStateProxy s)
     {
       return mMap.put(new IntArray(a), s);
     }
 
+    @Override
     public Collection<MemStateProxy> values()
     {
       return mMap.values();
     }
 
+    @Override
     public String toString()
     {
       return mMap.toString();
@@ -875,11 +892,13 @@ public class ObserverProjection
       mMap = new HashMap<IntArray, Integer>(num);
     }
 
+    @Override
     public Set<Map.Entry<int[],Integer>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
 
+    @Override
     public Integer get(final Object o)
     {
       final int[] a = (int[]) o;
@@ -898,11 +917,13 @@ public class ObserverProjection
       return mMap.put(new IntArray((int[])o), s);
     }
 
+    @Override
     public Integer put(final int[] a, final Integer s)
     {
       return mMap.put(new IntArray(a), s);
     }
 
+    @Override
     public Collection<Integer> values()
     {
       return mMap.values();
@@ -918,11 +939,13 @@ public class ObserverProjection
       mArray = array;
     }
 
+    @Override
     public int hashCode()
     {
       return Arrays.hashCode(mArray);
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final IntArray oth = (IntArray)o;
@@ -937,6 +960,7 @@ public class ObserverProjection
       return true;
     }
 
+    @Override
     public String toString()
     {
       return Arrays.toString(mArray);
@@ -955,6 +979,7 @@ public class ObserverProjection
       mDouble = d;
     }
 
+    @Override
     public int compareTo(final IntDouble id)
     {
       if (mDouble < id.mDouble) {
@@ -997,3 +1022,4 @@ public class ObserverProjection
   private TIntArrayList[][] mBackTrans;
   private int mDumpState = -1;
 }
+

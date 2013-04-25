@@ -9,13 +9,14 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TLongHashSet;
-import gnu.trove.TLongIterator;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -574,7 +576,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         mDeadlock[a][snum] = stateProps.isEmpty();
         snum++;
       }
-      ndTuple1[a] = initials.toNativeArray();
+      ndTuple1[a] = initials.toArray();
       final TIntArrayList[][] autTransitionLists =
         new TIntArrayList[mNumProperEvents + 1][numStates];
       final TIntArrayList[][] autTransitionListsRvs =
@@ -607,13 +609,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           for (int source = 0; source < numStates; source++) {
             final TIntArrayList list = autTransitionLists[e][source];
             if (list != null) {
-              transitions[a][e][source] = list.toNativeArray();
+              transitions[a][e][source] = list.toArray();
             }
           }
           for (int target = 0; target < numStates; target++) {
             final TIntArrayList listRvs = autTransitionListsRvs[e][target];
             if (listRvs != null) {
-              reverseTransitions[a][e][target] = listRvs.toNativeArray();
+              reverseTransitions[a][e][target] = listRvs.toArray();
             }
           }
         }
@@ -685,9 +687,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mBadStates = new BitSet(mNumStates);
     mSafeStates = new BitSet(mNumStates);
     final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
-    mGlobalVisited = new TObjectIntHashMap<int[]>(strategy);
+    mGlobalVisited = new TObjectIntCustomHashMap<int[]>(strategy);
     mGlobalVisited.ensureCapacity(tableSize);
-    mLocalVisited = new THashSet<int[]>(strategy);
+    mLocalVisited = new WatersHashSet<int[]>(strategy);
     mGlobalStack = new ArrayDeque<int[]>();
     mLocalStack = new ArrayDeque<int[]>();
     mBackTrace = new ArrayDeque<int[]>();
@@ -1855,7 +1857,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private int mDeadlockState;
 
   private List<int[]> mStateTuples;
-  private TObjectIntHashMap<int[]> mGlobalVisited;
+  private TObjectIntCustomHashMap<int[]> mGlobalVisited;
   private Deque<int[]> mGlobalStack;
   private Deque<int[]> mLocalStack;
   private Deque<int[]> mBackTrace;
@@ -1896,3 +1898,4 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private static final int MAX_TABLE_SIZE = 500000;
   private static final int SIZE_INT = 32;
 }
+

@@ -9,8 +9,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -53,6 +54,7 @@ public class MarkingSaturationTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
+  @Override
   public boolean isPartitioning()
   {
     return true;
@@ -64,6 +66,7 @@ public class MarkingSaturationTRSimplifier
     return true;
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
@@ -93,7 +96,7 @@ public class MarkingSaturationTRSimplifier
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     final int numStates = rel.getNumberOfStates();
     final TIntHashSet visitedStates = new TIntHashSet();
-    final TIntStack unvisitedStates = new TIntStack();
+    final TIntStack unvisitedStates = new TIntArrayStack();
     boolean modified = false;
     for (int prop = 0; prop < rel.getNumberOfPropositions(); prop++) {
       for (int stateID = 0; stateID < numStates; stateID++) {
@@ -124,3 +127,4 @@ public class MarkingSaturationTRSimplifier
   }
 
 }
+

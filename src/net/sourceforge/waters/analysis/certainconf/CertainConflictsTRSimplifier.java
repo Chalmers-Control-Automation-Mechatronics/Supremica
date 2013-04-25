@@ -1,8 +1,9 @@
 package net.sourceforge.waters.analysis.certainconf;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -464,7 +465,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         final int defaultID = getDefaultMarkingID();
         final int numStates = rel.getNumberOfStates();
         final TIntHashSet coreachableStates = new TIntHashSet(numStates);
-        final TIntStack unvisitedStates = new TIntStack();
+        final TIntStack unvisitedStates = new TIntArrayStack();
         // Creates a hash set of all states which can reach an omega marked or alpha
         // marked state
         for (int sourceID = 0; sourceID < numStates; sourceID++)

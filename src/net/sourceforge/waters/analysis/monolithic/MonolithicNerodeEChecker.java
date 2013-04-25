@@ -7,7 +7,7 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.LinkedList;
@@ -940,3 +940,4 @@ public class MonolithicNerodeEChecker
   private static final int SIZE_BUFFER = 1024;
 
 }
+

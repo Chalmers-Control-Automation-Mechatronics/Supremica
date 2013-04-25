@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TObjectByteIterator;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.iterator.TObjectByteIterator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1211,3 +1211,4 @@ public class CompositionalSynthesizer
   private Set<EventProxy> mRenamedEvents;
 
 }
+

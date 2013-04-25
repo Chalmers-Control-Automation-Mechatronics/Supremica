@@ -11,7 +11,7 @@ package net.sourceforge.waters.analysis.tr;
 
 import net.sourceforge.waters.model.des.AutomatonTools;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -149,3 +149,4 @@ public class CachingTransitionIterator implements TransitionIterator
   private final int mEventShift;
 
 }
+

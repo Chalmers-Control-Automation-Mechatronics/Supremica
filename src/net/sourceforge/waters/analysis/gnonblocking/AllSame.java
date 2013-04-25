@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -217,3 +217,4 @@ class AllSame
     }
   }
 }
+

@@ -9,14 +9,14 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.HashFunctions;
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TauClosure;
@@ -397,3 +397,4 @@ public class EnabledEventsSilentContinuationTRSimplifier
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mNumberOfEnabledEvents;
 }
+
