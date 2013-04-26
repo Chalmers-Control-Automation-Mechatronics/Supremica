@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="oeq_11b" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This is a larger test for observation equivalence from the central locking model. The test checks whether multiple observation equivalent transitions are removed correctly while not merging any states.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name="Timers">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="FT"/>
+                    <SimpleIdentifier Name="BT"/>
+                    <SimpleIdentifier Name="FH"/>
+                    <SimpleIdentifier Name="BH"/>
+                    <SimpleIdentifier Name="FS"/>
+                    <SimpleIdentifier Name="WSP"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="Counters">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="WSP"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="FahrerTueren">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="FT"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="VorderTueren">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="FT"/>
+                    <SimpleIdentifier Name="BT"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="Tueren">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="FT"/>
+                    <SimpleIdentifier Name="BT"/>
+                    <SimpleIdentifier Name="FH"/>
+                    <SimpleIdentifier Name="BH"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="MER_an">
+            <RangeList>
+                <SimpleIdentifier Name="Tueren"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ER_BT"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ER_FS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ER_FT"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ER_HK"/>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_SER">
+            <RangeList>
+                <SimpleIdentifier Name="Tueren"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_ER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="done_ZS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="CS_ok"/>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_VR"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="IN_IN,RUN">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="145" Y="190"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-53" Y="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="IN_XX,ZS">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="206" Y="119"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQ_CS1,CS1a">
+                        <PointGeometry>
+                            <Point X="114" Y="293"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-93" Y="-20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQ_CS2,CS2a">
+                        <PointGeometry>
+                            <Point X="150" Y="369"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQ_IN,RUN">
+                        <PointGeometry>
+                            <Point X="196" Y="270"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQ_XX,ZS">
+                        <PointGeometry>
+                            <Point X="268" Y="191"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="IN_IN,RUN" Target="IN_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-66" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="101" Y="157"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_IN,RUN" Target="IN_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="180" Y="152"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_IN,RUN" Target="RQ_CS1,CS1a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="119" Y="239"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_IN,RUN" Target="RQ_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-12" Y="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="IN_XX,ZS" Target="IN_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-71" Y="-43"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="139"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_XX,ZS" Target="IN_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="212" Y="64"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_XX,ZS" Target="RQ_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="13" Y="-54"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="244" Y="147"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_CS1,CS1a" Target="RQ_CS1,CS1a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <IndexedIdentifier Name="MER_an">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="61" Y="309"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_CS1,CS1a" Target="RQ_CS2,CS2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-19" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="124" Y="340"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_CS2,CS2a" Target="RQ_CS2,CS2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <IndexedIdentifier Name="MER_an">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="142" Y="424"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_CS2,CS2a" Target="RQ_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CS_ok"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="176" Y="327"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_IN,RUN" Target="RQ_CS1,CS1a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-3" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="153" Y="285"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_IN,RUN" Target="RQ_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <IndexedIdentifier Name="MER_an">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="239" Y="303"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_IN,RUN" Target="RQ_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="248" Y="241"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_XX,ZS" Target="RQ_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="-43"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="233" Y="225"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_XX,ZS" Target="RQ_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <IndexedIdentifier Name="MER_an">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="done_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="13" Y="-73"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="322" Y="178"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="IN_IN,RUN">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="109" Y="172"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="IN_XX,ZS">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="161" Y="115"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQ_CS1,CS1a">
+                        <PointGeometry>
+                            <Point X="125" Y="389"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-56" Y="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQ_CS2,CS2a">
+                        <PointGeometry>
+                            <Point X="193" Y="393"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQ_IN,RUN">
+                        <PointGeometry>
+                            <Point X="166" Y="286"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-72" Y="-4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="RQ_XX,ZS">
+                        <PointGeometry>
+                            <Point X="216" Y="197"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="IN_IN,RUN" Target="IN_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-49" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="60" Y="147"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_IN,RUN" Target="IN_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="139" Y="143"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_IN,RUN" Target="RQ_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="131" Y="229"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_XX,ZS" Target="IN_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-52" Y="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="122" Y="129"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_XX,ZS" Target="IN_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="163" Y="60"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="IN_XX,ZS" Target="RQ_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="194" Y="148"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_CS1,CS1a" Target="RQ_CS1,CS1a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <IndexedIdentifier Name="MER_an">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-44" Y="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="92" Y="432"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_CS1,CS1a" Target="RQ_CS2,CS2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="159" Y="399"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_CS2,CS2a" Target="RQ_CS2,CS2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <IndexedIdentifier Name="MER_an">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-5" Y="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="222" Y="440"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_CS2,CS2a" Target="RQ_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="CS_ok"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-14" Y="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="184" Y="344"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_IN,RUN" Target="RQ_CS1,CS1a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="141" Y="341"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_IN,RUN" Target="RQ_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <IndexedIdentifier Name="MER_an">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-36"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="213" Y="300"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_IN,RUN" Target="RQ_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="done_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="205" Y="247"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_XX,ZS" Target="RQ_IN,RUN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_ER"/>
+                            <IndexedIdentifier Name="soft_SER">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="soft_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-38" Y="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="186" Y="236"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RQ_XX,ZS" Target="RQ_XX,ZS">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ER_BT"/>
+                            <SimpleIdentifier Name="ER_FS"/>
+                            <SimpleIdentifier Name="ER_FT"/>
+                            <SimpleIdentifier Name="ER_HK"/>
+                            <IndexedIdentifier Name="MER_an">
+                                <SimpleIdentifier Name="FT"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="done_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-60"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="267" Y="177"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

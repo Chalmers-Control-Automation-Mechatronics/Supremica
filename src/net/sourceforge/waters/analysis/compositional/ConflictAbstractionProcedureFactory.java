@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SelfLoopsObservationEquivalenceTRSimplifier;
 
 
 /**
@@ -58,7 +59,7 @@ public enum ConflictAbstractionProcedureFactory
     {
       return EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure.
         createThreeStepConflictEquivalenceAbstractionProcedure
-          (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
+          (analyzer, SelfLoopsObservationEquivalenceTRSimplifier.Equivalence.
            WEAK_OBSERVATION_EQUIVALENCE, false, true, true);
     }
   },

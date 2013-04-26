@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.map.hash.TObjectByteHashMap;
 import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2269,10 +2269,12 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     boolean isOnlyNonSelfLoopAutomaton(final AutomatonProxy aut)
     {
-      if (mNumNonSelfloopAutomata + 1 < mAutomataMap.size()) {
+      if (mNumNonSelfloopAutomata == 0) {
+        return true;
+      } else if (mNumNonSelfloopAutomata == 1) {
+        return mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP;
+      } else {
         return false;
-      } else { //If there is only one automata that is not self loop for this event
-        return mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP; //And it is this one, return true
       }
     }
 

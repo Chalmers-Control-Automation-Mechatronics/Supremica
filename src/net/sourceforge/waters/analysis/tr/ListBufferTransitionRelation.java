@@ -2024,10 +2024,10 @@ public class ListBufferTransitionRelation
       try {
         final int newSize = partition.size() + mExtraStates;
         if (mSuccessorBuffer != null) {
-          mSuccessorBuffer.merge(partition, mExtraStates);
+          mSuccessorBuffer.merge(partition, mEventStatus, mExtraStates);
         }
         if (mPredecessorBuffer != null) {
-          mPredecessorBuffer.merge(partition, mExtraStates);
+          mPredecessorBuffer.merge(partition, mEventStatus,  mExtraStates);
         }
         final int numProps = mStateBuffer.getNumberOfPropositions();
         final long used = mStateBuffer.getUsedPropositions();
@@ -2389,4 +2389,3 @@ public class ListBufferTransitionRelation
                                        | CONFIG_PREDECESSORS;
 
 }
-

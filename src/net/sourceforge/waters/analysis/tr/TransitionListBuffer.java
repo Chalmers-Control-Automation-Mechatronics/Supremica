@@ -903,9 +903,17 @@ public abstract class TransitionListBuffer
       if (e >= 0) {
         final StateProxy fromState = getFromState(trans);
         final StateProxy toState = getToState(trans);
-        if (e == tau && fromState == toState) {
+        if (e == tau && fromState == toState) { //This stops tau self loops being created.
           continue;
         }
+        //If the event is self loops only everywhere else then don't create transition.
+        //Do not know if in correct automaton
+
+        if((eventEnc.getProperEventStatus(e) & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 && fromState == toState)
+        {
+          continue;
+        }
+
         final int from = stateEnc.getStateCode(fromState);
         final int to = stateEnc.getStateCode(toState);
         final int data = (to << mStateShift) | e;
@@ -940,6 +948,9 @@ public abstract class TransitionListBuffer
         }
       }
     }
+
+
+   checkIntegrity();
   }
 
   /**
@@ -1069,7 +1080,9 @@ public abstract class TransitionListBuffer
    *          the new merged state.
    * @see ListBufferTransitionRelation#merge(List) ListBufferTransitionRelation.merge()
    */
-  public void merge(final List<int[]> partition, final int extraStates)
+  public void merge(final List<int[]> partition,
+                    final byte[] eventStatus,
+                    final int extraStates)
   {
     mStateEventTransitions.clear();
     final int[] recoding = new int[mStateTransitions.length];
@@ -1090,6 +1103,7 @@ public abstract class TransitionListBuffer
     final int stateMask = (1 << eventShift) - 1;
     final int tau = EventEncoding.TAU;
     final TIntHashSet transitions = new TIntHashSet();
+
     code = 0;
     for (final int[] clazz : partition) {
       int list;
@@ -1102,10 +1116,14 @@ public abstract class TransitionListBuffer
           final int data = block[offset + OFFSET_DATA];
           final int event = data & mEventMask;
           final int target = recoding[data >>> mStateShift];
-          if (event != tau || code != target) { // suppress tau-selfloops
+          final boolean selfloop =
+            event == tau ||
+            (eventStatus[event] & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+          if (!selfloop || code != target) { // suppress tau-selfloops and only other self loops
             final int trans = (event << eventShift) | target;
             transitions.add(trans);
           }
+
           final int next = block[offset + OFFSET_NEXT];
           if (next == NULL) { // delete list once read
             block[offset + OFFSET_NEXT] = mRecycleStart;
