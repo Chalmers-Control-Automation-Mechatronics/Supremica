@@ -267,6 +267,12 @@ public abstract class AbstractCompilerTest
     compile("tests", "efa", "batch_tank_vout");
   }
 
+  public void testCompile_blocked_efa()
+    throws IOException, WatersException
+  {
+    compile("tests", "efa", "blocked_efa");
+  }
+
   public void testCompile_ControllableTestModelEFA()
     throws IOException, WatersException
   {
@@ -806,6 +812,7 @@ public abstract class AbstractCompilerTest
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
     throws Exception
   {
@@ -823,6 +830,7 @@ public abstract class AbstractCompilerTest
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
   }
 
+  @Override
   protected void tearDown()
     throws Exception
   {

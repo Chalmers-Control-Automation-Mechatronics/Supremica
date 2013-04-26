@@ -190,7 +190,7 @@ public class EFACompiler
       new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
     mEFAEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
     for (final EFAEventDecl edecl : mEFAEventDeclMap.values()) {
-      if (!edecl.isBlocked()) {
+      if (!edecl.isBlocked() || edecl.getKind() == EventKind.PROPOSITION) {
         mTransitionRelationBuilder.initEventRecords();
         final Collection<EFAAutomatonTransitionGroup> allgroups =
           edecl.getTransitionGroups();
