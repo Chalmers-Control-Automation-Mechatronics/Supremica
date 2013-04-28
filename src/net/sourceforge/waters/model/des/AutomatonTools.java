@@ -9,13 +9,15 @@
 
 package net.sourceforge.waters.model.des;
 
-import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.strategy.HashingStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
+
+import net.sourceforge.waters.analysis.tr.WatersHashSet;
 
 
 /**
@@ -147,10 +149,10 @@ public final class AutomatonTools
         }
       }
     }
-    final TObjectByteCustomHashMap<TransitionProxy> transitions =
-      new TObjectByteCustomHashMap<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
+    final Set<TransitionProxy> transitions =
+      new WatersHashSet<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
     for (final TransitionProxy trans : aut.getTransitions()) {
-      if (transitions.putIfAbsent(trans, (byte) 1) != 0) {
+      if (!transitions.add(trans)) {
         return false;
       }
     }
