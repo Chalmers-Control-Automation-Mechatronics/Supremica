@@ -472,10 +472,11 @@ public class EnabledEventsCompositionalConflictChecker extends
 
     @Override
     boolean replaceAutomaton(final AutomatonProxy oldAut,
-                             final AutomatonProxy newAut)
+                             final AutomatonProxy newAut,
+                             final byte status)
     {
 
-      boolean result = super.replaceAutomaton(oldAut, newAut);
+      boolean result = super.replaceAutomaton(oldAut, newAut, status);
       if (mDisablingAutomata.remove(oldAut)) {
         mDisablingAutomata.add(newAut);
         result = true;

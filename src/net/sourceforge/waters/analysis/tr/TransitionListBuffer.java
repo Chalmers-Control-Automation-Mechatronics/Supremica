@@ -90,10 +90,11 @@ public abstract class TransitionListBuffer
    *         not fit in the 32 bits available.
    */
   public TransitionListBuffer(final int numEvents,
-                              final int numStates)
+                              final int numStates,
+                              final byte[] eventStatus)
     throws OverflowException
   {
-    this(numEvents, numStates, MAX_BLOCK_SIZE);
+    this(numEvents, numStates, eventStatus, MAX_BLOCK_SIZE);
   }
 
 
@@ -112,6 +113,7 @@ public abstract class TransitionListBuffer
    */
   public TransitionListBuffer(final int numEvents,
                               final int numStates,
+                              final byte[] eventStatus,
                               final int numTrans)
     throws OverflowException
   {
@@ -142,6 +144,7 @@ public abstract class TransitionListBuffer
     mBlocks.add(block);
     mRecycleStart = NULL;
     mNextFreeIndex = NODE_SIZE;
+    mEventStatus = eventStatus;
   }
 
   /**
@@ -164,6 +167,7 @@ public abstract class TransitionListBuffer
     mStateEventTransitions = buffer.mStateEventTransitions;
     mRecycleStart = buffer.mRecycleStart;
     mNextFreeIndex = buffer.mNextFreeIndex;
+    mEventStatus = buffer.mEventStatus;
   }
 
 
@@ -228,7 +232,10 @@ public abstract class TransitionListBuffer
    */
   public boolean addTransition(final int from, final int event, final int to)
   {
-    if (event == EventEncoding.TAU && from == to) {
+    boolean selfLoop = false;
+    if(event == EventEncoding.TAU || (mEventStatus[event] & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0)
+    selfLoop = true;
+      if (selfLoop && from == to) {
       return false;
     }
     final int newData = (to << mStateShift) | event;
@@ -280,6 +287,10 @@ public abstract class TransitionListBuffer
     }
     final TIntHashSet existing = new TIntHashSet();
     if (event == EventEncoding.TAU) {
+      existing.add(from);
+    }
+    if((mEventStatus[event] & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0)
+    {
       existing.add(from);
     }
     int list = createList(from, event);
@@ -948,9 +959,6 @@ public abstract class TransitionListBuffer
         }
       }
     }
-
-
-   checkIntegrity();
   }
 
   /**
@@ -1081,7 +1089,6 @@ public abstract class TransitionListBuffer
    * @see ListBufferTransitionRelation#merge(List) ListBufferTransitionRelation.merge()
    */
   public void merge(final List<int[]> partition,
-                    final byte[] eventStatus,
                     final int extraStates)
   {
     mStateEventTransitions.clear();
@@ -1118,7 +1125,7 @@ public abstract class TransitionListBuffer
           final int target = recoding[data >>> mStateShift];
           final boolean selfloop =
             event == tau ||
-            (eventStatus[event] & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+            (mEventStatus[event] & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           if (!selfloop || code != target) { // suppress tau-selfloops and only other self loops
             final int trans = (event << eventShift) | target;
             transitions.add(trans);
@@ -1890,6 +1897,8 @@ public abstract class TransitionListBuffer
   private int mRecycleStart;
   private int mNextFreeIndex;
 
+  private final byte[] mEventStatus;
+
 
   //#########################################################################
   //# Class Constants
@@ -1901,5 +1910,6 @@ public abstract class TransitionListBuffer
 
   private static final int MIN_BLOCK_SIZE = 64;
   private static final int MAX_BLOCK_SIZE = 2048;
+
 
 }

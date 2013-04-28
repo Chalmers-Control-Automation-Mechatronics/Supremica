@@ -178,16 +178,6 @@ public class ListBufferTransitionRelation
     final int numEvents = eventEnc.getNumberOfProperEvents();
     final int numStates = stateEnc.getNumberOfStatesIncludingExtra();
     final int numTrans = aut.getTransitions().size();
-    if ((config & CONFIG_SUCCESSORS) != 0) {
-      mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates, numTrans);
-      mSuccessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
-    }
-    if ((config & CONFIG_PREDECESSORS) != 0) {
-      mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates, numTrans);
-      mPredecessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
-    }
     mEventStatus = new byte[numEvents];
     for (int e = 0; e < numEvents; e++) {
       byte status = eventEnc.getProperEventStatus(e);
@@ -196,6 +186,17 @@ public class ListBufferTransitionRelation
       }
       mEventStatus[e] = status;
     }
+    if ((config & CONFIG_SUCCESSORS) != 0) {
+      mSuccessorBuffer =
+        new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+      mSuccessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
+    }
+    if ((config & CONFIG_PREDECESSORS) != 0) {
+      mPredecessorBuffer =
+        new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+      mPredecessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
+    }
+
   }
 
   /**
@@ -235,19 +236,20 @@ public class ListBufferTransitionRelation
     final int numProps = eventEnc.getNumberOfPropositions();
     mStateBuffer = new IntStateBuffer(numStates, numProps);
     final int numEvents = eventEnc.getNumberOfProperEvents();
-    if ((config & CONFIG_SUCCESSORS) != 0) {
-      mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates, 0);
-    }
-    if ((config & CONFIG_PREDECESSORS) != 0) {
-      mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates, 0);
-    }
     mEventStatus = new byte[numEvents];
     for (int e = 0; e < numEvents; e++) {
       final byte status = eventEnc.getProperEventStatus(e);
       mEventStatus[e] = (byte) (status & ~EventEncoding.STATUS_UNUSED);
     }
+    if ((config & CONFIG_SUCCESSORS) != 0) {
+      mSuccessorBuffer =
+        new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus, 0);
+    }
+    if ((config & CONFIG_PREDECESSORS) != 0) {
+      mPredecessorBuffer =
+        new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, 0);
+    }
+
   }
 
   /**
@@ -285,15 +287,16 @@ public class ListBufferTransitionRelation
     mName = name;
     mKind = kind;
     mStateBuffer = new IntStateBuffer(numStates, numPropositions);
+    mEventStatus = new byte[numProperEvents];
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numProperEvents, numStates, 0);
+        new OutgoingTransitionListBuffer(numProperEvents, numStates,mEventStatus, 0);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numProperEvents, numStates, 0);
+        new IncomingTransitionListBuffer(numProperEvents, numStates, mEventStatus, 0);
     }
-    mEventStatus = new byte[numProperEvents];
+
   }
 
   /**
@@ -322,7 +325,7 @@ public class ListBufferTransitionRelation
     try {
       if ((config & CONFIG_SUCCESSORS) != 0) {
         mSuccessorBuffer =
-          new OutgoingTransitionListBuffer(numEvents, numStates, 0);
+          new OutgoingTransitionListBuffer(numEvents, numStates,mEventStatus, 0);
         if (rel.mSuccessorBuffer != null) {
           mSuccessorBuffer.setUpTransitions(rel.mSuccessorBuffer);
         } else {
@@ -331,7 +334,7 @@ public class ListBufferTransitionRelation
       }
       if ((config & CONFIG_PREDECESSORS) != 0) {
         mPredecessorBuffer =
-          new IncomingTransitionListBuffer(numEvents, numStates, 0);
+          new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, 0);
         if (rel.mPredecessorBuffer != null) {
           mPredecessorBuffer.setUpTransitions(rel.mPredecessorBuffer);
         } else {
@@ -1832,7 +1835,7 @@ public class ListBufferTransitionRelation
       if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
         if (mPredecessorBuffer != null) {
           mSuccessorBuffer =
-            new OutgoingTransitionListBuffer(numEvents, numStates);
+            new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus);
           mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
         } else {
           throw createNoBufferException(CONFIG_PREDECESSORS);
@@ -1841,7 +1844,7 @@ public class ListBufferTransitionRelation
       if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
         if (mSuccessorBuffer != null) {
           mPredecessorBuffer =
-            new IncomingTransitionListBuffer(numEvents, numStates);
+            new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus);
           mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
         } else {
           throw createNoBufferException(CONFIG_SUCCESSORS);
@@ -1900,13 +1903,13 @@ public class ListBufferTransitionRelation
     mStateBuffer = newStates;
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates, numTrans);
+        new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
     } else {
       mSuccessorBuffer = null;
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates, numTrans);
+        new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
     } else {
       mPredecessorBuffer = null;
     }
@@ -2024,10 +2027,10 @@ public class ListBufferTransitionRelation
       try {
         final int newSize = partition.size() + mExtraStates;
         if (mSuccessorBuffer != null) {
-          mSuccessorBuffer.merge(partition, mEventStatus, mExtraStates);
+          mSuccessorBuffer.merge(partition, mExtraStates);
         }
         if (mPredecessorBuffer != null) {
-          mPredecessorBuffer.merge(partition, mEventStatus,  mExtraStates);
+          mPredecessorBuffer.merge(partition,  mExtraStates);
         }
         final int numProps = mStateBuffer.getNumberOfPropositions();
         final long used = mStateBuffer.getUsedPropositions();

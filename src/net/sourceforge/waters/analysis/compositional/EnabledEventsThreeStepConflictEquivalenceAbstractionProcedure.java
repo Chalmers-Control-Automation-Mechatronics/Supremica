@@ -58,7 +58,8 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   public static EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     createThreeStepConflictEquivalenceAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer,
-       final SelfLoopsObservationEquivalenceTRSimplifier.Equivalence equivalence,
+       final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+       final SelfLoopsObservationEquivalenceTRSimplifier.Equivalence slEquivalence,
        final boolean includeNonAlphaDeterminisation,
        final boolean useLimitedCertainConflicts,
        final boolean useAlwaysEnabledLimitedCertainConflicts)
@@ -110,15 +111,23 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     } else {
       enabledEventsLimitedCertainConflictsRemover = null;
     }
-    final SelfLoopsObservationEquivalenceTRSimplifier bisimulator =
-      new SelfLoopsObservationEquivalenceTRSimplifier();
+
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-    (SelfLoopsObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-    (SelfLoopsObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator.setTransitionRemovalMode(ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode(ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
     postChain.add(bisimulator);
+
+    final SelfLoopsObservationEquivalenceTRSimplifier slBisimulator =
+      new SelfLoopsObservationEquivalenceTRSimplifier();
+    slBisimulator.setEquivalence(slEquivalence);
+    slBisimulator.setTransitionRemovalMode(SelfLoopsObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    slBisimulator.setMarkingMode(SelfLoopsObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    slBisimulator.setTransitionLimit(limit);
+    postChain.add(slBisimulator);
+
     if (includeNonAlphaDeterminisation) {
       final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
         new NonAlphaDeterminisationTRSimplifier();

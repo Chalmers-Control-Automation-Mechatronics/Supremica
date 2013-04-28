@@ -848,7 +848,9 @@ public abstract class AbstractCompositionalModelAnalyzer
           for (final EventProxy event : newAut.getEvents()) {
             final EventInfo info = mEventInfoMap.get(event);
             if (info != null) {
-              info.replaceAutomaton(aut, newAut);
+                //We ideally want to pass in the status for the event in newAut
+                //However removing events does not change self loops.
+              info.replaceAutomaton(aut, newAut, info.mAutomataMap.get(aut));
             }
           }
           if (mHasRemovedProperTransition) {
@@ -876,14 +878,14 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
     if (!found) {
-      return aut;
+      return aut;   //If none of the events in removed are present in aut, return aut
     }
     final int numEvents = events.size();
     final Collection<EventProxy> newEvents =
       new ArrayList<EventProxy>(numEvents - 1);
     for (final EventProxy event : events) {
-      if (!removed.contains(event)) {
-        newEvents.add(event);
+      if (!removed.contains(event)) {   //If we are not removing the event
+        newEvents.add(event);           //put it into newEvents list
       }
     }
     final Collection<TransitionProxy> transitions = aut.getTransitions();
@@ -892,9 +894,9 @@ public abstract class AbstractCompositionalModelAnalyzer
       new ArrayList<TransitionProxy>(numTrans);
     for (final TransitionProxy trans : transitions) {
       final EventProxy event = trans.getEvent();
-      if (!removed.contains(event)) {
-        newTransitions.add(trans);
-      } else if (trans.getSource() != trans.getTarget()) {
+      if (!removed.contains(event)) {       //If we are not removing the event
+        newTransitions.add(trans);          //Add the transition to list
+      } else if (trans.getSource() != trans.getTarget()) {  //If we are removing trans that is not self loop
         mHasRemovedProperTransition = true;
       }
     }
@@ -902,7 +904,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     final String name = aut.getName();
     final ComponentKind kind = aut.getKind();
     final Collection<StateProxy> states = aut.getStates();
-    final AutomatonProxy newAut = factory.createAutomatonProxy
+    final AutomatonProxy newAut = factory.createAutomatonProxy  //Create a new automaton with the new events and transitions
       (name, kind, newEvents, states, newTransitions);
     return newAut;
   }
@@ -2254,14 +2256,21 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
 
     boolean replaceAutomaton(final AutomatonProxy oldAut,
-                             final AutomatonProxy newAut)
+                             final AutomatonProxy newAut,
+                             final byte status)
     {
       final byte code = mAutomataMap.remove(oldAut);
       if (code == UNKNOWN_SELFLOOP) {
         // not found in map ...
         return false;
       } else {
-        mAutomataMap.put(newAut, code);
+        if(code == NOT_ONLY_SELFLOOP) {
+          mNumNonSelfloopAutomata--;
+        }
+        if (status == NOT_ONLY_SELFLOOP) {
+          mNumNonSelfloopAutomata++;
+        }
+        mAutomataMap.put(newAut, status);
         mSortedAutomataList = null;
         return true;
       }
@@ -2269,6 +2278,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     boolean isOnlyNonSelfLoopAutomaton(final AutomatonProxy aut)
     {
+
       if (mNumNonSelfloopAutomata == 0) {
         return true;
       } else if (mNumNonSelfloopAutomata == 1) {
@@ -2277,6 +2287,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         return false;
       }
     }
+
 
     //#######################################################################
     //# Debugging

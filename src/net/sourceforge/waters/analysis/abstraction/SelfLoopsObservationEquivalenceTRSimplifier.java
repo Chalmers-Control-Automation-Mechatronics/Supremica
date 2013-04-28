@@ -98,6 +98,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifier
     mEquivalence = mode;
   }
 
+
   /**
    * Gets the equivalence by which the transition relation is partitioned.
    * @see Equivalence
@@ -1823,6 +1824,8 @@ public class SelfLoopsObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Inner Enumeration Equivalence
+
+  /*
   /**
    * Possible equivalences for partitioning a transition relation.
 
