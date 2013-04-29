@@ -254,7 +254,7 @@ public class EventEncoding
             final int p = mPropositions.size();
             mEventCodeMap.put(event, p);
             mPropositions.add(event);
-            mPropositionStatus.add((byte) 0);
+            mPropositionStatus.add(STATUS_NONE);
           }
           break;
         default:
@@ -573,6 +573,57 @@ public class EventEncoding
 
 
   //#########################################################################
+  //# Event Status
+  /**
+   * Returns whether the given event status bits identify an event as
+   * a controllable in an event encoding.
+   */
+  public static boolean isControllableEvent(final byte status)
+  {
+    return (status & STATUS_CONTROLLABLE) != 0;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
+   * a local event in an event encoding.
+   */
+  public static boolean isLocalEvent(final byte status)
+  {
+    return (status & STATUS_LOCAL) == STATUS_LOCAL;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
+   * outside only-selfloop in an event encoding.
+   * @see #STATUS_OUTSIDE_ONLY_SELFLOOP
+   */
+  public static boolean isOutsideOnlySelfloopEvent(final byte status)
+  {
+    return (status & STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
+   * outside always enabled in an event encoding.
+   * @see #STATUS_OUTSIDE_ALWAYS_ENABLED
+   */
+  public static boolean isOutsideAlwaysEnabledEvent(final byte status)
+  {
+    return (status & STATUS_OUTSIDE_ALWAYS_ENABLED) != 0;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
+   * used (i.e., not unused) in an event encoding.
+   * @see #STATUS_UNUSED
+   */
+  public static boolean isUsedEvent(final byte status)
+  {
+    return (status & STATUS_UNUSED) == 0;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final List<EventProxy> mProperEvents;
   private final List<EventProxy> mPropositions;
@@ -631,31 +682,34 @@ public class EventEncoding
    */
   public static final byte STATUS_CONTROLLABLE = 0x01;
   /**
-   * A status flag indicating a local event.
-   * A local event is assumed not to be used in any other automaton
-   * except the current one.
-   */
-  public static final byte STATUS_LOCAL = 0x02;
-  /**
    * A status flag indicating an event that outside of the current automaton
    * only appears in selfloop transitions.
    */
-  public static final byte STATUS_OUTSIDE_ONLY_SELFLOOP = 0x04;
+  public static final byte STATUS_OUTSIDE_ONLY_SELFLOOP = 0x02;
   /**
    * A status flag indicating an event that outside of the current automaton
    * is always enabled. The only automaton ever disabling this event is the
    * current automaton.
    */
-  public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x08;
+  public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x04;
+  /**
+   * Status flags indicating a local event.
+   * This is a combination of the bits {@link #STATUS_OUTSIDE_ALWAYS_ENABLED}
+   * and {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}.
+   * A local event is assumed not to be used in any other automaton
+   * except the current one.
+   */
+  public static final byte STATUS_LOCAL =
+    STATUS_OUTSIDE_ONLY_SELFLOOP | STATUS_OUTSIDE_ALWAYS_ENABLED;
   /**
    * A status flag indicating an event not in the alphabet of the current
    * transition relation. This event is assumed to be implicitly selflooped
    * in all states.
    */
-  public static final byte STATUS_UNUSED = 0x10;
+  public static final byte STATUS_UNUSED = 0x08;
 
   private static final String[] STATUS_NAMES = {
-    "CONTROLLABLE", "LOCAL", "OUTSIDE_ONLY_SELFLOOP",
+    "CONTROLLABLE", "OUTSIDE_ONLY_SELFLOOP",
     "OUTSIDE_ALWAYS_ENABLED", "UNUSED"
   };
 
@@ -663,4 +717,3 @@ public class EventEncoding
     Collections.emptySet();
 
 }
-

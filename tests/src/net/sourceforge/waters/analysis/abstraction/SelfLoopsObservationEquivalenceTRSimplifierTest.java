@@ -68,13 +68,13 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventProxy tau = getEvent(aut, TAU);
     final EventEncoding encoding = new EventEncoding(aut, translator, tau);
-
-    //go through automaton
-    for (int event = 0; event < encoding.getNumberOfProperEvents(); event++) {
-      //find events
-      //see if controllable
-      if ((encoding.getProperEventStatus(event) & EventEncoding.STATUS_CONTROLLABLE) == 0) {
-        encoding.setProperEventStatus(event, EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
+    // Mark uncontrollable events (except tau) as selfloop-only
+    final int numEvents = encoding.getNumberOfProperEvents();
+    for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
+      final byte status = encoding.getProperEventStatus(event);
+      if (!EventEncoding.isControllableEvent(status)) {
+        encoding.setProperEventStatus
+          (event, (byte) (status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP));
       }
     }
     return encoding;
@@ -86,10 +86,9 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     return (SelfLoopsObservationEquivalenceTRSimplifier) super.getTransitionRelationSimplifier();
   }
 
+
   //#########################################################################
   //# Test Cases
-
-
   public void test_selfLoopObservationalEquivalence01() throws Exception
   {
     final String group = "tests";
@@ -97,6 +96,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     final String name = "selfLoopObservationalEquivalence01.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+
   public void test_selfLoopObservationalEquivalence02() throws Exception
   {
     final String group = "tests";
@@ -104,6 +104,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     final String name = "selfLoopObservationalEquivalence02.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+
   public void test_selfLoopObservationalEquivalence03() throws Exception
   {
     final String group = "tests";
@@ -111,6 +112,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     final String name = "selfLoopObservationalEquivalence03.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+
   public void test_selfLoopObservationalEquivalence04() throws Exception
   {
     final String group = "tests";
@@ -118,6 +120,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     final String name = "selfLoopObservationalEquivalence04.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+
   public void test_selfLoopObservationalEquivalence05() throws Exception
   {
     final String group = "tests";
@@ -125,6 +128,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     final String name = "selfLoopObservationalEquivalence05.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+
   public void test_selfLoopObservationalEquivalence06() throws Exception
   {
     final String group = "tests";
@@ -132,6 +136,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     final String name = "selfLoopObservationalEquivalence06.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+
   public void test_oeq_1() throws Exception
   {
     final String group = "tests";
@@ -216,8 +221,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  //tests b changed from uncontrollable to controllable.
-  public void test_oeq_11b() throws Exception
+  public void test_oeq_11() throws Exception
   {
     final SelfLoopsObservationEquivalenceTRSimplifier simplifier =
       getTransitionRelationSimplifier();
@@ -225,11 +229,11 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
       (SelfLoopsObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "oeq_11b.wmod";
+    final String name = "oeq_11.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_oeq_12b() throws Exception
+  public void test_oeq_12() throws Exception
   {
     final SelfLoopsObservationEquivalenceTRSimplifier simplifier =
       getTransitionRelationSimplifier();
@@ -237,23 +241,23 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
       (SelfLoopsObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "oeq_12b.wmod";
+    final String name = "oeq_12.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_oeq_13b() throws Exception
+  public void test_oeq_13() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "oeq_13b.wmod";
+    final String name = "oeq_13.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_oeq_14b() throws Exception
+  public void test_oeq_14() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "oeq_14b.wmod";
+    final String name = "oeq_14.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

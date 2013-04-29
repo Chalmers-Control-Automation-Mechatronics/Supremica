@@ -1093,12 +1093,13 @@ public class SelfLoopsObservationEquivalenceTRSimplifier
     {
     }
 
-    //thing that does the job
+    /**
+     * Checks if other equivalence classes must be split based on this class,
+     * and performs splits as necessary.
+     */
     @Override
     public void splitOn()
     {
-
-      //given a class and tries to check if other equivalence classes must be split based on this
       mIsOpenSplitter = false;
       collect(mTempClass);
       final int size = getSize();
@@ -1108,24 +1109,16 @@ public class SelfLoopsObservationEquivalenceTRSimplifier
       final int first = mEquivalence.getFirstSplitEvent();
 
       final ListBufferTransitionRelation transRel = getTransitionRelation();
-
       if (first == EventEncoding.TAU) {
         events.add(EventEncoding.TAU);
-
-      } //If this event is only self loops on all other automata, we can create a self loop on event
-        //inside this class, so this event can reach the class.
-     for(int i = 0; i < mOnlySelfLoopEvents.size(); i++)
-     {
-       final int e = mOnlySelfLoopEvents.get(i);
-       events.add(e);
-     }
-     if (mOnlySelfLoopEvents.size() > 0) {
-       System.out.println("#onlyselfloop " + mOnlySelfLoopEvents.size() +
-                          " #size " + size +
-                          " #states" + transRel.getNumberOfReachableStates());
-     }
-
-
+      }
+      // If this event is only selfloops in all other automata, we can create
+      // a selfloop on the event inside this class, so this event can reach
+      // the class.
+      for (int i = 0; i < mOnlySelfLoopEvents.size(); i++) {
+        final int e = mOnlySelfLoopEvents.get(i);
+        events.add(e);
+      }
       mPlainEventIterator.resetEvents(first, mNumEvents - 1);
 
       //determine which events can reach this class (big)

@@ -232,10 +232,8 @@ public abstract class TransitionListBuffer
    */
   public boolean addTransition(final int from, final int event, final int to)
   {
-    boolean selfLoop = false;
-    if(event == EventEncoding.TAU || (mEventStatus[event] & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0)
-    selfLoop = true;
-      if (selfLoop && from == to) {
+    if (from == to &&
+        EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
       return false;
     }
     final int newData = (to << mStateShift) | event;
@@ -286,11 +284,7 @@ public abstract class TransitionListBuffer
       return false;
     }
     final TIntHashSet existing = new TIntHashSet();
-    if (event == EventEncoding.TAU) {
-      existing.add(from);
-    }
-    if((mEventStatus[event] & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0)
-    {
+    if (EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
       existing.add(from);
     }
     int list = createList(from, event);
@@ -504,19 +498,26 @@ public abstract class TransitionListBuffer
       if (next != NULL) {
         heap.add(i);
       }
-      if (prevData != data || newList == tail) {
-        final int pair = allocatePair();
-        setNext(tail, pair);
-        tail = pair;
-        setDataAndNext(pair, data, NULL);
-        prevData = data;
-        if (i > 0) {
-          addition = true;
-          if (reverse != null) {
-            final int state = data >>> mStateShift;
-            final int event = data & mEventMask;
-            reverse.addTransition(state, event, dest);
-          }
+      if (prevData == data && newList != tail) {
+        // Suppress duplicates coming in from other lists
+        continue;
+      }
+      final int state = data >>> mStateShift;
+      final int event = data & mEventMask;
+      if (state == dest &&
+          EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
+        // Suppress tau and outside always-enabled selfloops
+        continue;
+      }
+      final int pair = allocatePair();
+      setNext(tail, pair);
+      tail = pair;
+      setDataAndNext(pair, data, NULL);
+      prevData = data;
+      if (i > 0) {
+        addition = true;
+        if (reverse != null) {
+          reverse.addTransition(state, event, dest);
         }
       }
     }
@@ -620,7 +621,8 @@ public abstract class TransitionListBuffer
          ProxyTools.getShortClassName(this) +
          " (only configured for " + mNumEvents + " events)!");
     }
-    final boolean tau = (newID == EventEncoding.TAU);
+    final boolean selfloop =
+      EventEncoding.isOutsideAlwaysEnabledEvent(mEventStatus[newID]);
     final TIntHashSet found = new TIntHashSet();
     final TransitionIterator iter1 = createReadOnlyIterator();
     final TransitionIterator iter2 = createModifyingIterator();
@@ -644,8 +646,8 @@ public abstract class TransitionListBuffer
       iter1.reset(state, oldID);
       while (iter1.advance()) {
         final int to = iter1.getCurrentToState();
-        if (tau && state == to) {
-          // nothing --- suppress tau selfloops ...
+        if (selfloop && state == to) {
+          // nothing --- suppress tau and outside always-enabled selfloops ...
         } else if (found.add(to)) {
           if (list == NULL) {
             list = createList(state, newID);
@@ -903,7 +905,6 @@ public abstract class TransitionListBuffer
     final Comparator<TransitionProxy> comparator =
       new TransitionComparator(eventEnc, stateEnc);
     Collections.sort(transitions, comparator);
-    final int tau = EventEncoding.TAU;
     int from0 = -1;
     int e0 = -1;
     int data0 = -1;
@@ -914,17 +915,11 @@ public abstract class TransitionListBuffer
       if (e >= 0) {
         final StateProxy fromState = getFromState(trans);
         final StateProxy toState = getToState(trans);
-        if (e == tau && fromState == toState) { //This stops tau self loops being created.
+        if (fromState == toState &&
+            EventEncoding.isOutsideAlwaysEnabledEvent(mEventStatus[e])) {
+          // Suppress tau and outside always-enabled selfloops
           continue;
         }
-        //If the event is self loops only everywhere else then don't create transition.
-        //Do not know if in correct automaton
-
-        if((eventEnc.getProperEventStatus(e) & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 && fromState == toState)
-        {
-          continue;
-        }
-
         final int from = stateEnc.getStateCode(fromState);
         final int to = stateEnc.getStateCode(toState);
         final int data = (to << mStateShift) | e;
@@ -1108,7 +1103,6 @@ public abstract class TransitionListBuffer
     final int[] newStateTransitions = new int[numClasses];
     final int eventShift = AutomatonTools.log2(mNumStates);
     final int stateMask = (1 << eventShift) - 1;
-    final int tau = EventEncoding.TAU;
     final TIntHashSet transitions = new TIntHashSet();
 
     code = 0;
@@ -1124,13 +1118,12 @@ public abstract class TransitionListBuffer
           final int event = data & mEventMask;
           final int target = recoding[data >>> mStateShift];
           final boolean selfloop =
-            event == tau ||
-            (mEventStatus[event] & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
-          if (!selfloop || code != target) { // suppress tau-selfloops and only other self loops
+            EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event]);
+          if (!selfloop || code != target) {
+            // suppress tau-selfloops and only-other selfloops
             final int trans = (event << eventShift) | target;
             transitions.add(trans);
           }
-
           final int next = block[offset + OFFSET_NEXT];
           if (next == NULL) { // delete list once read
             block[offset + OFFSET_NEXT] = mRecycleStart;
@@ -1887,6 +1880,7 @@ public abstract class TransitionListBuffer
   private final int mBlockSize;
 
   private final int mNumEvents;
+  private final byte[] mEventStatus;
   private final int mStateShift;
   private final int mEventMask;
   private final List<int[]> mBlocks;
@@ -1896,8 +1890,6 @@ public abstract class TransitionListBuffer
   private int mNumStates;
   private int mRecycleStart;
   private int mNextFreeIndex;
-
-  private final byte[] mEventStatus;
 
 
   //#########################################################################
@@ -1910,6 +1902,5 @@ public abstract class TransitionListBuffer
 
   private static final int MIN_BLOCK_SIZE = 64;
   private static final int MAX_BLOCK_SIZE = 2048;
-
 
 }

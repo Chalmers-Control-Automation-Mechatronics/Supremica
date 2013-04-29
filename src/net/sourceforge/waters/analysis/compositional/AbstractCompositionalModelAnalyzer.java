@@ -848,9 +848,7 @@ public abstract class AbstractCompositionalModelAnalyzer
           for (final EventProxy event : newAut.getEvents()) {
             final EventInfo info = mEventInfoMap.get(event);
             if (info != null) {
-                //We ideally want to pass in the status for the event in newAut
-                //However removing events does not change self loops.
-              info.replaceAutomaton(aut, newAut, info.mAutomataMap.get(aut));
+              info.replaceAutomaton(aut, newAut);
             }
           }
           if (mHasRemovedProperTransition) {
@@ -2256,21 +2254,14 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
 
     boolean replaceAutomaton(final AutomatonProxy oldAut,
-                             final AutomatonProxy newAut,
-                             final byte status)
+                             final AutomatonProxy newAut)
     {
       final byte code = mAutomataMap.remove(oldAut);
       if (code == UNKNOWN_SELFLOOP) {
         // not found in map ...
         return false;
       } else {
-        if(code == NOT_ONLY_SELFLOOP) {
-          mNumNonSelfloopAutomata--;
-        }
-        if (status == NOT_ONLY_SELFLOOP) {
-          mNumNonSelfloopAutomata++;
-        }
-        mAutomataMap.put(newAut, status);
+        mAutomataMap.put(newAut, code);
         mSortedAutomataList = null;
         return true;
       }
@@ -2278,12 +2269,12 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     boolean isOnlyNonSelfLoopAutomaton(final AutomatonProxy aut)
     {
-
-      if (mNumNonSelfloopAutomata == 0) {
+      switch (mNumNonSelfloopAutomata) {
+      case 0:
         return true;
-      } else if (mNumNonSelfloopAutomata == 1) {
+      case 1:
         return mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP;
-      } else {
+      default:
         return false;
       }
     }

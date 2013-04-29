@@ -238,8 +238,7 @@ public class ListBufferTransitionRelation
     final int numEvents = eventEnc.getNumberOfProperEvents();
     mEventStatus = new byte[numEvents];
     for (int e = 0; e < numEvents; e++) {
-      final byte status = eventEnc.getProperEventStatus(e);
-      mEventStatus[e] = (byte) (status & ~EventEncoding.STATUS_UNUSED);
+      mEventStatus[e] = eventEnc.getProperEventStatus(e);
     }
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
@@ -283,18 +282,21 @@ public class ListBufferTransitionRelation
                                       final int numStates, final int config)
     throws OverflowException
   {
+    assert numProperEvents > 0 :
+      "ListBufferTransitionRelation needs at least one proper event (tau)!";
     checkConfig(config);
     mName = name;
     mKind = kind;
     mStateBuffer = new IntStateBuffer(numStates, numPropositions);
     mEventStatus = new byte[numProperEvents];
+    mEventStatus[EventEncoding.TAU] = EventEncoding.STATUS_LOCAL;
     if ((config & CONFIG_SUCCESSORS) != 0) {
-      mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numProperEvents, numStates,mEventStatus, 0);
+      mSuccessorBuffer = new OutgoingTransitionListBuffer
+        (numProperEvents, numStates ,mEventStatus, 0);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
-      mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numProperEvents, numStates, mEventStatus, 0);
+      mPredecessorBuffer = new IncomingTransitionListBuffer
+        (numProperEvents, numStates, mEventStatus, 0);
     }
 
   }

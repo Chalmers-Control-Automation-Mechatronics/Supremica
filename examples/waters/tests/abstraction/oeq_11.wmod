@@ -48,27 +48,27 @@
         </ConstantAlias>
     </ConstantAliasList>
     <EventDeclList>
-        <EventDecl Kind="UNCONTROLLABLE" Name="MER_an">
+        <EventDecl Kind="CONTROLLABLE" Name="MER_an">
             <RangeList>
                 <SimpleIdentifier Name="Tueren"/>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="ER_BT"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="ER_FS"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="ER_FT"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="ER_HK"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ER_BT"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ER_FS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ER_FT"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ER_HK"/>
         <EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
         <EventDecl Kind="CONTROLLABLE" Name="soft_SER">
             <RangeList>
                 <SimpleIdentifier Name="Tueren"/>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="soft_ER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_ER"/>
         <EventDecl Kind="CONTROLLABLE" Name="done_ZS"/>
         <EventDecl Kind="CONTROLLABLE" Name="CS_ok"/>
         <EventDecl Kind="CONTROLLABLE" Name="soft_VR"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="before">
@@ -79,10 +79,10 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="190" X="145"/>
+                            <Point X="145" Y="190"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="7" X="-53"/>
+                            <Point X="-53" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="IN_XX,ZS">
@@ -90,47 +90,47 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="119" X="206"/>
+                            <Point X="206" Y="119"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RQ_CS1,CS1a">
                         <PointGeometry>
-                            <Point Y="293" X="114"/>
+                            <Point X="114" Y="293"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-20" X="-93"/>
+                            <Point X="-93" Y="-20"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RQ_CS2,CS2a">
                         <PointGeometry>
-                            <Point Y="369" X="150"/>
+                            <Point X="150" Y="369"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RQ_IN,RUN">
                         <PointGeometry>
-                            <Point Y="270" X="196"/>
+                            <Point X="196" Y="270"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RQ_XX,ZS">
                         <PointGeometry>
-                            <Point Y="191" X="268"/>
+                            <Point X="268" Y="191"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="IN_IN,RUN" Source="IN_IN,RUN">
+                    <Edge Source="IN_IN,RUN" Target="IN_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="soft_ER"/>
                             <IndexedIdentifier Name="soft_SER">
@@ -138,36 +138,36 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="soft_VR"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-66"/>
+                                <Point X="-66" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="157" X="101"/>
+                            <Point X="101" Y="157"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="IN_XX,ZS" Source="IN_IN,RUN">
+                    <Edge Source="IN_IN,RUN" Target="IN_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="done_ZS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="152" X="180"/>
+                            <Point X="180" Y="152"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_CS1,CS1a" Source="IN_IN,RUN">
+                    <Edge Source="IN_IN,RUN" Target="RQ_CS1,CS1a">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-30"/>
+                                <Point X="-30" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="239" X="119"/>
+                            <Point X="119" Y="239"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_IN,RUN" Source="IN_IN,RUN">
+                    <Edge Source="IN_IN,RUN" Target="RQ_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -175,11 +175,11 @@
                             <SimpleIdentifier Name="ER_HK"/>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-40" X="-12"/>
+                                <Point X="-12" Y="-40"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="IN_IN,RUN" Source="IN_XX,ZS">
+                    <Edge Source="IN_XX,ZS" Target="IN_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="soft_ER"/>
                             <IndexedIdentifier Name="soft_SER">
@@ -187,25 +187,25 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="soft_VR"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-43" X="-71"/>
+                                <Point X="-71" Y="-43"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="139" X="162"/>
+                            <Point X="162" Y="139"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="IN_XX,ZS" Source="IN_XX,ZS">
+                    <Edge Source="IN_XX,ZS" Target="IN_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="done_ZS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="64" X="212"/>
+                            <Point X="212" Y="64"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_XX,ZS" Source="IN_XX,ZS">
+                    <Edge Source="IN_XX,ZS" Target="RQ_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -213,14 +213,14 @@
                             <SimpleIdentifier Name="ER_HK"/>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-54" X="13"/>
+                                <Point X="13" Y="-54"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="147" X="244"/>
+                            <Point X="244" Y="147"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_CS1,CS1a" Source="RQ_CS1,CS1a">
+                    <Edge Source="RQ_CS1,CS1a" Target="RQ_CS1,CS1a">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -230,25 +230,25 @@
                                 <SimpleIdentifier Name="FT"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-10" X="-33"/>
+                                <Point X="-33" Y="-10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="309" X="61"/>
+                            <Point X="61" Y="309"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_CS2,CS2a" Source="RQ_CS1,CS1a">
+                    <Edge Source="RQ_CS1,CS1a" Target="RQ_CS2,CS2a">
                         <LabelBlock>
                             <SimpleIdentifier Name="soft_CS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-19"/>
+                                <Point X="-19" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="340" X="124"/>
+                            <Point X="124" Y="340"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_CS2,CS2a" Source="RQ_CS2,CS2a">
+                    <Edge Source="RQ_CS2,CS2a" Target="RQ_CS2,CS2a">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -258,36 +258,36 @@
                                 <SimpleIdentifier Name="FT"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-10"/>
+                                <Point X="-10" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="424" X="142"/>
+                            <Point X="142" Y="424"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_IN,RUN" Source="RQ_CS2,CS2a">
+                    <Edge Source="RQ_CS2,CS2a" Target="RQ_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="CS_ok"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="327" X="176"/>
+                            <Point X="176" Y="327"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_CS1,CS1a" Source="RQ_IN,RUN">
+                    <Edge Source="RQ_IN,RUN" Target="RQ_CS1,CS1a">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="-3"/>
+                                <Point X="-3" Y="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="285" X="153"/>
+                            <Point X="153" Y="285"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_IN,RUN" Source="RQ_IN,RUN">
+                    <Edge Source="RQ_IN,RUN" Target="RQ_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -302,25 +302,25 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="soft_VR"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="4"/>
+                                <Point X="4" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="303" X="239"/>
+                            <Point X="239" Y="303"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_XX,ZS" Source="RQ_IN,RUN">
+                    <Edge Source="RQ_IN,RUN" Target="RQ_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="done_ZS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="4"/>
+                                <Point X="4" Y="-6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="241" X="248"/>
+                            <Point X="248" Y="241"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_IN,RUN" Source="RQ_XX,ZS">
+                    <Edge Source="RQ_XX,ZS" Target="RQ_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="soft_ER"/>
                             <IndexedIdentifier Name="soft_SER">
@@ -328,14 +328,14 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="soft_VR"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-43" X="-39"/>
+                                <Point X="-39" Y="-43"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="225" X="233"/>
+                            <Point X="233" Y="225"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_XX,ZS" Source="RQ_XX,ZS">
+                    <Edge Source="RQ_XX,ZS" Target="RQ_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -346,11 +346,11 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="done_ZS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-73" X="13"/>
+                                <Point X="13" Y="-73"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="178" X="322"/>
+                            <Point X="322" Y="178"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -364,10 +364,10 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="172" X="109"/>
+                            <Point X="109" Y="172"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="IN_XX,ZS">
@@ -375,47 +375,47 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="115" X="161"/>
+                            <Point X="161" Y="115"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RQ_CS1,CS1a">
                         <PointGeometry>
-                            <Point Y="389" X="125"/>
+                            <Point X="125" Y="389"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-19" X="-56"/>
+                            <Point X="-56" Y="-19"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RQ_CS2,CS2a">
                         <PointGeometry>
-                            <Point Y="393" X="193"/>
+                            <Point X="193" Y="393"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-12" X="9"/>
+                            <Point X="9" Y="-12"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RQ_IN,RUN">
                         <PointGeometry>
-                            <Point Y="286" X="166"/>
+                            <Point X="166" Y="286"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-4" X="-72"/>
+                            <Point X="-72" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RQ_XX,ZS">
                         <PointGeometry>
-                            <Point Y="197" X="216"/>
+                            <Point X="216" Y="197"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="IN_IN,RUN" Source="IN_IN,RUN">
+                    <Edge Source="IN_IN,RUN" Target="IN_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="soft_ER"/>
                             <IndexedIdentifier Name="soft_SER">
@@ -423,36 +423,36 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="soft_VR"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="-49"/>
+                                <Point X="-49" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="147" X="60"/>
+                            <Point X="60" Y="147"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="IN_XX,ZS" Source="IN_IN,RUN">
+                    <Edge Source="IN_IN,RUN" Target="IN_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="done_ZS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="143" X="139"/>
+                            <Point X="139" Y="143"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_IN,RUN" Source="IN_IN,RUN">
+                    <Edge Source="IN_IN,RUN" Target="RQ_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-15" X="-35"/>
+                                <Point X="-35" Y="-15"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="229" X="131"/>
+                            <Point X="131" Y="229"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="IN_IN,RUN" Source="IN_XX,ZS">
+                    <Edge Source="IN_XX,ZS" Target="IN_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="soft_ER"/>
                             <IndexedIdentifier Name="soft_SER">
@@ -460,36 +460,36 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="soft_VR"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-45" X="-52"/>
+                                <Point X="-52" Y="-45"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="129" X="122"/>
+                            <Point X="122" Y="129"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="IN_XX,ZS" Source="IN_XX,ZS">
+                    <Edge Source="IN_XX,ZS" Target="IN_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="done_ZS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="60" X="163"/>
+                            <Point X="163" Y="60"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_XX,ZS" Source="IN_XX,ZS">
+                    <Edge Source="IN_XX,ZS" Target="RQ_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="148" X="194"/>
+                            <Point X="194" Y="148"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_CS1,CS1a" Source="RQ_CS1,CS1a">
+                    <Edge Source="RQ_CS1,CS1a" Target="RQ_CS1,CS1a">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -499,25 +499,25 @@
                                 <SimpleIdentifier Name="FT"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-40" X="-44"/>
+                                <Point X="-44" Y="-40"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="432" X="92"/>
+                            <Point X="92" Y="432"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_CS2,CS2a" Source="RQ_CS1,CS1a">
+                    <Edge Source="RQ_CS1,CS1a" Target="RQ_CS2,CS2a">
                         <LabelBlock>
                             <SimpleIdentifier Name="soft_CS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="-23"/>
+                                <Point X="-23" Y="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="399" X="159"/>
+                            <Point X="159" Y="399"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_CS2,CS2a" Source="RQ_CS2,CS2a">
+                    <Edge Source="RQ_CS2,CS2a" Target="RQ_CS2,CS2a">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -527,36 +527,36 @@
                                 <SimpleIdentifier Name="FT"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-32" X="-5"/>
+                                <Point X="-5" Y="-32"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="440" X="222"/>
+                            <Point X="222" Y="440"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_IN,RUN" Source="RQ_CS2,CS2a">
+                    <Edge Source="RQ_CS2,CS2a" Target="RQ_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="CS_ok"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="7" X="-14"/>
+                                <Point X="-14" Y="7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="344" X="184"/>
+                            <Point X="184" Y="344"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_CS1,CS1a" Source="RQ_IN,RUN">
+                    <Edge Source="RQ_IN,RUN" Target="RQ_CS1,CS1a">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-22"/>
+                                <Point X="-22" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="341" X="141"/>
+                            <Point X="141" Y="341"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_IN,RUN" Source="RQ_IN,RUN">
+                    <Edge Source="RQ_IN,RUN" Target="RQ_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -571,25 +571,25 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="soft_VR"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-36" X="4"/>
+                                <Point X="4" Y="-36"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="300" X="213"/>
+                            <Point X="213" Y="300"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_XX,ZS" Source="RQ_IN,RUN">
+                    <Edge Source="RQ_IN,RUN" Target="RQ_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="done_ZS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="5"/>
+                                <Point X="5" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="247" X="205"/>
+                            <Point X="205" Y="247"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_IN,RUN" Source="RQ_XX,ZS">
+                    <Edge Source="RQ_XX,ZS" Target="RQ_IN,RUN">
                         <LabelBlock>
                             <SimpleIdentifier Name="soft_ER"/>
                             <IndexedIdentifier Name="soft_SER">
@@ -597,14 +597,14 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="soft_VR"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-30" X="-38"/>
+                                <Point X="-38" Y="-30"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="236" X="186"/>
+                            <Point X="186" Y="236"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RQ_XX,ZS" Source="RQ_XX,ZS">
+                    <Edge Source="RQ_XX,ZS" Target="RQ_XX,ZS">
                         <LabelBlock>
                             <SimpleIdentifier Name="ER_BT"/>
                             <SimpleIdentifier Name="ER_FS"/>
@@ -615,11 +615,11 @@
                             </IndexedIdentifier>
                             <SimpleIdentifier Name="done_ZS"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-60" X="3"/>
+                                <Point X="3" Y="-60"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="177" X="267"/>
+                            <Point X="267" Y="177"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
