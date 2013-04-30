@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.simulator;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.Color;
 import java.util.ArrayList;

@@ -1,8 +1,9 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntStack;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 
 public class RemoveRedundantTransitions
@@ -33,7 +34,7 @@ public class RemoveRedundantTransitions
 
   private void backtrack(int state)
   {
-    final TIntStack stack = new TIntStack();
+    final TIntStack stack = new TIntArrayStack();
     stack.push(state);
     while (stack.size() != 0) {
       state = stack.pop();
@@ -82,3 +83,4 @@ public class RemoveRedundantTransitions
     TIME += System.currentTimeMillis();
   }
 }
+

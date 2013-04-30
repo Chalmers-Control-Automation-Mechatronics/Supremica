@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -1232,3 +1232,4 @@ public class CompNonBlockingChecker
     LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }
+

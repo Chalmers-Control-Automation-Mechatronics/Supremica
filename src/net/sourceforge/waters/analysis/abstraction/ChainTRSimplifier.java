@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -109,6 +109,7 @@ public class ChainTRSimplifier
     }
   }
 
+  @Override
   public boolean isPartitioning()
   {
     return mIsPartitioning;
@@ -126,6 +127,7 @@ public class ChainTRSimplifier
     return mReducedMarkings[propID];
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     if (mSteps != null) {
@@ -239,7 +241,7 @@ public class ChainTRSimplifier
             clazz.add(state1);
           }
         }
-        result.add(clazz.toNativeArray());
+        result.add(clazz.toArray());
         clazz.clear();
       }
       return result;
@@ -255,3 +257,4 @@ public class ChainTRSimplifier
   private boolean[] mReducedMarkings;
 
 }
+

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="selfLoopObservationalEquivalence02" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting">
+            <ColorGeometry>
+                <Color Blue="0" Green="0" Red="0"/>
+            </ColorGeometry>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="a"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="before">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point X="48" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point X="48" Y="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-27" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="after">
+            <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name="a"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point X="90" Y="39"/>
+                    </LabelGeometry>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point X="48" Y="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-27" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

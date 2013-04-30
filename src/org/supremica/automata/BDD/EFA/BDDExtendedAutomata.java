@@ -4,9 +4,9 @@ package org.supremica.automata.BDD.EFA;
  *
  * @author Sajed Miremadi, Zhennan Fei
  */
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -1918,3 +1918,4 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
        return markedValuesBDD.equals(manager.getOneBDD());
     }
 }
+

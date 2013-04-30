@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -80,6 +80,7 @@ import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
@@ -138,6 +139,7 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
+import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
 
@@ -179,7 +181,6 @@ public class GraphEditorPanel
     mHasGroupNodes = GraphTools.updateGroupNodeHierarchy(graph);
     mNeedsHierarchyUpdate = false;
     mSizeMayHaveChanged = true;
-    mIsPermanentFocusOwner = false;
     registerGraphObserver();
     registerSupremicaPropertyChangeListeners();
     addFocusListener(this);
@@ -733,7 +734,6 @@ public class GraphEditorPanel
         else{
           scrollable.add(copy);
         }
-
       }
       final Rectangle2D bounds =
         getShapeProducer().getMinimumBoundingRectangle(scrollable);
@@ -880,8 +880,8 @@ public class GraphEditorPanel
   @Override
   public void focusGained(final FocusEvent event)
   {
+    // System.err.println("focus gained : " + event.isTemporary());
     if (!event.isTemporary()) {
-      mIsPermanentFocusOwner = true;
       repaint();
     }
   }
@@ -889,8 +889,8 @@ public class GraphEditorPanel
   @Override
   public void focusLost(final FocusEvent event)
   {
+    // System.err.println("focus lost : " + event.isTemporary());
     if (!event.isTemporary()) {
-      mIsPermanentFocusOwner = false;
       repaint();
     }
   }
@@ -1130,12 +1130,8 @@ public class GraphEditorPanel
     }
   }
 
-  private boolean isSourceOfDrag(){
-    return mRoot.getModuleWindowInterface().getRootWindow().getFocusTracker()
-      .getWatersSelectionOwner() == GraphEditorPanel.this;
-  }
-
-  public boolean labelsAreSelected(){
+  private boolean labelsAreSelected()
+  {
     for (final ProxySubject proxy : getCurrentSelection()) {
       if (proxy instanceof ForeachSubject) {
         return true;
@@ -1144,6 +1140,13 @@ public class GraphEditorPanel
       }
     }
     return false;
+  }
+
+  private boolean isTrackedFocusOwner()
+  {
+    final IDE ide = mRoot.getModuleWindowInterface().getRootWindow();
+    final FocusTracker tracker = ide.getFocusTracker();
+    return tracker.getWatersSelectionOwner() == GraphEditorPanel.this;
   }
 
 
@@ -1607,12 +1610,11 @@ public class GraphEditorPanel
       } else {
         dragover = DragOverStatus.NOTDRAG;
       }
+      final boolean focussed = isTrackedFocusOwner();
       return new RenderingInformation
         (selected, showHandles, focused,
-         EditorColor.getColor(item, dragover, selected,
-                              error, mIsPermanentFocusOwner),
-         EditorColor.getShadowColor(item, dragover, selected,
-                                    error, mIsPermanentFocusOwner),
+         EditorColor.getColor(item, dragover, selected, error, focussed),
+         EditorColor.getShadowColor(item, dragover, selected, error, focussed),
          priority);
     }
 
@@ -1886,29 +1888,30 @@ public class GraphEditorPanel
         final List<ProxySubject> list = getListOfSelectedLabels();
         if (event.isShiftDown() || event.isControlDown()) {
           if (isSelected(item)) {
-            if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
+            if (item instanceof IdentifierSubject ||
+                item instanceof ForeachSubject) {
               removeFromSelection(item);
+            } else {
+              if (list.isEmpty()) {
+                removeFromSelection(item);
+              }
             }
-            else{
-               if(list.isEmpty()){
-                 removeFromSelection(item);
-               }
+          } else {
+            if (item instanceof IdentifierSubject ||
+                item instanceof ForeachSubject){
+              if (list.isEmpty()) {
+                if (mSelection.size() > 1) {
+                  // If there are more things selected, toggle the label block.
+                  final LabelBlockSubject block =
+                    SubjectTools.getAncestor(item, LabelBlockSubject.class);
+                  toggleSelection(block);
+                } else {
+                  // If the only thing selected is the label block, add the label.
+                  replaceSelection(item);
+                }
+              }
             }
-         } else {
-           if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
-             if(list.isEmpty()){
-               if(mSelection.size() > 1){
-                 //if there are more things selected, toggle the labelblock
-                 final LabelBlockSubject block = SubjectTools.getAncestor(item, LabelBlockSubject.class);
-                 toggleSelection(block);
-               }
-               else{
-                 //if the only thing selected is the labelblock, add the label
-                 replaceSelection(item);
-               }
-             }
-           }
-         }
+          }
         } else {
           if (isSelected(item)) {
             if (item instanceof LabelBlockSubject) {
@@ -1916,18 +1919,15 @@ public class GraphEditorPanel
                 if (mSelection.size() > 1) {
                   replaceSelection(item);
                 }
+              } else {
+                removeFromSelection(list);
               }
-              else{
-                  removeFromSelection(list);
-              }
-            }
-            else{
+            } else {
               replaceSelection(item);
             }
-          } else {
-            if(item instanceof IdentifierSubject || item instanceof ForeachSubject){
-              replaceSelection(item);
-            }
+          } else if (item instanceof IdentifierSubject ||
+                     item instanceof ForeachSubject) {
+            replaceSelection(item);
           }
         }
       }
@@ -1937,8 +1937,7 @@ public class GraphEditorPanel
     @Override
     public void mousePressed(final MouseEvent event)
     {
-      // System.err.println("ToolController.mousePressed() - " + mIsPermanentFocusOwner);
-      if (mIsPermanentFocusOwner) {
+      if (isFocusOwner()) {
         mousePressedWhenInFocus(event);
       } else {
         requestFocusInWindow();
@@ -1946,7 +1945,7 @@ public class GraphEditorPanel
           @Override
           public void run()
           {
-            if (mIsPermanentFocusOwner) {
+            if (isFocusOwner()) {
               mousePressedWhenInFocus(event);
             }
           }
@@ -3327,7 +3326,7 @@ public class GraphEditorPanel
     private void setExternalDragStatus(final int dropAction)
     {
       final List<? extends Proxy> selected = getCurrentSelection();
-      if (isSourceOfDrag()) {
+      if (isTrackedFocusOwner()) {
         for (final Proxy p : selected) {
           if (!(p instanceof LabelBlockSubject) &&
             SubjectTools.isAncestor((Subject) p, mDropList)) {
@@ -4970,7 +4969,7 @@ public class GraphEditorPanel
           elist.getEventIdentifierListModifiable();
         int pos = startpos < 0 ? list.size() : startpos;
         final List<? extends Proxy> selected;
-        if (isSourceOfDrag()) {
+        if (isTrackedFocusOwner()) {
           selected = getCurrentSelection();
         } else {
           selected = dropList;
@@ -5219,7 +5218,7 @@ public class GraphEditorPanel
       }
       final InternalDragActionDND dragAction = (InternalDragActionDND)mInternalDragAction;
 
-      if(support.getDropAction() == MOVE && !isSourceOfDrag()){
+      if(support.getDropAction() == MOVE && !isTrackedFocusOwner()){
         support.setDropAction(COPY);
       }
 
@@ -5412,7 +5411,6 @@ public class GraphEditorPanel
    */
   private boolean mHasGroupNodes;
   private boolean mSizeMayHaveChanged;
-  private boolean mIsPermanentFocusOwner;
 
   private ToolController mController;
   private ToolController mSelectController;
@@ -5442,3 +5440,4 @@ public class GraphEditorPanel
   private static final int STATE_INPUT_WIDTH = 128;
 
 }
+

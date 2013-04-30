@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -630,3 +630,4 @@ public class MonolithicSafetyVerifier
   private int mErrorAutomaton;
 
 }
+

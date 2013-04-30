@@ -4,9 +4,9 @@ package org.supremica.automata.BDD.EFA;
  *
  * @author Sajed Miremadi, Zhennan Fei
  */
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.List;
 
@@ -758,3 +758,4 @@ public class BDDExtendedManager extends BDDAbstractManager {
         return initialFeasibleStates.and(bddExAutomata.getInitialState().exist(bddExAutomata.getSourceLocationVarSet()).not());
     }
 }
+

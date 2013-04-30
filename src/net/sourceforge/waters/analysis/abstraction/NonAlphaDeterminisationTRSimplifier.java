@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -227,7 +227,7 @@ public class NonAlphaDeterminisationTRSimplifier
       }
     }
     assert remainingStates.size() > 1;
-    final int[] remainingStatesArray = remainingStates.toNativeArray();
+    final int[] remainingStatesArray = remainingStates.toArray();
     initialPartition.add(remainingStatesArray);
     return initialPartition;
   }
@@ -251,3 +251,4 @@ public class NonAlphaDeterminisationTRSimplifier
   private TransitionIterator mTauIterator;
 
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.PrintStream;
 import java.io.Serializable;
@@ -612,3 +612,4 @@ public abstract class AbstractModelVerifierFactory
   private final List<CommandLineArgument> mArgumentList;
 
 }
+

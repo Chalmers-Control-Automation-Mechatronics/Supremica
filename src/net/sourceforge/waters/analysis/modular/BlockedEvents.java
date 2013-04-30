@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -35,9 +35,9 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 public class BlockedEvents
 {
-  public BlockedEvents(List<AutomatonProxy> model,
-		       		   ProductDESProxyFactory factory,
-                       EventProxy marked)
+  public BlockedEvents(final List<AutomatonProxy> model,
+		       		   final ProductDESProxyFactory factory,
+                       final EventProxy marked)
   {
     mMarked = marked;
     mModel = model;
@@ -47,23 +47,23 @@ public class BlockedEvents
     containsmarked = false;
   }
 
-  public void setNodeLimit(int stateLimit)
+  public void setNodeLimit(final int stateLimit)
   {
     mNodeLimit = stateLimit;
   }
-  
+
   private EventProxy[] unionEvents()
   {
-    THashSet<EventProxy> merge = new THashSet<EventProxy>();
-    for (AutomatonProxy a : mModel) {merge.addAll(a.getEvents());}
-    EventProxy[] events = merge.toArray(new EventProxy[merge.size()]);
+    final THashSet<EventProxy> merge = new THashSet<EventProxy>();
+    for (final AutomatonProxy a : mModel) {merge.addAll(a.getEvents());}
+    final EventProxy[] events = merge.toArray(new EventProxy[merge.size()]);
     Arrays.sort(events);
     return events;
   }
-  
-  private Set<EventProxy> getDisabledEvents(Collection<EventProxy> props)
+
+  private Set<EventProxy> getDisabledEvents(final Collection<EventProxy> props)
   {
-    for (EventProxy e : props)
+    for (final EventProxy e : props)
     {
       if (e instanceof DisabledEvents) {
         return new THashSet<EventProxy>(((DisabledEvents) e).getDisabled());
@@ -71,11 +71,11 @@ public class BlockedEvents
     }
     return new THashSet<EventProxy>();
   }
-  
-  private int[] geteventnotinautomaton(AutomatonProxy aut)
+
+  private int[] geteventnotinautomaton(final AutomatonProxy aut)
   {
-    int size = events.length - aut.getEvents().size();
-    int[] arr = new int[size];
+    final int size = events.length - aut.getEvents().size();
+    final int[] arr = new int[size];
     int i = 0;
     for (int e = 0; e < events.length; e++) {
       if (!aut.getEvents().contains(events[e])) {
@@ -84,39 +84,39 @@ public class BlockedEvents
     }
     return arr;
   }
-  
-  private AutomatonProxy createAutomaton(boolean[][] eventOccurs,
-                                         int[][][] transitionsrel,
-                                         Set<EventProxy>[] disabled,
-                                         boolean[] initialStates,
-                                         boolean[] markedStates,
-                                         AutomatonProxy automaton)
+
+  private AutomatonProxy createAutomaton(final boolean[][] eventOccurs,
+                                         final int[][][] transitionsrel,
+                                         final Set<EventProxy>[] disabled,
+                                         final boolean[] initialStates,
+                                         final boolean[] markedStates,
+                                         final AutomatonProxy automaton)
   {
-    Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
-    List<StateProxy> states = new ArrayList<StateProxy>();
-    int[] eventsnotinaut = geteventnotinautomaton(automaton);
+    final Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
+    final List<StateProxy> states = new ArrayList<StateProxy>();
+    final int[] eventsnotinaut = geteventnotinautomaton(automaton);
     for (int s = 0; s < disabled.length; s++) {
       for (int ei = 0; ei < eventsnotinaut.length; ei++) {
-        int e = eventsnotinaut[ei];
+        final int e = eventsnotinaut[ei];
         if (!eventOccurs[e][s]) {
-          EventProxy ev = events[e];
+          final EventProxy ev = events[e];
           disabled[s].add(ev);
         }
       }
-      Collection<EventProxy> props = new THashSet<EventProxy>();
+      final Collection<EventProxy> props = new THashSet<EventProxy>();
       if (markedStates[s] && mMarked != null) {props.add(mMarked);}
       //if (!disabled[s].isEmpty()) {props.add(new DisabledEvents(disabled[s]));}
-      StateProxy ns = new AnnotatedMemStateProxy(s, props, initialStates[s]);
+      final StateProxy ns = new AnnotatedMemStateProxy(s, props, initialStates[s]);
       states.add(ns);
     }
     boolean removed = false;
     for (int e = 0; e < transitionsrel.length; e++) {
-      int[][] tr = transitionsrel[e];
+      final int[][] tr = transitionsrel[e];
       if (tr == null) {continue;}
       for (int s = 0; s < tr.length; s++) {
         if (tr[s] != null && eventOccurs[e][s]) {
           for (int ti = 0; ti < tr[s].length; ti++) {
-            int t = tr[s][ti];
+            final int t = tr[s][ti];
             trans.add(mFactory.createTransitionProxy(states.get(s), events[e],
                                                      states.get(t)));
           }
@@ -126,10 +126,10 @@ public class BlockedEvents
         }
       }
     }
-    String name = automaton.getName();
-    ComponentKind ck = automaton.getKind();
-    Collection<EventProxy> ev = automaton.getEvents();
-    AutomatonProxy aut = mFactory.createAutomatonProxy(name, ck, ev,
+    final String name = automaton.getName();
+    final ComponentKind ck = automaton.getKind();
+    final Collection<EventProxy> ev = automaton.getEvents();
+    final AutomatonProxy aut = mFactory.createAutomatonProxy(name, ck, ev,
                                                        states, trans);
     if (removed) {
       System.out.println("removed: " + aut.getName());
@@ -140,7 +140,7 @@ public class BlockedEvents
     }
     return aut;
   }
-  
+
   @SuppressWarnings("unchecked")
   public List<AutomatonProxy> run()
     throws AnalysisException
@@ -150,7 +150,7 @@ public class BlockedEvents
     TObjectIntHashMap<EventProxy> eventToIndex =
       new TObjectIntHashMap<EventProxy>();
     events = unionEvents();
-    int numAutomata = mModel.size();
+    final int numAutomata = mModel.size();
     eventAutomaton = new int[events.length][numAutomata];
     // transitions indexed first by automaton then by event
     // then by source state
@@ -159,33 +159,33 @@ public class BlockedEvents
       eventToIndex.put(events[i], i);
     }
     mEventToIndex = eventToIndex;
-    int[][] currentState = new int[numAutomata][];
+    final int[][] currentState = new int[numAutomata][];
     mMarkedStates = new boolean[numAutomata][];
     mDisabled = new Set[numAutomata][];
     mIntDisabled = new TIntHashSet[numAutomata][];
     mEventActivated = new boolean[numAutomata][events.length][];
     mInitialStates = new boolean[numAutomata][];
     for (int i = 0; i < mModel.size(); i++) {
-      AutomatonProxy a = mModel.get(i);
-      TObjectIntHashMap<StateProxy> statetoindex =
+      final AutomatonProxy a = mModel.get(i);
+      final TObjectIntHashMap<StateProxy> statetoindex =
         new TObjectIntHashMap<StateProxy>(a.getStates().size());
       mMarkedStates[i] = new boolean[a.getStates().size()];
       mInitialStates[i] = new boolean[a.getStates().size()];
       mDisabled[i] = new Set[a.getStates().size()];
       mIntDisabled[i] = new TIntHashSet[a.getStates().size()];
-      TIntArrayList cs = new TIntArrayList(1);
-      boolean add = !a.getEvents().contains(mMarked);
+      final TIntArrayList cs = new TIntArrayList(1);
+      final boolean add = !a.getEvents().contains(mMarked);
       containsmarked = containsmarked || add;
       // TODO do this smarter
       int snum = 0;
-      for (StateProxy s : a.getStates()) {
+      for (final StateProxy s : a.getStates()) {
         if (add || s.getPropositions().contains(mMarked)) {
           mMarkedStates[i][snum] = true;
         }
-        Set<EventProxy> dis = getDisabledEvents(s.getPropositions());
+        final Set<EventProxy> dis = getDisabledEvents(s.getPropositions());
         mDisabled[i][snum] = dis;
         mIntDisabled[i][snum] = new TIntHashSet();
-        for (EventProxy e : dis) {
+        for (final EventProxy e : dis) {
           if (eventToIndex.contains(e)) {
             mIntDisabled[i][snum].add(eventToIndex.get(e));
           }
@@ -198,17 +198,17 @@ public class BlockedEvents
         }
         statetoindex.put(s, snum); snum++;
       }
-      currentState[i] = cs.toNativeArray();
+      currentState[i] = cs.toArray();
       // TODO do this smarter later
-      TIntArrayList[][] auttransitionslists =
+      final TIntArrayList[][] auttransitionslists =
         new TIntArrayList[events.length][a.getStates().size()];
       for (int e = 0; e < events.length; e++) {
         mEventActivated[i][e] = new boolean[a.getStates().size()];
       }
-      for (TransitionProxy t : a.getTransitions()) {
-        int event = eventToIndex.get(t.getEvent());
-        int source = statetoindex.get(t.getSource());
-        int target = statetoindex.get(t.getTarget());
+      for (final TransitionProxy t : a.getTransitions()) {
+        final int event = eventToIndex.get(t.getEvent());
+        final int source = statetoindex.get(t.getSource());
+        final int target = statetoindex.get(t.getTarget());
         TIntArrayList list = auttransitionslists[event][source];
         if (list == null) {
           list = new TIntArrayList(1);
@@ -220,9 +220,9 @@ public class BlockedEvents
         if (!a.getEvents().contains(events[j])) {continue;}
         transitions[i][j] = new int[a.getStates().size()][];
         for (int k = 0; k < auttransitionslists[j].length; k++) {
-          TIntArrayList list = auttransitionslists[j][k];
+          final TIntArrayList list = auttransitionslists[j][k];
           if (list != null) {
-            int[] targs = list.toNativeArray(); transitions[i][j][k] = targs;
+            final int[] targs = list.toArray(); transitions[i][j][k] = targs;
           }
         }
       }
@@ -233,7 +233,7 @@ public class BlockedEvents
       //System.out.println("Marked:" + i + " " + Arrays.toString(mMarkedStates[i]));
     //}
     for (int i = 0; i < events.length; i++) {
-      IntDouble[] list = new IntDouble[numAutomata];
+      final IntDouble[] list = new IntDouble[numAutomata];
       for (int j = 0; j < mModel.size(); j++) {
         list[j] = new IntDouble(j, 0);
         if (transitions[j][i] != null) {
@@ -242,7 +242,7 @@ public class BlockedEvents
               list[j].mDouble++;
             }
           }
-          list[j].mDouble /= (double)transitions[j][i].length;
+          list[j].mDouble /= transitions[j][i].length;
         } else {
           list[j].mDouble = Double.POSITIVE_INFINITY;
         }
@@ -252,19 +252,19 @@ public class BlockedEvents
         eventAutomaton[i][j] = list[j].mInt;
       }
     }
-    
+
     // Time to start building the automaton
     numStates = 0;
     unvisited = new ArrayBag(100);
     permutations(currentState, new int[numAutomata], 0,
                  -1, -1, true);
     while (!unvisited.isEmpty()) {
-      int[] cs = unvisited.take();
+      final int[] cs = unvisited.take();
       //System.out.println(Arrays.toString(currentState));
       //explore(currentState, true);
       explore(cs);
     }
-    List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(numAutomata);
+    final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(numAutomata);
     for (int a = 0; a < mModel.size(); a++) {
       automata.add(createAutomaton(mEventActivated[a], transitions[a],
                                    mDisabled[a], mInitialStates[a],
@@ -272,9 +272,9 @@ public class BlockedEvents
     }
     return automata;
   }
-  
-  private void addState(int[] successor, int source,
-                        int event, boolean isInitial)
+
+  private void addState(final int[] successor, final int source,
+                        final int event, final boolean isInitial)
     throws AnalysisException
   {
     Integer target = states.get(successor);
@@ -290,21 +290,21 @@ public class BlockedEvents
       if (containsmarked) {
         if (determineMarked(successor)) {
           for (int a = 0; a < successor.length; a++) {
-            int s = successor[a];
-            int e = mEventToIndex.get(mMarked);
+            final int s = successor[a];
+            final int e = mEventToIndex.get(mMarked);
             mEventActivated[a][e][s] = true;
           }
         }
       }
     }
   }
-  
-  private void permutations(int[][] suc, int[] perm, int depth,
-                            int source, int event, boolean isInitial)
+
+  private void permutations(final int[][] suc, final int[] perm, final int depth,
+                            final int source, final int event, final boolean isInitial)
     throws AnalysisException
   {
     if (depth== perm.length) {
-      int[] successor = new int[depth];
+      final int[] successor = new int[depth];
       for (int i = 0; i < perm.length; i++) {
         successor[i] = suc[i][perm[i]];
       }
@@ -316,22 +316,22 @@ public class BlockedEvents
       permutations(suc, perm, depth + 1, source, event, isInitial);
     }
   }
-  
-  public boolean explore(int[] state)
+
+  public boolean explore(final int[] state)
     throws AnalysisException
   {
-    boolean result = false;
-    int numAutomata = transitions.length;
-    int source = states.get(state);
+    final boolean result = false;
+    final int numAutomata = transitions.length;
+    final int source = states.get(state);
     events:
     for (int i = 0; i < events.length; i++) {
-      int[][] suc = new int[numAutomata][];
+      final int[][] suc = new int[numAutomata][];
       for (int l = 0; l < numAutomata; l++) {
-        int automaton = eventAutomaton[i][l];
+        final int automaton = eventAutomaton[i][l];
         if (transitions[automaton][i] != null) {
           suc[automaton] = transitions[automaton][i][state[automaton]];
         } else {
-          int s = state[automaton];
+          final int s = state[automaton];
           if (!mIntDisabled[automaton][s].contains(s)) {
             suc[automaton] = new int[]{state[automaton]};
           }
@@ -346,15 +346,15 @@ public class BlockedEvents
         }
       }
       for (int a = 0; a < state.length; a++) {
-        int s = state[a]; mEventActivated[a][i][s] = true;
+        final int s = state[a]; mEventActivated[a][i][s] = true;
       }
-      int[] perms = new int[numAutomata];
+      final int[] perms = new int[numAutomata];
       permutations(suc,perms,0,source,i, false);
     }
     return result;
   }
-  
-  private boolean determineMarked(int[] suc)
+
+  private boolean determineMarked(final int[] suc)
   {
     //System.out.println("state:" + Arrays.toString(suc));
     for (int i = 0; i < suc.length; i++) {
@@ -364,42 +364,42 @@ public class BlockedEvents
     }
     return true;
   }
-  
+
   private static interface Bag
   {
     /** is the bag empty*/
     public boolean isEmpty();
-    
+
     /** add a new item to the bag */
     public void offer(int[] a);
-    
+
     /** remove an arbitrary item from the bag */
     public int[] take();
   }
-  
+
   @SuppressWarnings("unused")
   private static class IntBag
   {
     private int mLength;
     private final int mInitialSize;
     private int[] mValues;
-    
-	public IntBag(int initialSize)
+
+	public IntBag(final int initialSize)
     {
       mLength = 0;
       mInitialSize = initialSize;
       mValues = new int[mInitialSize];
     }
-    
+
     public boolean isEmpty()
     {
       return mLength == 0;
     }
-    
-    public void offer(int a)
+
+    public void offer(final int a)
     {
       if (mLength == mValues.length) {
-        int[] newArray = new int[mValues.length*2];
+        final int[] newArray = new int[mValues.length*2];
         // from memory this is actually faster than using the Arrays method for it
         for (int i = 0; i < mValues.length; i++) {
           newArray[i] = mValues[i];
@@ -409,13 +409,13 @@ public class BlockedEvents
       mValues[mLength] = a;
       mLength++;
     }
-    
+
     public int take()
     {
       mLength--;
-      int a = mValues[mLength];
+      final int a = mValues[mLength];
       if (mValues.length > mInitialSize && (mLength <= (mValues.length / 4))) {
-        int[] newArray = new int[mValues.length / 2];
+        final int[] newArray = new int[mValues.length / 2];
         for (int i = 0; i < mLength; i++) {
           newArray[i] = mValues[i];
         }
@@ -424,30 +424,32 @@ public class BlockedEvents
       return a;
     }
   }
-  
+
   private static class ArrayBag
     implements Bag
   {
     private int mLength;
     private final int mInitialSize;
     private int[][] mValues;
-    
-    public ArrayBag(int initialSize)
+
+    public ArrayBag(final int initialSize)
     {
       mLength = 0;
       mInitialSize = initialSize;
       mValues = new int[mInitialSize][];
     }
-    
+
+    @Override
     public boolean isEmpty()
     {
       return mLength == 0;
     }
-    
-    public void offer(int[] a)
+
+    @Override
+    public void offer(final int[] a)
     {
       if (mLength == mValues.length) {
-        int[][] newArray = new int[mValues.length*2][];
+        final int[][] newArray = new int[mValues.length*2][];
         // from memory this is actually faster than using the Arrays method for it
         for (int i = 0; i < mValues.length; i++) {
           newArray[i] = mValues[i];
@@ -457,15 +459,16 @@ public class BlockedEvents
       mValues[mLength] = a;
       mLength++;
     }
-    
+
+    @Override
     public int[] take()
     {
       mLength--;
-      int[] a = mValues[mLength];
+      final int[] a = mValues[mLength];
       // this shouldn't actually save any memory as the Map will still reference the array but oh well
       mValues[mLength] = null;
       if (mValues.length > mInitialSize && (mLength <= (mValues.length / 4))) {
-        int[][] newArray = new int[mValues.length / 2][];
+        final int[][] newArray = new int[mValues.length / 2][];
         for (int i = 0; i < mLength; i++) {
           newArray[i] = mValues[i];
         }
@@ -474,7 +477,7 @@ public class BlockedEvents
       return a;
     }
   }
-  
+
   /**
    *  I'll make this encode it properly later on
    *
@@ -484,74 +487,80 @@ public class BlockedEvents
   {
     return sState;
   }
-  
+
   @SuppressWarnings("unused")
   private int[] decode(final int[] sState)
   {
     return sState;
   }
-  
+
   private static class IntMap
     extends AbstractMap<int[], Integer>
   {
     final Map<IntArray, Integer> mMap;
-    
-    public IntMap(int num)
+
+    public IntMap(final int num)
     {
       mMap = new HashMap<IntArray, Integer>(num);
     }
-    
+
+    @Override
     public Set<Map.Entry<int[],Integer>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
-    
-    public Integer get(Object o)
+
+    @Override
+    public Integer get(final Object o)
     {
-      int[] a = (int[]) o;
+      final int[] a = (int[]) o;
       return mMap.get(new IntArray(a));
     }
-    
+
     @SuppressWarnings("unused")
-	public Integer get(int[] a)
+	public Integer get(final int[] a)
     {
       return mMap.get(new IntArray(a));
     }
-    
+
     @SuppressWarnings("unused")
-	public Integer put(Object o, Integer s)
+	public Integer put(final Object o, final Integer s)
     {
       return mMap.put(new IntArray((int[])o), s);
     }
-    
-    public Integer put(int[] a, Integer s)
+
+    @Override
+    public Integer put(final int[] a, final Integer s)
     {
       return mMap.put(new IntArray(a), s);
     }
-    
+
+    @Override
     public Collection<Integer> values()
     {
       return mMap.values();
     }
   }
-  
+
   private static class IntArray
   {
     public final int[] mArray;
-    
-    public IntArray(int[] array)
+
+    public IntArray(final int[] array)
     {
       mArray = array;
     }
-    
+
+    @Override
     public int hashCode()
     {
       return Arrays.hashCode(mArray);
     }
-    
-    public boolean equals(Object o)
+
+    @Override
+    public boolean equals(final Object o)
     {
-      IntArray oth = (IntArray)o;
+      final IntArray oth = (IntArray)o;
       if (oth.mArray.length != mArray.length) {
         return false;
       }
@@ -562,26 +571,28 @@ public class BlockedEvents
       }
       return true;
     }
-    
+
+    @Override
     public String toString()
     {
       return Arrays.toString(mArray);
     }
   }
-  
+
   private static class IntDouble
     implements Comparable<IntDouble>
   {
     final public int mInt;
     public double mDouble;
-    
-    public IntDouble(int i, double d)
+
+    public IntDouble(final int i, final double d)
     {
       mInt = i;
       mDouble = d;
     }
-    
-    public int compareTo(IntDouble id)
+
+    @Override
+    public int compareTo(final IntDouble id)
     {
       if (mDouble < id.mDouble) {
         return -1;
@@ -591,50 +602,51 @@ public class BlockedEvents
       return 0;
     }
   }
-  
+
   public int getDumpState()
   {
     return mDumpState;
   }
-  
+
   @SuppressWarnings("unused")
   private static class Pointer
     implements Comparable<Pointer>
   {
     EventProxy[] mArray;
     int mIndex;
-    
-	public Pointer(EventProxy[] array)
+
+	public Pointer(final EventProxy[] array)
     {
       mArray = array;
       mIndex = 0;
     }
-    
+
     public boolean increment()
     {
       mIndex++;
       return mIndex < mArray.length;
     }
-    
+
     public EventProxy getCurrent()
     {
       return mArray[mIndex];
     }
-    
-    public int compareTo(Pointer p)
+
+    @Override
+    public int compareTo(final Pointer p)
     {
       return mArray[mIndex].compareTo(p.mArray[p.mIndex]);
     }
   }
-  
+
   private TIntHashSet[][] mIntDisabled;
   private Set<EventProxy>[][] mDisabled;
   private boolean[][][] mEventActivated;
   @SuppressWarnings("unused")
-  private int mCompositionSize = 0;
+  private final int mCompositionSize = 0;
   private int mNodeLimit;
-  private List<AutomatonProxy> mModel;
-  private ProductDESProxyFactory mFactory;
+  private final List<AutomatonProxy> mModel;
+  private final ProductDESProxyFactory mFactory;
   private Map<int[], Integer> states;
   @SuppressWarnings("unused")
   private Collection<TransitionProxy> trans;
@@ -647,16 +659,17 @@ public class BlockedEvents
   @SuppressWarnings("unused")
   private TIntArrayList mNewMarked;
   @SuppressWarnings("unused")
-  private List<int[]> newtrans = new ArrayList<int[]>();
+  private final List<int[]> newtrans = new ArrayList<int[]>();
   private int numStates;
   private Bag unvisited;
   private int[][] eventAutomaton;
   private final EventProxy mMarked;
   @SuppressWarnings("unused")
   private int mNewDumpState;
-  private int mDumpState = -1;
+  private final int mDumpState = -1;
   @SuppressWarnings("unused")
-  private TIntHashSet mNewInitial = new TIntHashSet();
+  private final TIntHashSet mNewInitial = new TIntHashSet();
   private boolean containsmarked;
   private TObjectIntHashMap<EventProxy> mEventToIndex;
 }
+

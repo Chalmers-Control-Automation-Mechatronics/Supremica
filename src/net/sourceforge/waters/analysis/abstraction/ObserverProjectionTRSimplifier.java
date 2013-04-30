@@ -9,7 +9,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -128,6 +129,7 @@ public class ObserverProjectionTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
+  @Override
   public boolean isPartitioning()
   {
     return true;
@@ -139,6 +141,7 @@ public class ObserverProjectionTRSimplifier
     return true;
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =

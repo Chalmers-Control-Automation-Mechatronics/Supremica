@@ -9,8 +9,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -53,6 +54,7 @@ public class MarkingRemovalTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
+  @Override
   public boolean isPartitioning()
   {
     return true;
@@ -70,6 +72,7 @@ public class MarkingRemovalTRSimplifier
     return mReducedMarkings[propID];
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
@@ -99,7 +102,7 @@ public class MarkingRemovalTRSimplifier
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     final int numStates = rel.getNumberOfStates();
     final TIntHashSet visitedStates = new TIntHashSet();
-    final TIntStack unvisitedStates = new TIntStack();
+    final TIntStack unvisitedStates = new TIntArrayStack();
     final int numProps = rel.getNumberOfPropositions();
     boolean modified = false;
     mReducedMarkings = new boolean[numProps];
@@ -143,3 +146,4 @@ public class MarkingRemovalTRSimplifier
   private boolean[] mReducedMarkings;
 
 }
+

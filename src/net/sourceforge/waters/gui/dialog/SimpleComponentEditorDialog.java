@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -483,3 +483,4 @@ public class SimpleComponentEditorDialog
     WatersDataFlavor.createTransferable(COMPONENT_TEMPLATE);
 
 }
+

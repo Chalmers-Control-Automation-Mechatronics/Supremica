@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.BitSet;
 import java.util.Set;
@@ -204,3 +204,4 @@ abstract class EventBDD
   private StateProxy[] mCurrentAutomatonDeterministicSuccessors;
 
 }
+

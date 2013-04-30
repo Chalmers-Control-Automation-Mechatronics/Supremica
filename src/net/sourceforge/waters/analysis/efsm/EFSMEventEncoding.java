@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 
@@ -78,3 +78,4 @@ public class EFSMEventEncoding
 
   private static final int DEFAULT_SIZE = 16;
 }
+

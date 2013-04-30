@@ -9,9 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -551,7 +552,7 @@ public class LimitedCertainConflictsTRSimplifier
     final int defaultID = getDefaultMarkingID();
     if (mStateInfo == null) {
       mStateInfo = new int[numStates];
-      mUnvisitedStates = new TIntStack();
+      mUnvisitedStates = new TIntArrayStack();
       if (level != 0) {
         Arrays.fill(mStateInfo, level);
       }
@@ -607,3 +608,4 @@ public class LimitedCertainConflictsTRSimplifier
   private static final int COREACHABLE = -1;
 
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -266,3 +266,4 @@ public class CompositionalSimplifier
   private Set<EventProxy> mPreservedEvents = Collections.emptySet();
 
 }
+

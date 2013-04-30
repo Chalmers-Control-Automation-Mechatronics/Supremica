@@ -1,6 +1,6 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 public class RemoveFollowOnTau
@@ -92,3 +92,4 @@ public class RemoveFollowOnTau
     TIME += System.currentTimeMillis();
   }
 }
+

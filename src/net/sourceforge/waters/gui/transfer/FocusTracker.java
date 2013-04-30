@@ -19,6 +19,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.JTextComponent;
@@ -43,7 +44,7 @@ import net.sourceforge.waters.gui.observer.Subject;
  * <P>This implementation supports two types of focus-owning components,
  * <UL>
  * <LI>WATERS panels implementing the {@link SelectionOwner} interface;</LI>
- * <LI>Swing somponents that are subclass of {@link JTextComponent}, in
+ * <LI>Swing components that are subclass of {@link JTextComponent}, in
  *     order and support standard cut, copy, and paste of text.</LI>
  * </UL>
  *
@@ -86,37 +87,36 @@ public class FocusTracker
 
   //#########################################################################
   //# Interface java.beans.PropertyChangeListener
+  @Override
   public void propertyChange(final PropertyChangeEvent event)
   {
     final String prop = event.getPropertyName();
     if ("permanentFocusOwner".equals(prop)) {
       final Object newvalue = event.getNewValue();
-      /*
-      System.err.println
-        ("FocusTracker: " +
-         (newvalue == null ? "null" : newvalue.getClass().getName()));
-      */
+      // System.err.println
+      //   ("FocusTracker: " +
+      //    (newvalue == null ? "null" : newvalue.getClass().getName()));
       if (mSelectionOwner != newvalue) {
-	if (mWatersSelectionOwner != null) {
-	  mWatersSelectionOwner.detach(this);
-	} else if (mSwingSelectionOwner != null) {
-	  mSwingSelectionOwner.removeCaretListener(this);
-	}
-	if (newvalue instanceof SelectionOwner) {
-	  mSelectionOwner = newvalue;
-	  mWatersSelectionOwner = (SelectionOwner) newvalue;
-	  mSwingSelectionOwner = null;
-	  mWatersSelectionOwner.attach(this);
-	} else if (newvalue instanceof JTextComponent) {
-	  mSelectionOwner = newvalue;
-	  mWatersSelectionOwner = null;
-	  mSwingSelectionOwner = (JTextComponent) newvalue;
-	  mSwingSelectionOwner.addCaretListener(this);
-	} else if (mSelectionOwner != null) {
-	  mSelectionOwner = null;
-	  mWatersSelectionOwner = null;
-	  mSwingSelectionOwner = null;
-	} else {
+        if (mWatersSelectionOwner != null) {
+          mWatersSelectionOwner.detach(this);
+        } else if (mSwingSelectionOwner != null) {
+          mSwingSelectionOwner.removeCaretListener(this);
+        }
+        if (newvalue instanceof SelectionOwner) {
+          mSelectionOwner = newvalue;
+          mWatersSelectionOwner = (SelectionOwner) newvalue;
+          mSwingSelectionOwner = null;
+          mWatersSelectionOwner.attach(this);
+        } else if (newvalue instanceof JTextComponent) {
+          mSelectionOwner = newvalue;
+          mWatersSelectionOwner = null;
+          mSwingSelectionOwner = (JTextComponent) newvalue;
+          mSwingSelectionOwner.addCaretListener(this);
+        } else if (mSelectionOwner != null) {
+          mSelectionOwner = null;
+          mWatersSelectionOwner = null;
+          mSwingSelectionOwner = null;
+        } else {
           return;
         }
         fireSelectionChanged();
@@ -127,6 +127,7 @@ public class FocusTracker
 
   //#########################################################################
   //# Interface javax.swing.event.CaretListener
+  @Override
   public void caretUpdate(final CaretEvent event)
   {
     fireSelectionChanged();
@@ -135,11 +136,13 @@ public class FocusTracker
 
   //#########################################################################
   //# Interface java.awt.event.WindowFocusListener
+  @Override
   public void windowGainedFocus(final WindowEvent event)
   {
     fireSelectionChanged();
   }
 
+  @Override
   public void windowLostFocus(final WindowEvent event)
   {
   }
@@ -147,6 +150,7 @@ public class FocusTracker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
@@ -157,16 +161,19 @@ public class FocusTracker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
+  @Override
   public void attach(final Observer observer)
   {
     mObservers.add(observer);
   }
 
+  @Override
   public void detach(final Observer observer)
   {
     mObservers.remove(observer);
   }
 
+  @Override
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     // Just in case they try to register or deregister observers

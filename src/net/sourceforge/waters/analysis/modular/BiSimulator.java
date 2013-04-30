@@ -9,21 +9,23 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.procedure.TIntIntProcedure;
+import gnu.trove.procedure.TObjectProcedure;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntProcedure;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectProcedure;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.annotation.AnnotatedMemStateProxy;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -33,8 +35,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**
@@ -43,20 +43,20 @@ import java.util.Set;
 
 public class BiSimulator
 {
-  private AutomatonProxy mAutomaton;
+  private final AutomatonProxy mAutomaton;
   private final int mEventNum;
-  private int[][][] mTransitionsPred;
+  private final int[][][] mTransitionsPred;
   private final Set<EventProxy>[] mProps;
   private final EventProxy[] mEvents;
   private final boolean[] mIsInitial;
   @SuppressWarnings("unused")
-  private EventProxy mMark;
-  private SimpleEquivalenceClass[] mStateToClass;
-  private THashSet<SimpleEquivalenceClass> mWS;
-  private THashSet<ComplexEquivalenceClass> mWC;
-  private THashSet<SimpleEquivalenceClass> mP;
-  private ProductDESProxyFactory mFactory;
-  
+  private final EventProxy mMark;
+  private final SimpleEquivalenceClass[] mStateToClass;
+  private final THashSet<SimpleEquivalenceClass> mWS;
+  private final THashSet<ComplexEquivalenceClass> mWC;
+  private final THashSet<SimpleEquivalenceClass> mP;
+  private final ProductDESProxyFactory mFactory;
+
   //#########################################################################
   //# Constructor
   @SuppressWarnings("unchecked")
@@ -69,17 +69,17 @@ public class BiSimulator
     mMark = mark;
     mEventNum = automaton.getEvents().size();
     mTransitionsPred = new int[automaton.getStates().size()][mEventNum][];
-    TIntArrayList[][] temppred =
+    final TIntArrayList[][] temppred =
       new TIntArrayList[automaton.getStates().size()][mEventNum];
-    Collection<TransitionProxy> trans = mAutomaton.getTransitions();
+    final Collection<TransitionProxy> trans = mAutomaton.getTransitions();
     StateProxy[] states = new StateProxy[automaton.getStates().size()];
     EventProxy[] events = new EventProxy[automaton.getEvents().size()];
     states = automaton.getStates().toArray(states);
     events = automaton.getEvents().toArray(events);
     Arrays.sort(events);
-    TObjectIntHashMap<StateProxy> sti =
+    final TObjectIntHashMap<StateProxy> sti =
       new TObjectIntHashMap<StateProxy>(states.length);
-    TObjectIntHashMap<EventProxy> eti =
+    final TObjectIntHashMap<EventProxy> eti =
       new TObjectIntHashMap<EventProxy>(events.length);
     mProps = new Set[automaton.getStates().size()];
     mIsInitial = new boolean[states.length];
@@ -91,10 +91,10 @@ public class BiSimulator
       mProps[i] = new HashSet<EventProxy>(states[i].getPropositions());
     }
     for (int i = 0; i < events.length; i++) {eti.put(events[i], i);}
-    for (TransitionProxy tran : trans) {
-      int t = sti.get(tran.getTarget());
-      int e = eti.get(tran.getEvent());
-      int s = sti.get(tran.getSource());
+    for (final TransitionProxy tran : trans) {
+      final int t = sti.get(tran.getTarget());
+      final int e = eti.get(tran.getEvent());
+      final int s = sti.get(tran.getSource());
       mProps[s].add(tran.getEvent());
       TIntArrayList preds = temppred[t][e];
       if (preds == null) {
@@ -106,7 +106,7 @@ public class BiSimulator
     for (int i = 0; i < temppred.length; i++) {
       for (int j = 0; j < temppred[i].length; j++) {
         if (temppred[i][j] != null) {
-          mTransitionsPred[i][j] = temppred[i][j].toNativeArray();
+          mTransitionsPred[i][j] = temppred[i][j].toArray();
         }
       }
     }
@@ -116,24 +116,24 @@ public class BiSimulator
     mP = new THashSet<SimpleEquivalenceClass>();
     mStateToClass = new SimpleEquivalenceClass[mAutomaton.getStates().size()];
   }
-  
+
   private void setupInitialPartitions()
   {
     mWS.clear();
     mWC.clear();
     mP.clear();
-    Map<Collection<EventProxy>, TIntArrayList> map =
+    final Map<Collection<EventProxy>, TIntArrayList> map =
       new THashMap<Collection<EventProxy>, TIntArrayList>();
     for (int i = 0; i < mProps.length; i++) {
       TIntArrayList p = map.get(mProps[i]);
       if (p == null) {p = new TIntArrayList(); map.put(mProps[i], p);}
       p.add(i);
     }
-    for (Collection<EventProxy> props : map.keySet()) {
-      TIntArrayList p = map.get(props);
+    for (final Collection<EventProxy> props : map.keySet()) {
+      final TIntArrayList p = map.get(props);
       //System.out.println("props:" + props + "\tp:" +
       //                   Arrays.toString(p.toNativeArray()));
-      mWS.add(new SimpleEquivalenceClass(p.toNativeArray()));
+      mWS.add(new SimpleEquivalenceClass(p.toArray()));
     }
     /*System.out.println("partitions:" + mWS.size());
     System.out.println("maut size:" + mAutomaton.getStates().size());
@@ -155,7 +155,7 @@ public class BiSimulator
         if (!mWS.isEmpty()) {it = mWS.iterator();}
         else if (!mWC.isEmpty()) {it = mWC.iterator();}
         else {break;}
-        EquivalenceClass ec = it.next(); it.remove(); ec.splitOn();
+        final EquivalenceClass ec = it.next(); it.remove(); ec.splitOn();
       }
       if (size == -1) {
         size = mP.size();
@@ -195,14 +195,15 @@ public class BiSimulator
     final Collection<StateProxy> states = new ArrayList<StateProxy>(mP.size());
     mP.forEach(new TObjectProcedure<SimpleEquivalenceClass>() {
       int state = 0;
-      
-      public boolean execute(SimpleEquivalenceClass sec) {
-        Collection<EventProxy> mark = mProps[sec.mStates[0]];
+
+      @Override
+      public boolean execute(final SimpleEquivalenceClass sec) {
+        final Collection<EventProxy> mark = mProps[sec.mStates[0]];
         boolean isInitial = false;
         for (int i = 0; i < sec.mStates.length; i++) {
           if (mIsInitial[sec.mStates[i]]) {isInitial = true; break;}
         }
-        StateProxy st = new AnnotatedMemStateProxy(state, mark, isInitial);
+        final StateProxy st = new AnnotatedMemStateProxy(state, mark, isInitial);
         state++;
         classToState.put(sec, st); states.add(st); return true;
       }
@@ -210,7 +211,8 @@ public class BiSimulator
     final Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
     final THashSet<StateProxy> preds = new THashSet<StateProxy>();
     mP.forEach(new TObjectProcedure<SimpleEquivalenceClass>() {
-      public boolean execute(SimpleEquivalenceClass sec) {
+      @Override
+      public boolean execute(final SimpleEquivalenceClass sec) {
         final StateProxy target = classToState.get(sec);
         if (sec.mStates.length > 1) {
           //System.out.println(Arrays.toString(sec.mStates));
@@ -218,7 +220,8 @@ public class BiSimulator
         for (int i = 0; i < mEventNum; i++) {
           final EventProxy event = mEvents[i];
           sec.getInfo(i).forEachEntry(new TIntIntProcedure() {
-            public boolean execute(int s, int v) {
+            @Override
+            public boolean execute(final int s, final int v) {
               if (v == 0) {
                 System.out.println("zero value transitions");
                 return true;
@@ -227,7 +230,8 @@ public class BiSimulator
             }
           });
           preds.forEach(new TObjectProcedure<StateProxy>() {
-            public boolean execute(StateProxy source) {
+            @Override
+            public boolean execute(final StateProxy source) {
               trans.add(mFactory.createTransitionProxy(source, event, target));
               return true;
             }
@@ -242,7 +246,7 @@ public class BiSimulator
     if (mP.size() == 0) {
       assert(false);
     }
-    AutomatonProxy result = mFactory.createAutomatonProxy(mAutomaton.getName(),
+    final AutomatonProxy result = mFactory.createAutomatonProxy(mAutomaton.getName(),
                                                           ComponentKind.PLANT,
                                                           mAutomaton.getEvents(),
                                                           states, trans);
@@ -255,7 +259,7 @@ public class BiSimulator
     }*/
     return result;
   }
-  
+
   /*private void partition()
   {
     int start = mPartitions.size();
@@ -290,7 +294,7 @@ public class BiSimulator
       }
     }
   }
-  
+
   private long stateHashCode(int state)
   {
     long hashCode = 1;
@@ -302,7 +306,7 @@ public class BiSimulator
     }
     return hashCode;
   } */
-  
+
   /*private void addToW(SimpleEquivalenceClass sec, int[] X1, int[] X2)
   {
     SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
@@ -312,21 +316,21 @@ public class BiSimulator
       mW.add(child1);
       mW.add(child2);
   }*/
-  
-  private void addToW(SimpleEquivalenceClass sec, int[] X1, int[] X2)
+
+  private void addToW(final SimpleEquivalenceClass sec, final int[] X1, final int[] X2)
   {
-    SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
-    SimpleEquivalenceClass child2 = new SimpleEquivalenceClass(X2);
+    final SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
+    final SimpleEquivalenceClass child2 = new SimpleEquivalenceClass(X2);
     mP.remove(sec);
     if (mWS.remove(sec)) {
       mWS.add(child1);
       mWS.add(child2);
     } else {
-      ComplexEquivalenceClass comp = new ComplexEquivalenceClass(child1, child2);
+      final ComplexEquivalenceClass comp = new ComplexEquivalenceClass(child1, child2);
       comp.mInfo = sec.mInfo;
       if (sec.mParent != null) {
         comp.mParent = sec.mParent;
-        ComplexEquivalenceClass p = sec.mParent;
+        final ComplexEquivalenceClass p = sec.mParent;
         p.mChild1 = p.mChild1 == sec ? comp : p.mChild1;
         p.mChild2 = p.mChild2 == sec ? comp : p.mChild2;
       } else {
@@ -334,43 +338,43 @@ public class BiSimulator
       }
     }
   }
-  
-  private void addToW(SimpleEquivalenceClass sec, int[] X1, int[] X2, int[] X3)
+
+  private void addToW(final SimpleEquivalenceClass sec, int[] X1, int[] X2, int[] X3)
   {
     if (X2.length < X1.length) {
-      int[] t = X1; X1 = X2; X2 = t;
+      final int[] t = X1; X1 = X2; X2 = t;
     }
     if (X3.length < X1.length) {
-      int[] t = X1; X1 = X3; X3 = t;
+      final int[] t = X1; X1 = X3; X3 = t;
     }
-    SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
-    SimpleEquivalenceClass child2 = new SimpleEquivalenceClass(X2);
-    SimpleEquivalenceClass child3 = new SimpleEquivalenceClass(X3);
+    final SimpleEquivalenceClass child1 = new SimpleEquivalenceClass(X1);
+    final SimpleEquivalenceClass child2 = new SimpleEquivalenceClass(X2);
+    final SimpleEquivalenceClass child3 = new SimpleEquivalenceClass(X3);
     mP.remove(sec);
-    ComplexEquivalenceClass X23 = new ComplexEquivalenceClass(child2, child3);
-    ComplexEquivalenceClass X123 = new ComplexEquivalenceClass(child1, X23);
+    final ComplexEquivalenceClass X23 = new ComplexEquivalenceClass(child2, child3);
+    final ComplexEquivalenceClass X123 = new ComplexEquivalenceClass(child1, X23);
     X123.mInfo = sec.mInfo;
     if (sec.mParent != null) {
       X123.mParent = sec.mParent;
-      ComplexEquivalenceClass p = sec.mParent;
+      final ComplexEquivalenceClass p = sec.mParent;
       p.mChild1 = p.mChild1 == sec ? X123 : p.mChild1;
       p.mChild2 = p.mChild2 == sec ? X123 : p.mChild2;
     } else {
       mWC.add(X123);
     }
   }
-  
+
   private abstract class EquivalenceClass
   {
     ComplexEquivalenceClass mParent = null;
     TIntIntHashMap[] mInfo = null;
     int size;
-    
+
     public abstract TIntIntHashMap getInfo(int event);
-    
+
     public abstract void splitOn();
   }
-  
+
   private class SimpleEquivalenceClass
     extends EquivalenceClass
   {
@@ -380,8 +384,8 @@ public class BiSimulator
     TIntArrayList X2 = null;
     TIntArrayList X3 = null;
     boolean mSplit = false;
-    
-    public SimpleEquivalenceClass(int[] states)
+
+    public SimpleEquivalenceClass(final int[] states)
     {
       mStates = states;
       size = states.length; //TODO make this into function so less space
@@ -390,23 +394,24 @@ public class BiSimulator
       }
       mP.add(this);
     }
-    
+
     //TODO maybe keep track of what events an equivalence class has no incoming events from
+    @Override
     public void splitOn()
     {
       mInfo = new TIntIntHashMap[mEventNum];
-      List<SimpleEquivalenceClass> classes =
+      final List<SimpleEquivalenceClass> classes =
         new ArrayList<SimpleEquivalenceClass>();
       for (int e = 0; e < mEventNum; e++) {
         mInfo[e] = new TIntIntHashMap();
-        TIntIntHashMap map = mInfo[e];
+        final TIntIntHashMap map = mInfo[e];
         for (int s = 0; s < mStates.length; s++) {
-          int targ = mStates[s];
-          int[] preds = mTransitionsPred[targ][e];
+          final int targ = mStates[s];
+          final int[] preds = mTransitionsPred[targ][e];
           if (preds == null || preds.length == 0) {continue;}
           for (int p = 0; p < preds.length; p++) {
-            int pred = preds[p];
-            SimpleEquivalenceClass ec = mStateToClass[pred];
+            final int pred = preds[p];
+            final SimpleEquivalenceClass ec = mStateToClass[pred];
             TIntHashSet split = ec.mSplit1;
             if (split == null) {
               split = new TIntHashSet(ec.size);
@@ -418,13 +423,13 @@ public class BiSimulator
           }
         }
         for (int c = 0; c < classes.size(); c++) {
-          SimpleEquivalenceClass sec = classes.get(c);
+          final SimpleEquivalenceClass sec = classes.get(c);
           if (sec.mSplit1.size() != sec.size) {
-            int[] X1 = new int[sec.size - sec.mSplit1.size()];
-            int[] X2 = new int[sec.mSplit1.size()];
+            final int[] X1 = new int[sec.size - sec.mSplit1.size()];
+            final int[] X2 = new int[sec.mSplit1.size()];
             int x1 = 0, x2 = 0;
             for (int s = 0; s < sec.mStates.length; s++) {
-              int state = sec.mStates[s];
+              final int state = sec.mStates[s];
               if (sec.mSplit1.contains(state)) {
                 X2[x2] = state; x2++;
               } else {
@@ -438,8 +443,9 @@ public class BiSimulator
         classes.clear();
       }
     }
-    
-    public TIntIntHashMap getInfo(int event)
+
+    @Override
+    public TIntIntHashMap getInfo(final int event)
     {
       if (mInfo == null) {
         mInfo = new TIntIntHashMap[mEventNum];
@@ -451,7 +457,7 @@ public class BiSimulator
       info = new TIntIntHashMap();
       mInfo[event] = info;
       for (int i = 0; i < mStates.length; i++) {
-        int[] preds = mTransitionsPred[mStates[i]][event];
+        final int[] preds = mTransitionsPred[mStates[i]][event];
         if (preds == null || preds.length == 0) { continue;}
         for (int j = 0; j < preds.length; j++) {
           info.adjustOrPutValue(preds[j], 1, 1);
@@ -460,15 +466,15 @@ public class BiSimulator
       return info;
     }
   }
-  
+
   private class ComplexEquivalenceClass
     extends EquivalenceClass
   {
     EquivalenceClass mChild1;
     EquivalenceClass mChild2;
-    
-    public ComplexEquivalenceClass(EquivalenceClass child1,
-                                   EquivalenceClass child2)
+
+    public ComplexEquivalenceClass(final EquivalenceClass child1,
+                                   final EquivalenceClass child2)
     {
       if (child1.size < child2.size) {
         mChild1 = child1;
@@ -481,7 +487,8 @@ public class BiSimulator
       mChild2.mParent = this;
       size = child1.size + child2.size;
     }
-    
+
+    @Override
     public void splitOn()
     {
       final ArrayList<SimpleEquivalenceClass> classes =
@@ -498,13 +505,14 @@ public class BiSimulator
         });*/
         final TIntIntHashMap info1 = mChild1.getInfo(e);
         info.forEachEntry(new TIntIntProcedure() {
-          public boolean execute(int state, int value) {
+          @Override
+          public boolean execute(final int state, int value) {
             if (value == 0) {
               System.out.println("zero value split");
               info.remove(state); return true;
             }
-            int value1 = info1.get(state);
-            SimpleEquivalenceClass sec = mStateToClass[state];
+            final int value1 = info1.get(state);
+            final SimpleEquivalenceClass sec = mStateToClass[state];
             if (!sec.mSplit) {
               classes.add(sec); sec.mSplit = true;
             }
@@ -527,14 +535,14 @@ public class BiSimulator
               }
               X3.add(state);
             }
-            value -= value1; 
+            value -= value1;
             if (value != 0) {process.put(state, value);}
             return true;
           }
         });
         mChild2.mInfo[e] = process;
         for (int c = 0; c < classes.size(); c++) {
-          SimpleEquivalenceClass sec = classes.get(c);
+          final SimpleEquivalenceClass sec = classes.get(c);
           int[] X1, X2, X3;
           int number = sec.X1 != null ? 1 : 0;
           number = sec.X2 != null ? number + 1 : number;
@@ -550,9 +558,9 @@ public class BiSimulator
           System.out.println("X3:" + Arrays.toString(X3));
           System.out.println("X:" + Arrays.toString(sec.mStates));*/
           if (number == 2) {
-            X1 = sec.X1 == null ? null : sec.X1.toNativeArray();
-            X2 = sec.X2 == null ? null : sec.X2.toNativeArray();
-            X3 = sec.X3 == null ? null : sec.X3.toNativeArray();
+            X1 = sec.X1 == null ? null : sec.X1.toArray();
+            X2 = sec.X2 == null ? null : sec.X2.toArray();
+            X3 = sec.X3 == null ? null : sec.X3.toArray();
             if (X1 == null) {
               X1 = X3;
             } else if (X2 == null) {
@@ -560,8 +568,8 @@ public class BiSimulator
             }
             addToW(sec, X1, X2);
           } else if(number == 3) {
-            X1 = sec.X1.toNativeArray(); X2 = sec.X2.toNativeArray();
-            X3 = sec.X3.toNativeArray(); sec.mSplit = false;
+            X1 = sec.X1.toArray(); X2 = sec.X2.toArray();
+            X3 = sec.X3.toArray(); sec.mSplit = false;
             addToW(sec, X1, X2, X3);
           }
           sec.X1 = null; sec.X2 = null; sec.X3 = null; sec.mSplit = false;
@@ -573,8 +581,9 @@ public class BiSimulator
       if (mChild1 instanceof ComplexEquivalenceClass) {mWC.add((ComplexEquivalenceClass)mChild1);}
       if (mChild2 instanceof ComplexEquivalenceClass) {mWC.add((ComplexEquivalenceClass)mChild2);}
     }
-    
-    public TIntIntHashMap getInfo(int event)
+
+    @Override
+    public TIntIntHashMap getInfo(final int event)
     {
       if (mInfo == null) {
         mInfo = new TIntIntHashMap[mEventNum];
@@ -586,16 +595,18 @@ public class BiSimulator
       TIntIntHashMap info1 = mChild1.getInfo(event);
       TIntIntHashMap info2 = mChild2.getInfo(event);
       if (info1.size() < info2.size()) {
-        TIntIntHashMap t = info1; info1 = info2; info2 = t;
+        final TIntIntHashMap t = info1; info1 = info2; info2 = t;
       }
       final TIntIntHashMap info = new TIntIntHashMap(info1.size());
       info1.forEachEntry(new TIntIntProcedure() {
-        public boolean execute(int state, int value) {
+        @Override
+        public boolean execute(final int state, final int value) {
           info.put(state, value); return true;
         }
       });
       info2.forEachEntry(new TIntIntProcedure() {
-        public boolean execute(int state, int value) {
+        @Override
+        public boolean execute(final int state, final int value) {
           info.adjustOrPutValue(state, value, value); return true;
         }
       });
@@ -605,3 +616,4 @@ public class BiSimulator
     }
   }
 }
+

@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TLongObjectHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -645,3 +645,4 @@ public class IntStateBuffer
   private static final int MAX_PROPOSITIONS = 30;
 
 }
+

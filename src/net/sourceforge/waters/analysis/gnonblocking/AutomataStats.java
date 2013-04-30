@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import java.io.PrintStream;
 import net.sourceforge.waters.model.des.EventProxy;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import java.util.Set;
 import java.io.IOException;
@@ -93,3 +93,4 @@ class AutomataStats
     mPrint.close();
   }
 }
+

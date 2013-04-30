@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -419,10 +419,8 @@ public class EnabledEventsCompositionalConflictChecker extends
 
     private EnabledEventsEventInfo(final EventProxy event)
     {
-
       super(event);
       mDisablingAutomata = new THashSet<AutomatonProxy>();
-
     }
 
     public Set<AutomatonProxy> getDisablingAutomata()
@@ -454,13 +452,14 @@ public class EnabledEventsCompositionalConflictChecker extends
         return null;
     }
 
-    //Returns true if the automaton passed in is the only automaton disabling this event.
+    /**
+     * Returns true if the automaton passed in is the only automaton disabling
+     * this event.
+     */
     boolean isSingleDisablingAutomaton(final AutomatonProxy aut)
     {
-
-      return mDisablingAutomata.size() == 0
-             || (mDisablingAutomata.size() == 1 && mDisablingAutomata
-               .contains(aut));
+      return mDisablingAutomata.size() == 0 ||
+             (mDisablingAutomata.size() == 1 && mDisablingAutomata.contains(aut));
     }
 
     @Override
@@ -474,13 +473,11 @@ public class EnabledEventsCompositionalConflictChecker extends
     boolean replaceAutomaton(final AutomatonProxy oldAut,
                              final AutomatonProxy newAut)
     {
-
       boolean result = super.replaceAutomaton(oldAut, newAut);
       if (mDisablingAutomata.remove(oldAut)) {
         mDisablingAutomata.add(newAut);
         result = true;
       }
-
       return result;
     }
 

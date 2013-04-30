@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.Frame;
 import java.util.ArrayList;

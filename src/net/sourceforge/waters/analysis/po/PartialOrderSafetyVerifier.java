@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.po;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -695,7 +695,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
       temp.add(i);
     }
-    return temp.toNativeArray();
+    return temp.toArray();
   }
 
   @SuppressWarnings("unused")
@@ -774,7 +774,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
       break;
     }
-    return ample.toNativeArray();
+    return ample.toArray();
   }
 
   private int[] ample3(final PartialOrderStateTuple current){
@@ -836,7 +836,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         unionSet.add(ample.get(j));
       }
       if (unionSet.size() == mEventCodingList.size()){
-        return ample.toNativeArray();
+        return ample.toArray();
       }
       final TIntHashSet eventsSetMinusUnion = new TIntHashSet();
       for (j = 0; j < mEventCodingList.size(); j++){
@@ -864,7 +864,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
           continue ample;
         }
       }
-      return ample.toNativeArray();
+      return ample.toArray();
     }
     //mFullyExpanded.add(current);
     return enabled;
@@ -898,7 +898,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       mLocalSet.add(ampleState[automatonIndex]);
 
       while(stack .size() > 0){
-        final int stateIndex = stack.remove(stack.size() - 1);
+        final int stateIndex = stack.removeAt(stack.size() - 1);
         if(transMap[stateIndex][dependent] != -1){
           mLocalSet.clear();
           mEnabledUnionList.clear();
@@ -1175,3 +1175,4 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   @SuppressWarnings("unused")
   private int mLoopCount;
 }
+

@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -3316,3 +3316,4 @@ public class CompositionalGeneralisedConflictChecker
   private double mComposedModelNumberOfTransitions;
 
 }
+

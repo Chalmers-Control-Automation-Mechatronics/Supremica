@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TLongHashSet;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -1270,3 +1270,4 @@ public class SynthesisObservationEquivalenceTRSimplifier
   private TIntArrayList mTempClass;
 
 }
+

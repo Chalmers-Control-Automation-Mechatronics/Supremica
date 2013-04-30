@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -818,3 +818,4 @@ public class MonolithicControlLoopChecker
   private static final int SIZE_BUFFER = 1024;
 
 }
+

@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.simulator;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.awt.Component;
 import java.awt.Dimension;

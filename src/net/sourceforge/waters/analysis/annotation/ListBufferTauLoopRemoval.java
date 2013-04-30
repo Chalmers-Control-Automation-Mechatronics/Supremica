@@ -1,7 +1,8 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntStack;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ public class ListBufferTauLoopRemoval
     mTarjan = new int[mTransitionRelation.getNumberOfStates()];
     mLowLink = new int[mTransitionRelation.getNumberOfStates()];
     mOnstack = new boolean[mTransitionRelation.getNumberOfStates()];
-    mStack = new TIntStack();
+    mStack = new TIntArrayStack();
     mToBeMerged = new ArrayList<int[]>();
   }
 
@@ -78,7 +79,7 @@ public class ListBufferTauLoopRemoval
           break;
         }
       }
-      mToBeMerged.add(merge.toNativeArray());
+      mToBeMerged.add(merge.toArray());
     }
   }
 
@@ -96,3 +97,4 @@ public class ListBufferTauLoopRemoval
     TIME += System.currentTimeMillis();
   }
 }
+

@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -1774,3 +1774,4 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }
+

@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TLongArrayList;
-import gnu.trove.TLongIntHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -879,7 +879,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         mStateMap.put(state, i);
         i++;
       }
-      mInitialStates = initials.toNativeArray();
+      mInitialStates = initials.toArray();
 
       final int numevents = eventmap.size();
       mTransitionTable = new int[numevents][][];
@@ -1079,3 +1079,4 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   private static final int MAXDEPTH = 1024;
 
 }
+

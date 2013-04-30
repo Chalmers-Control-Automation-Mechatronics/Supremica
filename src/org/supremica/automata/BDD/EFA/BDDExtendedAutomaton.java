@@ -4,7 +4,7 @@ package org.supremica.automata.BDD.EFA;
  *
  * @author Sajed Miremadi, Zhennan Fei
  */
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -407,3 +407,4 @@ public class BDDExtendedAutomaton {
         return result;
     }
 }
+

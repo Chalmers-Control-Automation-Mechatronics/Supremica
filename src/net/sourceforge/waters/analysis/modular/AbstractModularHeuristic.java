@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -215,3 +215,4 @@ abstract class AbstractModularHeuristic
   static final String HEURISTIC_SUFFIX = "Heuristic";
 
 }
+

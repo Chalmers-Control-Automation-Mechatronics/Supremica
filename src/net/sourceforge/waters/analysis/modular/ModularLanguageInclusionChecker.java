@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -226,3 +226,4 @@ public class ModularLanguageInclusionChecker
   private int mStates;
 
 }
+

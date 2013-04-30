@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -556,3 +556,4 @@ public class IsomorphismChecker
   private TObjectIntHashMap<StateProxy> mSplitMap;
 
 }
+

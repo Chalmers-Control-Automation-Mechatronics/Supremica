@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TLongHashSet;
-import gnu.trove.TLongLongHashMap;
-import gnu.trove.TLongProcedure;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TLongHashSet;
+import gnu.trove.map.hash.TLongLongHashMap;
+import gnu.trove.procedure.TLongProcedure;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -331,3 +331,4 @@ public class LessMarkedFullCache
   private final TIntHashSet mNonCoreachable;
   private final int mMarking;
 }
+

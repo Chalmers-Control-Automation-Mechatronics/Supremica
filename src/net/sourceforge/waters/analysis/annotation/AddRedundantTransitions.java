@@ -1,9 +1,9 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -389,3 +389,4 @@ public class AddRedundantTransitions
     }
   }
 }
+

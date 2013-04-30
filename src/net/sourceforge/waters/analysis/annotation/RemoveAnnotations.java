@@ -1,7 +1,7 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -136,3 +136,4 @@ public class RemoveAnnotations
     }
   }
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -123,3 +123,4 @@ public class OnlySilentOutgoingTRSimplifier
   }
 
 }
+

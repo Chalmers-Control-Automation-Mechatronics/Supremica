@@ -9,13 +9,13 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntProcedure;
-import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TLongObjectIterator;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.iterator.TLongObjectIterator;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -2133,3 +2133,4 @@ public class ObservationEquivalenceTRSimplifier
   private int mMaxInfoSize;
 
 }
+

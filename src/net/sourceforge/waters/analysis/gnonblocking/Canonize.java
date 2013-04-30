@@ -9,15 +9,15 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashMap;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntProcedure;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntProcedure;
-import gnu.trove.TObjectObjectProcedure;
-import gnu.trove.TObjectProcedure;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.procedure.TIntIntProcedure;
+import gnu.trove.procedure.TObjectIntProcedure;
+import gnu.trove.procedure.TObjectObjectProcedure;
+import gnu.trove.procedure.TObjectProcedure;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +79,7 @@ public class Canonize
       // I need to update the initials now
       final TIntIntHashMap otherway = new TIntIntHashMap();
       initialtoinitial.forEachEntry(new TIntIntProcedure() {
+        @Override
         public boolean execute(final int k, final int v)
         {
           otherway.put(v, k);
@@ -120,6 +121,7 @@ public class Canonize
     final TIntArrayList nonAlphas = new TIntArrayList();
     lower.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     statesets.forEachEntry(new TObjectIntProcedure<TIntHashSet>(){
+      @Override
       public boolean execute(final TIntHashSet set, final int state) {
         final int[] arr = set.toArray();
         boolean hasalpha = false;
@@ -166,10 +168,11 @@ public class Canonize
     });
     // lm.outputstats();
     final List<int[]> partitions2 = new ArrayList<int[]>();
-    if (!nonAlphas.isEmpty()) {partitions2.add(nonAlphas.toNativeArray());}
+    if (!nonAlphas.isEmpty()) {partitions2.add(nonAlphas.toArray());}
     alphaset.forEachValue(new TObjectProcedure<TIntArrayList>() {
+      @Override
       public boolean execute(final TIntArrayList set) {
-        partitions2.add(set.toNativeArray());
+        partitions2.add(set.toArray());
         return true;
       }
     });
@@ -186,6 +189,7 @@ public class Canonize
         }
       }
       alphaset.forEachValue(new TObjectProcedure<TIntArrayList>() {
+        @Override
         public boolean execute(final TIntArrayList set) {
           for (int i = set.size() - 1; i >= 0; i--) {
             final int s = set.get(i);
@@ -228,9 +232,10 @@ public class Canonize
     }
     alphas.clear();
     alphaset.forEachEntry(new TObjectObjectProcedure<TIntHashSet, TIntArrayList>(){
+      @Override
       public boolean execute(final TIntHashSet alphasfun, final TIntArrayList states) {
         final int[] arralp = alphasfun.toArray();
-        final int[] arrsta = states.toNativeArray();
+        final int[] arrsta = states.toArray();
         for (int i = 0; i < arrsta.length; i++) {
           for (int j = 0; j < arralp.length; j++) {
             final int alpha = arralp[j];
@@ -265,3 +270,4 @@ public class Canonize
   private final int mMarking;
   private final int mCont;
 }
+

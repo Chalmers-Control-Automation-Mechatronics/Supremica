@@ -9,9 +9,10 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.HashFunctions;
-import gnu.trove.TIntProcedure;
-import gnu.trove.TPrimitiveHash;
+import gnu.trove.impl.hash.TPrimitiveHash;
+import gnu.trove.procedure.TIntProcedure;
+
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
@@ -113,10 +114,17 @@ abstract public class WatersIntHash
   /**
    * @return a deep clone of this collection
    */
-  public Object clone() {
-    final WatersIntHash h = (WatersIntHash)super.clone();
-    h._set = (int[])this._set.clone();
-    return h;
+  @Override
+  public Object clone()
+  {
+    WatersIntHash h;
+    try {
+      h = (WatersIntHash)super.clone();
+      h._set = this._set.clone();
+      return h;
+    } catch (final CloneNotSupportedException exception) {
+      throw new WatersRuntimeException(exception);
+    }
   }
 
   /**
@@ -167,8 +175,9 @@ abstract public class WatersIntHash
    *
    * @param index an <code>int</code> value
    */
+  @Override
   protected void removeAt(final int index) {
-    _set[index] = (int)0;
+    _set[index] = 0;
     super.removeAt(index);
   }
 
@@ -276,6 +285,7 @@ abstract public class WatersIntHash
    * Default implementation of TIntHashingStrategy:
    * delegates hashing to HashFunctions.hash(int).
    */
+  @Override
   public final int computeHashCode(final int val)
   {
     return HashFunctions.hash(val);
@@ -285,6 +295,7 @@ abstract public class WatersIntHash
    * Default implementation of TIntHashingStrategy:
    * considers primitive values equal if they are the same number.
    */
+  @Override
   public boolean equals(final int val1, final int val2)
   {
     return val1 == val2;
@@ -304,11 +315,13 @@ abstract public class WatersIntHash
 
     //######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.WatersIntIterator
+    @Override
     public void reset()
     {
       mIndex = -1;
     }
 
+    @Override
     public boolean advance()
     {
       while (mIndex < _states.length) {
@@ -320,11 +333,13 @@ abstract public class WatersIntHash
       return false;
     }
 
+    @Override
     public int getCurrentData()
     {
       return _set[mIndex];
     }
 
+    @Override
     public void remove()
     {
       removeAt(mIndex);
@@ -336,3 +351,4 @@ abstract public class WatersIntHash
   }
 
 }
+

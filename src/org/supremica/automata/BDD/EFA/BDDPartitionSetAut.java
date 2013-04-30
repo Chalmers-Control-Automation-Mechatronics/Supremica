@@ -1,8 +1,8 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.Iterator;
 import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -202,3 +202,4 @@ public class BDDPartitionSetAut extends BDDPartitionSet {
         return dependencyMap; // dependency is for forward and backward
     }
 }
+

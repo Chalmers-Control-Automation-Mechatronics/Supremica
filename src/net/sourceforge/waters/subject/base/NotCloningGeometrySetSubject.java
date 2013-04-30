@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.subject.base;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.AbstractSet;
 import java.util.Collection;
@@ -308,3 +308,4 @@ public class NotCloningGeometrySetSubject<E>
   private Set<E> mSet;
 
 }
+

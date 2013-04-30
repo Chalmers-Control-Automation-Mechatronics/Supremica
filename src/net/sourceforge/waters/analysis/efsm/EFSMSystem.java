@@ -12,6 +12,8 @@ package net.sourceforge.waters.analysis.efsm;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.waters.model.compiler.context.VariableContext;
+
 
 /**
  * @author Robi Malik, Sahar Mohajerani
@@ -21,31 +23,28 @@ public class EFSMSystem
 
   //#########################################################################
   //# Constructors
-  public EFSMSystem()
+  public EFSMSystem(final String name, final VariableContext context)
   {
-    this(DEFAULT_SIZE);
+    this(name, context, DEFAULT_SIZE);
   }
 
-  public EFSMSystem(final int size)
+  public EFSMSystem(final String name, final VariableContext context, final int size)
   {
-    mTransitionRelations = new ArrayList<EFSMTransitionRelation>(size);
-    mVariables = new ArrayList<EFSMVariable>(size);
+    this(name,
+         new ArrayList<EFSMVariable>(size),
+         new ArrayList<EFSMTransitionRelation>(size),
+         context);
   }
 
-  public EFSMSystem(final int size, final String name)
-  {
-    mTransitionRelations = new ArrayList<EFSMTransitionRelation>(size);
-    mVariables = new ArrayList<EFSMVariable>(size);
-    mName = name;
-  }
-
-  public EFSMSystem(final List<EFSMVariable> variables,
+  public EFSMSystem(final String name,
+                    final List<EFSMVariable> variables,
                     final List<EFSMTransitionRelation> transitionRelations,
-                    final String name)
+                    final VariableContext context)
   {
     mTransitionRelations = transitionRelations;
     mVariables = variables;
     mName = name;
+    mVariableContext = context;
   }
 
   //#########################################################################
@@ -75,10 +74,15 @@ public class EFSMSystem
     mName = name;
   }
 
+  public VariableContext getVariableContext( ){
+    return mVariableContext;
+  }
+
   //#########################################################################
   //# Data Members
   private final List<EFSMTransitionRelation> mTransitionRelations;
   private final List<EFSMVariable> mVariables;
+  private final VariableContext mVariableContext;
 
 
   //#########################################################################

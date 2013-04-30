@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -883,3 +883,4 @@ public abstract class AbstractSupervisorSynthesizerTest
   private List<ParameterBindingProxy> mBindings;
 
 }
+

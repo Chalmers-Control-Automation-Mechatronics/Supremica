@@ -1,7 +1,7 @@
 
 package org.supremica.automata.algorithms.TransitionProjection;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 import java.util.HashSet;
 import java.util.Set;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -250,3 +250,4 @@ public class AutomataTransitionProjection {
     }
 
 }
+

@@ -1,7 +1,7 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,12 +111,13 @@ public class LightWeightGraph
       for (int j = 0; j < temptransitions[i].length; j++) {
         final TIntArrayList t = temptransitions[i][j];
         if (t == null) {continue;}
-        mTransitions[i][j] = t.toNativeArray();
+        mTransitions[i][j] = t.toArray();
       }
     }
     mFactory = factory;
   }
 
+  @Override
   public LightWeightGraph clone()
   {
     assert(false);
@@ -125,6 +126,7 @@ public class LightWeightGraph
     //                            mMarked, mMark, mFactory);
   }
 
+  @Override
   public Set<EventProxy> getEvents()
   {
     if (mEventSet == null) {
@@ -190,6 +192,7 @@ public class LightWeightGraph
     }
   }
 
+  @Override
   public Set<StateProxy> getStates()
   {
     if (mStateSet == null) {
@@ -198,6 +201,7 @@ public class LightWeightGraph
     return mStateSet;
   }
 
+  @Override
   public Collection<TransitionProxy> getTransitions()
   {
     if (mTransitionSet == null) {
@@ -206,11 +210,13 @@ public class LightWeightGraph
     return mTransitionSet;
   }
 
+  @Override
   public Map<String,String> getAttributes()
   {
     return null;
   }
 
+  @Override
   public ComponentKind getKind()
   {
     return ComponentKind.SPEC;
@@ -242,11 +248,13 @@ public class LightWeightGraph
     return mStateNum;
   }
 
+  @Override
   public int hashCode()
   {
     return System.identityHashCode(this);
   }
 
+  @Override
   public boolean equals(final Object o)
   {
     return System.identityHashCode(this) == System.identityHashCode(o);
@@ -264,6 +272,7 @@ public class LightWeightGraph
       mEvent = event;
     }
 
+    @Override
     public Collection<EventProxy> getPropositions()
     {
       if (mEvent == null) {
@@ -273,16 +282,19 @@ public class LightWeightGraph
       }
     }
 
+    @Override
     public boolean isInitial()
     {
       return mName == 0;
     }
 
+    @Override
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName, mEvent);
     }
 
+    @Override
     public String getName()
     {
       return Integer.toString(mName);
@@ -297,6 +309,7 @@ public class LightWeightGraph
       return false;
     }
 
+    @Override
     public boolean refequals(final NamedProxy o)
     {
       if (o instanceof MemStateProxy) {
@@ -307,11 +320,13 @@ public class LightWeightGraph
       }
     }
 
+    @Override
     public int refHashCode()
     {
       return mName;
     }
 
+    @Override
     public Object acceptVisitor(final ProxyVisitor visitor)
       throws VisitorException
     {
@@ -319,22 +334,26 @@ public class LightWeightGraph
       return desvisitor.visitStateProxy(this);
     }
 
+    @Override
     public Class<StateProxy> getProxyInterface()
     {
       return StateProxy.class;
     }
 
+    @Override
     public int compareTo(final NamedProxy n)
     {
       return n.getName().compareTo(getName());
     }
 
+    @Override
     public String toString()
     {
       return "S:" + mName;
     }
   }
 
+  @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
@@ -342,9 +361,11 @@ public class LightWeightGraph
     return desvisitor.visitAutomatonProxy(this);
   }
 
+  @Override
   public Class<AutomatonProxy> getProxyInterface()
   {
     return AutomatonProxy.class;
   }
 
 }
+

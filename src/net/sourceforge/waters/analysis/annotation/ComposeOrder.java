@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -320,3 +320,4 @@ public class ComposeOrder
     }
   }
 }
+

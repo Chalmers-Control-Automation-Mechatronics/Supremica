@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TLongArrayList;
-import gnu.trove.TLongHashSet;
-import gnu.trove.TLongProcedure;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.procedure.TLongProcedure;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -69,7 +69,7 @@ public class LessMarked
     boolean secgreater = true;
     boolean firgreater = true;
     while (!tovisit.isEmpty()) {
-      tuple = tovisit.remove(tovisit.size() - 1);
+      tuple = tovisit.removeAt(tovisit.size() - 1);
       final int f = getFirst(tuple);
       final int s = getSecond(tuple);
       if (f == s) {System.out.println("the same"); continue;}
@@ -166,6 +166,7 @@ public class LessMarked
     public void moreMarked(final TLongHashSet set)
     {
       set.forEach(new TLongProcedure() {
+          @Override
           public boolean execute(final long tuple) {
             mLessMarked.add(longify(getSecond(tuple), getFirst(tuple)));
             return true;
@@ -203,3 +204,4 @@ public class LessMarked
   private final TIntHashSet mNonCoreachable;
   private final int mMarking;
 }
+

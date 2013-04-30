@@ -1,6 +1,6 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -96,7 +96,7 @@ public class BDDExtendedSynthesizer {
             nbrOfStates = bddAutomata.nbrOfNonblockingControllableStates;
             synthesisTimer.stop();
         }
-        
+
         else if(options.getSynthesisType().equals(SynthesisType.UNSAFETY))
         {
             synthesisTimer.start();
@@ -237,8 +237,8 @@ public class BDDExtendedSynthesizer {
 
         final TIntArrayList remainingVars = new TIntArrayList(bddAutomata.getManager().getFactory().getVarOrder());
         remainingVars.remove(0, intArray.size());
-        intArray.add(remainingVars.toNativeArray());
-        return intArray.toNativeArray();
+        intArray.add(remainingVars.toArray());
+        return intArray.toArray();
     }
 
     public void addGuardsToAutomata(final ModuleSubject module)
@@ -325,3 +325,4 @@ public class BDDExtendedSynthesizer {
     }
 
 }
+

@@ -12,7 +12,7 @@
 
 package net.sourceforge.waters.model.module;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -779,3 +779,4 @@ public class ModuleProxyCloner
   private Map<String,NodeProxy> mNodeMap;
 
 }
+

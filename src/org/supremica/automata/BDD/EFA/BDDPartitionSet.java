@@ -1,7 +1,7 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.List;
 import net.sf.javabdd.BDD;
 import org.supremica.automata.ExtendedAutomata;
@@ -66,3 +66,4 @@ public abstract class BDDPartitionSet{
      */
     protected abstract BDD getUncontrollableTransitionRelationBDD();
 }
+

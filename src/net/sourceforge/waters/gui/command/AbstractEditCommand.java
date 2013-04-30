@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.command;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -207,3 +207,4 @@ public abstract class AbstractEditCommand
   private boolean mUpdatesSelection;
 
 }
+
