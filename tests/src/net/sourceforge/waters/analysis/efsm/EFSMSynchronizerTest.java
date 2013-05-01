@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   AbstractTransitionRelationSimplifierTest
+//# PROJECT: Waters/Supremica GUI
+//# PACKAGE: net.sourceforge.waters.analysis.efsm
+//# CLASS:   EFSMSynchronizerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -17,7 +17,6 @@ import java.util.List;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -28,25 +27,21 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
-
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-
-public class PartialUnfolderTest
-  extends AbstractWatersTest
-{
-
-  //#########################################################################
-  //# Overrides for base class junit.framework.TestCase
-  public PartialUnfolderTest()
+public class EFSMSynchronizerTest extends AbstractWatersTest
   {
+
+  /**
+   *
+   */
+  public EFSMSynchronizerTest()
+  {
+    // TODO Auto-generated constructor stub
   }
 
-  public PartialUnfolderTest(final String name)
-  {
-    super(name);
-  }
+
 
   @Override
   protected void setUp() throws Exception
@@ -59,9 +54,9 @@ public class PartialUnfolderTest
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mModuleMarshaller);
-    mPartialUnfolder = new PartialUnfolder(mFactory, optable);
+    mEFSMSynchronization = new EFSMSynchronization(mFactory);
     mImporter = new EFSMSystemImporter(mFactory, optable);
-    mPartialUnfolder.setSourceInfoEnabled(true);
+    mEFSMSynchronization.setSourceInfoEnabled(true);
   }
 
   @Override
@@ -73,112 +68,69 @@ public class PartialUnfolderTest
   }
 
 
-  //#########################################################################
-  //# Test Cases
-  /**
-   * <P>
-   * Tests the model in file {supremica}/examples/waters/tests/abstraction/
-   * empty_1.wmod.
-   * </P>
-   *
-   * <P>
-   * All test modules contain up to two automata, named "before" and "after".
-   * The automaton named "before" is required to be present, and defines the
-   * input automaton for the abstraction rule. The automaton "after" defines the
-   * expected result of abstraction. It may be missing, in which case the
-   * abstraction should have no effect and return the unchanged input automaton
-   * (the test expects the same object, not an identical copy).
-   * </P>
-   *
-   * <P>
-   * The names of critical events are expected to be "tau", ":alpha", and
-   * ":accepting", respectively.
-   * </P>
-   *
-   * <P>
-   * After running the test, any automaton created by the rule is saved in
-   * {supremica}/logs/results/analysis/op/{classname} as a .des file
-   * (for text viewing) and as a .wmod file (to load into the IDE).
-   * </P>
-   */
-  public void testUnfolding_1() throws Exception
+
+  public void testSynch_1() throws Exception
   {
     final String group = "tests";
     final String subdir = "efsm";
-    final String name = "unfolding1.wmod";
-    runPartialUnfolder(group, subdir, name);
+    final String name = "synch1.wmod";
+    runSynchronizer(group, subdir, name);
   }
 
-  public void testUnfolding_2() throws Exception
+  public void testSynch_2() throws Exception
   {
     final String group = "tests";
     final String subdir = "efsm";
-    final String name = "unfolding2.wmod";
-    runPartialUnfolder(group, subdir, name);
+    final String name = "synch2.wmod";
+    runSynchronizer(group, subdir, name);
   }
 
-  public void testUnfolding_3() throws Exception
+  public void testSynch_3() throws Exception
   {
     final String group = "tests";
     final String subdir = "efsm";
-    final String name = "unfolding3.wmod";
-    runPartialUnfolder(group, subdir, name);
+    final String name = "synch3.wmod";
+    runSynchronizer(group, subdir, name);
   }
 
-  public void testUnfolding_4() throws Exception
+  public void testSynch_4() throws Exception
   {
     final String group = "tests";
     final String subdir = "efsm";
-    final String name = "unfolding4.wmod";
-    runPartialUnfolder(group, subdir, name);
+    final String name = "synch4.wmod";
+    runSynchronizer(group, subdir, name);
   }
 
-  public void testUnfolding_5() throws Exception
+  public void testSynch_5() throws Exception
   {
     final String group = "tests";
     final String subdir = "efsm";
-    final String name = "unfolding5.wmod";
-    runPartialUnfolder(group, subdir, name);
+    final String name = "synch5.wmod";
+    runSynchronizer(group, subdir, name);
   }
 
-  public void testUnfolding_6() throws Exception
+  public void testSynch_6() throws Exception
   {
     final String group = "tests";
     final String subdir = "efsm";
-    final String name = "unfolding6.wmod";
-    runPartialUnfolder(group, subdir, name);
-  }
-
-  public void testUnfolding_7() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "efsm";
-    final String name = "unfolding7.wmod";
-    runPartialUnfolder(group, subdir, name);
-  }
-
-  public void testUnfolding_8() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "efsm";
-    final String name = "unfolding8.wmod";
-    runPartialUnfolder(group, subdir, name);
+    final String name = "synch6.wmod";
+    runSynchronizer(group, subdir, name);
   }
 
 
   //#########################################################################
   //# Instantiating and Checking Modules
-  protected void runPartialUnfolder
+  protected void runSynchronizer
     (final String group, final String name,
      final List<ParameterBindingProxy> bindings)
   throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
-    runPartialUnfolder(groupdir, name, bindings);
+    runSynchronizer(groupdir, name, bindings);
   }
 
-  protected void runPartialUnfolder
+  protected void runSynchronizer
     (final String group, final String subdir,
      final String name,
      final List<ParameterBindingProxy> bindings)
@@ -186,41 +138,39 @@ public class PartialUnfolderTest
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
-    runPartialUnfolder(groupdir, subdir, name, bindings);
+    runSynchronizer(groupdir, subdir, name, bindings);
   }
 
-  protected void runPartialUnfolder
+  protected void runSynchronizer
     (final File groupdir, final String subdir,
      final String name,
      final List<ParameterBindingProxy> bindings)
   throws Exception
   {
     final File dir = new File(groupdir, subdir);
-    runPartialUnfolder(dir, name, bindings);
+    runSynchronizer(dir, name, bindings);
   }
 
-  protected void runPartialUnfolder
+  protected void runSynchronizer
     (final File dir, final String name,
      final List<ParameterBindingProxy> bindings)
   throws Exception
   {
     final File filename = new File(dir, name);
-    runPartialUnfolder(filename, bindings);
+    runSynchronizer(filename, bindings);
   }
-
 
   //#########################################################################
   //# Checking Instantiated Product DES problems
-  protected void runPartialUnfolder(final String group,
-                                                 final String name)
+  protected void runSynchronizer(final String group, final String name)
   throws Exception
   {
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
-    runPartialUnfolder(groupdir, name);
+    runSynchronizer(groupdir, name);
   }
 
-  protected void runPartialUnfolder(final String group,
+  protected void runSynchronizer(final String group,
                                                  final String subdir,
                                                  final String name)
   throws Exception
@@ -236,57 +186,50 @@ public class PartialUnfolderTest
   throws Exception
   {
     final File dir = new File(groupdir, subdir);
-    runPartialUnfolder(dir, name);
+    runSynchronizer(dir, name);
   }
 
-  protected void runPartialUnfolder(final File dir,
+  protected void runSynchronizer(final File dir,
                                                  final String name)
   throws Exception
   {
     final File filename = new File(dir, name);
-    runPartialUnfolder(filename);
+    runSynchronizer(filename);
   }
 
-  protected void runPartialUnfolder(final File filename)
+  protected void runSynchronizer(final File filename)
   throws Exception
   {
     final List<ParameterBindingProxy> empty = null;
-    runPartialUnfolder(filename, empty);
+    runSynchronizer(filename, empty);
   }
 
-  protected void runPartialUnfolder
+  protected void runSynchronizer
     (final File filename,
      final List<ParameterBindingProxy> bindings)
   throws Exception
   {
     final ModuleProxy module = (ModuleProxy) mDocumentManager.load(filename);
-    runPartialUnfolder(module, bindings);
+    runSynchronizer(module, bindings);
   }
 
 
-  //#########################################################################
-  //# Auxiliary Methods
-  private void runPartialUnfolder(final ModuleProxy module,
+
+  private void runSynchronizer(final ModuleProxy module,
                                   final List<ParameterBindingProxy> bindings)
     throws Exception
   {
-    getLogger().info("Checking " + module.getName() + " ...");
-    final ModuleProxy before = createModule(module, BEFORE);
+    final ModuleProxy before = createModule(module, BEFORE1,BEFORE2);
     final EFSMCompiler compiler = new EFSMCompiler(mDocumentManager, before);
     compiler.setSourceInfoEnabled(true);
     final EFSMSystem system = compiler.compile(bindings);
     final List<EFSMTransitionRelation> efsmTransitionRelationList =
       system.getTransitionRelations();
-    assertTrue("Module '" + module.getName() + "' contains more than one " +
-               "transition relation called '" + BEFORE + "'!",
-               efsmTransitionRelationList.size() == 1);
-    final EFSMTransitionRelation efsmTransitionRelation =
-      efsmTransitionRelationList.get(0);
-    final EFSMVariable unfoldedVariable = system.getVariables().get(0);
+    final EFSMTransitionRelation efsmTR1 = efsmTransitionRelationList.get(0);
+    final EFSMTransitionRelation efsmTR2 = efsmTransitionRelationList.get(1);
     final VariableContext context = system.getVariableContext();
     final EFSMTransitionRelation resultTransitionRelation =
-      mPartialUnfolder.unfold(efsmTransitionRelation, unfoldedVariable,
-                              context);
+      mEFSMSynchronization.synchronize(efsmTR1, efsmTR2);
     final List<EFSMTransitionRelation> list =
       Collections.singletonList(resultTransitionRelation);
     resultTransitionRelation.setName(RESULT);
@@ -319,18 +262,20 @@ public class PartialUnfolderTest
       }
     }
     fail("The module '" + module.getName() + "' does not contain any simple " +
-    		"component called '" + name + "'!");
+            "component called '" + name + "'!");
     return null;
   }
+
   private ModuleProxy createModule(final ModuleProxy module,
-                                   final String componentName)
+                                   final String componentName1,
+                                   final String componentName2)
   {
     final List<? extends Proxy> oldComponentList = module.getComponentList();
     final List<Proxy> newComponentList = new ArrayList<Proxy>(oldComponentList.size());
     for (final Proxy proxy : oldComponentList) {
       if(proxy instanceof SimpleComponentProxy) {
         final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
-        if (comp.getName().equals(componentName)) {
+        if (comp.getName().equals(componentName1)||comp.getName().equals(componentName2)) {
           newComponentList.add(comp);
         }
       } else {
@@ -345,29 +290,20 @@ public class PartialUnfolderTest
                                       module.getEventAliasList(),
                                       newComponentList);
   }
-
-  //#########################################################################
-  //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.analysis.AbstractAnalysisTest
-  protected void configure(final ModuleCompiler compiler)
-  {
-    compiler.setOptimizationEnabled(false);
-  }
-
-
   //#########################################################################
   //# Data Members
   private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
   private ModuleProxyFactory mFactory;
-  private PartialUnfolder mPartialUnfolder;
   private EFSMSystemImporter mImporter;
 
 
   //#########################################################################
   //# Class Constants
-  private final String BEFORE = "before";
+  private final String BEFORE1 = "before1";
+  private final String BEFORE2 = "before2";
   private final String AFTER = "after";
   private final String RESULT = "result";
 
+  private  EFSMSynchronization mEFSMSynchronization;
 }

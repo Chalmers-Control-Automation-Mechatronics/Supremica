@@ -145,8 +145,13 @@ public class EFSMSystemImporter
         final int target = iter.getCurrentTargetState();
         final ConstraintList update = efsmEvents.getUpdate(event);
         final List<SimpleExpressionProxy> guards = update.getConstraints();
-        final GuardActionBlockProxy guardActionBlock =
-          mModuleFactory.createGuardActionBlockProxy(guards, null, null);
+        final GuardActionBlockProxy guardActionBlock;
+        if(guards.size() == 0) {
+          guardActionBlock = null;
+        } else {
+          guardActionBlock =
+            mModuleFactory.createGuardActionBlockProxy(guards, null, null);
+        }
         final SimpleIdentifierProxy ident =
           mModuleFactory.createSimpleIdentifierProxy(eventName);
         final List<SimpleIdentifierProxy> identList =

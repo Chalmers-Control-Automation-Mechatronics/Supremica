@@ -59,10 +59,20 @@ public class EFSMTransitionRelation
     return mNodeList;
   }
 
+  public String getName()
+  {
+    return mTransitionRelation.getName();
+  }
+
+  public void setName(final String name)
+  {
+    mTransitionRelation.setName(name);
+  }
 
   //#########################################################################
   //# Data Members
   private final ListBufferTransitionRelation mTransitionRelation;
   private final EFSMEventEncoding mEventEncoding;
   private final List<SimpleNodeProxy> mNodeList;
+
 }

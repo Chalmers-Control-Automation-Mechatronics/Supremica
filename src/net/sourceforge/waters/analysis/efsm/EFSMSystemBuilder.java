@@ -9,14 +9,13 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.Proxy;
@@ -363,14 +362,14 @@ public class EFSMSystemBuilder
           final GuardActionBlockProxy update = edge.getGuardActionBlock();
           final ConstraintList simplifiedList =
             mSimplifiedGuardActionBlockMap.getByProxy(update);
-          final int event =
-            simplifiedList == null ? EventEncoding.TAU : mEventEncoding
-              .getEventId(simplifiedList);
-          final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
-          final int sourceState = mStateMap.get(source);
-          final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
-          final int targetState = mStateMap.get(target);
-          rel.addTransition(sourceState, event, targetState);
+          if (simplifiedList != null) {
+            final int event = mEventEncoding.getEventId(simplifiedList);
+            final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
+            final int sourceState = mStateMap.get(source);
+            final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
+            final int targetState = mStateMap.get(target);
+            rel.addTransition(sourceState, event, targetState);
+          }
         }
 
         if (mIsOptimizationEnabled)
@@ -435,7 +434,10 @@ public class EFSMSystemBuilder
       throws VisitorException
     {
       final GuardActionBlockProxy update = edge.getGuardActionBlock();
-      if (update != null) {
+      if (update == null) {
+        mSimplifiedGuardActionBlockMap.putByProxy(update, mTrueGuard);
+        mEventEncoding.createEventId(mTrueGuard);
+      } else {
         visitGuardActionBlockProxy(update);
       }
       return null;
@@ -547,7 +549,6 @@ public class EFSMSystemBuilder
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
-  @SuppressWarnings("unused")
   private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleProxy mInputModule;

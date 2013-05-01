@@ -27,7 +27,7 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 /**
- * @author saharm
+ * @author Robi Malik, Sahar Mohajerani
  */
 public class EFSMCompiler
 {
