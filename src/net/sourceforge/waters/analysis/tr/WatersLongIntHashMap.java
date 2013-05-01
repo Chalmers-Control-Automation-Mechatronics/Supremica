@@ -191,9 +191,9 @@ public class WatersLongIntHashMap
    * Inserts a key/value pair into the map.
    *
    * @param key
-   *          an <code>int</code> value
+   *          A <code>long</code> key.
    * @param value
-   *          an <code>int</code> value
+   *          An <code>int</code> value.
    * @return The previous value associated with <tt>key</tt>,
    *         or the default value if none was found.
    */

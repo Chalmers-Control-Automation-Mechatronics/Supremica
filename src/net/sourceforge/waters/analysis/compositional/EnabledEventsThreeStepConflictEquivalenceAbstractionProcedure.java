@@ -26,6 +26,7 @@ import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SelfLoopsObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -58,6 +59,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     createThreeStepConflictEquivalenceAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer,
        final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+       final SelfLoopsObservationEquivalenceTRSimplifier.Equivalence slEquivalence,
        final boolean includeNonAlphaDeterminisation,
        final boolean useLimitedCertainConflicts,
        final boolean useAlwaysEnabledLimitedCertainConflicts)
@@ -109,15 +111,23 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     } else {
       enabledEventsLimitedCertainConflictsRemover = null;
     }
+
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-    (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator.setTransitionRemovalMode(ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode(ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
     postChain.add(bisimulator);
+
+    final SelfLoopsObservationEquivalenceTRSimplifier slBisimulator =
+      new SelfLoopsObservationEquivalenceTRSimplifier();
+    slBisimulator.setEquivalence(slEquivalence);
+    slBisimulator.setTransitionRemovalMode(SelfLoopsObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    slBisimulator.setMarkingMode(SelfLoopsObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    slBisimulator.setTransitionLimit(limit);
+    postChain.add(slBisimulator);
+
     if (includeNonAlphaDeterminisation) {
       final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
         new NonAlphaDeterminisationTRSimplifier();
@@ -229,6 +239,23 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
       //create Event Encoding in right order with all enabled events at front of list
       final EventEncoding eventEnc = createEventEncoding(eventsList, tau);
+
+    //read selfLoop info at beginning of 3step:
+      final CompositionalConflictChecker eventsAnalyzer = (CompositionalConflictChecker)getAnalyzer();
+
+      //for all events
+      for(final EventProxy event : aut.getEvents()) {
+        //Get event info
+        final CompositionalConflictChecker.EventInfo eventInfo  = eventsAnalyzer.getEventInfo(event);
+        if(eventInfo != null && event != tau)
+        //check if event is the only nonSelfLoop is this automaton
+        if(eventInfo.isOnlyNonSelfLoopAutomaton(aut)) {
+          eventEnc.setProperEventStatus(eventEnc.getEventCode(event),
+                                        EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
+
+        }
+      }
+
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, eventEnc,
                                          inputStateEnc, config);

@@ -308,7 +308,7 @@ public class HalfWaySynthesisTRSimplifier
       rel.removeRedundantPropositions();
       mPseudoSupervisor =
         new ListBufferTransitionRelation(name, ComponentKind.SUPERVISOR,
-                                         0, 0, 0,
+                                         1, 0, 0,
                                          ListBufferTransitionRelation.
                                          CONFIG_SUCCESSORS);
     } catch (final OverflowException exception) {

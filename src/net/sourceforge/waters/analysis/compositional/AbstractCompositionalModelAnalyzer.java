@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.map.hash.TObjectByteHashMap;
 import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -876,14 +876,14 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
     if (!found) {
-      return aut;
+      return aut;   //If none of the events in removed are present in aut, return aut
     }
     final int numEvents = events.size();
     final Collection<EventProxy> newEvents =
       new ArrayList<EventProxy>(numEvents - 1);
     for (final EventProxy event : events) {
-      if (!removed.contains(event)) {
-        newEvents.add(event);
+      if (!removed.contains(event)) {   //If we are not removing the event
+        newEvents.add(event);           //put it into newEvents list
       }
     }
     final Collection<TransitionProxy> transitions = aut.getTransitions();
@@ -892,9 +892,9 @@ public abstract class AbstractCompositionalModelAnalyzer
       new ArrayList<TransitionProxy>(numTrans);
     for (final TransitionProxy trans : transitions) {
       final EventProxy event = trans.getEvent();
-      if (!removed.contains(event)) {
-        newTransitions.add(trans);
-      } else if (trans.getSource() != trans.getTarget()) {
+      if (!removed.contains(event)) {       //If we are not removing the event
+        newTransitions.add(trans);          //Add the transition to list
+      } else if (trans.getSource() != trans.getTarget()) {  //If we are removing trans that is not self loop
         mHasRemovedProperTransition = true;
       }
     }
@@ -902,7 +902,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     final String name = aut.getName();
     final ComponentKind kind = aut.getKind();
     final Collection<StateProxy> states = aut.getStates();
-    final AutomatonProxy newAut = factory.createAutomatonProxy
+    final AutomatonProxy newAut = factory.createAutomatonProxy  //Create a new automaton with the new events and transitions
       (name, kind, newEvents, states, newTransitions);
     return newAut;
   }
@@ -2269,12 +2269,16 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     boolean isOnlyNonSelfLoopAutomaton(final AutomatonProxy aut)
     {
-      if (mNumNonSelfloopAutomata + 1 < mAutomataMap.size()) {
+      switch (mNumNonSelfloopAutomata) {
+      case 0:
+        return true;
+      case 1:
+        return mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP;
+      default:
         return false;
-      } else { //If there is only one automata that is not self loop for this event
-        return mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP; //And it is this one, return true
       }
     }
+
 
     //#######################################################################
     //# Debugging
