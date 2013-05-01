@@ -12,8 +12,10 @@ package net.sourceforge.waters.analysis.efsm;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -68,12 +70,14 @@ public class PartialUnfolder
   //# Invocation
   EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
                                 final EFSMVariable var,
-                                final VariableContext rootContext)
+                         final EFSMVariableContext rootContext)
     throws EvalException, OverflowException
   {
+    mRootContext = rootContext;
+    mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable,
+                                                       mRootContext);
     mInputTransitionRelation = efsmRel;
     mUnfoldedVariable = var;
-    mRootContext = rootContext;
     mConstraintPropagator =
       new ConstraintPropagator(mFactory, mOperatorTable,
                                mUnfoldingVariableContext);
@@ -180,8 +184,12 @@ public class PartialUnfolder
         nodeList.add(node);
       }
     }
+    final Collection<EFSMVariable> variables = new THashSet<EFSMVariable>
+      (efsmRel.getVariables().size());
+
+    mEFSMVariableCollector.collectAllVariables(mUnfoldedEventEncoding, variables);
     return new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
-                                      nodeList);
+                                      variables, nodeList);
   }
   public void setSourceInfoEnabled(final boolean enabled)
   {
@@ -340,7 +348,7 @@ public class PartialUnfolder
   private final UnfoldingVariableContext mUnfoldingVariableContext;
   private boolean mSourceInfoEnabled;
 
-  private VariableContext mRootContext;
+  private EFSMVariableContext mRootContext;
   private EFSMTransitionRelation mInputTransitionRelation;
   private EFSMEventEncoding mInputEventEncoding;
   private EFSMVariable mUnfoldedVariable;
@@ -350,5 +358,6 @@ public class PartialUnfolder
   private TLongIntHashMap mUnfoldedStateMap;
   private EFSMEventEncoding mUnfoldedEventEncoding;
   private ConstraintPropagator mConstraintPropagator;
+  private EFSMVariableCollector mEFSMVariableCollector;
 
 }

@@ -35,6 +35,12 @@
         </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="before">
             <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name=":accepting"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point X="256" Y="288"/>
+                    </LabelGeometry>
+                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
@@ -44,28 +50,7 @@
                             <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="80" Y="224"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                 </NodeList>
-                <EdgeList>
-                    <Edge Source="S1" Target="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:before"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="64" Y="184"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
             </Graph>
         </SimpleComponent>
     </ComponentList>

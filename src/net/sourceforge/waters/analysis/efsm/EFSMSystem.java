@@ -12,8 +12,6 @@ package net.sourceforge.waters.analysis.efsm;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.waters.model.compiler.context.VariableContext;
-
 
 /**
  * @author Robi Malik, Sahar Mohajerani
@@ -23,12 +21,12 @@ public class EFSMSystem
 
   //#########################################################################
   //# Constructors
-  public EFSMSystem(final String name, final VariableContext context)
+  public EFSMSystem(final String name, final EFSMVariableContext context)
   {
     this(name, context, DEFAULT_SIZE);
   }
 
-  public EFSMSystem(final String name, final VariableContext context, final int size)
+  public EFSMSystem(final String name, final EFSMVariableContext context, final int size)
   {
     this(name,
          new ArrayList<EFSMVariable>(size),
@@ -39,7 +37,7 @@ public class EFSMSystem
   public EFSMSystem(final String name,
                     final List<EFSMVariable> variables,
                     final List<EFSMTransitionRelation> transitionRelations,
-                    final VariableContext context)
+                    final EFSMVariableContext context)
   {
     mTransitionRelations = transitionRelations;
     mVariables = variables;
@@ -74,7 +72,7 @@ public class EFSMSystem
     mName = name;
   }
 
-  public VariableContext getVariableContext( ){
+  public EFSMVariableContext getVariableContext( ){
     return mVariableContext;
   }
 
@@ -82,7 +80,7 @@ public class EFSMSystem
   //# Data Members
   private final List<EFSMTransitionRelation> mTransitionRelations;
   private final List<EFSMVariable> mVariables;
-  private final VariableContext mVariableContext;
+  private final EFSMVariableContext mVariableContext;
 
 
   //#########################################################################

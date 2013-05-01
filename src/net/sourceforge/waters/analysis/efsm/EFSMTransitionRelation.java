@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -25,19 +26,23 @@ public class EFSMTransitionRelation
   //# Constructors
   public EFSMTransitionRelation(final ListBufferTransitionRelation rel,
                                 final EFSMEventEncoding events,
+                                final Collection<EFSMVariable> variables,
                                 final List<SimpleNodeProxy> nodes)
   {
     mTransitionRelation = rel;
     mEventEncoding = events;
+    mVariables = variables;
+    for (final EFSMVariable var : variables) {
+      var.addTransitionRelation(this);
+    }
     mNodeList = nodes;
   }
 
   public EFSMTransitionRelation(final ListBufferTransitionRelation rel,
-                                final EFSMEventEncoding events)
+                                final EFSMEventEncoding events,
+                                final Collection<EFSMVariable> variables)
   {
-    mTransitionRelation = rel;
-    mEventEncoding = events;
-    mNodeList = null;
+    this(rel,events,variables,null);
   }
 
 
@@ -69,10 +74,22 @@ public class EFSMTransitionRelation
     mTransitionRelation.setName(name);
   }
 
+
+  public Collection<EFSMVariable> getVariables()
+  {
+    return mVariables;
+  }
+
+  public void dispose() {
+    for (final EFSMVariable var : mVariables) {
+      var.removeTransitionRelation(this);
+    }
+  }
   //#########################################################################
   //# Data Members
   private final ListBufferTransitionRelation mTransitionRelation;
   private final EFSMEventEncoding mEventEncoding;
   private final List<SimpleNodeProxy> mNodeList;
+  private final Collection<EFSMVariable> mVariables;
 
 }

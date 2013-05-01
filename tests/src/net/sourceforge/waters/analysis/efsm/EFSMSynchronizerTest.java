@@ -17,7 +17,6 @@ import java.util.List;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -227,7 +226,7 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
       system.getTransitionRelations();
     final EFSMTransitionRelation efsmTR1 = efsmTransitionRelationList.get(0);
     final EFSMTransitionRelation efsmTR2 = efsmTransitionRelationList.get(1);
-    final VariableContext context = system.getVariableContext();
+    final EFSMVariableContext context = system.getVariableContext();
     final EFSMTransitionRelation resultTransitionRelation =
       mEFSMSynchronization.synchronize(efsmTR1, efsmTR2);
     final List<EFSMTransitionRelation> list =

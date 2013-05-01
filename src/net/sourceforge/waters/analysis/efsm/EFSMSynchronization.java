@@ -1,6 +1,9 @@
 package net.sourceforge.waters.analysis.efsm;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -106,7 +109,7 @@ public class EFSMSynchronization
       final int code1 = stateMap1[s1];
       if (code1 >= 0) {
         for (int s2=0; s2<rel2.getNumberOfStates(); s2++ ){
-          final int code2 = stateMap1[s2];
+          final int code2 = stateMap2[s2];
           if (code2 >= 0) {
             if (rel1.isInitial(s1) && rel2.isInitial(s2)) {
               synchRel.setInitial(code, true);
@@ -145,7 +148,15 @@ public class EFSMSynchronization
         }
       }
     }
-    return new EFSMTransitionRelation(synchRel, synchEventEncoding, nodeList);
+    final Collection<EFSMVariable> variables1 = efsmTR1.getVariables();
+    final Collection<EFSMVariable> variables2 = efsmTR2.getVariables();
+    final Collection<EFSMVariable> variables = new THashSet<EFSMVariable>
+    (variables1.size() + variables2.size());
+    variables.addAll(variables1);
+    variables.addAll(variables2);
+
+    return new EFSMTransitionRelation(synchRel, synchEventEncoding,
+                                      variables,nodeList);
   }
 
   //#########################################################################

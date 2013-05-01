@@ -133,30 +133,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
-                <EdgeList>
-                    <Edge Source="S0:S0" Target="S0:S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:after"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="1" Y="10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="80" Y="144"/>
-                        </StartPointGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&lt;">
-                                    <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="3"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="-19"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                </EdgeList>
             </Graph>
         </SimpleComponent>
         <VariableComponent Name="y">
