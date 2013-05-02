@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.efsm;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.util.Collection;
 import java.util.Set;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -141,6 +142,26 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
   public void removeTransitionRelation (final EFSMTransitionRelation trans)
   {
     mTransitionRelations.remove(trans);
+  }
+
+  public boolean isLocal()
+  {
+    if (mTransitionRelations.size() == 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public EFSMTransitionRelation getTransitionRelation()
+  {
+    assert mTransitionRelations.size() == 1;
+    return mTransitionRelations.iterator().next();
+  }
+
+  public Collection<EFSMTransitionRelation> getTransitionRelations()
+  {
+    return mTransitionRelations;
   }
 
 

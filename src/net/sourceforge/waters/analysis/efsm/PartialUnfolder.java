@@ -20,7 +20,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
@@ -70,8 +70,8 @@ public class PartialUnfolder
   //# Invocation
   EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
                                 final EFSMVariable var,
-                         final EFSMVariableContext rootContext)
-    throws EvalException, OverflowException
+                                final EFSMVariableContext rootContext)
+    throws EvalException, AnalysisException
   {
     mRootContext = rootContext;
     mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable,

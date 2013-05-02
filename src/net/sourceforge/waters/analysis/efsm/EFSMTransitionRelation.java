@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-public class EFSMTransitionRelation
+public class EFSMTransitionRelation implements Comparable<EFSMTransitionRelation>
 {
 
   //#########################################################################
@@ -85,6 +85,15 @@ public class EFSMTransitionRelation
       var.removeTransitionRelation(this);
     }
   }
+
+  @Override
+  public int compareTo(final EFSMTransitionRelation efsmTR)
+  {
+    final String name1 = getName();
+    final String name2 = efsmTR.getName();
+    return name1.compareTo(name2);
+  }
+
   //#########################################################################
   //# Data Members
   private final ListBufferTransitionRelation mTransitionRelation;
