@@ -19,7 +19,7 @@ abstract class CompositionSelectionHeuristic
   //#########################################################################
   //# Constructors
   public CompositionSelectionHeuristic(final ModuleProxyFactory factory,
-                                      final CompilerOperatorTable op)
+                                       final CompilerOperatorTable op)
   {
 
   }
@@ -33,7 +33,8 @@ abstract class CompositionSelectionHeuristic
     final Set<List<EFSMTransitionRelation>> candidates =
       new THashSet<List<EFSMTransitionRelation>>();
     for (final EFSMVariable var : variablesList) {
-      final Collection<EFSMTransitionRelation> efsmTRSet = var.getTransitionRelations();
+      final Collection<EFSMTransitionRelation> efsmTRSet =
+        var.getTransitionRelations();
       final List<EFSMTransitionRelation> efsmTRList =
         new ArrayList<EFSMTransitionRelation>(efsmTRSet);
       for (int i = 0; i < efsmTRList.size(); i++) {
@@ -67,7 +68,6 @@ abstract class CompositionSelectionHeuristic
 
   public abstract double getHeuristicValue(List<EFSMTransitionRelation> candidate)
     throws AnalysisException, EvalException;
-
 
   //#########################################################################
   //# Data Members

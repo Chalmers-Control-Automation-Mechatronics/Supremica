@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.efsm;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -60,6 +61,18 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   public boolean supportsNondeterminism()
   {
     return true;
+  }
+
+  public int getInternalTransitionLimit()
+  {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  public CompilerOperatorTable getOperatorTable()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }
