@@ -1427,7 +1427,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     recordStatistics(aut);
     final boolean simplified =
-      mAbstractionProcedure.run(aut, notReallyHidden, steps);
+      mAbstractionProcedure.run(aut, notReallyHidden, steps, candidate);
     if (simplified) {
       final Collection<EventProxy> oldEvents = aut.getEvents();
       final int end = steps.size();
@@ -2267,18 +2267,33 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-    boolean isOnlyNonSelfLoopAutomaton(final AutomatonProxy aut)
+    /**
+     * Checks whether this event can be considered outside-only-selfloop
+     * when composing and simplifying the given candidate.
+     * @param  candidate  Candidate containing automata being composed and
+     *         simplified.
+     * @return <CODE>true</CODE> if all automata containing this event in
+     *         non-selfloop transitions are contained in the given candidate.
+     */
+    boolean isOnlyNonSelfLoopCandidate(final Candidate candidate)
     {
-      switch (mNumNonSelfloopAutomata) {
-      case 0:
+      int remaining = mNumNonSelfloopAutomata;
+      if (remaining == 0) {
         return true;
-      case 1:
-        return mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP;
-      default:
+      } else if (remaining > candidate.getNumberOfAutomata()) {
+        return false;
+      } else {
+        for (final AutomatonProxy aut : candidate.getAutomata()) {
+          if (mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP) {
+            remaining--;
+            if (remaining == 0) {
+              return true;
+            }
+          }
+        }
         return false;
       }
     }
-
 
     //#######################################################################
     //# Debugging

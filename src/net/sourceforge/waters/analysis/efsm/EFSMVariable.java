@@ -9,6 +9,11 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.util.Collection;
+import java.util.Set;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.UnaryOperator;
@@ -42,6 +47,7 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
     mVariableName = (SimpleExpressionProxy) cloner.getClone(var.getIdentifier());
     mInitialStatePredicate =
       (SimpleExpressionProxy) cloner.getClone(var.getInitialStatePredicate());
+    mTransitionRelations = new THashSet<EFSMTransitionRelation>();
   }
 
   EFSMVariable(final boolean isnext,
@@ -64,6 +70,7 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
     final ModuleProxyCloner cloner = factory.getCloner();
     mInitialStatePredicate = (SimpleExpressionProxy)
       cloner.getClone(initialStatePredicate);
+    mTransitionRelations = new THashSet<EFSMTransitionRelation>();
   }
 
 
@@ -127,6 +134,36 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
     return mInitialStatePredicate;
   }
 
+  public void addTransitionRelation (final EFSMTransitionRelation trans)
+  {
+    mTransitionRelations.add(trans);
+  }
+
+  public void removeTransitionRelation (final EFSMTransitionRelation trans)
+  {
+    mTransitionRelations.remove(trans);
+  }
+
+  public boolean isLocal()
+  {
+    if (mTransitionRelations.size() == 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public EFSMTransitionRelation getTransitionRelation()
+  {
+    assert mTransitionRelations.size() == 1;
+    return mTransitionRelations.iterator().next();
+  }
+
+  public Collection<EFSMTransitionRelation> getTransitionRelations()
+  {
+    return mTransitionRelations;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -135,5 +172,6 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
   private final CompiledRange mRange;
   private final SimpleExpressionProxy mVariableName;
   private final SimpleExpressionProxy mInitialStatePredicate;
+  private final Set<EFSMTransitionRelation> mTransitionRelations;
 
 }

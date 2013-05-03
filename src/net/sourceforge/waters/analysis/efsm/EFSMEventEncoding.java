@@ -32,7 +32,7 @@ public class EFSMEventEncoding
 
   public EFSMEventEncoding(final int size)
   {
-    mEventMap = new TObjectIntHashMap<ConstraintList>(size);
+    mEventMap = new TObjectIntHashMap<ConstraintList>(size, 0.5f, -1);
     mUpdateList = new ArrayList<ConstraintList>(size);
     // empty constraint list represents true
     final ConstraintList empty = new ConstraintList();
@@ -60,8 +60,9 @@ public class EFSMEventEncoding
 
   public int createEventId(final ConstraintList update)
   {
-    if (mEventMap.contains(update)) {
-      return mEventMap.get(update);
+    final int id = mEventMap.get(update);
+    if (id >= 0) {
+      return id;
     } else {
       final int event = mEventMap.size();
       mEventMap.put(update, event);

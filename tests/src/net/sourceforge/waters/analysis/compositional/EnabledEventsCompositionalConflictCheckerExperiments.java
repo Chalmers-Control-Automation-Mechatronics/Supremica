@@ -219,6 +219,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   //# Invocation
   void runAllTests() throws Exception
   {
+    testOnlySelfLoop01();
     testFailedTrafficLights();
 
     synthesiseTbedNoderailB();                                //
@@ -274,6 +275,17 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
 
   // #########################################################################
   // # Test Cases --- incremental suite
+
+
+
+  public void testOnlySelfLoop01() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "onlySelfLoop01.wmod";
+    runModel(group, dir, name, true);
+
+  }
 
   //tiny
   public void testFailedTrafficLights() throws Exception

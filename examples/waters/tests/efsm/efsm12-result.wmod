@@ -43,22 +43,6 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="S0" Target="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:G"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="78" Y="96"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau:G"/>
@@ -85,6 +69,14 @@
                                 <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:G"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="64" Y="107"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

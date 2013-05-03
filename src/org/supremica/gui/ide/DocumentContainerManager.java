@@ -58,9 +58,14 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.samples.maze.MazeCompiler;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import org.supremica.automata.IO.*;
 
 import org.supremica.automata.Project;
+import org.supremica.automata.IO.ADSUnmarshaller2;
+import org.supremica.automata.IO.HISCUnmarshaller;
+import org.supremica.automata.IO.SupremicaMarshaller;
+import org.supremica.automata.IO.SupremicaUnmarshaller;
+import org.supremica.automata.IO.TCTUnmarshaller;
+import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.xml.sax.SAXException;
 
 

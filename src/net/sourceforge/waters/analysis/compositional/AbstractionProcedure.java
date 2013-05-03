@@ -39,7 +39,7 @@ public interface AbstractionProcedure extends Abortable
    */
   public boolean run(AutomatonProxy aut,
                      Collection<EventProxy> local,
-                     List<AbstractionStep> steps)
+                     List<AbstractionStep> steps, Candidate cand)
     throws AnalysisException;
 
   public void storeStatistics();

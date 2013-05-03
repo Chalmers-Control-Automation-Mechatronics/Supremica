@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -18,26 +19,30 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-public class EFSMTransitionRelation
+public class EFSMTransitionRelation implements Comparable<EFSMTransitionRelation>
 {
 
   //#########################################################################
   //# Constructors
   public EFSMTransitionRelation(final ListBufferTransitionRelation rel,
                                 final EFSMEventEncoding events,
+                                final Collection<EFSMVariable> variables,
                                 final List<SimpleNodeProxy> nodes)
   {
     mTransitionRelation = rel;
     mEventEncoding = events;
+    mVariables = variables;
+    for (final EFSMVariable var : variables) {
+      var.addTransitionRelation(this);
+    }
     mNodeList = nodes;
   }
 
   public EFSMTransitionRelation(final ListBufferTransitionRelation rel,
-                                final EFSMEventEncoding events)
+                                final EFSMEventEncoding events,
+                                final Collection<EFSMVariable> variables)
   {
-    mTransitionRelation = rel;
-    mEventEncoding = events;
-    mNodeList = null;
+    this(rel,events,variables,null);
   }
 
 
@@ -59,10 +64,41 @@ public class EFSMTransitionRelation
     return mNodeList;
   }
 
+  public String getName()
+  {
+    return mTransitionRelation.getName();
+  }
+
+  public void setName(final String name)
+  {
+    mTransitionRelation.setName(name);
+  }
+
+
+  public Collection<EFSMVariable> getVariables()
+  {
+    return mVariables;
+  }
+
+  public void dispose() {
+    for (final EFSMVariable var : mVariables) {
+      var.removeTransitionRelation(this);
+    }
+  }
+
+  @Override
+  public int compareTo(final EFSMTransitionRelation efsmTR)
+  {
+    final String name1 = getName();
+    final String name2 = efsmTR.getName();
+    return name1.compareTo(name2);
+  }
 
   //#########################################################################
   //# Data Members
   private final ListBufferTransitionRelation mTransitionRelation;
   private final EFSMEventEncoding mEventEncoding;
   private final List<SimpleNodeProxy> mNodeList;
+  private final Collection<EFSMVariable> mVariables;
+
 }

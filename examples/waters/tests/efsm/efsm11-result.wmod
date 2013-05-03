@@ -75,22 +75,6 @@
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Source="S1" Target="S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:G"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="147" Y="169"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau:G"/>
@@ -118,21 +102,21 @@
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
+                    <Edge Source="S1" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:G"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="164" Y="148"/>
+                        </SplineGeometry>
+                    </Edge>
                     <Edge Source="S2" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau:G"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="10"/>
-                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="163" Y="154"/>
+                            <Point X="141" Y="169"/>
                         </SplineGeometry>
-                        <GuardActionBlock>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>

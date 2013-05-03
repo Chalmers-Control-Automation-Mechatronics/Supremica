@@ -15,6 +15,8 @@ import java.net.URI;
 
 import net.sourceforge.waters.model.base.WatersException;
 
+import org.xml.sax.SAXParseException;
+
 
 /**
  * An exception indicating that reading or importing Waters data structures
@@ -114,6 +116,30 @@ public class WatersUnmarshalException extends WatersException {
       final String msg = cause.getMessage();
       if (msg != null) {
         return msg;
+      }
+    } else if (cause instanceof SAXParseException) {
+      final String msg = cause.getMessage();
+      if (msg != null) {
+        final StringBuffer buffer = new StringBuffer();
+        final SAXParseException saxCause = (SAXParseException) cause;
+        final String sysid = saxCause.getSystemId();
+        if (sysid != null) {
+          if (sysid.startsWith("file:")) {
+            buffer.append("In file ");
+            buffer.append(sysid.substring(5));
+          } else {
+            buffer.append("At ");
+            buffer.append(sysid);
+          }
+        }
+        final int lineno = saxCause.getLineNumber();
+        if (lineno > 0) {
+          buffer.append(", line ");
+          buffer.append(lineno);
+        }
+        buffer.append(": ");
+        buffer.append(msg.replaceAll(":", ""));
+        return buffer.toString();
       }
     }
     if (mCulprit != null) {

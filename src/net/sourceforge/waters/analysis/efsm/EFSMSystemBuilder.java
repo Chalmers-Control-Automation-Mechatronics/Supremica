@@ -9,8 +9,9 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
@@ -28,13 +30,10 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
-import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
-import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.compiler.efa.EFAGuardCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -51,7 +50,6 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -82,13 +80,9 @@ public class EFSMSystemBuilder
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mInputModule = module;
     final String moduleName = module.getName();
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-    mModuleContext = new ModuleBindingContext(module);
-    mVariableContext = new EFSMVariableContext();
-    mGlobalVariableMap =
-      new ProxyAccessorHashMap<IdentifierProxy,EFSMVariable>(eq);
+    mVariableContext = new EFSMVariableContext(module, mOperatorTable);
     final int size = module.getComponentList().size();
-    mResultEFSMSystem = new EFSMSystem(moduleName, mVariableContext,size);
+    mResultEFSMSystem = new EFSMSystem(moduleName, mVariableContext, size);
   }
 
   //#########################################################################
@@ -116,14 +110,14 @@ public class EFSMSystemBuilder
     }
   }
 
-
   //#########################################################################
   //# Configuration
   public boolean isOptimizationEnabled()
   {
     return mIsOptimizationEnabled;
   }
-  public void setOptimizationEnabled (final boolean enable)
+
+  public void setOptimizationEnabled(final boolean enable)
   {
     mIsOptimizationEnabled = enable;
   }
@@ -267,9 +261,8 @@ public class EFSMSystemBuilder
           mSimpleExpressionCompiler.eval(type, null);
         final CompiledRange range =
           mSimpleExpressionCompiler.getRangeValue(value);
-        final EFSMVariable EFSMvar = new EFSMVariable(var, range,mFactory);
-        final IdentifierProxy ident = var.getIdentifier();
-        mGlobalVariableMap.putByProxy(ident, EFSMvar);
+        final EFSMVariable EFSMvar = new EFSMVariable(var, range, mFactory);
+        mVariableContext.addVariable(EFSMvar);
         mResultEFSMSystem.addVariable(EFSMvar);
         return EFSMvar;
       } catch (final EvalException exception) {
@@ -283,7 +276,7 @@ public class EFSMSystemBuilder
     {
       try {
         for (final SimpleIdentifierProxy ident : expr.getItems()) {
-          mModuleContext.insertEnumAtom(ident);
+          mVariableContext.insertEnumAtom(ident);
         }
         return null;
       } catch (final DuplicateIdentifierException exception) {
@@ -314,6 +307,7 @@ public class EFSMSystemBuilder
       mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
       mConstraintPropagator =
         new ConstraintPropagator(mFactory, mOperatorTable, mVariableContext);
+      mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable, mVariableContext);
     }
 
     //#######################################################################
@@ -333,63 +327,124 @@ public class EFSMSystemBuilder
       try {
         final GraphProxy graph = comp.getGraph();
         visitGraphProxy(graph);
-        final String name = comp.getName();
-        final int eventSize = mEventEncoding.size();
-        final ComponentKind kind = comp.getKind();
-        final int numProps = mUsesMarking ? 1 : 0;
-        final ListBufferTransitionRelation rel =
-          new ListBufferTransitionRelation(
-                                           name,
-                                           kind,
-                                           eventSize,
-                                           numProps,
-                                           mStateMap.size(),
-                                           ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-        final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
-        while (iter.hasNext()) {
-          iter.advance();
-          final SimpleNodeProxy node = iter.key();
-          final int code = iter.value();
-          if (node.isInitial()) {
-            rel.setInitial(code, true);
-          }
-          if (mUsesMarking
-              && containsMarkingProposition(node.getPropositions())) {
-            rel.setMarked(code, 0, true);
-          }
-        }
-        final Collection<EdgeProxy> edges = graph.getEdges();
-        for (final EdgeProxy edge : edges) {
-          final GuardActionBlockProxy update = edge.getGuardActionBlock();
-          final ConstraintList simplifiedList =
-            mSimplifiedGuardActionBlockMap.getByProxy(update);
-          final int event =
-            simplifiedList == null ? EventEncoding.TAU : mEventEncoding
-              .getEventId(simplifiedList);
-          final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
-          final int sourceState = mStateMap.get(source);
-          final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
-          final int targetState = mStateMap.get(target);
-          rel.addTransition(sourceState, event, targetState);
-        }
-
-        if (mIsOptimizationEnabled)
-        {
+        ListBufferTransitionRelation rel = createTransitionRelation(comp);
+        if (mIsOptimizationEnabled) {
           rel.removeRedundantPropositions();
+          final boolean hasUnreachableStates = rel.checkReachability();
+          if (hasUnreachableStates) {
+            final int newNumStates = rel.getNumberOfReachableStates();
+            final TObjectIntHashMap<SimpleNodeProxy> newStateMap =
+              new TObjectIntHashMap<SimpleNodeProxy>(newNumStates,
+                                                     0.5f, -1);
+
+            final List<SimpleNodeProxy> newNodeList;
+            if (mNodeList == null) {
+              newNodeList = null;
+            } else {
+              newNodeList = new ArrayList<SimpleNodeProxy>(newNumStates);
+            }
+            int newCode = 0;
+            for (final NodeProxy node : graph.getNodes()) {
+              if (node instanceof SimpleNodeProxy) {
+                final SimpleNodeProxy simple = (SimpleNodeProxy)node;
+                final int oldCode = mStateMap.get(simple);
+                if (rel.isReachable(oldCode)) {
+                  newStateMap.put(simple, newCode);
+                  newCode ++;
+                  if (newNodeList != null) {
+                    newNodeList.add(simple);
+                  }
+                }
+              }
+            }
+            final int oldNumEvents= mEventEncoding.size();
+            int newNumEvents = 1;
+            final boolean[] usedEvents = new boolean[oldNumEvents];
+            usedEvents[EventEncoding.TAU] = true;
+            final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+            while (iter.advance()) {
+              final int currentEvent = iter.getCurrentEvent();
+              if (!usedEvents[currentEvent]) {
+                newNumEvents ++;
+                usedEvents[currentEvent] = true;
+              }
+            }
+            final EFSMEventEncoding newEncoding = new EFSMEventEncoding(newNumEvents);
+            for (int i=0; i < oldNumEvents; i++) {
+              if (usedEvents[i]) {
+                final ConstraintList update = mEventEncoding.getUpdate(i);
+                newEncoding.createEventId(update);
+              }
+            }
+            mEventEncoding = newEncoding;
+            mStateMap = newStateMap;
+            mNodeList = newNodeList;
+            rel = createTransitionRelation(comp);
+            rel.removeRedundantPropositions();
+          }
         }
-        EFSMTransitionRelation efsmTransitionRelation = null;
-        if (mSourceInfoBuilder != null) {
-          efsmTransitionRelation =
-            new EFSMTransitionRelation(rel, mEventEncoding, mNodeList);
-        } else {
-          efsmTransitionRelation =
-            new EFSMTransitionRelation(rel, mEventEncoding);
-        }
+        final Collection<EFSMVariable> variables = new THashSet<EFSMVariable>();
+        mEFSMVariableCollector.collectAllVariables(mEventEncoding, variables);
+        final EFSMTransitionRelation efsmTransitionRelation =
+          new EFSMTransitionRelation(rel, mEventEncoding, variables, mNodeList);
         mResultEFSMSystem.addTransitionRelation(efsmTransitionRelation);
         return efsmTransitionRelation;
       } catch (final OverflowException exception) {
         throw wrap(exception);
       }
+    }
+
+    private ListBufferTransitionRelation createTransitionRelation
+      (final SimpleComponentProxy comp)
+      throws OverflowException
+    {
+      final GraphProxy graph = comp.getGraph();
+      final String name = comp.getName();
+      final int eventSize = mEventEncoding.size();
+      final ComponentKind kind = comp.getKind();
+      final int numProps = mUsesMarking ? 1 : 0;
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(name,
+                                         kind,
+                                         eventSize,
+                                         numProps,
+                                         mStateMap.size(),
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
+      while (iter.hasNext()) {
+        iter.advance();
+        final SimpleNodeProxy node = iter.key();
+        final int code = iter.value();
+        if (node.isInitial()) {
+          rel.setInitial(code, true);
+        }
+        if (mUsesMarking
+            && containsMarkingProposition(node.getPropositions())) {
+          rel.setMarked(code, 0, true);
+        }
+      }
+      final Collection<EdgeProxy> edges = graph.getEdges();
+      for (final EdgeProxy edge : edges) {
+        final GuardActionBlockProxy update = edge.getGuardActionBlock();
+        final ConstraintList simplifiedList =
+          mSimplifiedGuardActionBlockMap.getByProxy(update);
+        if (simplifiedList == null) {
+          continue;
+        }
+        final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
+        final int sourceState = mStateMap.get(source);
+        if (sourceState < 0) {
+          continue;
+        }
+        final int event = mEventEncoding.getEventId(simplifiedList);
+        if (event < 0) {
+          continue;
+        }
+        final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
+        final int targetState = mStateMap.get(target);
+        rel.addTransition(sourceState, event, targetState);
+      }
+      return rel;
     }
 
     @Override
@@ -402,17 +457,20 @@ public class EFSMSystemBuilder
         mUsesMarking = containsMarkingProposition(block);
       }
       final Collection<NodeProxy> nodes = graph.getNodes();
-      mStateMap = new TObjectIntHashMap<SimpleNodeProxy>(nodes.size());
-      mNodeList = new ArrayList<SimpleNodeProxy>(nodes.size());
+      mStateMap =
+        new TObjectIntHashMap<SimpleNodeProxy>(nodes.size(), 0.5f, -1);
+      if (mSourceInfoBuilder != null) {
+        mNodeList = new ArrayList<SimpleNodeProxy>(nodes.size());
+      } else {
+        mNodeList = null;
+      }
       visitCollection(nodes);
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
       final Collection<EdgeProxy> edges = graph.getEdges();
       mSimplifiedGuardActionBlockMap =
-        new ProxyAccessorHashMap<GuardActionBlockProxy,ConstraintList>(
-                                                                       eq,
-                                                                       edges
-                                                                         .size());
+        new ProxyAccessorHashMap<GuardActionBlockProxy,ConstraintList>
+          (eq, edges.size());
       mEventEncoding = new EFSMEventEncoding(edges.size());
       return visitCollection(edges);
     }
@@ -422,7 +480,9 @@ public class EFSMSystemBuilder
     {
       final int code = mStateMap.size();
       mStateMap.put(node, code);
-      mNodeList.add(node);
+      if (mNodeList != null) {
+        mNodeList.add(node);
+      }
       final EventListExpressionProxy props = node.getPropositions();
       if (containsMarkingProposition(props)) {
         mUsesMarking = true;
@@ -435,7 +495,10 @@ public class EFSMSystemBuilder
       throws VisitorException
     {
       final GuardActionBlockProxy update = edge.getGuardActionBlock();
-      if (update != null) {
+      if (update == null) {
+        mSimplifiedGuardActionBlockMap.putByProxy(update, mTrueGuard);
+        mEventEncoding.createEventId(mTrueGuard);
+      } else {
         visitGuardActionBlockProxy(update);
       }
       return null;
@@ -485,61 +548,7 @@ public class EFSMSystemBuilder
     private TObjectIntHashMap<SimpleNodeProxy> mStateMap;
     private List<SimpleNodeProxy> mNodeList;
     private boolean mUsesMarking;
-  }
-
-
-  //#########################################################################
-  //# Inner Class EFSMVariableContext
-  /**
-   * A variable context for EFSM compilation. Contains ranges of all
-   * variables, and identifies enumeration atoms.
-   */
-  private class EFSMVariableContext implements VariableContext
-  {
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    @Override
-    public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
-    {
-      if (varname instanceof IdentifierProxy) {
-        final IdentifierProxy ident = (IdentifierProxy) varname;
-        final EFSMVariable variable = mGlobalVariableMap.getByProxy(ident);
-        if (variable != null) {
-          return variable.getRange();
-        }
-      } else if (varname instanceof UnaryExpressionProxy) {
-        final UnaryExpressionProxy unary = (UnaryExpressionProxy) varname;
-        final UnaryOperator op = unary.getOperator();
-        if (op == mOperatorTable.getNextOperator()) {
-          return getVariableRange(unary.getSubTerm());
-        }
-      }
-      return null;
-    }
-
-    @Override
-    public SimpleExpressionProxy getBoundExpression(final SimpleExpressionProxy ident)
-    {
-      return mModuleContext.getBoundExpression(ident);
-    }
-
-    @Override
-    public boolean isEnumAtom(final IdentifierProxy ident)
-    {
-      return mModuleContext.isEnumAtom(ident);
-    }
-
-    @Override
-    public ModuleBindingContext getModuleBindingContext()
-    {
-      return mModuleContext;
-    }
-
-    @Override
-    public int getNumberOfVariables()
-    {
-      return mGlobalVariableMap.size();
-    }
+    private final EFSMVariableCollector mEFSMVariableCollector;
   }
 
   //#########################################################################
@@ -547,17 +556,13 @@ public class EFSMSystemBuilder
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
-  @SuppressWarnings("unused")
   private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleProxy mInputModule;
   private IdentifierProxy mDefaultMarking;
   private boolean mIsOptimizationEnabled;
 
-  private final ModuleBindingContext mModuleContext;
   private final EFSMVariableContext mVariableContext;
-  private final ProxyAccessorMap<IdentifierProxy,EFSMVariable> mGlobalVariableMap;
   private final EFSMSystem mResultEFSMSystem;
 
 }
-

@@ -3,6 +3,7 @@
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau:after"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="before">
@@ -57,7 +58,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-22"/>
+                                <Point X="14" Y="-9"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -65,9 +66,9 @@
             </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="after">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
+                    <SimpleNode Initial="true" Name="S0:0">
                         <PointGeometry>
                             <Point X="112" Y="80"/>
                         </PointGeometry>
@@ -75,7 +76,74 @@
                             <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Name="S1:0">
+                        <PointGeometry>
+                            <Point X="112" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S0:1">
+                        <PointGeometry>
+                            <Point X="112" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1:1">
+                        <PointGeometry>
+                            <Point X="112" Y="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S0:2">
+                        <PointGeometry>
+                            <Point X="112" Y="336"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1:2">
+                        <PointGeometry>
+                            <Point X="112" Y="400"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                 </NodeList>
+                <EdgeList>
+                    <Edge Source="S0:0" Target="S1:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S1:0" Target="S0:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S0:1" Target="S1:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S1:1" Target="S0:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S0:2" Target="S1:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
             </Graph>
         </SimpleComponent>
         <VariableComponent Name="x">

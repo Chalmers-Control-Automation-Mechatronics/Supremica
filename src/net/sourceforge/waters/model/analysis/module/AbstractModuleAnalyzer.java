@@ -9,14 +9,18 @@
 
 package net.sourceforge.waters.model.analysis.module;
 
+import java.util.List;
+
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 import org.apache.log4j.Logger;
 
@@ -74,6 +78,16 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
     clearAnalysisResult();
   }
 
+  public List<ParameterBindingProxy> getBinding()
+  {
+    return mBinding;
+  }
+
+  public void setBinding(final List<ParameterBindingProxy> binding)
+  {
+    mBinding = binding;
+  }
+
   public void setKindTranslator(final KindTranslator translator)
   {
     if (mKindTranslator != translator) {
@@ -124,6 +138,7 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
   }
 
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
@@ -149,7 +164,7 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
    * @throws AnalysisException
    */
   protected void setUp()
-    throws AnalysisException
+    throws EvalException, AnalysisException
   {
     mStartTime = System.currentTimeMillis();
     mIsAborting = false;
@@ -270,5 +285,6 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
   private int mTransitionLimit;
   private long mStartTime;
   private boolean mIsAborting;
+  List<ParameterBindingProxy> mBinding;
 
 }

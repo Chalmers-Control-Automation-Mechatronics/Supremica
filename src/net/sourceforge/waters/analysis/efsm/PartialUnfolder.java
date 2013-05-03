@@ -12,12 +12,15 @@ package net.sourceforge.waters.analysis.efsm;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
@@ -34,15 +37,16 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * An implementation of partial unfolding for extended finite-state
- * machines. Given an EFSM ({@link EFSMTransitionRelation}) and a
- * variable to be removed ({@link EFSMVariable}), a new EFSM is computed
- * by removing the given variable and expanding the states to include
- * the different variables values.
+ * An implementation of partial unfolding for extended finite-state machines.
+ * Given an EFSM ({@link EFSMTransitionRelation}) and a variable to be removed
+ * ({@link EFSMVariable}), a new EFSM is computed by removing the given
+ * variable and expanding the states to include the different variables
+ * values.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
@@ -62,17 +66,18 @@ public class PartialUnfolder
     mUnfoldingVariableContext = new UnfoldingVariableContext();
   }
 
-
   //#########################################################################
   //# Invocation
   EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
                                 final EFSMVariable var,
-                                final VariableContext rootContext)
-    throws EvalException, OverflowException
+                                final EFSMVariableContext rootContext)
+    throws EvalException, AnalysisException
   {
+    mRootContext = rootContext;
+    mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable,
+                                                       mRootContext);
     mInputTransitionRelation = efsmRel;
     mUnfoldedVariable = var;
-    mRootContext = rootContext;
     mConstraintPropagator =
       new ConstraintPropagator(mFactory, mOperatorTable,
                                mUnfoldingVariableContext);
@@ -82,10 +87,12 @@ public class PartialUnfolder
     final CompiledRange range = var.getRange();
     mInputEventEncoding = efsmRel.getEventEncoding();
     final ListBufferTransitionRelation rel = efsmRel.getTransitionRelation();
+    rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final int numInputStates = rel.getNumberOfStates();
     final SimpleExpressionProxy varName = var.getVariableName();
-    mUnfoldedVariableNamePrimed = mFactory.createUnaryExpressionProxy
-      (mOperatorTable.getNextOperator(), varName);
+    mUnfoldedVariableNamePrimed =
+      mFactory.createUnaryExpressionProxy(mOperatorTable.getNextOperator(),
+                                          varName);
     final TIntArrayList initialValues = new TIntArrayList();
     final TIntArrayList initialStates = new TIntArrayList();
     int variableCounter = 0;
@@ -109,8 +116,9 @@ public class PartialUnfolder
     mUnfoldedStateMap = new TLongIntHashMap(numInputStates);
     for (int lowState = 0; lowState < initialStates.size(); lowState++) {
       for (int highValue = 0; highValue < initialValues.size(); highValue++) {
-        final long initialPair = initialStates.get(lowState) |
-          ((long) initialValues.get(highValue) << 32);
+        final long initialPair =
+          initialStates.get(lowState)
+            | ((long) initialValues.get(highValue) << 32);
         final int code = mUnfoldedStateList.size();
         mUnfoldedStateList.add(initialPair);
         mUnfoldedStateMap.put(initialPair, code);
@@ -152,6 +160,13 @@ public class PartialUnfolder
         unfoldedRel.addTransition(source, event, target);
       }
     };
+
+    final List<SimpleNodeProxy> EFSMNodeList = efsmRel.getNodeList();
+
+    List<SimpleNodeProxy> nodeList = null;
+    if (mSourceInfoEnabled && EFSMNodeList != null) {
+      nodeList = new ArrayList<SimpleNodeProxy>(numUnfoldedStates);
+    }
     for (int s = 0; s < numUnfoldedStates; s++) {
       if (s < numInitialStates) {
         unfoldedRel.setInitial(s, true);
@@ -162,14 +177,32 @@ public class PartialUnfolder
         unfoldedRel.setMarked(s, 0, true);
       }
       expander2.expandState(s);
+      if (mSourceInfoEnabled && EFSMNodeList != null) {
+
+        final int value = (int) (pair >> 32);
+        final String name = EFSMNodeList.get(efsmState).getName() + ":" + value;
+        final SimpleNodeProxy node = mFactory.createSimpleNodeProxy(name);
+        nodeList.add(node);
+      }
     }
-    return new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding);
+    final Collection<EFSMVariable> variables = new THashSet<EFSMVariable>
+      (efsmRel.getVariables().size());
+
+    mEFSMVariableCollector.collectAllVariables(mUnfoldedEventEncoding, variables);
+    return new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
+                                      variables, nodeList);
   }
+  public void setSourceInfoEnabled(final boolean enabled)
+  {
+    mSourceInfoEnabled = enabled;
+  }
+
 
 
   //#########################################################################
   //# Inner Class StateExpander
-  private abstract class StateExpander {
+  private abstract class StateExpander
+  {
 
     //#######################################################################
     //# Constructor
@@ -182,13 +215,13 @@ public class PartialUnfolder
 
     //#######################################################################
     //# Access
-    private void expandState(final int source)
-      throws EvalException
+    private void expandState(final int source) throws EvalException
     {
       final long pair = mUnfoldedStateList.get(source);
       final int sourceState = (int) (pair & 0xffffffffL);
       final int sourceValue = (int) (pair >> 32);
-      mUnfoldingVariableContext.setCurrentValue(mRangeValues.get(sourceValue));
+      mUnfoldingVariableContext
+        .setCurrentValue(mRangeValues.get(sourceValue));
       mIterator.resetState(sourceState);
       while (mIterator.advance()) {
         final int event = mIterator.getCurrentEvent();
@@ -205,7 +238,8 @@ public class PartialUnfolder
                 mConstraintPropagator.getAllConstraints();
               final int unfoldedEvent =
                 mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
-              final long targetPair = targetState | ((long) targetValue << 32);
+              final long targetPair =
+                targetState | ((long) targetValue << 32);
               newTransition(source, unfoldedEvent, targetPair);
             }
             targetValue++;
@@ -226,6 +260,7 @@ public class PartialUnfolder
     }
 
     abstract void newTransition(int source, int event, long pair);
+
 
     //#######################################################################
     //# Instance Variables
@@ -250,8 +285,7 @@ public class PartialUnfolder
     }
 
     @Override
-    public SimpleExpressionProxy getBoundExpression
-      (final SimpleExpressionProxy varname)
+    public SimpleExpressionProxy getBoundExpression(final SimpleExpressionProxy varname)
     {
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
@@ -306,7 +340,6 @@ public class PartialUnfolder
     private SimpleExpressionProxy mPrimedValue;
   }
 
-
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
@@ -314,8 +347,9 @@ public class PartialUnfolder
   private final OccursChecker mOccursChecker;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final UnfoldingVariableContext mUnfoldingVariableContext;
+  private boolean mSourceInfoEnabled;
 
-  private VariableContext mRootContext;
+  private EFSMVariableContext mRootContext;
   private EFSMTransitionRelation mInputTransitionRelation;
   private EFSMEventEncoding mInputEventEncoding;
   private EFSMVariable mUnfoldedVariable;
@@ -325,6 +359,6 @@ public class PartialUnfolder
   private TLongIntHashMap mUnfoldedStateMap;
   private EFSMEventEncoding mUnfoldedEventEncoding;
   private ConstraintPropagator mConstraintPropagator;
+  private EFSMVariableCollector mEFSMVariableCollector;
 
 }
-

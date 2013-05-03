@@ -18,9 +18,9 @@ import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -29,7 +29,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
- * @author Robi Malik
+ * @author Robi Malik, Sahar Mohajerani
  */
 
 public class PartialUnfolderTest
@@ -60,6 +60,7 @@ public class PartialUnfolderTest
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mPartialUnfolder = new PartialUnfolder(mFactory, optable);
     mImporter = new EFSMSystemImporter(mFactory, optable);
+    mPartialUnfolder.setSourceInfoEnabled(true);
   }
 
   @Override
@@ -104,6 +105,62 @@ public class PartialUnfolderTest
     final String group = "tests";
     final String subdir = "efsm";
     final String name = "unfolding1.wmod";
+    runPartialUnfolder(group, subdir, name);
+  }
+
+  public void testUnfolding_2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "efsm";
+    final String name = "unfolding2.wmod";
+    runPartialUnfolder(group, subdir, name);
+  }
+
+  public void testUnfolding_3() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "efsm";
+    final String name = "unfolding3.wmod";
+    runPartialUnfolder(group, subdir, name);
+  }
+
+  public void testUnfolding_4() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "efsm";
+    final String name = "unfolding4.wmod";
+    runPartialUnfolder(group, subdir, name);
+  }
+
+  public void testUnfolding_5() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "efsm";
+    final String name = "unfolding5.wmod";
+    runPartialUnfolder(group, subdir, name);
+  }
+
+  public void testUnfolding_6() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "efsm";
+    final String name = "unfolding6.wmod";
+    runPartialUnfolder(group, subdir, name);
+  }
+
+  public void testUnfolding_7() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "efsm";
+    final String name = "unfolding7.wmod";
+    runPartialUnfolder(group, subdir, name);
+  }
+
+  public void testUnfolding_8() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "efsm";
+    final String name = "unfolding8.wmod";
     runPartialUnfolder(group, subdir, name);
   }
 
@@ -215,6 +272,7 @@ public class PartialUnfolderTest
     getLogger().info("Checking " + module.getName() + " ...");
     final ModuleProxy before = createModule(module, BEFORE);
     final EFSMCompiler compiler = new EFSMCompiler(mDocumentManager, before);
+    compiler.setSourceInfoEnabled(true);
     final EFSMSystem system = compiler.compile(bindings);
     final List<EFSMTransitionRelation> efsmTransitionRelationList =
       system.getTransitionRelations();
@@ -224,12 +282,13 @@ public class PartialUnfolderTest
     final EFSMTransitionRelation efsmTransitionRelation =
       efsmTransitionRelationList.get(0);
     final EFSMVariable unfoldedVariable = system.getVariables().get(0);
-    final VariableContext context = system.getVariableContext();
+    final EFSMVariableContext context = system.getVariableContext();
     final EFSMTransitionRelation resultTransitionRelation =
       mPartialUnfolder.unfold(efsmTransitionRelation, unfoldedVariable,
                               context);
     final List<EFSMTransitionRelation> list =
       Collections.singletonList(resultTransitionRelation);
+    resultTransitionRelation.setName(RESULT);
     final EFSMSystem resultSystem =
       new EFSMSystem(module.getName(), system.getVariables(), list, context);
     final ModuleProxy resultModuleProxy = mImporter.importModule(resultSystem);
@@ -237,9 +296,31 @@ public class PartialUnfolderTest
     final String ext = mModuleMarshaller.getDefaultExtension();
     final File outputFile = new File(outputDirectory, module.getName() + ext);
     mModuleMarshaller.marshal(resultModuleProxy, outputFile);
+    resultTransitionRelation.setName(AFTER);
+    final EFSMSystem afterSystem =
+      new EFSMSystem(module.getName(), system.getVariables(), list, context);
+    final ModuleProxy afterModuleProxy = mImporter.importModule(afterSystem);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true, false);
+    final SimpleComponentProxy result = findComponent(afterModuleProxy, AFTER);
+    final SimpleComponentProxy expected = findComponent(module, AFTER);
+    assertProxyEquals(eq, "Unexpected result", result, expected);
     getLogger().info("Done " + module.getName());
   }
 
+  private SimpleComponentProxy findComponent(final ModuleProxy module, final String name)
+  {
+    for (final Proxy proxy : module.getComponentList()) {
+      if(proxy instanceof SimpleComponentProxy) {
+        final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
+        if (comp.getName().equals(name)) {
+          return comp;
+        }
+      }
+    }
+    fail("The module '" + module.getName() + "' does not contain any simple " +
+    		"component called '" + name + "'!");
+    return null;
+  }
   private ModuleProxy createModule(final ModuleProxy module,
                                    final String componentName)
   {
@@ -256,12 +337,12 @@ public class PartialUnfolderTest
       }
     }
     return mFactory.createModuleProxy(module.getName(),
-                               module.getComment(),
-                               module.getLocation(),
-                               module.getConstantAliasList(),
-                               module.getEventDeclList(),
-                               module.getEventAliasList(),
-                               newComponentList);
+                                      module.getComment(),
+                                      module.getLocation(),
+                                      module.getConstantAliasList(),
+                                      module.getEventDeclList(),
+                                      module.getEventAliasList(),
+                                      newComponentList);
   }
 
   //#########################################################################
@@ -285,7 +366,7 @@ public class PartialUnfolderTest
   //#########################################################################
   //# Class Constants
   private final String BEFORE = "before";
-  @SuppressWarnings("unused")
   private final String AFTER = "after";
+  private final String RESULT = "result";
 
 }
