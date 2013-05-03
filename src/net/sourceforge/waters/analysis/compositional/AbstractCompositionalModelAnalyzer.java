@@ -1427,7 +1427,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     recordStatistics(aut);
     final boolean simplified =
-      mAbstractionProcedure.run(aut, notReallyHidden, steps);
+      mAbstractionProcedure.run(aut, notReallyHidden, steps, candidate);
     if (simplified) {
       final Collection<EventProxy> oldEvents = aut.getEvents();
       final int end = steps.size();
@@ -2279,6 +2279,28 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
+    boolean isOnlyNonSelfLoopCandidate(final Candidate cand)
+    {
+      int remaining = mNumNonSelfloopAutomata;
+      if(remaining > cand.getNumberOfAutomata())
+      {
+        return false;
+      }
+      else if(remaining == 0){
+        return true;
+      } else {
+        for(final AutomatonProxy aut : cand.getAutomata())
+        {
+          if(mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP){
+            remaining--;
+            if(remaining ==0){
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+    }
 
     //#######################################################################
     //# Debugging

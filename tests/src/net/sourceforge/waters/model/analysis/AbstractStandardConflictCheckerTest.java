@@ -38,6 +38,8 @@ public abstract class AbstractStandardConflictCheckerTest
   }
 
 
+
+
   //#########################################################################
   //# Test Cases --- handcrafted
   public void testEmpty() throws Exception
@@ -88,7 +90,13 @@ public abstract class AbstractStandardConflictCheckerTest
   }
 
 
-
+  public void test_onlySelfLoop01() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "nasty";
+    final String name = "onlySelfLoop01.wmod";
+    runModelVerifier(group, subdir, name, true);
+  }
 
   //#########################################################################
   //# Test Cases --- nondeterministic

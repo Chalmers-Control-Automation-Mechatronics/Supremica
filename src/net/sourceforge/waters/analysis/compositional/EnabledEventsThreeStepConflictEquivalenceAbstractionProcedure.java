@@ -184,7 +184,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
-                     final List<AbstractionStep> steps)
+                     final List<AbstractionStep> steps, final Candidate cand)
     throws AnalysisException
   {
     try {
@@ -249,7 +249,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         final CompositionalConflictChecker.EventInfo eventInfo  = eventsAnalyzer.getEventInfo(event);
         if(eventInfo != null && event != tau)
         //check if event is the only nonSelfLoop is this automaton
-        if(eventInfo.isOnlyNonSelfLoopAutomaton(aut)) {
+        if(eventInfo.isOnlyNonSelfLoopCandidate(cand)) {
           eventEnc.setProperEventStatus(eventEnc.getEventCode(event),
                                         EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
 

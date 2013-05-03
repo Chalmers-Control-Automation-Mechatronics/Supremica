@@ -122,7 +122,7 @@ public class SynthesisAbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
-                     final List<AbstractionStep> steps)
+                     final List<AbstractionStep> steps, final Candidate cand)
     throws AnalysisException
   {
     try {

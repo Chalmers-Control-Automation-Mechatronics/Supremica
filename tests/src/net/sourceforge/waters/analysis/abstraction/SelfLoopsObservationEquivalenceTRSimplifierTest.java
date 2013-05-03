@@ -136,6 +136,13 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     final String name = "selfLoopObservationalEquivalence06.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+  public void test_selfLoopObservationalEquivalence07() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "selfLoopObservationalEquivalence07.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
 
   public void test_oeq_1() throws Exception
   {
