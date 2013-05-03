@@ -33,7 +33,7 @@ import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
-import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -77,16 +77,19 @@ class NodeSetSubject
 
   //#########################################################################
   //# Interface java.util.Set
+  @Override
   public boolean add(final NodeSubject node)
   {
     return insert(node) == node;
   }
 
+  @Override
   public boolean addAll(final Collection<? extends NodeSubject> items)
   {
     return insertAll(items);
   }
 
+  @Override
   public boolean contains(final Object item)
   {
     if (item instanceof NodeSubject) {
@@ -97,11 +100,13 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public Iterator<NodeSubject> iterator()
   {
     return new NodeSetIterator();
   }
 
+  @Override
   public boolean remove(final Object item)
   {
     if (item instanceof NodeSubject) {
@@ -112,6 +117,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public int size()
   {
     return mNameMap.size();
@@ -120,6 +126,7 @@ class NodeSetSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.IndexedCollectionProxy
+  @Override
   public void checkAllUnique
     (final Collection<? extends NodeSubject> collection)
   {
@@ -128,6 +135,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public void checkUnique(final NamedProxy node)
   {
     final String name = node.getName();
@@ -137,11 +145,13 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public boolean containsName(final String name)
   {
     return mNameMap.containsKey(name);
   }
 
+  @Override
   public NodeSubject find(final String name)
   {
     final NodeSubject found = get(name);
@@ -151,11 +161,13 @@ class NodeSetSubject
     return found;
   }
 
+  @Override
   public NodeSubject get(final String name)
   {
     return mNameMap.get(name);
   }
 
+  @Override
   public NodeSubject insert(final NodeSubject node)
   {
     final Collection<NodeSubject> nodes = Collections.singletonList(node);
@@ -167,6 +179,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public boolean insertAll(final Collection<? extends NodeSubject> collection)
   {
     boolean changed = false;
@@ -195,6 +208,7 @@ class NodeSetSubject
     return changed;
   }
 
+  @Override
   public void insertAllUnique
     (final Collection<? extends NodeSubject> collection)
   {
@@ -218,12 +232,14 @@ class NodeSetSubject
     insertGroupNodes(groups);
   }
 
+  @Override
   public void insertUnique(final NodeSubject node)
   {
     final Collection<NodeSubject> nodes = Collections.singletonList(node);
     insertAllUnique(nodes);
   }
 
+  @Override
   public void reinsert(final NamedProxy proxy, final String newname)
   {
     final String oldname = proxy.getName();
@@ -239,6 +255,7 @@ class NodeSetSubject
     map.put(newname, proxy);
   }
 
+  @Override
   public NodeSubject removeName(final String name)
   {
     final NodeSubject victim = get(name);
@@ -279,23 +296,41 @@ class NodeSetSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
-  public void assignFrom(final Set<? extends NodeSubject> set)
+  @Override
+  public UndoInfo createUndoInfo(final Set<? extends NodeSubject> newState,
+                                 final Set<? extends Subject> boundary)
   {
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
-    if (!eq.isEqualSet(this, set)) {
+    if (eq.isEqualSet(this, newState)) {
+      return null;
+    } else {
       throw new UnsupportedOperationException
         ("Node set assignment not yet implemented!");
     }
   }
 
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    throw new UnsupportedOperationException
+      ("Node set assignment not yet implemented!");
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
+  @Override
   public Subject getParent()
   {
     return mParent;
   }
 
+  @Override
   public DocumentSubject getDocument()
   {
     if (mParent != null) {
@@ -305,12 +340,14 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public void setParent(final Subject parent)
   {
     checkSetParent(parent);
     mParent = parent;
   }
 
+  @Override
   public void checkSetParent(final Subject parent)
   {
     if (parent != null && mParent != null) {
@@ -323,6 +360,7 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public void addModelObserver(final ModelObserver observer)
   {
     if (mObservers == null) {
@@ -331,6 +369,7 @@ class NodeSetSubject
     mObservers.add(observer);
   }
 
+  @Override
   public void removeModelObserver(final ModelObserver observer)
   {
     if (mObservers != null &&
@@ -340,14 +379,10 @@ class NodeSetSubject
     }
   }
 
+  @Override
   public Collection<ModelObserver> getModelObservers()
   {
     return mObservers;
-  }
-
-  public void fireModelChanged(final ModelChangeEvent event)
-  {
-    SubjectTools.fireModelChanged(this, event);
   }
 
 
@@ -429,7 +464,7 @@ class NodeSetSubject
     node.setParent(this);
     final ModelChangeEvent event =
       ModelChangeEvent.createItemAdded(this, node);
-    node.fireModelChanged(event);
+    event.fire();
   }
 
   private void completeRemove(final NodeSubject node)
@@ -439,8 +474,7 @@ class NodeSetSubject
     node.setParent(null);
     final ModelChangeEvent event =
       ModelChangeEvent.createItemRemoved(this, node);
-    node.fireModelChanged(event);
-    fireModelChanged(event);
+    event.fire();
   }
 
 
@@ -537,6 +571,7 @@ class NodeSetSubject
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       if (mIterator.hasNext()) {
@@ -550,6 +585,7 @@ class NodeSetSubject
       }
     }
 
+    @Override
     public NodeSubject next()
     {
       if (!mIterator.hasNext() && mSimplePart) {
@@ -560,6 +596,7 @@ class NodeSetSubject
       return mVictim;
     }
 
+    @Override
     public void remove()
     {
       mIterator.remove();
@@ -608,6 +645,7 @@ class NodeSetSubject
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
       throws CyclicGroupNodeException
     {
@@ -615,6 +653,7 @@ class NodeSetSubject
       return mNextNode != null;
     }
 
+    @Override
     public GroupNodeSubject next()
     {
       advance();
@@ -628,6 +667,7 @@ class NodeSetSubject
       }
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -712,5 +752,6 @@ class NodeSetSubject
    * All nodes in this set, indexed by their names.
    */
   private final Map<String,NodeSubject> mNameMap;
+
 
 }

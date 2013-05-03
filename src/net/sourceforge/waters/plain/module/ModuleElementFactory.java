@@ -255,11 +255,13 @@ public class ModuleElementFactory
   public GroupNodeElement createGroupNodeProxy
       (final String name,
        final PlainEventListProxy propositions,
+       final Map<String,String> attributes,
        final Collection<? extends NodeProxy> immediateChildNodes,
        final BoxGeometryProxy geometry)
   {
     return new GroupNodeElement(name,
                                 propositions,
+                                attributes,
                                 immediateChildNodes,
                                 geometry);
   }
@@ -336,10 +338,10 @@ public class ModuleElementFactory
   }
 
   public LabelBlockElement createLabelBlockProxy
-      (final Collection<? extends Proxy> eventList,
+      (final Collection<? extends Proxy> eventIdentifierList,
        final LabelGeometryProxy geometry)
   {
-    return new LabelBlockElement(eventList,
+    return new LabelBlockElement(eventIdentifierList,
                                  geometry);
   }
 
@@ -417,9 +419,9 @@ public class ModuleElementFactory
   }
 
   public PlainEventListElement createPlainEventListProxy
-      (final Collection<? extends Proxy> eventList)
+      (final Collection<? extends Proxy> eventIdentifierList)
   {
-    return new PlainEventListElement(eventList);
+    return new PlainEventListElement(eventIdentifierList);
   }
 
   public PlainEventListElement createPlainEventListProxy()
@@ -490,6 +492,7 @@ public class ModuleElementFactory
   public SimpleNodeElement createSimpleNodeProxy
       (final String name,
        final PlainEventListProxy propositions,
+       final Map<String,String> attributes,
        final boolean initial,
        final PointGeometryProxy pointGeometry,
        final PointGeometryProxy initialArrowGeometry,
@@ -497,6 +500,7 @@ public class ModuleElementFactory
   {
     return new SimpleNodeElement(name,
                                  propositions,
+                                 attributes,
                                  initial,
                                  pointGeometry,
                                  initialArrowGeometry,

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -18,13 +18,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
 import net.sourceforge.waters.model.analysis.AbortException;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.analysis.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -85,12 +85,12 @@ public class MonolithicControlLoopChecker
    * as parameter to the constructor of this object. On termination,
    * the result of checking the property is known and can be queried
    * using the {@link
-   * net.sourceforge.waters.model.analysis.ModelVerifier#isSatisfied()
+   * net.sourceforge.waters.model.analysis.des.ModelVerifier#isSatisfied()
    * isSatisfied()} and {@link #getCounterExample()} methods.
    * @return <CODE>true</CODE> if the model is control-loop free, or
    *         <CODE>false</CODE> if it is not.
    *         The same value can be queried using the {@link
-   *         net.sourceforge.waters.model.analysis.ModelVerifier#isSatisfied()
+   *         net.sourceforge.waters.model.analysis.des.ModelVerifier#isSatisfied()
    *         isSatisfied()} method.
    */
   public boolean run()
@@ -224,29 +224,23 @@ public class MonolithicControlLoopChecker
       final int bits = getBitLength(aProxy);
       mNumBits[counter] = bits;
       mNumBitsMasks[counter] = (1 << bits) - 1;
-      if (totalBits >= bits) { // if current buffer can store this automaton
-        totalBits -= bits;
-      }
-      else {
+      if (totalBits < bits) {
         mNumInts++;
         totalBits = SIZE_INT;
       }
+      totalBits -= bits;
       counter++;
     }
-
     // get index
-    counter = 0;
     totalBits = SIZE_INT;
     mIndexAutomata = new int[mNumInts + 1];
-    mIndexAutomata[0] = counter++;
+    counter = 1;
     for (int i = 0; i < mNumAutomata; i++) {
-      if (totalBits >= mNumBits[i]) {
-        totalBits -= mNumBits[i];
-      }
-      else {
+      if (totalBits < mNumBits[i]) {
         mIndexAutomata[counter++] = i;
         totalBits = SIZE_INT;
       }
+      totalBits -= mNumBits[i];
     }
     mIndexAutomata[mNumInts] = mNumAutomata;
 
@@ -321,7 +315,7 @@ public class MonolithicControlLoopChecker
     }
 
     // create initial state tuple
-    mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
+    mGlobalStateSet = new StateHashSet<EncodedStateTuple>(EncodedStateTuple.class,SIZE_BUFFER);
     mInitialStateTuple = new int[mNumAutomata];
     int i = 0;
     for (final AutomatonProxy aProxy: mAutomataList) {
@@ -771,7 +765,7 @@ public class MonolithicControlLoopChecker
   private ArrayList<ArrayList<TransitionProxy>> mTransitionList;
 
   /** a map of state tuple in synchronised model */
-  private StateHashSet mGlobalStateSet;
+  private StateHashSet<EncodedStateTuple> mGlobalStateSet;
 
   /** a list of unvisited state tuple. */
   private List<EncodedStateTuple> mUnvisitedList;
@@ -824,3 +818,4 @@ public class MonolithicControlLoopChecker
   private static final int SIZE_BUFFER = 1024;
 
 }
+

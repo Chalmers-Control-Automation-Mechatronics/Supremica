@@ -10,8 +10,6 @@
 
 package net.sourceforge.waters.model.compiler.context;
 
-import java.util.Collection;
-
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
@@ -50,20 +48,23 @@ public class SingleBindingVariableContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.VariableBindingContext
+  @Override
   public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
   {
     final VariableContext parent = getParent();
     return parent.getVariableRange(varname);
   }
 
-  public Collection<SimpleExpressionProxy> getVariableNames()
+  @Override
+  public int getNumberOfVariables()
   {
     final VariableContext parent = getParent();
-    return parent.getVariableNames();
+    return parent.getNumberOfVariables();
   }
 
   //#########################################################################
   //# Simple Access
+  @Override
   VariableContext getParent()
   {
     return (VariableContext) super.getParent();

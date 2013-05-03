@@ -47,6 +47,7 @@ public final class EventAliasElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public EventAliasElement clone()
   {
     return (EventAliasElement) super.clone();

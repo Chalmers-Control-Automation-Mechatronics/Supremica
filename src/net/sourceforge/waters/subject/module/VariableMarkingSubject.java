@@ -12,6 +12,8 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -19,8 +21,13 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -53,6 +60,7 @@ public final class VariableMarkingSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public VariableMarkingSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -60,35 +68,60 @@ public final class VariableMarkingSubject
     return (VariableMarkingSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final VariableMarkingSubject downcast =
-        (VariableMarkingSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final IdentifierSubject proposition = downcast.getProposition();
-      if (mProposition.getClass() != proposition.getClass()) {
+    if (index <= 0) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 1:
         mProposition.setParent(null);
-        mProposition = proposition.clone();
+        mProposition = (IdentifierSubject) newValue;
         mProposition.setParent(this);
-        change = true;
-      } else {
-        mProposition.assignFrom(proposition);
-      }
-      final SimpleExpressionSubject predicate = downcast.getPredicate();
-      if (mPredicate.getClass() != predicate.getClass()) {
+        return ModelChangeEvent.createStateChanged(this);
+      case 2:
         mPredicate.setParent(null);
-        mPredicate = predicate.clone();
+        mPredicate = (SimpleExpressionSubject) newValue;
         mPredicate.setParent(this);
-        change = true;
-      } else {
-        mPredicate.assignFrom(predicate);
-      }
-      if (change) {
-        fireStateChanged();
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final VariableMarkingSubject downcast = (VariableMarkingSubject) newState;
+    if (mProposition.getClass() == downcast.mProposition.getClass()) {
+      final UndoInfo step1 =
+        mProposition.createUndoInfo(downcast.mProposition, boundary);
+      if (step1 != null) {
+        info.add(step1);
+      }
+    } else {
+      final IdentifierSubject clone1 = downcast.mProposition.clone();
+      final UndoInfo step1 = new ReplacementUndoInfo(1, mProposition, clone1);
+      info.add(step1);
+    }
+    if (mPredicate.getClass() == downcast.mPredicate.getClass()) {
+      final UndoInfo step2 =
+        mPredicate.createUndoInfo(downcast.mPredicate, boundary);
+      if (step2 != null) {
+        info.add(step2);
+      }
+    } else {
+      final SimpleExpressionSubject clone2 = downcast.mPredicate.clone();
+      final UndoInfo step2 = new ReplacementUndoInfo(2, mPredicate, clone2);
+      info.add(step2);
+    }
   }
 
 

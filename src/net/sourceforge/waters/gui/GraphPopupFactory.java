@@ -82,7 +82,7 @@ class GraphPopupFactory
       throw exception.getRuntimeException();
     }
   }
-  
+
   protected void addCommonMenuItems()
   {
     super.addCommonMenuItems();
@@ -185,7 +185,7 @@ class GraphPopupFactory
       final SortedMap<String,IdentifierSubject> map =
         new TreeMap<String,IdentifierSubject>();
       final Collection<AbstractSubject> props =
-        node.getPropositions().getEventListModifiable();
+        node.getPropositions().getEventIdentifierListModifiable();
       for (final AbstractSubject prop : props) {
         if (prop instanceof IdentifierSubject) {
           final IdentifierSubject ident = (IdentifierSubject) prop;

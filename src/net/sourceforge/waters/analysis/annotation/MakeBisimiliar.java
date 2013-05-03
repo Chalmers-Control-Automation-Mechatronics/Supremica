@@ -1,9 +1,9 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TLongHashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -47,8 +47,8 @@ public class MakeBisimiliar
       if (mTrans.isInitial(s)) {init.add(s);}
       if (mTrans.isMarked(s)) {mark.add(s);}
     }
-    mInitial = init.toNativeArray();
-    mark.toNativeArray();
+    mInitial = init.toArray();
+    mark.toArray();
   }
 
   public long mergeIntoLong(final int state, final int event)
@@ -303,3 +303,4 @@ public class MakeBisimiliar
     }
   }
 }
+

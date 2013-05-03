@@ -1,6 +1,6 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -10,8 +10,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 /**
  * Finds a trace between two reachable states in a distributed
- * synchronous product. 
- * 
+ * synchronous product.
+ *
  * This class is designed to find a trace from
  * the initial state to a bad state, but it could be used to find a
  * path between two states provided the target ('bad') state is
@@ -41,9 +41,9 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  */
 class TraceFinder implements PredecessorCallback
 {
-  public TraceFinder(ProductDESSchema model, 
-		     StateEncoding encoding, 
-		     SafetyVerifierWorker[] workers)
+  public TraceFinder(final ProductDESSchema model,
+		     final StateEncoding encoding,
+		     final SafetyVerifierWorker[] workers)
   {
     mModel = model;
     mStateEncoding = encoding;
@@ -65,16 +65,17 @@ class TraceFinder implements PredecessorCallback
     return mWorkers;
   }
 
-  public synchronized int takePredecessor(StateTuple original, 
-					  StateTuple predecessor, 
-					  int event)
+  @Override
+  public synchronized int takePredecessor(final StateTuple original,
+					  final StateTuple predecessor,
+					  final int event)
   {
     System.out.format("Given predecessor %s of %s (depth: %d), event %d\n",
-		      mStateEncoding.interpret(predecessor), 
-		      mStateEncoding.interpret(original), 
+		      mStateEncoding.interpret(predecessor),
+		      mStateEncoding.interpret(original),
 		      predecessor.getDepthHint(),
 		      event);
-    
+
     //Check if the predecessor state is actually relevant
     if (original.equals(mSearchState))
       {
@@ -82,7 +83,7 @@ class TraceFinder implements PredecessorCallback
 	//have, updating the current best if it is, then return the
 	//depth of the current best state so that future predecessors
 	//can be filtered by workers.
-	int pdepth = predecessor.getDepthHint();
+	final int pdepth = predecessor.getDepthHint();
 	if (pdepth < mBestDepth)
 	  {
 	    mBestDepth = pdepth;
@@ -101,24 +102,25 @@ class TraceFinder implements PredecessorCallback
       }
   }
 
-  public synchronized void searchCompleted(StateTuple original, String worker)
+  @Override
+  public synchronized void searchCompleted(final StateTuple original, final String worker)
   {
     //If the search was relevant, then decrement the running search
     //count (unless this will put the value less than zero). When the
     //value gets to zero, any waiting threads should be awakened.
     if (mPredecessorSearchCount > 0 && original.equals(mSearchState))
       mPredecessorSearchCount--;
-    
+
     if (mPredecessorSearchCount == 0)
       notifyAll();
   }
 
-  private synchronized void setPredecessorSearch(StateTuple state, 
-						 int counter)
+  private synchronized void setPredecessorSearch(final StateTuple state,
+						 final int counter)
   {
     mSearchState = state;
     mPredecessorSearchCount = counter;
-    
+
     //Reset the current best variables
     mBestPredecessor = null;
     mBestDepth = Integer.MAX_VALUE;
@@ -131,10 +133,10 @@ class TraceFinder implements PredecessorCallback
    * the bad state, that is to say the bad state is reachable from the
    * initial state. The bad event is added as the first step in the
    * trace.
-   * 
+   *
    * The trace is returned as an array of event ids, starting at the
    * initial state that will arrive at the bad state.
-   * 
+   *
    * If a trace cannot be created, some kind of AnalysisException will
    * be thrown, for example if the initial state is not returned as a
    * predecessor.
@@ -153,21 +155,21 @@ class TraceFinder implements PredecessorCallback
    * @throws AnalysisException if something bad happens while
    *                           generating the trace
    */
-  public int[] findTrace(StateTuple bad, int badevent, StateTuple initial)
+  public int[] findTrace(final StateTuple bad, final int badevent, final StateTuple initial)
     throws RemoteException, AnalysisException
   {
     //Export this object on an anonymous port. This will be passed to
     //workers when a predecessor search is initiated.
-    PredecessorCallback cb = (PredecessorCallback)
+    final PredecessorCallback cb = (PredecessorCallback)
       UnicastRemoteObject.exportObject(this, 0);
 
     //Create the trace list. This will be filled out backwards
     //(starting from the bad state), and reversed at the end.
-    TIntArrayList trace = new TIntArrayList();
+    final TIntArrayList trace = new TIntArrayList();
     trace.add(badevent);
-    
-    SafetyVerifierWorker[] workers = getWorkers();
-    
+
+    final SafetyVerifierWorker[] workers = getWorkers();
+
     try
       {
 	StateTuple state = bad;
@@ -175,7 +177,7 @@ class TraceFinder implements PredecessorCallback
 	  {
 	    //Start a search for the current state on each worker.
 	    setPredecessorSearch(state, workers.length);
-	    for (SafetyVerifierWorker w : workers)
+	    for (final SafetyVerifierWorker w : workers)
 	      w.predecessorSearch(state, cb);
 
 	    //Wait for all workers to indicate they have
@@ -194,17 +196,17 @@ class TraceFinder implements PredecessorCallback
 		      {
 			wait(1000);
 		      }
-		    catch (InterruptedException e)
+		    catch (final InterruptedException e)
 		      {
 			throw new AnalysisException("Finding trace interrupted!");
 		      }
 		  }
-			   
+
 		//Add the best event to the trace list.
 		trace.add(mBestEvent);
 		state = mBestPredecessor;
 	      }
-	    
+
 	    //If this occurs it is because all the searches returned
 	    //without finding a good predecessor state. This suggests
 	    //something bad, as it should never search for
@@ -213,7 +215,7 @@ class TraceFinder implements PredecessorCallback
 	    if (state == null)
 	      {
 		throw new AnalysisException
-		  ("No predecessor states were found when " + 
+		  ("No predecessor states were found when " +
 		   "building trace, but it wasn't the initial state!");
 	      }
 	  }
@@ -226,7 +228,7 @@ class TraceFinder implements PredecessorCallback
       }
 
     trace.reverse();
-    return trace.toNativeArray();
+    return trace.toArray();
   }
 
   private int mPredecessorSearchCount = 0;

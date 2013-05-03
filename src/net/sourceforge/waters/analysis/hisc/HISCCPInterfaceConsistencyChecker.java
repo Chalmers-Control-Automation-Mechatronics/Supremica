@@ -1,0 +1,318 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters HISC
+//# PACKAGE: net.sourceforge.waters.analysis.hisc
+//# CLASS:   HISCCPInterfaceConsistencyChecker
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.analysis.hisc;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
+import net.sourceforge.waters.analysis.annotation.TRConflictPreorderChecker;
+import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
+import net.sourceforge.waters.analysis.compositional.CompositionalSimplificationResult;
+import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
+import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
+
+
+/**
+ * @author Robi Malik
+ */
+
+public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
+{
+
+  //#########################################################################
+  //# Constructors
+  public HISCCPInterfaceConsistencyChecker(final ProductDESProxyFactory factory)
+  {
+    this(null, factory);
+  }
+
+  public HISCCPInterfaceConsistencyChecker(final ProductDESProxyFactory factory,
+                                           final ConflictChecker checker,
+                                           final CompositionalSimplifier simplifier)
+  {
+    this(null, factory, checker, simplifier);
+  }
+
+  public HISCCPInterfaceConsistencyChecker(final ProductDESProxy model,
+                                           final ProductDESProxyFactory factory)
+  {
+    this(model, factory,
+         new CompositionalConflictChecker(factory),
+         new CompositionalSimplifier(factory,
+                                     ConflictAbstractionProcedureFactory.OEQ));
+  }
+
+  public HISCCPInterfaceConsistencyChecker(final ProductDESProxy model,
+                                           final ProductDESProxyFactory factory,
+                                           final ConflictChecker checker,
+                                           final CompositionalSimplifier simplifier)
+  {
+    super(model, factory, HISCConflictKindTranslator.getInstance());
+    mConflictChecker = checker;
+    mSimplifier = simplifier;
+    mSynchronousProductBuilder =
+      new MonolithicSynchronousProductBuilder(factory);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
+  public void setModel(final ProductDESProxy model)
+  {
+    super.setModel(model);
+    mUsedMarking = null;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Specific Configuration
+  public void setConfiguredDefaultMarking(final EventProxy marking)
+  {
+    mConfiguredMarking = marking;
+    mUsedMarking = null;
+  }
+
+  public EventProxy getConfiguredDefaultMarking()
+  {
+    return mConfiguredMarking;
+  }
+
+  public void setConflictChecker(final ConflictChecker checker)
+  {
+    mConflictChecker = checker;
+  }
+
+  public ConflictChecker getConflictChecker()
+  {
+    return mConflictChecker;
+  }
+
+  public void setSimplifier(final CompositionalSimplifier simplifier)
+  {
+    mSimplifier = simplifier;
+  }
+
+  public CompositionalSimplifier getSimplifier()
+  {
+    return mSimplifier;
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+    final KindTranslator translator = getKindTranslator();
+    mConflictChecker.setKindTranslator(translator);
+    mSimplifier.setKindTranslator(translator);
+    mSynchronousProductBuilder.setKindTranslator(translator);
+    if (mConfiguredMarking == null) {
+      final ProductDESProxy des = getModel();
+      mUsedMarking = AbstractConflictChecker.getMarkingProposition(des);
+    } else {
+      mUsedMarking = mConfiguredMarking;
+    }
+    mConflictChecker.setConfiguredDefaultMarking(mUsedMarking);
+    mSimplifier.setConfiguredDefaultMarking(mUsedMarking);
+    final Collection<EventProxy> props = Collections.singletonList(mUsedMarking);
+    mSynchronousProductBuilder.setPropositions(props);
+  }
+
+  @Override
+  public boolean run() throws AnalysisException
+  {
+    try {
+      setUp();
+
+      // Collect interface events ...
+      final ProductDESProxy des = getModel();
+      final Collection<EventProxy> events = des.getEvents();
+      final Collection<EventProxy> interfaceEvents = new ArrayList<EventProxy>();
+      final KindTranslator translator = getKindTranslator();
+      final EventEncoding eventEnc = new EventEncoding();
+      boolean hasInterface = false;
+      for (final EventProxy event : events) {
+        final Map<String,String> attribs = event.getAttributes();
+        if (translator.getEventKind(event) == EventKind.PROPOSITION) {
+          // nothing
+        } else if (HISCAttributeFactory.isParameter(attribs)) {
+          interfaceEvents.add(event);
+          eventEnc.addEvent(event, translator, EventEncoding.STATUS_UNUSED);
+          hasInterface = true;
+        } else {
+          eventEnc.addSilentEvent(event);
+        }
+      }
+      final int markingID = eventEnc.addEvent(mUsedMarking, translator, EventEncoding.STATUS_UNUSED);
+      checkAbort();
+
+      // Separate into interface and subsystem automata ...
+      final Collection<AutomatonProxy> automata = des.getAutomata();
+      final Collection<AutomatonProxy> interfaces =
+        new ArrayList<AutomatonProxy>();
+      Collection<AutomatonProxy> subsystem =
+        new ArrayList<AutomatonProxy>(automata.size());
+      for (final AutomatonProxy aut : automata) {
+        final Map<String,String> attribs = aut.getAttributes();
+        if (HISCAttributeFactory.isInterface(attribs)) {
+          interfaces.add(aut);
+          hasInterface = true;
+        } else if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
+          subsystem.add(aut);
+        }
+      }
+      checkAbort();
+
+      // If there is no interface, just run a conflict check ...
+      if (!hasInterface) {
+        mConflictChecker.setModel(des);
+        mConflictChecker.run();
+        final VerificationResult result = mConflictChecker.getAnalysisResult();
+        setAnalysisResult(result);
+        return result.isSatisfied();
+      }
+
+      // If there is an interface, we must check the conflict preorder ...
+      final ProductDESProxyFactory factory = getFactory();
+      final String name = des.getName();
+      final ProductDESProxy interfaceDES =
+        AutomatonTools.createProductDESProxy(name + ":iface",
+                                             interfaces, factory);
+      ProductDESProxy subsystemDES =
+        AutomatonTools.createProductDESProxy(name + ":subsystem",
+                                             subsystem, factory);
+      // Minimise the subsystem ...
+      if (mSimplifier != null) {
+        mSimplifier.setModel(subsystemDES);
+        mSimplifier.setPreservedEvents(interfaceEvents);
+        mSimplifier.run();
+        final CompositionalSimplificationResult result =
+          mSimplifier.getAnalysisResult();
+        subsystemDES = result.getComputedProductDES();
+        subsystem = subsystemDES.getAutomata();
+        for (final EventProxy event : subsystemDES.getEvents()) {
+          if (eventEnc.getEventCode(event) < 0) {
+            eventEnc.addSilentEvent(event);
+          }
+        }
+      }
+      checkAbort();
+
+      // Compose the interface and subsystem to single transition relations ...
+      final ListBufferTransitionRelation interfaceRel =
+        createTransitionRelation(interfaceDES, eventEnc);
+      final ListBufferTransitionRelation subsystemRel =
+        createTransitionRelation(subsystemDES, eventEnc);
+
+      /// Check the conflict preorder ...
+      mConflictPreorderChecker =
+        new TRConflictPreorderChecker(subsystemRel, interfaceRel, markingID);
+      final boolean lc = mConflictPreorderChecker.isLessConflicting();
+      final VerificationResult result = getAnalysisResult();
+      result.setSatisfied(lc);
+      return lc;
+    } finally {
+      tearDown();
+      //final VerificationResult result = getAnalysisResult();
+      //System.out.println(result.getRunTime());
+    }
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    mUsedMarking = null;
+    mConflictPreorderChecker = null;
+    super.tearDown();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    mConflictChecker.requestAbort();
+    if (mSimplifier != null) {
+      mSimplifier.requestAbort();
+    }
+    if (mConflictPreorderChecker != null) {
+      mConflictPreorderChecker.requestAbort();
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private ListBufferTransitionRelation createTransitionRelation
+    (final ProductDESProxy des, final EventEncoding eventEnc)
+    throws AnalysisException
+  {
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    final AutomatonProxy aut;
+    if (automata.size() == 1) {
+      aut = automata.iterator().next();
+    } else {
+      mSynchronousProductBuilder.setModel(des);
+      mSynchronousProductBuilder.run();
+      aut = mSynchronousProductBuilder.getComputedAutomaton();
+    }
+    final int config = TRConflictPreorderChecker.getPreferredInputConfiguration();
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation(aut, eventEnc, config);
+    checkAbort();
+    return rel;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private EventProxy mConfiguredMarking;
+  private EventProxy mUsedMarking;
+
+  private ConflictChecker mConflictChecker;
+  private CompositionalSimplifier mSimplifier;
+  private final SynchronousProductBuilder mSynchronousProductBuilder;
+  private TRConflictPreorderChecker mConflictPreorderChecker;
+
+}

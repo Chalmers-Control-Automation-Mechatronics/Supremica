@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.subject.base;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.Proxy;
 
 
@@ -36,14 +38,20 @@ public interface ProxySubject
   public ProxySubject clone();
 
   /**
-   * Assigns the contents of another subject to this subject. This method
-   * ensures that the contents of this subject are equal to the contents of the
-   * given subject according to the contents. Items already contained in this
-   * subject are reused if possible, and may be changed in position as needed.
-   * Items not contained are cloned from the given subject. The method tries to
-   * produce as few model change notifications as possible.
-   * @param partner  The subject to be copied from.
+   * Creates assignment instructions to replace the contents of this list
+   * by the contents of another list. This method attempts to produce a
+   * minimal sequence of deletions and insertions to convert this set
+   * to the given new set.
+   * @param  newState An object containing the data after the intended
+   *                  assignment.
+   * @param  boundary Set of unchanged {@link Subject}s. Any children of
+   *                  the receiving subject contained in this set will be
+   *                  assumed and changed and not recursed into. The
+   *                  boundary can be <CODE>null</CODE> to force full
+   *                  recursion.
+   * @return Undo information containing a minimal assignment sequence.
    */
-  public boolean assignFrom(ProxySubject partner);
+  public UndoInfo createUndoInfo(ProxySubject newState,
+                                 Set<? extends Subject> boundary);
 
 }

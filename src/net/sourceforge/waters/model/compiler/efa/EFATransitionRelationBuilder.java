@@ -89,9 +89,6 @@ class EFATransitionRelationBuilder
   {
     final EFAVariableTransitionRelation rel =
       buildTransitionRelation(edecl, constraints);
-    if (rel.isEmpty()) {
-      return;
-    }
     final EventRecord found = mEventRecords.get(rel);
     if (found != null) {
       found.addSourceLocations(locations);
@@ -149,38 +146,43 @@ class EFATransitionRelationBuilder
     throws EvalException
   {
     try {
-      final int numLiterals = constraints.size();
-      mVariableRecords = new HashMap<EFAVariable,VariableRecord>(numLiterals);
-      final Collection<SimpleExpressionProxy> literals =
-        constraints.getConstraints();
-      for (final SimpleExpressionProxy literal : literals) {
-        collectRecord(edecl, literal);
-      }
-      final int numRecords = mVariableRecords.size();
-      final EFAVariableTransitionRelation result =
-        new EFAVariableTransitionRelation(numRecords);
-      result.provideFormula(constraints);
-      for (final VariableRecord record : mVariableRecords.values()) {
-        final EFAVariableTransitionRelationPart part =
-          record.createTransitionRelationPart();
-        if (part != null) {
-          final EFAVariableTransitionRelationPart unique = getUnique(part);
-          final EFAVariable var = record.getUnprimed();
-          result.addPart(var, unique);
-          if (result.isEmpty()) {
-            break;
-          }
+      final EFAVariableTransitionRelation result;
+      if (constraints == null) {
+        result = new EFAVariableTransitionRelation(true);
+      } else {
+        final int numLiterals = constraints.size();
+        mVariableRecords =
+          new HashMap<EFAVariable,VariableRecord>(numLiterals);
+        final Collection<SimpleExpressionProxy> literals =
+          constraints.getConstraints();
+        for (final SimpleExpressionProxy literal : literals) {
+          collectRecord(edecl, literal);
         }
-      }
-      for (final EFAVariable var : edecl.getVariables()) {
-        if (!mVariableRecords.containsKey(var)) {
-          final EFAVariable primedvar = getPrimedVariable(var);
-          final VariableRecord record =
-            new ModifyingVariableRecord(var, primedvar);
+        final int numRecords = mVariableRecords.size();
+        result = new EFAVariableTransitionRelation(numRecords);
+        result.provideFormula(constraints);
+        for (final VariableRecord record : mVariableRecords.values()) {
           final EFAVariableTransitionRelationPart part =
             record.createTransitionRelationPart();
-          final EFAVariableTransitionRelationPart unique = getUnique(part);
-          result.addPart(var, unique);
+          if (part != null) {
+            final EFAVariableTransitionRelationPart unique = getUnique(part);
+            final EFAVariable var = record.getUnprimed();
+            result.addPart(var, unique);
+            if (result.isEmpty()) {
+              break;
+            }
+          }
+        }
+        for (final EFAVariable var : edecl.getVariables()) {
+          if (!mVariableRecords.containsKey(var)) {
+            final EFAVariable primedvar = getPrimedVariable(var);
+            final VariableRecord record =
+              new ModifyingVariableRecord(var, primedvar);
+            final EFAVariableTransitionRelationPart part =
+              record.createTransitionRelationPart();
+            final EFAVariableTransitionRelationPart unique = getUnique(part);
+            result.addPart(var, unique);
+          }
         }
       }
       return getUnique(result);

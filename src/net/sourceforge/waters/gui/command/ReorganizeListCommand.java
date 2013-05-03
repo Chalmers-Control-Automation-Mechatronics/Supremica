@@ -29,8 +29,8 @@ public class ReorganizeListCommand
 		{
 			public int compare(final AbstractSubject a1, final AbstractSubject a2)
 			{
-				return (mList.getEventListModifiable().indexOf(a1) -
-                mList.getEventListModifiable().indexOf(a2));
+				return (mList.getEventIdentifierListModifiable().indexOf(a1) -
+                mList.getEventIdentifierListModifiable().indexOf(a2));
 			}
 
 			public boolean equals(final Object o)
@@ -41,7 +41,7 @@ public class ReorganizeListCommand
 		mIndexs = new IdentityHashMap<AbstractSubject, Integer>();
 		for (final AbstractSubject a : identifiers)
 		{
-			final int index = mList.getEventList().indexOf(a);
+			final int index = mList.getEventIdentifierList().indexOf(a);
 			mIndexs.put(a, new Integer(index));
 		}
 		mNewPosition = newPosition;
@@ -49,7 +49,7 @@ public class ReorganizeListCommand
 
 	public void execute()
 	{
-		final List<AbstractSubject> list = mList.getEventListModifiable();
+		final List<AbstractSubject> list = mList.getEventIdentifierListModifiable();
 		list.removeAll(mIdentifiers);
 		int i = 0;
 		for (final AbstractSubject a : mIdentifiers)
@@ -71,7 +71,7 @@ public class ReorganizeListCommand
     public void undo()
     {
 		final List<AbstractSubject> list =
-						mList.getEventListModifiable();
+						mList.getEventIdentifierListModifiable();
 		// Remove label and add to new position in list
 		list.removeAll(mIdentifiers);
 		for (final AbstractSubject a : mIdentifiers)

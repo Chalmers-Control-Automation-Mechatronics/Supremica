@@ -10,8 +10,8 @@
 package net.sourceforge.waters.analysis.hisc;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -68,15 +68,15 @@ public class SICProperty6Verifier extends AbstractSICConflictChecker
       final ProductDESProxy model = getModel();
       final SICPropertyBuilder builder =
         new SICPropertyBuilder(model, getFactory());
-      final EventProxy defaultMark = getUsedMarkingProposition();
+      final EventProxy defaultMark = getUsedDefaultMarking();
       builder.setInputMarking(defaultMark);
       ProductDESProxy convertedModel = null;
       convertedModel = builder.createSIC6Model();
       final ConflictChecker checker = getConflictChecker();
       checker.setModel(convertedModel);
-      checker.setMarkingProposition(defaultMark);
+      checker.setConfiguredDefaultMarking(defaultMark);
       final EventProxy preMark = builder.getGeneralisedPrecondition();
-      checker.setPreconditionMarking(preMark);
+      checker.setConfiguredPreconditionMarking(preMark);
       final VerificationResult result;
       try {
         checker.run();

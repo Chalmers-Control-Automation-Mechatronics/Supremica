@@ -10,6 +10,7 @@
 package net.sourceforge.waters.subject.base;
 
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -30,16 +31,20 @@ public interface SimpleListSubject<E>
   public SimpleListSubject<E> clone();
 
   /**
-   * Assigns the contents of another list to this list.
-   * This method ensures that the contents of this list are equal to the
-   * contents of the given list according to the {@link
-   * Object#equals(Object) equals()} method, in the given
-   * order. Items already contained in this list are resued, and changed in
-   * position as needed. Items not contained are cloned from the given
-   * list. The method produces as few model change notifications as
-   * possible.
-   * @param  list  The list to be copied from.
+   * Creates assignment instructions to replaces the contents of this list
+   * by the contents of another list. This method attempts to produce a
+   * minimal sequence of deletions and insertions to convert this set
+   * to the given new set.
+   * @param  newList  The list containing the data after the intended
+   *                  assignment.
+   * @param  boundary Set of unchanged {@link Subject}s. Any children of
+   *                  the receiving subject contained in this set will be
+   *                  assumed and changed and not recursed into. The
+   *                  boundary can be <CODE>null</CODE> to force full
+   *                  recursion.
+   * @return Undo information containing a minimal assignment sequence.
    */
-  public void assignFrom(final List<? extends E> list);
+  public UndoInfo createUndoInfo(List<? extends E> newList,
+                                 Set<? extends Subject> boundary);
 
 }

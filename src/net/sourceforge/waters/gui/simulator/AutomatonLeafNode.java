@@ -5,9 +5,8 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import net.sourceforge.waters.gui.IconLoader;
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -60,7 +59,7 @@ public class AutomatonLeafNode extends DefaultMutableTreeNode
   static Icon getAutomatonIcon(final Simulation sim, final AutomatonProxy aut)
   {
     final ModuleContainer container = sim.getModuleContainer();
-    final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
+    final Map<Object,SourceInfo> infomap = container.getSourceInfoMap();
     final SourceInfo info = infomap.get(aut);
     if (info == null) {
       return null;

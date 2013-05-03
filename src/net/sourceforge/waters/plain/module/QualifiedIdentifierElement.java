@@ -65,6 +65,7 @@ public final class QualifiedIdentifierElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public QualifiedIdentifierElement clone()
   {
     return (QualifiedIdentifierElement) super.clone();

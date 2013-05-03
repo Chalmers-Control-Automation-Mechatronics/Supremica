@@ -4,6 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
+
 import org.supremica.properties.Config;
 
 public class SoftplcSimulationDialog
@@ -11,25 +12,25 @@ public class SoftplcSimulationDialog
 {
 	private static final long serialVersionUID = 1L;
 	private boolean ok = false;
-	private JComboBox interfaces;
-	private Vector<Object> interfacesVector = new Vector<Object>();
+	private final JComboBox<Object> interfaces;
+	private final Vector<Object> interfacesVector = new Vector<Object>();
 
-	public SoftplcSimulationDialog(Frame frame, String title, boolean modal)
+	public SoftplcSimulationDialog(final Frame frame, final String title, final boolean modal)
 	{
 		super(frame, title, modal);
 
-		JPanel panel1 = new JPanel();
-		GridBagLayout gridBagLayout1 = new GridBagLayout();
-		JLabel cycleTimeLabel = new JLabel("Cycle time (ms)");
-		JLabel runSimulationLabel = new JLabel("Run simulation...");
-		JTextField cycleTime = new JTextField();
-		JLabel interfaceLabel = new JLabel("I/O interface");
-		JButton cancelButton = new JButton("Cancel");
-		JButton simulateButton = new JButton("Simulate");
-		JLabel tempLabel = new JLabel(" ");
+		final JPanel panel1 = new JPanel();
+		final GridBagLayout gridBagLayout1 = new GridBagLayout();
+		final JLabel cycleTimeLabel = new JLabel("Cycle time (ms)");
+		final JLabel runSimulationLabel = new JLabel("Run simulation...");
+		final JTextField cycleTime = new JTextField();
+		final JLabel interfaceLabel = new JLabel("I/O interface");
+		final JButton cancelButton = new JButton("Cancel");
+		final JButton simulateButton = new JButton("Simulate");
+		final JLabel tempLabel = new JLabel(" ");
 
 		interfacesVector.add(Config.SOFTPLC_INTERFACES.get()); // TO DO - Divide string into multiple entries - they are separated by colon
-		interfaces = new JComboBox(interfacesVector);
+		interfaces = new JComboBox<Object>(interfacesVector);
 
 		try
 		{
@@ -37,14 +38,14 @@ public class SoftplcSimulationDialog
 			runSimulationLabel.setFont(new java.awt.Font("Dialog", 1, 18));
 			cancelButton.addActionListener(new java.awt.event.ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)
+				public void actionPerformed(final ActionEvent e)
 				{
 					cancelButton_actionPerformed(e);
 				}
 			});
 			simulateButton.addActionListener(new java.awt.event.ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)
+				public void actionPerformed(final ActionEvent e)
 				{
 					simulateButton_actionPerformed(e);
 				}
@@ -62,7 +63,7 @@ public class SoftplcSimulationDialog
 			panel1.add(tempLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 29, 0));
 			pack();
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			ex.printStackTrace();
 		}
@@ -80,14 +81,14 @@ public class SoftplcSimulationDialog
 		return (org.supremica.gui.SoftplcInterface) interfacesVector.get(interfaces.getSelectedIndex());
 	}
 
-	void cancelButton_actionPerformed(ActionEvent e)
+	void cancelButton_actionPerformed(final ActionEvent e)
 	{
 		this.setVisible(false);
 
 		ok = false;
 	}
 
-	void simulateButton_actionPerformed(ActionEvent e)
+	void simulateButton_actionPerformed(final ActionEvent e)
 	{
 		this.setVisible(false);
 

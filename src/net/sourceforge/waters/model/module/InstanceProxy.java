@@ -93,7 +93,6 @@ public interface InstanceProxy extends ComponentProxy {
    * Gets the binding list of this instance.
    * @return A list of name-value pairs describing how the parameters
    *         of the instantiated module are bound to values.
-   *         Each element is of type {@link ParameterBindingProxy}.
    */
   public List<ParameterBindingProxy> getBindingList();
 

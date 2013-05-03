@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.Serializable;
 
+import net.sourceforge.waters.model.analysis.des.AbstractKindTranslator;
+
 
 /**
  * <P>A kind translator that does not change component and event

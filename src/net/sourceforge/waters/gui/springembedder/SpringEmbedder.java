@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.module.HornerPolynomial;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
@@ -128,7 +129,7 @@ public class SpringEmbedder
    * got geometry associated with them, without making any changes to
    * the graph.
    * @return <CODE>true</CODE> if any is missing geometry.
-   *         In this case, a call to {@link #setUpGeometry()} would
+   *         In this case, a call to {@link #setUpNodeGeometry()} would
    *         change the graph.
    * @throws GeometryAbsentException if the graph has more nodes than
    *         specified by the {@link Config#DOT_MAX_NBR_OF_STATES} setting,
@@ -169,16 +170,16 @@ public class SpringEmbedder
    * got geometry associated with them, and fills in random positions
    * for any simple nodes that have not. Labels without geometry are placed
    * at their default positions.
-   * @return <CODE>true</CODE> if any node has been assigned geometry.
-   *         In this case, the GUI should invoke the spring embedder
-   *         to layout the graph.
+   * @return <CODE>true</CODE> if any node has been assigned geometry
+   *         by this method. In this case, the GUI should invoke the spring
+   *         embedder to layout the graph.
    * @throws GeometryAbsentException if the graph has more nodes than
    *         specified by the {@link Config#DOT_MAX_NBR_OF_STATES} setting,
    *         or if a group node without geometry has been found. Group nodes
-   *         cannot be assigned geometry automatically, and therefore the graph
-   *         cannot be rendered when this exception is thrown.
+   *         cannot be assigned geometry automatically, and therefore the
+   *         graph cannot be rendered when this exception is thrown.
    */
-  public boolean setUpGeometry()
+  public boolean setUpNodeGeometry()
     throws GeometryAbsentException
   {
     checkNumberOfStates();
@@ -215,7 +216,6 @@ public class SpringEmbedder
           ("Unknown node type: " + node.getClass().getName() + "!");
       }
     }
-
     for (final EdgeSubject edge : mEdges) {
       // Fixing some broken models---these adjustments should not
       // be needed, but without them many old files would not be
@@ -226,25 +226,7 @@ public class SpringEmbedder
       if (edge.getTarget() instanceof SimpleNodeSubject) {
         edge.setEndPoint(null);
       }
-      if (edge.getLabelBlock().getGeometry() == null) {
-        final LabelGeometrySubject offset =
-          new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);
-        edge.getLabelBlock().setGeometry(offset);
-      }
-      if (edge.getGuardActionBlock() != null &&
-          edge.getGuardActionBlock().getGeometry() == null) {
-        // *** BUG ***
-        // Not a very good position!
-        // ***
-        final LabelGeometrySubject offset =
-          new LabelGeometrySubject
-               (new Point(LabelBlockProxyShape.DEFAULT_OFFSET_X,
-                          LabelBlockProxyShape.DEFAULT_OFFSET_Y + 10));
-        edge.getGuardActionBlock().setGeometry(offset);
-      }
-      edge.setGeometry(null);
     }
-
     return runEmbedder;
   }
 
@@ -350,7 +332,7 @@ public class SpringEmbedder
       } else {
         throw new IllegalStateException
           ("SpringEmbedder does not support nodes of type " +
-           node.getClass().getName() + "!");
+           ProxyTools.getShortClassName(node) + "!");
       }
     }
     final int numedges = mEdges.size();
@@ -402,6 +384,7 @@ public class SpringEmbedder
   private void runToConvergence()
   {
     if (!mStop) {
+      setUpEdgeGeometry();
       int count = 0;
       double limit = CONVERGENCE_CONST;
       for (int i = 1; i < NUM_PASSES; i++) {
@@ -479,6 +462,27 @@ public class SpringEmbedder
       wrapper.updatePoint();
     }
     return maxdelta;
+  }
+
+  private void setUpEdgeGeometry()
+  {
+    for (final EdgeSubject edge : mEdges) {
+      if (edge.getLabelBlock().getGeometry() == null) {
+        final LabelGeometrySubject offset =
+          new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);
+        edge.getLabelBlock().setGeometry(offset);
+      }
+      if (edge.getGuardActionBlock() != null &&
+          edge.getGuardActionBlock().getGeometry() == null) {
+        // TODO Find better position!
+        final LabelGeometrySubject offset =
+          new LabelGeometrySubject
+               (new Point(LabelBlockProxyShape.DEFAULT_OFFSET_X,
+                          LabelBlockProxyShape.DEFAULT_OFFSET_Y + 10));
+        edge.getGuardActionBlock().setGeometry(offset);
+      }
+      edge.setGeometry(null);
+    }
   }
 
   private Collection<? extends GeometryWrapper> calculateNewPoints()

@@ -15,12 +15,15 @@
         <SimpleComponent Kind="SPEC" Name="before">
             <Graph Deterministic="false">
                 <NodeList>
-                    <SimpleNode Name="S2">
+                    <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point Y="128" X="112"/>
+                            <Point Y="80" X="48"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="0" X="-27"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="4" X="-23"/>
+                            <Point Y="8" X="-16"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -29,6 +32,14 @@
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="-15" X="-23"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point Y="128" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="4" X="-23"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S3">
@@ -40,17 +51,6 @@
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point Y="7" X="1"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Initial="true" Name="S0">
-                        <PointGeometry>
-                            <Point Y="80" X="48"/>
-                        </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point Y="0" X="-27"/>
-                        </InitialArrowGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-16"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>

@@ -12,12 +12,19 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -60,6 +67,7 @@ public final class SimpleIdentifierSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public SimpleIdentifierSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -67,22 +75,37 @@ public final class SimpleIdentifierSubject
     return (SimpleIdentifierSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final SimpleIdentifierSubject downcast =
-        (SimpleIdentifierSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final String name = downcast.getName();
-      if (mName != name) {
-        mName = name;
-        change = true;
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
+        mName = (String) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final SimpleIdentifierSubject downcast =
+      (SimpleIdentifierSubject) newState;
+    if (!mName.equals(downcast.mName)) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mName, downcast.mName);
+      info.add(step2);
+    }
   }
 
 

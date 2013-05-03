@@ -9,11 +9,15 @@
 
 package net.sourceforge.waters.model.des;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.strategy.HashingStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
+
+import net.sourceforge.waters.analysis.tr.WatersHashSet;
 
 
 /**
@@ -26,6 +30,8 @@ import java.util.Collections;
 public final class AutomatonTools
 {
 
+  //#########################################################################
+  //# Public Methods
   /**
    * Calculates binary logarithm.
    * @return The largest number <I>k</I> such that
@@ -107,4 +113,82 @@ public final class AutomatonTools
     return factory.createProductDESProxy(name, eventList, automata);
   }
 
+  /**
+   * Returns whether the given product DES is deterministic.
+   * An product DES is considered as deterministic if all its
+   * automata are deterministic.
+   * @see #isDeterministic(AutomatonProxy)
+   */
+  public static boolean isDeterministic(final ProductDESProxy des)
+  {
+    for (final AutomatonProxy aut : des.getAutomata()) {
+      if (!isDeterministic(aut)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Returns whether the given automaton is deterministic.
+   * An automaton is considered as deterministic if it has at most
+   * one initial state, and whether there exists at most one transition
+   * associated with any given pair of source state and event.
+   * This method uses a hash table to perform the determinism check
+   * in time complexity linear in the number of transitions.
+   */
+  public static boolean isDeterministic(final AutomatonProxy aut)
+  {
+    boolean hasInit = false;
+    for (final StateProxy state : aut.getStates()) {
+      if (state.isInitial()) {
+        if (hasInit) {
+          return false;
+        } else {
+          hasInit = true;
+        }
+      }
+    }
+    final Set<TransitionProxy> transitions =
+      new WatersHashSet<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
+    for (final TransitionProxy trans : aut.getTransitions()) {
+      if (!transitions.add(trans)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Inner Class TransitionHashingStrategy
+  private static class TransitionHashingStrategy
+    implements HashingStrategy<TransitionProxy>
+  {
+    //#######################################################################
+    //# Interface gnu.trove.TObjectHashingStrategy
+    @Override
+    public int computeHashCode(final TransitionProxy trans)
+    {
+      return trans.getSource().hashCode() + 5 * trans.getEvent().hashCode();
+    }
+
+
+    @Override
+    public boolean equals(final TransitionProxy trans1,
+                          final TransitionProxy trans2)
+    {
+      return
+        trans1.getSource() == trans2.getSource() &&
+        trans1.getEvent() == trans2.getEvent();
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final TransitionHashingStrategy INSTANCE =
+      new TransitionHashingStrategy();
+    private static final long serialVersionUID = 1L;
+  }
+
 }
+

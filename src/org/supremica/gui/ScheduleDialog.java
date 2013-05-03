@@ -71,7 +71,7 @@ public class ScheduleDialog
         SchedulingConstants.BRUTE_FORCE_RELAXATION};
     private static final String[] milpHeuristics = new String[] {SchedulingConstants.OPTIMAL, SchedulingConstants.SUBOPTIMAL};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
-    private final JComboBox optiMethodsBox, heuristicsBox;
+    private final JComboBox<String> optiMethodsBox, heuristicsBox;
     private final JCheckBox nodeExpander, buildAutomaton, vgDrawer, balanceVelocities;
     @SuppressWarnings("unused")
 	private int memoryCapacity;
@@ -103,10 +103,10 @@ public class ScheduleDialog
         cancelButton = new JButton("Cancel");
 
         final JLabel optiMethodsLabel = new JLabel("Optimization methods: \t \t");
-        optiMethodsBox = new JComboBox(optimizationMethods);
+        optiMethodsBox = new JComboBox<String>(optimizationMethods);
 
         final JLabel heuristicsLabel = new JLabel("Heuristics: \t \t");
-        heuristicsBox = new JComboBox(astarHeuristics);
+        heuristicsBox = new JComboBox<String>(astarHeuristics);
 
         nodeExpander = new JCheckBox("use AK's node expander", false);
         buildAutomaton = new JCheckBox("build schedule", true);

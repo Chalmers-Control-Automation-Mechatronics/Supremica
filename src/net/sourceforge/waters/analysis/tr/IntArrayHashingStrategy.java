@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.TObjectHashingStrategy;
+import gnu.trove.strategy.HashingStrategy;
 
 import java.util.Arrays;
 
@@ -21,16 +21,18 @@ import java.util.Arrays;
  */
 
 public class IntArrayHashingStrategy
-  implements TObjectHashingStrategy<int[]>
+  implements HashingStrategy<int[]>
 {
 
   //#######################################################################
   //# Interface gnu.trove.TObjectHashingStrategy
+  @Override
   public int computeHashCode(final int[] array)
   {
     return Arrays.hashCode(array);
   }
 
+  @Override
   public boolean equals(final int[] array1, final int[] array2)
   {
     return Arrays.equals(array1, array2);

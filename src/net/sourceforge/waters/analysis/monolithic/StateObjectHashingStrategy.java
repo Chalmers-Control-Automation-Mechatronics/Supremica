@@ -34,24 +34,24 @@ import java.io.Serializable;
  * Implementors can use this interface to make the trove hashing
  * algorithms use object values, values provided by the java runtime,
  * or a custom strategy when computing hashcodes.
- * 
+ *
  * Created: Sat Aug 17 10:52:32 2002
  *
  * @author Eric Friedman
  * @version $Id$
  */
 
-interface StateObjectHashingStrategy extends Serializable {
-    
+interface StateObjectHashingStrategy<E> extends Serializable {
+
     /**
      * Computes a hash code for the specified object.  Implementors
      * can use the object's own <tt>hashCode</tt> method, the Java
      * runtime's <tt>identityHashCode</tt>, or a custom scheme.
-     * 
+     *
      * @param o the object for which the hashcode is to be computed.
      * @return the hashCode.
      */
-    public int computeHashCode(EncodedStateTuple o);
+    public int computeHashCode(E o);
 
     /**
      * Compares o1 and o2 for equality.  Strategy implementors may use
@@ -62,5 +62,5 @@ interface StateObjectHashingStrategy extends Serializable {
      * @param o2 an <code>Object</code> value
      * @return true if the objects are equal according to this strategy.
      */
-    public boolean equals(EncodedStateTuple o1, EncodedStateTuple o2);
+    public boolean equals(E o1, E o2);
 } // StateObjectHashingStrategy

@@ -502,12 +502,12 @@ class FindStatesTable
 	class StateMatcherAcceptingCellEditor
 		implements CellEditorListener
 	{
-		private JComboBox stateMatcherTypeCombo;
+		private JComboBox<Object> stateMatcherTypeCombo;
 		private FindStatesTableModel theTableModel;
 
 		StateMatcherAcceptingCellEditor()
 		{
-			stateMatcherTypeCombo = new JComboBox();
+			stateMatcherTypeCombo = new JComboBox<Object>();
 
 			Iterator<?> typeIt = StateMatcherOptions.Accepting.iterator();
 
@@ -550,12 +550,12 @@ class FindStatesTable
 	class StateMatcherForbiddenCellEditor
 		implements CellEditorListener
 	{
-		private JComboBox stateMatcherTypeCombo;
+		private JComboBox<Object>stateMatcherTypeCombo;
 		private FindStatesTableModel theTableModel;
 
 		StateMatcherForbiddenCellEditor()
 		{
-			stateMatcherTypeCombo = new JComboBox();
+			stateMatcherTypeCombo = new JComboBox<Object>();
 
 			Iterator<?> typeIt = StateMatcherOptions.Forbidden.iterator();
 
@@ -598,12 +598,12 @@ class FindStatesTable
 	class StateMatcherDeadlockCellEditor
 		implements CellEditorListener
 	{
-		private JComboBox stateMatcherTypeCombo;
+		private JComboBox<Object> stateMatcherTypeCombo;
 		private FindStatesTableModel theTableModel;
 
 		StateMatcherDeadlockCellEditor()
 		{
-			stateMatcherTypeCombo = new JComboBox();
+			stateMatcherTypeCombo = new JComboBox<Object>();
 
 			Iterator<?> typeIt = StateMatcherOptions.Deadlock.iterator();
 

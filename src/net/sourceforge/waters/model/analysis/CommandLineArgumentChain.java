@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 
 
@@ -44,6 +45,7 @@ public abstract class CommandLineArgumentChain
 
   //#######################################################################
   //# Simple Access
+  @Override
   protected String getArgumentTemplate()
   {
     return "<factory>";
@@ -58,7 +60,7 @@ public abstract class CommandLineArgumentChain
   //#######################################################################
   //# Parsing
   @Override
-  protected void parse(final Iterator<String> iter)
+  public void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
       final String factoryname = iter.next();
@@ -87,7 +89,7 @@ public abstract class CommandLineArgumentChain
   }
 
   @Override
-  protected void configure(final ModuleCompiler compiler)
+  public void configure(final ModuleCompiler compiler)
   {
     mSecondaryFactory.configure(compiler);
   }

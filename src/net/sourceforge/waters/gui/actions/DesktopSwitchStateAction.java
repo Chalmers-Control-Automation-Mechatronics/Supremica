@@ -18,7 +18,6 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -44,7 +43,7 @@ public class DesktopSwitchStateAction extends WatersAction
     String name = null;
     final ModuleContainer container =
       (ModuleContainer) ide.getActiveDocumentContainer();
-    final Map<Proxy,SourceInfo> infomap = container.getSourceInfoMap();
+    final Map<Object,SourceInfo> infomap = container.getSourceInfoMap();
     for (final StateProxy state : mAutomaton.getStates()) {
       if (infomap.get(state).getSourceObject() == node) {
         mState = state;
@@ -68,6 +67,7 @@ public class DesktopSwitchStateAction extends WatersAction
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent e)
   {
     getSimulation().setState(mAutomaton, mState);

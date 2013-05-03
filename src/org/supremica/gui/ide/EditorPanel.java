@@ -272,12 +272,8 @@ public class EditorPanel
             // Update enablement of actions dependent on the right component
             // (component editor panel) --- to be deprecated ...
             if (newComponent instanceof ComponentEditorPanel) {
-                getActions().editorSavePostscriptAction.setEnabled(true);
-                getActions().editorSavePDFAction.setEnabled(true);
                 getActions().editorPrintAction.setEnabled(true);
             } else {
-                getActions().editorSavePostscriptAction.setEnabled(false);
-                getActions().editorSavePDFAction.setEnabled(false);
                 getActions().editorPrintAction.setEnabled(false);
             }
             return true;

@@ -16,6 +16,7 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -32,7 +33,7 @@ import net.sourceforge.waters.subject.base.ProxySubject;
  * disabled.</P>
  *
  * <P>The internal mechanism for the assignment is the {@link
- * ProxySubject#assignFrom(ProxySubject) assignFrom()} method, which
+ * ProxySubject#createUndoInfo(ProxySubject) createUndoInfo} method, which
  * supports uniform assignments between subjects.</P>
  *
  * @author Robi Malik
@@ -47,21 +48,21 @@ public class EditCommand
   /**
    * Creates a new edit command that does not affect the selection.
    * @param  subject   The subject affected by this command.
-   * @param  newstate  A template subject to specify the desired state of the
+   * @param  newState  A template subject to specify the desired state of the
    *                   subject after execution of the command. It should be
    *                   of a type assignable to the subject, but <I>not</I>
    *                   be the same object.
    */
   public EditCommand(final ProxySubject subject,
-                     final ProxySubject newstate)
+                     final ProxySubject newState)
   {
-    this(subject, newstate, null);
+    this(subject, newState, null);
   }
 
   /**
    * Creates a new edit command.
    * @param  subject   The subject affected by this command.
-   * @param  newstate  A template subject to specify the desired state of the
+   * @param  newState  A template subject to specify the desired state of the
    *                   subject after execution of the command. It should be
    *                   of a type assignable to the subject, but <I>not</I>
    *                   be the same object.
@@ -70,16 +71,16 @@ public class EditCommand
    *                   should remain unchanged.
    */
   public EditCommand(final ProxySubject subject,
-                     final ProxySubject newstate,
+                     final ProxySubject newState,
                      final SelectionOwner panel)
   {
-    this(subject, newstate, panel, null);
+    this(subject, newState, panel, null);
   }
 
   /**
    * Creates a new edit command.
    * @param  subject   The subject affected by this command.
-   * @param  newstate  A template subject to specify the desired state of the
+   * @param  newState  A template subject to specify the desired state of the
    *                   subject after execution of the command. It should be
    *                   of a type assignable to the subject, but <I>not</I>
    *                   be the same object.
@@ -89,21 +90,37 @@ public class EditCommand
    * @param  name      The description of the command.
    */
   public EditCommand(final ProxySubject subject,
-                     final ProxySubject newstate,
+                     final ProxySubject newState,
+                     final SelectionOwner panel,
+                     final String name)
+  {
+    this(subject, subject.createUndoInfo(newState, null), panel, name);
+  }
+
+  /**
+   * Creates a new edit command.
+   * @param  subject   The subject affected by this command.
+   * @param  info      Undo information containing assignment instructions.
+   * @param  panel     The panel that contains the item and controls the
+   *                   selection, or <CODE>null</CODE> if the selection
+   *                   should remain unchanged.
+   * @param  name      The description of the command.
+   */
+  public EditCommand(final ProxySubject subject,
+                     final UndoInfo info,
                      final SelectionOwner panel,
                      final String name)
   {
     super(panel, name, panel != null);
     mSubject = subject;
-    mOldState = subject.clone();
-    mNewState = newstate;
+    mUndoInfo = info;
     if (name == null) {
       final String newname = ProxyNamer.getItemClassName(subject) + " Edit";
       setName(newname);
     }
     mHasBeenExecuted = false;
   }
-        
+
 
   //#########################################################################
   //# Simple Access
@@ -115,32 +132,12 @@ public class EditCommand
     return mSubject;
   }
 
-  /**
-   * Gets the state of the affected subject before execution of the command.
-   * The object returned is a clone of the original subject in the state
-   * before the command was first executed.
-   */
-  public ProxySubject getOldState()
-  {
-    return mOldState;
-  }
-
-  /**
-   * Gets the state of the affected subject after execution of the command.
-   * The object returned is the dummy object given by the user to specify
-   * the desired value of the subject after this command.
-   */
-  public ProxySubject getNewState()
-  {
-    return mNewState;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command
   public void execute()
   {
-    mSubject.assignFrom(mNewState);
+    mUndoInfo.redo(mSubject);
     if (mHasBeenExecuted) {
       updateSelection();
     } else {
@@ -150,7 +147,7 @@ public class EditCommand
 
   public void undo()
   {
-    mSubject.assignFrom(mOldState);
+    mUndoInfo.undo(mSubject);
     updateSelection();
   }
 
@@ -173,8 +170,7 @@ public class EditCommand
   //#########################################################################
   //# Data Members
   private final ProxySubject mSubject;
-  private final ProxySubject mNewState;
-  private final ProxySubject mOldState;
+  private final UndoInfo mUndoInfo;
   private boolean mHasBeenExecuted;
 
 }

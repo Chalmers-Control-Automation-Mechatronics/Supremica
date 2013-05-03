@@ -624,7 +624,7 @@ public class JAXBModuleExporter
 
     final LabelBlockProxy labelBlockProxy = proxy.getLabelBlock();
 
-    if (!labelBlockProxy.getEventList().isEmpty()) {
+    if (!labelBlockProxy.getEventIdentifierList().isEmpty()) {
       final LabelBlock labelBlockElement =
         visitLabelBlockProxy(labelBlockProxy);
       element.setLabelBlock(labelBlockElement);
@@ -679,8 +679,18 @@ public class JAXBModuleExporter
   {
     copyAliasProxy(proxy, element);
     final ExpressionProxy eventListProxy = proxy.getExpression();
-    final EventListExpression eventListElement =
-      (EventListExpression) eventListProxy.acceptVisitor(this);
+    final ExpressionType expressionElement =
+      (ExpressionType) eventListProxy.acceptVisitor(this);
+    final EventListExpression eventListElement;
+    if (expressionElement instanceof EventListExpression) {
+      eventListElement = (EventListExpression) expressionElement;
+    } else {
+      final EventListType elist = mFactory.createEventListType();
+      elist.getList().add(expressionElement);
+      eventListElement = mFactory.createEventListExpression();
+      eventListElement.setEventList(elist);
+      eventListElement.setUnpack(true);
+    }
     element.setExpression(eventListElement);
   }
 
@@ -870,7 +880,7 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyProxy(proxy, element);
-    final List<Proxy> eventListProxy = proxy.getEventList();
+    final List<Proxy> eventListProxy = proxy.getEventIdentifierList();
     final List<?> untyped = element.getList();
     @SuppressWarnings("unchecked")
     final List<ElementType> eventListElement = (List<ElementType>) untyped;
@@ -927,9 +937,7 @@ public class JAXBModuleExporter
     mModuleSequenceListHandler.toJAXB(this, list, element);
   }
 
-  private void copyNodeProxy
-      (final NodeProxy proxy,
-       final NodeType element)
+  private void copyNodeProxy(final NodeProxy proxy, final NodeType element)
     throws VisitorException
   {
     copyNamedProxy(proxy, element);
@@ -938,6 +946,9 @@ public class JAXBModuleExporter
       (EventListExpression) propositionsProxy.acceptVisitor(this);
     final EventListType propositionsList = propositionsElement.getEventList();
     element.setPropositions(propositionsList);
+    final Map<String,String> attribs = proxy.getAttributes();
+    final AttributeMap attribsElement = createAttributeMap(attribs);
+    element.setAttributeMap(attribsElement);
   }
 
   private void copyParameterBindingProxy
@@ -958,7 +969,7 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyExpressionProxy(proxy, element);
-    final List<Proxy> eventListProxy = proxy.getEventList();
+    final List<Proxy> eventListProxy = proxy.getEventIdentifierList();
     mEventListExpressionEventListHandler.toJAXB(this, eventListProxy, element);
   }
 

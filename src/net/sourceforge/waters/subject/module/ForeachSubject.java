@@ -15,8 +15,10 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -26,8 +28,13 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -91,6 +98,7 @@ public final class ForeachSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public ForeachSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -98,46 +106,72 @@ public final class ForeachSubject
     return (ForeachSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final ForeachSubject downcast = (ForeachSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final SimpleExpressionSubject range = downcast.getRange();
-      if (mRange.getClass() != range.getClass()) {
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
         mRange.setParent(null);
-        mRange = range.clone();
+        mRange = (SimpleExpressionSubject) newValue;
         mRange.setParent(this);
-        change = true;
-      } else {
-        mRange.assignFrom(range);
-      }
-      final SimpleExpressionSubject guard = downcast.getGuard();
-      if (mGuard == guard) {
-        // nothing
-      } else if (mGuard == null) {
-        mGuard = guard.clone();
-        mGuard.setParent(this);
-        change = true;
-      } else if (guard == null) {
-        mGuard.setParent(null);
-        mGuard = null;
-        change = true;
-      } else if (mGuard.getClass() != guard.getClass()) {
-        mGuard.setParent(null);
-        mGuard = guard.clone();
-        mGuard.setParent(this);
-        change = true;
-      } else {
-        mGuard.assignFrom(guard);
-      }
-      final ListSubject<AbstractSubject> body = downcast.getBodyModifiable();
-      mBody.assignFrom(body);
-      if (change) {
-        fireStateChanged();
+        return ModelChangeEvent.createStateChanged(this);
+      case 3:
+        if (mGuard != null) {
+          mGuard.setParent(null);
+        }
+        mGuard = (SimpleExpressionSubject) newValue;
+        if (mGuard != null) {
+          mGuard.setParent(this);
+        }
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final ForeachSubject downcast = (ForeachSubject) newState;
+    if (mRange.getClass() == downcast.mRange.getClass()) {
+      final UndoInfo step2 = mRange.createUndoInfo(downcast.mRange, boundary);
+      if (step2 != null) {
+        info.add(step2);
+      }
+    } else {
+      final SimpleExpressionSubject clone2 = downcast.mRange.clone();
+      final UndoInfo step2 = new ReplacementUndoInfo(2, mRange, clone2);
+      info.add(step2);
+    }
+    final boolean null3a = mGuard == null;
+    final boolean null3b = downcast.mGuard == null;
+    if (null3a != null3b ||
+        !null3a && mGuard.getClass() != downcast.mGuard.getClass()) {
+      if (boundary ==  null || !boundary.contains(mGuard)) {
+        final SimpleExpressionSubject clone3 =
+          ProxyTools.clone(downcast.mGuard);
+        final UndoInfo step3 = new ReplacementUndoInfo(3, mGuard, clone3);
+        info.add(step3);
+      }
+    } else if (!null3a) {
+      final UndoInfo step3 = mGuard.createUndoInfo(downcast.mGuard, boundary);
+      if (step3 != null) {
+        info.add(step3);
+      }
+    }
+    final UndoInfo step4 = mBody.createUndoInfo(downcast.mBody, boundary);
+    if (step4 != null) {
+      info.add(step4);
+    }
   }
 
 

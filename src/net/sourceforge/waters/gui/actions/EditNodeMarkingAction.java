@@ -60,7 +60,7 @@ public class EditNodeMarkingAction
     final String name = ident.toString();
     putValue(Action.NAME, name);
     final List<AbstractSubject> props =
-      node.getPropositions().getEventListModifiable();
+      node.getPropositions().getEventIdentifierListModifiable();
     if (props.contains(ident)) {
       putValue(Action.SHORT_DESCRIPTION,
                "Remove marking " + name + " from this node");
@@ -81,7 +81,7 @@ public class EditNodeMarkingAction
     final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
     final NodeSubject cloned = (NodeSubject) cloner.getClone(mNode);
     final List<AbstractSubject> props =
-      cloned.getPropositions().getEventListModifiable();
+      cloned.getPropositions().getEventIdentifierListModifiable();
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     final Iterator<AbstractSubject> iter = props.iterator();
     boolean removed = false;

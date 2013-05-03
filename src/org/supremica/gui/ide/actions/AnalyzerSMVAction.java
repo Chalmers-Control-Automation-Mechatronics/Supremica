@@ -35,44 +35,47 @@ public class AnalyzerSMVAction extends IDEAction {
     private static final long serialVersionUID = -5526955419215441122L;
     private static Logger logger = LoggerFactory.createLogger(AnalyzerSMVAction.class);
 
-    public AnalyzerSMVAction(List<IDEAction> actionList){
+    public AnalyzerSMVAction(final List<IDEAction> actionList){
         super(actionList);
-        
+
         setAnalyzerActiveRequired(true);
-        
+
         putValue(Action.NAME, "Verify nonblocking using NuSMV");
         putValue(Action.SHORT_DESCRIPTION, "Verify nonblocking using NuSMV");
     }
-    
+
     @Override
     public void doAction() {
-        DocumentProxy doc = ide.getActiveDocumentContainer().getDocument();
+        final DocumentProxy doc = ide.getActiveDocumentContainer().getDocument();
         if(doc instanceof ModuleProxy){
-            ModuleProxy m = (ModuleProxy) doc;
-            
+            final ModuleProxy m = (ModuleProxy) doc;
+
             try {
-                File f = File.createTempFile("supremica-NuSmv-" + m.getName(), ".smv");
-                PrintWriter pw = new PrintWriter(f);
+                final File f = File.createTempFile("supremica-NuSmv-" + m.getName(), ".smv");
+                final PrintWriter pw = new PrintWriter(f);
 
                 (new EFAToNuSMV()).print(m, pw, Arrays.asList(new EFAToNuSMV.SpecPrinterNonBlocking()));
                 pw.flush();
                 printFileToLog(f);
-                runNuSMV(f);                
-            } catch (IOException ex) {
+                runNuSMV(f);
+            } catch (final IOException ex) {
                 logger.error("IO error occurred while executing NuSMV module: " + ex.getMessage(), ex);
             }
         } else {
             logger.error("Document is not a Module (it is " + doc.getClass().toString() + ")");
-        }                
+        }
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         doAction();
     }
-    
-    
-    private void printFileToLog(File f) throws FileNotFoundException, IOException{
-        BufferedReader br = new BufferedReader(new FileReader(f));
+
+
+    private void printFileToLog(final File f)
+      throws FileNotFoundException, IOException
+    {
+      final BufferedReader br = new BufferedReader(new FileReader(f));
+      try {
         int line = 1;
         logger.info("File for NuSMV: ");
         while(br.ready()){
@@ -80,19 +83,21 @@ public class AnalyzerSMVAction extends IDEAction {
             line++;
         }
         logger.info("End of file for NuSMV.");
-    
+      } finally {
+        br.close();
+      }
     }
-    
-    private void runNuSMV(File inputFile) throws IOException{
-        String[] commands  = new String[]{
-            "c:\\Progs\\NuSMV-2.4.3\\2.4.3\\bin\\NuSMV.exe ", 
+
+    private void runNuSMV(final File inputFile) throws IOException{
+        final String[] commands  = new String[]{
+            "c:\\Progs\\NuSMV-2.4.3\\2.4.3\\bin\\NuSMV.exe ",
             inputFile.getAbsolutePath()};
 
-        java.lang.ProcessBuilder pb = new ProcessBuilder(commands);
+        final java.lang.ProcessBuilder pb = new ProcessBuilder(commands);
         pb.redirectErrorStream(true);
-        Process p = pb.start();
-        InputStream is = p.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        final Process p = pb.start();
+        final InputStream is = p.getInputStream();
+        final BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
         runMainOutputLoop(br, p);
     }
@@ -107,25 +112,25 @@ public class AnalyzerSMVAction extends IDEAction {
      * @param r
      * @param p
      */
-    private void runMainOutputLoop(BufferedReader br, Process p) throws IOException{
+    private void runMainOutputLoop(final BufferedReader br, final Process p) throws IOException{
         boolean term = false;
         while(!term){
             boolean alive = true;
             try{
                 p.exitValue();
                 alive = false;
-            } catch(IllegalThreadStateException e) { 
+            } catch(final IllegalThreadStateException e) {
                 // expected, do nothing
             }
-            boolean ready = br.ready();
+            final boolean ready = br.ready();
 
             if(ready){
                  while(br.ready())
-                    logger.info(br.readLine());                            
+                    logger.info(br.readLine());
             } else {
                 term = !alive; // terminate the loop if the process is not alive
-            }                
-        }                        
+            }
+        }
     }
 
 }

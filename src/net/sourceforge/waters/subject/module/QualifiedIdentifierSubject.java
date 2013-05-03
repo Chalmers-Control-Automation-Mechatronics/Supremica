@@ -12,13 +12,20 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -69,6 +76,7 @@ public final class QualifiedIdentifierSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public QualifiedIdentifierSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -76,36 +84,63 @@ public final class QualifiedIdentifierSubject
     return (QualifiedIdentifierSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final QualifiedIdentifierSubject downcast =
-        (QualifiedIdentifierSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final IdentifierSubject baseIdentifier = downcast.getBaseIdentifier();
-      if (mBaseIdentifier.getClass() != baseIdentifier.getClass()) {
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
         mBaseIdentifier.setParent(null);
-        mBaseIdentifier = baseIdentifier.clone();
+        mBaseIdentifier = (IdentifierSubject) newValue;
         mBaseIdentifier.setParent(this);
-        change = true;
-      } else {
-        mBaseIdentifier.assignFrom(baseIdentifier);
-      }
-      final IdentifierSubject componentIdentifier =
-        downcast.getComponentIdentifier();
-      if (mComponentIdentifier.getClass() != componentIdentifier.getClass()) {
+        return ModelChangeEvent.createStateChanged(this);
+      case 3:
         mComponentIdentifier.setParent(null);
-        mComponentIdentifier = componentIdentifier.clone();
+        mComponentIdentifier = (IdentifierSubject) newValue;
         mComponentIdentifier.setParent(this);
-        change = true;
-      } else {
-        mComponentIdentifier.assignFrom(componentIdentifier);
-      }
-      if (change) {
-        fireStateChanged();
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final QualifiedIdentifierSubject downcast =
+      (QualifiedIdentifierSubject) newState;
+    if (mBaseIdentifier.getClass() == downcast.mBaseIdentifier.getClass()) {
+      final UndoInfo step2 =
+        mBaseIdentifier.createUndoInfo(downcast.mBaseIdentifier, boundary);
+      if (step2 != null) {
+        info.add(step2);
+      }
+    } else {
+      final IdentifierSubject clone2 = downcast.mBaseIdentifier.clone();
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mBaseIdentifier, clone2);
+      info.add(step2);
+    }
+    if (mComponentIdentifier.getClass() == downcast.mComponentIdentifier.getClass()) {
+      final UndoInfo step3 =
+        mComponentIdentifier.createUndoInfo(downcast.mComponentIdentifier, boundary);
+      if (step3 != null) {
+        info.add(step3);
+      }
+    } else {
+      final IdentifierSubject clone3 = downcast.mComponentIdentifier.clone();
+      final UndoInfo step3 =
+        new ReplacementUndoInfo(3, mComponentIdentifier, clone3);
+      info.add(step3);
+    }
   }
 
 

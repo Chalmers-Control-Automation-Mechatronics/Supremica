@@ -12,6 +12,8 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
@@ -19,7 +21,12 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -69,6 +76,7 @@ public final class UnaryExpressionSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public UnaryExpressionSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -76,31 +84,52 @@ public final class UnaryExpressionSubject
     return (UnaryExpressionSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final UnaryExpressionSubject downcast =
-        (UnaryExpressionSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final UnaryOperator operator = downcast.getOperator();
-      if (mOperator != operator) {
-        mOperator = operator;
-        change = true;
-      }
-      final SimpleExpressionSubject subTerm = downcast.getSubTerm();
-      if (mSubTerm.getClass() != subTerm.getClass()) {
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
+        mOperator = (UnaryOperator) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 3:
         mSubTerm.setParent(null);
-        mSubTerm = subTerm.clone();
+        mSubTerm = (SimpleExpressionSubject) newValue;
         mSubTerm.setParent(this);
-        change = true;
-      } else {
-        mSubTerm.assignFrom(subTerm);
-      }
-      if (change) {
-        fireStateChanged();
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final UnaryExpressionSubject downcast = (UnaryExpressionSubject) newState;
+    if (!mOperator.equals(downcast.mOperator)) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mOperator, downcast.mOperator);
+      info.add(step2);
+    }
+    if (mSubTerm.getClass() == downcast.mSubTerm.getClass()) {
+      final UndoInfo step3 =
+        mSubTerm.createUndoInfo(downcast.mSubTerm, boundary);
+      if (step3 != null) {
+        info.add(step3);
+      }
+    } else {
+      final SimpleExpressionSubject clone3 = downcast.mSubTerm.clone();
+      final UndoInfo step3 = new ReplacementUndoInfo(3, mSubTerm, clone3);
+      info.add(step3);
+    }
   }
 
 

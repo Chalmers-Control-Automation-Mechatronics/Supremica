@@ -8,7 +8,7 @@ import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 import java.util.Set;
 
 
@@ -120,3 +120,4 @@ public class AnnotatedMemStateProxy implements StateProxy
     return "S:" + mName;
   }
 }
+

@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -44,7 +46,7 @@ public abstract class AbstractAutomatonBuilderTest
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mAutomatonBuilder = createAutomatonBuilder(factory);
-    mIsomorphismChecker = new IsomorphismChecker(factory, true);
+    mIsomorphismChecker = new IsomorphismChecker(factory, true, true);
     setNodeLimit();
   }
 

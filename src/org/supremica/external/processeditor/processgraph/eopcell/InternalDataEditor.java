@@ -51,7 +51,7 @@ public class InternalDataEditor
 		fillTable(internalTable.getTable());
 		
 		//Set up the editor
-		JComboBox validTypesComboBox = new JComboBox();
+		JComboBox<String> validTypesComboBox = new JComboBox<String>();
 		validTypesComboBox.addItem("Actuator");
 		validTypesComboBox.addItem("Variable");
 		validTypesComboBox.addItem("Sensor");

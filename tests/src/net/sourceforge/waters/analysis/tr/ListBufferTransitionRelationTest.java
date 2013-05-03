@@ -21,8 +21,8 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -469,7 +469,7 @@ public class ListBufferTransitionRelationTest extends
     final String comment = "Test output from " +
       ProxyTools.getShortClassName(this) + '.';
     saveAutomaton(result, desname, comment);
-    final IsomorphismChecker checker = new IsomorphismChecker(factory, false);
+    final IsomorphismChecker checker = new IsomorphismChecker(factory, false, true);
     checker.checkIsomorphism(result, aut);
   }
 
@@ -498,7 +498,7 @@ public class ListBufferTransitionRelationTest extends
       new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
     rel.checkIntegrity();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    final IsomorphismChecker checker = new IsomorphismChecker(factory, false);
+    final IsomorphismChecker checker = new IsomorphismChecker(factory, false, true);
     final String autname = aut.getName();
     final ComponentKind kind = aut.getKind();
     final Collection<EventProxy> events = aut.getEvents();
@@ -555,7 +555,7 @@ public class ListBufferTransitionRelationTest extends
     final StateEncoding stateEnc = new StateEncoding(aut);
     final EventEncoding eventEnc = new EventEncoding(aut, translator);
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    final IsomorphismChecker checker = new IsomorphismChecker(factory, false);
+    final IsomorphismChecker checker = new IsomorphismChecker(factory, false, true);
     final String autname = aut.getName();
     final ComponentKind kind = aut.getKind();
     final Collection<EventProxy> events = aut.getEvents();

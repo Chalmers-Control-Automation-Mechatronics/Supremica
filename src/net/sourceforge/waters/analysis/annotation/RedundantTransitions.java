@@ -1,7 +1,7 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TLongIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TLongIntHashMap;
 
 import java.util.Set;
 
@@ -150,3 +150,4 @@ public class RedundantTransitions
     TIME += System.currentTimeMillis();
   }
 }
+

@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+
 
 /**
  * An integer command line argument passed to a {@link ModelVerifierFactory}.
@@ -90,7 +92,7 @@ public abstract class CommandLineArgumentInteger
   //#######################################################################
   //# Parsing
   @Override
-  protected void parse(final Iterator<String> iter)
+  public void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
       final String value = iter.next();

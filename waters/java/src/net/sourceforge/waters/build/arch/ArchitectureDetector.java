@@ -29,7 +29,7 @@ import java.lang.reflect.Field;
  *   &lt;searchpath&gt; &lt;propfile&gt;</CODE><BR>
  * Examines each subdirectory &lt;subdir&gt of the given directory
  * &lt;searchpath&gt, recursively searching for dynamic libraries.
- * The name of the first subdirectory containing library that can be
+ * The name of the first subdirectory containing a library that can be
  * successfully loaded is placed as a property in the file &lt;propfile&gt,
  * which will contain a line like this:<BR>
  * &nbsp;&nbsp;<CODE>java.arch = &lt;subdir&gt;</CODE></P>
@@ -42,7 +42,7 @@ import java.lang.reflect.Field;
  * <LI>It will not attempt to load more than one dynamic library per
  * subdirectory. As soon as one attempt fails, the next subdirectory will
  * be searched.</LI>
- * <LI>If not loadable library can be found, the <CODE>java.arch</CODE>
+ * <LI>If no loadable library can be found, the <CODE>java.arch</CODE>
  * variable will be defined to be empty.</LI>
  * </UL>
  *
@@ -101,6 +101,9 @@ public class ArchitectureDetector
         }
       } else {
         final String name = child.getName();
+        if (name.equals("libBisimulationEquivalence.so")) {
+          continue;
+        }
         final String libname = LIBRARY_FILTER.getLibraryName(name);
         try {
           System.setProperty("java.library.path", subdir.toString());

@@ -9,10 +9,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.HashFunctions;
-import gnu.trove.TIntFunction;
-import gnu.trove.TIntIntProcedure;
-import gnu.trove.TIntProcedure;
+import gnu.trove.function.TIntFunction;
+import gnu.trove.procedure.TIntIntProcedure;
+import gnu.trove.procedure.TIntProcedure;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -160,10 +159,11 @@ public class WatersIntIntHashMap
   /**
    * @return a deep clone of this collection
    */
+  @Override
   public Object clone()
   {
     final WatersIntIntHashMap m = (WatersIntIntHashMap) super.clone();
-    m.mValues = (int[]) this.mValues.clone();
+    m.mValues = this.mValues.clone();
     return m;
   }
 
@@ -252,6 +252,7 @@ public class WatersIntIntHashMap
    * @param newCapacity
    *          an <code>int</code> value
    */
+  @Override
   protected void rehash(final int newCapacity)
   {
     final int oldCapacity = _set.length;
@@ -279,7 +280,8 @@ public class WatersIntIntHashMap
    *
    * @param key
    *          an <code>int</code> value
-   * @return the value of <tt>key</tt> or (int)0 if no such mapping exists.
+   * @return the value of <tt>key</tt> or the default value if no such
+   *         mapping exists.
    */
   public int get(final int key)
   {
@@ -291,11 +293,12 @@ public class WatersIntIntHashMap
    * Empties the map.
    *
    */
+  @Override
   public void clear()
   {
     super.clear();
-    Arrays.fill(_set, 0, _set.length, (int) 0);
-    Arrays.fill(mValues, 0, mValues.length, (int) 0);
+    Arrays.fill(_set, 0, _set.length, 0);
+    Arrays.fill(mValues, 0, mValues.length, 0);
     Arrays.fill(_states, 0, _states.length, FREE);
   }
 
@@ -304,11 +307,12 @@ public class WatersIntIntHashMap
    *
    * @param key
    *          an <code>int</code> value
-   * @return an <code>int</code> value, or (int)0 if no mapping for key exists
+   * @return an <code>int</code> value, or the default value if no mapping
+   *         for key exists
    */
   public int remove(final int key)
   {
-    int prev = (int) 0;
+    int prev = mDefaultValue;
     final int index = index(key);
     if (index >= 0) {
       prev = mValues[index];
@@ -324,6 +328,7 @@ public class WatersIntIntHashMap
    *          an <code>Object</code> value
    * @return a <code>boolean</code> value
    */
+  @Override
   public boolean equals(final Object other)
   {
     if (!(other instanceof WatersIntIntHashMap)) {
@@ -336,6 +341,7 @@ public class WatersIntIntHashMap
     return forEachEntry(new EqProcedure(that));
   }
 
+  @Override
   public int hashCode()
   {
     final HashProcedure p = new HashProcedure();
@@ -353,6 +359,7 @@ public class WatersIntIntHashMap
       return h;
     }
 
+    @Override
     public final boolean execute(final int key, final int value)
     {
       h += (_hashingStrategy.computeHashCode(key) ^ HashFunctions.hash(value));
@@ -370,6 +377,7 @@ public class WatersIntIntHashMap
       _otherMap = otherMap;
     }
 
+    @Override
     public final boolean execute(final int key, final int value)
     {
       final int index = _otherMap.index(key);
@@ -395,6 +403,7 @@ public class WatersIntIntHashMap
    * @param index
    *          an <code>int</code> value
    */
+  @Override
   protected void removeAt(final int index)
   {
     mValues[index] = mDefaultValue;
@@ -453,7 +462,7 @@ public class WatersIntIntHashMap
     if (a.length < size) {
       a = (int[]) Array.newInstance(a.getClass().getComponentType(), size);
     }
-    final int[] k = (int[]) _set;
+    final int[] k = _set;
     final byte[] states = _states;
     for (int i = k.length, j = 0; i-- > 0;) {
       if (states[i] == FULL) {
@@ -603,7 +612,7 @@ public class WatersIntIntHashMap
    */
   public boolean increment(final int key)
   {
-    return adjustValue(key, (int) 1);
+    return adjustValue(key, 1);
   }
 
   /**
@@ -661,12 +670,14 @@ public class WatersIntIntHashMap
     return newValue;
   }
 
+  @Override
   public String toString()
   {
     final StringBuilder buf = new StringBuilder("{");
     forEachEntry(new TIntIntProcedure() {
       private boolean first = true;
 
+      @Override
       public boolean execute(final int key, final int value)
       {
         if (first)
@@ -703,6 +714,7 @@ public class WatersIntIntHashMap
   private static final long serialVersionUID = 1L;
 
   private final TIntIntProcedure PUT_ALL_PROC = new TIntIntProcedure() {
+    @Override
     public boolean execute(final int key, final int value)
     {
       put(key, value);
@@ -711,3 +723,4 @@ public class WatersIntIntHashMap
   };
 
 }
+

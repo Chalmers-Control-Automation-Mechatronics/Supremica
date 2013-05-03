@@ -38,7 +38,7 @@ public class GlpkUI
     private boolean[][][] optimalAltPathVariables = null;
 
     /** Creates a new instance of GlpkUI */
-    public GlpkUI(Milp milpConstructor)
+    public GlpkUI(final Milp milpConstructor)
         throws Exception
     {
         this.milpConstructor = milpConstructor;
@@ -66,8 +66,8 @@ public class GlpkUI
     public void createModelFile()
         throws MilpException, IOException
     {
-        BufferedWriter w = new BufferedWriter(new FileWriter(modelFile));
-
+      final BufferedWriter w = new BufferedWriter(new FileWriter(modelFile));
+      try {
         // Definitions of parameters
         w.write("param nrOfPlants >= 0;");
         w.newLine();
@@ -102,19 +102,19 @@ public class GlpkUI
         w.newLine();
 
         // Write the definition of alernative-path variables to the model file
-        for (int[] altPathVar : milpConstructor.getAltPathVaribles())
+        for (final int[] altPathVar : milpConstructor.getAltPathVaribles())
         {
             w.write("var " + makeAltPathsVariableStr(altPathVar) + ", binary;\n");
         }
         // Write the definition of mutex variables to the model file
-        ArrayList<String> mutexVariables = milpConstructor.getMutexVariables();
-        for (String mutexVar : mutexVariables)
+        final ArrayList<String> mutexVariables = milpConstructor.getMutexVariables();
+        for (final String mutexVar : mutexVariables)
         {
             w.write("var " + mutexVar + ", binary;\n");
         }
         // Write the definition of the so called internal precedence variables to the model file
-        ArrayList<String> internalPrecVariables = milpConstructor.getInternalPrecVariables();
-        for (String internalPrecVar : internalPrecVariables)
+        final ArrayList<String> internalPrecVariables = milpConstructor.getInternalPrecVariables();
+        for (final String internalPrecVar : internalPrecVariables)
         {
             w.write("var " + internalPrecVar + ", binary;\n");
         }
@@ -132,7 +132,7 @@ public class GlpkUI
 
         // The cycle time constraints
         w.newLine();
-        for (int[] constr : milpConstructor.getCycleTimeConstraints())
+        for (final int[] constr : milpConstructor.getCycleTimeConstraints())
         {
              w.write("cycle_time_" + "r" + constr[0] + " : c >= " + "time[" + constr[0] +
                      ", " + constr[1] + "];\n");
@@ -140,25 +140,25 @@ public class GlpkUI
 
         // The initial (precedence) constraints
         w.newLine();
-        for (int[] constr : milpConstructor.getInitPrecConstraints())
-        {           
+        for (final int[] constr : milpConstructor.getInitPrecConstraints())
+        {
              w.write("initial_" + "r" + constr[0] + "_" + constr[1] + " : time[" +
                      constr[0] + ", " + constr[1] + "] >= deltaTime[" + constr[0] + ", " + constr[1] + "];\n");
         }
 
         // The precedence constraints
         w.newLine();
-        for (int[] constr : milpConstructor.getPrecConstraints())
+        for (final int[] constr : milpConstructor.getPrecConstraints())
         {
             int counter = 0;
-            
+
             if (constr.length > 3)
             {
-                for (int[] altVar : milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]}))
+                for (final int[] altVar : milpConstructor.getActiveAltPathVars(new int[]{constr[0], constr[1], constr[3]}))
                 {
-                    w.write("prec_" + "r" + constr[0] + "_" + constr[1] + "_" + constr[2] + "_" + counter++ + " : " + 
-                            "time[" + constr[0] + ", " + constr[2] + "] >= " + 
-                            " time[" + constr[0] + ", " + constr[1] + "] + " + 
+                    w.write("prec_" + "r" + constr[0] + "_" + constr[1] + "_" + constr[2] + "_" + counter++ + " : " +
+                            "time[" + constr[0] + ", " + constr[2] + "] >= " +
+                            " time[" + constr[0] + ", " + constr[1] + "] + " +
                             "deltaTime[" + constr[0] + ", " + constr[2] + "]" + " - bigM*(1 - " +
                             milpConstructor.makeAltPathsVariable(altVar[0], altVar[1], altVar[2]) +
                             ") + epsilon;\n");
@@ -174,11 +174,11 @@ public class GlpkUI
 
         // The alternative paths constraints
         w.newLine();
-        for (Constraint constr : milpConstructor.getAltPathsConstraints())
+        for (final Constraint constr : milpConstructor.getAltPathsConstraints())
         {
             w.write("alt_paths_");
 
-            int[] constrId = constr.getId();
+            final int[] constrId = constr.getId();
             if (constrId.length > 2)
             {
                 w.write(milpConstructor.makeAltPathsVariable(constrId[0], constrId[1], constrId[2]) +
@@ -191,8 +191,8 @@ public class GlpkUI
         }
 
         // The mutex constraints
-        w.newLine();       
-        for (int[] constr : milpConstructor.getMutexConstraints())
+        w.newLine();
+        for (final int[] constr : milpConstructor.getMutexConstraints())
         {
             // Find all active alt path variables for this b1u1-b2u2-pair
             String allActiveAltVarsStr = "";
@@ -201,12 +201,12 @@ public class GlpkUI
             {
                 for (int j=i+1; j<i+5; j+=2)
                 {
-                    java.util.Collection<int[]> currActiveVars = milpConstructor.getActiveAltPathVars(
+                    final java.util.Collection<int[]> currActiveVars = milpConstructor.getActiveAltPathVars(
                             new int[]{constr[i], constr[j], constr[j+1]});
                     if (currActiveVars.size() > 0)
                     {
-                        convergingStatesCounter++;                      
-                        for (int[] altVar : currActiveVars)
+                        convergingStatesCounter++;
+                        for (final int[] altVar : currActiveVars)
                         {
                             allActiveAltVarsStr += " - " + milpConstructor.makeAltPathsVariable(altVar[0], altVar[1], altVar[2]);
                         }
@@ -214,20 +214,20 @@ public class GlpkUI
                 }
             }
 
-            w.write("mutex_z" + constr[10] + "_r" + constr[0] + "_r" + constr[5] + "_var" + constr[11] + " : " + 
+            w.write("mutex_z" + constr[10] + "_r" + constr[0] + "_r" + constr[5] + "_var" + constr[11] + " : " +
                     milpConstructor.makeTimeVariable(constr[0], constr[1]) + " >= " +
                     milpConstructor.makeTimeVariable(constr[5], constr[8]) + " + epsilon - bigM * (" +
-                    convergingStatesCounter + allActiveAltVarsStr + " + " + 
+                    convergingStatesCounter + allActiveAltVarsStr + " + " +
                     milpConstructor.makeMutexVariable(constr[0], constr[5], constr[10], constr[11]) + ");\n");
-            w.write("dual_mutex_z" + constr[10] + "_r" + constr[0] + "_r" + constr[5] + "_var" + constr[11] + " : " + 
+            w.write("dual_mutex_z" + constr[10] + "_r" + constr[0] + "_r" + constr[5] + "_var" + constr[11] + " : " +
                     milpConstructor.makeTimeVariable(constr[5], constr[6]) + " >= " +
                     milpConstructor.makeTimeVariable(constr[0], constr[3]) + " + epsilon - bigM * (" +
-                    (1 + convergingStatesCounter) + allActiveAltVarsStr + " - " + 
+                    (1 + convergingStatesCounter) + allActiveAltVarsStr + " - " +
                     milpConstructor.makeMutexVariable(constr[0], constr[5], constr[10], constr[11]) + ");\n");
             if (convergingStatesCounter > 0)
             {
-                w.write("mutex_var_limit_z" + constr[10] + "_r" + constr[0] + "_r" + constr[5] + "_var" + constr[11] + " : " + 
-                        "-" + milpConstructor.makeMutexVariable(constr[0], constr[5], constr[10], constr[11]) + " >= " + 
+                w.write("mutex_var_limit_z" + constr[10] + "_r" + constr[0] + "_r" + constr[5] + "_var" + constr[11] + " : " +
+                        "-" + milpConstructor.makeMutexVariable(constr[0], constr[5], constr[10], constr[11]) + " >= " +
                         1.0 / convergingStatesCounter + " * (" + allActiveAltVarsStr + ");\n");
             }
         }
@@ -235,12 +235,12 @@ public class GlpkUI
         // The constraints due to external specifications
         w.newLine();
         int counter = 0;
-        for (ArrayList<int[]> xorConstraintsBlock : milpConstructor.getXorConstraints())
+        for (final ArrayList<int[]> xorConstraintsBlock : milpConstructor.getXorConstraints())
         {
             w.write("xor_" + counter++ + " : ");
 
             String tempStr = "";
-            for (int[] constr : xorConstraintsBlock)
+            for (final int[] constr : xorConstraintsBlock)
             {
                 if (constr.length == 1)
                 {
@@ -262,21 +262,21 @@ public class GlpkUI
 
         // The constraints on the events that are shared between the robots
         counter = 0;
-        for (ArrayList<ArrayList<ArrayList<int[]>>> sharedEventConstraintsBlock : milpConstructor.getSharedEventConstraints())
+        for (final ArrayList<ArrayList<ArrayList<int[]>>> sharedEventConstraintsBlock : milpConstructor.getSharedEventConstraints())
         {
             for (int i1 = 0; i1 < sharedEventConstraintsBlock.size() - 1; i1++)
             {
-                ArrayList<ArrayList<int[]>> allSharedTimeVarsInFirstPlant = sharedEventConstraintsBlock.get(i1);
+                final ArrayList<ArrayList<int[]>> allSharedTimeVarsInFirstPlant = sharedEventConstraintsBlock.get(i1);
 //                String allAltPathVarsInFirstPlantStr = "";
 
                 for (int i2 = i1 + 1; i2 < sharedEventConstraintsBlock.size(); i2++)
                 {
-                     ArrayList<ArrayList<int[]>> allSharedTimeVarsInSecondPlant = sharedEventConstraintsBlock.get(i2);
+                     final ArrayList<ArrayList<int[]>> allSharedTimeVarsInSecondPlant = sharedEventConstraintsBlock.get(i2);
 //                     String allAltPathVarsInSecondPlantStr = "";
 
                      for (int j1 = 0; j1 < allSharedTimeVarsInFirstPlant.size(); j1++)
                      {
-                         ArrayList<int[]> currSharedTimeVarsInFirstPlant = allSharedTimeVarsInFirstPlant.get(j1);
+                         final ArrayList<int[]> currSharedTimeVarsInFirstPlant = allSharedTimeVarsInFirstPlant.get(j1);
                          String constraintTailFirstPlant = "";
                          String allAltPathVarsInFirstPlantStr = "";
                          for (int k1 = 1; k1 < currSharedTimeVarsInFirstPlant.size(); k1++)
@@ -295,11 +295,11 @@ public class GlpkUI
                          {
                              String allAltPathVarsInSecondPlantStr = "";
 
-                             ArrayList<int[]> currSharedTimeVarsInSecondPlant = allSharedTimeVarsInSecondPlant.get(j2);
-                             String primalConstraint = "shared_event_" + counter + " : time[" + currSharedTimeVarsInFirstPlant.get(0)[0] + ", " +
+                             final ArrayList<int[]> currSharedTimeVarsInSecondPlant = allSharedTimeVarsInSecondPlant.get(j2);
+                             final String primalConstraint = "shared_event_" + counter + " : time[" + currSharedTimeVarsInFirstPlant.get(0)[0] + ", " +
                                      currSharedTimeVarsInFirstPlant.get(0)[1] + "] >= time[" + currSharedTimeVarsInSecondPlant.get(0)[0] +
                                      ", " + currSharedTimeVarsInSecondPlant.get(0)[1] + "]";
-                             String dualConstraint = "shared_event_dual_" + counter + " : time[" + currSharedTimeVarsInSecondPlant.get(0)[0] + ", " +
+                             final String dualConstraint = "shared_event_dual_" + counter + " : time[" + currSharedTimeVarsInSecondPlant.get(0)[0] + ", " +
                                      currSharedTimeVarsInSecondPlant.get(0)[1] + "] >= time[" + currSharedTimeVarsInFirstPlant.get(0)[0] +
                                      ", " + currSharedTimeVarsInFirstPlant.get(0)[1] + "]";
 
@@ -348,7 +348,7 @@ public class GlpkUI
         // of booking variables. In many cases (if there is a buffer within a potential
         // "circular wait", only unfeasible constraints are added.
         counter = 0;
-        for (CircularWaitConstraintBlock currConstraint : milpConstructor.getCircularWaitConstraints())
+        for (final CircularWaitConstraintBlock currConstraint : milpConstructor.getCircularWaitConstraints())
         {
             String circWaitConstrStr = "circ_wait_" + counter + " : ";
             String unfeasConstrStr = "unfeas_" + counter++ + " : ";
@@ -356,17 +356,17 @@ public class GlpkUI
             for (int i = 0; i < currConstraint.size(); i++)
             {
                 // Retrieve the plant-zone-state-information about the current circular wait constraint part
-                int zone = currConstraint.get(i)[0];
-                int plant1 = currConstraint.get(i)[1];
-                int plant2 = currConstraint.get(i)[2];
-                int tic1 = currConstraint.get(i)[3];
-                int tic2 = currConstraint.get(i)[4];
- 
+                final int zone = currConstraint.get(i)[0];
+                final int plant1 = currConstraint.get(i)[1];
+                final int plant2 = currConstraint.get(i)[2];
+                final int tic1 = currConstraint.get(i)[3];
+                final int tic2 = currConstraint.get(i)[4];
+
                 try
                 {
                     if (plant1 < plant2)
                     {
-                        int mutexVarIndex = milpConstructor.getMutexVarCounterMap().get(new int[]{
+                        final int mutexVarIndex = milpConstructor.getMutexVarCounterMap().get(new int[]{
                             zone, plant1, plant2, tic1, tic2}).intValue();
 
                         unfeasConstrStr += "(1 - r" + plant1 + "_books_z" + zone + "_before_r" +
@@ -376,7 +376,7 @@ public class GlpkUI
                     }
                     else
                     {
-                        int mutexVarIndex = milpConstructor.getMutexVarCounterMap().get(new int[]{
+                        final int mutexVarIndex = milpConstructor.getMutexVarCounterMap().get(new int[]{
                             zone, plant2, plant1, tic2, tic1}).intValue();
 
                         unfeasConstrStr += "r" + plant2 + "_books_z" + zone + "_before_r" +
@@ -385,7 +385,7 @@ public class GlpkUI
                                plant1 + "_var" + mutexVarIndex + ") + ";
                     }
                }
-               catch (NullPointerException ex)
+               catch (final NullPointerException ex)
                {
                    milpConstructor.addToMessages("Mutex variable with key = {" + zone + ", " +
                            plant1 + ", " + plant2 + ", " + tic1 + ", " + tic2 +
@@ -413,7 +413,7 @@ public class GlpkUI
         w.newLine();
 
         // The numbers of plants resp. zones are inserted into the GLPK-model
-        double[][] deltaTimes = milpConstructor.getDeltaTimes();
+        final double[][] deltaTimes = milpConstructor.getDeltaTimes();
         int maxNrOfStates = 0;
         for (int i = 0; i < deltaTimes.length; i++)
         {
@@ -450,7 +450,7 @@ public class GlpkUI
             w.write(i + "\t\t" + deltaTimes[i][0]);
             for (int j=1; j<deltaTimes[i].length; j++)
             {
-                String prevDeltaTimeStr = "" + deltaTimes[i][j-1];
+                final String prevDeltaTimeStr = "" + deltaTimes[i][j-1];
                 if (prevDeltaTimeStr.length() > 5)
                 {
                     w.write("\t" + deltaTimes[i][j]);
@@ -484,6 +484,9 @@ public class GlpkUI
         w.newLine();
         w.write("end;");
         w.flush();
+      } finally {
+        w.close();
+      }
     }
 
     /**
@@ -500,12 +503,12 @@ public class GlpkUI
      * This method-header allows to choose the model file manually (instead of
      * a temporary file that would be created by the system automatically).
      */
-    private void launchMilpSolver(File currModelFile)
+    private void launchMilpSolver(final File currModelFile)
         throws MilpException, IOException
     {
         // Defines the name of the .exe-file that will launch the GLPK-solver,
         // as well the arguments that are sent as input to the solve (e.g. *.mod and *.sol file names)
-        String[] cmds = new String[5];
+        final String[] cmds = new String[5];
         cmds[0] = "glpsol";
         cmds[1] = "-m";
         cmds[2] = currModelFile.getAbsolutePath();
@@ -517,7 +520,7 @@ public class GlpkUI
             // Launches the MILP-solver with the arguments defined above
             milpProcess = Runtime.getRuntime().exec(cmds);
         }
-        catch (IOException milpNotFoundException)
+        catch (final IOException milpNotFoundException)
         {
             milpConstructor.addToMessages("The GLPK-solver 'glpsol.exe' not found. " +
                     "Make sure that it is registered in your path.", SchedulingConstants.MESSAGE_TYPE_ERROR);
@@ -526,7 +529,7 @@ public class GlpkUI
         }
 
         // Listens for the output of MILP (that is the input to this application)...
-        BufferedReader milpEcho = new BufferedReader(
+        final BufferedReader milpEcho = new BufferedReader(
                 new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
 
         // ...and prints it to stdout
@@ -595,116 +598,115 @@ public class GlpkUI
             optimalAltPathVariables[i] = new boolean[milpConstructor.getDeltaTimes()[i].length]
                     [milpConstructor.getDeltaTimes()[i].length];
         }
+        final BufferedReader r = new BufferedReader(new FileReader(solutionFile));
+        try {
+          String str = r.readLine();
 
-        BufferedReader r = new BufferedReader(new FileReader(solutionFile));
-        String str = r.readLine();
-
-        // Go through the solution file and extract the suggested optimal times for each state
-        while (str != null)
-        {
-            StringTokenizer tokenizer = new StringTokenizer(str);
+          // Go through the solution file and extract the suggested optimal times for each state
+          while (str != null)
+          {
+            final StringTokenizer tokenizer = new StringTokenizer(str);
             String tokenStr = "";
             if (tokenizer.hasMoreTokens())
-                tokenStr = tokenizer.nextToken();
+              tokenStr = tokenizer.nextToken();
 
             if (str.indexOf(" time[") > -1)
             {
-                String strPlantIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
-                String strStateIndex = str.substring(str.indexOf(",") + 1, str.indexOf("]")).trim();
+              final String strPlantIndex = str.substring(str.indexOf("[") + 1, str.indexOf(",")).trim();
+              final String strStateIndex = str.substring(str.indexOf(",") + 1, str.indexOf("]")).trim();
 
-                double cost = -1;
-                boolean valFound = false;
-                while ((tokenStr = tokenizer.nextToken()) != null)
+              double cost = -1;
+              boolean valFound = false;
+              while ((tokenStr = tokenizer.nextToken()) != null)
+              {
+                try
                 {
-                    try
-                    {
-                        cost = Double.parseDouble(tokenStr.trim());
-                        valFound = true;
-                        break;
-                    }
-                    catch (NumberFormatException ex){}
+                  cost = Double.parseDouble(tokenStr.trim());
+                  valFound = true;
+                  break;
                 }
-                if (! valFound)
-                {
-                    throw new MilpException("Cost not found in '" + str + "' (GlpkUI.processSolutionFile())");
-                }
-//                String strCost = str.substring(str.indexOf("]") + 1).trim();
+                catch (final NumberFormatException ex){}
+              }
+              if (! valFound)
+              {
+                throw new MilpException("Cost not found in '" + str + "' (GlpkUI.processSolutionFile())");
+              }
+              //                String strCost = str.substring(str.indexOf("]") + 1).trim();
 
-                int plantIndex = (new Integer(strPlantIndex)).intValue();
-                int stateIndex = (new Integer(strStateIndex)).intValue();
-//                double cost = (new Double(strCost)).doubleValue();
+              final int plantIndex = (new Integer(strPlantIndex)).intValue();
+              final int stateIndex = (new Integer(strStateIndex)).intValue();
+              //                double cost = (new Double(strCost)).doubleValue();
 
-                optimalTimes[plantIndex][stateIndex] = cost;
+              optimalTimes[plantIndex][stateIndex] = cost;
             }
             else if (str.indexOf("c ") >  -1) // Print out the makespan of the system
             {
-//                String strMakespan = str.substring(str.indexOf("c") + 1).trim();
-                double makespan = -1;
-                boolean valFound = false;
-                while ((tokenStr = tokenizer.nextToken()) != null)
+              //                String strMakespan = str.substring(str.indexOf("c") + 1).trim();
+              double makespan = -1;
+              boolean valFound = false;
+              while ((tokenStr = tokenizer.nextToken()) != null)
+              {
+                try
                 {
-                    try
-                    {
-                        makespan = Double.parseDouble(tokenStr.trim());
-                        valFound = true;
-                        break;
-                    }
-                    catch (NumberFormatException ex){}
+                  makespan = Double.parseDouble(tokenStr.trim());
+                  valFound = true;
+                  break;
                 }
-                if (! valFound)
-                {
-                    throw new MilpException("Makespan not found in '" + str + "' (GlpkUI.processSolutionFile())");
-                }
+                catch (final NumberFormatException ex){}
+              }
+              if (! valFound)
+              {
+                throw new MilpException("Makespan not found in '" + str + "' (GlpkUI.processSolutionFile())");
+              }
 
-                makespan = milpConstructor.removeEpsilons(makespan);
-                milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + makespan + ".............................\n",
-                    SchedulingConstants.MESSAGE_TYPE_INFO);
+              makespan = milpConstructor.removeEpsilons(makespan);
+              milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + makespan + ".............................\n",
+                                            SchedulingConstants.MESSAGE_TYPE_INFO);
             }
             else if (str.indexOf(" prec_") > -1)
             {
-                str = str.substring(str.indexOf("_r") + 2);
-                str = str.substring(str.indexOf("_") + 1);
-                str = str.substring(str.indexOf("_") + 1);
-                String strEndStateIndex = str;
-                int counterIndex = str.indexOf("_");
-                if (counterIndex > -1)
-                {
-                    strEndStateIndex = str.substring(0, counterIndex);
-                }
-                
-                if (strEndStateIndex.indexOf(" ") > -1)
-                {
-                    strEndStateIndex = strEndStateIndex.substring(0, strEndStateIndex.indexOf(" "));
-                }
-                // optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
+              str = str.substring(str.indexOf("_r") + 2);
+              str = str.substring(str.indexOf("_") + 1);
+              str = str.substring(str.indexOf("_") + 1);
+              String strEndStateIndex = str;
+              final int counterIndex = str.indexOf("_");
+              if (counterIndex > -1)
+              {
+                strEndStateIndex = str.substring(0, counterIndex);
+              }
+
+              if (strEndStateIndex.indexOf(" ") > -1)
+              {
+                strEndStateIndex = strEndStateIndex.substring(0, strEndStateIndex.indexOf(" "));
+              }
+              // optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
             }
             else if (str.indexOf("_from") > -1 && str.indexOf("alt_paths") < 0)
             {
-                String strplantIndex = str.substring(str.indexOf("r") + 1, str.indexOf("_"));
-                str = str.substring(str.indexOf("_from_") + 6);
-                String strStartStateIndex = str.substring(0, str.indexOf("_"));
-                String strEndStateIndex = str.substring(str.lastIndexOf("_") + 1);
-                if (strEndStateIndex.indexOf(" ") > -1)
-                {
-                    strEndStateIndex = strEndStateIndex.substring(0, strEndStateIndex.indexOf(" "));
-                }
-
-                int plantIndex = (new Integer(strplantIndex)).intValue();
-                int startStateIndex = (new Integer(strStartStateIndex)).intValue();
-                int endStateIndex = (new Integer(strEndStateIndex)).intValue();
-
-                if (str.indexOf(" 1") < 0)
-                {
-                    str = r.readLine();
-                }
-
-                if (str.indexOf(" 0") == str.lastIndexOf(" 0"))
-                {
-                    optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
-                }
+              final String strplantIndex = str.substring(str.indexOf("r") + 1, str.indexOf("_"));
+              str = str.substring(str.indexOf("_from_") + 6);
+              final String strStartStateIndex = str.substring(0, str.indexOf("_"));
+              String strEndStateIndex = str.substring(str.lastIndexOf("_") + 1);
+              if (strEndStateIndex.indexOf(" ") > -1)
+              {
+                strEndStateIndex = strEndStateIndex.substring(0, strEndStateIndex.indexOf(" "));
+              }
+              final int plantIndex = (new Integer(strplantIndex)).intValue();
+              final int startStateIndex = (new Integer(strStartStateIndex)).intValue();
+              final int endStateIndex = (new Integer(strEndStateIndex)).intValue();
+              if (str.indexOf(" 1") < 0)
+              {
+                str = r.readLine();
+              }
+              if (str.indexOf(" 0") == str.lastIndexOf(" 0"))
+              {
+                optimalAltPathVariables[plantIndex][startStateIndex][endStateIndex] = true;
+              }
             }
-
             str = r.readLine();
+          }
+        } finally {
+          r.close();
         }
     }
 
@@ -731,7 +733,7 @@ public class GlpkUI
                 solutionFile.delete();
             }
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             milpConstructor.addToMessages("Cleaning up of the GLPK-solver failed.",
                     SchedulingConstants.MESSAGE_TYPE_ERROR);
@@ -755,7 +757,7 @@ public class GlpkUI
      * stored as int[plantIndex, fromStateIndex, toStateIndex],
      * into string representation.
      */
-    public String makeAltPathsVariableStr(int[] altPathsVariable)
+    public String makeAltPathsVariableStr(final int[] altPathsVariable)
     {
         return "r" + altPathsVariable[0] + "_from_" + altPathsVariable[1] + "_to_" + altPathsVariable[2];
     }

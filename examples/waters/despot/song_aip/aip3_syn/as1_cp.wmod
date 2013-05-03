@@ -1,0 +1,1244 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="as1_cp" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>HISC-CP version of AS1 subsystem.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="AError1AAS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="AError1BAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="ASDwnAS1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="AssmbErrAAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="AssmbErrBAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="DoRprAS1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="DoneReadAS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="DoneWriteAS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ExtrArvConvAS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ExtrArvPlatfAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="GClosesEL_2AS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="GOpensEL_2AS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsType1AS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsType2AS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MvExtrToConvAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="MvExtrToPlatfAS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PArvAtExtractorAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PStopClosesEL_2AS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PStopOpensEL_2AS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvGEL_2AS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvASAS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="PalletLvGEL_2AS1"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="ProcCplAS1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="ProcErrAS1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="ProcPalletAS1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcTyp1AS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcTyp2AS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="QTypeAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="RTasksCplAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ReadLabelAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="RelPalletAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="RobDwnAS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RobRprCplAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="RobUpAS1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RtaskCpl1AAS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RtaskCpl1BAS1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="RtimeoutAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="StrRobRepairAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="StrRtask1AAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="StrRtask1BAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="StrRtimerAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="WrtCplT1A_1BAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="WrtErr1AAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="WrtErr1BAS1"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="IntfAssmbStn_AS1">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="64" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fail2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="128" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-15" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fail3">
+                        <PointGeometry>
+                            <Point X="64" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-15" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="proc">
+                        <PointGeometry>
+                            <Point X="192" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="ok">
+                        <PointGeometry>
+                            <Point X="128" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-7" Y="-26"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fail1">
+                        <PointGeometry>
+                            <Point X="192" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-13" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="err">
+                        <PointGeometry>
+                            <Point X="128" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-9" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="idle" Target="proc">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="fail3" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-44" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="fail2" Target="fail3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="ok" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-46" Y="-34"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="82" Y="72"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="fail1" Target="fail2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="proc" Target="ok">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-28"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="174" Y="70"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="proc" Target="fail1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="err" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcErrAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-46" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="85" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="proc" Target="err">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="169" Y="94"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="op_mutex">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="64" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-22" Y="1"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="64" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-21" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="160" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="1"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-34" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1"/>
+                            <SimpleIdentifier Name="ProcErrAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="112" Y="57"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-34" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_HndlPallet_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s16"/>
+                    <SimpleNode Name="s15"/>
+                    <SimpleNode Name="s14"/>
+                    <SimpleNode Name="s13"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s11"/>
+                    <SimpleNode Name="s10"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s4" Target="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp1AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s11" Target="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RelPalletAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s11" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s14" Target="s14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RelPalletAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s14" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcErrAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ReadLabelAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneReadAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s8" Target="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RelPalletAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s8" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwnAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s6" Target="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobDwnAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s6" Target="s15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrBAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s6" Target="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RTasksCplAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s6" Target="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrAAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s13" Target="s14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneWriteAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s13" Target="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="WrtErr1AAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s7" Target="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s7" Target="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s10" Target="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneWriteAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s10" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="WrtCplT1A_1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s15" Target="s15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s15" Target="s16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToPlatfAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvPlatfAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s16" Target="s14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneWriteAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s16" Target="s16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="WrtErr1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsType1AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QTypeAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsType2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s12" Target="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s12" Target="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s5" Target="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PArvAtExtractorAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_HndlPalletLvAS_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s1" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvASAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1"/>
+                            <SimpleIdentifier Name="ProcErrAS1"/>
+                            <SimpleIdentifier Name="ASDwnAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RelPalletAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopClosesEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_OperateGateEL_2_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GOpensEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1"/>
+                            <SimpleIdentifier Name="ProcCplAS1"/>
+                            <SimpleIdentifier Name="ProcErrAS1"/>
+                            <SimpleIdentifier Name="ASDwnAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_IntfRobot_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp1AS1"/>
+                            <SimpleIdentifier Name="ProcTyp2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RTasksCplAS1"/>
+                            <SimpleIdentifier Name="AssmbErrAAS1"/>
+                            <SimpleIdentifier Name="AssmbErrBAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobDwnAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="l_DoRobotTasks_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s9"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s7"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s19"/>
+                    <SimpleNode Name="s18"/>
+                    <SimpleNode Name="s17"/>
+                    <SimpleNode Name="s16"/>
+                    <SimpleNode Name="s13"/>
+                    <SimpleNode Name="s12"/>
+                    <SimpleNode Name="s11">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s10"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s4" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s18">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AError1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s13" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUpAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s11" Target="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRprAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s18" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrBAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp1AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s12" Target="s13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobRprCplAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s12" Target="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRobRepairAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s5" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RTasksCplAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl1AAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask1AAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s19">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AError1AAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s6" Target="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask1AAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl1AAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s17">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AError1AAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s10" Target="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobDwnAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s19" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrAAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s17" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrAAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s7" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s7" Target="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s7" Target="s16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AError1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s7" Target="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s16" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="AssmbErrBAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s8" Target="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_ASNewEvents_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1"/>
+                            <SimpleIdentifier Name="ProcCplAS1"/>
+                            <SimpleIdentifier Name="ProcErrAS1"/>
+                            <SimpleIdentifier Name="ASDwnAS1"/>
+                            <SimpleIdentifier Name="RelPalletAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_CapGateEL_2_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s2" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_DepGateNExtrSen_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PArvAtExtractorAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PArvAtExtractorAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_Extractor_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvConvAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ExtrArvPlatfAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MvExtrToPlatfAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletArvGateSenEL_2_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletArvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletGateEL_2_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvGEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GOpensEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="GClosesEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PalletStopEL_2_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s1" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvASAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopClosesEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PStopOpensEL_2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_PSenAtExtractor_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletLvASAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PArvAtExtractorAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_QueryPalletTyp_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsType1AS1"/>
+                            <SimpleIdentifier Name="IsType2AS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QTypeAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_RWDevice_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ReadLabelAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="WrtCplT1A_1BAS1"/>
+                            <SimpleIdentifier Name="WrtErr1AAS1"/>
+                            <SimpleIdentifier Name="WrtErr1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneReadAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoneWriteAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_Robot_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtask1AAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl1BAS1"/>
+                            <SimpleIdentifier Name="AError1BAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRtimerAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s5" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobRprCplAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StrRobRepairAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtaskCpl1AAS1"/>
+                            <SimpleIdentifier Name="AError1AAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RtimeoutAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="l_RobotNewEvents_AS1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcTyp1AS1"/>
+                            <SimpleIdentifier Name="ProcTyp2AS1"/>
+                            <SimpleIdentifier Name="RTasksCplAS1"/>
+                            <SimpleIdentifier Name="AssmbErrAAS1"/>
+                            <SimpleIdentifier Name="AssmbErrBAS1"/>
+                            <SimpleIdentifier Name="RobDwnAS1"/>
+                            <SimpleIdentifier Name="DoRprAS1"/>
+                            <SimpleIdentifier Name="RobUpAS1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

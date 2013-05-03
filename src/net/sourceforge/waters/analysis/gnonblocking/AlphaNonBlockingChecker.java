@@ -9,12 +9,13 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,17 +33,17 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.composing.AllSame;
 import net.sourceforge.waters.analysis.modular.BlockedEvents;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -65,8 +66,9 @@ import org.supremica.log.LoggerFactory;
  * @author Simon Ware
  */
 
-public class AlphaNonBlockingChecker extends AbstractConflictChecker
-    implements ConflictChecker
+public class AlphaNonBlockingChecker
+  extends AbstractConflictChecker
+  implements ConflictChecker
 {
 
   // #########################################################################
@@ -84,81 +86,57 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     mAbstractionRules = new LinkedList<AbstractionRule>();
   }
 
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
   }
 
   public SortedSet<AutomatonProxy> addAlpha(final Set<AutomatonProxy> model)
+    throws AnalysisException
   {
     final SortedSet<AutomatonProxy> newmodel = new TreeSet<AutomatonProxy>();
     for (final AutomatonProxy aut : model) {
       final EventEncoding ee = new EventEncoding(aut, getKindTranslator());
-      if (!ee.getEvents().contains(getMarkingProposition())) {
-        ee.addEvent(getMarkingProposition(), getKindTranslator(), true);
+      if (!ee.getEvents().contains(getUsedDefaultMarking())) {
+        ee.addEvent(getUsedDefaultMarking(), getKindTranslator(),
+                    EventEncoding.STATUS_UNUSED);
       }
-      ee.addEvent(mAlpha, getKindTranslator(), true);
-      ee.addEvent(mCont, getKindTranslator(), false);
-      //ee.addEvent(getMarkingProposition(), true);
-      final int alpha = ee.getEventCode(mAlpha);
-      //int cont = ee.getEventCode(mCont);
-      System.out.println(alpha);
-      try {
-        final ListBufferTransitionRelation tr =
-          new ListBufferTransitionRelation(aut, ee,
-                                           ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-        newmodel.add(tr.createAutomaton(getFactory(), ee));
-      } catch (final Throwable t) {
-        System.out.println(t);
-      }
+      ee.addEvent(mAlpha, getKindTranslator(), EventEncoding.STATUS_UNUSED);
+      ee.addEvent(mCont, getKindTranslator(), EventEncoding.STATUS_NONE);
+      final ListBufferTransitionRelation tr =
+        new ListBufferTransitionRelation(aut, ee,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      newmodel.add(tr.createAutomaton(getFactory(), ee));
     }
     return newmodel;
   }
 
   // #########################################################################
   // # Invocation
+  @Override
   public boolean run() throws AnalysisException
   {
     clearStats();
     setUp();
     new AllSame(getModel()); // TODO Is this used?
     mTime -= System.currentTimeMillis();
-    if (getMarkingProposition() == null) {
-      setMarkingProposition(getUsedMarkingProposition());
-    }
-    /*
-    try {
-      mWriter = new BufferedWriter(new FileWriter("/home/darius/supremicastuff/reductions" + getModel().getName()));
-    } catch (final Throwable t) {
-      t.printStackTrace();
-    }
-    Runtime.getRuntime().traceMethodCalls(true);
-    */
     boolean result = false;
-    final double checkerstates = 0;
 
-      final ProjectionList list = project(getModel());
-      System.out.println("done proj");
-      mMinAutMap.clear();
-      //System.out.println(list);
-      if (list == null) {
-        return true;
-      }
-      System.out.println("1");
-      //System.out.println(list.getModel());
-      //System.out.println(list.getModel());
-      final ConflictChecker checker =
-        new NativeConflictChecker(list.getModel(), getMarkingProposition(),
-                                      getFactory());
-      checker
-          .setPreconditionMarking(mAlpha);
-      checker.setNodeLimit(100000);
-      System.out.println("2");
-      result = checker.run();
-     System.out.println(result);
-     System.out.println("3");
-      mFinalStates = checker.getAnalysisResult().getTotalNumberOfStates();
-      mFinalTrans = checker.getAnalysisResult().getTotalNumberOfTransitions();
+    final ProjectionList list = project(getModel());
+    mMinAutMap.clear();
+    if (list == null) {
+      return true;
+    }
+    final ConflictChecker checker =
+      new NativeConflictChecker(list.getModel(),
+                                getUsedDefaultMarking(),
+                                getFactory());
+    checker.setConfiguredPreconditionMarking(mAlpha);
+    checker.setNodeLimit(getNodeLimit());
+    result = checker.run();
+    mFinalStates = checker.getAnalysisResult().getTotalNumberOfStates();
+    mFinalTrans = checker.getAnalysisResult().getTotalNumberOfTransitions();
 
     if (!result) {
       final List<EventProxy> e = new ArrayList<EventProxy>();
@@ -168,42 +146,20 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     } else {
       setSatisfiedResult();
     }
-    System.out.println("result: " + result);
-    System.out.println("checkerstates: " + checkerstates);
     mTime += System.currentTimeMillis();
     try {
-      System.out.println("writing");
       final BufferedWriter write = new BufferedWriter(new FileWriter("/home/darius/Projects/supr/supremica/alpha/" + getModel().getName()));
       write.append(getStats());
-      //write.append("states:" + checkerstates + "\n");
       write.append("result:" + result);
       write.close();
-    } catch (final Throwable t) {
-      t.printStackTrace();
+    } catch (final IOException exception) {
+      // No writing --- never mind ...
     }
-    //System.out.println("Total Switched: " + switched);
     clearStats();
-    /*
-    try {
-      mWriter.flush();
-      mWriter.close();
-    } catch (final Throwable t) {
-      t.printStackTrace();
-    }
-    */
     return result;
-    /*
-     * if (checker.run()) { mStates +=
-     * checker.getAnalysisResult().getTotalNumberOfStates();
-     * setSatisfiedResult(); return true; } else { mStates +=
-     * checker.getAnalysisResult().getTotalNumberOfStates(); TraceProxy counter
-     * = checker.getCounterExample(); counter = list.getTrace(counter, model);
-     * List<EventProxy> e = counter.getEvents(); counter =
-     * getFactory().createSafetyTraceProxy(getModel().getName(), getModel(),
-     * e.subList(0, e.size() - 1)); setFailedResult(counter); return false; }
-     */
   }
 
+  @Override
   public ConflictTraceProxy getCounterExample()
   {
     return null;
@@ -258,6 +214,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  @Override
   public void setNodeLimit(final int limit)
   {
     super.setNodeLimit(limit);
@@ -268,6 +225,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     }
   }
 
+  @Override
   public void setUp()
     throws AnalysisException
   {
@@ -275,10 +233,9 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     final Set<EventProxy> mPropositions = new HashSet<EventProxy>();
     final ProductDESProxyFactory factory = getFactory();
     mPropositions.add(mAlpha);
-    mPropositions.add(getUsedMarkingProposition());
+    mPropositions.add(getUsedDefaultMarking());
     final EventProxy alpha = mAlpha;
-    final EventProxy omega = getUsedMarkingProposition();
-    System.out.println(mPropositions);
+    final EventProxy omega = getUsedDefaultMarking();
     final TauLoopRemovalRule tlrRule =
         new TauLoopRemovalRule(factory, getKindTranslator(), mPropositions);
     mAbstractionRules.add(tlrRule);
@@ -328,12 +285,14 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     mAbstractionRules.add(rttonsRule);
   }
 
-  public void setuplocal(final ProductDESProxy model, final Set<AutomatonProxy> automata)
+  public void setuplocal(final ProductDESProxy model,
+                         final Set<AutomatonProxy> automata)
+    throws EventNotFoundException
   {
     final TObjectIntHashMap<Set<AutomatonProxy>> numlocal =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
+      if (e == getUsedDefaultMarking()) {
         continue;
       }
       final Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
@@ -355,181 +314,14 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     result.setNumberOfStates(mStates);
   }
 
-  /*
-   * private Set<Set<AutomatonProxy>> getMaxAutomaton(Set<AutomatonProxy>
-   * automata) { Set<Set<AutomatonProxy>> pairs = new
-   * THashSet<Set<AutomatonProxy>>(); AutomatonProxy maxaut = null; for
-   * (AutomatonProxy aut : automata) { maxaut = maxaut == null ? aut : maxaut;
-   * maxaut = maxaut.getStates.size() < aut.getStates().size() ? aut : maxaut; }
-   * for (AutomatonProxy aut : automata) { if (maxaut == aut) {continue;}
-   * Set<AutomatonProxy> pair = new THashSet<AutomatonProxy>(2);
-   * pair.add(maxaut); pair.add(aut); pairs.add(pair); } return pairs; }
-   *
-   * private Set<Set<AutomatonProxy>> getMinTransitions(Set<AutomatonProxy>
-   * automata) { Set<Set<AutomatonProxy>> pairs = new
-   * THashSet<Set<AutomatonProxy>>(); AutomatonProxy minaut = null; for
-   * (AutomatonProxy aut : automata) { minaut = minaut == null ? aut : minaut;
-   * minaut = minaut.getTransitions().size() > aut.getStates().size() ? aut :
-   * minaut; } for (AutomatonProxy aut : automata) { if (minaut == aut)
-   * {continue;} Set<AutomatonProxy> pair = new THashSet<AutomatonProxy>(2);
-   * pair.add(minaut); pair.add(aut); pairs.add(pair); } return pairs; }
-   */
-
-  /*
-   * private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy>
-   * automata) { THashMap<AutomatonProxy, PriorityQueue<Tuple>> queues = new
-   * THashMap<AutomatonProxy, PriorityQueue<Tuple>>(); Set<Tuple> possible = new
-   * TreeSet<Tuple>(); for (AutomatonProxy a1 : automata) { queues.put(a1, new
-   * PriorityQueue<Tuple>()); for (AutomatonProxy a2 : automata) { if (a1 == a2)
-   * {continue;} Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
-   * auts.add(a1); auts.add(a2); double size = 0; Set<EventProxy> common = new
-   * HashSet<EventProxy>(model.getEvents()); Set<EventProxy> total = new
-   * HashSet<EventProxy>(); boolean contproj = false; int taus = 0; for
-   * (AutomatonProxy a : auts) { size += Math.log(a.getStates().size());
-   * total.addAll(a.getEvents()); common.retainAll(a.getEvents()); for
-   * (EventProxy e : a.getEvents()) { if (e.getName().startsWith("tau:")) {
-   * taus++; } } } double tot = 1; double uncom = 1; for (AutomatonProxy a :
-   * auts) { int uncom1 = 0; int tot1 = 0; for (TransitionProxy t :
-   * a.getTransitions()) { if (!common.contains(t.getEvent())) { uncom1++; }
-   * tot1++; } tot *= tot1; uncom *= uncom1; } size = uncom / tot;
-   * queues.get(a1).offer(new Tuple(auts, size)); } } for (AutomatonProxy a :
-   * queues.keySet()) { PriorityQueue<Tuple> queue = queues.get(a); if
-   * (queue.isEmpty()) {continue;} if (queue.size() == 1)
-   * {possible.add(queue.poll()); continue;} Tuple tup1 = queue.poll(); Tuple
-   * tup2 = queue.poll(); possible.add(new Tuple(tup1.mSet, tup1.mSize -
-   * tup2.mSize)); } return possible; }
-   */
-
-  /*
-   * private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy>
-   * automata) { Set<Tuple> possible = new TreeSet<Tuple>(); for (AutomatonProxy
-   * a1 : automata) { for (AutomatonProxy a2 : automata) { if (a1 == a2)
-   * {continue;} Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
-   * auts.add(a1); auts.add(a2); double size = 0; Set<EventProxy> common = new
-   * HashSet<EventProxy>(model.getEvents()); Set<EventProxy> total = new
-   * HashSet<EventProxy>(); boolean contproj = false; int taus = 0; for
-   * (AutomatonProxy a : auts) { size += Math.log(a.getStates().size());
-   * total.addAll(a.getEvents()); common.retainAll(a.getEvents()); for
-   * (EventProxy e : a.getEvents()) { if (e.getName().startsWith("tau:")) {
-   * taus++; } } } double tot = total.size(); double uncom = tot - common.size()
-   * - taus; size = uncom/tot; possible.add(new Tuple(auts, size)); } } return
-   * possible; }
-   */
-
-  @SuppressWarnings("unused")
-  private Set<Set<AutomatonProxy>> getMinTransitions(final Set<AutomatonProxy> automata)
-  {
-    final Set<Set<AutomatonProxy>> pairs = new THashSet<Set<AutomatonProxy>>();
-    AutomatonProxy minaut = null;
-    System.out.println("fixed mintrans");
-    for (final AutomatonProxy aut : automata) {
-      minaut = minaut == null ? aut : minaut;
-      minaut = minaut.getTransitions().size() > aut.getTransitions().size() ? aut : minaut;
-    }
-    for (final AutomatonProxy aut : automata) {
-      if (minaut == aut) {continue;}
-      final Set<AutomatonProxy> pair = new THashSet<AutomatonProxy>(2);
-      pair.add(minaut);
-      pair.add(aut);
-      pairs.add(pair);
-    }
-    return pairs;
-  }
-
-  /*private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy> automata)
-  {
-    THashMap<AutomatonProxy, PriorityQueue<Tuple>> queues = new THashMap<AutomatonProxy, PriorityQueue<Tuple>>();
-    Set<Tuple> possible = new TreeSet<Tuple>();
-    for (AutomatonProxy a1 : automata) {
-      queues.put(a1, new PriorityQueue<Tuple>());
-      for (AutomatonProxy a2 : automata) {
-        if (a1 == a2) {continue;}
-        Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
-        auts.add(a1); auts.add(a2);
-        double size = 0;
-        Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-        Set<EventProxy> total = new HashSet<EventProxy>();
-        boolean contproj = false;
-        int taus = 0;
-        for (AutomatonProxy a : auts) {
-          size += Math.log(a.getStates().size());
-          total.addAll(a.getEvents());
-          common.retainAll(a.getEvents());
-          for (EventProxy e : a.getEvents()) {
-            if (e.getName().startsWith("tau:")) {
-              taus++;
-            }
-          }
-        }
-        double tot = 1;
-        double uncom = 1;
-        for (AutomatonProxy a : auts) {
-          int uncom1 = 0;
-          int tot1 = 0;
-          for (TransitionProxy t : a.getTransitions()) {
-            if (!common.contains(t.getEvent())) {
-              uncom1++;
-            }
-            tot1++;
-          }
-          tot *= tot1;
-          uncom *= uncom1;
-        }
-        size = uncom / tot;
-        queues.get(a1).offer(new Tuple(auts, size));
-      }
-    }
-    for (AutomatonProxy a : queues.keySet()) {
-      PriorityQueue<Tuple> queue = queues.get(a);
-      if (queue.isEmpty()) {continue;}
-      if (queue.size() == 1) {possible.add(queue.poll()); continue;}
-      Tuple tup1 = queue.poll();
-      Tuple tup2 = queue.poll();
-      possible.add(new Tuple(tup1.mSet, tup1.mSize - tup2.mSize));
-    }
-    return possible;
-  }*/
-
-
-  /*private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy> automata)
-  {
-    Set<Tuple> possible = new TreeSet<Tuple>();
-    for (AutomatonProxy a1 : automata) {
-      for (AutomatonProxy a2 : automata) {
-        if (a1 == a2) {continue;}
-        Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
-        auts.add(a1); auts.add(a2);
-        double size = 0;
-        Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-        Set<EventProxy> total = new HashSet<EventProxy>();
-        boolean contproj = false;
-        int taus = 0;
-        for (AutomatonProxy a : auts) {
-          size += Math.log(a.getStates().size());
-          total.addAll(a.getEvents());
-          common.retainAll(a.getEvents());
-          for (EventProxy e : a.getEvents()) {
-            if (e.getName().startsWith("tau:")) {
-              taus++;
-            }
-          }
-        }
-        double tot = total.size();
-        double uncom = tot - common.size() - taus;
-        size = uncom/tot;
-        possible.add(new Tuple(auts, size));
-      }
-    }
-    return possible;
-  }*/
-
-  private List<Set<AutomatonProxy>> getMinTransitions(final ProductDESProxy model, final SortedSet<AutomatonProxy> automata)
+  private List<Set<AutomatonProxy>> getMinTransitions
+    (final ProductDESProxy model, final SortedSet<AutomatonProxy> automata)
+    throws EventNotFoundException
   {
     final TObjectIntHashMap<Set<AutomatonProxy>> common =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     final List<Set<AutomatonProxy>> pairs = new ArrayList<Set<AutomatonProxy>>();
     AutomatonProxy minaut = null;
-    System.out.println("realy fixed min trans");
     for (final AutomatonProxy aut : automata) {
       minaut = minaut == null ? aut : minaut;
       minaut = minaut.getTransitions().size() > aut.getTransitions().size() ? aut : minaut;
@@ -547,7 +339,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     final TObjectIntHashMap<Set<AutomatonProxy>> numoccuring =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     for (final EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
+      if (e == getUsedDefaultMarking()) {
         continue;
       }
       final Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
@@ -560,54 +352,14 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
         numoccuring.put(possess, numoccuring.get(possess) + 1);
       }
     }
-    //System.out.println(pairs);
-    /*Collections.sort(pairs, new Comparator<Set<AutomatonProxy>>() {
-        public int compare(Set<AutomatonProxy> a1, Set<AutomatonProxy> a2)
-        {
-          int local1 = numoccuring.get(a1);
-          int local2 = numoccuring.get(a2);
-          if (local1 != local2) {return local2 - local1;}
-          Collection<EventProxy> CommonEvents1 = new THashSet<EventProxy>(model.getEvents());
-          Collection<EventProxy> CommonEvents2 = new THashSet<EventProxy>(model.getEvents());
-          for (AutomatonProxy aut : a1) {
-            CommonEvents1.retainAll(aut.getEvents());
-          }
-          for (AutomatonProxy aut : a2) {
-            CommonEvents2.retainAll(aut.getEvents());
-          }
-          return CommonEvents2.size() - CommonEvents1.size();
-        }
-    });*/
     mCommon = common;
     mNumlocal = numoccuring;
     return pairs;
   }
 
-  /*private Set<AutomatonProxy> pollList(List<AutomatonProxy> possible)
-  {
-    Set<AutomatonProxy> min = Collections.min(possible, new Comparator<Set<AutomatonProxy>>() {
-        public int compare(Set<AutomatonProxy> a1, Set<AutomatonProxy> a2)
-        {
-          int local1 = numoccuring.get(a1);
-          int local2 = numoccuring.get(a2);
-          if (local1 != local2) {return local2 - local1;}
-          Collection<EventProxy> CommonEvents1 = new THashSet<EventProxy>(model.getEvents());
-          Collection<EventProxy> CommonEvents2 = new THashSet<EventProxy>(model.getEvents());
-          for (AutomatonProxy aut : a1) {
-            CommonEvents1.retainAll(aut.getEvents());
-          }
-          for (AutomatonProxy aut : a2) {
-            CommonEvents2.retainAll(aut.getEvents());
-          }
-          return CommonEvents2.size() - CommonEvents1.size();
-        }
-    });
-    possible.remove(min);
-    return min;
-  }*/
-
   @SuppressWarnings("unused")
   private Set<AutomatonProxy> getMinSync(final List<Set<AutomatonProxy>> auts)
+    throws AnalysisException
   {
     int minautnum = 65000;
     Set<AutomatonProxy> minauts = null;
@@ -621,26 +373,21 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
                                                                      automata);
       final String compname = "";
       final boolean first = true;
-      try {
-        final MonolithicSynchronousProductBuilder composer =
-          new MonolithicSynchronousProductBuilder(compmodel, getFactory());
-        final List<EventProxy> propositions = new ArrayList<EventProxy>();
-        propositions.add(getMarkingProposition());
-        propositions.add(mAlpha);
-        composer.setPropositions(propositions);
-        final int size = maxsize;
-        //System.out.println(size);
-        //composer.setTransitionLimit(maxsize * maxsize);
-        composer.setNodeLimit(6500);
-        composer.setTransitionLimit(10000000);
-        composer.run();
-        final int compnum = composer.getComputedAutomaton().getStates().size();
-        System.out.println("compsize: " + compnum);
-        if (compnum < minautnum) {
-          minauts = automata;
-          minautnum = compnum;
-        }
-      } catch (final Throwable t) {
+      final MonolithicSynchronousProductBuilder composer =
+        new MonolithicSynchronousProductBuilder(compmodel, getFactory());
+      final List<EventProxy> propositions = new ArrayList<EventProxy>();
+      propositions.add(getUsedDefaultMarking());
+      propositions.add(mAlpha);
+      composer.setPropositions(propositions);
+      final int size = maxsize;
+      //composer.setTransitionLimit(maxsize * maxsize);
+      composer.setNodeLimit(6500);
+      composer.setTransitionLimit(10000000);
+      composer.run();
+      final int compnum = composer.getComputedAutomaton().getStates().size();
+      if (compnum < minautnum) {
+        minauts = automata;
+        minautnum = compnum;
       }
     }
     return minauts;
@@ -670,54 +417,11 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     return auts.remove(i);
   }
 
-  @SuppressWarnings({"unused", "unchecked"})
-  private List<Set<AutomatonProxy>> getTuples(final ProductDESProxy model, final Set<AutomatonProxy> automata)
-  {
-    final TObjectIntHashMap<Set<AutomatonProxy>> heur =
-      new TObjectIntHashMap<Set<AutomatonProxy>>();
-    final List<Set<AutomatonProxy>> possible =
-      new ArrayList<Set<AutomatonProxy>>();
-    //System.out.println("keyset:" + numoccuring.keySet().size());
-    Set<AutomatonProxy>[] keys = new Set[mNumOccurinng.size()];
-    keys = mNumOccurinng.keys(keys);
-    for (final Set<AutomatonProxy> s : Arrays.asList(keys)) {
-      if (s.size() > 4 && s.size() != automata.size()) {
-        continue;
-      }
-      double size = 0;
-      final Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-      final Set<EventProxy> total = new HashSet<EventProxy>();
-      for (final AutomatonProxy a : s) {
-        size += Math.log(a.getStates().size());
-        total.addAll(a.getEvents());
-        common.retainAll(a.getEvents());
-      }
-      final double tot = total.size();
-      final double uncom = tot - common.size();
-      size = uncom;
-      //possible.add(new Tuple(s, size));
-      possible.add(s);
-      heur.put(s, common.size());
-    }
-    mCommon = heur;
-    /*Collections.sort(possible, new Comparator<Set<AutomatonProxy>>() {
-        public int compare(Set<AutomatonProxy> a1, Set<AutomatonProxy> a2)
-        {
-          double heur1 = mNumOccurinng.get(a1);
-          double heur2 = mNumOccurinng.get(a2);
-          if (heur1 < heur2) {return -1;}
-          else if (heur1 == heur2) {return 0;}
-          else {return 1;}
-        }
-    });*/
-    return possible;
-  }
-
-
   @SuppressWarnings("unused")
   private static class AutomataComparator implements
       Comparator<SortedSet<AutomatonProxy>>
   {
+    @Override
     public int compare(final SortedSet<AutomatonProxy> s1,
                        final SortedSet<AutomatonProxy> s2)
     {
@@ -749,7 +453,6 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
       Reader:
       while (reader.ready()) {
         final String name = reader.readLine();
-        //System.out.println(name);
         if (name.equals("")) {return comp;}
         for (final AutomatonProxy aut : automata) {
           if (aut.getName().equals(name)) {
@@ -763,51 +466,6 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     return null;
   }
 
-  /*private Set<Tuple> getTuples(ProductDESProxy model, Set<AutomatonProxy> automata)
-  {
-    Map<EventProxy, Set<AutomatonProxy>> haveEvent =
-      new THashMap<EventProxy, Set<AutomatonProxy>>();
-    for (EventProxy e : model.getEvents()) {
-      if (e == getMarkingProposition()) {
-        continue;
-      }
-      Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
-      for (AutomatonProxy a : automata) {
-        if (a.getEvents().contains(e)) {
-          possess.add(a);
-        }
-      }
-      haveEvent.put(e, possess);
-    }
-    Set<Tuple> possible = new TreeSet<Tuple>();
-    for (AutomatonProxy a1 : automata) {
-      for (AutomatonProxy a2 : automata) {
-        if (a1 == a2) {continue;}
-        Set<AutomatonProxy> auts = new HashSet<AutomatonProxy>(2);
-        auts.add(a1); auts.add(a2);
-        double size = 0;
-        Set<EventProxy> common = new HashSet<EventProxy>(model.getEvents());
-        Set<EventProxy> total = new HashSet<EventProxy>();
-        Set<AutomatonProxy> cover = new THashSet<AutomatonProxy>();
-        int taus = 0;
-        for (AutomatonProxy a : auts) {
-          total.addAll(a.getEvents());
-          common.retainAll(a.getEvents());
-        }
-        for (EventProxy e : total) {
-          Set<AutomatonProxy> have = haveEvent.get(e);
-          if (have == null) {continue;}
-          cover.addAll(have);
-        }
-        for (AutomatonProxy a : cover) {
-          size += Math.log(a.getStates().size());
-        }
-        possible.add(new Tuple(auts, size));
-      }
-    }
-    return possible;
-  }*/
-
   private ProjectionList project(final ProductDESProxy model)
     throws AnalysisException
   {
@@ -819,81 +477,30 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     final Iterator<AutomatonProxy> autit = model.getAutomata().iterator();
     while (autit.hasNext()) {
       final AutomatonProxy aut = autit.next();
-      //System.out.println(aut.getName() + " " + aut.getKind());
       if (ComponentKind.PROPERTY != aut.getKind()) {
         automata.add(aut);
       }
     }
     automata = addAlpha(automata);
-    /*BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new FileReader("/home/darius/supremicastuff/" + model.getName()));
-    } catch (final Throwable t) {
-      t.printStackTrace();
-    }*/
-    //mRIT.addAutomata(automata);
     ProjectionList p = null;
     final Collection<AutomatonProxy> tautomata = automata;
     for (final AutomatonProxy a : tautomata) {
       p = new ProjectionList(p, automata, Collections.singleton(a));
       automata = new TreeSet<AutomatonProxy>(p.getAutomata());
-      /*final ConflictChecker checker =
-        new NativeConflictChecker(p.getModel(), getMarkingProposition(),
-                                      getFactory());
-      checker
-          .setPreconditionMarking(mAlpha);
-      boolean result = checker.run();
-      if (!result) {
-        System.out.println(checker.getCounterExample());
-        MonolithicSynchronousProductBuilder composer =
-          new MonolithicSynchronousProductBuilder(p.getModel(), getFactory());
-        List<EventProxy> propositions = new ArrayList<EventProxy>();
-        propositions.add(getMarkingProposition());
-        propositions.add(mAlpha);
-        composer.setPropositions(propositions);
-        final int size = maxsize;
-        //System.out.println(size);
-        //composer.setTransitionLimit(maxsize * maxsize);
-        composer.setNodeLimit(6500);
-        composer.setTransitionLimit(10000000);
-        composer.run();
-        System.out.println(composer.getComputedAutomaton());
-        System.exit(1);
-      }*/
     }
     while (true) {
-      //setuplocal(model, automata);
-      //automata = mME.run(automata, getFactory());
-      //System.out.println("numautomata:" + automata.size());
-      //Set<Tuple> possible = getTuples(model, automata);
       final List<Set<AutomatonProxy>> possible = getMinTransitions(model, automata);
-      //final Set<AutomatonProxy> set = getFromReader(automata, reader);
-      //if (set == null) {break;}
       boolean stop = true;
       ProjectionList minlist = null;
       minSize = Integer.MAX_VALUE / 4;
-      System.out.println("Automata: " +automata.size());
-      //for (Tuple tup : possible) {
-      //for (Set<AutomatonProxy> set : possible) {
       while (!possible.isEmpty()) {
         final Set<AutomatonProxy> set = getMinSet(possible);
-        //if (num > 3) {break;}
         try {
-          /*
-          long imaxsize = 1;
-          for (AutomatonProxy a : tup.mSet) {
-            if (mDontOnOwn.contains(a) && tup.mSet.size() == 1) {
-              continue tuples;
-            }
-            imaxsize *= a.getStates().size();
-          }
-          System.out.println(imaxsize);*/
-          final ProjectionList t =
-            new ProjectionList(p, automata, set);
+          final ProjectionList t = new ProjectionList(p, automata, set);
           if (minSize >= t.getNew().getStates().size()) {
             minlist = t;
             minSize = t.getNew().getStates().size();
-            //break;
+            break;
           }
         } catch (final AnalysisException exception) {
         }
@@ -902,24 +509,12 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
         p = minlist;
         automata = new TreeSet<AutomatonProxy>(p.getAutomata());
         stop = false;
-        //System.out.println("numcomposed" + p.getComposed().size());
       }
       stop = automata.size() == 2 ? true : stop;
-      /*else {
-        if (maxsize < 2000000) {
-          maxsize *= 2;
-          stop = false;
-        }
-      }*/
       if (stop) {
         break;
       }
     }
-    /*try {
-      reader.close();
-    } catch (final Throwable t) {
-      t.printStackTrace();
-    }*/
     final Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
     while (it.hasNext()) {
       final AutomataHidden ah = it.next();
@@ -927,185 +522,8 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
         it.remove();
       }
     }
-    System.out.println("finish project");
     return p;
   }
-
-  /*private ProjectionList project(ProductDESProxy model)
-    throws AnalysisException, CertainConflictException
-  {
-    eventscheck(model);
-    // mRIT = new RemoveImpossibleTransitions(getMarkingProposition());
-    // mME = new MergeEvents(getMarkingProposition(), model.getEvents());
-    maxsize = 4000000;
-    mChecked.clear();
-    Set<AutomatonProxy> automata = new TreeSet<AutomatonProxy>();
-    final Iterator<AutomatonProxy> autit = model.getAutomata().iterator();
-    while (autit.hasNext()) {
-      final AutomatonProxy aut = autit.next();
-      //System.out.println(aut.getName() + " " + aut.getKind());
-      if (ComponentKind.PROPERTY != aut.getKind()) {
-        automata.add(aut);
-      }
-    }
-    ComposeOrder comporder = new ComposeOrder(model, automata);
-    comporder.run();
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new FileReader("/home/darius/supremicastuff/" + model.getName()));
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-    //mRIT.addAutomata(automata);
-    ProjectionList p = null;
-    while (true) {
-      // automata = mME.run(automata, getFactory());
-      //System.out.println("numautomata:" + automata.size());
-      //Set<Tuple> possible = getTuples(model, automata);
-      //Collection<Set<AutomatonProxy>> possible = getMinTransitions(model, automata);
-      Set<AutomatonProxy> set = getFromReader(automata, reader);
-      if (set == null) {break;}
-      boolean stop = true;
-      int overflows = 0;
-      ProjectionList minlist = null;
-      minSize = Integer.MAX_VALUE / 4;
-      int setSize = -1;
-      //System.out.println("possible: " + possible.size());
-      int num = 0;
-      tuples:
-      //for (Tuple tup : possible) {
-      //for (Set<AutomatonProxy> set : possible) {
-        //if (num > 3) {break;}
-        try {
-          long imaxsize = 1;
-          ProjectionList t =
-            new ProjectionList(p, automata, set);
-          num++;
-          if (minSize >= t.getNew().getStates().size()) {
-            minlist = t;
-            minSize = t.getNew().getStates().size();
-            //break;
-          }
-        } catch (final AnalysisException exception) {
-          //exception.printStackTrace();
-          //System.out.println("over");
-          overflows++;
-        }
-      //}
-      if (minlist != null) {
-        p = minlist;
-        automata = new TreeSet<AutomatonProxy>(p.getAutomata());
-        stop = false;
-        //System.out.println("numcomposed" + p.getComposed().size());
-      }
-      if (stop) {
-        break;
-      }
-    }
-    try {
-      reader.close();
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-    Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
-    while (it.hasNext()) {
-      AutomataHidden ah = it.next();
-      if (!mChecked.contains(ah)) {
-        it.remove();
-      }
-    }
-    return p;
-  }*/
-
-  /*private ProjectionList project(ProductDESProxy model)
-    throws AnalysisException, CertainConflictException
-  {
-    eventscheck(model);
-    //mRIT = new RemoveImpossibleTransitions(getMarkingProposition());
-    //mME = new MergeEvents(getMarkingProposition(), model.getEvents());
-    maxsize = 4000000;
-    mChecked.clear();
-    Set<AutomatonProxy> automata = new TreeSet<AutomatonProxy>();
-    Iterator<AutomatonProxy> autit = model.getAutomata().iterator();
-    while (autit.hasNext()) {
-      AutomatonProxy aut = autit.next();
-      //System.out.println(aut.getName() + " " + aut.getKind());
-      if (ComponentKind.PROPERTY != aut.getKind()) {
-        automata.add(aut);
-      }
-    }
-    AntOrder antorder = new AntOrder(model, automata);
-    antorder.run(100);
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new FileReader("/home/darius/supremicastuff/" + model.getName()));
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-    //mRIT.addAutomata(automata);
-    ProjectionList p = null;
-    while (true) {
-      //automata = mME.run(automata, getFactory());
-      //System.out.println("numautomata:" + automata.size());
-      //Set<Tuple> possible = getTuples(model, automata);
-      //Collection<Set<AutomatonProxy>> possible = getMinTransitions(model, automata);
-      //Set<AutomatonProxy> set = getFromReader(automata, reader);
-      Set<AutomatonProxy> set = antorder.selectComp(automata);
-      if (set == null) {break;}
-      boolean stop = true;
-      int overflows = 0;
-      ProjectionList minlist = null;
-      minSize = Integer.MAX_VALUE / 4;
-      int setSize = -1;
-      //System.out.println("possible: " + possible.size());
-      int num = 0;
-      tuples:
-      //for (Tuple tup : possible) {
-      //for (Set<AutomatonProxy> set : possible) {
-        //if (num > 3) {break;}
-        try {
-          long imaxsize = 1;
-          ProjectionList t =
-            new ProjectionList(p, automata, set);
-          num++;
-          if (minSize >= t.getNew().getStates().size()) {
-            minlist = t;
-            minSize = t.getNew().getStates().size();
-            //break;
-          }
-        } catch (final AnalysisException exception) {
-          // exception.printStackTrace();
-          //System.out.println("over");
-          overflows++;
-        }
-      //}
-      if (minlist != null) {
-        p = minlist;
-        automata = new TreeSet<AutomatonProxy>(p.getAutomata());
-        stop = false;
-        antorder.setActual(set, p.getNew());
-        //System.out.println("numcomposed" + p.getComposed().size());
-      } else {
-        antorder.setActual(set, null);
-      }
-      if (stop) {
-        break;
-      }
-    }
-    try {
-      reader.close();
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-    Iterator<AutomataHidden> it = mMinAutMap.keySet().iterator();
-    while (it.hasNext()) {
-      final AutomataHidden ah = it.next();
-      if (!mChecked.contains(ah)) {
-        it.remove();
-      }
-    }
-    return p;
-  }*/
 
   @SuppressWarnings("unused")
   private boolean setFailedResult(final TraceProxy counterexample,
@@ -1137,8 +555,8 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
   }
 
 
-  // #########################################################################
-  // # Inner Class ProjectionList
+  //#########################################################################
+  //# Inner Class ProjectionList
   private class ProjectionList
   {
     final SortedSet<AutomatonProxy> mAutomata;
@@ -1161,24 +579,19 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
 
     @SuppressWarnings("unused")
     private void blockedEvents()
+      throws EventNotFoundException
     {
       final Set<AutomatonProxy> mTempComp = new TreeSet<AutomatonProxy>();
       final Set<AutomatonProxy> mTempAut = new TreeSet<AutomatonProxy>();
-      //System.out.println("before");
-      for (final AutomatonProxy aut : mCompautomata) {
-        System.out.println(aut.getName() +
-                           " states:" + aut.getStates().size() +
-                           " trans:" + aut.getTransitions().size());
-      }
       for (final AutomatonProxy aut : mCompautomata) {
         AutomatonProxy aut1 = aut;
         mTempAut.clear();
         for (final AutomatonProxy aut2 : mAutomata) {
           if (containsAny(aut1.getEvents(), aut2.getEvents())) {
             List<AutomatonProxy> tocomp =
-                Arrays.asList(new AutomatonProxy[] {aut1, aut2});
+              Arrays.asList(new AutomatonProxy[] {aut1, aut2});
             final BlockedEvents be =
-                new BlockedEvents(tocomp, getFactory(), getMarkingProposition());
+              new BlockedEvents(tocomp, getFactory(), getUsedDefaultMarking());
             be.setNodeLimit(100000);
             try {
               tocomp = be.run();
@@ -1195,18 +608,14 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
         mAutomata.addAll(mTempAut);
         mTempComp.add(aut1);
       }
-      //System.out.println("after");
       mCompautomata.clear();
       mCompautomata.addAll(mTempComp);
-      for (final AutomatonProxy aut : mCompautomata) {
-        //System.out.println(aut.getName() + " trans:" + aut.getTransitions().size());
-      }
     }
 
     public ProjectionList(final ProjectionList parent,
                           final Set<AutomatonProxy> automata,
                           final Set<AutomatonProxy> compAutomata)
-      throws AnalysisException
+    throws AnalysisException
     {
       mParent = null;// parent;
       mCompautomata = new TreeSet<AutomatonProxy>(new AutomatonComparator());
@@ -1214,7 +623,6 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
       mAutomata = new TreeSet<AutomatonProxy>(automata);
       final Set<EventProxy> events = new TreeSet<EventProxy>();
       for (final AutomatonProxy a : mCompautomata) {
-        System.out.println(a.getName() + ": " + a.getStates().size());
         events.addAll(a.getEvents());
       }
       mAutomata.removeAll(compAutomata);
@@ -1225,243 +633,71 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
           mHidden.removeAll(a.getEvents());
         }
       }
-      //if (mHidden.contains(getMarkingProposition())) {
-      mHidden.remove(getMarkingProposition());
+      mHidden.remove(getUsedDefaultMarking());
       mHidden.remove(mAlpha);
-      System.out.println("hide: " + mHidden);
-      //}
-      //AutomataHidden ah =
-      //  new AutomataHidden(compAutomata, new HashSet<EventProxy>(mHidden));
-      //mChecked.add(ah);
       AutomatonProxy minAutomaton;
-      //mMinAutMap.remove(ah);
-      /*if (mMinAutMap.containsKey(ah)) {
-        minAutomaton = mMinAutMap.get(ah);
-        if (minAutomaton == null) {
-          throw new OverflowException();
+      try {
+        final ProductDESProxy compmodel =
+          getFactory().createProductDESProxy("temp",
+                                             mOriginalAlphabet,
+                                             mCompautomata);
+        String compname = "";
+        boolean first = true;
+        for (final AutomatonProxy aut : mCompautomata) {
+          if (!first) {compname += "||";}
+          compname += aut.getName();
+          first = false;
         }
-      } else {*/
-        //blockedEvents();
-        //System.out.println("marking: " + getMarkingProposition());
-        try {
-          // removeTransitions
-          /*
-           * compAutomata.clear(); for (AutomatonProxy aut : mCompautomata) {
-           * //System.out.println("before"); //System.out.println(aut);
-           * TransitionRelation tr = new TransitionRelation(aut,
-           * getMarkingProposition(), mOriginalAlphabet); mRIT.run(tr); aut =
-           * tr.getAutomaton(getFactory()); compAutomata.add(aut);
-           * //System.out.println("after"); //System.out.println(aut); }
-           */
-          // end remove transitions
-          final ProductDESProxy compmodel = getFactory().createProductDESProxy("temp",
-                                                                         mOriginalAlphabet,
-                                                                         mCompautomata);
-          String compname = "";
-          boolean first = true;
-          //System.out.println("comp");
-          for (final AutomatonProxy aut : mCompautomata) {
-            if (!first) {compname += "||";}
-            compname += aut.getName();
-            first = false;
-          }
-          if (mCompautomata.size() > 1) {
-            //GeneralisedCanonicalSynchronousProductBuilder composer =
-            //  new GeneralisedCanonicalSynchronousProductBuilder(compmodel, getFactory(), mAlpha);
-            final MonolithicSynchronousProductBuilder composer =
-              new MonolithicSynchronousProductBuilder(compmodel, getFactory());
-            final List<EventProxy> propositions = new ArrayList<EventProxy>();
-            propositions.add(getMarkingProposition());
-            propositions.add(mAlpha);
-            composer.setPropositions(propositions);
-            //System.out.println(size);
-            //composer.setTransitionLimit(maxsize * maxsize);
-            composer.setNodeLimit(6500);
-            composer.setTransitionLimit(10000000);
-            System.out.println("attempt");
-            mCompTime -= System.currentTimeMillis();
-            composer.run();
-            System.out.println("finish comp");
-            minAutomaton = composer.getComputedAutomaton();
-            //System.out.println(mCompautomata);
-            //System.out.println(minAutomaton);
-            mCompTime += System.currentTimeMillis();
-            //String compname = minAutomaton.getName();
-            final int compsize = minAutomaton.getStates().size();
-            final int transitionsize = minAutomaton.getTransitions().size();
-            mPeakstates = compsize >= mPeakstates ? compsize : mPeakstates;
-            mTotalstates += compsize;
-            mPeakTransitions = transitionsize >= mPeakTransitions ? transitionsize : mPeakTransitions;
-            mTotalTransitions += transitionsize;
-            System.out.println("compsize:" + minAutomaton.getStates().size());
-          } else {
-            minAutomaton = mCompautomata.iterator().next();
-          }
-          //mAllSame.update(compAutomata, mAutomata, minAutomaton, getFactory(), mHidden);
-          //minAutomaton = mAllSame.getResult() != null ? mAllSame.getResult() :
-                                                        //minAutomaton;
-          /*if (mAllSame.getNotComposed() != null) {
-            mAutomata.clear();
-            mAutomata.addAll(mAllSame.getNotComposed());
-          }*/
-          //mRIT.removeAutomata(mCompautomata);
-          /*RemoveEvents rev = new RemoveEvents(minAutomaton, mRIT.findEventsWhichAreImpossibleAfter(minAutomaton.getEvents()),
-                                              getMarkingProposition(), getFactory());
-          rev.run();
-          Set<EventProxy> blocked = rev.getImpossible();
-          if (!blocked.isEmpty()) {
-            minAutomaton = Composer.removeBlocked(blocked, minAutomaton, getFactory());
-            List<AutomatonProxy> temp = new ArrayList<AutomatonProxy>(mAutomata);
-            mAutomata.clear();
-            //mRIT.removeAutomata(mAutomata);
-            for (AutomatonProxy aut : temp) {
-              aut = Composer.removeBlocked(blocked, aut, getFactory());
-              mAutomata.add(aut);
-              //mRIT.addAutomata(Collections.singleton(aut));
-            }
-            mHidden.removeAll(blocked);
-          }*/
-          if (true) {
-            //System.out.println("hiding:" + mHidden.size());
-            final EventProxy tauproxy =
-              getFactory().createEventProxy("tau:" + minAutomaton.getName(),
-                                            EventKind.UNCONTROLLABLE);
-            final EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(), tauproxy);
-            final ListBufferTransitionRelation tr =
-              new ListBufferTransitionRelation(minAutomaton, ee,
-                                               ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-            /*for (EventProxy event : mOriginalAlphabet) {
-              if (mAllSelfLoops.containsKey(event) && mAllSelfLoops.get(event).isEmpty()) {
-                System.out.println("self looped");
-                tr.removeAllTransitionsWithEvent(tr.eventToInt(event));
-              }
-            }*/
-            final int tau = EventEncoding.TAU;
-            //System.out.println(tr.createAutomaton(getFactory(), ee));
-            for (final EventProxy event : mHidden) {
-              if (getKindTranslator().getEventKind(event) == EventKind.PROPOSITION) {continue;}
-              final int evcode = ee.getEventCode(event);
-              if (evcode == -1) {System.out.println(event);continue;}
-              if (evcode == EventEncoding.TAU) {continue;}
-              tr.replaceEvent(evcode, tau);
-              tr.removeEvent(evcode);
-            }
-            //System.out.println(tr.createAutomaton(getFactory(), ee));
-            // System.out.println(minAutomaton);
-            // System.out.println(mCompautomata);
-            final int marking = ee.getEventCode(getMarkingProposition());
-            final int alpha = ee.getEventCode(mAlpha);
-            final int cont = ee.getEventCode(mCont);
-            tr.replaceEvent(cont, tau);
-            //minAutomaton = applyAbstractionRules(tr.createAutomaton(getFactory(), ee), ee.getTauEvent());
-            //System.out.println("heuristic: " + applyAbstractionRules(tr.createAutomaton(getFactory(), ee), ee.getTauEvent()).getStates().size());
-            /*CertainConflictListBuffer cc = new CertainConflictListBuffer(tr,
-                                                                         tau, marking); cc.run();
-            if (cc.getDumpState() != -1) {
-              tr.setMarked(cc.getDumpState(), alpha, true);
-            }*/
-            //System.out.println(tr.createAutomaton(getFactory(), ee));
-            final Canonize canonizer = new Canonize(tr, ee, marking, alpha, cont);
-            final ListBufferTransitionRelation canon = canonizer.run(getFactory());
-            /*ObservationEquivalenceTRSimplifier oetrs = new ObservationEquivalenceTRSimplifier(tr);
-            oetrs.run();
-            ListBufferTransitionRelation canon = tr;*/
-            /*cc = new CertainConflictListBuffer(canon, tau, marking); cc.run();
-            if (cc.getDumpState() != -1) {
-              canon.setMarked(cc.getDumpState(), alpha, true);
-            }*/
-            canon.setName(compname);
-            //canon.replaceEvent(cont, tau);
-            //minAutomaton = canon.createAutomaton(getFactory(), ee);
-            //System.out.println("CANON: " + canon.getName());
-            //System.out.println(minAutomaton);
-            System.out.println("canminsize: " + canon.createAutomaton(getFactory(), ee).getStates().size());
-            /*ee = new EventEncoding(minAutomaton, getKindTranslator());
-            tr =
-              new ListBufferTransitionRelation(minAutomaton, ee,
-                                               ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-            tr.setName(compname);
-            minAutomaton = tr.createAutomaton(getFactory(), ee);*/
-            minAutomaton = canon.createAutomaton(getFactory(), ee);
-            //System.out.println(minAutomaton);
-            //minAutomaton = applyAbstractionRules(minAutomaton, ee.getTauEvent());
-            //System.out.println(minAutomaton.getEvents());
-            //System.out.println("minsize: " + minAutomaton.getStates().size());
-            //System.out.println(minAutomaton);
-            //mAggDiff += diff;
-            //mSmallestDiff = mSmallestDiff > diff ? diff : mSmallestDiff;
-            //mLargestDiff = mLargestDiff < diff ? diff : mLargestDiff;
-            /*System.out.println("write");
-            try {
-              for (final AutomatonProxy a : mCompautomata) {
-                mWriter.write(a.getName());
-                mWriter.newLine();
-              }
-              mWriter.write("compsize: " + compsize);
-              mWriter.newLine();
-              mWriter.write("minsize: " + minAutomaton.getStates().size());
-              mWriter.newLine();
-              mWriter.newLine();
-              mWriter.flush();
-            } catch (final Throwable t) {
-              t.printStackTrace();
-            }*/
-            /*AutomatonProxy minAutomaton2 = minAutomaton;
-            minAutomaton = temp;
-            //System.out.println("half");
-            mBITIME -= System.currentTimeMillis();
-            sim = new BiSimulator(minAutomaton,
-                                              getMarkingProposition(),
-                                              getFactory());
-            mBISIMulation += minAutomaton.getStates().size();
-            minAutomaton = sim.run();
-            mBITIME += System.currentTimeMillis();
-            mBISIMulation -= minAutomaton.getStates().size();
-            tr = new TransitionRelation(minAutomaton, getMarkingProposition());
-            tau = tr.getEventInt(tauevent);
-            ie = new IncomingEquivalent(tr, tau); ie.run();
-            //System.out.println("before");
-            //System.out.println(tr.getAutomaton(getFactory()));
-            //System.out.println("make equivalent");
-            //System.out.println("after");
-            //System.out.println(tr.getAutomaton(getFactory()));
-            rut = new RemoveUnneededTransitions(tr, tau); rut.run();
-            ie = new IncomingEquivalent(tr, tau); ie.run();
-            con = new CertainConflict(tr, tau);
-            con.run();
-            minAutomaton = tr.getAutomaton(getFactory());
-            if (minAutomaton.getStates().size() > minAutomaton2.getStates().size()) {
-              System.out.println("without ann: " + minAutomaton.getStates().size());
-              System.out.println("with ann: " + minAutomaton2.getStates().size());
-              minAutomaton = minAutomaton2;
-            }*/
-            // if (diff < 0) {throw new AnalysisException("exception");}
-            //System.out.println(minAutomaton.getName());
-            //System.out.println("origstates:" + origstates);
-            //System.out.println("origtrans:" + origtrans);
-            //System.out.println("states:" + minAutomaton.getStates().size());
-            //System.out.println("trans:" + minAutomaton.getTransitions().size());
-            //System.out.println("events:" + minAutomaton.getEvents().size());
-            //System.out.println("hidden: " + mHidden);
-          }
-          /*if (minAutomaton.getStates().size() > minAutomaton2.getStates().size()) {
-            System.out.println("SWITCH"); System.out.println("SWITCH");
-            switched++;
-            minAutomaton = minAutomaton2;
-          }*/
-          // mMinAutMap.put(ah, minAutomaton);
-        } catch (final AnalysisException exception) {
-          mCompTime += System.currentTimeMillis();
-          mStates += mMaxProjStates;
-          //mMinAutMap.put(ah, null);
-          throw exception;
+        if (mCompautomata.size() > 1) {
+          final MonolithicSynchronousProductBuilder composer =
+            new MonolithicSynchronousProductBuilder(compmodel, getFactory());
+          final List<EventProxy> propositions = new ArrayList<EventProxy>();
+          propositions.add(getUsedDefaultMarking());
+          propositions.add(mAlpha);
+          composer.setPropositions(propositions);
+          composer.setNodeLimit(6500);
+          composer.setTransitionLimit(10000000);
+          composer.run();
+          minAutomaton = composer.getComputedAutomaton();
+          final int compsize = minAutomaton.getStates().size();
+          final int transitionsize = minAutomaton.getTransitions().size();
+          mPeakstates = compsize >= mPeakstates ? compsize : mPeakstates;
+          mTotalstates += compsize;
+          mPeakTransitions = transitionsize >= mPeakTransitions ? transitionsize : mPeakTransitions;
+          mTotalTransitions += transitionsize;
+        } else {
+          minAutomaton = mCompautomata.iterator().next();
         }
-      //}
-      // RemoveTransitions
-      // mRIT.removeAutomata(mCompautomata);
-      // mRIT.addAutomata(Collections.singleton(minAutomaton));
-      // EndRemoveTransitions
-      //mRIT.addAutomata(Collections.singleton(minAutomaton));
+        if (true) {
+          final EventProxy tauproxy =
+            getFactory().createEventProxy("tau:" + minAutomaton.getName(),
+                                          EventKind.UNCONTROLLABLE);
+          final EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(), tauproxy);
+          final ListBufferTransitionRelation tr =
+            new ListBufferTransitionRelation(minAutomaton, ee,
+                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+          final int tau = EventEncoding.TAU;
+          for (final EventProxy event : mHidden) {
+            if (getKindTranslator().getEventKind(event) == EventKind.PROPOSITION) {continue;}
+            final int evcode = ee.getEventCode(event);
+            if (evcode == -1) {continue;}
+            if (evcode == EventEncoding.TAU) {continue;}
+            tr.replaceEvent(evcode, tau);
+            tr.removeEvent(evcode);
+          }
+          final int marking = ee.getEventCode(getUsedDefaultMarking());
+          final int alpha = ee.getEventCode(mAlpha);
+          final int cont = ee.getEventCode(mCont);
+          tr.replaceEvent(cont, tau);
+          final Canonize canonizer = new Canonize(tr, ee, marking, alpha, cont);
+          final ListBufferTransitionRelation canon = canonizer.run(getFactory());
+          canon.setName(compname);
+          minAutomaton = canon.createAutomaton(getFactory(), ee);
+        }
+      } catch (final AnalysisException exception) {
+        mStates += mMaxProjStates;
+        throw exception;
+      }
       mAutomata.add(minAutomaton);
       mDontOnOwn.add(minAutomaton);
       mNew = minAutomaton;
@@ -1469,7 +705,6 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
       for (final AutomatonProxy a : mAutomata) {
         mTarget.addAll(a.getEvents());
       }
-      System.out.println("end projection");
     }
 
     public ProductDESProxy getModel()
@@ -1510,9 +745,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
         automata
             .add(new HashMap<Key,StateProxy>(proxy.getTransitions().size()));
         final Set<EventProxy> autevents = new HashSet<EventProxy>(mOriginalAlphabet);
-        // System.out.println(autevents);
         autevents.removeAll(proxy.getEvents());
-        // System.out.println(autevents);
         int init = 0;
         final Set<StateProxy> states = proxy.getStates();
         for (final StateProxy s : states) {
@@ -1536,27 +769,22 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
       Place place = new Place(currstate, null, 0, null);
       stateList.offer(place);
       final List<EventProxy> oldevents = trace.getEvents();
-      // System.out.println(oldevents);
 
       final Set<Place> visited = new HashSet<Place>();
       visited.add(place);
       while (true) {
         place = stateList.poll();
-        // System.out.println(place.getTrace());
         if (place.mIndex >= oldevents.size()) {
           break;
         }
         currstate = place.mCurrState;
         final Set<EventProxy> possevents = new HashSet<EventProxy>(mHidden);
-        // System.out.println(mHidden);
         hidden: for (final EventProxy pe : possevents) {
-          // System.out.println(pe);
           final List<StateProxy> newstate =
               new ArrayList<StateProxy>(currstate.size());
           for (i = 0; i < currstate.size(); i++) {
             if (aut[i].getEvents().contains(pe)) {
               final StateProxy t = automata.get(i).get(new Key(currstate.get(i), pe));
-              // System.out.println(t);
               if (t == null) {
                 continue hidden;
               }
@@ -1565,7 +793,6 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
               newstate.add(currstate.get(i));
             }
           }
-          // System.out.println(newstate);
           final Place newPlace = new Place(newstate, pe, place.mIndex, place);
           if (visited.add(newPlace)) {
             stateList.offer(newPlace);
@@ -1626,11 +853,13 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
         return events;
       }
 
+      @Override
       public int compareTo(final Place other)
       {
         return other.mIndex - mIndex;
       }
 
+      @Override
       public int hashCode()
       {
         int hash = 7;
@@ -1639,6 +868,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
         return hash;
       }
 
+      @Override
       public boolean equals(final Object o)
       {
         final Place p = (Place) o;
@@ -1663,11 +893,13 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
         mHash = hash;
       }
 
+      @Override
       public int hashCode()
       {
         return mHash;
       }
 
+      @Override
       public boolean equals(final Object other)
       {
         if (other != null && other.getClass() == getClass()) {
@@ -1683,6 +915,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
   private static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
+    @Override
     public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
@@ -1702,6 +935,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
       mHidden = hidden;
     }
 
+    @Override
     public int hashCode()
     {
       int code = 31 + mAutomata.hashCode();
@@ -1709,6 +943,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
       return code;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       if (o instanceof AutomataHidden) {
@@ -1732,6 +967,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
       mSize = size;
     }
 
+    @Override
     public int compareTo(final Tuple t)
     {
       if (mSize < t.mSize) {
@@ -1753,8 +989,6 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     for (final AbstractionRule rule : mAbstractionRules) {
       try {
         abstractedAut = rule.applyRule(autToAbstract, tau);
- //       System.out.println(rule.getClass().toString());
-//        System.out.println(abstractedAut);
         autToAbstract = abstractedAut;
       } catch (final OutOfMemoryError error) {
         System.gc();
@@ -1777,24 +1011,7 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
     new THashSet<AutomataHidden>();
   private final Set<AutomatonProxy> mDontOnOwn =
     new THashSet<AutomatonProxy>();
-  private final TObjectIntHashMap<Set<AutomatonProxy>> mNumOccurinng = null;
   private TObjectIntHashMap<Set<AutomatonProxy>> mCommon = null;
-
-  /*
-  private final int mLargestComposition = 0;
-  private final int mLargestTransitions = 0;
-  private final int mAggComposition = 0;
-  private final int mAggTransitions = 0;
-  private final int mAnnotatedBISIMulation = 0;
-  private final int mBISIMulation = 0;
-  private final int mAnnBITIME = 0;
-  private final int mBITIME = 0;
-  private final int mSmallestDiff = Integer.MAX_VALUE;
-  private final int mLargestDiff = Integer.MIN_VALUE;
-  private final int mAggDiff = 0;
-  */
-  @SuppressWarnings("unused")
-  private int mCompTime = 0;
 
   private int maxsize = 1000;
   private int mTime = 0;
@@ -1810,13 +1027,12 @@ public class AlphaNonBlockingChecker extends AbstractConflictChecker
   private final EventProxy mAlpha;
   private final EventProxy mCont;
 
-  // private BufferedWriter mWriter = null;
 
-
-  // #########################################################################
-  // # Class Constants
+  //#########################################################################
+  //# Class Constants
   @SuppressWarnings("unused")
   private static final Logger LOGGER =
       LoggerFactory.createLogger(AlphaNonBlockingChecker.class);
 
 }
+

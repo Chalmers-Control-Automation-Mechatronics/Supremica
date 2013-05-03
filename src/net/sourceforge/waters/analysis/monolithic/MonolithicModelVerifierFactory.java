@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

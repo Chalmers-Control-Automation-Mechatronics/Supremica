@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -28,10 +28,10 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
 import net.sourceforge.waters.analysis.sd.NerodeEquVerificationResult;
 import net.sourceforge.waters.analysis.sd.NerodeKindTranslator;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -455,3 +455,4 @@ public class ModularNerodeEquivalenceChecker
   static final String HEURISTIC_SUFFIX = "Heuristic";
 
 }
+

@@ -74,7 +74,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler
  * ModuleInstanceCompiler}).</P>
  *
- * <P>Th EFA compiler ensures that the resultant module only contains
+ * <P>The EFA compiler ensures that the resultant module only contains
  * nodes of the following types.</P>
  * <UL>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
@@ -153,7 +153,7 @@ public class EFACompiler
       computeEventPartitions();
       // Pass 4 ...
       final Pass4Visitor pass4 = new Pass4Visitor();
-      return (ModuleProxy) pass4.visitModuleProxy(mInputModule);
+      return pass4.visitModuleProxy(mInputModule);
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -190,7 +190,7 @@ public class EFACompiler
       new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
     mEFAEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
     for (final EFAEventDecl edecl : mEFAEventDeclMap.values()) {
-      if (!edecl.isBlocked()) {
+      if (!edecl.isBlocked() || edecl.getKind() == EventKind.PROPOSITION) {
         mTransitionRelationBuilder.initEventRecords();
         final Collection<EFAAutomatonTransitionGroup> allgroups =
           edecl.getTransitionGroups();
@@ -212,7 +212,6 @@ public class EFACompiler
             record.getTransitionRelation();
           //System.err.println(edecl.getEventDecl().getName() + " > " + rel);
           final EFAEvent event = new EFAEvent(edecl, rel);
-          edecl.addEvent(event);
           for (final Proxy location : record.getSourceLocations()) {
             Collection<EFAEvent> collection = mEFAEventMap.get(location);
             if (collection == null) {
@@ -221,11 +220,14 @@ public class EFACompiler
             }
             collection.add(event);
           }
-          for (final EFAVariable var : rel.getVariables()) {
-            var.addEvent(event);
+          if (!rel.isEmpty()) {
+            edecl.addEvent(event);
+            for (final EFAVariable var : rel.getVariables()) {
+              var.addEvent(event);
+            }
+            final ConstraintList formula = rel.getFormula();
+            namer.addGuard(formula);
           }
-          final ConstraintList formula = rel.getFormula();
-          namer.addGuard(formula);
         }
         mTransitionRelationBuilder.clearEventRecords();
         for (final EFAEvent event : edecl.getEvents()) {
@@ -271,17 +273,15 @@ public class EFACompiler
         final ConstraintList guard = part.getGuard();
         propagator.addConstraints(guard);
         propagator.propagate();
-        if (!propagator.isUnsatisfiable()) {
-          parts.add(part);
-          if (!guard.isTrue()) {
-            locations.addAll(part.getSourceLocations());
-          }
-          collectEventPartition
-            (edecl, groups, parts, index + 1, propagator, locations);
-          parts.remove(index);
-          for (int i = locations.size() - 1; i >= numlocs; i--) {
-            locations.remove(i);
-          }
+        parts.add(part);
+        if (!guard.isTrue()) {
+          locations.addAll(part.getSourceLocations());
+        }
+        collectEventPartition(edecl, groups, parts, index + 1,
+                              propagator, locations);
+        parts.remove(index);
+        for (int i = locations.size() - 1; i >= numlocs; i--) {
+          locations.remove(i);
         }
       }
     } else {
@@ -294,6 +294,10 @@ public class EFACompiler
                                    final Collection<Proxy> locations)
     throws EvalException
   {
+    if (parent.isUnsatisfiable()) {
+      createEvent(edecl, parent, locations);
+      return;
+    }
     final ConstraintList guard = parent.getAllConstraints();
     //System.err.println(guard);
     final VariableContext context = parent.getContext();
@@ -381,6 +385,7 @@ public class EFACompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public List<SimpleIdentifierProxy> visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -395,6 +400,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public Object visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
@@ -403,11 +409,13 @@ public class EFACompiler
       return null;
     }
 
+    @Override
     public Object visitNodeProxy(final NodeProxy node)
     {
       return null;
     }
 
+    @Override
     public CompiledRange visitSimpleComponentProxy
       (final SimpleComponentProxy comp)
       throws VisitorException
@@ -423,6 +431,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public IdentifierProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
       throws VisitorException
     {
@@ -438,6 +447,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public CompiledRange visitVariableComponentProxy
       (final VariableComponentProxy var)
       throws VisitorException
@@ -480,6 +490,7 @@ public class EFACompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -504,6 +515,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public EFAEventDecl visitEventDeclProxy(final EventDeclProxy decl)
       throws VisitorException
     {
@@ -517,6 +529,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -529,6 +542,7 @@ public class EFACompiler
       return null;
     }
 
+    @Override
     public ConstraintList visitGuardActionBlockProxy
       (final GuardActionBlockProxy ga)
       throws VisitorException
@@ -546,6 +560,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public EFAEventDecl visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
@@ -568,14 +583,16 @@ public class EFACompiler
       }
     }
 
+    @Override
     public Object visitLabelBlockProxy(final LabelBlockProxy block)
       throws VisitorException
     {
-      final List<Proxy> list = block.getEventList();
+      final List<Proxy> list = block.getEventIdentifierList();
       visitCollection(list);
       return null;
     }
 
+    @Override
     public Object visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
@@ -591,6 +608,7 @@ public class EFACompiler
       return null;
     }
 
+    @Override
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
       throws VisitorException
     {
@@ -632,6 +650,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public Object visitVariableComponentProxy(final VariableComponentProxy var)
     {
       return null;
@@ -728,6 +747,7 @@ public class EFACompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEventDeclProxy(final EventDeclProxy decl)
       throws VisitorException
     {
@@ -750,6 +770,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -765,6 +786,7 @@ public class EFACompiler
       return result;
     }
 
+    @Override
     public GraphProxy visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -784,14 +806,14 @@ public class EFACompiler
         mLabelList = new LinkedList<IdentifierProxy>();
         final LabelBlockProxy blocked0 = graph.getBlockedEvents();
         if (blocked0 != null) {
-          final List<Proxy> list = blocked0.getEventList();
+          final List<Proxy> list = blocked0.getEventIdentifierList();
           visitCollection(list);
         }
         final Collection<EFAEvent> events =
           mEFAEventMap.get(mCurrentComponent);
         if (events != null) {
           for (final EFAEvent event : events) {
-            if (!mEFAAlphabet.contains(event)) {
+            if (!mEFAAlphabet.contains(event) && !event.isBlocked()) {
               final IdentifierProxy ident = event.createIdentifier(mFactory);
               mLabelList.add(ident);
             }
@@ -813,6 +835,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
       throws VisitorException
     {
@@ -820,6 +843,8 @@ public class EFACompiler
       final PlainEventListProxy props0 = group.getPropositions();
       final PlainEventListProxy props1 =
         (PlainEventListProxy) mCloner.getClone(props0);
+      final Map<String,String> attribs0 = group.getAttributes();
+      final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
       final Collection<NodeProxy> children0 = group.getImmediateChildNodes();
       final int numchildren = children0.size();
       final Collection<NodeProxy> children1 =
@@ -829,13 +854,14 @@ public class EFACompiler
         children1.add(child1);
       }
       final GroupNodeProxy result =
-        mFactory.createGroupNodeProxy(name, props1, children1, null);
+        mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
       mNodeList.add(result);
       mNodeMap.put(group, result);
       addSourceInfo(result, group);
       return result;
     }
 
+    @Override
     public Object visitIdentifierProxy(final IdentifierProxy ident)
     {
       Collection<EFAEvent> events = mEFAEventMap.get(ident);
@@ -844,7 +870,9 @@ public class EFACompiler
         events = edecl.getEvents();
       }
       for (final EFAEvent event : events) {
-        if (mInBlockedEventsList) {
+        if (event.isBlocked()) {
+          continue;
+        } else if (mInBlockedEventsList) {
           if (mEFAAlphabet.add(event)) {
             final IdentifierProxy subident = event.createIdentifier(mFactory);
             mLabelList.add(subident);
@@ -860,12 +888,13 @@ public class EFACompiler
       return null;
     }
 
+    @Override
     public LabelBlockProxy visitLabelBlockProxy(final LabelBlockProxy block)
       throws VisitorException
     {
       try {
         mLabelList = new LinkedList<IdentifierProxy>();
-        final List<Proxy> list = block.getEventList();
+        final List<Proxy> list = block.getEventIdentifierList();
         visitCollection(list);
         return mFactory.createLabelBlockProxy(mLabelList, null);
       } finally {
@@ -873,6 +902,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public ModuleProxy visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
@@ -895,6 +925,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public SimpleComponentProxy visitSimpleComponentProxy
       (final SimpleComponentProxy comp)
       throws VisitorException
@@ -918,6 +949,7 @@ public class EFACompiler
       }
     }
 
+    @Override
     public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
       throws VisitorException
     {
@@ -925,15 +957,18 @@ public class EFACompiler
       final PlainEventListProxy props0 = node.getPropositions();
       final PlainEventListProxy props1 =
         (PlainEventListProxy) mCloner.getClone(props0);
+      final Map<String,String> attribs0 = node.getAttributes();
+      final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
       final boolean initial = node.isInitial();
       final SimpleNodeProxy result = mFactory.createSimpleNodeProxy
-        (name, props1, initial, null, null, null);
+        (name, props1, attribs1, initial, null, null, null);
       mNodeList.add(result);
       mNodeMap.put(node, result);
       addSourceInfo(result, node);
       return result;
     }
 
+    @Override
     public SimpleComponentProxy visitVariableComponentProxy
       (final VariableComponentProxy comp)
       throws VisitorException

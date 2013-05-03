@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Attach-Case-to-Assembly-6" type="subsystem">
+            <Integrity status="not-verified" date-stamp=""/>
+            <Reachable status="not-verified" date-stamp=""/>
+            <Nonblocking status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="3" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="1" sx="205" sy="46" lx="11" ly="8"/>
+            <St id="2" nm="s2-atc-case" al="s2-atc-case" mk="0" rch="1" sx="365" sy="46" lx="3" ly="4"/>
+            <St id="3" nm="s3" al="s3" mk="0" rch="1" sx="205" sy="206" lx="11" ly="3"/>
+        </States>
+        <Events count="3" ctrl-count="1" unctrl-count="2" def-count="1" ans-count="1" req-count="1">
+            <Ev id="1" nm="start-case-6" al="str-case-6" ctrl="1" type="r"/>
+            <Ev id="2" nm="attach-case-6" al="attch-case-6" ctrl="0" type="d"/>
+            <Ev id="3" nm="complete-case-6" al="compl-case-6" ctrl="0" type="a"/>
+        </Events>
+        <Trans-Function count="3">
+            <Transitions count="3">
+                <Tr fID="2" eID="2" tID="3" lx="261.773" ly="147.683" cnt="2">
+                    <Pos x="215" y="196"/>
+                    <Pos x="355" y="55.9955"/>
+                </Tr>
+                <Tr fID="1" eID="1" tID="2" lx="238.823" ly="15" cnt="2">
+                    <Pos x="355" y="45.9955"/>
+                    <Pos x="215" y="45.9997"/>
+                </Tr>
+                <Tr fID="3" eID="3" tID="1" lx="75" ly="100.177" cnt="2">
+                    <Pos x="205" y="56"/>
+                    <Pos x="205" y="196"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

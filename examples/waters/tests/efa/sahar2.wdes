@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="sahar2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A test for EFA compilation.
+This test checks whether uncontrollable transitions with incompatible guards in the plant and specification are handled correctly when compiling and optimising.</ns2:Comment>
+<EventList>
+<Event Kind="UNCONTROLLABLE" Name="u"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="P">
+<EventRefList>
+<EventRef Name="u"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Event="u" Source="S0" Target="S1"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="K">
+<EventRefList>
+<EventRef Name="u"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+</StateList>
+</Automaton>
+</AutomataList>
+</ProductDES>

@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.base.GeometryProxy;
  * <P>This is the abstract base class of all mutable Waters elements
  * in the <I>subject</I> implementation. It provides the basic functionality
  * of a mutable object.</P>
- * 
+ *
  * @author Robi Malik
  */
 
@@ -68,7 +68,7 @@ public abstract class GeometrySubject
     final Subject source = parent == null ? this : parent;
     final ModelChangeEvent event =
       ModelChangeEvent.createGeometryChanged(source, this);
-    fireModelChanged(event);
+    event.fire();
   }
 
 }

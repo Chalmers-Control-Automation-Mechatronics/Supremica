@@ -24,8 +24,8 @@
         <EventDecl Kind="CONTROLLABLE" Name="recv_msg">
             <RangeList>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="5"/>
-                    <IntConstant Value="5"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
@@ -155,6 +155,20 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
+        <VariableComponent Name="var_consumer_data">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="var_consumer_data"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="proctype_consumer">
             <Graph>
                 <NodeList>
@@ -209,9 +223,20 @@
                                 <IntConstant Value="5"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="5"/>
+                                <Point Y="-17" X="10"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_consumer_data"/>
+                                    <IntConstant Value="5"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="8" X="8"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                     <Edge Target="consumer_3" Source="consumer_2">
                         <LabelBlock>

@@ -36,24 +36,25 @@ public abstract class EventListExpressionElement
   //# Constructors
   /**
    * Creates a new event list expression.
-   * @param eventList The list of events of the new event list expression, or <CODE>null</CODE> if empty.
+   * @param eventIdentifierList The list of event identifiers of the new event list expression, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
-  protected EventListExpressionElement(final Collection<? extends Proxy> eventList)
+  protected EventListExpressionElement(final Collection<? extends Proxy> eventIdentifierList)
   {
-    if (eventList == null) {
-      mEventList = Collections.emptyList();
+    if (eventIdentifierList == null) {
+      mEventIdentifierList = Collections.emptyList();
     } else {
-      final List<Proxy> eventListModifiable =
-        new ArrayList<Proxy>(eventList);
-      mEventList =
-        Collections.unmodifiableList(eventListModifiable);
+      final List<Proxy> eventIdentifierListModifiable =
+        new ArrayList<Proxy>(eventIdentifierList);
+      mEventIdentifierList =
+        Collections.unmodifiableList(eventIdentifierListModifiable);
     }
   }
 
   /**
    * Creates a new event list expression using default values.
    * This constructor creates an event list expression with
-   * an empty list of events.
+   * an empty list of event identifiers.
    */
   protected EventListExpressionElement()
   {
@@ -63,6 +64,7 @@ public abstract class EventListExpressionElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public EventListExpressionElement clone()
   {
     return (EventListExpressionElement) super.clone();
@@ -71,19 +73,19 @@ public abstract class EventListExpressionElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.EventListExpressionProxy
-  public List<Proxy> getEventList()
+  public List<Proxy> getEventIdentifierList()
   {
-    return mEventList;
+    return mEventIdentifierList;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final List<Proxy> mEventList;
+  private final List<Proxy> mEventIdentifierList;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -9006351211108790339L;
+  private static final long serialVersionUID = -2466395113461561993L;
 
 }

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
-import net.sourceforge.waters.model.analysis.IsomorphismChecker;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -50,7 +50,7 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mAbstractionRule = createAbstractionRule(factory);
     mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
-    mIsomorphismChecker = new IsomorphismChecker(factory, false);
+    mIsomorphismChecker = new IsomorphismChecker(factory, false, true);
   }
 
   protected void tearDown() throws Exception

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -184,3 +184,4 @@ class BDDStateCounter
   private final TObjectDoubleHashMap<BDD> mCache;
 
 }
+

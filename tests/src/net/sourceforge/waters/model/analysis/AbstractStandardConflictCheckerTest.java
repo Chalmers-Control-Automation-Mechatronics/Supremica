@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -35,6 +36,8 @@ public abstract class AbstractStandardConflictCheckerTest
   {
     super(name);
   }
+
+
 
 
   //#########################################################################
@@ -87,9 +90,17 @@ public abstract class AbstractStandardConflictCheckerTest
   }
 
 
+  public void test_onlySelfLoop01() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "nasty";
+    final String name = "onlySelfLoop01.wmod";
+    runModelVerifier(group, subdir, name, true);
+  }
+
   //#########################################################################
   //# Test Cases --- nondeterministic
-  public void testNondeterministicCombiniations() throws Exception
+  public void testNondeterministicCombinations() throws Exception
   {
     final String group = "tests";
     final String dir = "nondeterministic";
@@ -214,6 +225,14 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- nasty
+  public void testAgvbPart1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "agvb_part1.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testCertainConf1() throws Exception
   {
     final String group = "tests";
@@ -254,6 +273,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testFTechnikConflict() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "ftechnik_conflict.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testJpt10Counter() throws Exception
   {
     final String group = "tests";
@@ -286,6 +313,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testPrimeSieve2b() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "prime_sieve2b.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testRhoneTU34() throws Exception
   {
     final String group = "tests";
@@ -308,6 +343,14 @@ public abstract class AbstractStandardConflictCheckerTest
     final String dir = "nasty";
     final String name = "twoinit.wmod";
     runModelVerifier(group, dir, name, true);
+  }
+
+  public void testTwoInitBlock() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "twoinit_block.wmod";
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testVerriegel4Counter2() throws Exception

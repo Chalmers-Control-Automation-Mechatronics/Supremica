@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Sink" type="subsystem">
+            <Integrity status="valid" date-stamp="Mon Nov 12 15:23:34 2012"/>
+            <Reachable status="yes" date-stamp="Mon Nov 12 15:23:34 2012"/>
+            <Nonblocking status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="1" marked-count="1">
+            <InitSt id="1" nm="s1" al="s1" mk="1" rch="1" sx="267" sy="209" lx="5" ly="5"/>
+        </States>
+        <Events count="1" ctrl-count="1" unctrl-count="0" def-count="1" ans-count="0" req-count="0">
+            <Ev id="1" nm="allow-exit" al="allow-ex" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="1">
+            <Transitions count="1">
+                <Tr fID="1" eID="1" tID="1" lx="75.3405" ly="50.313" ang="225">
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

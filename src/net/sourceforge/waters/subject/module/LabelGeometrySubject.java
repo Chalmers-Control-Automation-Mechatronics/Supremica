@@ -13,6 +13,7 @@
 package net.sourceforge.waters.subject.module;
 
 import java.awt.geom.Point2D;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -20,7 +21,12 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.subject.base.GeometrySubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 
@@ -65,6 +71,7 @@ public final class LabelGeometrySubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public LabelGeometrySubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -72,26 +79,44 @@ public final class LabelGeometrySubject
     return (LabelGeometrySubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final LabelGeometrySubject downcast = (LabelGeometrySubject) partner;
-      boolean change = super.assignFrom(partner);
-      final Point2D offset = downcast.getOffset();
-      if (!mOffset.equals(offset)) {
-        mOffset = (Point2D) offset.clone();
-        change = true;
-      }
-      final AnchorPosition anchor = downcast.getAnchor();
-      if (mAnchor != anchor) {
-        mAnchor = anchor;
-        change = true;
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 0) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 1:
+        mOffset = (Point2D) newValue;
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      case 2:
+        mAnchor = (AnchorPosition) newValue;
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final LabelGeometrySubject downcast = (LabelGeometrySubject) newState;
+    if (!mOffset.equals(downcast.mOffset)) {
+      final UndoInfo step1 =
+        new ReplacementUndoInfo(1, mOffset, downcast.mOffset);
+      info.add(step1);
+    }
+    if (!mAnchor.equals(downcast.mAnchor)) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mAnchor, downcast.mAnchor);
+      info.add(step2);
+    }
   }
 
 

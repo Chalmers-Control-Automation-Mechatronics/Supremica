@@ -244,6 +244,7 @@
         <xs:sequence>
           <xs:element ref="M:EventList" minOccurs="0"/>
         </xs:sequence>
+        <xs:attribute name="Unpack" type="xs:boolean" default="false"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -521,6 +522,7 @@
             <jaxb:property name="Propositions"/>
           </xs:appinfo></xs:annotation>
         </xs:element>
+        <xs:element ref="B:AttributeMap" minOccurs="0"/>
       </xs:sequence>
     </xs:extension>
   </xs:complexContent>

@@ -1,8 +1,8 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.iterator.TIntIterator;
 
 import java.util.Set;
 
@@ -45,6 +45,8 @@ public class AnnotateGraph
   public void run()
   {
     TIME -= System.currentTimeMillis();
+    mTransitionRelation.removeAllSelfLoops(mTau);
+    mTransitionRelation.removeAllAnnotations(mTau);
     STATESREMOVED -= mTransitionRelation.unreachableStates();
     final TIntHashSet tausremoved = new TIntHashSet();
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
@@ -65,16 +67,27 @@ public class AnnotateGraph
           System.out.println("null ae");
           ae = new TIntHashSet();
         }
+        /*if (s == 13) {
+          System.out.println("annotate");
+          System.out.println(Arrays.toString(ae.toArray()));
+        }*/
         mTransitionRelation.addAllSuccessors(target, s);
         ANNOTATIONSREMOVEDSUBSET += mTransitionRelation.getAnnotations2(target).size();
         anns = TransitionRelation.subsets(mTransitionRelation.getAnnotations2(target),
                                            anns);
       }
+      /*if (s == 13) {
+        System.out.println("13's anns");
+        for (TIntHashSet ann : anns) {
+          System.out.println(Arrays.toString(ann.toArray()));
+        }
+      }*/
       ANNOTATIONSREMOVEDSUBSET -= anns.size();
       if (!anns.isEmpty()) {
         mTransitionRelation.setAnnotation(s, anns);
       }
     }
+    System.out.println("mTau: " + mTau);
     mTransitionRelation.removeAllAnnotations(mTau);
     mTransitionRelation.removeEvent(mTau);
     STATESTAUSREMOVEDFROM += tausremoved.size();
@@ -152,3 +165,4 @@ public class AnnotateGraph
     TIME += System.currentTimeMillis();
   }*/
 }
+

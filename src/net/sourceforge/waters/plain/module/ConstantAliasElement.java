@@ -67,6 +67,7 @@ public final class ConstantAliasElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public ConstantAliasElement clone()
   {
     return (ConstantAliasElement) super.clone();

@@ -211,6 +211,18 @@ glue class AbortException extends Exception {
   AbortException();
 }
 
+enum class OverflowKind {STATE, TRANSITION, NODE, MEMORY}
+
+glue class OverflowException extends Exception {
+  OverflowException(glue OverflowKind kind);
+  OverflowException(glue OverflowKind kind, int limit);
+}
+
+
+//###########################################################################
+package net.sourceforge.waters.model.analysis.des;
+//###########################################################################
+
 glue class EventNotFoundException extends Exception {
   EventNotFoundException(glue NamedProxy container, String name);
 }
@@ -220,13 +232,6 @@ glue class NondeterministicDESException extends Exception {
   NondeterministicDESException(glue AutomatonProxy aut,
 			       glue StateProxy state,
 			       glue EventProxy event);
-}
-
-enum class OverflowKind {STATE, TRANSITION, NODE, MEMORY}
-
-glue class OverflowException extends Exception {
-  OverflowException(glue OverflowKind kind);
-  OverflowException(glue OverflowKind kind, int limit);
 }
 
 
@@ -260,7 +265,7 @@ glue class NativeSafetyVerifier extends NativeModelVerifier {
 }
 
 glue class NativeConflictChecker extends NativeModelVerifier {
-  glue EventProxy getPreconditionMarking();
-  glue EventProxy getUsedMarkingProposition();
+  glue EventProxy getUsedDefaultMarking();
+  glue EventProxy getConfiguredPreconditionMarking();
   glue KindTranslator getKindTranslator();
 }

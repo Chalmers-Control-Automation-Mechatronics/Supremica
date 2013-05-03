@@ -9,15 +9,16 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntProcedure;
-import gnu.trove.TIntStack;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -110,8 +111,8 @@ public class IncomingEquivalenceTRSimplifier
     mClassListReadIterator = mListBuffer.createReadOnlyIterator();
     mClassListWriteIterator = mListBuffer.createModifyingIterator();
     mNewList = mListBuffer.createList();
-    mStack1 = new TIntStack();
-    mStack2 = new TIntStack();
+    mStack1 = new TIntArrayStack();
+    mStack2 = new TIntArrayStack();
     mEvents0 = new TIntHashSet();
     mEvents1 = new TIntHashSet();
     mPredecessorsTauClosure =
@@ -798,12 +799,14 @@ public class IncomingEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.abstraction.WatersIntHashingStrategy
+    @Override
     public int computeHashCode(final int root)
     {
       final ClassInfo info = mStateClasses[root];
       return info.incomingEquivalenceHashCode();
     }
 
+    @Override
     public boolean equals(final int root1, final int root2)
     {
       final ClassInfo info = mStateClasses[root1];
@@ -825,12 +828,14 @@ public class IncomingEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.abstraction.WatersIntHashingStrategy
+    @Override
     public int computeHashCode(final int root)
     {
       final ClassInfo info = mStateClasses[root];
       return info.activeEventsHashCode();
     }
 
+    @Override
     public boolean equals(final int root1, final int root2)
     {
       final ClassInfo info = mStateClasses[root1];
@@ -839,6 +844,7 @@ public class IncomingEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface gnu.trove.TIntProcedure
+    @Override
     public boolean execute(final int list)
     {
       final ClassInfo root = mergeList(list, true);
@@ -938,3 +944,4 @@ public class IncomingEquivalenceTRSimplifier
   private static final int OMEGA_EVENT = -1;
 
 }
+

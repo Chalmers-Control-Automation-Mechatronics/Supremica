@@ -6,12 +6,12 @@
         <EventDecl Kind="CONTROLLABLE" Name="exch_ch">
             <RangeList>
                 <BinaryExpression Operator="..">
-                    <IntConstant Value="1"/>
-                    <IntConstant Value="2"/>
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
-                    <IntConstant Value="4"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
@@ -195,12 +195,12 @@
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="var_B_key"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="var_B_data"/>
                                     <IntConstant Value="3"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_B_key"/>
+                                    <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
@@ -221,12 +221,12 @@
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="var_B_key"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="var_B_data"/>
                                     <IntConstant Value="4"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_B_key"/>
+                                    <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
@@ -250,12 +250,12 @@
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="var_B_key"/>
-                                    <IntConstant Value="2"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
                                     <SimpleIdentifier Name="var_B_data"/>
                                     <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="var_B_key"/>
+                                    <IntConstant Value="2"/>
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">

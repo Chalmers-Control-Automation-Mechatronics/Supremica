@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -254,7 +254,7 @@ public class StateEncoding
     mExtraStates = extra;
   }
 
-  public int getNumberOfIncludingExtraStates()
+  public int getNumberOfStatesIncludingExtra()
   {
     return mStates.length + mExtraStates;
   }
@@ -267,3 +267,4 @@ public class StateEncoding
   private int mExtraStates;
 
 }
+

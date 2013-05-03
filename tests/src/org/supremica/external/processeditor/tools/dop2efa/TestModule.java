@@ -26,7 +26,7 @@ public class TestModule extends TestCase{
      * Called before every test case method.
      */
     protected void setUp(){
-    	module = new Module("Test", false);
+    	module = new Module("Test");
     }
     
     /**

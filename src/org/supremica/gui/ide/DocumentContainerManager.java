@@ -60,10 +60,11 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 import org.supremica.automata.Project;
-import org.supremica.automata.IO.ADSUnmarshaller;
+import org.supremica.automata.IO.ADSUnmarshaller2;
 import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaMarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
+import org.supremica.automata.IO.TCTUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.xml.sax.SAXException;
 
@@ -100,10 +101,18 @@ public class DocumentContainerManager
       new PromelaUnmarshaller(factory);
     final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller =
       new UMDESUnmarshaller(factory);
+    // final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
+    //  new ADSUnmarshaller(factory);
+    /**
+     * ADSUnmarshaller is replaced by ADSUnmarshaller2 since the
+     * former does not work!!! /Mohammad~Reza
+     */
     final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
-      new ADSUnmarshaller(factory);
+      new ADSUnmarshaller2(factory);
     final ProxyUnmarshaller<ModuleProxy> validUnmarshaller =
       new ValidUnmarshaller(factory, opTable);
+    final ProxyUnmarshaller<ModuleProxy> tctUnmarshaller =
+      new TCTUnmarshaller(factory);
     final ProductDESProxyFactory desfactory =
       ProductDESElementFactory.getInstance();
     final JAXBTraceMarshaller traceMarshaller =
@@ -121,6 +130,7 @@ public class DocumentContainerManager
     mDocumentManager.registerUnmarshaller(promelaUnmarshaller);
     mDocumentManager.registerUnmarshaller(umdesUnmarshaller);
     mDocumentManager.registerUnmarshaller(adsUnmarshaller);
+    mDocumentManager.registerUnmarshaller(tctUnmarshaller);
     mDocumentManager.registerUnmarshaller(validUnmarshaller);
 
     mProductDESImporter = new ProductDESImporter(factory);
@@ -245,6 +255,23 @@ public class DocumentContainerManager
     return openContainer(uri, false);
   }
 
+  public DocumentContainer openContainer(final DocumentProxy doc)
+  {
+    final URI uri = doc.getLocation();
+    final DocumentContainer found = mURIContainerMap.get(uri);
+    if (found == null) {
+      final DocumentContainer container = createContainer(doc);
+      if (container == null) {
+        return null;
+      }
+      addContainer(container);
+      return container;
+    } else {
+      setActiveContainer(found);
+      return found;
+    }
+  }
+
   public void saveActiveContainer()
   {
     mWasCancelled = false;
@@ -294,7 +321,6 @@ public class DocumentContainerManager
       ("Unknown document type: " + doc.getClass().getName() + "!");
     }
   }
-
 
 
   //#########################################################################

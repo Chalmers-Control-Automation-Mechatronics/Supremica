@@ -12,6 +12,10 @@
 
 package net.sourceforge.waters.plain.module;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.plain.base.NamedElement;
@@ -34,9 +38,11 @@ public abstract class NodeElement
    * Creates a new node.
    * @param name The name of the new node.
    * @param propositions The list of propositions of the new node, or <CODE>null</CODE> if empty.
+   * @param attributes The attribute map of the new node, or <CODE>null</CODE> if empty.
    */
   protected NodeElement(final String name,
-                        final PlainEventListProxy propositions)
+                        final PlainEventListProxy propositions,
+                        final Map<String,String> attributes)
   {
     super(name);
     if (propositions == null) {
@@ -44,23 +50,34 @@ public abstract class NodeElement
     } else {
       mPropositions = propositions;
     }
+    if (attributes == null) {
+      mAttributes = Collections.emptyMap();
+    } else {
+      final Map<String,String> attributesModifiable =
+        new TreeMap<String,String>(attributes);
+      mAttributes =
+        Collections.unmodifiableMap(attributesModifiable);
+    }
   }
 
   /**
    * Creates a new node using default values.
    * This constructor creates a node with
-   * an empty list of propositions.
+   * an empty list of propositions and
+   * an empty attribute map.
    * @param name The name of the new node.
    */
   protected NodeElement(final String name)
   {
     this(name,
+         null,
          null);
   }
 
 
   //#########################################################################
   //# Cloning
+  @Override
   public NodeElement clone()
   {
     return (NodeElement) super.clone();
@@ -74,14 +91,20 @@ public abstract class NodeElement
     return mPropositions;
   }
 
+  public Map<String,String> getAttributes()
+  {
+    return mAttributes;
+  }
+
 
   //#########################################################################
   //# Data Members
   private final PlainEventListProxy mPropositions;
+  private final Map<String,String> mAttributes;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 8722673673545066528L;
+  private static final long serialVersionUID = -6959993503258239244L;
 
 }

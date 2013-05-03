@@ -1,5 +1,7 @@
 package org.supremica.automata.BDD.EFA;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
@@ -21,6 +23,7 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
+import org.supremica.automata.algorithms.Guard.GeneticMinimizer.Chromosome;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
@@ -71,6 +74,7 @@ public class BDDExtendedSynthesizer {
 */
 
         synthesisTimer = new ActionTimer();
+
         if(options.getSynthesisType().equals(SynthesisType.CONTROLLABLE))
         {
             synthesisTimer.start();
@@ -93,6 +97,45 @@ public class BDDExtendedSynthesizer {
             synthesisTimer.stop();
         }
 
+        else if(options.getSynthesisType().equals(SynthesisType.UNSAFETY))
+        {
+            synthesisTimer.start();
+
+//            BDDDomain v11Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("v11"));
+//            BDDDomain v12Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("v12"));
+//            BDDDomain v21Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("v21"));
+//            BDDDomain v22Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("v22"));
+//            BDDDomain VR1Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("r1"));
+//            BDDDomain VR2Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("r2"));
+//            BDDDomain VR3Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("r3"));
+//
+//            BDD state1 = bddAutomata.getManager().createBDD(0,v11Domain).and(
+//                    bddAutomata.getManager().createBDD(1,v12Domain)).and(
+//                    bddAutomata.getManager().createBDD(1,v21Domain)).and(
+//                    bddAutomata.getManager().createBDD(0,v22Domain));
+//
+//            BDD state2 = bddAutomata.getManager().createBDD(1,v11Domain).and(
+//                    bddAutomata.getManager().createBDD(0,v12Domain)).and(
+//                    bddAutomata.getManager().createBDD(0,v21Domain)).and(
+//                    bddAutomata.getManager().createBDD(1,v22Domain));
+//
+//
+//            BDD minimalDeadlocks = state1.or(state2);
+            statesAfterSynthesis =  bddAutomata.getUnsafeStates();
+            nbrOfStates = bddAutomata.nbrOfUnsafeStates;
+            synthesisTimer.stop();
+        }
+
+    }
+
+
+    public String getFeasibleValues(final String variable)
+    {
+        return bddAutomata.intListToFormula(
+                            variable,
+                            bddAutomata.BDD2valuations(
+                                bddAutomata.getMarkedStates().and(
+                                statesAfterSynthesis),variable));
     }
 
     public long nbrOfStates()
@@ -134,11 +177,68 @@ public class BDDExtendedSynthesizer {
         while(it.hasNext())
         {
             final String sigmaName = it.next();
+//            System.err.println("The currrrrent event is: "+ sigmaName);
+//            Set<String> genes = new HashSet<String>(bddAutomata.variableOrderingNames);
+//            genes.remove("Events");
+//            genes.remove("1");
+//            FitnessEvaluation fitnessEvaluation = new FitnessEvaluation() {
+//                Map<Chromosome,Integer> cache = new HashMap<Chromosome, Integer>();
+//                public int eval(Chromosome chromosome)
+//                {
+//                    if(cache.containsKey(chromosome))
+//                    {
+//                        return cache.get(chromosome);
+//                    }
+//                    else
+//                    {
+//                        int[] optimalVarOrdering = decodeToIntArray(chromosome);
+////                        System.err.println("Changing var order...");
+//                        bddAutomata.getManager().getFactory().setVarOrder(optimalVarOrdering);
+////                        System.err.println("Change of var order completed.");
+//                        BDDExtendedGuardGenerator bddgg = new BDDExtendedGuardGenerator(bddAutomata, sigmaName, statesAfterSynthesis, options);
+//                        cache.put(chromosome, bddgg.getNbrOfTerms());
+//                        return bddgg.getNbrOfTerms();
+//                    }
+//                }
+//            };
+//            int[] optimalVarOrdering = decodeToIntArray((new Genetics(fitnessEvaluation, genes, new Genetics.GeneticOptions()).runGenetics()));
+//            bddAutomata.getManager().getFactory().setVarOrder(optimalVarOrdering);
+
             bddgg = new BDDExtendedGuardGenerator(bddAutomata, sigmaName, statesAfterSynthesis, options);
             event2guard.put(sigmaName, bddgg);
         }
         guardTimer.stop();
 
+    }
+
+    int[] decodeToIntArray(final Chromosome chromosome)
+    {
+        final TIntArrayList intArray = new TIntArrayList(bddAutomata.getEventDomain().vars());
+        for(final String gene:chromosome.getGenes())
+        {
+            final Integer geneIndex = bddAutomata.getIndexMap().getVariableIndexByName(gene);
+
+            if(bddAutomata.getSourceLocationDomain(gene) != null)
+            {
+                intArray.add(bddAutomata.getTempLocationDomain(gene).vars());
+                intArray.add(bddAutomata.getSourceLocationDomain(gene).vars());
+                intArray.add(bddAutomata.getDestLocationDomain(gene).vars());
+            }
+            else if(bddAutomata.getSourceVariableDomain(geneIndex) != null)
+            {
+                intArray.add(bddAutomata.getTempVariableDomain(geneIndex).vars());
+                intArray.add(bddAutomata.getSourceVariableDomain(geneIndex).vars());
+                intArray.add(bddAutomata.getDestVariableDomain(geneIndex).vars());
+            }
+            else
+                throw new IllegalArgumentException("The gene does not exist!");
+
+        }
+
+        final TIntArrayList remainingVars = new TIntArrayList(bddAutomata.getManager().getFactory().getVarOrder());
+        remainingVars.remove(0, intArray.size());
+        intArray.add(remainingVars.toArray());
+        return intArray.toArray();
     }
 
     public void addGuardsToAutomata(final ModuleSubject module)
@@ -156,7 +256,7 @@ public class BDDExtendedSynthesizer {
                     SimpleExpressionSubject ses1 = null;
                     SimpleExpressionSubject ses2 = null;
 
-                    final String currEvent = ep.getLabelBlock().getEventList().iterator().next().toString();
+                    final String currEvent = ep.getLabelBlock().getEventIdentifierList().iterator().next().toString();
                     currBDDGG = event2guard.get(currEvent);
 
                     if(ep.getGuardActionBlock()==null)
@@ -225,3 +325,4 @@ public class BDDExtendedSynthesizer {
     }
 
 }
+

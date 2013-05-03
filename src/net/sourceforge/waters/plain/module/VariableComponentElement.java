@@ -91,6 +91,7 @@ public final class VariableComponentElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public VariableComponentElement clone()
   {
     return (VariableComponentElement) super.clone();

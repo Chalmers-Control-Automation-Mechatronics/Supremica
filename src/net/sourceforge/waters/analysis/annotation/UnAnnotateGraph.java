@@ -1,13 +1,14 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TIntObjectIterator;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -20,8 +21,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Arrays;
 
 
 public class UnAnnotateGraph
@@ -51,8 +50,17 @@ public class UnAnnotateGraph
     mMarked = marked;
   }
 
+  public UnAnnotateGraph(final TransitionRelation transitionrelation, final EventProxy marked,
+                         final EventProxy tau)
+  {
+    mTransitionRelation = transitionrelation;
+    mMarked = marked;
+    mTau = tau;
+  }
+
   public AutomatonProxy run(final ProductDESProxyFactory factory)
   {
+    //mTransitionRelation.printstuff();
     TIME -= System.currentTimeMillis();
     final boolean containsmarked = mTransitionRelation.getEvents().contains(mMarked);
     final Map<TIntHashSet, TIntArrayList> statesWithAnnotation =
@@ -123,7 +131,7 @@ public class UnAnnotateGraph
       assert(statenum == nextStates.size());
     }
     for (final TIntHashSet ann : statesWithAnnotation.keySet()) {
-      final TIntHashSet states = new TIntHashSet(statesWithAnnotation.get(ann).toNativeArray());
+      final TIntHashSet states = new TIntHashSet(statesWithAnnotation.get(ann).toArray());
       final TIntArrayList withActiveEvents = statesWithActiveEvents.get(ann);
       if (withActiveEvents != null) {
         final int[] arr = states.toArray();
@@ -247,15 +255,13 @@ public class UnAnnotateGraph
       final StateProxy target = nextStates.get(ot);
       newTransitions.add(factory.createTransitionProxy(source, event, target));
     }
-    mTau = factory.createEventProxy("tau:" + mTransitionRelation.getName(), EventKind.UNCONTROLLABLE);
+    //mTau = factory.createEventProxy("tau:" + mTransitionRelation.getName(), EventKind.UNCONTROLLABLE);
     for (int i = 0; i < newStates.size(); i++) {
       final StateProxy source = nextStates.get(i);
       final TIntArrayList taus = newStates.get(i);
-      //System.out.println("Taus:" + taus.size());
       for (int j = 0; j < taus.size(); j++) {
         final int state = taus.get(j);
         if (i == state) {continue;}
-        //System.out.println("tau:" + state);
         final StateProxy target = nextStates.get(state);
         newTransitions.add(factory.createTransitionProxy(source, mTau, target));
       }
@@ -275,3 +281,4 @@ public class UnAnnotateGraph
     return mTau;
   }
 }
+

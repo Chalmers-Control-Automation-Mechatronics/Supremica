@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -30,6 +31,9 @@ import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.DocumentSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -53,7 +57,9 @@ public final class ModuleSubject
    * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
    * @param eventDeclList The event declaration list of the new module, or <CODE>null</CODE> if empty.
    * @param eventAliasList The event alias list of the new module, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.AliasProxy AliasProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    * @param componentList The component list of the new module, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.ComponentProxy ComponentProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
   public ModuleSubject(final String name,
                        final String comment,
@@ -120,6 +126,7 @@ public final class ModuleSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public ModuleSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -127,28 +134,33 @@ public final class ModuleSubject
     return (ModuleSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    if (this != partner) {
-      final ModuleSubject downcast = (ModuleSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ListSubject<ConstantAliasSubject> constantAliasList =
-        downcast.getConstantAliasListModifiable();
-      mConstantAliasList.assignFrom(constantAliasList);
-      final ListSubject<EventDeclSubject> eventDeclList =
-        downcast.getEventDeclListModifiable();
-      mEventDeclList.assignFrom(eventDeclList);
-      final ListSubject<AbstractSubject> eventAliasList =
-        downcast.getEventAliasListModifiable();
-      mEventAliasList.assignFrom(eventAliasList);
-      final ListSubject<AbstractSubject> componentList =
-        downcast.getComponentListModifiable();
-      mComponentList.assignFrom(componentList);
-      if (change) {
-        fireStateChanged();
-      }
+    super.collectUndoInfo(newState, info, boundary);
+    final ModuleSubject downcast = (ModuleSubject) newState;
+    final UndoInfo step4 =
+      mConstantAliasList.createUndoInfo(downcast.mConstantAliasList, boundary);
+    if (step4 != null) {
+      info.add(step4);
     }
-    return false;
+    final UndoInfo step5 =
+      mEventDeclList.createUndoInfo(downcast.mEventDeclList, boundary);
+    if (step5 != null) {
+      info.add(step5);
+    }
+    final UndoInfo step6 =
+      mEventAliasList.createUndoInfo(downcast.mEventAliasList, boundary);
+    if (step6 != null) {
+      info.add(step6);
+    }
+    final UndoInfo step7 =
+      mComponentList.createUndoInfo(downcast.mComponentList, boundary);
+    if (step7 != null) {
+      info.add(step7);
+    }
   }
 
 
@@ -226,6 +238,7 @@ public final class ModuleSubject
 
   /**
    * Gets the modifiable event alias list of this module.
+   * Each element is of type {@link net.sourceforge.waters.model.module.AliasProxy AliasProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
   public ListSubject<AbstractSubject> getEventAliasListModifiable()
   {
@@ -234,6 +247,7 @@ public final class ModuleSubject
 
   /**
    * Gets the modifiable component list of this module.
+   * Each element is of type {@link net.sourceforge.waters.model.module.ComponentProxy ComponentProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
   public ListSubject<AbstractSubject> getComponentListModifiable()
   {

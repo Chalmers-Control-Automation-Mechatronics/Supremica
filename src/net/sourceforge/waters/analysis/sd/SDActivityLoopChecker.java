@@ -10,7 +10,7 @@
 package net.sourceforge.waters.analysis.sd;
 
 import net.sourceforge.waters.analysis.modular.ModularControlLoopChecker;
-import net.sourceforge.waters.model.analysis.ControlLoopChecker;
+import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

@@ -43,10 +43,10 @@ public class IncomingTransitionListBuffer extends TransitionListBuffer
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public IncomingTransitionListBuffer(final int numEvents, final int numStates)
+  public IncomingTransitionListBuffer(final int numEvents, final int numStates, final byte[] eventStatus)
     throws OverflowException
   {
-    super(numEvents, numStates);
+    super(numEvents, numStates,  eventStatus);
   }
 
   /**
@@ -64,10 +64,11 @@ public class IncomingTransitionListBuffer extends TransitionListBuffer
    */
   public IncomingTransitionListBuffer(final int numEvents,
                                       final int numStates,
+                                      final byte[] eventStatus,
                                       final int numTrans)
     throws OverflowException
   {
-    super(numEvents, numStates, numTrans);
+    super(numEvents, numStates, eventStatus, numTrans);
   }
 
   /**
@@ -85,31 +86,37 @@ public class IncomingTransitionListBuffer extends TransitionListBuffer
 
   //#########################################################################
   //# Overrides for net.sourceforge.water.analysis.op.TransitionListBuffer
+  @Override
   public StateProxy getFromState(final TransitionProxy trans)
   {
     return trans.getTarget();
   }
 
+  @Override
   public StateProxy getToState(final TransitionProxy trans)
   {
     return trans.getSource();
   }
 
+  @Override
   public int getIteratorSourceState(final TransitionIterator iter)
   {
     return iter.getCurrentToState();
   }
 
+  @Override
   public int getIteratorTargetState(final TransitionIterator iter)
   {
     return iter.getCurrentFromState();
   }
 
+  @Override
   public int getOtherIteratorFromState(final TransitionIterator iter)
   {
     return iter.getCurrentTargetState();
   }
 
+  @Override
   public int getOtherIteratorToState(final TransitionIterator iter)
   {
     return iter.getCurrentSourceState();

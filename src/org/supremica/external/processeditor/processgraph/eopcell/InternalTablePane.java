@@ -19,8 +19,8 @@ import org.supremica.external.processeditor.processgraph.table.BasicTablePane;
 import org.supremica.external.processeditor.processgraph.table.ValueChangedCellRenderer;
 import org.supremica.manufacturingTables.xsd.eop.*;
 
-public class InternalTablePane 
-						extends 
+public class InternalTablePane
+						extends
 							BasicTablePane
 						implements
 							ActionListener,
@@ -31,159 +31,159 @@ public class InternalTablePane
     public static final String ACTUATOR = "Actuator";
 	public static final String VARIABLE = "Variable";
 	public static final String SENSOR = "Sensor";
-	
-	private List<JComboBox> comboBoxList = null;
+
+	private List<JComboBox<String>> comboBoxList = null;
 	private InternalDataEditor editor = null;
-	
-	public InternalTablePane(InternalComponents internalComponents){
+
+	public InternalTablePane(final InternalComponents internalComponents){
 		super();
 		setHeader("Internal components state");
-		
+
 		jbTableHeader.addActionListener(this);
 		jbTableHeader.addMouseListener(this);
-		
+
 		//first row not editable
 		table.getModel().setRowEditable(0, false);
 		table.setDefaultRenderer(Object.class, new ValueChangedCellRenderer());
-		
-		comboBoxList = new LinkedList<JComboBox>();
-		
+
+		comboBoxList = new LinkedList<JComboBox<String>>();
+
 		if(internalComponents == null){
 			setUpTypeRow();
 			return;
 		}
-		
+
 		//Add columns
 		List<String> stringList = internalComponents.getActuator();
-		for(String actuator : stringList){
+		for(final String actuator : stringList){
 			addActuator(actuator);
 		}
-		
+
 		stringList = internalComponents.getVariable();
-		for(String variable : stringList){
+		for(final String variable : stringList){
 			addVariable(variable);
 		}
-		
+
 		stringList = internalComponents.getSensor();
-		for(String sensor : stringList){
+		for(final String sensor : stringList){
 			addSensor(sensor);
 		}
 		setUpTypeRow();
 	}
-	
-	public void insertActions(List<Action> actionList){
-		for(Action action : actionList){
+
+	public void insertActions(final List<Action> actionList){
+		for(final Action action : actionList){
 			EOPTableFiller.insertInternalConditionFromActionToTable(action, table);
 		}
 	}
-	
+
 	public InternalComponents getInternalComponents(){
 		return EOPTableExtractor.getInternalComponentsFromTable(table);
 	}
-	
+
 	private void setUpTypeRow() {
-		int numberOfColumns = table.getColumnCount();
+		final int numberOfColumns = table.getColumnCount();
 		for(int col = 0; col < numberOfColumns; col++){
 			table.getColumnModel().
 				  getColumn( col ).
 				  	setCellEditor( new InternalCellEditor(comboBoxList.get(col)) );
 		}
 	}
-	
-	public void addActuator(String name){
+
+	public void addActuator(final String name){
 		addActuator(name, null);
 	}
-	
-	public void addActuator(String name, String[] values){
+
+	public void addActuator(final String name, final String[] values){
 		addCol( name );
 		table.setValueAt(ACTUATOR, 0, getColumnCount()-1);
 		comboBoxList.add(buildComboBox(values));
 		setUpTypeRow();
 	}
-	
-	public void addVariable(String name){
+
+	public void addVariable(final String name){
 		addVariable(name, null);
 	}
-	
-	public void addVariable(String name, String[] values){
+
+	public void addVariable(final String name, final String[] values){
 		addCol( name );
 		table.setValueAt(VARIABLE, 0, getColumnCount()-1);
 		comboBoxList.add(buildComboBox(values));
 		setUpTypeRow();
 	}
-	
-	public void addSensor(String name){
+
+	public void addSensor(final String name){
 		addSensor(name, null);
 	}
-	
-	public void addSensor(String name, String[] values){
+
+	public void addSensor(final String name, final String[] values){
 		addCol( name );
 		table.setValueAt(SENSOR, 0, getColumnCount()-1);
 		comboBoxList.add(buildComboBox(values));
 		setUpTypeRow();
 	}
-	
-	private JComboBox buildComboBox(String[] values){
-		JComboBox comboBox = null;
+
+	private JComboBox<String> buildComboBox(final String[] values){
+		JComboBox<String> comboBox = null;
 		if(values != null && values.length > 0){
-			comboBox = new JComboBox();
+			comboBox = new JComboBox<String>();
 			for(int i = 0; i < values.length; i++){
 				comboBox.addItem(values[i]);
 			}
 		}
 		return comboBox;
 	}
-	
-	public void removeInternalComponent(String name){
+
+	public void removeInternalComponent(final String name){
 		if(name == null){
 			return;
 		}
 		comboBoxList.remove(table.removeCol(name));
 		setUpTypeRow();
 	}
-	
-	
-	public void setCellEditor(int col, String[] values){
+
+
+	public void setCellEditor(final int col, final String[] values){
 		comboBoxList.set(col, buildComboBox(values));
 		setUpTypeRow();
 	}
-	
+
 	// --- ActionListener ---
-	public void actionPerformed(ActionEvent e) {
-        Object o = e.getSource();
+	public void actionPerformed(final ActionEvent e) {
+        final Object o = e.getSource();
         if(o == jbTableHeader){
-        	Point pos =  jbTableHeader.getLocationOnScreen();
-        	
+        	final Point pos =  jbTableHeader.getLocationOnScreen();
+
         	editor = new InternalDataEditor(this);
         	pos.translate( 0, -editor.getHeight()/2 );
-        	
+
         	if(pos.y < 0){
         		pos.translate( 0, editor.getHeight()/2 );
         	}
-        	
-        	editor.setLocation(pos);     	
+
+        	editor.setLocation(pos);
         	editor.setVisible(true);
 		}else{
         	System.err.println("unknown source " + o);
         }
     }
-	
+
 	/* --- MouseListener --- */
-    public void mouseClicked(MouseEvent e){}
-    public void mouseEntered(MouseEvent e){
+    public void mouseClicked(final MouseEvent e){}
+    public void mouseEntered(final MouseEvent e){
     	if(e.getSource().equals(jbTableHeader)){
     		jbTableHeader.setContentAreaFilled(true);
     		jbTableHeader.setBorderPainted(true);
     	}
     }
-    public void mouseExited(MouseEvent e){
+    public void mouseExited(final MouseEvent e){
     	if(e.getSource().equals(jbTableHeader)){
     		jbTableHeader.setContentAreaFilled(false);
     		jbTableHeader.setBorderPainted(false);
     	}
-    } 
-    public void mousePressed(MouseEvent e){}
-    public void mouseReleased(MouseEvent e){}
+    }
+    public void mousePressed(final MouseEvent e){}
+    public void mouseReleased(final MouseEvent e){}
 }
 
 
@@ -199,51 +199,51 @@ class InternalCellEditor extends
 	private static final String ACTUATOR = "Actuator";
 	private static final String VARIABLE = "Variable";
 	private static final String SENSOR = "Sensor";
-	
+
 	private int editor = -1;
-	
-	JComboBox validTypesComboBox = null;
-	JComboBox validDataComboBox = null;
-	
+
+	JComboBox<String> validTypesComboBox = null;
+	JComboBox<String> validDataComboBox = null;
+
 	JTextField txtField = null;
-	
-	public InternalCellEditor( JComboBox dataComboBox ){
+
+	public InternalCellEditor( final JComboBox<String> dataComboBox ){
 		super(new JTextField());
-		
+
 		//Set up the editor
-		validTypesComboBox = new JComboBox();
-		
+		validTypesComboBox = new JComboBox<String>();
+
 		validDataComboBox = dataComboBox;
-		
+
 		validTypesComboBox.addItem(ACTUATOR);
 		validTypesComboBox.addItem(VARIABLE);
 		validTypesComboBox.addItem(SENSOR);
-		
+
 		txtField = new JTextField();
 		txtField.setBorder(BorderFactory.createLineBorder(Color.black));
 	}
-	
+
 	public Object[] getValidValues(){
 		if(validDataComboBox == null){
 			return null;
 		}
-		
-		int numberOfItems = validDataComboBox.getItemCount();
-		
-		Object[] os = new Object[numberOfItems];
+
+		final int numberOfItems = validDataComboBox.getItemCount();
+
+		final Object[] os = new Object[numberOfItems];
 		for(int i = 0; i < numberOfItems; i++){
 			os[i] = validDataComboBox.getItemAt(i);
 		}
 		return os;
 	}
-	
+
 	//override in DefaultCellEditor
-	public Component getTableCellEditorComponent(JTable table,
-												 Object value,
-												 boolean isSelected,
-												 int row,
-												 int column)
-	{	
+	public Component getTableCellEditorComponent(final JTable table,
+												 final Object value,
+												 final boolean isSelected,
+												 final int row,
+												 final int column)
+	{
 		switch(row){
 		case 0:
 			editor = 1;
@@ -254,15 +254,15 @@ class InternalCellEditor extends
 				txtField.setText(value.toString());
 				return txtField;
 			}
-			
+
 			editor = 2;
 			return validDataComboBox;
 		}
 	}
-	
+
 	//override in DefaultCellEditor
 	public Object getCellEditorValue(){
-		
+
 		switch(editor){
 		case 0:
 			return txtField.getText();
@@ -271,7 +271,7 @@ class InternalCellEditor extends
 		case 2:
 			return validDataComboBox.getSelectedItem();
 		}
-		
+
 		//default return
 		return super.getCellEditorValue();
 	}

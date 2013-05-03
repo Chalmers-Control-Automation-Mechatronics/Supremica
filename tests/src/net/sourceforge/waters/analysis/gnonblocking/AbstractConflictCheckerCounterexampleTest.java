@@ -13,7 +13,7 @@ import net.sourceforge.waters.analysis.modular.ProjectingLanguageInclusionChecke
 import net.sourceforge.waters.analysis.modular.Projection2;
 import net.sourceforge.waters.analysis.modular.SafetyProjectionBuilder;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

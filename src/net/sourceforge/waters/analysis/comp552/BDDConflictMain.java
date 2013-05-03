@@ -1,15 +1,25 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //##########################################################################
-//# PROJECT: COMP452/552-10B Assignment 3
+//# PROJECT: COMP452/552-12A Assignment 3
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   BDDConflictMain
 //##########################################################################
-//# $Id$
-//##########################################################################
+//# This file contains the work of:
+//# Family name:
+//# First name:
+//# Student ID:
+//###########################################################################
+//# You are welcome to edit this file,
+//# but please DO NOT CHANGE the way how the main class communicates
+//# with the BDDConflictChecker class.
+//###########################################################################
+
 
 package net.sourceforge.waters.analysis.comp552;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -17,6 +27,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -82,6 +93,7 @@ public class BDDConflictMain
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);
+      final Collection<String> empty = Collections.emptyList();
 
       for (int i = 0; i < args.length; i++) {
         final String name = args[i];
@@ -94,6 +106,7 @@ public class BDDConflictMain
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
+          compiler.setEnabledPropertyNames(empty);
           des = compiler.compile();
         }
         final BDDConflictChecker checker =
@@ -106,11 +119,9 @@ public class BDDConflictMain
           System.out.println("nonconflicting");
         } else {
           System.out.println("CONFLICTING");
-          /*
           System.out.println("Counterexample:");
-          final ConflictTraceProxy counterex = checker.getCounterExample();
+          final TraceProxy counterex = checker.getCounterExample();
           System.out.println(counterex.toString());
-          */
         }
       }
 

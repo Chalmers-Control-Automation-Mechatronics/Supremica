@@ -66,6 +66,7 @@ public final class SplineGeometryElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public SplineGeometryElement clone()
   {
     return (SplineGeometryElement) super.clone();

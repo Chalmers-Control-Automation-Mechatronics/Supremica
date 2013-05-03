@@ -91,7 +91,6 @@ public interface EventDeclProxy extends IdentifiedProxy {
    * Gets the list of index ranges of this event declaration.
    * @return A (modifiable) list of expressions, each identifying
    *         range of array indexes for the corresponding dimension.
-   *         Each element is of type {@link SimpleExpressionProxy}.
    */
   public List<SimpleExpressionProxy> getRanges();
 

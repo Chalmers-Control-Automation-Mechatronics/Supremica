@@ -23,6 +23,7 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -157,9 +158,7 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
       assertTrue("Can't apply bindings to ProductDES!",
                  bindings == null || bindings.isEmpty());
       final ProductDESProxy des = (ProductDESProxy) doc;
-      final DeterministicProductDESChecker checker =
-        DeterministicProductDESChecker.getInstance();
-      mProductDESIsDeterministic = checker.isDeterministic(des);
+      mProductDESIsDeterministic = AutomatonTools.isDeterministic(des);
       return des;
     } else if (doc instanceof ModuleProxy) {
       final ModuleProxy module = (ModuleProxy) doc;

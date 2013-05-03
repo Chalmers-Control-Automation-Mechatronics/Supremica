@@ -263,8 +263,9 @@ public class DefaultAnalysisResult
     } else {
       writer.println("Verification result: " + mSatisfied);
     }
+    @SuppressWarnings("resource")
+    final Formatter formatter = new Formatter(writer);
     if (mRunTime >= 0) {
-      final Formatter formatter = new Formatter(writer);
       final float seconds = 0.001f * mRunTime;
       formatter.format("Total runtime: %.3fs\n", seconds);
     }
@@ -272,7 +273,6 @@ public class DefaultAnalysisResult
     if (mTotalNumberOfAutomata >= 0) {
       writer.println("Total number of automata: " + mTotalNumberOfAutomata);
     }
-    final Formatter formatter = new Formatter(writer);
     if (mTotalNumberOfStates >= 0) {
       formatter.format("Total number of states: %.0f\n", mTotalNumberOfStates);
     }
@@ -310,6 +310,7 @@ public class DefaultAnalysisResult
       writer.print(mTotalNumberOfAutomata);
     }
     writer.print(',');
+    @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
     if (mTotalNumberOfStates >= 0) {
       formatter.format("%.0f", mTotalNumberOfStates);

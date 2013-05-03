@@ -1,8 +1,8 @@
 package net.sourceforge.waters.analysis.distributed;
 
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

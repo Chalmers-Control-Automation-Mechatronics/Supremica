@@ -49,7 +49,9 @@ public final class ModuleElement
    * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
    * @param eventDeclList The event declaration list of the new module, or <CODE>null</CODE> if empty.
    * @param eventAliasList The event alias list of the new module, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.AliasProxy AliasProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    * @param componentList The component list of the new module, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.ComponentProxy ComponentProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
   public ModuleElement(final String name,
                        final String comment,
@@ -120,6 +122,7 @@ public final class ModuleElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public ModuleElement clone()
   {
     return (ModuleElement) super.clone();

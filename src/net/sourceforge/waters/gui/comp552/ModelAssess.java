@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.gui.comp552;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,9 +43,9 @@ import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.IsomorphismChecker;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -78,6 +78,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
 import org.xml.sax.SAXException;
 
 
@@ -91,6 +92,8 @@ public class ModelAssess
   //# Main Program Entry Point
   public static void main(final String[] args)
   {
+    Config.GUI_EDITOR_EDGEARROW_AT_END.set(false);
+
     if (args.length != 4) {
       usage();
     }
@@ -162,7 +165,7 @@ public class ModelAssess
     mDocumentManager.registerUnmarshaller(marshaller);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(factory, optable, false);
-    mIsomorphismChecker = new IsomorphismChecker(mProductDESFactory, true);
+    mIsomorphismChecker = new IsomorphismChecker(mProductDESFactory, true, true);
     loadConfiguration(config);
     loadClassList(classlist);
   }
@@ -216,6 +219,7 @@ public class ModelAssess
     final File dir = file.getAbsoluteFile().getParentFile();
     final FileReader stream = new FileReader(file);
     try {
+      @SuppressWarnings("resource")
       final BufferedReader reader = new BufferedReader(stream);
       mSolutions.clear();
       Solution sol = null;
@@ -290,6 +294,7 @@ public class ModelAssess
   {
     final FileReader stream = new FileReader(classlist);
     try {
+      @SuppressWarnings("resource")
       final BufferedReader reader = new BufferedReader(stream);
       mStudents.clear();
       while (true) {
@@ -347,11 +352,9 @@ public class ModelAssess
     Solution result = mDefaultSolution;
     for (final Solution solution : mSolutions) {
       final int count = solution.getNumberOfMatches(attempt);
-      if (count > 0) {
+      if (count > best) {
         best = count;
         result = solution;
-      } else if (count == best) {
-        result = mDefaultSolution;
       }
     }
     return result;
@@ -458,7 +461,7 @@ public class ModelAssess
       final ModuleProxy module = compiler.getInputModule();
       final ModuleContext mcontext = new ModuleContext(module);
       final RenderingContext rcontext = new ModuleRenderingContext(mcontext);
-      final Map<Proxy,SourceInfo> infomap = compiler.getSourceInfoMap();
+      final Map<Object,SourceInfo> infomap = compiler.getSourceInfoMap();
       for (final AutomatonProxy aut : automata) {
         final SourceInfo info = infomap.get(aut);
         final SimpleComponentProxy comp =
@@ -500,7 +503,7 @@ public class ModelAssess
 
   private void printMarks(final float marks)
   {
-    final int round = (int) Math.round(marks);
+    final int round = Math.round(marks);
     if (Math.abs(marks - round) >= 0.01f) {
       mOutput.print(marks);
       mOutput.print(" marks");
@@ -701,6 +704,7 @@ public class ModelAssess
 
     //#######################################################################
     //# Override for java.lang.Object
+    @Override
     public String toString()
     {
       return mModule.getName();
@@ -1208,6 +1212,7 @@ public class ModelAssess
 
     //#########################################################################
     //# Overrides for AbstractTest
+    @Override
     boolean check(final ProductDESProxy des)
     {
       final Solution sol = getSolution();
@@ -1231,6 +1236,7 @@ public class ModelAssess
 
     //#########################################################################
     //# Overrides for AbstractTest
+    @Override
     boolean check(final ProductDESProxy des)
     {
       mSpec = null;
@@ -1249,6 +1255,7 @@ public class ModelAssess
       return true;
     }
 
+    @Override
     void printDiagnostics()
     {
       mOutput.print("--- specification ");
@@ -1300,6 +1307,7 @@ public class ModelAssess
 
     //#########################################################################
     //# Overrides for AbstractTest
+    @Override
     boolean check(final ProductDESProxy des)
       throws AnalysisException
     {
@@ -1308,6 +1316,7 @@ public class ModelAssess
     }
 
 
+    @Override
     void printDiagnostics()
     {
       final TraceProxy trace = mVerifier.getCounterExample();
@@ -1330,7 +1339,7 @@ public class ModelAssess
             if (matcher.find()) {
               final int end = matcher.end();
               final String rest = name.substring(end);
-              mOutput.print("$\\langle$expecting ");
+              mOutput.print("$\\langle$ex\\-pect\\-ing ");
               printLaTeXString(rest, false);
               mOutput.print("$\\rangle$");
             } else {
@@ -1391,6 +1400,7 @@ public class ModelAssess
 
     //#######################################################################
     //# Overrides for AbstractModelVerifierTest
+    @Override
     boolean check(final ProductDESProxy des)
       throws AnalysisException
     {
@@ -1403,7 +1413,7 @@ public class ModelAssess
         final EventProxy marking = getSecondaryMarking(propdes);
         if (marking != null) {
           final ConflictChecker checker = (ConflictChecker) getModelVerifier();
-          checker.setMarkingProposition(marking);
+          checker.setConfiguredDefaultMarking(marking);
         }
         return super.check(propdes);
       }
@@ -1452,6 +1462,7 @@ public class ModelAssess
 
     //#######################################################################
     //# Overrides for AbstractModelVerifierTest
+    @Override
     boolean check(final ProductDESProxy des)
       throws AnalysisException
     {
@@ -1488,6 +1499,7 @@ public class ModelAssess
 
     //#######################################################################
     //# Overrides for AbstractModelVerifierTest
+    @Override
     boolean check(final ProductDESProxy des)
       throws AnalysisException
     {
@@ -1520,15 +1532,16 @@ public class ModelAssess
       while (name.charAt(++splitpos) == ' ') {
       }
       mFirstName = name.substring(splitpos);
-      mFilterBegin = mFirstName + ' ' + mLastName + '_';
-      // mFilterBegin = uid + "-";
+      mPattern = Pattern.compile("^[^0-9_]+_" + mStudentID + "-.*$");
     }
 
     //#######################################################################
     //# Interface java.io.FilenameFilter
+    @Override
     public boolean accept(final File dir, final String name)
     {
-      return name.startsWith(mFilterBegin);
+      final Matcher matcher = mPattern.matcher(name);
+      return matcher.matches();
     }
 
     //#######################################################################
@@ -1553,7 +1566,7 @@ public class ModelAssess
     private final String mUserID;
     private final String mFirstName;
     private final String mLastName;
-    private final String mFilterBegin;
+    private final Pattern mPattern;
 
   }
 
@@ -1578,3 +1591,4 @@ public class ModelAssess
   private int mAutomatonIndex;
 
 }
+

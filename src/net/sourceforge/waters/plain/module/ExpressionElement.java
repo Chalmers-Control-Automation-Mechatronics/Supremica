@@ -39,6 +39,7 @@ public abstract class ExpressionElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public ExpressionElement clone()
   {
     return (ExpressionElement) super.clone();

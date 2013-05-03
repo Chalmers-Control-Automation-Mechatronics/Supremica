@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.analysis;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+
 
 /**
  * A record containing the result of a {@link ModelAnalyzer}.

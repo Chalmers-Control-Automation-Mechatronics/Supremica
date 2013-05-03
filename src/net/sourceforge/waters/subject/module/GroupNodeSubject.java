@@ -14,8 +14,10 @@ package net.sourceforge.waters.subject.module;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -24,9 +26,13 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.SetSubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -46,15 +52,17 @@ public final class GroupNodeSubject
    * Creates a new group node.
    * @param name The name of the new group node.
    * @param propositions The list of propositions of the new group node, or <CODE>null</CODE> if empty.
+   * @param attributes The attribute map of the new group node, or <CODE>null</CODE> if empty.
    * @param immediateChildNodes The set of immediate child nodes of the new group node, or <CODE>null</CODE> if empty.
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
   public GroupNodeSubject(final String name,
                           final PlainEventListProxy propositions,
+                          final Map<String,String> attributes,
                           final Collection<? extends NodeProxy> immediateChildNodes,
                           final BoxGeometryProxy geometry)
   {
-    super(name, propositions);
+    super(name, propositions, attributes);
     if (immediateChildNodes == null) {
       mImmediateChildNodes = new ChildNodeSetSubject();
     } else {
@@ -71,6 +79,7 @@ public final class GroupNodeSubject
    * Creates a new group node using default values.
    * This constructor creates a group node with
    * an empty list of propositions,
+   * an empty attribute map,
    * an empty set of immediate child nodes, and
    * the geometric information set to <CODE>null</CODE>.
    * @param name The name of the new group node.
@@ -80,12 +89,14 @@ public final class GroupNodeSubject
     this(name,
          null,
          null,
+         null,
          null);
   }
 
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public GroupNodeSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -93,33 +104,58 @@ public final class GroupNodeSubject
     return (GroupNodeSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final GroupNodeSubject downcast = (GroupNodeSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final SetSubject<NodeSubject> immediateChildNodes =
-        downcast.getImmediateChildNodesModifiable();
-      mImmediateChildNodes.assignFrom(immediateChildNodes);
-      final BoxGeometrySubject geometry = downcast.getGeometry();
-      if (mGeometry == geometry) {
-        // nothing
-      } else if (mGeometry == null) {
-        mGeometry = geometry.clone();
-        mGeometry.setParent(this);
-        fireGeometryChanged(mGeometry);
-      } else if (geometry == null) {
-        mGeometry.setParent(null);
-        mGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mGeometry.assignFrom(geometry);
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 3) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 4:
+        if (mGeometry != null) {
+          mGeometry.setParent(null);
+        }
+        mGeometry = (BoxGeometrySubject) newValue;
+        if (mGeometry != null) {
+          mGeometry.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final GroupNodeSubject downcast = (GroupNodeSubject) newState;
+    final UndoInfo step5 =
+      mImmediateChildNodes.createUndoInfo(downcast.mImmediateChildNodes, boundary);
+    if (step5 != null) {
+      info.add(step5);
+    }
+    final boolean null4a = mGeometry == null;
+    final boolean null4b = downcast.mGeometry == null;
+    if (null4a != null4b) {
+      if (boundary ==  null || !boundary.contains(mGeometry)) {
+        final BoxGeometrySubject clone4 =
+          ProxyTools.clone(downcast.mGeometry);
+        final UndoInfo step4 = new ReplacementUndoInfo(4, mGeometry, clone4);
+        info.add(step4);
+      }
+    } else if (!null4a) {
+      final UndoInfo step4 =
+        mGeometry.createUndoInfo(downcast.mGeometry, boundary);
+      if (step4 != null) {
+        info.add(step4);
+      }
+    }
   }
 
 

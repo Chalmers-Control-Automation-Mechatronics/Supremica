@@ -177,7 +177,7 @@ public class AutomataSynchronizer
 	    {
 		    synchExecuter.join();
 	    }
-	} 
+	}
 	catch (final InterruptedException e)
 	{
 	    // Current thread has been interrupted, perhaps
@@ -394,7 +394,7 @@ public class AutomataSynchronizer
                 }
             }
 
-            final ListSubject<AbstractSubject> eventList = edge.getLabelBlock().getEventListModifiable();
+            final ListSubject<AbstractSubject> eventList = edge.getLabelBlock().getEventIdentifierListModifiable();
             for(final AbstractSubject e:eventList)
             {
 //                EventDeclSubject eventSubject = (EventDeclSubject)e;

@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.transfer;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -117,18 +117,47 @@ public abstract class WatersDataFlavor extends DataFlavor
    *         data flavour could be identified for the given data.
    * @see WatersDataFlavor
    */
-  public static Transferable createTransferable
-    (Collection<? extends Proxy> data)
+  public static ProxyTransferable createTransferable
+    (final Collection<? extends Proxy> data)
+  {
+    return createTransferable(data, true);
+  }
+
+  /**
+   * Creates a {@link Transferable} containing the given collection of
+   * {@link Proxy} objects. This method automatically determines appropriate
+   * data flavours for the given list of objects and makes modifications to
+   * the data as necessary.
+   * @param  data   The objects to be stored in the transferable.
+   *                The data will be duplicated and copies will be stored
+   *                in the transferable.
+   * @param  supportsIdentifier Whether or not the created transferable
+   *                should support the identifier data flavor
+   *                {@link WatersDataFlavor#IDENTIFIER}. Most transferables
+   *                support this flavor, but it can be suppressed by setting
+   *                this parameter to <CODE>false</CODE>.
+   * @return An instance of {@link ProxyTransferable} containing the data.
+   * @throws {@link IllegalArgumentException} to indicate that no suitable
+   *         data flavour could be identified for the given data.
+   * @see WatersDataFlavor
+   */
+  public static ProxyTransferable createTransferable
+    (Collection<? extends Proxy> data, final boolean supportsIdentifier)
   {
     data = getReducedData(data);
     final DataFlavorVisitor visitor = DataFlavorVisitor.getInstance();
     final List<WatersDataFlavor> flavors =
       visitor.getTransferDataFlavors(data);
-    final int count = flavors.size() + 1;
+    int count = flavors.size() + 1;
+    if (!supportsIdentifier && flavors.contains(WatersDataFlavor.IDENTIFIER)) {
+      count--;
+    }
     final DataFlavor[] flavorsArray = new DataFlavor[count];
     int index = 0;
     for (final DataFlavor flavor : flavors) {
-      flavorsArray[index++] = flavor;
+      if (supportsIdentifier || flavor != WatersDataFlavor.IDENTIFIER) {
+        flavorsArray[index++] = flavor;
+      }
     }
     flavorsArray[index] = DataFlavor.stringFlavor;
     final WatersDataFlavor flavor0 = flavors.get(0);
@@ -142,10 +171,22 @@ public abstract class WatersDataFlavor extends DataFlavor
    * createTransferable()} method.
    * @see WatersDataFlavor
    */
-  public static Transferable createTransferable(final Proxy proxy)
+  public static ProxyTransferable createTransferable(final Proxy proxy)
+  {
+    return createTransferable(proxy, true);
+  }
+
+  /**
+   * Creates a {@link Transferable} containing a single {@link Proxy} object.
+   * This method behaves like the {@link #createTransferable(Collection,boolean)
+   * createTransferable()} method.
+   * @see WatersDataFlavor
+   */
+  public static ProxyTransferable createTransferable
+    (final Proxy proxy, final boolean supportsIdentifier)
   {
     final List<Proxy> data = Collections.singletonList(proxy);
-    return createTransferable(data);
+    return createTransferable(data, supportsIdentifier);
   }
 
 

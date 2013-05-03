@@ -14,6 +14,7 @@ package net.sourceforge.waters.subject.module;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -23,7 +24,12 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.AttributeMapSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -86,6 +92,7 @@ public final class SimpleComponentSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public SimpleComponentSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -93,27 +100,50 @@ public final class SimpleComponentSubject
     return (SimpleComponentSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final SimpleComponentSubject downcast =
-        (SimpleComponentSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ComponentKind kind = downcast.getKind();
-      if (mKind != kind) {
-        mKind = kind;
-        change = true;
-      }
-      final GraphSubject graph = downcast.getGraph();
-      mGraph.assignFrom(graph);
-      final AttributeMapSubject attributes =
-        downcast.getAttributesModifiable();
-      mAttributes.assignFrom(attributes);
-      if (change) {
-        fireStateChanged();
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
+        mKind = (ComponentKind) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 3:
+        mGraph.setParent(null);
+        mGraph = (GraphSubject) newValue;
+        mGraph.setParent(this);
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final SimpleComponentSubject downcast = (SimpleComponentSubject) newState;
+    if (!mKind.equals(downcast.mKind)) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mKind, downcast.mKind);
+      info.add(step2);
+    }
+    final UndoInfo step3 = mGraph.createUndoInfo(downcast.mGraph, boundary);
+    if (step3 != null) {
+      info.add(step3);
+    }
+    final UndoInfo step4 =
+      mAttributes.createUndoInfo(downcast.mAttributes, boundary);
+    if (step4 != null) {
+      info.add(step4);
+    }
   }
 
 

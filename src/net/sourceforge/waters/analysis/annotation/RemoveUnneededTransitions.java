@@ -1,6 +1,6 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 import java.util.Arrays;
 
 
@@ -50,3 +50,4 @@ public class RemoveUnneededTransitions
     TIME += System.currentTimeMillis();
   }
 }
+

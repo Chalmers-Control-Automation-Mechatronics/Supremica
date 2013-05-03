@@ -52,6 +52,11 @@ class EFAEvent {
     return mTransitionRelation;
   }
 
+  boolean isBlocked()
+  {
+    return mTransitionRelation.isEmpty();
+  }
+
   IdentifierProxy createIdentifier(final ModuleProxyFactory factory)
   {
     final EventDeclProxy decl = mEFAEventDecl.getEventDecl();

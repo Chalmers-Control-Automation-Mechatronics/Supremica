@@ -11,7 +11,7 @@
                 </EnumSetExpression>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
-                    <IntConstant Value="3"/>
+                    <IntConstant Value="255"/>
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
@@ -149,6 +149,25 @@
                 <SimpleIdentifier Name="C_1"/>
             </EnumSetExpression>
             <ComponentList>
+                <VariableComponent>
+                    <IndexedIdentifier Name="var_C_val">
+                        <SimpleIdentifier Name="procid"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="0"/>
+                            <IntConstant Value="255"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="var_C_val">
+                                <SimpleIdentifier Name="procid"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
                 <SimpleComponent Kind="PLANT">
                     <IndexedIdentifier Name="proctype_C">
                         <SimpleIdentifier Name="procid"/>
@@ -157,7 +176,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="C_0">
                                 <PointGeometry>
-                                    <Point Y="64" X="80"/>
+                                    <Point Y="64" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-7" X="9"/>
@@ -165,7 +184,7 @@
                             </SimpleNode>
                             <SimpleNode Name="C_1">
                                 <PointGeometry>
-                                    <Point Y="144" X="80"/>
+                                    <Point Y="144" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-6" X="9"/>
@@ -176,7 +195,7 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="224" X="80"/>
+                                    <Point Y="224" X="224"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point Y="-5" X="7"/>
@@ -200,14 +219,53 @@
                                         <SimpleIdentifier Name="procid"/>
                                         <IntConstant Value="0"/>
                                     </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="-21" X="-126"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="184" X="197"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_C_val">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="1" X="-130"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Target="C_2" Source="C_1">
+                                <LabelBlock>
                                     <IndexedIdentifier Name="exch_ch">
                                         <SimpleIdentifier Name="procid"/>
                                         <IntConstant Value="3"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-19" X="4"/>
+                                        <Point Y="-20" X="8"/>
                                     </LabelGeometry>
                                 </LabelBlock>
+                                <SplineGeometry>
+                                    <Point Y="184" X="254"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="var_C_val">
+                                                <SimpleIdentifier Name="procid"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="3"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point Y="0" X="12"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                         </EdgeList>
                     </Graph>

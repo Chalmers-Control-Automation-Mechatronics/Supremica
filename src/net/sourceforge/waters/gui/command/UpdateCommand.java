@@ -86,15 +86,36 @@ public class UpdateCommand
     mPanel = panel;
     mUpdatesSelection = updatesSelection;
     mHasBeenExecuted = false;
+    String named;
+    String suffix;
     if (name == null) {
-      final int size = modified.size() + added.size() + removed.size();
-      final List<Proxy> all = new ArrayList<Proxy>(size);
-      all.addAll(modified);
-      all.addAll(added);
-      all.addAll(removed);
-      final String named = ProxyNamer.getCollectionClassName(all);
-      final String suffix =
-        added.isEmpty() && removed.isEmpty() ? "Movement" : "Rearrangement";
+      if(added.isEmpty()){
+        if(removed.isEmpty()){
+          suffix = "Movement";
+          named = ProxyNamer.getCollectionClassName(modified);
+        }
+        else{
+          suffix = "Deletion";
+          named = ProxyNamer.getCollectionClassName(removed);
+        }
+      }
+      else{
+        if(removed.isEmpty()){
+          suffix = "Insertion";
+          named = ProxyNamer.getCollectionClassName(added);
+        }
+        else{
+          suffix = "Rearrangement";
+          final int size = modified.size() + added.size() + removed.size();
+          final List<Proxy> all = new ArrayList<Proxy>(size);
+          all.addAll(modified);
+          all.addAll(added);
+          all.addAll(removed);
+          named = ProxyNamer.getCollectionClassName(all);
+        }
+      }
+
+
       if (named != null) {
         setName(named + ' ' + suffix);
       } else {
@@ -119,15 +140,25 @@ public class UpdateCommand
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command
+  @Override
   public void execute()
   {
-    final int size = mModified.size() + mAdded.size();
-    final List<Proxy> visible = new ArrayList<Proxy>(size);
-    visible.addAll(mModified);
-    visible.addAll(mAdded);
-    if (!mUpdatesSelection || !mHasBeenExecuted) {
+    final List<? extends Proxy> visible;
+    if (mAdded.isEmpty()) {
+      visible = mModified;
+    } else {
+      visible = mAdded;
+    }
+    if (!mUpdatesSelection) {
       mPanel.removeFromSelection(mRemoved);
       super.execute();
+      mHasBeenExecuted = true;
+    } else if (!mHasBeenExecuted) {
+      mPanel.removeFromSelection(mRemoved);
+      super.execute();
+      if (!mAdded.isEmpty()) {
+        mPanel.replaceSelection(mAdded);
+      }
       mHasBeenExecuted = true;
     } else if (mRemoved.isEmpty()) {
       super.execute();
@@ -141,12 +172,15 @@ public class UpdateCommand
     mPanel.activate();
   }
 
+  @Override
   public void undo()
   {
-    final int size = mModified.size() + mRemoved.size();
-    final List<Proxy> visible = new ArrayList<Proxy>(size);
-    visible.addAll(mModified);
-    visible.addAll(mRemoved);
+    final List<? extends Proxy> visible;
+    if (mRemoved.isEmpty()) {
+      visible = mModified;
+    } else {
+      visible = mRemoved;
+    }
     if (!mUpdatesSelection) {
       mPanel.removeFromSelection(mAdded);
       super.undo();
@@ -163,7 +197,8 @@ public class UpdateCommand
   }
 
   @Override
-  public void setUpdatesSelection(final boolean update){
+  public void setUpdatesSelection(final boolean update)
+  {
     super.setUpdatesSelection(update);
     mUpdatesSelection = false;
   }

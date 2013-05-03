@@ -17,78 +17,79 @@ import javax.swing.JTable;
 
 /**
  * Clase que define el controlador de eventos de la lista de terminos de la tabla de verdad *
- * @author Pedro Sanz  
+ * @author Pedro Sanz
  */
 public class QMCControladorListaTablaVerdad extends MouseAdapter {
 
-   
+
     int index, fila;
     String valorTerm, tipoTerm;
     ArrayList<?> listaBinarios;
     QMCBinarioBean binarioInteractivo, binarioLogico;
-    JList listaCabecerasTablaVerdad;
+    JList<Object> listaCabecerasTablaVerdad;
     JTable tablaTerminos;
     QMCInicio aplicacion;
-    QMCFuncion funcion;    
-    
-    
-    public QMCControladorListaTablaVerdad(QMCInicio aplicacion, QMCFuncion funcion)
+    QMCFuncion funcion;
+
+
+    public QMCControladorListaTablaVerdad(final QMCInicio aplicacion, final QMCFuncion funcion)
     {
         this.aplicacion = aplicacion;
-        this.funcion = funcion;       
+        this.funcion = funcion;
     }
-    
+
     /**
-     * Implementación del método mouseClicked que realiza las comprobaciones pertinentes  
+     * Implementación del método mouseClicked que realiza las comprobaciones pertinentes
      * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-     */    
-    public void mouseClicked(MouseEvent e)
+     */
+    @SuppressWarnings("unchecked")
+    public void mouseClicked(final MouseEvent e)
     {
-        listaCabecerasTablaVerdad = (JList)e.getSource();
-        index = listaCabecerasTablaVerdad.locationToIndex(e.getPoint());                                    
+        listaCabecerasTablaVerdad = (JList<Object>)e.getSource();
+        index = listaCabecerasTablaVerdad.locationToIndex(e.getPoint());
         binarioInteractivo = (QMCBinarioBean)listaCabecerasTablaVerdad.getModel().getElementAt(index);
         binarioInteractivo.setTermino(!binarioInteractivo.isTermino());
-        listaBinarios = funcion.getListaBinarios();        
+        listaBinarios = funcion.getListaBinarios();
         binarioLogico = (QMCBinarioBean)listaBinarios.get(listaCabecerasTablaVerdad.getSelectedIndex());
         tablaTerminos = aplicacion.getTablaTerminos();
         if(funcion.getForma() == 's')
-        {           
+        {
             tipoTerm = "minterm";
         }
         else
         {
             tipoTerm = "maxterm";
         }
-        
+
         // Accion de marcado
         if(binarioInteractivo.isTermino())
-        {            
+        {
             // comprueba si es termino
             if(binarioLogico.isTermino() || binarioLogico.isIndiferencia())
             {
                fila = Integer.parseInt(binarioLogico.getPosicion());
-               
+
                tablaTerminos.setValueAt(binarioLogico.getValorDec(),fila ,0);
                tablaTerminos.setValueAt(binarioLogico.getValorBin(),fila ,1);
                tablaTerminos.setValueAt(new Integer(binarioLogico.getIndice()),fila ,2);
                tablaTerminos.setRowSelectionInterval(fila,fila);
             }
             else
-            {                         
+            {
                 // muestra dialogo error
                 JOptionPane.showMessageDialog(null, "El valor marcado no es "+tipoTerm, "Minimización interactiva", JOptionPane.ERROR_MESSAGE);
                 // desmarca la seleccion
-                binarioInteractivo.setTermino(false);                          
-            }                          
+                binarioInteractivo.setTermino(false);
+            }
         }
         // Accion de desmarcado
         else
-        {         
+        {
             binarioInteractivo.setTermino(true);
-        }                          
-        Rectangle rect = listaCabecerasTablaVerdad.getCellBounds(index, index);
+        }
+        final Rectangle rect = listaCabecerasTablaVerdad.getCellBounds(index, index);
         listaCabecerasTablaVerdad.repaint(rect);
     }
-   
+
 
 }

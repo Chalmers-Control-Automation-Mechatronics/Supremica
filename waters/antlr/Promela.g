@@ -51,8 +51,8 @@ tokens{
 package net.sourceforge.waters.external.promela.parser;
 
 
+import net.sourceforge.waters.external.promela.*;
 import net.sourceforge.waters.external.promela.ast.*;
-import net.sourceforge.waters.external.promela.PromelaParserError;
 
 }
 
@@ -65,6 +65,7 @@ import net.sourceforge.waters.external.promela.PromelaParserError;
 @members {
   private ArrayList<PromelaParserError> errors = new ArrayList<PromelaParserError>();
   private Stack paraphrases = new Stack();
+  private PromelaMType mMType = new PromelaMType("mtype");
   
   public ArrayList<PromelaParserError> getErrors() {
     return errors;
@@ -97,7 +98,7 @@ specRule
 @init  { paraphrases.push("in specification"); }
 @after { paraphrases.pop(); }
 	:	moduleRule+ EOF
-		-> ^(MODULE_ROOT<ModuleTreeNode> moduleRule*)
+		-> ^(MODULE_ROOT<ModuleTreeNode>[mMType] moduleRule*)
 	;
 
 moduleRule
@@ -249,12 +250,24 @@ stmntRule
         | CEXPRASSERTBLOCK
 	;
 
+/* Old version
+ * assignRule
+ * @init  { paraphrases.push("in assignment"); }
+ * @after { paraphrases.pop(); }
+ * 	:	varrefRule (ASSIGN any_exprRule | PLUSPLUS | MINUSMINUS)
+ * 	;
+ */
+
+//New version -Ethan
 assignRule
 @init  { paraphrases.push("in assignment"); }
 @after { paraphrases.pop(); }
-	:	varrefRule (ASSIGN any_exprRule | PLUSPLUS | MINUSMINUS)
-	;
-
+  : varrefRule ASSIGN any_exprRule -> ^(ASSIGN<BinaryStatementTreeNode>["="] varrefRule any_exprRule)
+  | varrefRule PLUSPLUS -> ^(PLUSPLUS<UnaryStatementTreeNode>["++"] varrefRule)
+  | varrefRule MINUSMINUS -> ^(MINUSMINUS<UnaryStatementTreeNode>["--"] varrefRule)
+  ;
+  
+  
 //modified
 receiveRule
 @init  { paraphrases.push("in receive statement"); }
@@ -341,7 +354,7 @@ decl_lstRule
 
 //modified
 one_declRule
-@init  { paraphrases.push("in declaration"); boolean visible = true; String type="";}
+@init  { paraphrases.push("in declaration"); boolean visible = true; PromelaType type=null;}
 @after { paraphrases.pop(); }
 	:	(visibleRule {visible = $visibleRule.visible;})? typenameRule {type = $typenameRule.type;} ivarRule (COMMA ivarRule)*
 		-> ^(VARDEFINITION<VardefTreeNode>[visible, type] ivarRule+)
@@ -364,7 +377,7 @@ ivarRule
 	//	-> ^(NAME STATEMENT constRule typeRule*)
 	;
 
-/*
+/* Original version
 any_exprRule
 	:	'(' any_exprRule ')'
         | any_exprRule binaropRule any_exprRule
@@ -383,14 +396,15 @@ any_exprRule
 	;
 */
 // changed a lot, very strange, coz Run A() is found here
+/* Second version
 any_exprRule 
 @init  { paraphrases.push("in any expression"); }
 @after { paraphrases.pop(); }
 	:	(PARENOPEN (any_exprRule) PARENCLOSE ) (binaropRule any_exprRule)* 
 	  | PARENOPEN PARENCLOSE 
-    	  | varrefRule AT varrefRule
+    | varrefRule AT varrefRule
 	  | unaropRule any_exprRule 
-          | (unaropRule)? PARENOPEN receiveRule PARENCLOSE 
+    | (unaropRule)? PARENOPEN receiveRule PARENCLOSE 
 	  | PARENOPEN any_exprRule ARROW any_exprRule COLON any_exprRule PARENCLOSE 
 	  | LEN PARENOPEN varrefRule PARENCLOSE 
 	  | varrefRule 
@@ -402,10 +416,135 @@ any_exprRule
 	  | varrefRule ALTPARENOPEN any_exprRule ALTPARENCLOSE AT varrefRule
 	  | RUN NAME PARENOPEN (arg_lstRule)? PARENCLOSE (priorityRule)? 
 		-> ^(RUN<RunTreeNode> NAME<NameTreeNode> (arg_lstRule)? (priorityRule)?)
-	  
-	  
 	;
+*/
+/*
+//Current version -Ethan
+any_exprRule
+@init  { paraphrases.push("in any expression"); }
+@after { paraphrases.pop(); }
+  : RUN NAME PARENOPEN (arg_lstRule)? PARENCLOSE (priorityRule)? 
+    -> ^(RUN<RunTreeNode> NAME<NameTreeNode> (arg_lstRule)? (priorityRule)?)
+  | a_exprRule
+  ;
 
+//Lowest level, has a -> b : c
+a_exprRule
+  : PARENOPEN b_exprRule ARROW b_exprRule COLON any_exprRule PARENCLOSE
+  | b_exprRule
+  ;
+*/
+//Second level, has logical or
+any_exprRule
+  : c_exprRule (OROR c_exprRule)* -> c_exprRule (^(OROR<BinaryStatementTreeNode>["||"]) c_exprRule)*
+  ;
+
+//Third level, has logical and
+c_exprRule
+  : d_exprRule (ANDAND d_exprRule)* -> d_exprRule (^(ANDAND<BinaryStatementTreeNode>["&&"]) d_exprRule)*
+  ;
+
+//Fourth level, has bitwise or
+d_exprRule
+  : e_exprRule (OR e_exprRule)* -> e_exprRule (^(OR<BinaryStatementTreeNode>["|"]) e_exprRule)*
+  ;
+
+//Fifth level, has bitwise exclusive or
+e_exprRule
+  : f_exprRule (DACH f_exprRule)* -> f_exprRule (^(DACH<BinaryStatementTreeNode>["^"]) f_exprRule)*
+  ;
+
+//Sixth level, has bitwise and
+f_exprRule
+  : g_exprRule (AND g_exprRule)* -> g_exprRule (^(AND<BinaryStatementTreeNode>["&"]) g_exprRule)*
+  ;
+
+//Seventh level, has equals and not equals
+g_exprRule
+  : h_exprRule (e_ne_Rule h_exprRule)* -> h_exprRule (^(e_ne_Rule) h_exprRule)*
+  ;
+ 
+e_ne_Rule
+  : EQUALS -> ^(EQUALS<BinaryStatementTreeNode>["=="])
+  | NOTEQUALS -> ^(NOTEQUALS<BinaryStatementTreeNode>["!="])
+  ;
+
+//Eighth level, has <, >, <=, >=
+h_exprRule
+  : i_exprRule (l_m_lt_gt_Rule i_exprRule)* -> i_exprRule (^(l_m_lt_gt_Rule) i_exprRule)*
+  ;
+
+l_m_lt_gt_Rule
+  : LESS -> ^(LESS<BinaryStatementTreeNode>["<"])
+  | MORE -> ^(MORE<BinaryStatementTreeNode>[">"])
+  | LESSTHAN -> ^(LESSTHAN<BinaryStatementTreeNode>["<="])
+  | GREATERTHAN -> ^(GREATERTHAN<BinaryStatementTreeNode>[">="])
+  ;
+
+//Ninth level, has bit shifts (<< and >>)
+//TODO
+i_exprRule
+  : j_exprRule
+  ;
+
+//Tenth level, has plus and minus
+j_exprRule
+  : k_exprRule ((PLUS | MINUS) k_exprRule)*
+  ;
+
+//Eleventh level, has times, divide and modulus
+k_exprRule
+  : l_exprRule (s_s_p_Rule l_exprRule)* -> l_exprRule (^(s_s_p_Rule) l_exprRule)*
+  ;
+
+s_s_p_Rule
+  : STAR -> ^(STAR<BinaryStatementTreeNode>["*"])
+  | SLASH -> ^(SLASH<BinaryStatementTreeNode>["/"])
+  | PERCENT -> ^(PERCENT<BinaryStatementTreeNode>["modulus"])
+  ;
+//Didn't like the string "%" for some reason
+
+//Twelfth level, has negate (boolean), complement and negative(integer)
+//I think that the exclamation mark is mucking up the send on channel  tries to match !statement instead of ch!statement
+l_exprRule
+  : EXCLAMATIONMARK m_exprRule -> ^(EXCLAMATIONMARK<UnaryStatementTreeNode>["!"] m_exprRule)
+  | TILDE m_exprRule -> ^(TILDE<UnaryStatementTreeNode>["~"] m_exprRule)
+  | MINUS m_exprRule -> ^(MINUS<UnaryStatementTreeNode>["-"] m_exprRule)
+  | m_exprRule
+  ;
+
+//Last level, has brackets, variables and constants
+//TODO add in array access here | varrefRule ALTPARENOPEN any_exprRule ALTPARENCLOSE AT varrefRule
+m_exprRule
+  : PARENOPEN any_exprRule PARENCLOSE -> ^(any_exprRule)
+  | PARENOPEN any_exprRule ARROW any_exprRule COLON any_exprRule PARENCLOSE
+  | RUN NAME PARENOPEN (arg_lstRule)? PARENCLOSE (priorityRule)? 
+    -> ^(RUN<RunTreeNode> NAME<NameTreeNode> (arg_lstRule)? (priorityRule)?)
+  | constRule
+  | varrefRule
+  | LEN PARENOPEN varrefRule PARENCLOSE
+  | TIMEOUT 
+  | NP 
+  | (ENABLED|PCVALUE) PARENOPEN any_exprRule PARENCLOSE
+  ;
+/*
+: (PARENOPEN (any_exprRule) PARENCLOSE ) (binaropRule any_exprRule)* 
+    | PARENOPEN PARENCLOSE 
+    | varrefRule AT varrefRule
+    | unaropRule any_exprRule 
+    | (unaropRule)? PARENOPEN receiveRule PARENCLOSE 
+    | PARENOPEN any_exprRule ARROW any_exprRule COLON any_exprRule PARENCLOSE 
+    | LEN PARENOPEN varrefRule PARENCLOSE 
+    | varrefRule 
+    | pollRule 
+    | constRule 
+    | TIMEOUT 
+    | NP 
+    | (ENABLED|PCVALUE) PARENOPEN any_exprRule PARENCLOSE 
+    | varrefRule ALTPARENOPEN any_exprRule ALTPARENCLOSE AT varrefRule
+    | RUN NAME PARENOPEN (arg_lstRule)? PARENCLOSE (priorityRule)? 
+    -> ^(RUN<RunTreeNode> NAME<NameTreeNode> (arg_lstRule)? (priorityRule)?)
+*/
 pollRule
 @init  { paraphrases.push("in poll statement"); }
 @after { paraphrases.pop(); }
@@ -417,13 +556,14 @@ pollRule
 //		-> ^(STATEMENT constRule typenameRule* )
 //	;
 	
-typenameRule returns [String type]
-	:	BIT | BOOL {$type = "bit";}
-		 | BYTE {$type = "byte";}
-		 | SHORT {$type = "short";}
-		| INT {$type = "int";}
-		| MTYPE {$type = "mtype";}
-		| unameRule
+typenameRule returns [PromelaType type]
+	:	BIT {$type = PromelaIntRange.BIT;}
+	| BOOL {$type = PromelaIntRange.BIT;}
+	| BYTE {$type = PromelaIntRange.BYTE;}
+	| SHORT {$type = PromelaIntRange.SHORT;}
+	| INT {$type = PromelaIntRange.INT;}
+	| MTYPE {$type = mMType;}
+	| unameRule
 		
 	;
 typeRule

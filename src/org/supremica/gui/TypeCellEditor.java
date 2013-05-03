@@ -63,7 +63,7 @@ class TypeCellEditor
 {
 	private JTable theTable;
 	private TableSorter theTableSorter;
-	private JComboBox automatonTypeCombo;
+	private JComboBox<AutomatonType> automatonTypeCombo;
 	private VisualProjectContainer theVisualProjectContainer;
 	private static Logger logger = LoggerFactory.createLogger(TypeCellEditor.class);
 
@@ -72,7 +72,7 @@ class TypeCellEditor
 		this.theTable = theTable;
 		this.theVisualProjectContainer = theVisualProjectContainer;
 		this.theTableSorter = theTableSorter;
-		automatonTypeCombo = new JComboBox();
+		automatonTypeCombo = new JComboBox<AutomatonType>();
 
 		Iterator<AutomatonType> typeIt = AutomatonType.iterator();
 

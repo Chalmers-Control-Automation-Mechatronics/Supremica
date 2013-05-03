@@ -9,19 +9,20 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TLongObjectHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.list.array.TIntArrayList;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -54,40 +55,51 @@ public class IntStateBuffer
    *                    events used as markings of the states.
    * @param  stateEnc   State encoding that defines the assignment of state
    *                    codes for the states in the buffer.
+   * @param  events     Set of events used in automaton, or <CODE>null</CODE>.
+   *                    If the event encoding defines propositions as extra
+   *                    selfloops, all states will be marked by extra-selfloop
+   *                    propositions not in the set of events.
    * @throws OverflowException if the event encoding map has more than 30
    *                    propositions.
    */
   public IntStateBuffer(final EventEncoding eventEnc,
-                        final StateEncoding stateEnc)
+                        final StateEncoding stateEnc,
+                        final Set<EventProxy> events)
     throws OverflowException
   {
-    this(stateEnc.getNumberOfIncludingExtraStates(),
+    this(stateEnc.getNumberOfStatesIncludingExtra(),
          eventEnc.getNumberOfPropositions());
-    final int numStates = stateEnc.getNumberOfIncludingExtraStates();
+    final int numStates = stateEnc.getNumberOfStatesIncludingExtra();
     final int extraStates = stateEnc.getNumberOfExtraStates();
     for (int state = numStates - extraStates; state < numStates; state++) {
       setReachable(state, false);
     }
     int tags0 = TAG_REACHABLE;
-    final List<EventProxy> extra = eventEnc.getExtraSelfloops();
-    if (extra != null) {
-      for (final EventProxy event : extra) {
-        if (event.getKind() == EventKind.PROPOSITION) {
-          final int code = eventEnc.getEventCode(event);
-          tags0 |= (1 << code);
+    for (int e = 0; e < eventEnc.getNumberOfPropositions(); e++) {
+      final byte status = eventEnc.getPropositionStatus(e);
+      if ((status & EventEncoding.STATUS_UNUSED) != 0) {
+        final EventProxy event = eventEnc.getProposition(e);
+        if (events == null || !events.contains(event)) {
+          tags0 |= (1 << e);
         }
       }
     }
+
     int i = 0;
     for (final StateProxy state : stateEnc.getStates()) {
-      int tags = tags0;
-      if (state.isInitial()) {
-        tags |= TAG_INITIAL;
-      }
-      for (final EventProxy event : state.getPropositions()) {
-        final int code = eventEnc.getEventCode(event);
-        if (code >= 0) {
-          tags |= 1 << code;
+      int tags;
+      if (state == null) {
+        tags = 0;
+      } else {
+        tags = tags0;
+        if (state.isInitial()) {
+          tags |= TAG_INITIAL;
+        }
+        for (final EventProxy event : state.getPropositions()) {
+          final int code = eventEnc.getEventCode(event);
+          if (code >= 0) {
+            tags |= 1 << code;
+          }
         }
       }
       mStateInfo[i++] = tags;
@@ -240,12 +252,21 @@ public class IntStateBuffer
 
   /**
    * Checks whether a state is marked.
+   * This method reports a state as marked if the indicated proposition is
+   * not marked as used (marked by default for proposition not in the
+   * automaton alphabet), or if the state is explicitly marked by the
+   * proposition.
    * @param  state   ID of the state to be tested.
    * @param  prop    ID of the marking proposition to be tested.
    */
   public boolean isMarked(final int state, final int prop)
   {
-    return (mStateInfo[state] & (1 << prop)) != 0;
+    final int code = 1 << prop;
+    if ((mUsedPropositions & code) != 0) {
+      return (mStateInfo[state] & code) != 0;
+    } else {
+      return true;
+    }
   }
 
   /**
@@ -552,6 +573,64 @@ public class IntStateBuffer
 
 
   //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter printer = new PrintWriter(writer);
+    dump(printer);
+    return writer.toString();
+  }
+
+  public void dump(final PrintWriter printer)
+  {
+    printer.print('{');
+    int last = -1;
+    for (int s = 0; s < mStateInfo.length; s++) {
+      final int info = mStateInfo[s] &~ TAG_REACHABLE;
+      if (info != 0) {
+        if (last >= 0) {
+          printer.print(", ");
+        }
+        last = s;
+        if ((info & TAG_INITIAL) != 0) {
+          printer.print("->");
+        }
+        printer.print(s);
+        if ((info & mUsedPropositions) != 0) {
+          if (mNumPropositions == 1) {
+            printer.print('*');
+          } else {
+            printer.print('<');
+            boolean first = true;
+            for (int p = 0; p < mNumPropositions; p++) {
+              if ((info & (1 << p) & mUsedPropositions) != 0) {
+                if (first) {
+                  first = false;
+                } else {
+                  printer.print(",");
+                }
+                printer.print(p);
+              }
+            }
+            printer.print('>');
+          }
+        }
+      }
+    }
+    if (last < mStateInfo.length - 1) {
+      if (last < 0) {
+        printer.print("0");
+      }
+      printer.print(" ... ");
+      printer.print(mStateInfo.length - 1);
+    }
+    printer.print('}');
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final int mNumPropositions;
   private final int[] mStateInfo;
@@ -566,3 +645,4 @@ public class IntStateBuffer
   private static final int MAX_PROPOSITIONS = 30;
 
 }
+

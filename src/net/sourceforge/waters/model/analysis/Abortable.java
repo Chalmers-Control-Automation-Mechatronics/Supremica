@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+
 
 /**
  * <P>The interface for analysis operations that can be aborted.</P>

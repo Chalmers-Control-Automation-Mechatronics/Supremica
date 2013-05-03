@@ -443,7 +443,7 @@ class EventList
     private State currState;
     private final StateViewer stateViewer;
     private final EventListModel eventsList;
-    private final JList theList;
+    private final JList<Object> theList;
 
     public EventList(final StateViewer stateViewer, final Automaton theAutomaton, final boolean forward)
     {
@@ -453,7 +453,7 @@ class EventList
         this.theAutomaton = theAutomaton;
         this.forward = forward;
         eventsList = new EventListModel(theAutomaton, forward);
-        theList = new JList(eventsList);
+        theList = new JList<Object>(eventsList);
 
         final JScrollPane scrollPanel = new JScrollPane(theList);
 
@@ -533,7 +533,7 @@ class EventList
 }
 
 class EventListModel
-    extends AbstractListModel
+    extends AbstractListModel<Object>
 {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")

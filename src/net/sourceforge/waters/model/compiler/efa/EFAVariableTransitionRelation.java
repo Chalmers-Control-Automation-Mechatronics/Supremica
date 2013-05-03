@@ -123,7 +123,11 @@ class EFAVariableTransitionRelation
    */
   Set<EFAVariable> getVariables()
   {
-    return mParts.keySet();
+    if (mParts == null) {
+      return Collections.emptySet();
+    } else {
+      return mParts.keySet();
+    }
   }
 
   /**
@@ -132,7 +136,7 @@ class EFAVariableTransitionRelation
    * @return The partial transition relation associated with the given
    *         variable, or <CODE>null</CODE> to indicate that the variable
    *         is left unchanged by this transition.
-   */ 
+   */
   EFAVariableTransitionRelationPart getPart(final EFAVariable var)
   {
     return mParts.get(var);
@@ -142,7 +146,7 @@ class EFAVariableTransitionRelation
    * Adds a new part to this transition relation.
    * @param var       The variable to which the new transition relation part
    *                  is to be associated. If the transition relation already
-   *                  contains a partial relation for this variable, the 
+   *                  contains a partial relation for this variable, the
    *                  behaviour is undefined.
    * @param part      The new partial transition relation to be associated
    *                  to the variable.

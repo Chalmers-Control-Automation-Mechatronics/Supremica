@@ -9,8 +9,9 @@
 
 package net.sourceforge.waters.subject.base;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.AbstractSet;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,7 +22,7 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
- * <E>A wrapper of the {@link HashSet} class that also implements the
+ * <E>A wrapper of the {@link THashSet} class that also implements the
  * {@link Subject} interface.</P>
  *
  * <E>This is an implementation of a mutable set with full event
@@ -93,7 +94,8 @@ public class NotCloningGeometrySetSubject<E>
   {
     final boolean result = mSet.add(element);
     if (result) {
-      fireGeometryChange();
+      final ModelChangeEvent event = createGeometryChange();
+      event.fire();
     }
     return result;
   }
@@ -112,7 +114,8 @@ public class NotCloningGeometrySetSubject<E>
   {
     final boolean result = mSet.remove(victim);
     if (result) {
-      fireGeometryChange();
+      final ModelChangeEvent event = createGeometryChange();
+      event.fire();
     }
     return result;
   }
@@ -178,34 +181,49 @@ public class NotCloningGeometrySetSubject<E>
     return mObservers;
   }
 
-  public void fireModelChanged(final ModelChangeEvent event)
-  {
-    SubjectTools.fireModelChanged(this, event);
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SimpleSetSubject
-  public void assignFrom(final Set<? extends E> set)
+  public UndoInfo createUndoInfo(final Set<? extends E> newSet,
+                                 final Set<? extends Subject> boundary)
   {
-    final int oldsize = size();
-    final int newsize = set.size();
-    final Collection<E> added = new ArrayList<E>(newsize);
-    final Collection<E> kept = new ArrayList<E>(oldsize);
-    for (final E newitem : set) {
-      if (contains(newitem)) {
-        kept.add(newitem);
-      } else {
-        added.add(newitem);
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
+    final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
+    for (final E oldItem : this) {
+      if (!newSet.contains(oldItem)) {
+        final UndoInfo remove = new ReplacementUndoInfo(oldItem, null);
+        info.add(remove);
       }
     }
-    final boolean removing = mSet.retainAll(kept);
-    final boolean adding = mSet.addAll(added);
-    if (removing || adding) {
-      fireGeometryChange();
+    for (final E newItem : newSet) {
+      if (!contains(newItem)) {
+        final UndoInfo add = new ReplacementUndoInfo(null, newItem);
+        info.add(add);
+      }
+    }
+    if (info.isEmpty()) {
+      return null;
+    } else {
+      return info;
     }
   }
 
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    if (oldValue != null) {
+      mSet.remove(oldValue);
+    }
+    if (newValue != null) {
+      @SuppressWarnings("unchecked")
+      final Class<E> clazz = (Class<E>) newValue.getClass();
+      mSet.add(clazz.cast(newValue));
+    }
+    return createGeometryChange();
+  }
 
   //#########################################################################
   //# Printing
@@ -220,13 +238,13 @@ public class NotCloningGeometrySetSubject<E>
 
   //#########################################################################
   //# Auxiliary Methods
-  private void fireGeometryChange()
+  private ModelChangeEvent createGeometryChange()
   {
-    final Subject source = mParent != null ? mParent.getParent() : null;
+    final Subject source = mParent != null ? mParent.getParent() : this;
     final ModelChangeEvent event =
       ModelChangeEvent.createGeometryChanged(source,
                                              (GeometrySubject) mParent);
-    fireModelChanged(event);
+    return event;
   }
 
 
@@ -258,7 +276,8 @@ public class NotCloningGeometrySetSubject<E>
     public void remove()
     {
       mIterator.remove();
-      fireGeometryChange();
+      final ModelChangeEvent event = createGeometryChange();
+      event.fire();
     }
 
 
@@ -289,3 +308,4 @@ public class NotCloningGeometrySetSubject<E>
   private Set<E> mSet;
 
 }
+

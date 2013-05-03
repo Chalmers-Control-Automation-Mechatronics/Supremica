@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntProcedure;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.procedure.TIntProcedure;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -56,6 +56,11 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
   public IntSetBuffer(final int numValues, final int initialSize)
   {
+    this(numValues, 0, 0);
+  }
+
+  public IntSetBuffer(final int numValues, final int initialSize, final int defaultHashSetValue)
+  {
     mSizeShift = AutomatonTools.log2(numValues + 1);
     mSizeMask = (1 << mSizeShift) - 1;
     mDataShift = AutomatonTools.log2(numValues);
@@ -63,7 +68,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
     mBlocks = new ArrayList<int[]>();
     final int[] block = new int[BLOCK_SIZE];
     mBlocks.add(block);
-    mDirectory = new WatersIntHashSet(initialSize, this);
+    mDirectory = new WatersIntHashSet(initialSize, defaultHashSetValue, this);
     mSize = mNextFreeOffset = 0;
   }
 
@@ -113,6 +118,74 @@ public class IntSetBuffer implements WatersIntHashingStrategy
       mSize++;
       mNextFreeOffset += words;
     }
+    return result;
+  }
+
+  public int get(final int[] data) {
+
+    final int count = data.length;
+    final int words = getNumberOfWords(count);
+    ensureCapacity(words);
+    int blockno = mNextFreeOffset >>> BLOCK_SHIFT;
+    int[] block = mBlocks.get(blockno);
+    int offset = mNextFreeOffset & BLOCK_MASK;
+    long current = count;
+    int shift = mSizeShift;
+    for (final long value : data) {
+      current |= (value << shift);
+      shift += mDataShift;
+      if (shift >= 32) {
+        if (offset >= BLOCK_SIZE) {
+          offset = 0;
+          block = mBlocks.get(++blockno);
+        }
+        block[offset++] = (int) (current & 0xffffffffL);
+        current >>>= 32;
+        shift -= 32;
+      }
+    }
+    if (shift > 0) {
+      if (offset >= BLOCK_SIZE) {
+        offset = 0;
+        block = mBlocks.get(++blockno);
+      }
+      block[offset] = (int) (current & 0xffffffffL);
+    }
+   return mDirectory.get(mNextFreeOffset);
+  }
+
+  public int[] getSet(final int index)
+  {
+    int blockno = index >>> BLOCK_SHIFT;
+
+    int[] block = mBlocks.get(blockno);
+    int offset = index & BLOCK_MASK;
+    long data = block[offset];
+    final int count = (int)data & mSizeMask;
+    final int[] result = new int[count];
+    data = data >>> mSizeShift;
+    int totalShifted = mSizeShift;
+    for (int i = 0; i < count; i++)
+    {
+        if (totalShifted + mDataShift >= 32)
+        {
+          offset++;
+          if (offset >= BLOCK_SIZE) {
+            offset = 0;
+            block = mBlocks.get(++blockno);
+          }
+          final int bitsleft = 32 - totalShifted;
+
+           totalShifted = 0 - bitsleft;
+           final long newblock = block[offset] & 0xffffffffL;
+           data |= (newblock);
+        }
+        // this cast is OK as mDataMask < 32
+        result[i] = (int)data & mDataMask;
+        data = data >>> mDataShift;
+        totalShifted += mDataShift;
+    }
+
     return result;
   }
 
@@ -565,3 +638,4 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   private static final long serialVersionUID = 1L;
 
 }
+

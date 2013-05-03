@@ -16,8 +16,8 @@ import java.io.Serializable;
  * Interface to support pluggable hashing and equality strategies in maps
  * and sets. Implementors can use this interface to customise the way
  * hash codes are computed or how primitive values are considered as
- * equal. This is a modified version of interface
- * {@link gnu.trove.TIntHashingStrategy}.
+ * equal. This is a modified version of interface TIntHashingStrategy in
+ * GNU Trove&nbsp;2.
  *
  * @author Eric D. Friedman, Robi Malik
  */

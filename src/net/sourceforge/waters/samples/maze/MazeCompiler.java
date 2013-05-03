@@ -220,7 +220,8 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
     final PlainEventListProxy props =
       mFactory.createPlainEventListProxy();
     final SimpleNodeProxy node =
-      mFactory.createSimpleNodeProxy("q0", props, true, null, null, null);
+      mFactory.createSimpleNodeProxy("q0", props, null,
+                                     true, null, null, null);
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final List<Proxy> blocked = new LinkedList<Proxy>();
     for (final Action action : escapes) {

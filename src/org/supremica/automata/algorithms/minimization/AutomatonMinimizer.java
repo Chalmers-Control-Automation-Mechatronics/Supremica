@@ -275,8 +275,9 @@ public class AutomatonMinimizer
             }
           }
           final KindTranslator translator = IdenticalKindTranslator.getInstance();
-         final OPSearchAutomatonSimplifier simp =
+          final OPSearchAutomatonSimplifier simp =
             new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
+          simp.run();
           final AutomatonProxy result = simp.getComputedAutomaton();
           if (result != aut) {
             final ProjectBuildFromWaters exporter =
@@ -708,7 +709,7 @@ public class AutomatonMinimizer
           {
               final Arc arc = arcIt.next();
               final LabeledEvent event = arc.getEvent();
- 
+
               if(event.isTauEvent())
               {
                 final LabeledEvent orig = ((TauEvent)event).getOriginalEvent();

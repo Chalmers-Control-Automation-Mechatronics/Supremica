@@ -13,18 +13,18 @@ import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
  *
  * @author Avenir Kobetski
  */
-public class CbcUI 
+public class CbcUI
         extends MpsUI
 {
-    public CbcUI(Milp milpConstructor)
+    public CbcUI(final Milp milpConstructor)
             throws Exception
     {
         super(milpConstructor);
     }
-    
-    public void launchMilpSolver(File mpsFile)
+
+    public void launchMilpSolver(final File mpsFile)
             throws MilpException, IOException
-    {      
+    {
         BufferedWriter commandWriter = null;
         try
         {
@@ -42,18 +42,18 @@ public class CbcUI
             commandWriter.flush();
             commandWriter.close();
         }
-        catch (IOException milpNotFoundException)
+        catch (final IOException milpNotFoundException)
         {
             milpConstructor.addToMessages("The CBC-solver 'cbc.exe' not found. " +
                     "Make sure that it is registered in your path.", SchedulingConstants.MESSAGE_TYPE_ERROR);
-            
+
             throw new MilpException(milpNotFoundException.getMessage());
         }
-        
+
         // Listens for the output of MILP (that is the input to this application)...
-        BufferedReader milpEcho = new BufferedReader(
+        final BufferedReader milpEcho = new BufferedReader(
                 new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
-        
+
         // ...and prints it to stdout
         String milpEchoStr = "";
         while ((milpEchoStr = milpEcho.readLine()) != null)
@@ -62,28 +62,28 @@ public class CbcUI
             {
                 throw new MilpException(milpEchoStr + " (specifications should be relaxed if possible).");
             }
-            
+
             if (milpEchoStr.contains("Result"))
             {
                 System.out.println("milpecho = " + milpEchoStr);
-     
+
                 milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("objective") + 10).trim();
-                String objValue = milpEchoStr.substring(0, milpEchoStr.indexOf("after")).trim();
-                
+                final String objValue = milpEchoStr.substring(0, milpEchoStr.indexOf("after")).trim();
+
                 milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("after") + 6).trim();
-                String nrNodes = milpEchoStr.substring(0, milpEchoStr.indexOf("node")).trim();
-                
+                final String nrNodes = milpEchoStr.substring(0, milpEchoStr.indexOf("node")).trim();
+
                 milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("and") + 4).trim();
-                String nrIters = milpEchoStr.substring(0, milpEchoStr.indexOf("iteration")).trim();
-                
+                final String nrIters = milpEchoStr.substring(0, milpEchoStr.indexOf("iteration")).trim();
+
                 milpEchoStr = milpEchoStr.substring(milpEchoStr.indexOf("took") + 5).trim();
-                String runTime = milpEchoStr.substring(0, milpEchoStr.indexOf("sec")).trim();
-                
-                milpConstructor.addToMessages("\tOptimization time = " + runTime + "ms", 
-                        SchedulingConstants.MESSAGE_TYPE_INFO); 
-                milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + objValue, 
+                final String runTime = milpEchoStr.substring(0, milpEchoStr.indexOf("sec")).trim();
+
+                milpConstructor.addToMessages("\tOptimization time = " + runTime + "ms",
                         SchedulingConstants.MESSAGE_TYPE_INFO);
-                milpConstructor.addToMessages("\tNr of nodes = " + nrNodes +"; nr of iterations = " + nrIters, 
+                milpConstructor.addToMessages("\t\tOPTIMAL MAKESPAN: " + objValue,
+                        SchedulingConstants.MESSAGE_TYPE_INFO);
+                milpConstructor.addToMessages("\tNr of nodes = " + nrNodes +"; nr of iterations = " + nrIters,
                         SchedulingConstants.MESSAGE_TYPE_INFO);
             }
         }
@@ -91,12 +91,11 @@ public class CbcUI
 
     public void processSolutionFile()
         throws MilpException, FileNotFoundException, IOException
-    {       
-        Hashtable<Integer, Double> optimalTimeVarValues = new Hashtable<Integer, Double>();
-        Hashtable<Integer, Integer> optimalBinVarValues = new Hashtable<Integer, Integer>();
-        
-        BufferedReader r = new BufferedReader(new FileReader(solutionFile));
-     
+    {
+      final Hashtable<Integer, Double> optimalTimeVarValues = new Hashtable<Integer, Double>();
+      final Hashtable<Integer, Integer> optimalBinVarValues = new Hashtable<Integer, Integer>();
+      final BufferedReader r = new BufferedReader(new FileReader(solutionFile));
+      try {
         // Go through the solution file and extract the suggested optimal times for each state
         String str;
         while ((str = r.readLine()) != null)
@@ -106,33 +105,35 @@ public class CbcUI
             {
                 str = str.substring(cutIndex + 1);
                 cutIndex = str.indexOf(" ");
-                Integer varIndex = new Integer(str.substring(0, cutIndex).trim());
-                
+                final Integer varIndex = new Integer(str.substring(0, cutIndex).trim());
+
                 str = str.substring(cutIndex).trim();
                 cutIndex = str.indexOf(" ");
-                Integer varValue = new Integer(str.substring(0, cutIndex).trim());
-                
+                final Integer varValue = new Integer(str.substring(0, cutIndex).trim());
+
                 optimalBinVarValues.put(new Integer(varIndex), varValue);
             }
-            else 
+            else
             {
                 cutIndex = str.indexOf("T");
                 if (cutIndex > 0)
                 {
                     str = str.substring(cutIndex + 1);
                     cutIndex = str.indexOf(" ");
-                    Integer varIndex = new Integer(str.substring(0, cutIndex).trim());
+                    final Integer varIndex = new Integer(str.substring(0, cutIndex).trim());
 
                     str = str.substring(cutIndex).trim();
                     cutIndex = str.indexOf(" ");
-                    Double varValue = new Double(str.substring(0, cutIndex).trim());
+                    final Double varValue = new Double(str.substring(0, cutIndex).trim());
 
                     optimalTimeVarValues.put(varIndex, varValue);
                 }
             }
         }
-        
-        fillOptimalVarArrays(optimalTimeVarValues, optimalBinVarValues);
+      } finally {
+        r.close();
+      }
+      fillOptimalVarArrays(optimalTimeVarValues, optimalBinVarValues);
     }
 }
 

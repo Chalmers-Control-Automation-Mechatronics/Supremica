@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.subject.base;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.IndexedCollection;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
@@ -53,31 +55,49 @@ public abstract class NamedSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public NamedSubject clone()
   {
     return (NamedSubject) super.clone();
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final boolean changed = super.assignFrom(partner);
-      final NamedProxy named = (NamedSubject) partner;
-      setName(named.getName());
-      return changed;
-    } else {
-      return false;
+    switch (index) {
+    case 1:
+      final String name = (String) newValue;
+      return assignName(name);
+    default:
+      return null;
+    }
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final NamedSubject named = (NamedSubject) newState;
+    if (!named.getName().equals(mName)) {
+      final UndoInfo step = new ReplacementUndoInfo(1, mName, named.getName());
+      info.add(step);
     }
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.NamedProxy
+  @Override
   public String getName()
   {
     return mName;
   }
 
+  @Override
   public boolean refequals(final NamedProxy partner)
   {
     return getName().equals(partner.getName());
@@ -103,7 +123,20 @@ public abstract class NamedSubject
   public void setName(final String name)
     throws DuplicateNameException, ItemNotFoundException
   {
-    if (!mName.equals(name)) {
+    final ModelChangeEvent event = assignName(name);
+    if (event != null) {
+      event.fire();
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private ModelChangeEvent assignName(final String name)
+  {
+    if (mName.equals(name)) {
+      return null;
+    } else {
       final Subject parent = getParent();
       if (parent instanceof IndexedCollection<?>) {
         final IndexedCollection<?> collection = (IndexedCollection<?>) parent;
@@ -112,7 +145,7 @@ public abstract class NamedSubject
       final ModelChangeEvent event =
         ModelChangeEvent.createNameChanged(this, mName);
       mName = name;
-      fireModelChanged(event);
+      return event;
     }
   }
 

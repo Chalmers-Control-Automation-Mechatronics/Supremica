@@ -9,10 +9,13 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.BitSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
+import java.util.BitSet;
+
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbortException;
@@ -234,7 +237,7 @@ public class HalfWaySynthesisTRSimplifier
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     final int defaultID = getDefaultMarkingID();
     final int numStates = rel.getNumberOfStates();
-    final TIntStack unvisited = new TIntStack();
+    final TIntStack unvisited = new TIntArrayStack();
     // Creates a hash set of all states which can reach a marked state.
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (rel.isMarked(sourceID, defaultID) && rel.isReachable(sourceID)
@@ -267,7 +270,7 @@ public class HalfWaySynthesisTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     iterateLocalUncontrollable(iter);
-    final TIntStack unvisited = new TIntStack();
+    final TIntStack unvisited = new TIntArrayStack();
     for (int state = oldBadStates.nextSetBit(0); state >= 0;
          state = oldBadStates.nextSetBit(state+1)) {
       unvisited.push(state);
@@ -298,18 +301,14 @@ public class HalfWaySynthesisTRSimplifier
       }
       final int numEvents = rel.getNumberOfProperEvents();
       for (int event = 0; event < numEvents; event++) {
-        rel.setUsedEvent(event, false);
+        final byte status = rel.getProperEventStatus(event);
+        rel.setProperEventStatus
+          (event, (byte) (status | EventEncoding.STATUS_UNUSED));
       }
       rel.removeRedundantPropositions();
-      final ComponentKind kind = rel.getKind();
-      final ListBufferTransitionRelation abstraction =
-        new ListBufferTransitionRelation(name, kind, 0, 0, 0,
-                                         ListBufferTransitionRelation.
-                                         CONFIG_SUCCESSORS);
-      setTransitionRelation(abstraction);
       mPseudoSupervisor =
         new ListBufferTransitionRelation(name, ComponentKind.SUPERVISOR,
-                                         0, 0, 0,
+                                         1, 0, 0,
                                          ListBufferTransitionRelation.
                                          CONFIG_SUCCESSORS);
     } catch (final OverflowException exception) {
@@ -333,3 +332,4 @@ public class HalfWaySynthesisTRSimplifier
   private ListBufferTransitionRelation mPseudoSupervisor;
 
 }
+

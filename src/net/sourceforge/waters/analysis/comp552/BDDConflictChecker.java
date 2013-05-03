@@ -1,14 +1,28 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: COMP452/552-10B Assignment 3
+//# PROJECT: COMP452/552-12A Assignment 3
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   BDDConflictChecker
 //###########################################################################
-//# $Id$
+//# This file contains the work of:
+//# Family name:
+//# First name:
+//# Student ID:
+//###########################################################################
+//# You are welcome to edit this file as much as you like,
+//# but please DO NOT CHANGE the public interface.
+//# Do not change the signature of the two constructors,
+//# or the run() or getCounterExample() method.
+//# You should expect that several calls to run() followed by
+//# getCounterExample(), so your code needs to be reentrant and it
+//# must shut down the BDDFactory even in case of an exception.
+//###########################################################################
+//# WARNING: If you do not comply with these rules, the automatic tester
+//# may fail to run your program, resulting in 0 marks for you assignment.
 //###########################################################################
 
 package net.sourceforge.waters.analysis.comp552;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -93,6 +107,12 @@ public class BDDConflictChecker extends ModelChecker
     // "buddy" first to see whether the native library can be loaded.
     // Another (faster?) alternative is "cudd".
     final BDDFactory bddFactory = BDDFactory.init("buddy", 10000, 5000);
+    // You can try to increase performance by increasing the cache sizes,
+    // but please be aware of the memory limits. Anything above 1 million
+    // is close to suicide, except perhaps when using "cudd". If you
+    // want to push the limits, please test your program inside
+    // 'ulimit -v 1048576 -m 1048576', and pass the -Xmx argument to
+    // the Java VM.
 
     // Uncomment the following try-catch block to disable disconcerting
     // debug output.
@@ -160,18 +180,23 @@ public class BDDConflictChecker extends ModelChecker
       // First get the model.
       final ProductDESProxy model = getModel();
       // Create an encoding for the events and automata.
-      final BDDEncoding enc = new BDDEncoding(bddFactory, model);
+      mBDDEncoding = new BDDEncoding(bddFactory, model);
       // Get the initial states BDD ...
-      final BDD init = enc.getInitialStateBDD();
+      final BDD init = mBDDEncoding.computeInitialStatesBDD();
       // ... and the marked states BDD.
       final EventProxy marking = getConfiguredMarkingProposition();
-      final BDD marked = enc.getMarkedStateBDD(marking);
-      // What states are initial and not marked?
+      final BDD marked = mBDDEncoding.computeMarkedStatesBDD(marking);
+      // Which states are initial and not marked?
       final BDD notMarked = marked.not();
       marked.free();
       final BDD initNotMarked = init.andWith(notMarked);
       // Use this BDD for something (well, sort of) ...
       initNotMarked.free();
+
+      // Try to compute a counterexample ...
+      // This is not yet implemented and should only be done of the model is
+      // conflicting, but never mind ...
+      mCounterExample = computeCounterExample();
 
       // Still no real progress towards conflict checking.
       // Let us just leave ...
@@ -197,35 +222,57 @@ public class BDDConflictChecker extends ModelChecker
    * coreachable. That is, after executing the counterexample, the automata
    * are in a state from where it is no longer possible to reach a state
    * where all automata are marked at the same time.
-   * @return A trace object representing the counterexample.
+   * @return A conflict trace object representing the counterexample.
    *         The returned trace is constructed for the input product DES
    *         of this conflict checker and shares its automata and
    *         event objects.
-   * @throws IllegalStateException if this method is called before
-   *         model checking has completed, i.e., before {@link #run()}
-   *         has been called, or model checking has found that the
-   *         property is satisfied and there is no counterexample.
    */
   public ConflictTraceProxy getCounterExample()
   {
-    // The following creates a trace that consists of all the events in
-    // the input model.
+    // Just return a stored counterexample. This is the recommended way
+    // of doing this, because we can no longer use the BDD factory after
+    // the run() method has finished. The counterexample can be computed
+    // by a method similar to computeCounterExample() below or otherwise.
+    return mCounterExample;
+  }
+
+
+  /**
+   * Computes a counterexample.
+   * This method is to be called from {@link #run()} after the model was
+   * found to be conflicting, before the BDD factory has been closed. It
+   * uses BDD operations to build the counterexample.
+   * @return The computed counterexample.
+   */
+  private ConflictTraceProxy computeCounterExample()
+  {
+    // The following creates a trace that consists of the first three events
+    // in the input model.
     // This code is only here to demonstrate the use of the interfaces.
     // IT DOES NOT GIVE A CORRECT TRACE!
-
-    final ProductDESProxyFactory desFactory = getFactory();
     final ProductDESProxy model = getModel();
-    final String modelname = model.getName();
-    final String tracename = modelname + "-conflicting";
-    final Collection<EventProxy> events = model.getEvents();
-    final List<EventProxy> tracelist = new LinkedList<EventProxy>();
-    for (final EventProxy event : events) {
-      tracelist.add(event);
+    final String modelName = model.getName();
+    final String traceName = modelName + "-conflicting";
+    final List<EventProxy> traceList = new LinkedList<EventProxy>();
+    for (int e = 0; e < 3; e++) {
+      if (e < mBDDEncoding.getNumberOfProperEvents()) {
+        // Get event from encoding.
+        final EventProxy event = mBDDEncoding.getEvent(e);
+        // Construct the BDD for this event.
+        final BDD eventBDD = mBDDEncoding.computeEventBDD(event);
+        // Decode the BDD back to an event.
+        final EventProxy bddEvent = mBDDEncoding.findEvent(eventBDD);
+        // This should give back the event.
+        assert event == bddEvent : "Unexpected event found";
+        eventBDD.free();
+        traceList.add(event);
+      }
     }
     // Note. The conflict kind field of the trace is optional for
     // this assignment---it will not be tested.
+    final ProductDESProxyFactory desFactory = getFactory();
     final ConflictTraceProxy trace =
-      desFactory.createConflictTraceProxy(tracename, model, tracelist,
+      desFactory.createConflictTraceProxy(traceName, model, traceList,
                                           ConflictKind.CONFLICT);
     return trace;
   }
@@ -285,5 +332,7 @@ public class BDDConflictChecker extends ModelChecker
   //#########################################################################
   //# Data Members
   private final EventProxy mMarking;
+  private BDDEncoding mBDDEncoding;
+  private ConflictTraceProxy mCounterExample;
 
 }

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,7 +185,9 @@ public class NonAlphaDeterminisationTRSimplifier
   private boolean hasNonPreconditionMarkedStates()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (getPreconditionMarkingID() < 0 && !rel.isUsedEvent(EventEncoding.TAU)) {
+    if (getPreconditionMarkingID() < 0 &&
+        (rel.getProperEventStatus(EventEncoding.TAU) &
+         EventEncoding.STATUS_UNUSED) != 0) {
       return false;
     }
     final int numStates = rel.getNumberOfStates();
@@ -225,7 +227,7 @@ public class NonAlphaDeterminisationTRSimplifier
       }
     }
     assert remainingStates.size() > 1;
-    final int[] remainingStatesArray = remainingStates.toNativeArray();
+    final int[] remainingStatesArray = remainingStates.toArray();
     initialPartition.add(remainingStatesArray);
     return initialPartition;
   }
@@ -249,3 +251,4 @@ public class NonAlphaDeterminisationTRSimplifier
   private TransitionIterator mTauIterator;
 
 }
+

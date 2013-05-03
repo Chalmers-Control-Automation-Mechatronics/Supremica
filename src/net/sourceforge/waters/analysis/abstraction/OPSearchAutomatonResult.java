@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import java.io.PrintWriter;
+
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 
 
@@ -33,12 +34,34 @@ public class OPSearchAutomatonResult
    */
   public OPSearchAutomatonResult()
   {
+    mPeakComponents = -1;
+    mPeakVerifierPairs = -1;
     mNumberOfIterations = -1;
   }
 
 
   //#########################################################################
   //# Simple Access Methods
+  /**
+   * Gets the peak number of strongly connected components encountered
+   * during OP-Search.
+   * @return Number of strongly connected components
+   *         or <CODE>-1</CODE> if not set.
+   */
+  public int getPeakNumberOfComponents()
+  {
+    return mPeakComponents;
+  }
+
+  /**
+   * Gets the peak number of verifier pairs constructed during OP-Search.
+   * @return Number of pairs or <CODE>-1</CODE> if not set.
+   */
+  public int getPeakNumberOfVerifierPairs()
+  {
+    return mPeakVerifierPairs;
+  }
+
   /**
    * Gets the number of iterations performed by OP-Search.
    * The number of iterations is equal to the number of transitions changed
@@ -49,6 +72,7 @@ public class OPSearchAutomatonResult
   {
     return mNumberOfIterations;
   }
+
 
 
   //#########################################################################
@@ -70,6 +94,10 @@ public class OPSearchAutomatonResult
   {
     super.merge(other);
     final OPSearchAutomatonResult result = (OPSearchAutomatonResult) other;
+    mPeakComponents =
+      Math.max(mPeakComponents, result.mPeakComponents);
+    mPeakVerifierPairs =
+      Math.max(mPeakVerifierPairs, result.mPeakVerifierPairs);
     mNumberOfIterations =
       mergeAdd(mNumberOfIterations, result.mNumberOfIterations);
   }
@@ -78,6 +106,14 @@ public class OPSearchAutomatonResult
   public void print(final PrintWriter writer)
   {
     super.print(writer);
+    if (mPeakComponents >= 0) {
+      writer.println("Peak number of strongly connected components: " +
+                     mPeakComponents);
+    }
+    if (mPeakVerifierPairs >= 0) {
+      writer.println("Peak number of OP-verifier pairs: " +
+                     mPeakVerifierPairs);
+    }
     if (mNumberOfIterations >= 0) {
       writer.println("Total number of OP-search iterations: " +
                      mNumberOfIterations);
@@ -89,6 +125,14 @@ public class OPSearchAutomatonResult
   {
     super.printCSVHorizontal(writer);
     writer.print(',');
+    if (mPeakComponents >= 0) {
+      writer.print(mPeakComponents);
+    }
+    writer.print(',');
+    if (mPeakVerifierPairs >= 0) {
+      writer.print(mPeakVerifierPairs);
+    }
+    writer.print(',');
     if (mNumberOfIterations >= 0) {
       writer.print(mNumberOfIterations);
     }
@@ -98,12 +142,28 @@ public class OPSearchAutomatonResult
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
+    writer.print(",Comps");
+    writer.print(",VPairs");
     writer.print(",Iter");
   }
 
 
   //#########################################################################
   //# Gathering
+  void recordComponents(final int numComps)
+  {
+    if (numComps > mPeakComponents) {
+      mPeakComponents = numComps;
+    }
+  }
+
+  void recordVerifier(final int numPairs)
+  {
+    if (numPairs > mPeakVerifierPairs) {
+      mPeakVerifierPairs = numPairs;
+    }
+  }
+
   void recordIteration()
   {
     mNumberOfIterations = mergeAdd(mNumberOfIterations, 1);
@@ -112,6 +172,8 @@ public class OPSearchAutomatonResult
 
   //#########################################################################
   //# Data Members
+  private int mPeakComponents;
+  private int mPeakVerifierPairs;
   private int mNumberOfIterations;
 
 }

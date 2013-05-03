@@ -16,14 +16,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntProcedure;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectProcedure;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.procedure.TIntIntProcedure;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.procedure.TObjectProcedure;
 
 import net.sourceforge.waters.analysis.AnnotatedMemStateProxy;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -36,10 +36,10 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.analysis.TransitionRelation;
 import java.util.Set;
 import java.util.HashMap;
-import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TLongHashSet;
-import gnu.trove.TLongLongHashMap;
-import gnu.trove.TLongArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.hash.TLongHashSet;
+import gnu.trove.map.hash.TLongLongHashMap;
+import gnu.trove.list.array.TLongArrayList;
 import java.lang.Comparable;
 import org.omg.SendingContext.RunTime;
 import java.util.HashSet;
@@ -1709,3 +1709,4 @@ public class BiSimulatorRedundant
     }
   }
 }
+

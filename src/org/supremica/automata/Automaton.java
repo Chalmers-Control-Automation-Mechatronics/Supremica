@@ -672,7 +672,7 @@ public class Automaton
 
         if ((prefix == null) || prefix.equals(""))
         {
-            name = new StringBuffer("r");
+            name = new StringBuffer("q");	// this was 'r', why? Above it says 'q', I changed // MF
         }
         else
         {
@@ -2086,8 +2086,12 @@ public class Automaton
         boolean done_something = false; // keep track so we don't add dump-states over and over
 
         // Create uniquely named dump state
+        /* Use the new DumpState getDumpState() instead
         final State dump = createUniqueState("dump");
         addState(dump);
+        */
+        DumpState dump = getDumpState(true);
+
         // saturate, else something will always be done
         saturate(dump, alpha, dump);
 
@@ -2108,6 +2112,29 @@ public class Automaton
 
         return done_something;
     }
+
+	/**
+	 * Return the unique dump state.
+	 * If the create param is true, the state is created it it does not already exist
+	 */
+	public DumpState getDumpState(boolean create)
+	{
+		State s = getStateWithName(DumpState.DUMPSTATENAME);
+		if(s != null)
+		{
+			return (DumpState) s;	// We know this is the dump state!
+		}
+
+		// else it does not exist already, should we create it?
+		if(create)
+		{
+			DumpState d = new DumpState();
+			addState(d);
+			return d;
+		}
+
+		return null;	// it did not exist and we should not create it
+	}
 
     /**
      * Saturate the automaton with self-loops on events not defined

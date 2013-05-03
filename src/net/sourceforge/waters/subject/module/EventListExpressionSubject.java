@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -23,6 +24,9 @@ import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -40,23 +44,24 @@ public abstract class EventListExpressionSubject
   //# Constructors
   /**
    * Creates a new event list expression.
-   * @param eventList The list of events of the new event list expression, or <CODE>null</CODE> if empty.
+   * @param eventIdentifierList The list of event identifiers of the new event list expression, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
-  protected EventListExpressionSubject(final Collection<? extends Proxy> eventList)
+  protected EventListExpressionSubject(final Collection<? extends Proxy> eventIdentifierList)
   {
-    if (eventList == null) {
-      mEventList = new ArrayListSubject<AbstractSubject>();
+    if (eventIdentifierList == null) {
+      mEventIdentifierList = new ArrayListSubject<AbstractSubject>();
     } else {
-      mEventList = new ArrayListSubject<AbstractSubject>
-        (eventList, AbstractSubject.class);
+      mEventIdentifierList = new ArrayListSubject<AbstractSubject>
+        (eventIdentifierList, AbstractSubject.class);
     }
-    mEventList.setParent(this);
+    mEventIdentifierList.setParent(this);
   }
 
   /**
    * Creates a new event list expression using default values.
    * This constructor creates an event list expression with
-   * an empty list of events.
+   * an empty list of event identifiers.
    */
   protected EventListExpressionSubject()
   {
@@ -66,6 +71,7 @@ public abstract class EventListExpressionSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public EventListExpressionSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -73,27 +79,27 @@ public abstract class EventListExpressionSubject
     return (EventListExpressionSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    if (this != partner) {
-      final EventListExpressionSubject downcast =
-        (EventListExpressionSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ListSubject<AbstractSubject> eventList =
-        downcast.getEventListModifiable();
-      mEventList.assignFrom(eventList);
-      return change;
-    } else {
-      return false;
+    super.collectUndoInfo(newState, info, boundary);
+    final EventListExpressionSubject downcast =
+      (EventListExpressionSubject) newState;
+    final UndoInfo step1 =
+      mEventIdentifierList.createUndoInfo(downcast.mEventIdentifierList, boundary);
+    if (step1 != null) {
+      info.add(step1);
     }
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.EventListExpressionProxy
-  public List<Proxy> getEventList()
+  public List<Proxy> getEventIdentifierList()
   {
-    final List<?> precast = mEventList;
+    final List<?> precast = mEventIdentifierList;
     @SuppressWarnings("unchecked")
     final List<Proxy> downcast = (List<Proxy>) precast;
     return Collections.unmodifiableList(downcast);
@@ -103,16 +109,17 @@ public abstract class EventListExpressionSubject
   //#########################################################################
   //# Setters
   /**
-   * Gets the modifiable list of events consituting this event list expression.
+   * Gets the modifiable list of event identifiers constituting this event list expression.
+   * Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
-  public ListSubject<AbstractSubject> getEventListModifiable()
+  public ListSubject<AbstractSubject> getEventIdentifierListModifiable()
   {
-    return mEventList;
+    return mEventIdentifierList;
   }
 
 
   //#########################################################################
   //# Data Members
-  private ListSubject<AbstractSubject> mEventList;
+  private ListSubject<AbstractSubject> mEventIdentifierList;
 
 }

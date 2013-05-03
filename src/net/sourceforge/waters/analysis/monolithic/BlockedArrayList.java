@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-class BlockedArrayList<T> extends AbstractList<T> {
+public class BlockedArrayList<T> extends AbstractList<T> {
 
   //#########################################################################
   //# Constructors
-  BlockedArrayList(final Class<T> clazz)
+  public BlockedArrayList(final Class<T> clazz)
   {
     clazz_ = clazz;
     size_ = 0;

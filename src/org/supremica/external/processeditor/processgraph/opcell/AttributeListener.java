@@ -4,10 +4,10 @@ import javax.swing.JList;
 
 
 /**
- * Handles the communication between a attribute object and 
+ * Handles the communication between a attribute object and
  * its container.
  */
-public interface AttributeListener {   
+public interface AttributeListener {
     /**
      * Is invoked when a change to the attribute has been made.
      */
@@ -23,17 +23,17 @@ public interface AttributeListener {
     /**
      * Rebuild this object's container.
      */
-    public void rebuild();    
+    public void rebuild();
     /**
      * Sets the list.
      *
      * @param list the concerned list
      */
-    public void setList(JList list);
+    public void setList(JList<AttributePanel> list);
     /**
      * Packs this object and its container.
      */
-    public void upPack();   
+    public void upPack();
     /**
      * Sets the attribute type color.
      */

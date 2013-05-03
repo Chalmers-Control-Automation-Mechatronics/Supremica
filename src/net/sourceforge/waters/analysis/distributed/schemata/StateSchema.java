@@ -6,9 +6,9 @@ import java.io.Serializable;
 
 public class StateSchema implements Serializable
 {
-  StateSchema(String name, 
-	      boolean initial, 
-	      int[] propositions)
+  StateSchema(final String name,
+	      final boolean initial,
+	      final int[] propositions)
   {
     mName = name;
     mInitial = initial;
@@ -25,7 +25,7 @@ public class StateSchema implements Serializable
     return mInitial;
   }
 
-  public int getPropositionId(int index)
+  public int getPropositionId(final int index)
   {
     return mPropositionIds[index];
   }
@@ -35,10 +35,16 @@ public class StateSchema implements Serializable
     return mPropositionIds.length;
   }
 
+  @Override
   public String toString()
   {
-    Formatter fmt = new Formatter();
-    return fmt.format("(%s, %b, %s)", mName, mInitial, Arrays.toString(mPropositionIds)).toString();
+    final Formatter fmt = new Formatter();
+    try {
+      return fmt.format("(%s, %b, %s)", mName, mInitial,
+                        Arrays.toString(mPropositionIds)).toString();
+    } finally {
+      fmt.close();
+    }
   }
 
   private final String mName;

@@ -13,8 +13,9 @@ package net.sourceforge.waters.model.compiler.context;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -54,6 +55,24 @@ public class OccursChecker extends DefaultModuleProxyVisitor
   //#########################################################################
   //# Invocation
   public boolean occurs(final SimpleExpressionProxy varname,
+                        final ConstraintList constraints)
+  {
+    try {
+      mVarName = varname;
+      for (final SimpleExpressionProxy expr : constraints.getConstraints()) {
+        if (occurs(expr)) {
+          return true;
+        }
+      }
+      return false;
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    } finally {
+      mVarName = null;
+    }
+  }
+
+  public boolean occurs(final SimpleExpressionProxy varname,
                         final SimpleExpressionProxy expr)
   {
     try {
@@ -84,6 +103,7 @@ public class OccursChecker extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public Boolean visitBinaryExpressionProxy
     (final BinaryExpressionProxy expr)
     throws VisitorException
@@ -93,6 +113,7 @@ public class OccursChecker extends DefaultModuleProxyVisitor
     return occurs(lhs) || occurs(rhs);
   }
 
+  @Override
   public Boolean visitIndexedIdentifierProxy
     (final IndexedIdentifierProxy ident)
     throws VisitorException
@@ -106,6 +127,7 @@ public class OccursChecker extends DefaultModuleProxyVisitor
     return false;
   }
 
+  @Override
   public Boolean visitQualifiedIdentifierProxy
     (final QualifiedIdentifierProxy ident)
     throws VisitorException
@@ -119,12 +141,14 @@ public class OccursChecker extends DefaultModuleProxyVisitor
     return (Boolean) comp.acceptVisitor(this);
   }
 
+  @Override
   public Boolean visitSimpleExpressionProxy
     (final SimpleExpressionProxy expr)
   {
     return false;
   }
 
+  @Override
   public Boolean visitUnaryExpressionProxy
     (final UnaryExpressionProxy expr)
     throws VisitorException

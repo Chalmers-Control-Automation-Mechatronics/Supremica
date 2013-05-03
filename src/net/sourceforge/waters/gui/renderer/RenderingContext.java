@@ -12,7 +12,7 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Font;
 
-import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;

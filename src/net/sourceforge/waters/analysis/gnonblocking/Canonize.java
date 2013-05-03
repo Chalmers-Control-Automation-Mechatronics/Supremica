@@ -9,15 +9,15 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashMap;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntProcedure;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntProcedure;
-import gnu.trove.TObjectObjectProcedure;
-import gnu.trove.TObjectProcedure;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.procedure.TIntIntProcedure;
+import gnu.trove.procedure.TObjectIntProcedure;
+import gnu.trove.procedure.TObjectObjectProcedure;
+import gnu.trove.procedure.TObjectProcedure;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,6 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -52,44 +51,27 @@ public class Canonize
   }
 
   public ListBufferTransitionRelation run(final ProductDESProxyFactory factory)
-    throws OverflowException, AnalysisException
+    throws AnalysisException
   {
     final ListBufferTauLoopRemoval lbtr = new ListBufferTauLoopRemoval(mAutomaton);
     lbtr.run();
-//    System.out.println("automaton: " + mAutomaton.createAutomaton(factory, mEncoding));
-    //System.out.println(mAutomaton.getNumberOfReachableStates());
-    //System.out.println("canon");
     final TIntHashSet alphas = new TIntHashSet();
     for (int s = 0; s < mAutomaton.getNumberOfStates(); s++) {
-      //System.out.println(mAutomaton.isMarked(s, mAlpha));
       if (mAutomaton.isMarked(s, mAlpha)) {alphas.add(s);}
     }
-    //System.out.println("alphas:" + Arrays.toString(alphas.toArray()));
     Determinizer determinizer = new Determinizer(mAutomaton, mEncoding,
                                                  mMarking);
-    determinizer.setNodeLimit(40000);
+    determinizer.setNodeLimit(100000);
     determinizer.run(alphas.toArray());
-    //System.out.println("det");
     final ListBufferTransitionRelation lower = determinizer.getAutomaton();
     FindBlockingStates fbs = new FindBlockingStates(lower, mMarking);
     TIntHashSet blocking = fbs.getBlockingStates();
     int[] arrblocking = blocking.toArray();
     for (int i = 0; i < arrblocking.length; i++) {
-      //System.out.println("blocking: " + i);
       lower.removeIncomingTransitions(arrblocking[i]);
       lower.removeOutgoingTransitions(arrblocking[i]);
     }
-    //System.out.println(lower);
     lower.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    //System.out.println(lower);
-    //System.out.println(lower.getNumberOfReachableStates());
-    /*ListBufferTransitionRelation clower = new ListBufferTransitionRelation(lower, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    ObservationEquivalenceTRSimplifier oetrsl = new ObservationEquivalenceTRSimplifier(clower);
-    //System.out.println(lower);
-    oetrsl.run();
-    System.out.println("lower: " + lower.getNumberOfReachableStates() + ", " + clower.getNumberOfReachableStates());*/
-    //oetrs.applyResultPartition();
-    //System.out.println("lower:" + lower.createAutomaton(factory, mEncoding));
     final List<int[]> partitions = null; //oetrs.getResultPartition();
     // this tells me what the alpha states in the original became when determinizing
     final TIntIntHashMap initialtoinitial = determinizer.getInitialToInitial();
@@ -97,6 +79,7 @@ public class Canonize
       // I need to update the initials now
       final TIntIntHashMap otherway = new TIntIntHashMap();
       initialtoinitial.forEachEntry(new TIntIntProcedure() {
+        @Override
         public boolean execute(final int k, final int v)
         {
           otherway.put(v, k);
@@ -109,7 +92,6 @@ public class Canonize
           final int state = arr[i];
           if (!otherway.containsKey(state)) {continue;}
           final int initial = otherway.get(state);
-          //System.out.println(state + "; " + initial);
           initialtoinitial.put(initial, s);
         }
       }
@@ -121,13 +103,11 @@ public class Canonize
       mAutomaton.removeIncomingTransitions(arrblocking[i]);
       mAutomaton.removeOutgoingTransitions(arrblocking[i]);
     }
-    //System.out.println("aut: " + mAutomaton.createAutomaton(factory, mEncoding));
     determinizer = new Determinizer(mAutomaton, mEncoding,
                                     mAlpha);
-    determinizer.setNodeLimit(10000);
+    determinizer.setNodeLimit(100000);
     determinizer.run();
     final ListBufferTransitionRelation upper = determinizer.getAutomaton();
-    //System.out.println("upper: " + upper.createAutomaton(factory, mEncoding));
     fbs = new FindBlockingStates(upper, mAlpha);
     blocking = fbs.getBlockingStates();
     arrblocking = blocking.toArray();
@@ -137,13 +117,13 @@ public class Canonize
     }
     final TObjectIntHashMap<TIntHashSet> statesets = determinizer.getSetStateMap();
     final THashMap<TIntHashSet, TIntArrayList> alphaset = new THashMap<TIntHashSet, TIntArrayList>();
-    final LessMarked lm = new LessMarked(lower, mMarking, new TIntHashSet());
+    final LessMarkedFullCache lm = new LessMarkedFullCache(lower, mMarking, new TIntHashSet());
     final TIntArrayList nonAlphas = new TIntArrayList();
     lower.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     statesets.forEachEntry(new TObjectIntProcedure<TIntHashSet>(){
+      @Override
       public boolean execute(final TIntHashSet set, final int state) {
-        final int[] arr = set.toArray(); //System.out.println(Arrays.toString(alphas.toArray()));
-        //System.out.println(Arrays.toString(arr));
+        final int[] arr = set.toArray();
         boolean hasalpha = false;
         OUTER:
         for (int i = 0; i < arr.length; i++) {
@@ -156,21 +136,16 @@ public class Canonize
             int s2 = arr[j]; if (s2 == -1) {continue;}
             if (!alphas.contains(s2)) {continue;}
             s2 = initialtoinitial.get(s2);
-            //System.out.println("\ts1: " + s1 + "\ts2:" + s2 + "arr: " + Arrays.toString(arr));
             if (s1 == s2) {
-              System.out.println("same");
               arr[j] = -1;
               continue INNER;
             }
             final int lesser = lm.run(s1, s2);
-            //System.out.println("\ts1: " + s1 + "\ts2:" + s2 + "\tlesser:" + lesser);
             if (lesser == s1) {
-              //System.out.println("SUBSUMED");
               arr[j] = -1;
               continue INNER;
             }
             if (lesser == s2) {
-              //System.out.println("SUBSUMED");
               arr[i] = -1;
               continue OUTER;
             }
@@ -184,7 +159,6 @@ public class Canonize
         alphas.remove(-1);
         TIntArrayList stateswith = alphaset.get(alphas);
         if (stateswith == null) {
-          //System.out.println("add alphaset");
           stateswith = new TIntArrayList();
           alphaset.put(alphas, stateswith);
         }
@@ -192,27 +166,19 @@ public class Canonize
         return true;
       }
     });
+    // lm.outputstats();
     final List<int[]> partitions2 = new ArrayList<int[]>();
-    if (!nonAlphas.isEmpty()) {partitions2.add(nonAlphas.toNativeArray());}
+    if (!nonAlphas.isEmpty()) {partitions2.add(nonAlphas.toArray());}
     alphaset.forEachValue(new TObjectProcedure<TIntArrayList>() {
+      @Override
       public boolean execute(final TIntArrayList set) {
-        partitions2.add(set.toNativeArray());
-        //System.out.println(Arrays.toString(set.toNativeArray()));
+        partitions2.add(set.toArray());
         return true;
       }
     });
-    //System.out.println(Arrays.toString(nonAlphas.toNativeArray()));
-    //System.out.println(partitions2.size() + ":" + upper.getNumberOfReachableStates());
     final int uppstates = upper.getNumberOfStates();
     upper.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    //ListBufferTransitionRelation cupper = new ListBufferTransitionRelation(upper, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    //oetrs = new ObservationEquivalenceTRSimplifier(cupper);
-    //System.out.println(lower);
-    //oetrs.run();
-    //System.out.println("upper: " + upper.getNumberOfReachableStates() + ", " + cupper.getNumberOfReachableStates());
     final List<int[]> partitions3 = null; //oetrs.getResultPartition();
-    //oetrs.applyResultPartition();
-    //System.out.println("upper: " + upper.createAutomaton(factory, mEncoding));
     if (partitions3 != null) {
       final int[] intmap = new int[uppstates];
       for (int p = 0; p < partitions3.size(); p++) {
@@ -223,6 +189,7 @@ public class Canonize
         }
       }
       alphaset.forEachValue(new TObjectProcedure<TIntArrayList>() {
+        @Override
         public boolean execute(final TIntArrayList set) {
           for (int i = set.size() - 1; i >= 0; i--) {
             final int s = set.get(i);
@@ -254,6 +221,7 @@ public class Canonize
     for (int s = 0; s < lowerstates; s++) {
       final TransitionIterator ti = lower.createSuccessorsReadOnlyIterator(s);
       canon.setReachable(s + upperstates, true);
+      canon.setInitial(s + upperstates, false);
       if (lower.isMarked(s, mMarking)) {
         canon.setMarked(s + upperstates, mMarking, true);
       }
@@ -263,20 +231,15 @@ public class Canonize
       }
     }
     alphas.clear();
-    //System.out.println("lower to glue");
-    //System.out.println(alphaset.size());
     alphaset.forEachEntry(new TObjectObjectProcedure<TIntHashSet, TIntArrayList>(){
+      @Override
       public boolean execute(final TIntHashSet alphasfun, final TIntArrayList states) {
-        //System.out.println("alphas:" + Arrays.toString(alphasfun.toArray()));
-        //System.out.println("states:" + Arrays.toString(states.toNativeArray()));
         final int[] arralp = alphasfun.toArray();
-        final int[] arrsta = states.toNativeArray();
+        final int[] arrsta = states.toArray();
         for (int i = 0; i < arrsta.length; i++) {
           for (int j = 0; j < arralp.length; j++) {
             final int alpha = arralp[j];
             alphas.add(alpha);
-            //alpha = initialtoinitial.get(alpha);
-            //System.out.println(arrsta[i] + " " + (alpha + upperstates + lowerstates));
             canon.setReachable(alpha + upperstates + lowerstates, true);
             canon.addTransition(arrsta[i], mCont, //EventEncoding.TAU,
                                 alpha + upperstates + lowerstates);
@@ -286,22 +249,18 @@ public class Canonize
       }
     });
     final int[] alphaarr = alphas.toArray();
-    //System.out.println("glue to upper");
     for (int i = 0; i < alphaarr.length; i++) {
       final int state = alphaarr[i];
-      //System.out.println("state: " + state + "lowerstates: " + lowerstates);
       canon.setMarked(lowerstates + upperstates + state, mAlpha, true);
       canon.setReachable(lowerstates + upperstates + state, true);
-      //System.out.println((lowerstates + upperstates + state) + " " + (state + upperstates));
       canon.addTransition(lowerstates + upperstates + state, mCont, //EventEncoding.TAU,
                           state + upperstates);
     }
-    //System.out.println("end canon");
-    //System.out.println("canon before: " + canon.createAutomaton(factory, mEncoding));
+    for (int s = 0; s < lowerstates; s++) {
+      canon.setInitial(s + upperstates, false);
+    }
     final ObservationEquivalenceTRSimplifier oetrs = new ObservationEquivalenceTRSimplifier(canon);
     oetrs.run();
-    //System.out.println("canon: " + canon.createAutomaton(factory, mEncoding));
-    //if (canon.getName().equals("Canon:{Canon:{Input1,Output},WS2}")) {System.exit(4);}
     return canon;
   }
 
@@ -311,3 +270,4 @@ public class Canonize
   private final int mMarking;
   private final int mCont;
 }
+

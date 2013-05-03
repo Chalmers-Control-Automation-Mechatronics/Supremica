@@ -18,32 +18,33 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Set;
 
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
+import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
-import net.sourceforge.waters.model.compiler.context.
-  UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
+import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -73,7 +74,6 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -201,9 +201,20 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     mEnabledPropositionNames = names;
   }
 
+  public HISCCompileMode getHISCCompileMode()
+  {
+    return mHISCCompileMode;
+  }
+
+  public void setHISCCompileMode(final HISCCompileMode mode)
+  {
+    mHISCCompileMode = mode;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public SimpleExpressionProxy visitConstantAliasProxy
     (final ConstantAliasProxy alias)
     throws VisitorException
@@ -230,6 +241,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
     throws VisitorException
   {
@@ -281,6 +293,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public CompiledEvent visitEventAliasProxy(final EventAliasProxy alias)
     throws VisitorException
   {
@@ -301,6 +314,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public CompiledEvent visitEventDeclProxy(final EventDeclProxy decl)
     throws VisitorException
   {
@@ -312,6 +326,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final List<SimpleExpressionProxy> declRanges = decl.getRanges();
       CompiledEvent event = binding == null ? null : binding.getEventValue();
       if (event == null) {
+        // Declare new event ...
         final int numranges = declRanges.size();
         final List<CompiledRange> ranges =
           new ArrayList<CompiledRange>(numranges);
@@ -334,6 +349,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
           }
         }
       } else {
+        // Use event through parameter binding ...
         final EventKind kind = decl.getKind();
         final int mask = event.getKindMask();
         if (!EventKindMask.isAssignable(kind, mask) ||
@@ -368,6 +384,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public CompiledEventList visitEventListExpressionProxy
     (final EventListExpressionProxy proxy)
     throws VisitorException
@@ -381,7 +398,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   {
     try {
       mCurrentEventList = new CompiledEventList(mask);
-      final List<Proxy> list = proxy.getEventList();
+      final List<Proxy> list = proxy.getEventIdentifierList();
       visitCollection(list);
       return mCurrentEventList;
     } finally {
@@ -389,6 +406,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public Object visitForeachProxy(final ForeachProxy foreach)
     throws VisitorException
   {
@@ -426,6 +444,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public GraphProxy visitGraphProxy(final GraphProxy graph)
     throws VisitorException
   {
@@ -461,6 +480,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
     throws VisitorException
   {
@@ -469,6 +489,8 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     final CompiledEventList event = visitEventListExpressionProxy
       (props0, EventKindMask.TYPEMASK_PROPOSITION);
     final PlainEventListProxy props1 = createPlainEventList(event);
+    final Map<String,String> attribs0 = group.getAttributes();
+    final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
     final Set<NodeProxy> children0 = group.getImmediateChildNodes();
     final int numchildren = children0.size();
     final List<NodeProxy> children1 = new ArrayList<NodeProxy>(numchildren);
@@ -477,13 +499,14 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       children1.add(child1);
     }
     final GroupNodeProxy compiled =
-      mFactory.createGroupNodeProxy(name, props1, children1, null);
+      mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
     mNodeMap.put(group, compiled);
     mCurrentNodes.add(compiled);
     addSourceInfo(compiled, group);
     return compiled;
   }
 
+  @Override
   public GuardActionBlockProxy visitGuardActionBlockProxy
     (final GuardActionBlockProxy ga)
     throws VisitorException
@@ -539,6 +562,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public Object visitIdentifierProxy(final IdentifierProxy ident)
     throws VisitorException
   {
@@ -577,11 +601,21 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public Object visitInstanceProxy(final InstanceProxy inst)
     throws VisitorException
   {
     final BindingContext oldContext = mContext;
     final CompiledNameSpace oldNameSpace = mNameSpace;
+    switch (mHISCCompileMode) {
+    case HISC_LOW:
+      return null;
+    case HISC_HIGH:
+      mHISCCompileMode = HISCCompileMode.HISC_LOW;
+      break;
+    default:
+      break;
+    }
     try {
       final IdentifierProxy ident = inst.getIdentifier();
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
@@ -611,9 +645,13 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       mContext = oldContext;
       mNameSpace = oldNameSpace;
       mParameterMap = null;
+      if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
+        mHISCCompileMode = HISCCompileMode.HISC_HIGH;
+      }
     }
   }
 
+  @Override
   public CompiledEventList visitLabelBlockProxy(final LabelBlockProxy block)
     throws VisitorException
   {
@@ -624,7 +662,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     (final LabelBlockProxy block, final int mask)
     throws VisitorException
   {
-    final List<Proxy> list = block.getEventList();
+    final List<Proxy> list = block.getEventIdentifierList();
     if (list.isEmpty()) {
       final EmptyLabelBlockException exception =
         new EmptyLabelBlockException(block, mCurrentEdge, mCurrentComponent);
@@ -634,6 +672,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public Object visitModuleProxy(final ModuleProxy module)
     throws VisitorException
   {
@@ -674,6 +713,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     return null;
   }
 
+  @Override
   public CompiledParameterBinding visitParameterBindingProxy
     (final ParameterBindingProxy binding)
     throws VisitorException
@@ -687,6 +727,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     return compiled;
   }
 
+  @Override
   public SimpleComponentProxy visitSimpleComponentProxy
     (final SimpleComponentProxy comp)
     throws VisitorException
@@ -697,13 +738,21 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
       final IdentifierProxy fullname =
         mNameSpace.getPrefixedIdentifier(suffix, mFactory);
-      final ComponentKind kind = comp.getKind();
+      ComponentKind kind = comp.getKind();
+      Map<String,String> attribs = comp.getAttributes();
+      if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
+        if (HISCAttributeFactory.isInterface(attribs)) {
+          attribs = null;
+          kind = ComponentKind.PLANT;
+        } else {
+          return null;
+        }
+      }
       if (isDisabledProperty(kind, fullname)) {
         return null;
       }
       final GraphProxy graph = comp.getGraph();
       final GraphProxy newgraph = visitGraphProxy(graph);
-      final Map<String,String> attribs = comp.getAttributes();
       final SimpleComponentProxy newcomp =
         mFactory.createSimpleComponentProxy(fullname, kind, newgraph, attribs);
       mNameSpace.addComponent(suffix, newcomp);
@@ -718,6 +767,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public SimpleExpressionProxy visitSimpleExpressionProxy
     (final SimpleExpressionProxy expr)
     throws VisitorException
@@ -729,6 +779,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
     throws VisitorException
   {
@@ -738,19 +789,26 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     final CompiledEventList event = visitEventListExpressionProxy
       (props0, EventKindMask.TYPEMASK_PROPOSITION);
     final PlainEventListProxy props1 = createPlainEventList(event);
+    final Map<String,String> attribs0 = node.getAttributes();
+    final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
     final SimpleNodeProxy compiled =
-      mFactory.createSimpleNodeProxy(name, props1, initial, null, null, null);
+      mFactory.createSimpleNodeProxy(name, props1, attribs1,
+                                     initial, null, null, null);
     mNodeMap.put(node, compiled);
     mCurrentNodes.add(compiled);
     addSourceInfo(compiled, node);
     return compiled;
   }
 
+  @Override
   public VariableComponentProxy visitVariableComponentProxy
     (final VariableComponentProxy var)
     throws VisitorException
   {
     try {
+      if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
+        return null;
+      }
       mHasEFAElements = true;
       final IdentifierProxy ident = var.getIdentifier();
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
@@ -883,7 +941,14 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       namespace.getPrefixedIdentifier(suffix, mFactory);
     final EventKind kind = edecl.getKind();
     final boolean observable = edecl.isObservable();
-    final Map<String,String> attribs = edecl.getAttributes();
+    Map<String,String> attribs = edecl.getAttributes();
+    if (mHISCCompileMode == HISCCompileMode.HISC_HIGH &&
+        edecl.getScope() != ScopeKind.LOCAL &&
+        HISCAttributeFactory.getEventType(attribs) !=
+        HISCAttributeFactory.EventType.DEFAULT) {
+      attribs = new HashMap<String,String>(attribs);
+      HISCAttributeFactory.setParameter(attribs, true);
+    }
     final EventDeclProxy decl = mFactory.createEventDeclProxy
       (ident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
     mCompiledEvents.add(decl);
@@ -959,6 +1024,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
       throws VisitorException
     {
@@ -967,6 +1033,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return containsPrime(lhs) || containsPrime(rhs);
     }
 
+    @Override
     public Boolean visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
@@ -980,6 +1047,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return false;
     }
 
+    @Override
     public Boolean visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -989,11 +1057,13 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return containsPrime(base) || containsPrime(comp);
     }
 
+    @Override
     public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
     {
       return false;
     }
 
+    @Override
     public Boolean visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
       throws VisitorException
     {
@@ -1031,6 +1101,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public IndexedIdentifierProxy visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
@@ -1058,6 +1129,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -1077,6 +1149,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     public SimpleIdentifierProxy visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
     {
@@ -1119,6 +1192,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public IndexedIdentifierProxy visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
     {
@@ -1132,6 +1206,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return mFactory.createIndexedIdentifierProxy(name, mIndexes);
     }
 
+    @Override
     public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -1143,6 +1218,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return mFactory.createQualifiedIdentifierProxy(base, comp1);
     }
 
+    @Override
     public IndexedIdentifierProxy visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
     {
@@ -1163,6 +1239,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+    @Override
     public SimpleExpressionProxy getBoundExpression
       (final SimpleExpressionProxy expr)
     {
@@ -1180,11 +1257,13 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       return null;
     }
 
+    @Override
     public boolean isEnumAtom(final IdentifierProxy ident)
     {
       return mContext.isEnumAtom(ident);
     }
 
+    @Override
     public ModuleBindingContext getModuleBindingContext()
     {
       return mContext.getModuleBindingContext();
@@ -1205,6 +1284,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+    @Override
     public SimpleExpressionProxy getBoundExpression
       (final SimpleExpressionProxy expr)
     {
@@ -1215,6 +1295,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     public boolean isEnumAtom(final IdentifierProxy ident)
     {
       if (mEquality.equals(ident, mSuffix)) {
@@ -1224,6 +1305,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     public ModuleBindingContext getModuleBindingContext()
     {
       return mContext.getModuleBindingContext();
@@ -1252,6 +1334,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   private boolean mIsOptimizationEnabled = true;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
+  private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
 
   private boolean mHasEFAElements;
 

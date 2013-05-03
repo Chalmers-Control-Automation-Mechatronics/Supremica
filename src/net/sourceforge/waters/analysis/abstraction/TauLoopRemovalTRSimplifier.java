@@ -9,8 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntStack;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -42,6 +44,7 @@ public class TauLoopRemovalTRSimplifier
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.
   //# TransitionRelationSimplifier
+  @Override
   public boolean isPartitioning()
   {
     return true;
@@ -53,6 +56,7 @@ public class TauLoopRemovalTRSimplifier
     return true;
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
@@ -74,7 +78,7 @@ public class TauLoopRemovalTRSimplifier
     mTarjan = new int[numStates];
     mLowLink = new int[numStates];
     mOnstack = new boolean[numStates];
-    mStack = new TIntStack();
+    mStack = new TIntArrayStack();
     mToBeMerged = new ArrayList<TIntArrayList>();
   }
 
@@ -95,7 +99,7 @@ public class TauLoopRemovalTRSimplifier
       final BitSet merged = new BitSet(numStates);
       for (final TIntArrayList merge : mToBeMerged) {
         checkAbort();
-        final int[] array = merge.toNativeArray();
+        final int[] array = merge.toArray();
         partition.add(array);
         modified |= array.length > 1;
         for (final int s : array) {
@@ -194,3 +198,4 @@ public class TauLoopRemovalTRSimplifier
   private Collection<TIntArrayList> mToBeMerged;
 
 }
+

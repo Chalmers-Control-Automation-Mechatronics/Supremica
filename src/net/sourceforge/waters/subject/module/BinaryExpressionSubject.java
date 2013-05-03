@@ -12,6 +12,8 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -19,7 +21,12 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -76,6 +83,7 @@ public final class BinaryExpressionSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public BinaryExpressionSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -83,40 +91,67 @@ public final class BinaryExpressionSubject
     return (BinaryExpressionSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final BinaryExpressionSubject downcast =
-        (BinaryExpressionSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final BinaryOperator operator = downcast.getOperator();
-      if (mOperator != operator) {
-        mOperator = operator;
-        change = true;
-      }
-      final SimpleExpressionSubject left = downcast.getLeft();
-      if (mLeft.getClass() != left.getClass()) {
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
+        mOperator = (BinaryOperator) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 3:
         mLeft.setParent(null);
-        mLeft = left.clone();
+        mLeft = (SimpleExpressionSubject) newValue;
         mLeft.setParent(this);
-        change = true;
-      } else {
-        mLeft.assignFrom(left);
-      }
-      final SimpleExpressionSubject right = downcast.getRight();
-      if (mRight.getClass() != right.getClass()) {
+        return ModelChangeEvent.createStateChanged(this);
+      case 4:
         mRight.setParent(null);
-        mRight = right.clone();
+        mRight = (SimpleExpressionSubject) newValue;
         mRight.setParent(this);
-        change = true;
-      } else {
-        mRight.assignFrom(right);
-      }
-      if (change) {
-        fireStateChanged();
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final BinaryExpressionSubject downcast =
+      (BinaryExpressionSubject) newState;
+    if (!mOperator.equals(downcast.mOperator)) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mOperator, downcast.mOperator);
+      info.add(step2);
+    }
+    if (mLeft.getClass() == downcast.mLeft.getClass()) {
+      final UndoInfo step3 = mLeft.createUndoInfo(downcast.mLeft, boundary);
+      if (step3 != null) {
+        info.add(step3);
+      }
+    } else {
+      final SimpleExpressionSubject clone3 = downcast.mLeft.clone();
+      final UndoInfo step3 = new ReplacementUndoInfo(3, mLeft, clone3);
+      info.add(step3);
+    }
+    if (mRight.getClass() == downcast.mRight.getClass()) {
+      final UndoInfo step4 = mRight.createUndoInfo(downcast.mRight, boundary);
+      if (step4 != null) {
+        info.add(step4);
+      }
+    } else {
+      final SimpleExpressionSubject clone4 = downcast.mRight.clone();
+      final UndoInfo step4 = new ReplacementUndoInfo(4, mRight, clone4);
+      info.add(step4);
+    }
   }
 
 

@@ -11,14 +11,15 @@ package net.sourceforge.waters.gui.actions;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
 
 import org.supremica.gui.ide.IDE;
 
@@ -30,12 +31,18 @@ public abstract class WatersActionManager implements Observer
   // # Constructor
   public WatersActionManager(final IDE ide)
   {
-    final int SIZE = 32;
+    final int SIZE = 64;
     mActionMap = new HashMap<Class<? extends IDEAction>,IDEAction>(SIZE);
     mKeyboardActionMap = new HashMap<Class<? extends IDEAction>,Action>(SIZE);
     addAction(new AnalyzeConflictCheckAction(ide));
     addAction(new AnalyzeControllabilityAction(ide));
     addAction(new AnalyzeControlLoopAction(ide));
+    addAction(new AnalyzeHISCCPControllabilityAction(ide));
+    try {
+      addAction(new AnalyzeHISCCPInterfaceConsistencyAction(ide));
+    } catch (final NoClassDefFoundError error) {
+      // skip this one
+    }
     addAction(new AnalyzeLanguageInclusionAction(ide));
     addAction(new AnalyzeSICProperty5Action(ide));
     addAction(new AnalyzeSICProperty6Action(ide));
@@ -53,6 +60,7 @@ public abstract class WatersActionManager implements Observer
     addAction(new EditEventLabelAction(ide));
     addAction(new GraphLayoutAction(ide));
     addAction(new GraphSaveEPSAction(ide));
+    addAction(new GraphSavePDFAction(ide));
     addAction(new IDECopyAction(ide));
     addAction(new IDECutAction(ide));
     addAction(new IDEDeleteAction(ide));
@@ -120,6 +128,7 @@ public abstract class WatersActionManager implements Observer
 
   // #########################################################################
   // # Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     for (final IDEAction action : mActionMap.values()) {

@@ -30,6 +30,7 @@ public class Actions extends WatersActionManager
         super(ide);
         addAction(new NewAction(ide));
         addAction(new OpenAction(ide));
+        addAction(new OpenRASAction(ide));
         addAction(new SaveAction(ide));
         addAction(new SaveAsAction(ide));
         addAction(new ImportAction(ide));
@@ -109,9 +110,7 @@ public class Actions extends WatersActionManager
 
     // Printing Actions
     public IDEAction editorPrintAction = new EditorPrintAction(mIDEActions);
-    public IDEAction editorSavePDFAction = new EditorSavePDFAction(mIDEActions);
     public IDEAction editorSaveSVGAction = new EditorSaveSVGAction(mIDEActions);
-    public IDEAction editorSavePostscriptAction = new EditorSavePostscriptAction(mIDEActions);
 
     // Editor Actions
     public IDEAction editorCopyAsWMFAction = new EditorCopyAsWMFAction(mIDEActions);
@@ -121,9 +120,10 @@ public class Actions extends WatersActionManager
     public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(mIDEActions);
     public IDEAction editorSynthesizerAction = new EditorSynthesizerAction(mIDEActions);
     public IDEAction editorReachabilityGraphAction = new EditorReachabilityGraphAction(mIDEActions);
+    public IDEAction editorTransitionProjectionAction = new EditorTransitionProjectionAction(mIDEActions);
     public IDEAction editorReadSpecAction = new EditorReadSpecAction(mIDEActions);
     public IDEAction editorReadFTAction = new EditorReadFisherThompsonAction(mIDEActions);
-   
+
     // Analyzer Options
     public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(mIDEActions);
 

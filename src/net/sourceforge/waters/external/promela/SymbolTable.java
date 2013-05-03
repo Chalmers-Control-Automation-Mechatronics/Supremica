@@ -1,6 +1,10 @@
 package net.sourceforge.waters.external.promela;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.HashSet;
 
 import net.sourceforge.waters.external.promela.ast.*;
 
@@ -10,7 +14,12 @@ import net.sourceforge.waters.external.promela.ast.*;
  */
 public class SymbolTable
 {
-  private final HashMap<String, VardefTreeNode> mVariableTable;//This hash map stores all of the variables in it
+  //This hash map stores all of the variables in it
+  private final HashMap<String, PromelaTree> mVariableTable;
+
+  //This has all of the names of the variables in it
+  //The keys in the hash map are not used, as the order is not guaranteed
+  private final ArrayList<String> mVariableNames;
 
   private final SymbolTable mParentTable;//This is the parent table (or null if the current table is the root table)
   private final HashMap<String, SymbolTable> mChildTables;//The child tables for the current table. They are stored using the name of the scope they are in
@@ -18,12 +27,13 @@ public class SymbolTable
   String mName;//The name for the current symbol table this is used to retrieve the symbol table from its parent
 
   /**
-   * The constructor for the symbol table class
-   * @author Ethan Duff
+   * The default constructor for the symbol table class
    */
   public SymbolTable()
   {
-    mVariableTable = new HashMap<String,VardefTreeNode>();
+    mVariableTable = new HashMap<String,PromelaTree>();
+    mVariableNames = new ArrayList<String>();
+
     mParentTable = null;
     mChildTables = new HashMap<String, SymbolTable>();
   }
@@ -34,14 +44,15 @@ public class SymbolTable
    */
   private SymbolTable(final SymbolTable parent)
   {
-    mVariableTable = new HashMap<String,VardefTreeNode>();
+    mVariableTable = new HashMap<String,PromelaTree>();
+    mVariableNames = new ArrayList<String>();
+
     mParentTable = parent;
     mChildTables = new HashMap<String,SymbolTable>();
   }
 
   /**
    * A method to get the parent symbol table for the current table
-   * @author Ethan Duff
    * @return The parent symbol table to the current table. May be null if there is no parent
    */
   public SymbolTable getParentTable()
@@ -94,7 +105,7 @@ public class SymbolTable
    * @param classification The VardefTreeNode that has the variable to be created as its child
    * @return A return value of false indicates that the variable was unable to be created because the name was already taken.
    */
-  public boolean put(final String name, final VardefTreeNode classification)
+  public boolean put(final String name, final PromelaTree classification)
   {
     //Check if the name is taken
     boolean nameFree = true;
@@ -103,10 +114,12 @@ public class SymbolTable
 
     if(nameFree)
     {
-
       //The name was free
-      //Now, add the variable into the table
+      //Now add the variable into the table
       mVariableTable.put(name, classification);
+
+      //Now add the name into the array list
+      mVariableNames.add(name);
 
       return true;
     }
@@ -122,7 +135,7 @@ public class SymbolTable
    * @param name The name of the possible variable
    * @return True if the variable does exist, false if it does not exist
    */
-  public boolean contains(final String name)
+  public boolean containsKey(final String name)
   {
     if(mVariableTable.containsKey(name))
     {
@@ -130,7 +143,7 @@ public class SymbolTable
     }
     else if(mParentTable != null)
     {
-      return mParentTable.contains(name);
+      return mParentTable.containsKey(name);
     }
     else
     {
@@ -139,15 +152,15 @@ public class SymbolTable
   }
 
   /**
-   * A method to retrieve the classification of a variable
-   * @author Ethan Duff
-   * @param name The name of the variable that is being retrieved
-   * @return The VardefTreeNode containing the variable classification, or null if the variable does not exist
+   * A method to retrieve the value matching the given key
+   * @param name The name of the key that is being retrieved
+   * @return The PromelaTree containing the value,, or null if the key does not exist
    */
-  public VardefTreeNode get(final String name)
+  public PromelaTree get(final String name)
   {
     if(mVariableTable.containsKey(name))
     {
+      //The key is contained, so return the value matching it
       return mVariableTable.get(name);
     }
     else if(mParentTable != null)
@@ -163,8 +176,32 @@ public class SymbolTable
   }
 
   /**
+   * A method to get all of the names of the keys for this level in the symbol table
+   * @return An ArrayList of Strings containing the keys
+   */
+  public ArrayList<String> getLocalKeys()
+  {
+    return mVariableNames;
+  }
+
+  /**
+   * A method to get all of the entries in the symbol table
+   * @return A Set containing all of the entries in the symbol table
+   */
+  public Set<Entry<String,PromelaTree>> getEntrySet()
+  {
+    final HashSet<Entry<String, PromelaTree>> returnSet = new HashSet<Entry<String,PromelaTree>>();
+    returnSet.addAll(mVariableTable.entrySet());
+    if(mParentTable != null)
+    {
+      final Set<Entry<String,PromelaTree>> parentEntrySet = mParentTable.getEntrySet();
+      returnSet.addAll(parentEntrySet);
+    }
+    return returnSet;
+  }
+
+  /**
    * A method to check if a given name is free for use
-   * @author Ethan Duff
    * @param name The name that is requested to be used
    * @return True if the name is free, false if the name is already taken
    */

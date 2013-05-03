@@ -335,7 +335,7 @@ public class EventTableModel
                              final EventListExpressionProxy source)
   {
     if (source != null) {
-      collectEvents(dest, source.getEventList());
+      collectEvents(dest, source.getEventIdentifierList());
     }
   }
 
@@ -406,8 +406,11 @@ public class EventTableModel
     {
       switch (event.getKind()) {
       case ModelChangeEvent.ITEM_ADDED:
-        final Proxy value = (Proxy) event.getValue();
-        mIdentifierCollectVisitor.addClonedIdentifiers(value);
+        final Object value = event.getValue();
+        if(value instanceof Proxy){
+          mIdentifierCollectVisitor.addClonedIdentifiers((Proxy) value);
+        }
+
         break;
       case ModelChangeEvent.STATE_CHANGED:
         final Subject source = event.getSource();
@@ -684,7 +687,7 @@ public class EventTableModel
       (final EventListExpressionProxy expr)
       throws VisitorException
     {
-      final List<? extends Proxy> eventlist = expr.getEventList();
+      final List<? extends Proxy> eventlist = expr.getEventIdentifierList();
       visitCollection(eventlist);
       return null;
     }
@@ -767,7 +770,7 @@ public class EventTableModel
       (final EventListExpressionProxy expr)
       throws VisitorException
     {
-      final List<? extends Proxy> eventlist = expr.getEventList();
+      final List<? extends Proxy> eventlist = expr.getEventIdentifierList();
       return processList(eventlist);
     }
 

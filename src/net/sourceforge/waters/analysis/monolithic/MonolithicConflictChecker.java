@@ -9,6 +9,12 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -17,14 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import gnu.trove.*;
-
 import net.sourceforge.waters.model.analysis.AbortException;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -126,6 +130,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run() throws AnalysisException
   {
     try {
@@ -134,18 +139,25 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       final ProductDESProxy model = getModel();
       mEventMap = new EventMap(model);
       mSyncProduct = new SyncProduct();
-      mSyncProduct.build();
+      int firstBlockingState = mSyncProduct.build();
 
       // Set the marked states coreachable and explore their predecessors.
       final KindTranslator translator = getKindTranslator();
       final int numstates = mSyncProduct.getNumberOfStates();
       final BitSet coreachable = new BitSet(numstates);
-      final EventProxy marking = getUsedMarkingProposition();
-      final EventProxy preconditionMarking = getPreconditionMarking();
+      final EventProxy marking = getUsedDefaultMarking();
+      final EventProxy preconditionMarking = getConfiguredPreconditionMarking();
       final SyncStateSchema stateSchema =
           new SyncStateSchema(model, translator, mEventMap, marking,
-              preconditionMarking);
+                              preconditionMarking);
       final AutomatonSchema[] automata = stateSchema.getOrdering();
+      if (firstBlockingState >= 0) {
+        final ConflictTraceProxy counterexample =
+          buildCounterExample(firstBlockingState, ConflictKind.DEADLOCK,
+                              model, stateSchema, automata);
+        return setFailedResult(counterexample);
+      }
+
       final int numaut = automata.length;
       final int[] dstate = new int[numaut];
       boolean ok = true;
@@ -153,15 +165,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         final long state = mSyncProduct.getStateFromId(stateid);
         // Decode the state.
         stateSchema.decodeState(state, dstate);
-        // check if the state is marked
-        boolean marked = true;
-        for (int i = 0; i < automata.length; i++) {
-          if (!automata[i].isMarked(dstate[i])) {
-            marked = false;
-            break;
-          }
-        }
-        if (marked) {
+        if (stateSchema.isMarked(dstate)) {
           // state is marked so mark all predecessors as coreachable
           ok &= exploreBackwards(stateid, coreachable, MAXDEPTH);
         }
@@ -177,7 +181,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       // if all precondition marked states are coreachable then the model
       // is nonblocking
       boolean nonblocking = true;
-      int firstBlockingState = -1;
       if (preconditionMarking != null) {
         for (int stateid = 0; stateid < numstates; stateid++) {
           final long state = mSyncProduct.getStateFromId(stateid);
@@ -216,9 +219,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       if (nonblocking) {
         return setSatisfiedResult();
       } else {
+        final ConflictKind kind = preconditionMarking == null ?
+                            ConflictKind.LIVELOCK : ConflictKind.CONFLICT;
         final ConflictTraceProxy counterexample =
-            buildCounterExample(firstBlockingState, model, stateSchema,
-                                automata);
+            buildCounterExample(firstBlockingState, kind,
+                                model, stateSchema, automata);
         return setFailedResult(counterexample);
       }
 
@@ -230,6 +235,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
@@ -265,61 +271,59 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  private ConflictTraceProxy buildCounterExample(
-                                                 final int firstBlockingState,
-                                                 final ProductDESProxy model,
-                                                 final SyncStateSchema stateSchema,
-                                                 final AutomatonSchema[] automata)
+  private ConflictTraceProxy buildCounterExample
+    (final int firstBlockingState,
+     final ConflictKind kind,
+     final ProductDESProxy model,
+     final SyncStateSchema stateSchema,
+     final AutomatonSchema[] automata)
   {
     // Generate a counter example. As each state is numbered in the
     // order it is encountered, and a breadth first exploration
     // strategy is used, and all states are reachable, following the
     // transition to a state with the lowest id will give a
     // counterexample.
-    final List<TraceStepProxy> countertrace = new LinkedList<TraceStepProxy>();
-    final ProductDESProxyFactory desFactory = getFactory();
+    final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
+    final ProductDESProxyFactory factory = getFactory();
+    final int numaut = automata.length;
+    final Map<AutomatonProxy,StateProxy> stateMap =
+      new HashMap<AutomatonProxy,StateProxy>(numaut);
+    final int numInit = mSyncProduct.getNumberOfInitialStates();
     // Find the unchecked state with the lowest
     // id, as this should give the shortest counterexample.
     // or if a second marking condition is simultaneously used, look
     // for the first non-coreachable precondition marked state.
-    int trace_start = firstBlockingState;
+    int current = firstBlockingState;
     // Until we reach the start state...
-    while (trace_start != 0) {
-      final TIntArrayList preds = mSyncProduct.getPredecessors(trace_start);
-      final int pred = preds.get(0);
-      final EventProxy event = mSyncProduct.findEvent(pred, trace_start);
-      final Map<AutomatonProxy,StateProxy> statemap =
-          new HashMap<AutomatonProxy,StateProxy>();
-      final int numaut = automata.length;
-
-      final int[] decodedSource = new int[numaut];
-      final int[] decodedTarget = new int[numaut];
-      final long srcstate = mSyncProduct.getStateFromId(pred);
-      final long targetstate = mSyncProduct.getStateFromId(trace_start);
-      stateSchema.decodeState(srcstate, decodedSource);
-      stateSchema.decodeState(targetstate, decodedTarget);
-      for (int i = 0; i < automata.length; i++) {
-        final int eventID = mEventMap.getId(event);
-        final int[] targets =
-            automata[i].getSuccessorStates(decodedSource[i], eventID);
-        assert targets != null : "Every state of a counterexample trace must have at least one successor state";
-        if (targets.length > 1) {
-          statemap.put(automata[i].getAutomatonProxy(), automata[i]
-              .getStateProxyFromID(decodedTarget[i]));
-        }
+    do {
+      final int[] tuple = new int[numaut];
+      final long packed = mSyncProduct.getStateFromId(current);
+      stateSchema.decodeState(packed, tuple);
+      for (int a = 0; a < automata.length; a++) {
+        final AutomatonSchema schema = automata[a];
+        final AutomatonProxy aut = schema.getAutomatonProxy();
+        final int s = tuple[a];
+        final StateProxy state = schema.getStateProxyFromID(s);
+        stateMap.put(aut, state);
       }
-      final TraceStepProxy traceStep =
-          desFactory.createTraceStepProxy(event, statemap);
-      countertrace.add(0, traceStep);
-      trace_start = pred;
-    }
-    final TraceStepProxy startPoint =
-        desFactory.createTraceStepProxy(null, null);
-    countertrace.add(0, startPoint);
+      final TraceStepProxy step;
+      if (current >= numInit) {
+        final TIntArrayList preds = mSyncProduct.getPredecessors(current);
+        final int pred = preds.get(0);
+        final EventProxy event = mSyncProduct.findEvent(pred, current);
+        step = factory.createTraceStepProxy(event, stateMap);
+        stateMap.clear();
+        current = pred;
+      } else {
+        step = factory.createTraceStepProxy(null, stateMap);
+        current = -1;
+      }
+      steps.add(0, step);
+    } while (current >= 0);
     final String tracename = getTraceName();
     final ConflictTraceProxy trace =
-        desFactory.createConflictTraceProxy(tracename, null, null, model, model
-            .getAutomata(), countertrace, ConflictKind.CONFLICT);
+        factory.createConflictTraceProxy(tracename, null, null, model,
+                                         model.getAutomata(), steps, kind);
     return trace;
   }
 
@@ -369,12 +373,13 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     {
       final ProductDESProxy model = getModel();
       final KindTranslator translator = getKindTranslator();
-      final EventProxy marking = getUsedMarkingProposition();
-      final EventProxy preconditionMarking = getPreconditionMarking();
+      final EventProxy marking = getUsedDefaultMarking();
+      final EventProxy preconditionMarking = getConfiguredPreconditionMarking();
       // Create a new state schema for the product.
       mStateSchema =
           new SyncStateSchema(model, translator, mEventMap, marking,
-              preconditionMarking);
+                              preconditionMarking);
+      mDeadlockDetectionEnabled = preconditionMarking == null;
       final int numaut = getNumberOfAutomata();
       mSourceBuffer = new int[numaut];
       mTargetBuffer = new int[numaut];
@@ -396,6 +401,11 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     private int getNumberOfTransitions()
     {
       return mNumberOfTransitions;
+    }
+
+    private int getNumberOfInitialStates()
+    {
+      return mNumberOfInitialStates;
     }
 
     //#######################################################################
@@ -461,25 +471,40 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       return mStateList.get(id);
     }
 
-    private void build() throws AnalysisException
+    private int build() throws AnalysisException
     {
-      // Compose the initial state.
+      // Compose the initial states.
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
-      final StateProxy[] state = new StateProxy[automata.length];
-      for (int i = 0; i < automata.length; i++) {
-        state[i] = automata[i].getInitialState();
-        if (state[i] == null) {
-          return;
-        }
-      }
-      final long init = mStateSchema.encodeState(state);
-      addNewState(init, -1);
+      final int[] tuple = new int[automata.length];
+      collectInitialStates(0, tuple);
+      mNumberOfInitialStates = mNextStateIndex;
       // Expand all the states in the fringe, until no more
       // are added. This implies we have explored the entire
       // synchronous product.
       while (fringeSize() > 0) {
-        expand();
+        final int deadlockState = expand();
+        if (deadlockState >= 0) {
+          return deadlockState;
+        }
         checkAbort();
+      }
+      return -1;
+    }
+
+    private void collectInitialStates(final int a, final int[] tuple)
+      throws OverflowException
+    {
+      if (a == tuple.length) {
+        final long init = mStateSchema.encodeState(tuple);
+        addNewState(init, -1);
+      } else {
+        final AutomatonSchema[] automata = mStateSchema.getOrdering();
+        final AutomatonSchema schema = automata[a];
+        final int[] initials = schema.getInitialStates();
+        for (final int s : initials) {
+          tuple[a] = s;
+          collectInitialStates(a + 1, tuple);
+        }
       }
     }
 
@@ -487,7 +512,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
      * Expands the first available state in the fringe. It is invalid to call
      * this method with an empty fringe.
      */
-    private void expand() throws OverflowException
+    private int expand() throws OverflowException
     {
       assert fringeSize() > 0 : "expand should not be called on an empty fringe";
 
@@ -499,7 +524,10 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       final AutomatonSchema[] automata = mStateSchema.getOrdering();
 
       // Explore transitions ...
-      nextevent: for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
+      boolean deadlock = mDeadlockDetectionEnabled;
+      nextevent:
+      for (int eventid = 0; eventid < mEventMap.size(); eventid++) {
+        boolean selfloop = true;
         int i = -1;
         for (int autid = 0; autid < automata.length; autid++) {
           final AutomatonSchema schema = automata[autid];
@@ -508,14 +536,20 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
           if (targets == null) {
             continue nextevent;
           } else if (targets.length == 1) {
-            mTargetBuffer[autid] = targets[0];
+            final int target = targets[0];
+            mTargetBuffer[autid] = target;
+            selfloop &= src == target;
           } else {
             i++;
             mNondeterministicAutomata[i] = autid;
+            selfloop = false;
           }
         }
+        deadlock &= selfloop;
         expandNondeterministic(automata, eventid, stateid, i);
       }
+      deadlock &= !mStateSchema.isMarked(mSourceBuffer);
+      return deadlock ? stateid : -1;
     }
 
     private void expandNondeterministic(final AutomatonSchema[] automata,
@@ -576,8 +610,19 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     //# Data Members
     private final SyncStateSchema mStateSchema;
 
+    /**
+     * Whether synchronous product building should be aborted on encountering
+     * a deadlock state. Disabled for generalised nonblocking.
+     */
+    private final boolean mDeadlockDetectionEnabled;
+
     private final List<TIntArrayList> mPredecessors =
         new BlockedArrayList<TIntArrayList>(TIntArrayList.class);
+
+    /**
+     * The number of initial states.
+     */
+    private int mNumberOfInitialStates;
 
     /**
      * A map of synchronous product states to integer IDs, to allow the states
@@ -736,20 +781,6 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     }
 
     /**
-     * A convenience method that encodes the state from an array of state proxy
-     * objects by looking up the state indexes in the automata schema.
-     */
-    private long encodeState(final StateProxy[] states)
-    {
-      assert states.length == mAutomata.length : "Wrong number of states given";
-      final int[] istates = new int[states.length];
-      for (int i = 0; i < states.length; i++) {
-        istates[i] = mAutomata[i].getStateNumber(states[i]);
-      }
-      return encodeState(istates);
-    }
-
-    /**
      * Encodes a synchronous product state from an array of state indexes. The
      * ordering of the states should match the ordering of automata given by the
      * getOrdering method.
@@ -774,6 +805,16 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       for (int i = 0; i < mEncondings.length; i++) {
         tuple[i] = mEncondings[i].decode(state);
       }
+    }
+
+    private boolean isMarked(final int[] tuple)
+    {
+      for (int a = 0; a < mAutomata.length; a++) {
+        if (!mAutomata[a].isMarked(tuple[a])) {
+          return false;
+        }
+      }
+      return true;
     }
 
     //#######################################################################
@@ -820,10 +861,10 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         mPreconditionMarkedStates = null;
       }
       int i = 0;
-      StateProxy initial = null;
+      final TIntArrayList initials = new TIntArrayList();
       for (final StateProxy state : states) {
         if (state.isInitial()) {
-          initial = state;
+          initials.add(i);
         }
         // If the state contains the marking proposition,
         // add it to the set of marked states.
@@ -838,7 +879,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         mStateMap.put(state, i);
         i++;
       }
-      mInitialState = initial;
+      mInitialStates = initials.toArray();
 
       final int numevents = eventmap.size();
       mTransitionTable = new int[numevents][][];
@@ -915,9 +956,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       return mStates.length;
     }
 
-    private StateProxy getInitialState()
+    private int[] getInitialStates()
     {
-      return mInitialState;
+      return mInitialStates;
     }
 
     /**
@@ -970,9 +1011,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     private final TIntHashSet mPreconditionMarkedStates;
     private final int[][][] mTransitionTable;
     /**
-     * The initial state of the automaton.
+     * Codes of the initial states of the automaton.
      */
-    private final StateProxy mInitialState;
+    private final int[] mInitialStates;
 
     private final AutomatonProxy mAutomaton;
 
@@ -1038,3 +1079,4 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   private static final int MAXDEPTH = 1024;
 
 }
+

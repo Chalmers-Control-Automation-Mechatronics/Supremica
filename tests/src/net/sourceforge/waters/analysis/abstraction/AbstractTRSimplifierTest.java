@@ -17,8 +17,8 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -56,7 +56,7 @@ public abstract class AbstractTRSimplifierTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSimplifier = createTransitionRelationSimplifier();
     mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
-    mIsomorphismChecker = new IsomorphismChecker(factory, false);
+    mIsomorphismChecker = new IsomorphismChecker(factory, false, true);
   }
 
   @Override
@@ -289,12 +289,14 @@ public abstract class AbstractTRSimplifierTest
     final EventEncoding eventEnc = createEventEncoding(des, aut);
     final StateEncoding inputStateEnc = createStateEncoding(aut);
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
-    final ListBufferTransitionRelation rel =
+    ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
     rel.checkReachability();
     mSimplifier.setTransitionRelation(rel);
     configureTransitionRelationSimplifier();
     if (mSimplifier.run()) {
+      rel = mSimplifier.getTransitionRelation();
+      rel.checkIntegrity();
       rel.setName("result");
       rel.removeTauSelfLoops();
       rel.removeProperSelfLoopEvents();
@@ -380,12 +382,12 @@ public abstract class AbstractTRSimplifierTest
     final EventProxy alpha = getEvent(des, ALPHA);
     mAlphaID = enc.getEventCode(alpha);
     if (alpha != null && mAlphaID < 0) {
-      mAlphaID = enc.addEvent(alpha, translator, true);
+      mAlphaID = enc.addEvent(alpha, translator, EventEncoding.STATUS_UNUSED);
     }
     final EventProxy omega = getEvent(des, OMEGA);
     mOmegaID = enc.getEventCode(omega);
     if (omega != null && mOmegaID < 0) {
-      mOmegaID = enc.addEvent(omega, translator, true);
+      mOmegaID = enc.addEvent(omega, translator, EventEncoding.STATUS_UNUSED);
     }
     return enc;
   }

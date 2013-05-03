@@ -13,10 +13,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -29,6 +30,17 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 public abstract class AbstractSICProperty6VerifierTest extends
     AbstractConflictCheckerTest
 {
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractAnalysisTest
+  @Override
+  protected void configure(final ModuleCompiler compiler)
+  {
+    super.configure(compiler);
+    compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
+  }
+
 
   //#########################################################################
   //# Test Cases
@@ -144,6 +156,18 @@ public abstract class AbstractSICProperty6VerifierTest extends
     runModelVerifier("tests", "hisc",
                      "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
                      false);
+  }
+
+  public void testSICProperty6Verifier_parManEg_node1()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "Node1.wmod", true);
+  }
+
+  public void testSICProperty6Verifier_parManEg_node4()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "Node4.wmod", true);
   }
 
   // SimpleManufacturingExample
@@ -275,7 +299,7 @@ public abstract class AbstractSICProperty6VerifierTest extends
     final Collection<AutomatonProxy> automata = des.getAutomata();
     for (final AutomatonProxy aut : automata) {
       final Map<String,String> attribs = aut.getAttributes();
-      if (HISCAttributes.isInterface(attribs)) {
+      if (HISCAttributeFactory.isInterface(attribs)) {
         final StateProxy state = checkCounterExample(aut, conflictTrace);
         final Collection<EventProxy> props = state.getPropositions();
         assertTrue("Counterexample takes interface automaton " +
@@ -293,8 +317,8 @@ public abstract class AbstractSICProperty6VerifierTest extends
     final Collection<EventProxy> iface = new ArrayList<EventProxy>();
     for (final EventProxy event : events) {
       final Map<String,String> attribs = event.getAttributes();
-      if (HISCAttributes.getEventType(attribs) !=
-          HISCAttributes.EventType.DEFAULT) {
+      if (HISCAttributeFactory.getEventType(attribs) !=
+          HISCAttributeFactory.EventType.DEFAULT) {
         iface.add(event);
       }
     }

@@ -63,43 +63,51 @@ public class WeakObservationEquivalenceTRSimplifierTest
 
   //#########################################################################
   //# Test Cases
-  public void test_woeq_1() throws Exception
+  public void test_woeq1() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "woeq_1.wmod";
+    final String name = "woeq01.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_woeq_2() throws Exception
+  public void test_woeq2() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "woeq_2.wmod";
+    final String name = "woeq02.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_woeq_3() throws Exception
+  public void test_woeq3() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "woeq_3.wmod";
+    final String name = "woeq03.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_woeq_4() throws Exception
+  public void test_woeq4() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "woeq_4.wmod";
+    final String name = "woeq04.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_woeq_5() throws Exception
+  public void test_woeq5() throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "woeq_5.wmod";
+    final String name = "woeq05.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_woeq6() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "woeq06.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
@@ -249,11 +257,11 @@ public class WeakObservationEquivalenceTRSimplifierTest
    */
   public void testReentrant() throws Exception
   {
-    test_woeq_1();
+    test_woeq1();
     test_oeq_2();
     test_oeq_3();
     test_oeq_4();
-    test_woeq_1();
+    test_woeq1();
     test_oeq_2();
   }
 

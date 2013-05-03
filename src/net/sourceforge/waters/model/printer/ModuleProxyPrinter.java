@@ -262,7 +262,7 @@ public class ModuleProxyPrinter
       (final EventListExpressionProxy proxy)
     throws VisitorException
   {
-    printEmptyCollection(proxy.getEventList());
+    printEmptyCollection(proxy.getEventIdentifierList());
     return null;
   }
 
@@ -297,7 +297,7 @@ public class ModuleProxyPrinter
     throws VisitorException
   {
     final LabelBlockProxy blocked = proxy.getBlockedEvents();
-    if (blocked != null && !blocked.getEventList().isEmpty()) {
+    if (blocked != null && !blocked.getEventIdentifierList().isEmpty()) {
       print("BLOCKED ");
       visitLabelBlockProxy(blocked);
       println();
@@ -467,7 +467,7 @@ public class ModuleProxyPrinter
     throws VisitorException
   {
     final EventListExpressionProxy propositions = proxy.getPropositions();
-    final List<Proxy> list = propositions.getEventList();
+    final List<Proxy> list = propositions.getEventIdentifierList();
     if (!list.isEmpty()) {
       print (' ');
       printCollection(list);

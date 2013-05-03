@@ -252,12 +252,14 @@ public interface ModuleProxyFactory
    * Creates a new group node.
    * @param name The name of the new group node.
    * @param propositions The list of propositions of the new group node, or <CODE>null</CODE> if empty.
+   * @param attributes The attribute map of the new group node, or <CODE>null</CODE> if empty.
    * @param immediateChildNodes The set of immediate child nodes of the new group node, or <CODE>null</CODE> if empty.
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
   public GroupNodeProxy createGroupNodeProxy
       (String name,
        PlainEventListProxy propositions,
+       Map<String,String> attributes,
        Collection<? extends NodeProxy> immediateChildNodes,
        BoxGeometryProxy geometry);
 
@@ -265,6 +267,7 @@ public interface ModuleProxyFactory
    * Creates a new group node using default values.
    * This method creates a group node with
    * an empty list of propositions,
+   * an empty attribute map,
    * an empty set of immediate child nodes, and
    * the geometric information set to <CODE>null</CODE>.
    * @param name The name of the new group node.
@@ -356,17 +359,18 @@ public interface ModuleProxyFactory
 
   /**
    * Creates a new label block.
-   * @param eventList The list of events of the new label block, or <CODE>null</CODE> if empty.
+   * @param eventIdentifierList The list of event identifiers of the new label block, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    * @param geometry The geometry of the new label block, or <CODE>null</CODE>.
    */
   public LabelBlockProxy createLabelBlockProxy
-      (Collection<? extends Proxy> eventList,
+      (Collection<? extends Proxy> eventIdentifierList,
        LabelGeometryProxy geometry);
 
   /**
    * Creates a new label block using default values.
    * This method creates a label block with
-   * an empty list of events and
+   * an empty list of event identifiers and
    * the geometry set to <CODE>null</CODE>.
    */
   public LabelBlockProxy createLabelBlockProxy();
@@ -397,7 +401,9 @@ public interface ModuleProxyFactory
    * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
    * @param eventDeclList The event declaration list of the new module, or <CODE>null</CODE> if empty.
    * @param eventAliasList The event alias list of the new module, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.AliasProxy AliasProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    * @param componentList The component list of the new module, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.ComponentProxy ComponentProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
   public ModuleProxy createModuleProxy
       (String name,
@@ -459,15 +465,16 @@ public interface ModuleProxyFactory
 
   /**
    * Creates a new plain event list.
-   * @param eventList The list of events of the new plain event list, or <CODE>null</CODE> if empty.
+   * @param eventIdentifierList The list of event identifiers of the new plain event list, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
   public PlainEventListProxy createPlainEventListProxy
-      (Collection<? extends Proxy> eventList);
+      (Collection<? extends Proxy> eventIdentifierList);
 
   /**
    * Creates a new plain event list using default values.
    * This method creates a plain event list with
-   * an empty list of events.
+   * an empty list of event identifiers.
    */
   public PlainEventListProxy createPlainEventListProxy();
 
@@ -548,6 +555,7 @@ public interface ModuleProxyFactory
    * Creates a new simple node.
    * @param name The name of the new simple node.
    * @param propositions The list of propositions of the new simple node, or <CODE>null</CODE> if empty.
+   * @param attributes The attribute map of the new simple node, or <CODE>null</CODE> if empty.
    * @param initial The initial status of the new simple node.
    * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
    * @param initialArrowGeometry The position of the initial state arrow of the new simple node, or <CODE>null</CODE>.
@@ -556,6 +564,7 @@ public interface ModuleProxyFactory
   public SimpleNodeProxy createSimpleNodeProxy
       (String name,
        PlainEventListProxy propositions,
+       Map<String,String> attributes,
        boolean initial,
        PointGeometryProxy pointGeometry,
        PointGeometryProxy initialArrowGeometry,
@@ -565,6 +574,7 @@ public interface ModuleProxyFactory
    * Creates a new simple node using default values.
    * This method creates a simple node with
    * an empty list of propositions,
+   * an empty attribute map,
    * the initial status set to <CODE>false</CODE>,
    * the geometric position set to <CODE>null</CODE>,
    * the position of the initial state arrow set to <CODE>null</CODE>, and

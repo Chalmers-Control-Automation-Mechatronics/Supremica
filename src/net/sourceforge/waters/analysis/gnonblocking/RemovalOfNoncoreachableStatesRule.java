@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.Collection;
 
@@ -152,3 +152,4 @@ class RemovalOfNoncoreachableStatesRule extends TRSimplifierAbstractionRule
   private StateEncoding mOutputEncoding;
 
 }
+

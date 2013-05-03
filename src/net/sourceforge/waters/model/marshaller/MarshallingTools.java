@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.xml.bind.JAXBException;
 
@@ -95,6 +96,26 @@ public class MarshallingTools
   }
 
   /**
+   * Saves a collection of automata into a product DES (<CODE>.wdes</CODE>)
+   * file. This methods creates a product DES containing the events of the
+   * given automata and the automata, and saves it into a file.
+   * @param  automata  The automata to be saved.
+   * @param  filename  The name of the output file,
+   *                   should have <CODE>.wdes</CODE> extension.
+   */
+  public static void saveProductDES(final Collection<AutomatonProxy> automata,
+                                    final String filename)
+  {
+    final int dotpos = filename.lastIndexOf(".");
+    final String name = dotpos >= 0 ? filename.substring(0, dotpos) : filename;
+    final ProductDESProxyFactory factory =
+      ProductDESElementFactory.getInstance();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy(name, automata, factory);
+    saveProductDES(des, filename);
+  }
+
+  /**
    * Saves a module as a Waters module (<CODE>.wmod</CODE>) file.
    * @param  module    The module to be saved.
    * @param  filename  The name of the output file,
@@ -157,6 +178,26 @@ public class MarshallingTools
       ProductDESElementFactory.getInstance();
     final ProductDESProxy des =
       AutomatonTools.createProductDESProxy(aut, factory);
+    saveModule(des, filename);
+  }
+
+  /**
+   * Saves a collection of automata into a Waters module (<CODE>.wmod</CODE>)
+   * file. This methods creates a product DES containing the events of the
+   * given automata and the automata, and saves it into a file.
+   * @param  automata  The automata to be saved.
+   * @param  filename  The name of the output file,
+   *                   should have <CODE>.wmod</CODE> extension.
+   */
+  public static void saveModule(final Collection<AutomatonProxy> automata,
+                                final String filename)
+  {
+    final int dotpos = filename.lastIndexOf(".");
+    final String name = dotpos >= 0 ? filename.substring(0, dotpos) : filename;
+    final ProductDESProxyFactory factory =
+      ProductDESElementFactory.getInstance();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy(name, automata, factory);
     saveModule(des, filename);
   }
 

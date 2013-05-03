@@ -65,13 +65,18 @@ public interface Subject {
 
 
   //#########################################################################
+  //# Assignment
+  public ModelChangeEvent assignMember(int index,
+                                       Object oldValue,
+                                       Object newValue);
+
+
+  //#########################################################################
   //# Observers
   public void addModelObserver(ModelObserver observer);
 
   public void removeModelObserver(ModelObserver observer);
 
   public Collection<ModelObserver> getModelObservers();
-
-  public void fireModelChanged(ModelChangeEvent event);
 
 }

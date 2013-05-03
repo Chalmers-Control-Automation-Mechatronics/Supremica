@@ -48,6 +48,7 @@ public final class ParameterBindingElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public ParameterBindingElement clone()
   {
     return (ParameterBindingElement) super.clone();

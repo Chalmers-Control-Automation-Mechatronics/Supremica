@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -662,7 +662,7 @@ public class Projection3
             writer.append(',');
           }
           writer.append('\n');
-          writer.flush();
+          writer.close();
           mRowResults = new String[]{"#States","#Events","#Hidden","#Sync.Trans",
                                      "Sync.Time","Syne.States","Det.Time",
                                      "Det.States","Min.Time","Min.States","Overall"};

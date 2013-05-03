@@ -14,16 +14,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.ConstantAliasEditorDialog;
 import net.sourceforge.waters.gui.EditorEditEdgeDialog;
-import net.sourceforge.waters.gui.EventAliasEditorDialog;
-import net.sourceforge.waters.gui.EventDeclEditorDialog;
-import net.sourceforge.waters.gui.ForeachEditorDialog;
-import net.sourceforge.waters.gui.InstanceEditorDialog;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.ParameterBindingEditorDialog;
-import net.sourceforge.waters.gui.SimpleComponentEditorDialog;
-import net.sourceforge.waters.gui.VariableEditorDialog;
+import net.sourceforge.waters.gui.dialog.ConstantAliasEditorDialog;
+import net.sourceforge.waters.gui.dialog.EventAliasEditorDialog;
+import net.sourceforge.waters.gui.dialog.EventDeclEditorDialog;
+import net.sourceforge.waters.gui.dialog.ForeachEditorDialog;
+import net.sourceforge.waters.gui.dialog.InstanceEditorDialog;
+import net.sourceforge.waters.gui.dialog.NodeEditorDialog;
+import net.sourceforge.waters.gui.dialog.ParameterBindingEditorDialog;
+import net.sourceforge.waters.gui.dialog.SimpleComponentEditorDialog;
+import net.sourceforge.waters.gui.dialog.VariableEditorDialog;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
@@ -37,6 +39,7 @@ import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
@@ -46,6 +49,7 @@ import net.sourceforge.waters.subject.module.EventAliasSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
@@ -250,6 +254,21 @@ public class IDEPropertiesAction
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final SimpleComponentSubject subject = (SimpleComponentSubject) comp;
         new SimpleComponentEditorDialog(root, subject);
+      }
+      return true;
+    }
+
+    public Boolean visitNodeProxy(final NodeProxy node)
+    {
+      if (mDoEdit) {
+        final IDE ide = getIDE();
+        final SelectionOwner panel =
+          ide.getFocusTracker().getWatersSelectionOwner();
+        if (panel instanceof GraphEditorPanel) {
+          final ModuleWindowInterface root = getActiveModuleWindowInterface();
+          final NodeSubject subject = (NodeSubject) node;
+          new NodeEditorDialog(root, panel, subject);
+        }
       }
       return true;
     }

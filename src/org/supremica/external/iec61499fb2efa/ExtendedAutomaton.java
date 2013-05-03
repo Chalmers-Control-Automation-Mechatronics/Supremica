@@ -131,11 +131,11 @@ class ExtendedAutomaton
                     factory.createPlainEventListProxy(propList);
 				graph.getNodesModifiable().add
                     (factory.createSimpleNodeProxy(name, acceptingProposition,
-                                                   initial, null, null, null));
+                                                   null, initial, null, null, null));
 			}
 			else
 			{
-				graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name, null, initial, null, null, null));
+				graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name, null, null, initial, null, null, null));
 			}
 		}
 	}

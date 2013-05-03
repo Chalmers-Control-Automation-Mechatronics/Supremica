@@ -27,6 +27,9 @@ import net.sourceforge.waters.analysis.hisc.AbstractSICConflictChecker;
 import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -81,6 +84,7 @@ public class CommandLineTool
     boolean noargs = false;
     int timeout = -1;
     PrintWriter csv = null;
+    final Formatter formatter = new Formatter(System.out);
 
     try {
       if (args.length < 2) {
@@ -204,7 +208,6 @@ public class CommandLineTool
       factory.parse(argIter);
       factory.configure(checker);
 
-      final Formatter formatter = new Formatter(System.out);
       boolean first = true;
       for (final String name : argList) {
         final File filename = new File(name);
@@ -330,6 +333,7 @@ public class CommandLineTool
       if (csv != null) {
         csv.close();
       }
+      formatter.close();
     }
   }
 

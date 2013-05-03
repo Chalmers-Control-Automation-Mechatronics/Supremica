@@ -59,34 +59,34 @@ public class AutomataEventList
         extends JPanel
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	@SuppressWarnings("unused")
-	private boolean forward;
+	private final boolean forward;
     @SuppressWarnings("unused")
-	private boolean showStateId = false;
+	private final boolean showStateId = false;
     @SuppressWarnings("unused")
-	private Automata theAutomata;
+	private final Automata theAutomata;
     private int[] currState;
-    private AutomataStateViewer stateViewer;
-    private AutomataEventListModel eventsList;
-    private JList theList;
-    
-    public AutomataEventList(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper, boolean forward)
+    private final AutomataStateViewer stateViewer;
+    private final AutomataEventListModel eventsList;
+    private final JList<Object> theList;
+
+    public AutomataEventList(final AutomataStateViewer stateViewer, final AutomataSynchronizerHelper helper, final boolean forward)
     {
         setLayout(new BorderLayout());
-        
+
         this.stateViewer = stateViewer;
         this.theAutomata = helper.getAutomata();
         this.forward = forward;
         eventsList = new AutomataEventListModel(helper, forward);
-        theList = new JList(eventsList);
-        
-        JScrollPane scrollPanel = new JScrollPane(theList);
-        
+        theList = new JList<Object>(eventsList);
+
+        final JScrollPane scrollPanel = new JScrollPane(theList);
+
         theList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
+
         String label;
-        
+
         if (forward)
         {
             label = "Outgoing events";
@@ -95,51 +95,51 @@ public class AutomataEventList
         {
             label = "Incoming events";
         }
-        
-        JLabel jLabel = new JLabel(label);
-        
+
+        final JLabel jLabel = new JLabel(label);
+
         // jLabel.setOpaque(true);
         // jLabel.setBackground(Color.yellow);
         add(jLabel, BorderLayout.NORTH);
         add(scrollPanel, BorderLayout.CENTER);
         theList.addMouseListener(new MouseAdapter()
         {
-            public void mouseClicked(MouseEvent e)
+            public void mouseClicked(final MouseEvent e)
             {
                 if (e.getClickCount() == 2)
                 {
-                    int index = theList.locationToIndex(e.getPoint());
-                    
+                    final int index = theList.locationToIndex(e.getPoint());
+
                     if (index >= 0)
                     {
-                        int[] newState = eventsList.getStateAt(currState, index);
-                        
+                        final int[] newState = eventsList.getStateAt(currState, index);
+
                         updateStateViewer(newState);
                     }
                 }
             }
         });
     }
-    
-    public void setShowStateId(boolean showStateId)
+
+    public void setShowStateId(final boolean showStateId)
     {
         eventsList.setShowStateId(showStateId);
     }
-    
-    public void setCurrState(int[] currState)
+
+    public void setCurrState(final int[] currState)
     {
         this.currState = currState;
-        
+
         theList.clearSelection();
         update();
     }
-    
+
     public void update()
     {
         eventsList.setCurrState(currState);
     }
-    
-    private void updateStateViewer(int[] newState)
+
+    private void updateStateViewer(final int[] newState)
     {
         stateViewer.setCurrState(newState);
     }

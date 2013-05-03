@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import net.sourceforge.waters.model.base.ProxyTools;
+
 
 /**
  * <P>A subject implementation of an attribute map.</P>
@@ -70,32 +72,73 @@ public final class AttributeMapSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public AttributeMapSubject clone()
   {
     return new AttributeMapSubject(this);
   }
 
-  /**
-   * Assigns the contents of another attribute map to this attribute map. This
-   * method ensures that the contents of this attribute map are equal to the
-   * contents of the given attribute map according to the
-   * {@link java.lang.Object#equals(Object) equals()} method. Mappings already
-   * contained in this attribute map are reused, the method produces as few
-   * model change notifications as possible.
-   * @param map
-   *          The attribute map to be copied from.
-   */
-  public void assignFrom(final Map<String,String> map)
+  public UndoInfo createUndoInfo(final Map<String,String> newMap,
+                                 final Set<? extends Subject> boundary)
   {
-    for (final String key : keySet()) {
-      if (!map.containsKey(key)) {
-        remove(key);
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
+    final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
+    for (final Map.Entry<String,String> oldEntry : entrySet()) {
+      final String oldKey = oldEntry.getKey();
+      final String newValue = newMap.get(oldKey);
+      if (newValue == null) {
+        final UndoInfo remove = new ReplacementUndoInfo(oldEntry, null);
+        info.add(remove);
+      } else if (!oldEntry.getValue().equals(newValue)) {
+        final Map.Entry<String,String> newEntry =
+          new AbstractMap.SimpleEntry<String,String>(oldKey, newValue);
+        final UndoInfo replace = new ReplacementUndoInfo(oldEntry, newEntry);
+        info.add(replace);
       }
     }
-    for (final Map.Entry<String,String> entry : map.entrySet()) {
-      final String key = entry.getKey();
+    for (final Map.Entry<String,String> newEntry : newMap.entrySet()) {
+      final String newKey = newEntry.getKey();
+      if (!containsKey(newKey)) {
+        final UndoInfo add = new ReplacementUndoInfo(null, newEntry);
+        info.add(add);
+      }
+    }
+    if (info.isEmpty()) {
+      return null;
+    } else {
+      return info;
+    }
+  }
+
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    if (newValue == null) {
+      @SuppressWarnings("unchecked")
+      final Map.Entry<String,String> entry =
+        (Map.Entry<String,String>) oldValue;
+      final String attrib = entry.getKey();
+      mMap.remove(attrib);
+      return ModelChangeEvent.createItemRemoved(this, attrib);
+    } else if (oldValue == null) {
+      @SuppressWarnings("unchecked")
+      final Map.Entry<String,String> entry =
+        (Map.Entry<String,String>) newValue;
+      final String attrib = entry.getKey();
       final String value = entry.getValue();
-      put(key, value);
+      mMap.putRaw(attrib, value);
+      return ModelChangeEvent.createItemAdded(this, attrib);
+    } else {
+      @SuppressWarnings("unchecked")
+      final Map.Entry<String,String> entry =
+        (Map.Entry<String,String>) newValue;
+      final String attrib = entry.getKey();
+      final String value = entry.getValue();
+      mMap.putRaw(attrib, value);
+      return ModelChangeEvent.createStateChanged(this);
     }
   }
 
@@ -128,7 +171,7 @@ public final class AttributeMapSubject
     if (old != null) {
       final ModelChangeEvent event =
           ModelChangeEvent.createItemRemoved(this, key);
-      fireModelChanged(event);
+      event.fire();
     }
     return old;
   }
@@ -160,7 +203,7 @@ public final class AttributeMapSubject
     if (parent != null && mParent != null) {
       final StringBuffer buffer = new StringBuffer();
       buffer.append("Trying to redefine parent of ");
-      final String clsname = AbstractSubject.getShortClassName(this);
+      final String clsname = ProxyTools.getShortClassName(this);
       buffer.append(clsname);
       buffer.append('!');
       throw new IllegalStateException(buffer.toString());
@@ -186,11 +229,6 @@ public final class AttributeMapSubject
   public Collection<ModelObserver> getModelObservers()
   {
     return mObservers;
-  }
-
-  public void fireModelChanged(final ModelChangeEvent event)
-  {
-    SubjectTools.fireModelChanged(this, event);
   }
 
 
@@ -231,8 +269,15 @@ public final class AttributeMapSubject
       super.put(attrib, value);
       final ModelChangeEvent event =
           new ModelChangeEvent(AttributeMapSubject.this, eventkind, attrib);
-      fireModelChanged(event);
+      event.fire();
       return old;
+    }
+
+    //#########################################################################
+    //# Direct Access
+    private void putRaw(final String attrib, final String value)
+    {
+      super.put(attrib, value);
     }
 
     //#########################################################################
@@ -296,7 +341,7 @@ public final class AttributeMapSubject
       mVictim = null;
       final ModelChangeEvent event =
           ModelChangeEvent.createItemRemoved(AttributeMapSubject.this, attrib);
-      fireModelChanged(event);
+      event.fire();
     }
 
     //#######################################################################
@@ -309,7 +354,7 @@ public final class AttributeMapSubject
 
   //#########################################################################
   //# Interface java.util.Map
-  private final Map<String,String> mMap;
+  private final AttributeTreeMap mMap;
   private final Set<Entry<String,String>> mAttributeEntrySet;
   private Subject mParent;
   private List<ModelObserver> mObservers;

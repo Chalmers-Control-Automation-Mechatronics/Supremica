@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.base;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.Serializable;
 
@@ -151,3 +151,4 @@ public class ImmutableOrderedSet<P extends NamedProxy>
   private static final long serialVersionUID = 1L;
 
 }
+

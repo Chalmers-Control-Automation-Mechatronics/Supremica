@@ -1,10 +1,10 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -84,7 +84,7 @@ public class UnAnnotateGraph2
       assert(statenum == nextStates.size());
     }
     for (final TIntHashSet ann : statesWithAnnotation.keySet()) {
-      final int[] states = statesWithAnnotation.get(ann).toNativeArray();
+      final int[] states = statesWithAnnotation.get(ann).toArray();
       for (int i = 0; i < states.length; i++) {
         final int state = states[i];
         Collection<EventProxy> used = notmarked;
@@ -142,3 +142,4 @@ public class UnAnnotateGraph2
                                         nextStates, newTransitions);
   }
 }
+

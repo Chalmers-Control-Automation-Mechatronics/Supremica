@@ -12,7 +12,7 @@
 
 package net.sourceforge.waters.plain.module;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,6 +67,7 @@ public final class ColorGeometryElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public ColorGeometryElement clone()
   {
     return (ColorGeometryElement) super.clone();
@@ -109,3 +110,4 @@ public final class ColorGeometryElement
   private static final long serialVersionUID = -5667739637678377383L;
 
 }
+

@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.analysis;
 import java.util.List;
 import java.util.LinkedList;
 
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
@@ -71,6 +72,13 @@ public abstract class AbstractSynchronousProductBuilderTest
   {
     final String group = "handwritten";
     final String name = "small_factory_2";
+    runAutomatonBuilder(group, name);
+  }
+
+  public void testSmallFactory2u() throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "small_factory_2u";
     runAutomatonBuilder(group, name);
   }
 

@@ -925,11 +925,12 @@ public final class AutomataSynchronizerExecuter
         Automaton theAutomaton = helper.getAutomaton();
 
         // Should we add disabled events to a dump state? If so, create that state!
-        org.supremica.automata.State dumpState = null;
+        org.supremica.automata.DumpState dumpState = null; // This one is used below!
         if (rememberDisabledEvents)
         {
-            dumpState = theAutomaton.createUniqueState("qf");
-            theAutomaton.addState(dumpState);
+            // dumpState = theAutomaton.createUniqueState("qf");
+            // theAutomaton.addState(dumpState);
+            dumpState = theAutomaton.getDumpState(true);
             dumpState.setForbidden(true);
         }
 

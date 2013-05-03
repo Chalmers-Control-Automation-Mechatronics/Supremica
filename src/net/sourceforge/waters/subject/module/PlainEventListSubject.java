@@ -19,7 +19,6 @@ import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.subject.base.ProxySubject;
 
 
 /**
@@ -37,17 +36,18 @@ public final class PlainEventListSubject
   //# Constructors
   /**
    * Creates a new plain event list.
-   * @param eventList The list of events of the new plain event list, or <CODE>null</CODE> if empty.
+   * @param eventIdentifierList The list of event identifiers of the new plain event list, or <CODE>null</CODE> if empty.
+   *        Each element is of type {@link net.sourceforge.waters.model.module.IdentifierProxy IdentifierProxy} or {@link net.sourceforge.waters.model.module.ForeachProxy ForeachProxy}.
    */
-  public PlainEventListSubject(final Collection<? extends Proxy> eventList)
+  public PlainEventListSubject(final Collection<? extends Proxy> eventIdentifierList)
   {
-    super(eventList);
+    super(eventIdentifierList);
   }
 
   /**
    * Creates a new plain event list using default values.
    * This constructor creates a plain event list with
-   * an empty list of events.
+   * an empty list of event identifiers.
    */
   public PlainEventListSubject()
   {
@@ -56,21 +56,11 @@ public final class PlainEventListSubject
 
 
   //#########################################################################
-  //# Cloning and Assigning
+  //# Cloning
+  @Override
   public PlainEventListSubject clone()
   {
     return (PlainEventListSubject) super.clone();
-  }
-
-  public boolean assignFrom(final ProxySubject partner)
-  {
-    if (this != partner) {
-      boolean change = super.assignFrom(partner);
-      if (change) {
-        fireStateChanged();
-      }
-    }
-    return false;
   }
 
 

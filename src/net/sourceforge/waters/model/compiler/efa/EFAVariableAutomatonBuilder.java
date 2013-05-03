@@ -152,7 +152,7 @@ class EFAVariableAutomatonBuilder
       final PlainEventListProxy elist =
         props.isEmpty() ? null : mFactory.createPlainEventListProxy(props);
       final SimpleNodeProxy node = mFactory.createSimpleNodeProxy
-        (name, elist, initial, null, null, null);
+        (name, elist, null, initial, null, null, null);
       mNodeList.add(node);
       mNodeMap.putByProxy(value, node);
       props.clear();

@@ -17,6 +17,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -25,14 +26,25 @@ import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
+import net.sourceforge.waters.gui.actions.AnalyzeHISCCPControllabilityAction;
+import net.sourceforge.waters.gui.actions.AnalyzeHISCCPInterfaceConsistencyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
+import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
+import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCThree_one_propertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDNSLActivityLoopAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
+import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
+import net.sourceforge.waters.gui.actions.GraphSavePDFAction;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
@@ -76,20 +88,12 @@ import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.ImportAction;
 import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
+import org.supremica.gui.ide.actions.OpenRASAction;
 import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
-
-import  net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
 
 /**
  * <P>
@@ -212,6 +216,8 @@ public class IDEMenuBar extends JMenuBar
     updateModulesMenu();
     final IDEListener ideListener = new IDEListener();
     ide.attach(ideListener);
+    final SupremicaPropertyChangeListener fileListener =
+      new FilePropertyListener();
     final SupremicaPropertyChangeListener createListener =
         new CreatePropertyListener();
     Config.INCLUDE_INSTANTION.addPropertyChangeListener(createListener);
@@ -222,6 +228,7 @@ public class IDEMenuBar extends JMenuBar
     Config.INCLUDE_EXTERNALTOOLS.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
+    Config.INCLUDE_RAS_SUPPORT.addPropertyChangeListener(fileListener);
     Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_HISC.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_SD.addPropertyChangeListener(analyzeListener);
@@ -243,6 +250,11 @@ public class IDEMenuBar extends JMenuBar
       mFileMenu.add(newmod);
       final Action open = actions.getAction(OpenAction.class);
       mFileMenu.add(open);
+      if(Config.INCLUDE_RAS_SUPPORT.isTrue()){
+        final Action openRas = actions.getAction(OpenRASAction.class);
+        mFileMenu.add(openRas);
+      }
+
       final Action save = actions.getAction(SaveAction.class);
       mFileMenu.add(save);
       final Action saveas = actions.getAction(SaveAsAction.class);
@@ -253,10 +265,10 @@ public class IDEMenuBar extends JMenuBar
       final Action importAction = actions.getAction(ImportAction.class);
       mFileMenu.add(importAction);
       //mFileMenu.add(mIDE.getActions().editorPrintAction.getMenuItem());
-      mFileMenu.add(mIDE.getActions().editorSavePostscriptAction.getMenuItem());
       final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
       mFileMenu.add(epsprint);
-      mFileMenu.add(mIDE.getActions().editorSavePDFAction.getMenuItem());
+      final Action pdfprint = actions.getAction(GraphSavePDFAction.class);
+      mFileMenu.add(pdfprint);
       mFileMenu.addSeparator();
       final Action exit = actions.getAction(ExitAction.class);
       mFileMenu.add(exit);
@@ -300,7 +312,6 @@ public class IDEMenuBar extends JMenuBar
     final Component panel = getActivePanel();
     if (panel != null) {
       // Create
-      // Why not "Insert"? All MS programs use insert. ~~~Robi
       if (mCreateMenu == null && panel instanceof EditorPanel) {
         mCreateMenu = new JMenu("Create");
         mCreateMenu.setMnemonic(KeyEvent.VK_C);
@@ -319,7 +330,6 @@ public class IDEMenuBar extends JMenuBar
           final Action inseventalias =
             actions.getAction(InsertEventAliasAction.class);
           mCreateMenu.add(inseventalias);
-       // TODO Auto-generated method stub
           final Action insinstance =
             actions.getAction(InsertInstanceAction.class);
           mCreateMenu.add(insinstance);
@@ -329,8 +339,6 @@ public class IDEMenuBar extends JMenuBar
         }
         final Action insevent = actions.getAction(InsertEventDeclAction.class);
         mCreateMenu.add(insevent);
-        // menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
-        // menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
       }
 
       // Verify
@@ -359,6 +367,16 @@ public class IDEMenuBar extends JMenuBar
           final Action sic6 =
             actions.getAction(AnalyzeSICProperty6Action.class);
           mVerifyMenu.add(sic6);
+          try {
+            final Action hisccp =
+              actions.getAction(AnalyzeHISCCPInterfaceConsistencyAction.class);
+            mVerifyMenu.add(hisccp);
+          } catch (final NoClassDefFoundError error) {
+            // skip this if it can't be loaded
+          }
+          final Action hiscco =
+            actions.getAction(AnalyzeHISCCPControllabilityAction.class);
+          mVerifyMenu.add(hiscco);
         }
 	    if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
            mVerifyMenu.addSeparator();
@@ -395,8 +413,7 @@ public class IDEMenuBar extends JMenuBar
             final Action PTimeBeh =
               actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
             mVerifyMenu.add(PTimeBeh);
-
-		}
+        }
       }
 
       // Analyze
@@ -407,6 +424,7 @@ public class IDEMenuBar extends JMenuBar
         mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
         mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
         mEdAnalyzeMenu.add(actions.editorReachabilityGraphAction.getMenuItem());
+//        mEdAnalyzeMenu.add(actions.editorTransitionProjectionAction.getMenuItem());
       }
 
       // Simulate
@@ -639,6 +657,7 @@ public class IDEMenuBar extends JMenuBar
       item.setToolTipText(path);
     }
     final ActionListener listener = new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent event)
       {
         final DocumentContainerManager manager =
@@ -657,6 +676,7 @@ public class IDEMenuBar extends JMenuBar
   {
     // #######################################################################
     // # Interface net.sourceforge.waters.gui.observer.Observer
+    @Override
     public void update(final EditorChangedEvent event)
     {
       switch (event.getKind()) {
@@ -673,6 +693,20 @@ public class IDEMenuBar extends JMenuBar
     }
   }
 
+  // #########################################################################
+  // # Inner Class ToolsPropertyListener
+  private class FilePropertyListener implements
+      SupremicaPropertyChangeListener
+  {
+    // #######################################################################
+    // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    @Override
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      mFileMenu = null;
+      rebuildMenus();
+    }
+  }
 
   // #########################################################################
   // # Inner Class CreatePropertyListener
@@ -681,13 +715,13 @@ public class IDEMenuBar extends JMenuBar
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mCreateMenu = null;
       rebuildMenus();
     }
   }
-
 
   // #########################################################################
   // # Inner Class ToolsPropertyListener
@@ -696,6 +730,7 @@ public class IDEMenuBar extends JMenuBar
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mToolsMenu = null;
@@ -709,6 +744,7 @@ public class IDEMenuBar extends JMenuBar
   {
     // #######################################################################
     // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mVerifyMenu = null;
@@ -731,6 +767,7 @@ public class IDEMenuBar extends JMenuBar
 
     // #######################################################################
     // # Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       try {

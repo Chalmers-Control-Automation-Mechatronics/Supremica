@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -30,17 +30,17 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.Candidate;
+import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -195,37 +195,37 @@ public class CompositionalGeneralisedConflictChecker
 
   // Ugly override to make this method visible within package.
   @Override
-  protected EventProxy getUsedMarkingProposition()
+  protected EventProxy getUsedDefaultMarking()
       throws EventNotFoundException
   {
-    return super.getUsedMarkingProposition();
+    return super.getUsedDefaultMarking();
   }
 
   @Override
-  public void setPreconditionMarking(final EventProxy marking)
+  public void setConfiguredPreconditionMarking(final EventProxy marking)
   {
-    super.setPreconditionMarking(marking);
+    super.setConfiguredPreconditionMarking(marking);
     mUsedPreconditionMarking = null;
   }
 
   /**
    * Gets the precondition marking proposition to be used. This method returns
    * the marking proposition specified by the
-   * {@link #setPreconditionMarking(EventProxy)
+   * {@link #setConfiguredPreconditionMarking(EventProxy)
    * setGeneralisedPrecondition()} method, if non-null, or creates an alpha
    * marking if the model does not contain one.
    */
   protected EventProxy getUsedPreconditionMarkingProposition()
   {
     if (mUsedPreconditionMarking == null) {
-      if (getPreconditionMarking() == null) {
+      if (getConfiguredPreconditionMarking() == null) {
         final ProductDESProxyFactory factory = getFactory();
         final EventProxy alpha =
             factory.createEventProxy(":alpha", EventKind.PROPOSITION);
 
         mUsedPreconditionMarking = alpha;
       } else {
-        mUsedPreconditionMarking = getPreconditionMarking();
+        mUsedPreconditionMarking = getConfiguredPreconditionMarking();
       }
     }
     return mUsedPreconditionMarking;
@@ -269,18 +269,16 @@ public class CompositionalGeneralisedConflictChecker
           AutomatonProxy abstractedAut = aut;
           final List<AutomatonProxy> autAsList = Collections.singletonList(aut);
           final Set<EventProxy> localEvents = identifyLocalEvents(autAsList);
-          if (localEvents.size() > 0) {
-            try {
-              abstractedAut = hideAndAbstract(aut, localEvents);
+          try {
+            abstractedAut = hideAndAbstract(aut, localEvents);
+            if (abstractedAut != aut) {
               modified = true;
               modifyingSteps.addAll(mTemporaryModifyingSteps);
-            } catch (final OverflowException exception) {
-              // abstractedAut remains aut ...
             }
-            mTemporaryModifyingSteps.clear();
-          } else {
+          } catch (final OverflowException exception) {
             // abstractedAut remains aut ...
           }
+          mTemporaryModifyingSteps.clear();
           remainingAut.add(abstractedAut);
         }
       }
@@ -340,13 +338,14 @@ public class CompositionalGeneralisedConflictChecker
           }
         }
       }
+      // MarshallingTools.saveModule(model, "model.wmod");
       final ConflictChecker checker =
-          new NativeConflictChecker(model, getUsedMarkingProposition(),
+          new NativeConflictChecker(model, getUsedDefaultMarking(),
               getFactory());
       // final ConflictChecker checker = new MonolithicConflictChecker(model,
       // getUsedMarkingProposition(), getFactory());
       checker
-          .setPreconditionMarking(getUsedPreconditionMarkingProposition());
+          .setConfiguredPreconditionMarking(getUsedPreconditionMarkingProposition());
       checker.setNodeLimit(mFinalStepNodeLimit);
       checker.setTransitionLimit(mFinalStepTransitionLimit);
       final boolean result = checker.run();
@@ -617,7 +616,7 @@ public class CompositionalGeneralisedConflictChecker
     mTemporaryModifyingSteps = new ArrayList<Step>();
     mUsedPreconditionMarking = null;
     final EventProxy alpha = getUsedPreconditionMarkingProposition();
-    final EventProxy omega = getUsedMarkingProposition();
+    final EventProxy omega = getUsedDefaultMarking();
     mPropositions = new ArrayList<EventProxy>(2);
     mPropositions.add(alpha);
     mPropositions.add(omega);
@@ -674,6 +673,14 @@ public class CompositionalGeneralisedConflictChecker
       rttonsRule.setAlphaMarking(alpha);
       rttonsRule.setDefaultMarking(omega);
       mAbstractionRules.add(rttonsRule);
+      /*
+      final CanonizeAbstractionRule canonRule =
+          new CanonizeAbstractionRule(factory, translator,
+                                               mPropositions);
+      canonRule.setAlphaMarking(alpha);
+      canonRule.setOmegaMarking(omega);
+      mAbstractionRules.add(canonRule);
+      */
     }
   }
 
@@ -1586,9 +1593,7 @@ public class CompositionalGeneralisedConflictChecker
   {
     protected double getHeuristicValue(final Candidate candidate)
     {
-      final double localEvents = countCandidatesLocalEvents(candidate);
-      final double totalEvents = countCandidatesTotalEvents(candidate);
-      return localEvents / totalEvents;
+      return countCandidatesLocalEvents(candidate);
     }
   }
 
@@ -3311,3 +3316,4 @@ public class CompositionalGeneralisedConflictChecker
   private double mComposedModelNumberOfTransitions;
 
 }
+

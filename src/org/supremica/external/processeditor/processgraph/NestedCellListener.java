@@ -2,15 +2,17 @@ package org.supremica.external.processeditor.processgraph;
 
 import javax.swing.JList;
 
+import org.supremica.external.processeditor.processgraph.opcell.AttributePanel;
+
 
 /**
  * Handles the communication from a nested cell and to its listener.
  */
-public interface NestedCellListener {   
+public interface NestedCellListener {
     /**
      * Rebuilds this object.
      */
-    public void rebuild();    
+    public void rebuild();
     /**
      * Returns a copy of this object.
      */
@@ -47,7 +49,7 @@ public interface NestedCellListener {
      */
     public void elementDelete(Object element);
     /**
-     * Adds <code>newElement</code> to this object. 
+     * Adds <code>newElement</code> to this object.
      * <p>
      * The <code>newElement</code> is inserted next to the
      * <code>oldElement</code>.
@@ -57,7 +59,7 @@ public interface NestedCellListener {
      */
     public void elementAdd(Object oldElement, Object newElement);
     /**
-     * Replaces the <code>oldElement</code> with the the 
+     * Replaces the <code>oldElement</code> with the the
      * <code>newElement</code>.
      *
      * @param oldElement the object that is to be replaced
@@ -66,7 +68,7 @@ public interface NestedCellListener {
     public void elementReplace(Object oldElement, Object newElement);
     /**
      * Replaces this object with the <code>newElement</code>.
-     * 
+     *
      * @param newElement the object that is to replace this object
      */
     public void elementReplace(Object newElement);
@@ -75,13 +77,13 @@ public interface NestedCellListener {
      *
      * @param newElement the object to be pasted
      */
-    public void elementPaste(Object newElement);    
+    public void elementPaste(Object newElement);
     /**
      * Sets the list.
      *
      * @param list the concerned list
      */
-    public void setList(JList list);
+    public void setList(JList<AttributePanel> list);
     /**
      * Sets the attribute type color.
      */
@@ -92,5 +94,5 @@ public interface NestedCellListener {
      * @param o the object to give unique name
      * @return the object with unique name
      */
-    public Object setUniqueNames(Object o);        
+    public Object setUniqueNames(Object o);
 }

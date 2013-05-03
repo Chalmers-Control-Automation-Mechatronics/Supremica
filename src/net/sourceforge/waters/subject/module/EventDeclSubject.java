@@ -16,7 +16,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
@@ -28,7 +30,12 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.AttributeMapSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -114,6 +121,7 @@ public final class EventDeclSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public EventDeclSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -121,51 +129,87 @@ public final class EventDeclSubject
     return (EventDeclSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final EventDeclSubject downcast = (EventDeclSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final EventKind kind = downcast.getKind();
-      if (mKind != kind) {
-        mKind = kind;
-        change = true;
-      }
-      final boolean observable = downcast.isObservable();
-      if (mIsObservable != observable) {
-        mIsObservable = observable;
-        change = true;
-      }
-      final ScopeKind scope = downcast.getScope();
-      if (mScope != scope) {
-        mScope = scope;
-        change = true;
-      }
-      final ListSubject<SimpleExpressionSubject> ranges =
-        downcast.getRangesModifiable();
-      mRanges.assignFrom(ranges);
-      final ColorGeometrySubject colorGeometry = downcast.getColorGeometry();
-      if (mColorGeometry == colorGeometry) {
-        // nothing
-      } else if (mColorGeometry == null) {
-        mColorGeometry = colorGeometry.clone();
-        mColorGeometry.setParent(this);
-        fireGeometryChanged(mColorGeometry);
-      } else if (colorGeometry == null) {
-        mColorGeometry.setParent(null);
-        mColorGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mColorGeometry.assignFrom(colorGeometry);
-      }
-      final AttributeMapSubject attributes =
-        downcast.getAttributesModifiable();
-      mAttributes.assignFrom(attributes);
-      if (change) {
-        fireStateChanged();
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
+        mKind = (EventKind) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 3:
+        mIsObservable = (Boolean) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 4:
+        mScope = (ScopeKind) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 6:
+        if (mColorGeometry != null) {
+          mColorGeometry.setParent(null);
+        }
+        mColorGeometry = (ColorGeometrySubject) newValue;
+        if (mColorGeometry != null) {
+          mColorGeometry.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final EventDeclSubject downcast = (EventDeclSubject) newState;
+    if (!mKind.equals(downcast.mKind)) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mKind, downcast.mKind);
+      info.add(step2);
+    }
+    if (mIsObservable != downcast.mIsObservable) {
+      final UndoInfo step3 =
+        new ReplacementUndoInfo(3, mIsObservable, downcast.mIsObservable);
+      info.add(step3);
+    }
+    if (!mScope.equals(downcast.mScope)) {
+      final UndoInfo step4 =
+        new ReplacementUndoInfo(4, mScope, downcast.mScope);
+      info.add(step4);
+    }
+    final UndoInfo step5 = mRanges.createUndoInfo(downcast.mRanges, boundary);
+    if (step5 != null) {
+      info.add(step5);
+    }
+    final boolean null6a = mColorGeometry == null;
+    final boolean null6b = downcast.mColorGeometry == null;
+    if (null6a != null6b) {
+      if (boundary ==  null || !boundary.contains(mColorGeometry)) {
+        final ColorGeometrySubject clone6 =
+          ProxyTools.clone(downcast.mColorGeometry);
+        final UndoInfo step6 =
+          new ReplacementUndoInfo(6, mColorGeometry, clone6);
+        info.add(step6);
+      }
+    } else if (!null6a) {
+      final UndoInfo step6 =
+        mColorGeometry.createUndoInfo(downcast.mColorGeometry, boundary);
+      if (step6 != null) {
+        info.add(step6);
+      }
+    }
+    final UndoInfo step7 =
+      mAttributes.createUndoInfo(downcast.mAttributes, boundary);
+    if (step7 != null) {
+      info.add(step7);
+    }
   }
 
 

@@ -93,6 +93,7 @@ public final class EdgeElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public EdgeElement clone()
   {
     return (EdgeElement) super.clone();

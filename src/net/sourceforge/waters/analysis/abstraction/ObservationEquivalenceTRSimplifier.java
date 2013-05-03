@@ -9,12 +9,13 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TLongObjectIterator;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.iterator.TLongObjectIterator;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -233,8 +234,26 @@ public class ObservationEquivalenceTRSimplifier
     mNumReachableStates = rel.getNumberOfReachableStates();
     mNumEvents = rel.getNumberOfProperEvents();
     mStateShift = AutomatonTools.log2(mNumEvents);
+    mFanout =
+      mNumReachableStates > 0 ?
+      (float) rel.getNumberOfTransitions() / (float) mNumReachableStates :
+      0.0f;
   }
 
+  @Override
+  public void setPropositions(final int preconditionID, final int defaultID)
+  {
+    long mask = 0;
+    if (preconditionID >= 0) {
+      mask |= (1L << preconditionID);
+    }
+    if (defaultID >= 0) {
+      mask |= (1L << defaultID);
+    }
+    setPropositionMask(mask);
+  }
+
+  @Override
   public boolean isPartitioning()
   {
     return true;
@@ -246,6 +265,7 @@ public class ObservationEquivalenceTRSimplifier
     return true;
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
@@ -258,7 +278,7 @@ public class ObservationEquivalenceTRSimplifier
   {
     super.reset();
     mTauClosure = null;
-    mTauIterator = mEventIterator = null;
+    mTauIterator = mEventClosureIterator = null;
   }
 
 
@@ -465,6 +485,8 @@ public class ObservationEquivalenceTRSimplifier
   throws AnalysisException
   {
     super.setUp();
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    mPlainEventIterator = rel.createPredecessorsReadOnlyIterator();
     if (mSplitters == null) {
       mHasModifications = false;
       removeRedundantTransitions(TransitionRemovalTime.BEFORE);
@@ -475,14 +497,8 @@ public class ObservationEquivalenceTRSimplifier
       removeRedundantTransitions(TransitionRemovalTime.BEFORE);
     }
     setUpTauClosure();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
     if (mInitialInfoSize >= 0) {
-      final int numTrans = rel.getNumberOfTransitions();
-      if (mNumReachableStates > 0) {
-        mInitialInfoSize = numTrans / mNumReachableStates;
-      } else {
-        mInitialInfoSize = 0;
-      }
+      mInitialInfoSize = (int) Math.ceil(mFanout);
     }
     final int numStates = rel.getNumberOfStates();
     mTempClass = new TIntArrayList(numStates);
@@ -507,6 +523,7 @@ public class ObservationEquivalenceTRSimplifier
   protected void tearDown()
   {
     super.tearDown();
+    mPlainEventIterator = null;
     mClassLists = null;
     mClassReadIterator = null;
     mClassWriteIterator = null;
@@ -523,6 +540,7 @@ public class ObservationEquivalenceTRSimplifier
    * performs a second pass to remove redundant transitions.
    * @see TransitionRemoval
    */
+  @Override
   protected void applyResultPartition()
   throws AnalysisException
   {
@@ -548,11 +566,11 @@ public class ObservationEquivalenceTRSimplifier
   private void setUpTauClosure() throws OverflowException
   {
     if (!mEquivalence.respectsTau()) {
-      if (mEventIterator == null) {
+      if (mEventClosureIterator == null) {
         final ListBufferTransitionRelation rel = getTransitionRelation();
         final TransitionIterator inner =
-          rel.createPredecessorsReadOnlyIterator(EventEncoding.TAU);
-        mEventIterator =
+          rel.createPredecessorsReadOnlyIterator(-1, EventEncoding.TAU);
+        mEventClosureIterator =
           new OneEventCachingTransitionIterator(inner, EventEncoding.TAU);
       }
     } else {
@@ -565,24 +583,22 @@ public class ObservationEquivalenceTRSimplifier
         } else {
           mTauClosure = rel.createSuccessorsTauClosure(limit);
         }
-        mTauIterator = mTauClosure.createIterator();
-        if (mInitialInfoSize < 0) {
-          mTauIterator = new OneEventCachingTransitionIterator
-                               (mTauIterator, EventEncoding.TAU);
-        }
-        mEventIterator = mTauClosure.createFullEventClosureIterator(-1);
+        final TransitionIterator inner = mTauClosure.createIterator();
+        mTauIterator = new OneEventCachingTransitionIterator
+                             (inner, EventEncoding.TAU);
+        mEventClosureIterator = mTauClosure.createFullEventClosureIterator(-1);
       }
     }
   }
 
   private TransitionIterator getPredecessorIterator(final int event)
   {
-    if (event == EventEncoding.TAU) {
+    if (event == EventEncoding.TAU && mEquivalence.respectsTau()) {
       mTauIterator.reset();
       return mTauIterator;
     } else {
-      mEventIterator.resetEvent(event);
-      return mEventIterator;
+      mEventClosureIterator.resetEvent(event);
+      return mEventClosureIterator;
     }
   }
 
@@ -638,7 +654,7 @@ public class ObservationEquivalenceTRSimplifier
     final List<int[]> partition = getResultPartition();
     if (partition != null) {
       mTauClosure = null;
-      mTauIterator = mEventIterator = null;
+      mTauIterator = mEventClosureIterator = null;
       final WeakObservationEquivalencePartitioning partitioner =
         new WeakObservationEquivalencePartitioning(rel, partition,
                                                    mPropositionMask,
@@ -674,7 +690,8 @@ public class ObservationEquivalenceTRSimplifier
       trans:
       while (iter0.advance()) {
         final int e = iter0.getCurrentEvent();
-        if (!rel.isUsedEvent(e) || e == skipped) {
+        if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) != 0 ||
+            e == skipped) {
           continue;
         }
         checkAbort();
@@ -830,6 +847,7 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface java.util.Comparable<Splitter>
+    @Override
     public int compareTo(final Splitter splitter)
     {
       return mSize - splitter.getSize();
@@ -837,11 +855,13 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface Splitter
+    @Override
     public int getSize()
     {
       return mSize;
     }
 
+    @Override
     public void collect(final TIntArrayList states)
     {
       reset(mClassReadIterator);
@@ -992,6 +1012,7 @@ public class ObservationEquivalenceTRSimplifier
       return writer.toString();
     }
 
+    @Override
     public void dump(final PrintWriter printer)
     {
       mClassLists.dumpList(printer, mList);
@@ -1036,35 +1057,71 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface Splitter
+    @Override
     public ComplexEquivalenceClass getParent()
     {
       return null;
     }
 
+    @Override
     public void setParent(final ComplexEquivalenceClass parent)
     {
     }
 
+    @Override
     public InfoMap getInfo()
     {
       return null;
     }
 
+    @Override
     public void setInfo(final InfoMap info)
     {
     }
 
+    @Override
     public void splitOn()
     {
       mIsOpenSplitter = false;
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final Collection<EquivalenceClass> splitClasses =
-        new THashSet<EquivalenceClass>();
       collect(mTempClass);
       final int size = getSize();
+      final int hashSize = Math.min(Math.round(size * mFanout), mNumEvents);
+      final TIntHashSet events = new TIntHashSet(hashSize);
       final int first = mEquivalence.getFirstSplitEvent();
-      for (int event = first; event < mNumEvents; event++) {
-        if (rel.isUsedEvent(event)) {
+      if (first == EventEncoding.TAU) {
+        events.add(EventEncoding.TAU);
+      }
+      mPlainEventIterator.resetEvents(first, mNumEvents - 1);
+      if (mEquivalence.respectsTau()) {
+        mTauIterator.reset();
+        for (int i = 0; i < size; i++) {
+          final int state = mTempClass.get(i);
+          mTauIterator.resume(state);
+          while (mTauIterator.advance()) {
+            final int taupred = mTauIterator.getCurrentSourceState();
+            mPlainEventIterator.resetState(taupred);
+            while (mPlainEventIterator.advance()) {
+              final int event = mPlainEventIterator.getCurrentEvent();
+              events.add(event);
+            }
+          }
+        }
+      } else {
+        for (int i = 0; i < size; i++) {
+          final int state = mTempClass.get(i);
+          mPlainEventIterator.resetState(state);
+          while (mPlainEventIterator.advance()) {
+            final int event = mPlainEventIterator.getCurrentEvent();
+            events.add(event);
+          }
+        }
+      }
+      final Collection<EquivalenceClass> splitClasses =
+        new THashSet<EquivalenceClass>();
+      events.forEach(new TIntProcedure() {
+        @Override
+        public boolean execute(final int event)
+        {
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           for (int i = 0; i < size; i++) {
@@ -1083,11 +1140,14 @@ public class ObservationEquivalenceTRSimplifier
             splitClass.splitUsingOverflowList();
           }
           splitClasses.clear();
+          // Not using info or MINSTATE: stop if the class has split itself.
+          return getSize() == size || !mEquivalence.mustEnqueueBigBrother();
         }
-      }
+      });
       mTempClass.clear();
     }
 
+    @Override
     public void enqueue(final boolean force)
     {
       if (!mIsOpenSplitter) {
@@ -1098,6 +1158,7 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Overrides for EquivalenceClass
+    @Override
     void doSimpleSplit(final int overflowList,
                        final int overflowSize,
                        final boolean preds)
@@ -1119,7 +1180,9 @@ public class ObservationEquivalenceTRSimplifier
       }
       overflowClass.setUpStateToClass();
       overflowClass.enqueue(false);
-      mEquivalence.enqueueBigBrother(this);
+      if (mEquivalence.mustEnqueueBigBrother()) {
+        enqueue(false);
+      }
     }
 
     //#######################################################################
@@ -1154,6 +1217,7 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface java.util.Comparable<Splitter>
+    @Override
     public int compareTo(final Splitter splitter)
     {
       if (mInfo == null) {
@@ -1170,26 +1234,31 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface Splitter
+    @Override
     public ComplexEquivalenceClass getParent()
     {
       return mParent;
     }
 
+    @Override
     public void setParent(final ComplexEquivalenceClass parent)
     {
       mParent = parent;
     }
 
+    @Override
     public InfoMap getInfo()
     {
       return mInfo;
     }
 
+    @Override
     public void setInfo(final InfoMap info)
     {
       mInfo = info;
     }
 
+    @Override
     public void splitOn()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -1202,7 +1271,7 @@ public class ObservationEquivalenceTRSimplifier
       final int size = getSize();
       final int first = mEquivalence.getFirstSplitEvent();
       for (int event = first; event < mNumEvents; event++) {
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           for (int i = 0; i < size; i++) {
@@ -1231,6 +1300,7 @@ public class ObservationEquivalenceTRSimplifier
       mMaxInfoSize = Math.max(mMaxInfoSize, info.size());
     }
 
+    @Override
     public void enqueue(final boolean force)
     {
       mParent = null;
@@ -1417,6 +1487,7 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface java.util.Comparable<Splitter>
+    @Override
     public int compareTo(final Splitter splitter)
     {
       if (mInfo == null) {
@@ -1433,37 +1504,44 @@ public class ObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface Splitter
+    @Override
     public int getSize()
     {
       return mSize;
     }
 
+    @Override
     public ComplexEquivalenceClass getParent()
     {
       return mParent;
     }
 
+    @Override
     public void setParent(final ComplexEquivalenceClass parent)
     {
       mParent = parent;
     }
 
+    @Override
     public InfoMap getInfo()
     {
       return mInfo;
     }
 
+    @Override
     public void setInfo(final InfoMap info)
     {
       mInfo = info;
     }
 
+    @Override
     public void collect(final TIntArrayList states)
     {
       mLittleChild.collect(states);
       mBigChild.collect(states);
     }
 
+    @Override
     public void splitOn()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -1479,7 +1557,7 @@ public class ObservationEquivalenceTRSimplifier
       final TIntHashSet visited = new TIntHashSet();
       final int first = mEquivalence.getFirstSplitEvent();
       for (int event = first; event < mNumEvents; event++) {
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           for (int i = 0; i < tempSize; i++) {
@@ -1538,6 +1616,7 @@ public class ObservationEquivalenceTRSimplifier
       mMaxInfoSize = Math.max(mMaxInfoSize, littleInfo.size());
     }
 
+    @Override
     public void enqueue(final boolean force)
     {
       mParent = null;
@@ -1569,6 +1648,7 @@ public class ObservationEquivalenceTRSimplifier
       return writer.toString();
     }
 
+    @Override
     public void dump(final PrintWriter printer)
     {
       printer.write('<');
@@ -1715,8 +1795,9 @@ public class ObservationEquivalenceTRSimplifier
         return simplifier.new PlainEquivalenceClass(states);
       }
       @Override
-      void enqueueBigBrother(final PlainEquivalenceClass clazz)
+      boolean mustEnqueueBigBrother()
       {
+        return false;
       }
     },
     /**
@@ -1796,11 +1877,6 @@ public class ObservationEquivalenceTRSimplifier
       return respectsTau() ? EventEncoding.TAU : EventEncoding.NONTAU;
     }
 
-    void enqueueBigBrother(final PlainEquivalenceClass clazz)
-    {
-      clazz.enqueue(false);
-    }
-
     TransitionRemoval getTransitionRemovalMode
       (final ObservationEquivalenceTRSimplifier simplifier)
     {
@@ -1809,6 +1885,18 @@ public class ObservationEquivalenceTRSimplifier
       } else {
         return TransitionRemoval.NONE;
       }
+    }
+
+    /**
+     * Returns whether the algorithm should always enqueue both equivalence
+     * classes resulting from a split. When minimising deterministic
+     * automata or when using the "info map" for bisimulation, only the
+     * smaller class resulting from a split may need to be checked again.
+     * Otherwise, both classes are enqueued to be checked again.
+     */
+    boolean mustEnqueueBigBrother()
+    {
+      return true;
     }
 
     void applyResultPartition
@@ -1877,7 +1965,7 @@ public class ObservationEquivalenceTRSimplifier
      * Enables the first pass to remove of redundant transitions for all events
      * except the silent event with code {@link EventEncoding#TAU}. This option
      * is safe for all automata, and is used as the default. The second pass is
-     * performed in addition (even in case of trivial partition, to remove
+     * performed in addition (even in case of a trivial partition, to remove
      * tau-transitions).
      */
     NONTAU {
@@ -2027,11 +2115,13 @@ public class ObservationEquivalenceTRSimplifier
   private int mNumEvents;
   private int mNumClasses;
   private int mStateShift;
+  private float mFanout;
   private boolean mHasModifications;
 
   private TauClosure mTauClosure;
   private TransitionIterator mTauIterator;
-  private TransitionIterator mEventIterator;
+  private TransitionIterator mEventClosureIterator;
+  private TransitionIterator mPlainEventIterator;
   private IntListBuffer mClassLists;
   private IntListBuffer.ReadOnlyIterator mClassReadIterator;
   private IntListBuffer.ModifyingIterator mClassWriteIterator;
@@ -2043,3 +2133,4 @@ public class ObservationEquivalenceTRSimplifier
   private int mMaxInfoSize;
 
 }
+

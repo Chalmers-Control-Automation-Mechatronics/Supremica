@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -107,6 +109,19 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     final File rootdir = getWatersInputRoot();
     final File groupdir = new File(rootdir, group);
     runModelVerifier(groupdir, subdir, name, expect);
+  }
+
+  protected void runModelVerifier(final String group,
+                                  final String subdir1,
+                                  final String subdir2,
+                                  final String name,
+                                  final boolean expect)
+      throws Exception
+  {
+    final File rootdir = getWatersInputRoot();
+    final File groupdir1 = new File(rootdir, group);
+    final File groupdir2 = new File(groupdir1, subdir1);
+    runModelVerifier(groupdir2, subdir2, name, expect);
   }
 
   protected void runModelVerifier(final File groupdir, final String subdir,
@@ -383,7 +398,9 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       if (!result) {
         counterexample = mModelVerifier.getCounterExample();
         precheckCounterExample(counterexample);
-        saveCounterExample(counterexample);
+        if (counterexample != null) {
+          saveCounterExample(counterexample);
+        }
       }
       assertEquals("Wrong result from model checker: got " + result +
                    " but should have been " + expect + "!", expect, result);

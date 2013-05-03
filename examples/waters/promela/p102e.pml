@@ -1,8 +1,8 @@
-/*                                                                    
- * A test for the Promela importer in Waters.                         
- * This tests whether the compiler can distinguish two channels
+/*            
+ * A test for the Promela importer in Waters.
+ * This tests whether the compiler can distinguish two channels      
  * of different length.
- */                                                                   
+ */           
 
 chan msg = [1] of { byte };
 chan ack = [0] of { byte };

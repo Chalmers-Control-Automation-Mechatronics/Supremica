@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -59,18 +59,21 @@ public class NativeModelVerifierFactory
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  @Override
   public NativeConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
     return new NativeConflictChecker(factory);
   }
 
+  @Override
   public NativeControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
     return new NativeControllabilityChecker(factory);
   }
 
+  @Override
   public NativeLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
@@ -88,7 +91,8 @@ public class NativeModelVerifierFactory
       super("-broad", "Run state expansion in 'broad' mode");
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.BROAD);
@@ -106,7 +110,8 @@ public class NativeModelVerifierFactory
       super("-narrow", "Run state expansion in 'narrow' mode");
     }
 
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.NARROW);

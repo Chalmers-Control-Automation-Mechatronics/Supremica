@@ -9,10 +9,11 @@
 
 package net.sourceforge.waters.subject.module;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -22,9 +23,11 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.base.DocumentSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.SetSubject;
 import net.sourceforge.waters.subject.base.Subject;
-import net.sourceforge.waters.subject.base.SubjectTools;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -59,7 +62,7 @@ class ChildNodeSetSubject
    */
   public ChildNodeSetSubject(final int size)
   {
-    mProxySet = new HashSet<NodeSubject>(size);
+    mProxySet = new THashSet<NodeSubject>(size);
   }
 
   /**
@@ -91,7 +94,7 @@ class ChildNodeSetSubject
       final ChildNodeSetSubject cloned = (ChildNodeSetSubject) super.clone();
       cloned.mParent = null;
       cloned.mObservers = null;
-      cloned.mProxySet = new HashSet<NodeSubject>(mProxySet);
+      cloned.mProxySet = new THashSet<NodeSubject>(mProxySet);
       return cloned;
     } catch (final CloneNotSupportedException exception) {
       throw new WatersRuntimeException(exception);
@@ -171,10 +174,44 @@ class ChildNodeSetSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SetSubject
-  public void assignFrom(final Set<? extends NodeSubject> set)
+  public UndoInfo createUndoInfo(final Set<? extends NodeSubject> newSet,
+                                 final Set<? extends Subject> boundary)
   {
-    throw new UnsupportedOperationException
-      ("Child node set assignment not yet implemented!");
+    if (boundary != null && boundary.contains(this)) {
+      return null;
+    }
+    final RecursiveUndoInfo info = new RecursiveUndoInfo(this);
+    for (final NodeSubject oldNode : this) {
+      if (!newSet.contains(oldNode)) {
+        final UndoInfo remove = new ReplacementUndoInfo(oldNode, null);
+        info.add(remove);
+      }
+    }
+    for (final NodeSubject newNode : newSet) {
+      if (!contains(newNode)) {
+        final UndoInfo add = new ReplacementUndoInfo(null, newNode);
+        info.add(add);
+      }
+    }
+    if (info.isEmpty()) {
+      return null;
+    } else {
+      return info;
+    }
+  }
+
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
+  {
+    if (oldValue != null) {
+      remove(oldValue);
+    }
+    if (newValue != null) {
+      final NodeSubject node = (NodeSubject) newValue;
+      add(node);
+    }
+    return null;
   }
 
 
@@ -233,11 +270,6 @@ class ChildNodeSetSubject
     return mObservers;
   }
 
-  public void fireModelChanged(final ModelChangeEvent event)
-  {
-    SubjectTools.fireModelChanged(this, event);
-  }
-
 
   //#########################################################################
   //# Printing
@@ -256,14 +288,14 @@ class ChildNodeSetSubject
   {
     final ModelChangeEvent event =
       ModelChangeEvent.createItemAdded(this, node);
-    fireModelChanged(event);
+    event.fire();
   }
 
   private void afterRemove(final Subject subject)
   {
     final ModelChangeEvent event =
       ModelChangeEvent.createItemRemoved(this, subject);
-    fireModelChanged(event);
+    event.fire();
   }
 
 
@@ -329,3 +361,4 @@ class ChildNodeSetSubject
   private Set<NodeSubject> mProxySet;
 
 }
+

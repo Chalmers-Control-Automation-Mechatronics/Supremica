@@ -1,0 +1,730 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.tr
+//# CLASS:   WatersLongIntHashMap
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.analysis.tr;
+
+import gnu.trove.function.TIntFunction;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.procedure.TLongIntProcedure;
+import gnu.trove.procedure.TLongProcedure;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
+
+/**
+ * An open addressed map implementation for <CODE>long</CODE> keys and
+ * <CODE>int</CODE> values.
+ *
+ * This is a modified version of {@link gnu.trove.TLongIntHashMap} that
+ * supports configurable equality of keys.
+ *
+ * @author Eric D. Friedman, Robi Malik
+ */
+
+public class WatersLongIntHashMap
+  extends WatersLongHash
+{
+
+  //#########################################################################
+  //# Constructors
+  /**
+   * Creates a new <code>WatersLongIntHashMap</code> instance with the default
+   * capacity and load factor.
+   */
+  public WatersLongIntHashMap()
+  {
+    super();
+    mDefaultValue = 0;
+  }
+
+  /**
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime
+   * capacity equal to or greater than <tt>initialCapacity</tt> and with the
+   * default load factor.
+   * @param initialCapacity
+   *          used to find a prime capacity for the table.
+   */
+  public WatersLongIntHashMap(final int initialCapacity)
+  {
+    super(initialCapacity);
+    mDefaultValue = 0;
+  }
+
+  /**
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime
+   * capacity equal to or greater than <tt>initialCapacity</tt> and with the
+   * specified load factor.
+   * @param initialCapacity
+   *          used to find a prime capacity for the table.
+   * @param defaultValue
+   *          value to be returned when looking up a nonexistent key.
+   */
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final int defaultValue)
+  {
+    super(initialCapacity);
+    mDefaultValue = defaultValue;
+  }
+
+  /**
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime
+   * capacity equal to or greater than <tt>initialCapacity</tt> and with the
+   * specified load factor.
+   * @param initialCapacity
+   *          used to find a prime capacity for the table.
+   * @param defaultValue
+   *          value to be returned when looking up a nonexistent key.
+   */
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final int defaultValue,
+                              final float loadFactor)
+  {
+    super(initialCapacity, loadFactor);
+    mDefaultValue = defaultValue;
+  }
+
+  /**
+   * Creates a new <code>WatersLongIntHashMap</code> instance with the default
+   * capacity and load factor.
+   * @param strategy
+   *          used to compute hash codes and to compare keys.
+   */
+  public WatersLongIntHashMap(final WatersLongHashingStrategy strategy)
+  {
+    super(strategy);
+    mDefaultValue = 0;
+  }
+
+  /**
+   * Creates a new <code>WatersLongIntHashMap</code> instance whose capacity is
+   * the next highest prime above <tt>initialCapacity + 1</tt> unless that value
+   * is already prime.
+   * @param initialCapacity
+   *          used to find a prime capacity for the table.
+   * @param strategy
+   *          used to compute hash codes and to compare keys.
+   */
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final WatersLongHashingStrategy strategy)
+  {
+    super(initialCapacity, strategy);
+    mDefaultValue = 0;
+  }
+
+  /**
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime value
+   * at or near the specified capacity and load factor.
+   * @param initialCapacity
+   *          used to find a prime capacity for the table.
+   * @param defaultValue
+   *          value to be returned when looking up a nonexistent key.
+   * @param strategy
+   *          used to compute hash codes and to compare keys.
+   */
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final int defaultValue,
+                              final WatersLongHashingStrategy strategy)
+  {
+    super(initialCapacity, strategy);
+    mDefaultValue = defaultValue;
+  }
+
+  /**
+   * Creates a new <code>WatersLongIntHashMap</code> instance with a prime value
+   * at or near the specified capacity and load factor.
+   * @param initialCapacity
+   *          used to find a prime capacity for the table.
+   * @param defaultValue
+   *          value to be returned when looking up a nonexistent key.
+   * @param loadFactor
+   *          used to calculate the threshold over which rehashing takes place.
+   * @param strategy
+   *          used to compute hash codes and to compare keys.
+   */
+  public WatersLongIntHashMap(final int initialCapacity,
+                              final int defaultValue,
+                              final float loadFactor,
+                              final WatersLongHashingStrategy strategy)
+  {
+    super(initialCapacity, loadFactor, strategy);
+    mDefaultValue = defaultValue;
+  }
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  /**
+   * @return a deep clone of this collection
+   */
+  @Override
+  public Object clone()
+  {
+    final WatersLongIntHashMap m = (WatersLongIntHashMap) super.clone();
+    m.mValues = this.mValues.clone();
+    return m;
+  }
+
+  /**
+   * Initialises the hash table to a prime capacity which is at least
+   * <tt>initialCapacity + 1</tt>.
+   *
+   * @param initialCapacity
+   *          an <code>int</code> value
+   * @return the actual capacity chosen
+   */
+  @Override
+  public int setUp(final int initialCapacity)
+  {
+    final int capacity = super.setUp(initialCapacity);
+    mValues = new int[capacity];
+    return capacity;
+  }
+
+  /**
+   * Inserts a key/value pair into the map.
+   *
+   * @param key
+   *          A <code>long</code> key.
+   * @param value
+   *          An <code>int</code> value.
+   * @return The previous value associated with <tt>key</tt>,
+   *         or the default value if none was found.
+   */
+  public int put(final long key, final int value)
+  {
+    final int index = insertionIndex(key);
+    return doPut(key, value, index);
+  }
+
+  /**
+   * Inserts a key/value pair into the map if the specified key is not already
+   * associated with a value.
+   * @return The previous value associated with <tt>key</tt>,
+   *         or the default value if none was found.
+   */
+  public int putIfAbsent(final long key, final int value)
+  {
+    final int index = insertionIndex(key);
+    if (index < 0) {
+      return mValues[-index - 1];
+    } else {
+      return doPut(key, value, index);
+    }
+  }
+
+  private int doPut(final long key, final int value, int index)
+  {
+    byte previousState;
+    int previous = mDefaultValue;
+    boolean isNewMapping = true;
+    if (index < 0) {
+      index = -index - 1;
+      previous = mValues[index];
+      isNewMapping = false;
+    }
+    previousState = _states[index];
+    _set[index] = key;
+    _states[index] = FULL;
+    mValues[index] = value;
+    if (isNewMapping) {
+      postInsertHook(previousState == FREE);
+    }
+    return previous;
+  }
+
+  /**
+   * Put all the entries from the given map into this map.
+   *
+   * @param map
+   *          The map from which entries will be obtained to put into this map.
+   */
+  public void putAll(final WatersLongIntHashMap map)
+  {
+    map.forEachEntry(PUT_ALL_PROC);
+  }
+
+  /**
+   * rehashes the map to the new capacity.
+   *
+   * @param newCapacity
+   *          a <code>long</code> value
+   */
+  @Override
+  protected void rehash(final int newCapacity)
+  {
+    final int oldCapacity = _set.length;
+    final long oldKeys[] = _set;
+    final int oldVals[] = mValues;
+    final byte oldStates[] = _states;
+
+    _set = new long[newCapacity];
+    mValues = new int[newCapacity];
+    _states = new byte[newCapacity];
+
+    for (int i = oldCapacity; i-- > 0;) {
+      if (oldStates[i] == FULL) {
+        final long o = oldKeys[i];
+        final int index = insertionIndex(o);
+        _set[index] = o;
+        mValues[index] = oldVals[i];
+        _states[index] = FULL;
+      }
+    }
+  }
+
+  /**
+   * retrieves the value for <tt>key</tt>
+   *
+   * @param key
+   *          a <code>long</code> value
+   * @return the value of <tt>key</tt> or the default value if no such
+   *         mapping exists.
+   */
+  public int get(final long key)
+  {
+    final int index = index(key);
+    return index < 0 ? mDefaultValue : mValues[index];
+  }
+
+  /**
+   * Empties the map.
+   *
+   */
+  @Override
+  public void clear()
+  {
+    super.clear();
+    Arrays.fill(_set, 0, _set.length, 0);
+    Arrays.fill(mValues, 0, mValues.length, 0);
+    Arrays.fill(_states, 0, _states.length, FREE);
+  }
+
+  /**
+   * Deletes a key/value pair from the map.
+   *
+   * @param key
+   *          a <code>long</code> value
+   * @return an <code>int</code> value, or the default value if no mapping
+   *         for key exists
+   */
+  public int remove(final long key)
+  {
+    int prev = mDefaultValue;
+    final int index = index(key);
+    if (index >= 0) {
+      prev = mValues[index];
+      removeAt(index); // clear key,state; adjust size
+    }
+    return prev;
+  }
+
+  /**
+   * Compares this map with another map for equality of their stored entries.
+   *
+   * @param other
+   *          an <code>Object</code> value
+   * @return a <code>boolean</code> value
+   */
+  @Override
+  public boolean equals(final Object other)
+  {
+    if (!(other instanceof WatersLongIntHashMap)) {
+      return false;
+    }
+    final WatersLongIntHashMap that = (WatersLongIntHashMap) other;
+    if (that.size() != this.size()) {
+      return false;
+    }
+    return forEachEntry(new EqProcedure(that));
+  }
+
+  @Override
+  public int hashCode()
+  {
+    final HashProcedure p = new HashProcedure();
+    forEachEntry(p);
+    return p.getHashCode();
+  }
+
+
+  private final class HashProcedure implements TLongIntProcedure
+  {
+    private int h = 0;
+
+    public int getHashCode()
+    {
+      return h;
+    }
+
+    @Override
+    public final boolean execute(final long key, final int value)
+    {
+      h += (_hashingStrategy.computeHashCode(key) ^ HashFunctions.hash(value));
+      return true;
+    }
+  }
+
+
+  private static final class EqProcedure implements TLongIntProcedure
+  {
+    private final WatersLongIntHashMap _otherMap;
+
+    EqProcedure(final WatersLongIntHashMap otherMap)
+    {
+      _otherMap = otherMap;
+    }
+
+    @Override
+    public final boolean execute(final long key, final int value)
+    {
+      final int index = _otherMap.index(key);
+      if (index >= 0 && eq(value, _otherMap.get(key))) {
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Compare two ints for equality.
+     */
+    private final boolean eq(final int v1, final int v2)
+    {
+      return v1 == v2;
+    }
+
+  }
+
+  /**
+   * removes the mapping at <tt>index</tt> from the map.
+   *
+   * @param index
+   *          an <code>int</code> value
+   */
+  @Override
+  protected void removeAt(final int index)
+  {
+    mValues[index] = mDefaultValue;
+    super.removeAt(index); // clear key, state; adjust size
+  }
+
+  /**
+   * Returns the values of the map.
+   *
+   * @return a <code>Collection</code> value
+   */
+  public int[] getValues()
+  {
+    final int[] vals = new int[size()];
+    final int[] v = mValues;
+    final byte[] states = _states;
+
+    for (int i = v.length, j = 0; i-- > 0;) {
+      if (states[i] == FULL) {
+        vals[j++] = v[i];
+      }
+    }
+    return vals;
+  }
+
+  /**
+   * returns the keys of the map.
+   *
+   * @return a <code>Set</code> value
+   */
+  public long[] keys()
+  {
+    final long[] keys = new long[size()];
+    final long[] k = _set;
+    final byte[] states = _states;
+    for (int i = k.length, j = 0; i-- > 0;) {
+      if (states[i] == FULL) {
+        keys[j++] = k[i];
+      }
+    }
+    return keys;
+  }
+
+  /**
+   * returns the keys of the map.
+   *
+   * @param a
+   *          the array into which the elements of the list are to be stored, if
+   *          it is big enough; otherwise, a new array of the same type is
+   *          allocated for this purpose.
+   * @return a <code>Set</code> value
+   */
+  public long[] keys(long[] a)
+  {
+    final int size = size();
+    if (a.length < size) {
+      a = (long[]) Array.newInstance(a.getClass().getComponentType(), size);
+    }
+    final long[] k = _set;
+    final byte[] states = _states;
+    for (int i = k.length, j = 0; i-- > 0;) {
+      if (states[i] == FULL) {
+        a[j++] = k[i];
+      }
+    }
+    return a;
+  }
+
+  /**
+   * checks for the presence of <tt>val</tt> in the values of the map.
+   *
+   * @param val
+   *          an <code>int</code> value
+   * @return a <code>boolean</code> value
+   */
+  public boolean containsValue(final int val)
+  {
+    final byte[] states = _states;
+    final int[] vals = mValues;
+    for (int i = vals.length; i-- > 0;) {
+      if (states[i] == FULL && val == vals[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * checks for the present of <tt>key</tt> in the keys of the map.
+   *
+   * @param key
+   *          an <code>int</code> value
+   * @return a <code>boolean</code> value
+   */
+  public boolean containsKey(final long key)
+  {
+    return contains(key);
+  }
+
+  /**
+   * Executes <tt>procedure</tt> for each key in the map.
+   *
+   * @param procedure
+   *          a <code>TIntProcedure</code> value
+   * @return false if the loop over the keys terminated because the procedure
+   *         returned false for some key.
+   */
+  public boolean forEachKey(final TLongProcedure procedure)
+  {
+    return forEach(procedure);
+  }
+
+  /**
+   * Executes <tt>procedure</tt> for each value in the map.
+   *
+   * @param procedure
+   *          a <code>TIntProcedure</code> value
+   * @return false if the loop over the values terminated because the procedure
+   *         returned false for some value.
+   */
+  public boolean forEachValue(final TIntProcedure procedure)
+  {
+    final byte[] states = _states;
+    final int[] values = mValues;
+    for (int i = values.length; i-- > 0;) {
+      if (states[i] == FULL && !procedure.execute(values[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Executes <tt>procedure</tt> for each key/value entry in the map.
+   *
+   * @param procedure
+   *          a <code>TOIntIntProcedure</code> value
+   * @return false if the loop over the entries terminated because the procedure
+   *         returned false for some entry.
+   */
+  public boolean forEachEntry(final TLongIntProcedure procedure)
+  {
+    final byte[] states = _states;
+    final long[] keys = _set;
+    final int[] values = mValues;
+    for (int i = keys.length; i-- > 0;) {
+      if (states[i] == FULL && !procedure.execute(keys[i], values[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Retains only those entries in the map for which the procedure returns a
+   * true value.
+   *
+   * @param procedure
+   *          determines which entries to keep
+   * @return true if the map was modified.
+   */
+  public boolean retainEntries(final TLongIntProcedure procedure)
+  {
+    boolean modified = false;
+    final byte[] states = _states;
+    final long[] keys = _set;
+    final int[] values = mValues;
+    // Temporarily disable compaction. This is a fix for bug #1738760
+    tempDisableAutoCompaction();
+    try {
+      for (int i = keys.length; i-- > 0;) {
+        if (states[i] == FULL && !procedure.execute(keys[i], values[i])) {
+          removeAt(i);
+          modified = true;
+        }
+      }
+    } finally {
+      reenableAutoCompaction(true);
+    }
+    return modified;
+  }
+
+  /**
+   * Transform the values in this map using <tt>function</tt>.
+   *
+   * @param function
+   *          a <code>TIntFunction</code> value
+   */
+  public void transformValues(final TIntFunction function)
+  {
+    final byte[] states = _states;
+    final int[] values = mValues;
+    for (int i = values.length; i-- > 0;) {
+      if (states[i] == FULL) {
+        values[i] = function.execute(values[i]);
+      }
+    }
+  }
+
+  /**
+   * Increments the primitive value mapped to key by 1
+   *
+   * @param key
+   *          the key of the value to increment
+   * @return true if a mapping was found and modified.
+   */
+  public boolean increment(final long key)
+  {
+    return adjustValue(key, 1);
+  }
+
+  /**
+   * Adjusts the primitive value mapped to key.
+   *
+   * @param key
+   *          the key of the value to increment
+   * @param amount
+   *          the amount to adjust the value by.
+   * @return true if a mapping was found and modified.
+   */
+  public boolean adjustValue(final long key, final int amount)
+  {
+    final int index = index(key);
+    if (index < 0) {
+      return false;
+    } else {
+      mValues[index] += amount;
+      return true;
+    }
+  }
+
+  /**
+   * Adjusts the primitive value mapped to the key if the key is present in the
+   * map. Otherwise, the <tt>initial_value</tt> is put in the map.
+   *
+   * @param key
+   *          the key of the value to increment
+   * @param adjust_amount
+   *          the amount to adjust the value by
+   * @param put_amount
+   *          the value put into the map if the key is not initial present
+   * @return the value present in the map after the adjustment or put operation
+   */
+  public int adjustOrPutValue(final long key, final int adjust_amount,
+                              final int put_amount)
+  {
+    int index = insertionIndex(key);
+    final boolean isNewMapping;
+    final int newValue;
+    if (index < 0) {
+      index = -index - 1;
+      newValue = (mValues[index] += adjust_amount);
+      isNewMapping = false;
+    } else {
+      newValue = (mValues[index] = put_amount);
+      isNewMapping = true;
+    }
+    final byte previousState = _states[index];
+    _set[index] = key;
+    _states[index] = FULL;
+    if (isNewMapping) {
+      postInsertHook(previousState == FREE);
+    }
+    return newValue;
+  }
+
+  @Override
+  public String toString()
+  {
+    final StringBuilder buf = new StringBuilder("{");
+    forEachEntry(new TLongIntProcedure() {
+      private boolean first = true;
+
+      @Override
+      public boolean execute(final long key, final int value)
+      {
+        if (first)
+          first = false;
+        else
+          buf.append(",");
+
+        buf.append(key);
+        buf.append("=");
+        buf.append(value);
+        return true;
+      }
+    });
+    buf.append("}");
+    return buf.toString();
+  }
+
+
+  //########################################################################
+  //# Data Members
+  /**
+   * The values of the map.
+   */
+  private transient int[] mValues;
+
+  /**
+   * The default value for nonexistent keys
+   */
+  private final int mDefaultValue;
+
+
+  //########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
+  private final TLongIntProcedure PUT_ALL_PROC = new TLongIntProcedure() {
+    @Override
+    public boolean execute(final long key, final int value)
+    {
+      put(key, value);
+      return true;
+    }
+  };
+
+}
+

@@ -1,8 +1,8 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TLongHashSet;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -143,3 +143,4 @@ public class EquivalentIncoming
     TIME += System.currentTimeMillis();
   }*/
 }
+

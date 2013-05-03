@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+
 
 /**
  * A floating point number command line argument passed to a
@@ -75,6 +77,7 @@ public abstract class CommandLineArgumentDouble
 
   //#######################################################################
   //# Simple Access
+  @Override
   protected String getArgumentTemplate()
   {
     return "<n>";
@@ -89,7 +92,7 @@ public abstract class CommandLineArgumentDouble
   //#######################################################################
   //# Parsing
   @Override
-  protected void parse(final Iterator<String> iter)
+  public void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
       final String value = iter.next();

@@ -9,11 +9,12 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntIterator;
-import gnu.trove.TIntStack;
-import gnu.trove.TLongHashSet;
+import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.List;
 
@@ -144,12 +145,12 @@ public class WeakObservationEquivalencePartitioning
     final int numEvents = mTransitionRelation.getNumberOfProperEvents();
     mAdditionalTransitions = new PreTransitionBuffer(numEvents);
     final int tau = EventEncoding.TAU;
-    final TIntStack tauStack = new TIntStack();
+    final TIntStack tauStack = new TIntArrayStack();
     final TransitionIterator tauEventIter =
       mTransitionRelation.createAnyReadOnlyIterator();
     final TIntHashSet tauSuccessors = new TIntHashSet();
     final TIntHashSet succClasses = new TIntHashSet();
-    final TIntStack eventStack = new TIntStack();
+    final TIntStack eventStack = new TIntArrayStack();
     final TransitionIterator eventIter =
       mTransitionRelation.createAnyReadOnlyIterator();
     final TIntHashSet eventSuccessors = new TIntHashSet();
@@ -307,3 +308,4 @@ public class WeakObservationEquivalencePartitioning
   private PreTransitionBuffer mAdditionalTransitions;
 
 }
+

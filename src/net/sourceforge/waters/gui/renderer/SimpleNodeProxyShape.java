@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.PropositionIcon;
+import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import org.supremica.properties.Config;
@@ -118,6 +118,7 @@ public class SimpleNodeProxyShape
                               final Rectangle2D bounds,
                               final List<Color> colors)
   {
+    graphics.setStroke(SINGLESTROKE);
     if (colors == null) {
       final Arc2D arc = new Arc2D.Double(bounds, 0, 360, Arc2D.OPEN);
       graphics.draw(arc);

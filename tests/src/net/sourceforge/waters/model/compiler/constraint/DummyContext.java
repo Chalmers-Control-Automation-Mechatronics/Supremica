@@ -10,11 +10,6 @@
 
 package net.sourceforge.waters.model.compiler.constraint;
 
-import java.util.AbstractSet;
-import java.util.Collection;
-import java.util.Iterator;
-
-import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
@@ -43,17 +38,20 @@ class DummyContext implements VariableContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+  @Override
   public SimpleExpressionProxy getBoundExpression
     (final SimpleExpressionProxy ident)
   {
     return null;
   }
 
+  @Override
   public boolean isEnumAtom(final IdentifierProxy ident)
   {
     return mAtoms.containsProxy(ident);
   }
 
+  @Override
   public ModuleBindingContext getModuleBindingContext()
   {
     return null;
@@ -62,14 +60,16 @@ class DummyContext implements VariableContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.context.VariableContext
+  @Override
   public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
   {
    return mRangeMap.getByProxy(varname);
   }
 
-  public Collection<SimpleExpressionProxy> getVariableNames()
+  @Override
+  public int getNumberOfVariables()
   {
-    return new VariableNameSet(mRangeMap);
+    return mRangeMap.size();
   }
 
 
@@ -84,79 +84,6 @@ class DummyContext implements VariableContext
                    final CompiledRange range)
   {
     mRangeMap.putByProxy(varname, range);
-  }
-
-
-  //#########################################################################
-  //# Inner Class VariableNameSet
-  private class VariableNameSet
-    extends AbstractSet<SimpleExpressionProxy>
-  {
-
-    //#######################################################################
-    //# Constructor
-    VariableNameSet
-      (final ProxyAccessorMap<SimpleExpressionProxy,CompiledRange> map)
-    {
-      mMap = map;
-    }
-
-    //#######################################################################
-    //# Interface java.util.Set
-    public int size()
-    {
-      return mMap.size();
-    }
-
-    public Iterator<SimpleExpressionProxy> iterator()
-    {
-      return new VariableNameIterator(mMap.keySet().iterator());
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final ProxyAccessorMap<SimpleExpressionProxy,CompiledRange> mMap;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class VariableNameIterator
-  private class VariableNameIterator
-    implements Iterator<SimpleExpressionProxy>
-  {
-
-    //#######################################################################
-    //# Constructor
-    VariableNameIterator
-      (final Iterator<ProxyAccessor<SimpleExpressionProxy>> master)
-    {
-      mMaster = master;
-    }
-
-    //#######################################################################
-    //# Interface java.util.Iterator
-    public boolean hasNext()
-    {
-      return mMaster.hasNext();
-    }
-
-    public SimpleExpressionProxy next()
-    {
-      final ProxyAccessor<SimpleExpressionProxy> accessor = mMaster.next();
-      return accessor.getProxy();
-    }
-
-    public void remove()
-    {
-      throw new UnsupportedOperationException
-        ("Can't remove variables through variable name iteration!");
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final Iterator<ProxyAccessor<SimpleExpressionProxy>> mMaster;
-
   }
 
 

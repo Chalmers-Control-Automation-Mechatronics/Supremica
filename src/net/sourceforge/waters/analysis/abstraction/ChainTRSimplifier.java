@@ -9,18 +9,14 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.base.ProxyTools;
-
-import org.apache.log4j.Logger;
 
 
 public class ChainTRSimplifier
@@ -58,17 +54,17 @@ public class ChainTRSimplifier
 
   //#########################################################################
   //# Configuration
-  int size()
+  public int size()
   {
     return mSteps.size();
   }
 
-  TransitionRelationSimplifier getStep(final int index)
+  public TransitionRelationSimplifier getStep(final int index)
   {
     return mSteps.get(index);
   }
 
-  int add(final TransitionRelationSimplifier step)
+  public int add(final TransitionRelationSimplifier step)
   {
     final int index = size();
     final int config = step.getPreferredInputConfiguration();
@@ -113,16 +109,10 @@ public class ChainTRSimplifier
     }
   }
 
+  @Override
   public boolean isPartitioning()
   {
     return mIsPartitioning;
-  }
-
-  public boolean run()
-    throws AnalysisException
-  {
-    mStopIndex = size();
-    return super.run();
   }
 
   @Override
@@ -137,6 +127,7 @@ public class ChainTRSimplifier
     return mReducedMarkings[propID];
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     if (mSteps != null) {
@@ -150,12 +141,30 @@ public class ChainTRSimplifier
   }
 
   @Override
+  public void collectStatistics(final List<TRSimplifierStatistics> list)
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.collectStatistics(list);
+    }
+  }
+
+  @Override
   public void reset()
   {
     super.reset();
     for (final TransitionRelationSimplifier step : mSteps) {
       step.reset();
     }
+  }
+
+  @Override
+  protected void logStart()
+  {
+  }
+
+  @Override
+  protected void logFinish(final boolean success)
+  {
   }
 
 
@@ -172,51 +181,27 @@ public class ChainTRSimplifier
 
 
   //#########################################################################
-  //# Specific Access
-  public boolean runTo(final int index)
-  throws AnalysisException
-  {
-    mStopIndex = index;
-    return super.run();
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for net.sourceforge.waters.analysis.abstraction.
+  //# AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()
   throws AnalysisException
   {
-    final Logger logger = getLogger();
     mIsObservationEquivalentAbstraction = true;
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (logger.isDebugEnabled()) {
-      logger.debug(rel.getName());
-      logger.debug(rel.getNumberOfReachableStates() + " states, " +
-                   rel.getNumberOfTransitions() + " transitions, " +
-                   rel.getNumberOfMarkings() + " markings.");
-    }
     final int numProps = rel.getNumberOfPropositions();
     mReducedMarkings = new boolean[numProps];
     boolean result = false;
-    final Iterator<TransitionRelationSimplifier> iter = mSteps.iterator();
-    for (int index = 0; index < mStopIndex; index++) {
+    for (final TransitionRelationSimplifier step : mSteps) {
       checkAbort();
-      final TransitionRelationSimplifier step = iter.next();
-      if (logger.isDebugEnabled()) {
-        logger.debug(ProxyTools.getShortClassName(step) + " ...");
-      }
       final int config = step.getPreferredInputConfiguration();
       if (config != 0) {
         rel.reconfigure(config);
       }
       step.setTransitionRelation(rel);
       if (step.run()) {
-        if (logger.isDebugEnabled()) {
-          logger.debug(rel.getNumberOfReachableStates() + " states, " +
-                       rel.getNumberOfTransitions() + " transitions, " +
-                       rel.getNumberOfMarkings() + " markings.");
-        }
+        final ListBufferTransitionRelation rel1 = step.getTransitionRelation();
+        setTransitionRelation(rel1);
         result = true;
         mIsObservationEquivalentAbstraction &=
           step.isObservationEquivalentAbstraction();
@@ -224,8 +209,11 @@ public class ChainTRSimplifier
           mReducedMarkings[prop] |= step.isReducedMarking(prop);
         }
         if (isPartitioning()) {
-          final List<int[]> partition = step.getResultPartition();
-          mergePartitions(partition);
+          final List<int[]> currentPartition = getResultPartition();
+          final List<int[]> newPartition = step.getResultPartition();
+          final List<int[]> combinedPartition =
+            mergePartitions(currentPartition, newPartition);
+          setResultPartitionList(combinedPartition);
         }
       }
     }
@@ -234,40 +222,39 @@ public class ChainTRSimplifier
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void mergePartitions(final List<int[]> next)
+  //# Merging Partitions
+  public static List<int[]> mergePartitions(final List<int[]> part1,
+                                     final List<int[]> part2)
   {
-    if (next == null) {
-      return;
-    }
-    final List<int[]> current = getResultPartition();
-    if (current == null) {
-      setResultPartitionList(next);
-      return;
-    }
-    final int nextSize = next.size();
-    final List<int[]> result = new ArrayList<int[]>(nextSize);
-    final TIntArrayList clazz = new TIntArrayList();
-    for (final int[] clazz2 : next) {
-      for (final int state2 : clazz2) {
-        final int[] clazz1 = current.get(state2);
-        for (final int state1 : clazz1) {
-          clazz.add(state1);
+    if (part1 == null) {
+      return part2;
+    } else if (part2 == null) {
+      return part1;
+    } else {
+      final int size2 = part2.size();
+      final List<int[]> result = new ArrayList<int[]>(size2);
+      final TIntArrayList clazz = new TIntArrayList();
+      for (final int[] clazz2 : part2) {
+        for (final int state2 : clazz2) {
+          final int[] clazz1 = part1.get(state2);
+          for (final int state1 : clazz1) {
+            clazz.add(state1);
+          }
         }
+        result.add(clazz.toArray());
+        clazz.clear();
       }
-      result.add(clazz.toNativeArray());
-      clazz.clear();
+      return result;
     }
-    setResultPartitionList(result);
   }
 
 
   //#########################################################################
   //# Data Members
   private final List<TransitionRelationSimplifier> mSteps;
-  private int mStopIndex;
   private boolean mIsPartitioning;
   private boolean mIsObservationEquivalentAbstraction;
   private boolean[] mReducedMarkings;
 
 }
+

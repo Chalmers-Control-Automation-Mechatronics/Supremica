@@ -132,7 +132,7 @@ public interface TransitionRelationSimplifier
   /**
    * Returns whether the abstraction produced by the last {@link #run()}
    * is weak observation equivalent to the input automaton. This information
-   * is used to enabled more efficient trace computation.
+   * is used to enable more efficient trace computation.
    */
   public boolean isObservationEquivalentAbstraction();
 
@@ -160,6 +160,15 @@ public interface TransitionRelationSimplifier
    * {@link #createStatistics()} was called.
    */
   public TRSimplifierStatistics getStatistics();
+
+  /**
+   * Stores statistics in the given list. This method is used to
+   * collect detailed statistics for each individual simplifier invoked by
+   * this simplifier.
+   * @param  list           Statistics records are added to the end of this
+   *                        list, in order of invocation of the simplifiers.
+   */
+  public void collectStatistics(List<TRSimplifierStatistics> list);
 
   /**
    * Cleans up. This method removes all temporary data and results

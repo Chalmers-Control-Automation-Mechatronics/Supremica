@@ -1,110 +1,113 @@
 package org.supremica.external.avocades.common;
 
 import java.util.LinkedList;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
 
 import org.supremica.automata.ExtendedAutomaton;
 
 public class EFA extends ExtendedAutomaton{
-	
+
 	/**
     *
     * list of states to store added state
     * in ExtendedAutomata
     *
     */
-   private LinkedList<String> states;
-   
+   private final LinkedList<String> states;
+
    /**
     * list of events to store added event
     * in ExtendedAutomaton
     */
-   private LinkedList<String> events;
-   
-   private Module module;
+   private final LinkedList<String> events;
 
-   public EFA(String name, Module m){
+   private final Module module;
+
+   @SuppressWarnings("deprecation")
+   public EFA(final String name, final Module m){
 	   super(name,m,true);
-	   
+
 	   module = m;
-	   
+
 	   states = new LinkedList<String>();
 	   events = new LinkedList<String>();
    }
-   
-   public void addTransition(String from, String to,
-		   String event, String guard, String action ){
-	   
+
+   public void addTransition(final String from, final String to,
+		   String event, final String guard, String action ){
+
 	   this.addEvent(event);
-	   
+
 	   //event, guard and action must ends whit ;
 	   if(event.length() > 0 && !event.endsWith(";")){
 		   event = event.concat(";");
 	   }
-	   
+
 	   if(action.length() > 0 && !action.endsWith(";")){
 		   action = action.concat(";");
 	   }
-	   
+
 	   //super
 	   super.addTransition(from,to,event,guard,action);
    }
-   
-   public void addState(String name){
-	   this.addState(name, false, false);
+
+   public NodeProxy addState(final String name){
+	   return this.addState(name, false, false);
    }
-   
-   public void addInitialState(String name){
+
+   public void addInitialState(final String name){
 	   this.addState(name, false, true);
    }
-   
-   public void addInitialState(String name, boolean accepting){
+
+   public void addInitialState(final String name, final boolean accepting){
 	   this.addState(name, accepting, true);
    }
-   
-   public void addAcceptingState(String name){
+
+   public void addAcceptingState(final String name){
 	   this.addState(name, true, false);
    }
-   
+
    /**
-    * 
+    *
     */
-   public void addState(String name, boolean accepting, boolean initial){
+   public NodeProxy addState(final String name, final boolean accepting, final boolean initial){
 	 //check in data
        if(name == null){
-           return;
+           return null;
        }else if(name.length() == 0){
-    	   return;
+    	   return null;
        }
-       
+
        //check if we already added this state
        if(states.contains(name)){
-    	   return;
+    	   return null;
        }
- 
        //add new state
-       super.addState(name, accepting, initial,false);
+       final NodeProxy state = super.addState(name, accepting, initial,false);
        states.add(name);
+       return state;
    }
-   
+
    /**
     * add event String event to automata (module).
     * if e already exist or null do nothing.
-    * 
+    *
     * @param event events separated whit ; tex. e1;e2;
     */
-   protected void addEvent(String event){
-       
+   protected void addEvent(final String event){
+
        //check in data
        if(event == null ){
            return;
        }else if(event.length() == 0){
     	   return;
        }
-       
+
        //parse event
        //events are separated whit ; tex event1;event2
-       String[] es = event.split(";");
-       
+       final String[] es = event.split(";");
+
        //add new event to automata
        for(int i = 0; i < es.length; i++){
     	   if(!eventExist(es[i])){
@@ -113,20 +116,20 @@ public class EFA extends ExtendedAutomaton{
     	   }
        }
    }
-   
-   public void addEvent(String event, String kind){
-       
+
+   public EventDeclProxy addEvent(final String event, final String kind){
+
        //check in data
        if(event == null ){
-           return;
+           return null;
        }else if(event.length() == 0){
-    	   return;
+    	   return null;
        }
-       
+
        //parse event
        //events are separated whit ; tex event1;event2
-       String[] es = event.split(";");
-       
+       final String[] es = event.split(";");
+
        //add new event to automata
        for(int i = 0; i < es.length; i++){
     	   if(!eventExist(es[i])){
@@ -134,9 +137,10 @@ public class EFA extends ExtendedAutomaton{
     		   events.add(es[i]);
     	   }
        }
+       return null;
    }
-   
-   
+
+
    /**
     * returns the name of next state
     * returned by
@@ -148,7 +152,7 @@ public class EFA extends ExtendedAutomaton{
        }
        return "s"+states.size();
    }
-   
+
    /**
     * return last state in list
     * @return last state in list
@@ -156,36 +160,36 @@ public class EFA extends ExtendedAutomaton{
    public String lastState(){
        return states.getLast();
    }
-   
+
    /**
     * Add a new unique state and return its name
     * as a String.
     * @return a new state with a unique name.
     */
    public String newUniqueState(){
-       String s = nextState();
+       final String s = nextState();
        addState(s);
        return s;
    }
-   
+
    /**
     * return true if state already in list of states
     * @param state
     * @return true if state exists.
     */
-   public boolean stateExist(String state){
+   public boolean stateExist(final String state){
        return states.contains(state);
    }
-   
+
    /**
     * return true if event already in list of events
     * @param event
     * @return
     */
-   public boolean eventExist(String event){
+   public boolean eventExist(final String event){
        return events.contains(event);
    }
-   
+
    public Module getModule(){
 	   return module;
    }

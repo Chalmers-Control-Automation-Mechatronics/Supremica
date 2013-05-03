@@ -11,47 +11,42 @@ import net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerifica
 
 
 /**
- * A simple application for extracting information from 
+ * A simple application for extracting information from
  * serialised job results.
  *
  * @author Sam Douglas
  */
 public class ResultAnalyser
 {
-  public static void main(String[] args) throws Exception
+  public static void main(final String[] args) throws Exception
   {
     //Read in the JobResult. I'm being a bit lazy here with
     //error handling. Let the JVM handle it.
-    File dumpFile = new File(args[0]);
-    FileInputStream fis = new FileInputStream(dumpFile);
-    ObjectInputStream ois = new ObjectInputStream(fis);
-    JobResult results = (JobResult)ois.readObject();
-
-    if (args.length < 2)
-      {
-	outputResultSummary(results);
-	return;
+    final File dumpFile = new File(args[0]);
+    final FileInputStream fis = new FileInputStream(dumpFile);
+    final ObjectInputStream ois = new ObjectInputStream(fis);
+    final JobResult results = (JobResult) ois.readObject();
+    ois.close();
+    if (args.length < 2) {
+      outputResultSummary(results);
+      return;
+    }
+    final String op = args[1];
+    if ("stats".equals(op)) {
+      doStats(results, args, 2);
+    }
+    if ("exception".equals(op)) {
+      final Exception e = results.getException();
+      if (e != null) {
+        e.printStackTrace();
       }
-
-    String op = args[1];
-
-    if ("stats".equals(op))
-      {
-	doStats(results, args, 2);
-      }
-    
-    if ("exception".equals(op))
-      {
-	Exception e = results.getException();
-	if (e != null)
-	  e.printStackTrace();
-      }
+    }
   }
 
-  private static void doStats(JobResult results, String[] args, int first_param) throws Exception
+  private static void doStats(final JobResult results, final String[] args, final int first_param) throws Exception
   {
-    SafetyVerificationJobResult svresult = new SafetyVerificationJobResult(results);
-    JobStats mainstats = svresult.getJobStats();
+    final SafetyVerificationJobResult svresult = new SafetyVerificationJobResult(results);
+    final JobStats mainstats = svresult.getJobStats();
 
     if (first_param >= args.length)
       {
@@ -59,7 +54,7 @@ public class ResultAnalyser
 	return;
       }
 
-    String op = args[first_param];
+    final String op = args[first_param];
 
     if ("workers".equals(op))
       {
@@ -67,9 +62,9 @@ public class ResultAnalyser
       }
   }
 
-  private static void doWorkers(JobStats stats, String[] args, int first_param) throws Exception
+  private static void doWorkers(final JobStats stats, final String[] args, final int first_param) throws Exception
   {
-    JobStats[] workers = (JobStats[])stats.get("worker-stats");
+    final JobStats[] workers = (JobStats[])stats.get("worker-stats");
 
     if (first_param >= args.length)
       {
@@ -78,41 +73,41 @@ public class ResultAnalyser
       }
   }
 
-  private static void outputAllWorkerStats(JobStats[] workers)
+  private static void outputAllWorkerStats(final JobStats[] workers)
   {
     boolean first = true;
-    for (JobStats s : workers)
+    for (final JobStats s : workers)
       {
 	if (s == null)
 	  continue;
 
-	//Separate entries with a newline. Don't 
+	//Separate entries with a newline. Don't
 	//put a newline in for the first one though
 	if (!first)
 	  System.out.println();
 	else
 	  first = false;
-	  
+
 	outputStatsSummary(s);
       }
   }
 
-  private static void outputStatsSummary(JobStats stats)
+  private static void outputStatsSummary(final JobStats stats)
   {
-    Map<String,Object> statsmap = stats.getStatsMap();
+    final Map<String,Object> statsmap = stats.getStatsMap();
 
-    for (Map.Entry<String,Object> ent : statsmap.entrySet())
+    for (final Map.Entry<String,Object> ent : statsmap.entrySet())
       {
 	System.out.format("%s: %s\n", ent.getKey(), ent.getValue());
       }
   }
 
-  private static void outputResultSummary(JobResult results) throws Exception
+  private static void outputResultSummary(final JobResult results) throws Exception
   {
     //Just output the fields of the result dump by default
-    Map<String,Object> resultmap = results.getAttributeMap();
+    final Map<String,Object> resultmap = results.getAttributeMap();
 
-    for (Map.Entry<String,Object> ent : resultmap.entrySet())
+    for (final Map.Entry<String,Object> ent : resultmap.entrySet())
       {
 	System.out.format("%s: %s\n", ent.getKey(), ent.getValue());
       }

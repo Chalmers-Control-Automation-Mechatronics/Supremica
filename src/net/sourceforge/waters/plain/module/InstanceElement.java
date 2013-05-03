@@ -78,6 +78,7 @@ public final class InstanceElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public InstanceElement clone()
   {
     return (InstanceElement) super.clone();

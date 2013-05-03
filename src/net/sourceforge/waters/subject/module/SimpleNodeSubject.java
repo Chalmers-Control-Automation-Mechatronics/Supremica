@@ -13,8 +13,10 @@
 package net.sourceforge.waters.subject.module;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -24,7 +26,12 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -44,6 +51,7 @@ public final class SimpleNodeSubject
    * Creates a new simple node.
    * @param name The name of the new simple node.
    * @param propositions The list of propositions of the new simple node, or <CODE>null</CODE> if empty.
+   * @param attributes The attribute map of the new simple node, or <CODE>null</CODE> if empty.
    * @param initial The initial status of the new simple node.
    * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
    * @param initialArrowGeometry The position of the initial state arrow of the new simple node, or <CODE>null</CODE>.
@@ -51,12 +59,13 @@ public final class SimpleNodeSubject
    */
   public SimpleNodeSubject(final String name,
                            final PlainEventListProxy propositions,
+                           final Map<String,String> attributes,
                            final boolean initial,
                            final PointGeometryProxy pointGeometry,
                            final PointGeometryProxy initialArrowGeometry,
                            final LabelGeometryProxy labelGeometry)
   {
-    super(name, propositions);
+    super(name, propositions, attributes);
     mIsInitial = initial;
     mPointGeometry = (PointGeometrySubject) pointGeometry;
     if (mPointGeometry != null) {
@@ -76,6 +85,7 @@ public final class SimpleNodeSubject
    * Creates a new simple node using default values.
    * This constructor creates a simple node with
    * an empty list of propositions,
+   * an empty attribute map,
    * the initial status set to <CODE>false</CODE>,
    * the geometric position set to <CODE>null</CODE>,
    * the position of the initial state arrow set to <CODE>null</CODE>, and
@@ -86,6 +96,7 @@ public final class SimpleNodeSubject
   {
     this(name,
          null,
+         null,
          false,
          null,
          null,
@@ -95,6 +106,7 @@ public final class SimpleNodeSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public SimpleNodeSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -102,64 +114,114 @@ public final class SimpleNodeSubject
     return (SimpleNodeSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final SimpleNodeSubject downcast = (SimpleNodeSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final boolean initial = downcast.isInitial();
-      if (mIsInitial != initial) {
-        mIsInitial = initial;
-        change = true;
-      }
-      final PointGeometrySubject pointGeometry = downcast.getPointGeometry();
-      if (mPointGeometry == pointGeometry) {
-        // nothing
-      } else if (mPointGeometry == null) {
-        mPointGeometry = pointGeometry.clone();
-        mPointGeometry.setParent(this);
-        fireGeometryChanged(mPointGeometry);
-      } else if (pointGeometry == null) {
-        mPointGeometry.setParent(null);
-        mPointGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mPointGeometry.assignFrom(pointGeometry);
-      }
-      final PointGeometrySubject initialArrowGeometry =
-        downcast.getInitialArrowGeometry();
-      if (mInitialArrowGeometry == initialArrowGeometry) {
-        // nothing
-      } else if (mInitialArrowGeometry == null) {
-        mInitialArrowGeometry = initialArrowGeometry.clone();
-        mInitialArrowGeometry.setParent(this);
-        fireGeometryChanged(mInitialArrowGeometry);
-      } else if (initialArrowGeometry == null) {
-        mInitialArrowGeometry.setParent(null);
-        mInitialArrowGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mInitialArrowGeometry.assignFrom(initialArrowGeometry);
-      }
-      final LabelGeometrySubject labelGeometry = downcast.getLabelGeometry();
-      if (mLabelGeometry == labelGeometry) {
-        // nothing
-      } else if (mLabelGeometry == null) {
-        mLabelGeometry = labelGeometry.clone();
-        mLabelGeometry.setParent(this);
-        fireGeometryChanged(mLabelGeometry);
-      } else if (labelGeometry == null) {
-        mLabelGeometry.setParent(null);
-        mLabelGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mLabelGeometry.assignFrom(labelGeometry);
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 3) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 4:
+        mIsInitial = (Boolean) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 5:
+        if (mPointGeometry != null) {
+          mPointGeometry.setParent(null);
+        }
+        mPointGeometry = (PointGeometrySubject) newValue;
+        if (mPointGeometry != null) {
+          mPointGeometry.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      case 6:
+        if (mInitialArrowGeometry != null) {
+          mInitialArrowGeometry.setParent(null);
+        }
+        mInitialArrowGeometry = (PointGeometrySubject) newValue;
+        if (mInitialArrowGeometry != null) {
+          mInitialArrowGeometry.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      case 7:
+        if (mLabelGeometry != null) {
+          mLabelGeometry.setParent(null);
+        }
+        mLabelGeometry = (LabelGeometrySubject) newValue;
+        if (mLabelGeometry != null) {
+          mLabelGeometry.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final SimpleNodeSubject downcast = (SimpleNodeSubject) newState;
+    if (mIsInitial != downcast.mIsInitial) {
+      final UndoInfo step4 =
+        new ReplacementUndoInfo(4, mIsInitial, downcast.mIsInitial);
+      info.add(step4);
+    }
+    final boolean null5a = mPointGeometry == null;
+    final boolean null5b = downcast.mPointGeometry == null;
+    if (null5a != null5b) {
+      if (boundary ==  null || !boundary.contains(mPointGeometry)) {
+        final PointGeometrySubject clone5 =
+          ProxyTools.clone(downcast.mPointGeometry);
+        final UndoInfo step5 =
+          new ReplacementUndoInfo(5, mPointGeometry, clone5);
+        info.add(step5);
+      }
+    } else if (!null5a) {
+      final UndoInfo step5 =
+        mPointGeometry.createUndoInfo(downcast.mPointGeometry, boundary);
+      if (step5 != null) {
+        info.add(step5);
+      }
+    }
+    final boolean null6a = mInitialArrowGeometry == null;
+    final boolean null6b = downcast.mInitialArrowGeometry == null;
+    if (null6a != null6b) {
+      if (boundary ==  null || !boundary.contains(mInitialArrowGeometry)) {
+        final PointGeometrySubject clone6 =
+          ProxyTools.clone(downcast.mInitialArrowGeometry);
+        final UndoInfo step6 =
+          new ReplacementUndoInfo(6, mInitialArrowGeometry, clone6);
+        info.add(step6);
+      }
+    } else if (!null6a) {
+      final UndoInfo step6 =
+        mInitialArrowGeometry.createUndoInfo(downcast.mInitialArrowGeometry, boundary);
+      if (step6 != null) {
+        info.add(step6);
+      }
+    }
+    final boolean null7a = mLabelGeometry == null;
+    final boolean null7b = downcast.mLabelGeometry == null;
+    if (null7a != null7b) {
+      if (boundary ==  null || !boundary.contains(mLabelGeometry)) {
+        final LabelGeometrySubject clone7 =
+          ProxyTools.clone(downcast.mLabelGeometry);
+        final UndoInfo step7 =
+          new ReplacementUndoInfo(7, mLabelGeometry, clone7);
+        info.add(step7);
+      }
+    } else if (!null7a) {
+      final UndoInfo step7 =
+        mLabelGeometry.createUndoInfo(downcast.mLabelGeometry, boundary);
+      if (step7 != null) {
+        info.add(step7);
+      }
+    }
   }
 
 

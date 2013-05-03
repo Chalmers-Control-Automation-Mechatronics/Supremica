@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +36,11 @@ import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -55,10 +58,12 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
@@ -112,7 +117,7 @@ class EditorGraph
       final LabelBlockSubject blocked = graph.getBlockedEvents();
       mBlockedEvents = blocked.clone();
       mBlockedEvents.setParent(this);
-      new LabelBlockChangeRecord(blocked, mBlockedEvents);
+      mChangeRecordCreator.createChangeRecordsForLabelBlock(blocked, mBlockedEvents);
     } else {
       mBlockedEvents = null;
     }
@@ -235,25 +240,30 @@ class EditorGraph
                               final boolean selecting)
   {
     final List<ProxySubject> modified = new LinkedList<ProxySubject>();
-    final List<ProxySubject> added = new LinkedList<ProxySubject>();
     final List<ProxySubject> removed = new LinkedList<ProxySubject>();
     int minpass = Integer.MAX_VALUE;
     int maxpass = Integer.MIN_VALUE;
+    int count = 0;
     for (final ChangeRecord record : mFakeMap.values()) {
       final ProxySubject original = record.createOriginal();
       switch (record.getChangeKind()) {
       case ModelChangeEvent.ITEM_ADDED:
-        added.add(original);
+        // Can't use objects from the secondary graph,
+        // they will be duplicated when creating an InsertCommand ...
+        count ++;
         break;
       case ModelChangeEvent.ITEM_REMOVED:
+        count ++;
         removed.add(original);
         break;
       case ModelChangeEvent.STATE_CHANGED:
       case ModelChangeEvent.GEOMETRY_CHANGED:
+        count ++;
         modified.add(original);
         break;
       default:
         if (record.hasImplicitChanges()) {
+          count ++;
           modified.add(original);
         }
         break;
@@ -267,18 +277,20 @@ class EditorGraph
         maxpass = maxpass1;
       }
     }
-    final int size = modified.size() + added.size() + removed.size();
-    if (size == 0) {
+    if (count == 0) {
       return null;
     }
+    final List<ProxySubject> added = new LinkedList<ProxySubject>();
     final List<AbstractEditCommand> commands =
-      new ArrayList<AbstractEditCommand>(size);
+      new ArrayList<AbstractEditCommand>(count);
     for (int pass = minpass; pass <= maxpass; pass++) {
       for (final ChangeRecord record : mFakeMap.values()) {
         final AbstractEditCommand cmd = record.getUpdateCommand(surface, pass);
         if (cmd != null) {
           cmd.setUpdatesSelection(false);
           commands.add(cmd);
+          final List<ProxySubject> created = cmd.getSelectionAfterInsert();
+          added.addAll(created);
         }
       }
     }
@@ -350,7 +362,8 @@ class EditorGraph
   {
     final SimpleNodeSubject node1 = node0.clone();
     mNodes.add(node1);
-    mObserverMap.put(node1, new EditorSimpleNode(node1));
+    final EditorSimpleNode esn =  new EditorSimpleNode(node1);
+    mObserverMap.put(node1, esn);
     new SimpleNodeChangeRecord(node0, node1);
   }
 
@@ -408,7 +421,7 @@ class EditorGraph
   {
     moveEdgeStart(edge0, dx, dy);
     moveEdgeEnd(edge0, dx, dy);
-    moveEdgeHandle(edge0, dx, dy);
+    moveEdgeHandle(edge0, dx, dy, false, null);
   }
 
   /**
@@ -464,12 +477,97 @@ class EditorGraph
    */
   void moveEdgeHandle(final EdgeSubject edge0,
                       final double dx,
-                      final double dy)
+                      final double dy,
+                      final boolean moveAlongHalfWay,
+                      final Point2D dragStart)
   {
     final EdgeSubject edge1 = (EdgeSubject) getCopy(edge0);
     final Point2D point = GeometryTools.getTurningPoint1(edge0);
-    point.setLocation(point.getX() + dx, point.getY() + dy);
-    GeometryTools.createMidGeometry(edge1, point, SplineKind.INTERPOLATING);
+    final Point2D newpoint = new Point2D.Double(point.getX() + dx, point.getY() + dy);
+    final Point2D start = GeometryTools.getStartPoint(edge1);
+    final Point2D end = GeometryTools.getEndPoint(edge1);
+    double x = newpoint.getX();
+    double y = newpoint.getY();
+    //dragstart will == null if the self loop is just following a node
+    if(GeometryTools.isSelfloop(edge1) && dragStart != null){
+      double hx = dragStart.getX() - start.getX();
+      double hy = dragStart.getY() - start.getY();
+      double px = hx + dx;
+      double py = hy + dy;
+      double h = (hx * hx + hy * hy);
+      double a0011 = (hx * px) + (hy * py);
+      double a01 = (hx * py) - (hy * px);
+      final double pointX = point.getX() - start.getX();
+      final double pointY = point.getY() - start.getY();
+      x = (a0011 * pointX - a01 * pointY) / h;
+      y = (a01 * pointX + a0011 * pointY) / h;
+      if (moveAlongHalfWay) {
+        //directional move
+        final double xDistAbs = Math.abs(x);
+        final double yDistAbs = Math.abs(y);
+        if (xDistAbs <= (TAN225 * yDistAbs)) {
+          px = 0;
+          py = y < 0 ? -1 : 1;
+          a0011 = (x * px) + (y * py);
+          a01 = (x * py) - (y * px);
+          h = Math.sqrt(x * x + y * y);
+          y = (a01 * x + a0011 * y) / h;
+          x = 0;
+        } else if (yDistAbs < (TAN225 * xDistAbs)) {
+          px = x < 0 ? -1 : 1;
+          py = 0;
+          a0011 = (x * px) + (y * py);
+          a01 = (x * py) - (y * px);
+          h = Math.sqrt(x * x + y * y);
+          x = (a0011 * x - a01 * y) / h;
+          y = 0;
+        } else {
+          hx = x;
+          hy = y;
+          px = hx < 0 ? -HALF_SQRT2 : HALF_SQRT2;
+          py = hy < 0 ? -HALF_SQRT2 : HALF_SQRT2;
+          a0011 = (hx * px) + (hy * py);
+          a01 = (hx * py) - (hy * px);
+          h = Math.sqrt(hx * hx + hy * hy);
+          x = (a0011 * hx - a01 * hy) / h;
+          y = (a01 * hx + a0011 * hy) / h;
+        }
+      }
+      x += start.getX();
+      y += start.getY();
+    }
+    else{
+      if(moveAlongHalfWay){
+        //edge half way move
+        final double sx = start.getX();
+        final double sy = start.getY();
+        final double ex = end.getX();
+        final double ey = end.getY();
+        final double px = newpoint.getX();
+        final double py = newpoint.getY();
+        final double mx = (sx + ex) / 2;
+        final double my = (sy + ey) / 2;
+        final double sxex = sx - ex;
+        final double syey = sy - ey;
+        //slope is undefined (vertical)
+        if (sxex == 0) {
+          x = px;
+          y = my;
+        }
+        //slope = 0 (horizontal)
+        else if (syey == 0) {
+          x = mx;
+          y = py;
+        } else {
+          final double eSlope = syey / sxex;
+          final double pSlope = (-1) / eSlope;
+          x = (-(eSlope * px) + (pSlope * mx) + py - my) / (pSlope - eSlope);
+          y = (eSlope * (x - px)) + py;
+        }
+      }
+    }
+    newpoint.setLocation(x, y);
+    GeometryTools.createMidGeometry(edge1, newpoint, SplineKind.INTERPOLATING);
   }
 
   /**
@@ -894,7 +992,7 @@ class EditorGraph
     public EditorSimpleNode(final SimpleNodeSubject node)
     {
       super(node);
-      mPoint = node.getPointGeometry().getPoint();
+       mPoint = node.getPointGeometry().getPoint();
     }
 
     //#######################################################################
@@ -982,8 +1080,7 @@ class EditorGraph
   {
     //#######################################################################
     //# Constructors
-    ChangeRecord(final ProxySubject original,
-                 final ProxySubject fake)
+    ChangeRecord(final ProxySubject original, final ProxySubject fake)
     {
       this(original, fake, ModelChangeEvent.NO_CHANGE);
     }
@@ -1142,6 +1239,20 @@ class EditorGraph
 
 
   //#########################################################################
+  //# Inner Class LabelChangeRecord
+  private class LabelChangeRecord
+    extends ChangeRecord
+  {
+    //#######################################################################
+    //# Constructors
+    LabelChangeRecord(final ProxySubject original, final ProxySubject fake)
+    {
+      super(original, fake);
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class SimpleNodeChangeRecord
   private class SimpleNodeChangeRecord
     extends ChangeRecord
@@ -1294,7 +1405,7 @@ class EditorGraph
     EdgeChangeRecord(final EdgeSubject original,
                      final EdgeSubject fake)
     {
-      super(original, fake);
+      this(original, fake, ModelChangeEvent.NO_CHANGE);
     }
 
     EdgeChangeRecord(final EdgeSubject original,
@@ -1302,6 +1413,18 @@ class EditorGraph
                      final int kind)
     {
       super(original, fake, kind);
+      LabelBlockSubject originalLB = null;
+      LabelBlockSubject fakeLB = null;
+      if (original != null) {
+        originalLB = original.getLabelBlock();
+      }
+      if (fake != null) {
+        fakeLB = fake.getLabelBlock();
+      }
+      if (originalLB != null && fakeLB != null) {
+        mChangeRecordCreator.createChangeRecordsForLabelBlock(originalLB,
+                                                              fakeLB);
+      }
     }
 
     //#######################################################################
@@ -1386,6 +1509,10 @@ class EditorGraph
         final GuardActionBlockSubject gablock = fake.getGuardActionBlock();
         final EdgeSubject edge = GraphTools.getCreatedEdge
           (mGraph, asource, atarget, start, end, lblock, gablock);
+        final SplineGeometrySubject spline = fake.getGeometry();
+        if(spline != null){
+          edge.setGeometry(spline.clone());
+        }
         setOriginal(edge);
         return edge;
       }
@@ -1668,9 +1795,15 @@ class EditorGraph
     public ProxySubject visitLabelBlockProxy(final LabelBlockProxy original)
     {
       final LabelBlockSubject osubject = (LabelBlockSubject) original;
-      final EdgeSubject oedge = (EdgeSubject) osubject.getParent();
-      final EdgeSubject fedge = (EdgeSubject) getFake(oedge);
-      return fedge.getLabelBlock();
+      final Subject parent = osubject.getParent();
+      if (parent instanceof EdgeSubject) {
+        final EdgeSubject oedge = (EdgeSubject) parent;
+        final EdgeSubject fedge = (EdgeSubject) getFake(oedge);
+        return fedge.getLabelBlock();
+      }
+      else {
+        return mBlockedEvents;
+      }
     }
 
     public GuardActionBlockSubject visitGuardActionBlockProxy
@@ -1691,6 +1824,7 @@ class EditorGraph
       final SimpleNodeSubject fnode = (SimpleNodeSubject) getFake(onode);
       return fnode.getLabelGeometry();
     }
+
   }
 
 
@@ -1752,6 +1886,9 @@ class EditorGraph
       final LabelGeometrySubject fsubject = (LabelGeometrySubject) fake;
       final SimpleNodeSubject fnode = (SimpleNodeSubject) fsubject.getParent();
       final SimpleNodeSubject onode = (SimpleNodeSubject) getOriginal(fnode);
+      if(onode == null){
+
+      }
       return onode.getLabelGeometry();
     }
   }
@@ -1783,8 +1920,24 @@ class EditorGraph
       }
     }
 
+    private void createChangeRecordsForLabelBlock
+      (final LabelBlockSubject original,
+       final LabelBlockSubject fake)
+    {
+      try {
+        final List<? extends ProxySubject> originalList =
+          original.getEventIdentifierListModifiable();
+        final List<? extends ProxySubject> fakeList =
+          fake.getEventIdentifierListModifiable();
+        visitLists(originalList, fakeList);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public ChangeRecord visitEdgeProxy(final EdgeProxy fake)
     {
       final EdgeSubject oedge = (EdgeSubject) mOriginal;
@@ -1792,6 +1945,22 @@ class EditorGraph
       return new EdgeChangeRecord(oedge, fedge, mKind);
     }
 
+    @Override
+    public ChangeRecord visitForeachProxy(final ForeachProxy fake)
+      throws VisitorException
+    {
+      final ForeachSubject oforeach = (ForeachSubject) mOriginal;
+      final ForeachSubject fforeach = (ForeachSubject) mFake;
+      new LabelChangeRecord(oforeach, fforeach);
+      final ListSubject<? extends ProxySubject> originalList =
+        oforeach.getBodyModifiable();
+      final ListSubject<? extends ProxySubject> fakeList =
+        fforeach.getBodyModifiable();
+      visitLists(originalList, fakeList);
+      return null;
+    }
+
+    @Override
     public ChangeRecord visitGroupNodeProxy(final GroupNodeProxy fake)
     {
       final GroupNodeSubject ogroup = (GroupNodeSubject) mOriginal;
@@ -1799,6 +1968,7 @@ class EditorGraph
       return new GroupNodeChangeRecord(ogroup, fgroup, mKind);
     }
 
+    @Override
     public ChangeRecord visitGuardActionBlockProxy
       (final GuardActionBlockProxy fake)
     {
@@ -1809,6 +1979,15 @@ class EditorGraph
       return new GuardActionBlockChangeRecord(oblock, fblock, mKind);
     }
 
+    @Override
+    public ChangeRecord visitIdentifierProxy(final IdentifierProxy fake)
+    {
+      final IdentifierSubject oident = (IdentifierSubject) mOriginal;
+      final IdentifierSubject fident = (IdentifierSubject) mFake;
+      return new LabelChangeRecord(oident, fident);
+    }
+
+    @Override
     public ChangeRecord visitLabelBlockProxy(final LabelBlockProxy fake)
     {
       final LabelBlockSubject oblock = (LabelBlockSubject) mOriginal;
@@ -1816,6 +1995,7 @@ class EditorGraph
       return new LabelBlockChangeRecord(oblock, fblock, mKind);
     }
 
+    @Override
     public ChangeRecord visitLabelGeometryProxy(final LabelGeometryProxy fake)
     {
       final LabelGeometrySubject ogeo = (LabelGeometrySubject) mOriginal;
@@ -1823,11 +2003,28 @@ class EditorGraph
       return new LabelGeometryChangeRecord(ogeo, fgeo, mKind);
     }
 
+    @Override
     public ChangeRecord visitSimpleNodeProxy(final SimpleNodeProxy fake)
     {
       final SimpleNodeSubject onode = (SimpleNodeSubject) mOriginal;
       final SimpleNodeSubject fnode = (SimpleNodeSubject) mFake;
       return new SimpleNodeChangeRecord(onode, fnode, mKind);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void visitLists(final List<? extends ProxySubject> originalList,
+                            final List<? extends ProxySubject> fakeList)
+      throws VisitorException
+    {
+      final Iterator<? extends ProxySubject> originalIter =
+        originalList.iterator();
+      final Iterator<? extends ProxySubject> fakeIter = fakeList.iterator();
+      while (originalIter.hasNext()) {
+        mOriginal = originalIter.next();
+        mFake = fakeIter.next();
+        mOriginal.acceptVisitor(this);
+      }
     }
 
     //#######################################################################
@@ -1863,6 +2060,9 @@ class EditorGraph
   private static final int FIRST_PASS = PASS0_UNLINK;
   @SuppressWarnings("unused")
   private static final int LAST_PASS = PASS3_RELINK;
+
+  private static final double TAN225 = Math.sqrt(2) -1;
+  private static final double HALF_SQRT2 = 0.5*Math.sqrt(2);
 
   private static final LabelGeometrySubject DEFAULT_LABELBLOCK_GEO =
     new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);

@@ -12,14 +12,14 @@ package net.sourceforge.waters.analysis.bdd;
 import java.util.List;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -175,23 +175,23 @@ public class BDDConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
-  public void setMarkingProposition(final EventProxy marking)
+  public void setConfiguredDefaultMarking(final EventProxy marking)
   {
     mMarking = marking;
     mUsedMarking = null;
   }
 
-  public EventProxy getMarkingProposition()
+  public EventProxy getConfiguredDefaultMarking()
   {
     return mMarking;
   }
 
-  public void setPreconditionMarking(final EventProxy marking)
+  public void setConfiguredPreconditionMarking(final EventProxy marking)
   {
     mPreconditionMarking = marking;
   }
 
-  public EventProxy getPreconditionMarking()
+  public EventProxy getConfiguredPreconditionMarking()
   {
     return mPreconditionMarking;
   }
@@ -309,7 +309,7 @@ public class BDDConflictChecker
   /**
    * Gets the marking proposition to be used.
    * This method returns the marking proposition specified by the {@link
-   * #setMarkingProposition(EventProxy) setMarkingProposition()} method, if
+   * #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()} method, if
    * non-null, or the default marking proposition of the input model.
    * @throws IllegalArgumentException to indicate that the a
    *         <CODE>null</CODE> marking was specified, but input model does

@@ -12,14 +12,21 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -51,6 +58,7 @@ public final class ParameterBindingSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public ParameterBindingSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -58,26 +66,45 @@ public final class ParameterBindingSubject
     return (ParameterBindingSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final ParameterBindingSubject downcast =
-        (ParameterBindingSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ExpressionSubject expression = downcast.getExpression();
-      if (mExpression.getClass() != expression.getClass()) {
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
         mExpression.setParent(null);
-        mExpression = expression.clone();
+        mExpression = (ExpressionSubject) newValue;
         mExpression.setParent(this);
-        change = true;
-      } else {
-        mExpression.assignFrom(expression);
-      }
-      if (change) {
-        fireStateChanged();
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final ParameterBindingSubject downcast =
+      (ParameterBindingSubject) newState;
+    if (mExpression.getClass() == downcast.mExpression.getClass()) {
+      final UndoInfo step2 =
+        mExpression.createUndoInfo(downcast.mExpression, boundary);
+      if (step2 != null) {
+        info.add(step2);
+      }
+    } else {
+      final ExpressionSubject clone2 = downcast.mExpression.clone();
+      final UndoInfo step2 = new ReplacementUndoInfo(2, mExpression, clone2);
+      info.add(step2);
+    }
   }
 
 

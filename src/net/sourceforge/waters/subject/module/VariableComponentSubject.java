@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -26,7 +27,12 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -95,6 +101,7 @@ public final class VariableComponentSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public VariableComponentSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -102,44 +109,75 @@ public final class VariableComponentSubject
     return (VariableComponentSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final VariableComponentSubject downcast =
-        (VariableComponentSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final SimpleExpressionSubject type = downcast.getType();
-      if (mType.getClass() != type.getClass()) {
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 2:
         mType.setParent(null);
-        mType = type.clone();
+        mType = (SimpleExpressionSubject) newValue;
         mType.setParent(this);
-        change = true;
-      } else {
-        mType.assignFrom(type);
-      }
-      final boolean deterministic = downcast.isDeterministic();
-      if (mIsDeterministic != deterministic) {
-        mIsDeterministic = deterministic;
-        change = true;
-      }
-      final SimpleExpressionSubject initialStatePredicate =
-        downcast.getInitialStatePredicate();
-      if (mInitialStatePredicate.getClass() != initialStatePredicate.getClass()) {
+        return ModelChangeEvent.createStateChanged(this);
+      case 3:
+        mIsDeterministic = (Boolean) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 4:
         mInitialStatePredicate.setParent(null);
-        mInitialStatePredicate = initialStatePredicate.clone();
+        mInitialStatePredicate = (SimpleExpressionSubject) newValue;
         mInitialStatePredicate.setParent(this);
-        change = true;
-      } else {
-        mInitialStatePredicate.assignFrom(initialStatePredicate);
-      }
-      final ListSubject<VariableMarkingSubject> variableMarkings =
-        downcast.getVariableMarkingsModifiable();
-      mVariableMarkings.assignFrom(variableMarkings);
-      if (change) {
-        fireStateChanged();
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final VariableComponentSubject downcast =
+      (VariableComponentSubject) newState;
+    if (mType.getClass() == downcast.mType.getClass()) {
+      final UndoInfo step2 = mType.createUndoInfo(downcast.mType, boundary);
+      if (step2 != null) {
+        info.add(step2);
+      }
+    } else {
+      final SimpleExpressionSubject clone2 = downcast.mType.clone();
+      final UndoInfo step2 = new ReplacementUndoInfo(2, mType, clone2);
+      info.add(step2);
+    }
+    if (mIsDeterministic != downcast.mIsDeterministic) {
+      final UndoInfo step3 =
+        new ReplacementUndoInfo(3, mIsDeterministic, downcast.mIsDeterministic);
+      info.add(step3);
+    }
+    if (mInitialStatePredicate.getClass() == downcast.mInitialStatePredicate.getClass()) {
+      final UndoInfo step4 =
+        mInitialStatePredicate.createUndoInfo(downcast.mInitialStatePredicate, boundary);
+      if (step4 != null) {
+        info.add(step4);
+      }
+    } else {
+      final SimpleExpressionSubject clone4 =
+        downcast.mInitialStatePredicate.clone();
+      final UndoInfo step4 =
+        new ReplacementUndoInfo(4, mInitialStatePredicate, clone4);
+      info.add(step4);
+    }
+    final UndoInfo step5 =
+      mVariableMarkings.createUndoInfo(downcast.mVariableMarkings, boundary);
+    if (step5 != null) {
+      info.add(step5);
+    }
   }
 
 

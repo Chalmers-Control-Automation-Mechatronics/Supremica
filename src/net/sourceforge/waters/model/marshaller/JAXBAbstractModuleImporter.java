@@ -80,6 +80,7 @@ import net.sourceforge.waters.xsd.module.EnumSetExpression;
 import net.sourceforge.waters.xsd.module.EventAlias;
 import net.sourceforge.waters.xsd.module.EventDecl;
 import net.sourceforge.waters.xsd.module.EventListExpression;
+import net.sourceforge.waters.xsd.module.EventListType;
 import net.sourceforge.waters.xsd.module.ExpressionType;
 import net.sourceforge.waters.xsd.module.ForeachComponent;
 import net.sourceforge.waters.xsd.module.ForeachEvent;
@@ -701,6 +702,18 @@ public abstract class JAXBAbstractModuleImporter
   {
     final IdentifierProxy identifier = createIdentifier(element);
     final EventListExpression eventListElement = element.getExpression();
+    if (eventListElement.isUnpack()) {
+      final EventListType elist = eventListElement.getEventList();
+      final List<ElementType> list = elist.getList();
+      if (list.size() == 1) {
+        final ElementType first = list.iterator().next();
+        final Object imported = importElement(first);
+        if (imported instanceof IdentifierProxy) {
+          final IdentifierProxy ident = (IdentifierProxy) imported;
+          return mFactory.createEventAliasProxy(identifier, ident);
+        }
+      }
+    }
     final EventListExpressionProxy eventList =
       importPlainEventList(eventListElement);
     return mFactory.createEventAliasProxy(identifier, eventList);
@@ -825,6 +838,8 @@ public abstract class JAXBAbstractModuleImporter
     mNodeEventListHandler.fromJAXB(this, element, eventList);
     final PlainEventListProxy propositions =
       mFactory.createPlainEventListProxy(eventList);
+    final AttributeMap attribsElement = element.getAttributeMap();
+    final Map<String,String> attribs = importAttributeMap(attribsElement);
     final Collection<NodeProxy> immediateChildNodes =
       new CheckedImportList<NodeProxy>(GroupNodeProxy.class, name, "node");
     final List<NodeRef> immediateChildNodesElement = element.getNodes();
@@ -837,6 +852,7 @@ public abstract class JAXBAbstractModuleImporter
       importBoxGeometry(geometryElement);
     return mFactory.createGroupNodeProxy(name,
                                          propositions,
+                                         attribs,
                                          immediateChildNodes,
                                          geometry);
   }
@@ -1023,6 +1039,8 @@ public abstract class JAXBAbstractModuleImporter
     mNodeEventListHandler.fromJAXB(this, element, eventList);
     final PlainEventListProxy propositions =
       mFactory.createPlainEventListProxy(eventList);
+    final AttributeMap attribsElement = element.getAttributeMap();
+    final Map<String,String> attribs = importAttributeMap(attribsElement);
     final boolean initial = element.isInitial();
     final PointGeometryType pointGeometryElement = element.getPointGeometry();
     final PointGeometryProxy pointGeometry =
@@ -1036,6 +1054,7 @@ public abstract class JAXBAbstractModuleImporter
       importLabelGeometry(labelGeometryElement);
     return mFactory.createSimpleNodeProxy(name,
                                           propositions,
+                                          attribs,
                                           initial,
                                           pointGeometry,
                                           arrowGeometry,

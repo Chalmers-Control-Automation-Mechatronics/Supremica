@@ -26,6 +26,8 @@ public interface ModuleProxyVisitor
   extends ProxyVisitor
 {
 
+  //#########################################################################
+  //# Visitor Methods
   public Object visitAliasProxy(AliasProxy proxy)
     throws VisitorException;
 

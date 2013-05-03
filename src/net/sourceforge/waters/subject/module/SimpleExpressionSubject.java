@@ -12,9 +12,17 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -52,6 +60,7 @@ public abstract class SimpleExpressionSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public SimpleExpressionSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -59,20 +68,36 @@ public abstract class SimpleExpressionSubject
     return (SimpleExpressionSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final SimpleExpressionSubject downcast =
-        (SimpleExpressionSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final String plainText = downcast.getPlainText();
-      if (mPlainText != plainText) {
-        mPlainText = plainText;
-        fireGeometryChanged(mPlainText);
-      }
-      return change;
+    if (index <= 0) {
+      return super.assignMember(index, oldValue, newValue);
     } else {
-      return false;
+      switch (index) {
+      case 1:
+        mPlainText = (String) newValue;
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
+      }
+    }
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final SimpleExpressionSubject downcast =
+      (SimpleExpressionSubject) newState;
+    if (!ProxyTools.equals(mPlainText, downcast.mPlainText)) {
+      final UndoInfo step1 =
+        new ReplacementUndoInfo(1, mPlainText, downcast.mPlainText);
+      info.add(step1);
     }
   }
 

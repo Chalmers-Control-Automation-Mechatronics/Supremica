@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -338,3 +338,4 @@ class AutomatonPartitioning
   private static final double THRESHOLD = 0.4;
 
 }
+

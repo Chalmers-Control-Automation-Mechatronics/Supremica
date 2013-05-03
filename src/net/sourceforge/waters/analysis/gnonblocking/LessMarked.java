@@ -9,9 +9,10 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TLongArrayList;
-import gnu.trove.TLongHashSet;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.procedure.TLongProcedure;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -23,6 +24,10 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 
 public class LessMarked
 {
+  private final LessMarkedCache mCache;
+  private final TLongHashSet allvisited;
+  private int mRevisited;
+
   // #######################################################################
   // # Constructor
   public LessMarked(final ListBufferTransitionRelation automaton,
@@ -31,6 +36,27 @@ public class LessMarked
     mAutomaton = automaton;
     mNonCoreachable = nonCoreachable;
     mMarking = marking;
+    mCache = new LessMarkedCache();
+    allvisited = new TLongHashSet();
+    mRevisited = 0;
+  }
+
+  private void statkeeping(final long tuple) {
+    final int first = getFirst(tuple);
+    final int second = getSecond(tuple);
+    if (first < second) {
+      if (!allvisited.add(longify(first, second))) {mRevisited++;}
+    } else {
+      if (!allvisited.add(longify(second, first))) {mRevisited++;}
+    }
+    //if (mRevisited % 1000000 == 0) {outputstats();}
+  }
+
+  @SuppressWarnings("unused")
+  private void outputstats()
+  {
+    System.out.println("Distinct States: " + allvisited.size());
+    System.out.println("Revisits: " + mRevisited);
   }
 
   public int run(final int first, final int second)
@@ -43,9 +69,23 @@ public class LessMarked
     boolean secgreater = true;
     boolean firgreater = true;
     while (!tovisit.isEmpty()) {
-      tuple = tovisit.remove(tovisit.size() - 1);
+      tuple = tovisit.removeAt(tovisit.size() - 1);
       final int f = getFirst(tuple);
       final int s = getSecond(tuple);
+      if (f == s) {System.out.println("the same"); continue;}
+      final int cache = mCache.isMoreOrLessMarked(tuple);
+      if (cache < 0) {
+        //System.out.println("cache used");
+        firgreater = false; continue;
+      } else if (cache > 1) {
+        //System.out.println("cache used");
+        secgreater = false; continue;
+      }
+      if (mCache.isIncomparable(tuple)) {
+        System.out.println("incomparable");
+        //return -1;
+      }
+      statkeeping(tuple);
       //System.out.println("f: " + f + "s:" + s);
       final boolean fmarked = mAutomaton.isMarked(f, mMarking);
       final boolean smarked = mAutomaton.isMarked(s, mMarking);
@@ -80,7 +120,15 @@ public class LessMarked
         }
       }
     }
-    return firgreater ? second : first;
+    if (!firgreater && !secgreater) {
+      return -1;
+    }
+    if (firgreater) {
+      mCache.moreMarked(visited);
+      return second;
+    }
+    mCache.lessMarked(visited);
+    return first;
   }
 
   private static long longify(final int firststate, final int secondstate)
@@ -103,7 +151,57 @@ public class LessMarked
     return (int)tuple;
   }
 
+
+  private static class LessMarkedCache
+  {
+    private final TLongHashSet mLessMarked;
+    private final TLongHashSet mIncomparable;
+
+    public LessMarkedCache()
+    {
+      mLessMarked = new TLongHashSet();
+      mIncomparable = new TLongHashSet();
+    }
+
+    public void moreMarked(final TLongHashSet set)
+    {
+      set.forEach(new TLongProcedure() {
+          @Override
+          public boolean execute(final long tuple) {
+            mLessMarked.add(longify(getSecond(tuple), getFirst(tuple)));
+            return true;
+          }
+      });
+    }
+
+    public void lessMarked(final TLongHashSet set)
+    {
+      mLessMarked.addAll(set.toArray());
+    }
+
+    @SuppressWarnings("unused")
+    public void incomparable(final long tuple)
+    {
+      mIncomparable.add(tuple);
+      mIncomparable.add(longify(getSecond(tuple), getFirst(tuple)));
+    }
+
+    public boolean isIncomparable(final long tuple)
+    {
+      return mIncomparable.contains(tuple);
+    }
+
+    public int isMoreOrLessMarked(final long tuple)
+    {
+      if (mLessMarked.contains(tuple)) {return -1;}
+      final long tuple2 = longify(getSecond(tuple), getFirst(tuple));
+      if (mLessMarked.contains(tuple2)) {return 1;}
+      return 0;
+    }
+  }
+
   private final ListBufferTransitionRelation mAutomaton;
   private final TIntHashSet mNonCoreachable;
   private final int mMarking;
 }
+

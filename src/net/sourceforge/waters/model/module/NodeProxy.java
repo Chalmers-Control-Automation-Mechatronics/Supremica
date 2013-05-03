@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.module;
 
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -50,8 +51,16 @@ public interface NodeProxy extends NamedProxy {
    * This method returns the set of simple nodes or group nodes
    * that are directly contained in this group node.
    * @return An unmodifiable set of nodes.
-   *         Each element is of type {@link NodeProxy}.
    */
   public Set<NodeProxy> getImmediateChildNodes();
+
+  /**
+   * Gets the attribute map for this node.
+   * The attribute map can be used by tools supporting external model
+   * formats to store information that does not appear in standard DES
+   * models.
+   * @return An immutable map mapping attribute names to values.
+   */
+  public Map<String,String> getAttributes();
 
 }

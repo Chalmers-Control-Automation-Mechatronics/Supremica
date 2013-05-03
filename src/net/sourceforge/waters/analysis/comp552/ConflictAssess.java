@@ -33,8 +33,9 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.analysis.bdd.BDDLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -192,8 +193,8 @@ public class ConflictAssess
               if (mTerminated) {
                 return;
               }
-              index++;
             }
+            index++;
           }
           line = reader.readLine();
         }
@@ -280,12 +281,12 @@ public class ConflictAssess
       mProgressPrinter.flush();
     }
 
-    ConflictChecker checker;
+    BDDConflictChecker checker;
     boolean result;
     double time;
     try {
       mSecurityManager.setEnabled(true);
-      checker = new ConflictChecker(des, mDESFactory);
+      checker = new BDDConflictChecker(des, mDESFactory);
       final long starttime = System.currentTimeMillis();
       result = checker.run();
       final long stoptime = System.currentTimeMillis();
@@ -293,16 +294,18 @@ public class ConflictAssess
       if (result == expect) {
         mNumCorrectAnswers++;
       }
+      mProgressPrinter.println("result " + mNumCorrectAnswers);
     } catch (final OutOfMemoryError error) {
       checker = null;
       System.gc();
       printException(error);
+      mProgressPrinter.println("result " + mNumCorrectAnswers);
       return;
     } catch (final Throwable exception) {
       printException(exception);
+      mProgressPrinter.println("result " + mNumCorrectAnswers);
       return;
     } finally {
-      mProgressPrinter.println("result " + mNumCorrectAnswers);
       mProgressPrinter.flush();
       mSecurityManager.setEnabled(false);
     }
@@ -331,7 +334,7 @@ public class ConflictAssess
         mProgressPrinter.println("in " + index);
         mProgressPrinter.flush();
       }
-      ConflictTraceProxy trace;
+      TraceProxy trace;
       try {
         mSecurityManager.setEnabled(true);
         trace = checker.getCounterExample();
@@ -361,7 +364,7 @@ public class ConflictAssess
   //#########################################################################
   //# Counterexample Verification
   private boolean checkCounterExample(final ProductDESProxy des,
-                                      final ConflictTraceProxy trace)
+                                      final TraceProxy trace)
   {
     if (trace == null) {
       printMalformedCounterExample(trace, "is NULL");
@@ -385,7 +388,7 @@ public class ConflictAssess
   }
 
   private boolean checkCounterExample(final ProductDESProxy des,
-                                      final ConflictTraceProxy trace,
+                                      final TraceProxy trace,
                                       final boolean containsnull,
                                       final boolean containsprop,
                                       final boolean reversed)
@@ -439,7 +442,7 @@ public class ConflictAssess
   }
 
   private boolean checkReversedCounterExample(final ProductDESProxy des,
-                                              final ConflictTraceProxy trace)
+                                              final TraceProxy trace)
   {
     final List<EventProxy> origlist = trace.getEvents();
     final List<EventProxy> reversedlist = new LinkedList<EventProxy>();
@@ -447,7 +450,7 @@ public class ConflictAssess
       reversedlist.add(0, event);
     }
     final String name = trace.getName() + ":reversed";
-    final ConflictKind kind = trace.getKind();
+    final ConflictKind kind = ConflictKind.CONFLICT;
     final ConflictTraceProxy reversedtrace =
       mDESFactory.createConflictTraceProxy(name, des, reversedlist, kind);
     if (checkCounterExample(des, reversedtrace, false, false, true)) {
@@ -460,7 +463,7 @@ public class ConflictAssess
   }
 
   private StateProxy checkCounterExample(final AutomatonProxy aut,
-                                         final ConflictTraceProxy trace)
+                                         final TraceProxy trace)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
@@ -495,7 +498,7 @@ public class ConflictAssess
   }
 
   private synchronized void printMalformedCounterExample
-    (final ConflictTraceProxy conftrace, final SafetyTraceProxy langtrace)
+    (final TraceProxy conftrace, final SafetyTraceProxy langtrace)
   {
     printMalformedCounterExample(conftrace, "does not lead to blocking state");
     mReportPrinter.println("  A marked state can be reached as follows:");
@@ -561,13 +564,23 @@ public class ConflictAssess
     mReportPrinter.flush();
   }
 
-  private synchronized void printException(final Throwable exception)
+  private void printException(final Throwable exception)
+  {
+    printException(exception, false);
+  }
+
+  private synchronized void printException(final Throwable exception,
+                                           final boolean crashing)
   {
     if (!mTerminated) {
-      final String fullname = exception.getClass().getName();
-      final int start = fullname.lastIndexOf('.');
-      final String shortname = fullname.substring(start + 1);
-      mReportPrinter.println(shortname);
+      final String shortname = ProxyTools.getShortClassName(exception);
+      if (crashing) {
+        mReportPrinter.print(shortname);
+        mReportPrinter.print(' ');
+        mReportPrinter.flush();
+      } else {
+        mReportPrinter.println(shortname);
+      }
       exception.printStackTrace(System.err);
     }
   }

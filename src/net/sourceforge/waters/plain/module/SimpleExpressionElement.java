@@ -50,6 +50,7 @@ public abstract class SimpleExpressionElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public SimpleExpressionElement clone()
   {
     return (SimpleExpressionElement) super.clone();

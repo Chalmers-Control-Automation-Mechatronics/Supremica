@@ -111,6 +111,7 @@ public final class EventDeclElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public EventDeclElement clone()
   {
     return (EventDeclElement) super.clone();

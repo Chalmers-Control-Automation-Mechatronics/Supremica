@@ -10,44 +10,44 @@ import javax.swing.ListCellRenderer;
 /**
  * Attribute renderer.
  */
-class AttributeCellRenderer extends AttributePanel implements ListCellRenderer
-{    
+class AttributeCellRenderer extends AttributePanel implements ListCellRenderer<AttributePanel>
+{
 	private static final long serialVersionUID = 1L;
-	protected RowPainter myContainer = null;    
+	protected RowPainter myContainer = null;
 
-	public AttributeCellRenderer(RowPainter rp)
-    {	
+	public AttributeCellRenderer(final RowPainter rp)
+    {
 	myContainer = rp;
 	setOpaque(true);
-	setLayout(null);	
-    }       
-    
+	setLayout(null);
+    }
+
     /**
      * Creates a new instance of this class.
      */
     public Component getListCellRendererComponent(
-						  JList list,
-						  Object value,
-						  int index,
-						  boolean isSelected,
-						  boolean cellHasFocus)
-    {        
+						  final JList<? extends AttributePanel> list,
+						  final AttributePanel value,
+						  final int index,
+						  final boolean isSelected,
+						  final boolean cellHasFocus)
+    {
 	//DEBUG
 	//System.out.println("AttributeCellRenderer.getListCellRendererComponent()");
-	//END DEBUG					
-	this.setValue(((AttributePanel)value).nameLabel.getText());		       
+	//END DEBUG
+	this.setValue(((AttributePanel)value).nameLabel.getText());
 	this.setUpperIndicator(((AttributePanel)value).getUpperIndicator());
-	this.setLowerIndicator(((AttributePanel)value).getLowerIndicator());   	
-	this.setAttributeSize();	       	       	
+	this.setLowerIndicator(((AttributePanel)value).getLowerIndicator());
+	this.setAttributeSize();
         if(isSelected) {
 	    this.setBackground(Color.blue);
             this.nameLabel.setBackground(list.getSelectionBackground());
-            this.nameLabel.setForeground(list.getSelectionForeground());   
+            this.nameLabel.setForeground(list.getSelectionForeground());
         }else {
 	    this.setBackground(((AttributePanel)value).getAttributeColor());
             this.nameLabel.setBackground(list.getBackground());
-            this.nameLabel.setForeground(list.getForeground());	   
-        }	       
+            this.nameLabel.setForeground(list.getForeground());
+        }
         return this;
     }
 }

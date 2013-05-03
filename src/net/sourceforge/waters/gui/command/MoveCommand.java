@@ -16,6 +16,7 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 
@@ -24,7 +25,7 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
  * object.</P>
  *
  * <P>This command is typically used after the user has moved a
- * graphical objects. It is passed a {@link GeometrySubject} to be
+ * graphical object. It is passed a {@link GeometrySubject} to be
  * modified, and a dummy geometry containing the new values. When executed,
  * all changes are applied at the same time, in an attempt to reduce the
  * number of geometry change notifications fired.</P>
@@ -34,8 +35,8 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
  * feature can be disabled.</P>
  *
  * <P>The internal mechanism for the assignment is the {@link
- * GeometrySubject#assignFrom(GeometrySubject) assignFrom()} method, which
- * supports uniform assignments between subjects.</P>
+ * GeometrySubject#createUndoInfo(ProxySubject) createUndoInfo()} method,
+ * which supports uniform assignments between subjects.</P>
  *
  * <P>This command only supports the geometry change for a single graphical
  * object. To modify several objects at the same time, multiple MoveCommand
@@ -53,21 +54,21 @@ public class MoveCommand
   /**
    * Creates a new move command that does not affect the selection.
    * @param  subject   The geometry affected by this command.
-   * @param  newstate  A template geometry to specify the desired state of the
+   * @param  newState  A template geometry to specify the desired state of the
    *                   subject after execution of the command. It should be
    *                   of a type assignable to the subject, but <I>not</I>
    *                   be the same object.
    */
   public MoveCommand(final GeometrySubject subject,
-                     final GeometrySubject newstate)
+                     final GeometrySubject newState)
   {
-    this(subject, newstate, null);
+    this(subject, newState, null);
   }
 
   /**
    * Creates a new move command.
    * @param  subject   The geometry affected by this command.
-   * @param  newstate  A template geometry to specify the desired state of the
+   * @param  newState  A template geometry to specify the desired state of the
    *                   subject after execution of the command. It should be
    *                   of a type assignable to the subject, but <I>not</I>
    *                   be the same object.
@@ -76,16 +77,16 @@ public class MoveCommand
    *                   should remain unchanged.
    */
   public MoveCommand(final GeometrySubject subject,
-                     final GeometrySubject newstate,
+                     final GeometrySubject newState,
                      final SelectionOwner panel)
   {
-    this(subject, newstate, panel, null);
+    this(subject, newState, panel, null);
   }
 
   /**
    * Creates a new move command.
    * @param  subject   The geometry affected by this command.
-   * @param  newstate  A template geometry to specify the desired state of the
+   * @param  newState  A template geometry to specify the desired state of the
    *                   subject after execution of the command. It should be
    *                   of a type assignable to the subject, but <I>not</I>
    *                   be the same object.
@@ -95,14 +96,13 @@ public class MoveCommand
    * @param  name      The description of the command.
    */
   public MoveCommand(final GeometrySubject subject,
-                     final GeometrySubject newstate,
+                     final GeometrySubject newState,
                      final SelectionOwner panel,
                      final String name)
   {
     super(panel, name, panel != null);
     mSubject = subject;
-    mOldState = subject.clone();
-    mNewState = newstate;
+    mUndoInfo = subject.createUndoInfo(newState, null);
     if (name == null) {
       final ProxySubject parent = (ProxySubject) subject.getParent();
       final String newname = ProxyNamer.getItemClassName(parent) + " Movement";
@@ -122,32 +122,12 @@ public class MoveCommand
     return mSubject;
   }
 
-  /**
-   * Gets the state of the affected geometry before execution of the command.
-   * The object returned is a clone of the original geometry in the state
-   * before the command was first executed.
-   */
-  public GeometrySubject getOldState()
-  {
-    return mOldState;
-  }
-
-  /**
-   * Gets the state of the affected geometry after execution of the command.
-   * The object returned is the dummy object given by the user to specify
-   * the desired value of the geometry after this command.
-   */
-  public GeometrySubject getNewState()
-  {
-    return mNewState;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command
   public void execute()
   {
-    mSubject.assignFrom(mNewState);
+    mUndoInfo.redo(mSubject);
     if (mHasBeenExecuted) {
       updateSelection();
     } else {
@@ -157,7 +137,7 @@ public class MoveCommand
 
   public void undo()
   {
-    mSubject.assignFrom(mOldState);
+    mUndoInfo.undo(mSubject);
     updateSelection();
   }
 
@@ -169,13 +149,14 @@ public class MoveCommand
     if (getUpdatesSelection()) {
       final SelectionOwner panel = getPanel();
       final ProxySubject parent = (ProxySubject) mSubject.getParent();
-      final List<ProxySubject> list;
+      ProxySubject selected = parent;
       if(parent instanceof SimpleNodeSubject){
-        list = Collections.singletonList((ProxySubject) mSubject);
+        final SimpleNodeSubject node = (SimpleNodeSubject)parent;
+        if(node.getLabelGeometry() == mSubject){
+          selected = mSubject;
+        }
       }
-      else{
-        list = Collections.singletonList(parent);
-      }
+      final List<ProxySubject> list = Collections.singletonList(selected);
       panel.replaceSelection(list);
       panel.scrollToVisible(list);
       panel.activate();
@@ -186,8 +167,7 @@ public class MoveCommand
   //#########################################################################
   //# Data Members
   private final GeometrySubject mSubject;
-  private final GeometrySubject mNewState;
-  private final GeometrySubject mOldState;
+  private final UndoInfo mUndoInfo;
   private boolean mHasBeenExecuted;
 
 }

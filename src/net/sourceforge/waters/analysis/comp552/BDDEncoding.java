@@ -1,11 +1,17 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: COMP452/552-10B Assignment 3
+//# PROJECT: COMP452/552-12A Assignment 3
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   BDDEncoding
 //###########################################################################
-//# $Id$
+//# This file contains the work of:
+//# Family name:
+//# First name:
+//# Student ID:
 //###########################################################################
+//# You are welcome to edit this file as much as you like.
+//###########################################################################
+
 
 package net.sourceforge.waters.analysis.comp552;
 
@@ -38,8 +44,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * and the current and next states of each automaton. To compute the
  * synchronous product transition relation, first the transition relation
  * is built for each automaton, tagged with event codes. The transition
- * relations of all automata are combined using logical AND, and the
- * event bits are removed from the result using existential quantification.</P>
+ * relations of all automata are combined using logical AND, and the event
+ * bits are removed from the result using existential quantification.</P>
  *
  * <P>The variable ordering used is such that the event variables appear first,
  * followed by the current and next state bits of all automata. The bits for
@@ -52,15 +58,15 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <H4>You are encouraged to modify this class or replace it by something
  * better.</H4>
  *
- * <P>This class mainly serves as a demonstration to show how to encode
+ * <P>This class mainly serves as a demonstration how to encode
  * automata using BDDs. It is kept simple and leaves a lot of room for
- * performance improvement. Things that can be improved include are:</P>
+ * performance improvement. Things that can be improved:</P>
  * <OL>
  * <LI>Find a better variable ordering.</LI>
- * <LI>It is better to avoid computing monolithic transition relation as
- *     returned by {@link BDDEncoding#getTransitionRelationBDD()}, and use
- *     partitioned transition relations instead.</LI>
  * <LI>Disjunctive partitioning is better than conjunctive partitioning.</LI>
+ * <LI>It is better to avoid computing monolithic transition relation as
+ *     returned by {@link BDDEncoding#computeTransitionRelationBDD()}, and
+ *     use partitioned transition relations instead.</LI>
  * <LI>etc.</LI>
  * </OL>
  *
@@ -85,10 +91,12 @@ public class BDDEncoding
     // Encode events ...
     final Collection<EventProxy> events = model.getEvents();
     int numEvents = events.size();
+    mEventList = new ArrayList<EventProxy>(numEvents);
     mEventMap = new HashMap<EventProxy,Integer>(numEvents);
     int index = 0;
     for (final EventProxy event : events) {
       if (event.getKind() != EventKind.PROPOSITION) {
+        mEventList.add(event);
         mEventMap.put(event, index++);
       }
     }
@@ -124,7 +132,7 @@ public class BDDEncoding
    *         model, which is true precisely when the model is in an initial
    *         state.
    */
-  public BDD getInitialStateBDD()
+  public BDD computeInitialStatesBDD()
   {
     BDD init = mBDDFactory.one();
     final int end = mAutomata.size();
@@ -146,7 +154,7 @@ public class BDDEncoding
    *         model, which is true precisely when the model is a state marked
    *         by the given proposition,
    */
-  public BDD getMarkedStateBDD(final EventProxy marking)
+  public BDD computeMarkedStatesBDD(final EventProxy marking)
   {
     BDD terminal = mBDDFactory.one();
     final int end = mAutomata.size();
@@ -160,15 +168,38 @@ public class BDDEncoding
 
   /**
    * Computes a BDD representing the monolithic transition relation of this
-   * encoding's model.
+   * encoding's model without event bits.
+   * This method builds the BDD from the automata model, which is a
+   * computationally expensive operation.
    * @return A BDD over the current and next state variables of all automata
    *         in the model, which is true precisely when there is a transition
    *         between the current and next state in the synchronous composition
    *         of all automata in the encoded model.
    */
-  public BDD getTransitionRelationBDD()
+  public BDD computeTransitionRelationBDD()
   {
-    // First compose the transition relations of all automata, bottom-up ...
+    final BDD trans = computeTransitionRelationBDDWithEvents();
+    final BDDVarSet eventVars = computeEventVarSet();
+    final BDD result = trans.exist(eventVars);
+    trans.free();
+    eventVars.free();
+    return result;
+  }
+
+  /**
+   * Computes a BDD representing the monolithic transition relation of this
+   * encoding's model with event bits.
+   * This method builds the BDD from the automata model, which is a
+   * computationally expensive operation.
+   * @return A BDD over the event, current state, and next state variables of
+   *         all automata in the model, which is true precisely when there is
+   *         a transition with the event between the current and next state
+   *         in the synchronous composition of all automata in the encoded
+   *         model.
+   */
+  public BDD computeTransitionRelationBDDWithEvents()
+  {
+    // Compose the transition relations of all automata, bottom-up ...
     final BDD trans = mBDDFactory.one();
     final int end = mAutomata.size();
     final ListIterator<AutomatonEncoding> iter = mAutomata.listIterator(end);
@@ -177,14 +208,30 @@ public class BDDEncoding
       final BDD autTrans = enc.getTransitionRelationBDD();
       trans.andWith(autTrans);
     }
-    // The resultant BDD includes the event variables and all state and next
-    // state variables. Most model checking algorithms only use the transition
-    // information, so we quantify out the event variables.
-    final BDDVarSet eventVars = getEventVarSet();
-    final BDD result = trans.exist(eventVars);
-    trans.free();
-    eventVars.free();
-    return result;
+    return trans;
+  }
+
+  /**
+   * Returns the number of non-proposition events in this encoding.
+   */
+  public int getNumberOfProperEvents()
+  {
+    return mEventList.size();
+  }
+
+  /**
+   * Retrieves the event with the given code.
+   * @param  code         The integer code assigned to the event.
+   *                      Non-proposition events are assigned codes starting
+   *                      at&nbsp;0 in the order they appear in the input
+   *                      model.
+   * @return The event with the given code.
+   * @throws IndexOutOfBoundsException if the encoding has no event with
+   *                      the given code.
+   */
+  public EventProxy getEvent(final int code)
+  {
+    return mEventList.get(code);
   }
 
   /**
@@ -193,7 +240,7 @@ public class BDDEncoding
    * @return A BDD over the event variables, which is true precisely when
    *         the event variables encode the given event.
    */
-  public BDD getEventBDD(final EventProxy event)
+  public BDD computeEventBDD(final EventProxy event)
   {
     final Integer code = mEventMap.get(event);
     if (code == null) {
@@ -206,13 +253,68 @@ public class BDDEncoding
   }
 
   /**
+   * <P>Finds an event that can satisfy a given BDD. This method traverses
+   * the given BDD to find a bit combination of the event variables that can
+   * make the conditions of this BDD true. If found, this bit combination
+   * is mapped to an event object.</P>
+   * <P>This method can be used to find a counterexample. Given a BDD encoding
+   * constraints on states and events, an event satisfying the constraints
+   * can be found. Note that choosing an event imposes further constraints,
+   * so the next step should be intersect the constraints with the BDD
+   * for the returned event.</P>
+   * @param  bdd          The BDD to be examined, which should use the event
+   *                      variables. It may use other variables as well.
+   * @return One possible event that may be true under the constraints of
+   *         the given BDD, or <CODE>null</CODE>.
+   * @see #computeEventBDD(EventProxy) getEventBDD()
+   */
+  public EventProxy findEvent(final BDD bdd)
+  {
+    // No event if the BDD is constant false.
+    if (bdd.isZero()) {
+      return null;
+    }
+    BDD current = bdd;
+    int code = 0;
+    while (!current.isOne()) {
+      final int varindex = current.var();
+      final BDD low = current.low();
+      final BDD high = current.high();
+      // Follow paths, but never touch 0-terminal.
+      if (low.isZero()) {
+        current = high;
+      } else if (high.isZero()) {
+        current = low;
+      } else if (low.level() < high.level()) {
+        current = high;
+      } else {
+        current = low;
+      }
+      // If following 1-branch of an event variable,
+      // set corresponding bit in event code.
+      if (current == high && varindex < mNumEventBits) {
+        final int bitindex = mNumEventBits - varindex - 1;
+        code |= (1 << bitindex);
+      }
+    }
+    // Look up event with identified code.
+    if (code < mEventList.size()) {
+      return mEventList.get(code);
+    } else {
+      return null;
+    }
+  }
+
+  /**
    * Computes a variable set containing all current state variables of this
    * encoding.
    * Variable sets can be used with the {@link BDD#exist(BDDVarSet) exist()}
    * or {@link BDD#relprod(BDD, BDDVarSet) relprod()} or similar methods to
    * evaluate Boolean quantification of BDDs.
+   * This method runs in linear complexity in the number of automaton
+   * variables, provided the initial variable ordering has not changed.
    */
-  public BDDVarSet getCurrentStateVarSet()
+  public BDDVarSet computeCurrentStateVarSet()
   {
     // Most BDD packages represent variable sets as BDDs,
     // so we also build them bottom-up.
@@ -231,8 +333,10 @@ public class BDDEncoding
    * Variable sets can be used with the {@link BDD#exist(BDDVarSet) exist()}
    * or {@link BDD#relprod(BDD, BDDVarSet) relprod()} or similar methods to
    * evaluate Boolean quantification of BDDs.
+   * This method runs in linear complexity in the number of automaton
+   * variables, provided the initial variable ordering has not changed.
    */
-  public BDDVarSet getNextStateVarSet()
+  public BDDVarSet computeNextStateVarSet()
   {
     final int firstIndex = mNumEventBits + 1;
     final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
@@ -249,7 +353,7 @@ public class BDDEncoding
    * or {@link BDD#relprod(BDD, BDDVarSet) relprod()} or similar methods to
    * evaluate Boolean quantification of BDDs.
    */
-  public BDDVarSet getEventVarSet()
+  public BDDVarSet computeEventVarSet()
   {
     final BDDVarSet varset = mBDDFactory.emptySet();
     for (int varIndex = mNumEventBits - 1; varIndex >= 0; varIndex--) {
@@ -264,8 +368,10 @@ public class BDDEncoding
    * BDD pairings can be used with the {@link BDD#replace(BDDPairing) replace()}
    * or {@link BDD#replaceWith(BDDPairing) replaceWith()} methods to
    * substitute variables in a BDD.
+   * This method runs in linear complexity in the number of automaton
+   * variables, provided the initial variable ordering has not changed.
    */
-  public BDDPairing getCurrentStateToNextStatePairing()
+  public BDDPairing computeCurrentStateToNextStatePairing()
   {
     final int firstIndex = mNumEventBits;
     final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
@@ -283,8 +389,10 @@ public class BDDEncoding
    * BDD pairings can be used with the {@link BDD#replace(BDDPairing) replace()}
    * or {@link BDD#replaceWith(BDDPairing) replaceWith()} methods to
    * substitute variables in a BDD.
+   * This method runs in linear complexity in the number of automaton
+   * variables, provided the initial variable ordering has not changed.
    */
-  public BDDPairing getNextStateToCurrentStatePairing()
+  public BDDPairing computeNextStateToCurrentStatePairing()
   {
     final int firstIndex = mNumEventBits;
     final int lastIndex = firstIndex + 2 * (mNumAutomataBits - 1);
@@ -418,10 +526,10 @@ public class BDDEncoding
      * Since the automaton uses two sets of variables for the current and next
      * state, the actual number of bits allocated is double this number. The
      * range of allocated bits is from {@link #getFirstVariableIndex()} to
-     * {@link #getFirstVariableIndex()}&nbsp;+&nbsp;2*({@link
-     * #getNumberOfBits()}-1). Variables are allocated in an interleaving
-     * fashion, with each current state followed by a next state bit. The
-     * most significant bit appears first in the ordering.
+     * {@link #getFirstVariableIndex()}&nbsp;+ 2*{@link
+     * #getNumberOfBits()}&nbsp;-&nbsp;1. Variables are allocated in an
+     * interleaving fashion, with each current state followed by a next state
+     * bit. The most significant bit appears first in the ordering.
      */
     private int getNumberOfBits()
     {
@@ -469,11 +577,11 @@ public class BDDEncoding
      * marked in this automaton. The resulting BDD is composed using logical
      * AND with the given BDD.</P>
      * <P>Since BDDs are best constructed bottom-up, this method works most
-     * efficiently when the given BDD only contains variables that appear later
-     * in the variable ordering than the current state variables of this
+     * efficiently when the given BDD only contains variables that appear
+     * later in the variable ordering than the current state variables of this
      * automaton.</P>
-     * @param  otherBDD      A BDD to which the marked states of this automaton
-     *                       are added.
+     * @param  otherBDD      A BDD to which the marked states of this
+     *                       automaton are added.
      * @param  marking       The marking to be considered. This should be an
      *                       event of type {@link EventKind#PROPOSITION
      *                       PROPOSITION}, which is used by the model.
@@ -504,8 +612,8 @@ public class BDDEncoding
      * Computes a BDD representing the transition relation of this automaton.
      * @return A BDD over the event variables of the model and the current and
      *         next state variables of this automaton, which is true precisely
-     *         when there is a transition between the current and next state in
-     *         this automaton using the encoded event.
+     *         when there is a transition between the current and next state
+     *         in this automaton using the encoded event.
      */
     private BDD getTransitionRelationBDD()
     {
@@ -536,7 +644,7 @@ public class BDDEncoding
       final BDD bdd = mBDDFactory.zero();
       for (final EventProxy event : mAutomaton.getEvents()) {
         if (event.getKind() != EventKind.PROPOSITION) {
-          final BDD eventBDD = getEventBDD(event);
+          final BDD eventBDD = computeEventBDD(event);
           bdd.orWith(eventBDD);
         }
       }
@@ -642,8 +750,13 @@ public class BDDEncoding
    */
   private final BDDFactory mBDDFactory;
   /**
+   * A list containing all non-proposition events of the model in the
+   * indexed by their event codes.
+   */
+  private final List<EventProxy> mEventList;
+  /**
    * A map that assigns each non-proposition event of the model to an
-   * integer code.
+   * integer code. This map is the reverse of the {@link #mEventList}.
    */
   private final Map<EventProxy,Integer> mEventMap;
   /**

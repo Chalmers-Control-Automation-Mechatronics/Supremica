@@ -49,6 +49,9 @@
  */
 package org.supremica.automata.algorithms;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -60,7 +63,7 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBu
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -147,13 +150,17 @@ public class AutomataVerifier
     /** For error message when Supremica can't be certain on the answer. */
     private boolean failure = false;
 
-    public AutomataVerifier(final Automata theAutomata, final VerificationOptions verificationOptions, final SynchronizationOptions synchronizationOptions, final MinimizationOptions minimizationOptions)
-    throws IllegalArgumentException, Exception
+    public AutomataVerifier(final Automata theAutomata,
+                            final VerificationOptions verificationOptions,
+                            final SynchronizationOptions synchronizationOptions,
+                            final MinimizationOptions minimizationOptions)
     {
-        this.theAutomata = new Automata(theAutomata);
-        this.verificationOptions = verificationOptions;
-        this.synchronizationOptions = synchronizationOptions;
-        this.minimizationOptions = minimizationOptions;
+      this.theAutomata = new Automata(theAutomata);
+      final URI uri = theAutomata.getLocation();
+      this.theAutomata.setLocation(uri);
+      this.verificationOptions = verificationOptions;
+      this.synchronizationOptions = synchronizationOptions;
+      this.minimizationOptions = minimizationOptions;
     }
 
     /**
@@ -1841,6 +1848,16 @@ public class AutomataVerifier
       final OPSearchAutomatonSimplifier simp =
         new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
       simp.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
+      if (Config.VERBOSE_MODE.isTrue()) {
+        try {
+          final File wmod = theAutomata.getFileLocation();
+          final File dir = wmod.getParentFile();
+          final File log = new File(dir, "op.log");
+          simp.setLogFile(log);
+        } catch (final MalformedURLException exception) {
+          // No file - no logging
+        }
+      }
       return simp.run();
     }
 

@@ -9,9 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.BitSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
-import gnu.trove.TIntStack;
+import java.util.BitSet;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -26,12 +27,12 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * @author Rachel Francis
  */
 
-class OmegaRemovalTRSimplifier
+public class OmegaRemovalTRSimplifier
   extends AbstractMarkingTRSimplifier
 {
   //#########################################################################
   //# Constructors
-  OmegaRemovalTRSimplifier()
+  public OmegaRemovalTRSimplifier()
   {
   }
 
@@ -67,7 +68,7 @@ class OmegaRemovalTRSimplifier
     final int numStates = rel.getNumberOfStates();
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
     final BitSet reachableStates = new BitSet(numStates);
-    final TIntStack unvisitedStates = new TIntStack();
+    final TIntStack unvisitedStates = new TIntArrayStack();
     // Create a bit set of all states which are reachable from an
     // alpha-marked state ...
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
@@ -113,3 +114,4 @@ class OmegaRemovalTRSimplifier
   }
 
 }
+

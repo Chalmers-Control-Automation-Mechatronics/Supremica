@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="transferline" xmlns="http://waters.sourceforge.net/xsd/des">
+<ProductDES Name="transferline" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>Model of a transfer line in a manufacturing system according to W.M. Wonham. This is the parametrisable version, with N functional blocks in sequence.
+Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online http://www.control.utoronto.ca/people/profs/wonham/wonham.html]</ns2:Comment>
 <EventList>
 <Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="machine_load[1]"/>

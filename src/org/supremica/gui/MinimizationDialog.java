@@ -176,7 +176,7 @@ public class MinimizationDialog
     {
         private static final long serialVersionUID = 1L;
 
-        private final JComboBox minimizationTypeBox;
+        private final JComboBox<EquivalenceRelation> minimizationTypeBox;
         private final JCheckBox alsoTransitions;
         private final JCheckBox keepOriginal;
         private final JCheckBox ignoreMarking;
@@ -186,7 +186,7 @@ public class MinimizationDialog
         public MinimizationDialogStandardPanel()
         {
             minimizationTypeBox =
-              new JComboBox(EquivalenceRelation.enabledValues());
+              new JComboBox<EquivalenceRelation>(EquivalenceRelation.enabledValues());
             minimizationTypeBox.addActionListener(this);
 
             // Disable bisimulation equivalence if library is missing!
@@ -305,11 +305,11 @@ public class MinimizationDialog
         private static final long serialVersionUID = 1L;
 
         private final JCheckBox compositionalMinimization;
-        private final JComboBox minimizationStrategy;
-        private final JComboBox minimizationHeuristic;
+        private final JComboBox<MinimizationStrategy> minimizationStrategy;
+        private final JComboBox<MinimizationHeuristic> minimizationHeuristic;
         private final Alphabet unionAlphabet;
         private Alphabet targetAlphabet;
-        private final JList targetAlphabetSelector;
+        private final JList<String> targetAlphabetSelector;
 
         //private JTextArea note;
 
@@ -319,10 +319,10 @@ public class MinimizationDialog
             targetAlphabet = null;
 
             // Strategy
-            minimizationStrategy = new JComboBox(MinimizationStrategy.values());
+            minimizationStrategy = new JComboBox<MinimizationStrategy>(MinimizationStrategy.values());
 
             // Strategy
-            minimizationHeuristic = new JComboBox(MinimizationHeuristic.values());
+            minimizationHeuristic = new JComboBox<MinimizationHeuristic>(MinimizationHeuristic.values());
 
             // Compositional?
             compositionalMinimization = new JCheckBox("Compositional minimization (keep selected events)");
@@ -330,7 +330,7 @@ public class MinimizationDialog
             compositionalMinimization.addActionListener(this);
 
             // Alphabetselector
-            final DefaultListModel list = new DefaultListModel();
+            final DefaultListModel<String> list = new DefaultListModel<String>();
             for (final Iterator<LabeledEvent> evIt = unionAlphabet.iterator(); evIt.hasNext(); )
             {
                 final LabeledEvent event = evIt.next();
@@ -341,7 +341,7 @@ public class MinimizationDialog
                     list.addElement(event.getLabel());
                 }
             }
-            targetAlphabetSelector = new JList(list);
+            targetAlphabetSelector = new JList<String>(list);
             targetAlphabetSelector.setVisibleRowCount(6);
             targetAlphabetSelector.setPrototypeCellValue("AT LEAST THIS WIDE");
             final JScrollPane alphaPane = new JScrollPane(targetAlphabetSelector);
@@ -402,13 +402,13 @@ public class MinimizationDialog
                 final int[] selected = targetAlphabetSelector.getSelectedIndices();
                 //String[] selected = (String[]) targetAlphabetSelector.getSelectedValues();
                 //String[] selected = targetAlphabetSelector.getModel();
-                final ListModel list = targetAlphabetSelector.getModel();
+                final ListModel<String> list = targetAlphabetSelector.getModel();
                 for (int i=0; i<selected.length; i++)
                 {
                     //targetAlphabet.addEvent(unionAlphabet.getEvent(targetAlphabetSelector.getItem(selected[i])));
                     //System.err.println("Seleceted: " + (String) selected[i]);
                     //targetAlphabet.addEvent(unionAlphabet.getEvent(selected[i]));
-                    final String label = (String) list.getElementAt(selected[i]);
+                    final String label = list.getElementAt(selected[i]);
                     targetAlphabet.addEvent(unionAlphabet.getEvent(label));
                 }
             }

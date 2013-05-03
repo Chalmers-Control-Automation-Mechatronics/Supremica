@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.transfer;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -134,7 +134,7 @@ public class GraphDataFlavor extends ModuleDataFlavor
     @Override
     public Object visitLabelBlockProxy(final LabelBlockProxy block)
     {
-      final List<Proxy> list = block.getEventList();
+      final List<Proxy> list = block.getEventIdentifierList();
       final LabelBlockSubject subject = (LabelBlockSubject) block;
       if (list.isEmpty() || subject.getParent() instanceof GraphProxy) {
         mTransferredBlock = block;

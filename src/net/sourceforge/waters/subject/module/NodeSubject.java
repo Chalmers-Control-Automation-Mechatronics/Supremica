@@ -12,11 +12,20 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.subject.base.AttributeMapSubject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -36,9 +45,11 @@ public abstract class NodeSubject
    * Creates a new node.
    * @param name The name of the new node.
    * @param propositions The list of propositions of the new node, or <CODE>null</CODE> if empty.
+   * @param attributes The attribute map of the new node, or <CODE>null</CODE> if empty.
    */
   protected NodeSubject(final String name,
-                        final PlainEventListProxy propositions)
+                        final PlainEventListProxy propositions,
+                        final Map<String,String> attributes)
   {
     super(name);
     if (propositions == null) {
@@ -47,23 +58,32 @@ public abstract class NodeSubject
       mPropositions = (PlainEventListSubject) propositions;
     }
     mPropositions.setParent(this);
+    if (attributes == null) {
+      mAttributes = new AttributeMapSubject();
+    } else {
+      mAttributes = new AttributeMapSubject(attributes);
+    }
+    mAttributes.setParent(this);
   }
 
   /**
    * Creates a new node using default values.
    * This constructor creates a node with
-   * an empty list of propositions.
+   * an empty list of propositions and
+   * an empty attribute map.
    * @param name The name of the new node.
    */
   protected NodeSubject(final String name)
   {
     this(name,
+         null,
          null);
   }
 
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public NodeSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -71,16 +91,42 @@ public abstract class NodeSubject
     return (NodeSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final NodeSubject downcast = (NodeSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final PlainEventListSubject propositions = downcast.getPropositions();
-      mPropositions.assignFrom(propositions);
-      return change;
+    if (index <= 1) {
+      return super.assignMember(index, oldValue, newValue);
     } else {
-      return false;
+      switch (index) {
+      case 2:
+        mPropositions.setParent(null);
+        mPropositions = (PlainEventListSubject) newValue;
+        mPropositions.setParent(this);
+        return ModelChangeEvent.createStateChanged(this);
+      default:
+        return null;
+      }
+    }
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final NodeSubject downcast = (NodeSubject) newState;
+    final UndoInfo step2 =
+      mPropositions.createUndoInfo(downcast.mPropositions, boundary);
+    if (step2 != null) {
+      info.add(step2);
+    }
+    final UndoInfo step4 =
+      mAttributes.createUndoInfo(downcast.mAttributes, boundary);
+    if (step4 != null) {
+      info.add(step4);
     }
   }
 
@@ -90,6 +136,14 @@ public abstract class NodeSubject
   public PlainEventListSubject getPropositions()
   {
     return mPropositions;
+  }
+
+  public Map<String,String> getAttributes()
+  {
+    final Map<?,?> precast = mAttributes;
+    @SuppressWarnings("unchecked")
+    final Map<String,String> downcast = (Map<String,String>) precast;
+    return Collections.unmodifiableMap(downcast);
   }
 
 
@@ -109,9 +163,18 @@ public abstract class NodeSubject
     fireStateChanged();
   }
 
+  /**
+   * Gets the modifiable attribute map for this node.
+   */
+  public AttributeMapSubject getAttributesModifiable()
+  {
+    return mAttributes;
+  }
+
 
   //#########################################################################
   //# Data Members
   private PlainEventListSubject mPropositions;
+  private AttributeMapSubject mAttributes;
 
 }

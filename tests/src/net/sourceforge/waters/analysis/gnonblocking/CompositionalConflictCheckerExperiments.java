@@ -9,8 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -146,8 +146,8 @@ public abstract class CompositionalConflictCheckerExperiments extends
     final List<AbstractionRule> ruleList = new LinkedList<AbstractionRule>();
     final ProductDESProxyFactory factory = mVerifier.getFactory();
     final EventProxy alpha = mVerifier.getUsedPreconditionMarkingProposition();
-    mVerifier.setPreconditionMarking(alpha);
-    final EventProxy omega = mVerifier.getUsedMarkingProposition();
+    mVerifier.setConfiguredPreconditionMarking(alpha);
+    final EventProxy omega = mVerifier.getUsedDefaultMarking();
     final List<EventProxy> propositions = new ArrayList<EventProxy>(2);
     propositions.add(alpha);
     propositions.add(omega);

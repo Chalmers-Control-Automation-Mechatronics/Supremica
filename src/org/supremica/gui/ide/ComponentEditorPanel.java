@@ -10,32 +10,20 @@
 
 package org.supremica.gui.ide;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.DefaultFontMapper;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfTemplate;
-import com.lowagie.text.pdf.PdfWriter;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.LayoutManager;
-import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Locale;
 import java.util.logging.Level;
 
-import javax.print.StreamPrintService;
-import javax.print.StreamPrintServiceFactory;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttribute;
 import javax.print.attribute.PrintRequestAttributeSet;
@@ -172,139 +160,34 @@ public class ComponentEditorPanel
         // a problem with the size of wmf-data
         //width += (int)0.1*width;
         //height += (int)0.1*height;
-        Graphics theGraphics = toClipboard.getGraphics(mSurface.getWidth(), mSurface.getHeight());
+        final Graphics theGraphics = toClipboard.getGraphics(mSurface.getWidth(), mSurface.getHeight());
 
         mSurface.print(theGraphics);
         toClipboard.copyToClipboard();
     }
 
 
-    public void exportPDF()
-    {
-        // Get file to export to
-        JFileChooser chooser = new JFileChooser();
-        chooser.setSelectedFile(new File(getName() + ".pdf"));
-        int returnVal = chooser.showSaveDialog(mSurface);
-        File file = chooser.getSelectedFile();
-        // Not OK?
-        if (returnVal != JFileChooser.APPROVE_OPTION)
-        {
-            return;
-        }
-
-        // Create output
-        int width = mSurface.getWidth();
-        int height = mSurface.getHeight();
-        Document document = new Document(new com.lowagie.text.Rectangle(width, height));
-
-        try
-        {
-            PdfWriter writer= PdfWriter.getInstance(document,  new FileOutputStream(file));
-
-            document.addAuthor("Supremica");
-            document.open();
-
-            PdfContentByte cb = writer.getDirectContent();
-            PdfTemplate tp = cb.createTemplate(width, height);
-            Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
-            mSurface.print(g2);
-            //Rectangle2D rectangle2D = new Rectangle2D.Double(0, 0, width, height);
-            //chart.draw(g2, rectangle2D);
-            g2.dispose();
-            cb.addTemplate(tp, 0, 0);
-
-        }
-        catch (DocumentException de)
-        {
-            System.err.println(de.getMessage());
-        }
-        catch (IOException ioe)
-        {
-            System.err.println(ioe.getMessage());
-        }
-
-        document.close();
-    }
-
-    /**
-     * Prints postscript output to file (specified by user).
-     */
-    public void exportPostscript()
-    {
-        String psMimeType = "application/postscript";
-
-        StreamPrintServiceFactory[] factories =
-            PrinterJob.lookupStreamPrintServices(psMimeType);
-        if (factories.length > 0)
-        {
-            try
-            {
-                // Get file to export to
-                JFileChooser chooser = new JFileChooser();
-                String name;
-                name = getName();
-                chooser.setSelectedFile(new File(name + ".ps"));
-                int returnVal = chooser.showSaveDialog(mSurface);
-                File file = chooser.getSelectedFile();
-                // Not OK?
-                if (returnVal != JFileChooser.APPROVE_OPTION)
-                {
-                    return;
-                }
-
-                // Get printerservice and set up PrintJob
-                FileOutputStream outstream = new FileOutputStream(file);
-                StreamPrintService psPrinter = factories[0].getPrintService(outstream);
-                // psPrinter is our Postscript print service
-                PrinterJob printJob = PrinterJob.getPrinterJob();
-                printJob.setPrintService(psPrinter);
-                printJob.setPrintable(mSurface);
-                // Printing attributes
-                PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
-                PrintRequestAttribute jobName = new JobName("Supremica Printing", Locale.ENGLISH);
-                attributes.add(jobName);
-
-                // Show printing dialog
-                //if (printJob.printDialog(attributes))
-                // Print!
-                printJob.print(attributes);
-            }
-            catch (FileNotFoundException ex)
-            {
-                mModuleContainer.getIDE().error("File not found. " + ex);
-            }
-            catch (PrinterException ex)
-            {
-                mModuleContainer.getIDE().error("Error printing. " + ex);
-            }
-        }
-        else
-        {
-            mModuleContainer.getIDE().info("No Postscript printer service installed.");
-        }
-    }
-
     public void exportSVG(){
         // Get file to export to
-        JFileChooser chooser = new JFileChooser();
+        final JFileChooser chooser = new JFileChooser();
         chooser.setSelectedFile(new File(getName() + ".svg"));
-        int returnVal = chooser.showSaveDialog(mSurface);
-        File file = chooser.getSelectedFile();
+        final int returnVal = chooser.showSaveDialog(mSurface);
+        final File file = chooser.getSelectedFile();
         // Not OK?
         if (returnVal != JFileChooser.APPROVE_OPTION)
         {
             return;
         }
         // Get a DOMImplementation.
-        DOMImplementation domImpl =
+        final DOMImplementation domImpl =
             GenericDOMImplementation.getDOMImplementation();
 
         // Create an instance of org.w3c.dom.Document.
-        String svgNS = "http://www.w3.org/2000/svg";
-        org.w3c.dom.Document document = domImpl.createDocument(svgNS, "svg", null);
+        final String svgNS = "http://www.w3.org/2000/svg";
+        final org.w3c.dom.Document document = domImpl.createDocument(svgNS, "svg", null);
 
         // Create an instance of the SVG Generator.
-        SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+        final SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
 
         // Ask the test to render into the SVG Graphics2D implementation.
         //Graphics2D
@@ -312,16 +195,16 @@ public class ComponentEditorPanel
 
         // Finally, stream out SVG to the standard output using
         // UTF-8 encoding.
-        boolean useCSS = true; // we want to use CSS style attributes
+        final boolean useCSS = true; // we want to use CSS style attributes
         Writer out;
         try {
             out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
             svgGenerator.stream(out, useCSS);
-        } catch (UnsupportedEncodingException ex) {
+        } catch (final UnsupportedEncodingException ex) {
             java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "unsupported encoding UTF-8", ex);
-        } catch (SVGGraphics2DIOException ex) {
+        } catch (final SVGGraphics2DIOException ex) {
             java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "somethign wrong with svg output", ex);
-        } catch (FileNotFoundException ex) {
+        } catch (final FileNotFoundException ex) {
             java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "file not found", ex);
         }
 
@@ -334,7 +217,7 @@ public class ComponentEditorPanel
     {
         try
         {
-            PrinterJob printJob = PrinterJob.getPrinterJob();
+            final PrinterJob printJob = PrinterJob.getPrinterJob();
             if (printJob.getPrintService() == null)
             {
                 mModuleContainer.getIDE().error("No default printer set.");
@@ -343,8 +226,8 @@ public class ComponentEditorPanel
             printJob.setPrintable(mSurface);
 
             // Printing attributes
-            PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
-            PrintRequestAttribute name = new JobName("Supremica Printing", Locale.ENGLISH);
+            final PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+            final PrintRequestAttribute name = new JobName("Supremica Printing", Locale.ENGLISH);
             attributes.add(name);
 
             // Show printing dialog
@@ -359,7 +242,7 @@ public class ComponentEditorPanel
                 LOGGER.debug("Printing done!");
             }
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             System.err.println(ex);
             System.err.println(ex.getStackTrace());

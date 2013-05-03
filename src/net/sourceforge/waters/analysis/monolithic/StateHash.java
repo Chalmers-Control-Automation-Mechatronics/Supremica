@@ -35,9 +35,10 @@ package net.sourceforge.waters.analysis.monolithic;
  *
  * @author Eric D. Friedman
  * @version $Id$
+ * @param <E>
  */
 
-abstract class StateHash implements Cloneable {
+abstract class StateHash<E> implements Cloneable {
     /** the current number of occupied slots in the hash. */
     protected transient int _size;
 
@@ -67,13 +68,16 @@ abstract class StateHash implements Cloneable {
      * space.
      */
     protected int _maxSize;
-    
+
+    protected final Class<? extends E> _clazz;
+
+
     /**
      * Creates a new <code>StateHash</code> instance with the default
      * capacity and load factor.
      */
-    public StateHash() {
-        this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
+    public StateHash(final Class<? extends E> clazz) {
+        this(clazz,DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR);
     }
 
     /**
@@ -83,8 +87,8 @@ abstract class StateHash implements Cloneable {
      *
      * @param initialCapacity an <code>int</code> value
      */
-    public StateHash(int initialCapacity) {
-        this(initialCapacity, DEFAULT_LOAD_FACTOR);
+    public StateHash(final Class<? extends E> clazz,final int initialCapacity) {
+        this(clazz,initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
     /**
@@ -96,16 +100,17 @@ abstract class StateHash implements Cloneable {
      * @param initialCapacity an <code>int</code> value
      * @param loadFactor a <code>float</code> value
      */
-    public StateHash(int initialCapacity, float loadFactor) {
+    public StateHash(final Class<? extends E> clazz,final int initialCapacity, final float loadFactor) {
         super();
         _loadFactor = loadFactor;
+        _clazz = clazz;
         setUp((int)Math.ceil(initialCapacity / loadFactor));
     }
 
     public Object clone() {
         try {
             return super.clone();
-        } catch (CloneNotSupportedException cnse) {
+        } catch (final CloneNotSupportedException cnse) {
             return null; // it's supported
         }
     }
@@ -118,7 +123,7 @@ abstract class StateHash implements Cloneable {
      * @return the current physical capacity of the hash table.
      */
     abstract protected int capacity();
-    
+
     /**
      * Ensure that this hashtable has sufficient capacity to hold
      * <tt>desiredCapacity<tt> <b>additional</b> elements without
@@ -127,14 +132,14 @@ abstract class StateHash implements Cloneable {
      *
      * @param desiredCapacity an <code>int</code> value
      */
-    public void ensureCapacity(int desiredCapacity) {
+    public void ensureCapacity(final int desiredCapacity) {
         if (desiredCapacity > (_maxSize - size())) {
             rehash(PrimeFinder.nextPrime((int)Math.ceil(desiredCapacity + size() /
                                                         _loadFactor) + 1));
             computeMaxSize(capacity());
         }
     }
-    
+
     /**
      * Compresses the hashtable to the minimum prime size (as defined
      * by PrimeFinder) that will hold all of the elements currently in
@@ -159,7 +164,7 @@ abstract class StateHash implements Cloneable {
     }
 
     /**
-     * This simply calls {@link #compact compact}.  It is included for 
+     * This simply calls {@link #compact compact}.  It is included for
      * symmetry with other collection classes.  Note that the name of this
      * method is somewhat misleading (which is why we prefer
      * <tt>compact</tt>) as the load factor may require capacity above
@@ -170,15 +175,15 @@ abstract class StateHash implements Cloneable {
     public final void trimToSize() {
         compact();
     }
-    
+
     /**
      * initializes the hashtable to a prime capacity which is at least
-     * <tt>initialCapacity + 1</tt>.  
+     * <tt>initialCapacity + 1</tt>.
      *
      * @param initialCapacity an <code>int</code> value
      * @return the actual capacity chosen
      */
-    protected int setUp(int initialCapacity) {
+    protected int setUp(final int initialCapacity) {
         int capacity;
 
         capacity = PrimeFinder.nextPrime(initialCapacity);
@@ -199,7 +204,7 @@ abstract class StateHash implements Cloneable {
      *
      * @param capacity an <code>int</code> value
      */
-    private final void computeMaxSize(int capacity) {
+    private final void computeMaxSize(final int capacity) {
         // need at least one free slot for open addressing
         _maxSize = Math.min(capacity - 1,
                             (int)Math.floor(capacity * _loadFactor));
@@ -210,18 +215,18 @@ abstract class StateHash implements Cloneable {
      * After an insert, this hook is called to adjust the size/free
      * values of the set and to perform rehashing if necessary.
      */
-    protected final void postInsertHook(boolean usedFreeSlot) {
+    protected final void postInsertHook(final boolean usedFreeSlot) {
         if (usedFreeSlot) {
             _free--;
         }
-        
+
         // rehash whenever we exhaust the available space in the table
         if (++_size > _maxSize || _free == 0) {
             // choose a new capacity suited to the new state of the table
             // if we've grown beyond our maximum size, double capacity;
             // if we've exhausted the free spots, rehash to the same capacity,
             // which will free up any stale removed slots for reuse.
-            int newCapacity = _size > _maxSize ? PrimeFinder.nextPrime(capacity() << 1) : capacity();
+            final int newCapacity = _size > _maxSize ? PrimeFinder.nextPrime(capacity() << 1) : capacity();
             rehash(newCapacity);
             computeMaxSize(capacity());
         }

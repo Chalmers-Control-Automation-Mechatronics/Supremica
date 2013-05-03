@@ -15,6 +15,7 @@ package net.sourceforge.waters.subject.module;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -25,6 +26,9 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -73,6 +77,7 @@ public final class EnumSetExpressionSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public EnumSetExpressionSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -80,20 +85,18 @@ public final class EnumSetExpressionSubject
     return (EnumSetExpressionSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
   {
-    if (this != partner) {
-      final EnumSetExpressionSubject downcast =
-        (EnumSetExpressionSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final ListSubject<SimpleIdentifierSubject> items =
-        downcast.getItemsModifiable();
-      mItems.assignFrom(items);
-      if (change) {
-        fireStateChanged();
-      }
+    super.collectUndoInfo(newState, info, boundary);
+    final EnumSetExpressionSubject downcast =
+      (EnumSetExpressionSubject) newState;
+    final UndoInfo step2 = mItems.createUndoInfo(downcast.mItems, boundary);
+    if (step2 != null) {
+      info.add(step2);
     }
-    return false;
   }
 
 

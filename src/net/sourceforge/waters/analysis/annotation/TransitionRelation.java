@@ -1,28 +1,30 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.TIntHashSet;
-import java.util.Set;
-import net.sourceforge.waters.model.des.EventProxy;
-import gnu.trove.TIntProcedure;
-import gnu.trove.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import gnu.trove.TObjectIntHashMap;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import java.util.Collection;
-import java.util.Map;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import java.util.ArrayList;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.List;
-import gnu.trove.THashMap;
-import java.util.HashSet;
 import net.sourceforge.waters.xsd.base.EventKind;
-import java.util.Collections;
-import java.util.Arrays;
-import gnu.trove.TIntArrayList;
-import java.util.TreeSet;
 
 public class TransitionRelation
 {
@@ -178,6 +180,7 @@ public class TransitionRelation
       for (final TIntHashSet ann : annotations) {
         final Set<EventProxy> set = new THashSet<EventProxy>();
         ann.forEach(new TIntProcedure() {
+          @Override
           public boolean execute(final int e) {
             final EventProxy event = mEvents[e];
             assert(event != null);
@@ -243,6 +246,7 @@ public class TransitionRelation
           continue;
         }
         succs.forEach(new TIntProcedure() {
+          @Override
           public boolean execute(final int succ) {
             final StateProxy target = states.get(succ);
             trans.add(factory.createTransitionProxy(source, event, target));
@@ -432,11 +436,12 @@ public class TransitionRelation
         final Iterator<TIntHashSet> it = anns.iterator();
         while (it.hasNext()) {
           final TIntHashSet ann = it.next();
-          //System.out.println(Arrays.toString(ann.toArray()));
           if (ann.contains(event)) {
-            //System.out.println("removed");
             it.remove();
           }
+        }
+        if (anns.isEmpty()) {
+          mAnnotations[s] = null;
         }
       }
     }
@@ -820,7 +825,7 @@ public class TransitionRelation
       if (tobecheckedset.add(s)) {tobechecked.add(s);}
     }
     while (!tobechecked.isEmpty()) {
-      final int state = tobechecked.remove(tobechecked.size() - 1);
+      final int state = tobechecked.removeAt(tobechecked.size() - 1);
       if (!hasPredecessors(state)) {
         final int[] succs = removeAllOutgoing(state).toArray();
         for (int i = 0; i < succs.length; i++) {
@@ -1051,7 +1056,7 @@ public class TransitionRelation
     final TIntArrayList tobevisited = new TIntArrayList();
     taureachable.add(state); tobevisited.add(state);
     while (!tobevisited.isEmpty()) {
-      final int visit = tobevisited.remove(tobevisited.size() - 1);
+      final int visit = tobevisited.removeAt(tobevisited.size() - 1);
       addTransition(state, tau, visit);
       final TIntHashSet taus = getSuccessors(visit, tau);
       if (taus == null) {continue;}
@@ -1159,6 +1164,20 @@ public class TransitionRelation
     addTransition(state, tau, state);
   }*/
 
+  public void printstuff()
+  {
+    System.out.println("marking: " + mEventToInt.get(mMarkedEvent));
+    for (int s = 0; s < mPredecessors.length; s++) {
+      System.out.print(s + ": " + Arrays.toString(getActiveEvents(s).toArray()));
+      System.out.print("ANNS:" + getAnnotations2(s).size());
+      System.out.println();
+      for (final TIntHashSet ann : getAnnotations2(s)) {
+        System.out.print(Arrays.toString(ann.toArray()) + ", ");
+      }
+      System.out.println();
+    }
+  }
+
   public int unreachableStates()
   {
     int num = 0;
@@ -1178,3 +1197,4 @@ public class TransitionRelation
     return num;
   }
 }
+

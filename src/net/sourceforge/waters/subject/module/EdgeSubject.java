@@ -12,6 +12,9 @@
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Set;
+
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -22,8 +25,13 @@ import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
+import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.UndoInfo;
 
 
 /**
@@ -108,6 +116,7 @@ public final class EdgeSubject
 
   //#########################################################################
   //# Cloning and Assigning
+  @Override
   public EdgeSubject clone()
   {
     final ModuleProxyCloner cloner =
@@ -115,85 +124,156 @@ public final class EdgeSubject
     return (EdgeSubject) cloner.getClone(this);
   }
 
-  public boolean assignFrom(final ProxySubject partner)
+  @Override
+  public ModelChangeEvent assignMember(final int index,
+                                       final Object oldValue,
+                                       final Object newValue)
   {
-    if (this != partner) {
-      final EdgeSubject downcast = (EdgeSubject) partner;
-      boolean change = super.assignFrom(partner);
-      final NodeSubject source = downcast.getSource();
-      if (mSource != source) {
-        mSource = source;
-        change = true;
-      }
-      final NodeSubject target = downcast.getTarget();
-      if (mTarget != target) {
-        mTarget = target;
-        change = true;
-      }
-      final LabelBlockSubject labelBlock = downcast.getLabelBlock();
-      mLabelBlock.assignFrom(labelBlock);
-      final GuardActionBlockSubject guardActionBlock =
-        downcast.getGuardActionBlock();
-      if (mGuardActionBlock == guardActionBlock) {
-        // nothing
-      } else if (mGuardActionBlock == null) {
-        mGuardActionBlock = guardActionBlock.clone();
-        mGuardActionBlock.setParent(this);
-        change = true;
-      } else if (guardActionBlock == null) {
-        mGuardActionBlock.setParent(null);
-        mGuardActionBlock = null;
-        change = true;
-      } else {
-        mGuardActionBlock.assignFrom(guardActionBlock);
-      }
-      final SplineGeometrySubject geometry = downcast.getGeometry();
-      if (mGeometry == geometry) {
-        // nothing
-      } else if (mGeometry == null) {
-        mGeometry = geometry.clone();
-        mGeometry.setParent(this);
-        fireGeometryChanged(mGeometry);
-      } else if (geometry == null) {
-        mGeometry.setParent(null);
-        mGeometry = null;
-        fireGeometryChanged(null);
-      } else {
-        mGeometry.assignFrom(geometry);
-      }
-      final PointGeometrySubject startPoint = downcast.getStartPoint();
-      if (mStartPoint == startPoint) {
-        // nothing
-      } else if (mStartPoint == null) {
-        mStartPoint = startPoint.clone();
-        mStartPoint.setParent(this);
-        fireGeometryChanged(mStartPoint);
-      } else if (startPoint == null) {
-        mStartPoint.setParent(null);
-        mStartPoint = null;
-        fireGeometryChanged(null);
-      } else {
-        mStartPoint.assignFrom(startPoint);
-      }
-      final PointGeometrySubject endPoint = downcast.getEndPoint();
-      if (mEndPoint == endPoint) {
-        // nothing
-      } else if (mEndPoint == null) {
-        mEndPoint = endPoint.clone();
-        mEndPoint.setParent(this);
-        fireGeometryChanged(mEndPoint);
-      } else if (endPoint == null) {
-        mEndPoint.setParent(null);
-        mEndPoint = null;
-        fireGeometryChanged(null);
-      } else {
-        mEndPoint.assignFrom(endPoint);
-      }
-      if (change) {
-        fireStateChanged();
+    if (index <= 0) {
+      return super.assignMember(index, oldValue, newValue);
+    } else {
+      switch (index) {
+      case 1:
+        mSource = (NodeSubject) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 2:
+        mTarget = (NodeSubject) newValue;
+        return ModelChangeEvent.createStateChanged(this);
+      case 3:
+        mLabelBlock.setParent(null);
+        mLabelBlock = (LabelBlockSubject) newValue;
+        mLabelBlock.setParent(this);
+        return ModelChangeEvent.createStateChanged(this);
+      case 4:
+        if (mGuardActionBlock != null) {
+          mGuardActionBlock.setParent(null);
+        }
+        mGuardActionBlock = (GuardActionBlockSubject) newValue;
+        if (mGuardActionBlock != null) {
+          mGuardActionBlock.setParent(this);
+        }
+        return ModelChangeEvent.createStateChanged(this);
+      case 5:
+        if (mGeometry != null) {
+          mGeometry.setParent(null);
+        }
+        mGeometry = (SplineGeometrySubject) newValue;
+        if (mGeometry != null) {
+          mGeometry.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      case 6:
+        if (mStartPoint != null) {
+          mStartPoint.setParent(null);
+        }
+        mStartPoint = (PointGeometrySubject) newValue;
+        if (mStartPoint != null) {
+          mStartPoint.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      case 7:
+        if (mEndPoint != null) {
+          mEndPoint.setParent(null);
+        }
+        mEndPoint = (PointGeometrySubject) newValue;
+        if (mEndPoint != null) {
+          mEndPoint.setParent(this);
+        }
+        return ModelChangeEvent.createGeometryChanged(this, newValue);
+      default:
+        return null;
       }
     }
-    return false;
+  }
+
+  @Override
+  protected void collectUndoInfo(final ProxySubject newState,
+                                 final RecursiveUndoInfo info,
+                                 final Set<? extends Subject> boundary)
+  {
+    super.collectUndoInfo(newState, info, boundary);
+    final EdgeSubject downcast = (EdgeSubject) newState;
+    if (mSource != downcast.mSource) {
+      final UndoInfo step1 =
+        new ReplacementUndoInfo(1, mSource, downcast.mSource);
+      info.add(step1);
+    }
+    if (mTarget != downcast.mTarget) {
+      final UndoInfo step2 =
+        new ReplacementUndoInfo(2, mTarget, downcast.mTarget);
+      info.add(step2);
+    }
+    final UndoInfo step3 =
+      mLabelBlock.createUndoInfo(downcast.mLabelBlock, boundary);
+    if (step3 != null) {
+      info.add(step3);
+    }
+    final boolean null4a = mGuardActionBlock == null;
+    final boolean null4b = downcast.mGuardActionBlock == null;
+    if (null4a != null4b) {
+      if (boundary ==  null || !boundary.contains(mGuardActionBlock)) {
+        final GuardActionBlockSubject clone4 =
+          ProxyTools.clone(downcast.mGuardActionBlock);
+        final UndoInfo step4 =
+          new ReplacementUndoInfo(4, mGuardActionBlock, clone4);
+        info.add(step4);
+      }
+    } else if (!null4a) {
+      final UndoInfo step4 =
+        mGuardActionBlock.createUndoInfo(downcast.mGuardActionBlock, boundary);
+      if (step4 != null) {
+        info.add(step4);
+      }
+    }
+    final boolean null5a = mGeometry == null;
+    final boolean null5b = downcast.mGeometry == null;
+    if (null5a != null5b) {
+      if (boundary ==  null || !boundary.contains(mGeometry)) {
+        final SplineGeometrySubject clone5 =
+          ProxyTools.clone(downcast.mGeometry);
+        final UndoInfo step5 = new ReplacementUndoInfo(5, mGeometry, clone5);
+        info.add(step5);
+      }
+    } else if (!null5a) {
+      final UndoInfo step5 =
+        mGeometry.createUndoInfo(downcast.mGeometry, boundary);
+      if (step5 != null) {
+        info.add(step5);
+      }
+    }
+    final boolean null6a = mStartPoint == null;
+    final boolean null6b = downcast.mStartPoint == null;
+    if (null6a != null6b) {
+      if (boundary ==  null || !boundary.contains(mStartPoint)) {
+        final PointGeometrySubject clone6 =
+          ProxyTools.clone(downcast.mStartPoint);
+        final UndoInfo step6 =
+          new ReplacementUndoInfo(6, mStartPoint, clone6);
+        info.add(step6);
+      }
+    } else if (!null6a) {
+      final UndoInfo step6 =
+        mStartPoint.createUndoInfo(downcast.mStartPoint, boundary);
+      if (step6 != null) {
+        info.add(step6);
+      }
+    }
+    final boolean null7a = mEndPoint == null;
+    final boolean null7b = downcast.mEndPoint == null;
+    if (null7a != null7b) {
+      if (boundary ==  null || !boundary.contains(mEndPoint)) {
+        final PointGeometrySubject clone7 =
+          ProxyTools.clone(downcast.mEndPoint);
+        final UndoInfo step7 = new ReplacementUndoInfo(7, mEndPoint, clone7);
+        info.add(step7);
+      }
+    } else if (!null7a) {
+      final UndoInfo step7 =
+        mEndPoint.createUndoInfo(downcast.mEndPoint, boundary);
+      if (step7 != null) {
+        info.add(step7);
+      }
+    }
   }
 
 

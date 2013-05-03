@@ -15,11 +15,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.hisc.HISCAttributes;
+import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -36,8 +37,19 @@ public abstract class AbstractSICProperty5VerifierTest
   extends AbstractConflictCheckerTest
 {
 
-  // #########################################################################
-  // # Test Cases
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractAnalysisTest
+  @Override
+  protected void configure(final ModuleCompiler compiler)
+  {
+    super.configure(compiler);
+    compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
+  }
+
+
+  //#########################################################################
+  //# Test Cases
   // testHISC
   public void testSICProperty5Verifier_hisc0_low1() throws Exception
   {
@@ -138,18 +150,30 @@ public abstract class AbstractSICProperty5VerifierTest
                      "parManEg_I_mfb_lowlevel_multiAnswers.wmod", true);
   }
 
+  public void testSICProperty5Verifier_parManEg_I_mfb_lowlevel_multiAnswers_noInterface()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc",
+                     "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
+                     false);
+  }
+
   public void testSICProperty5Verifier_parManEg_I_mfb_middlelevel()
   throws Exception
   {
     runModelVerifier("tests", "hisc", "parManEg_I_mfb_middlelevel.wmod", true);
   }
 
-  public void testSICProperty5Verifier_parManEg_I_mfb_parManEg_I_mfb_lowlevel_multiAnswers_noInterface()
+  public void testSICProperty5Verifier_parManEg_node1()
   throws Exception
   {
-    runModelVerifier("tests", "hisc",
-                     "parManEg_I_mfb_lowlevel_multiAnswers_noInterface.wmod",
-                     false);
+    runModelVerifier("despot", "parallelManufacturingExample", "Node1.wmod", true);
+  }
+
+  public void testSICProperty5Verifier_parManEg_node4()
+  throws Exception
+  {
+    runModelVerifier("despot", "parallelManufacturingExample", "Node4.wmod", true);
   }
 
   // SimpleManufacturingExample
@@ -163,42 +187,42 @@ public abstract class AbstractSICProperty5VerifierTest
   // song_aip
   public void testSICProperty5Verifier_aip3_syn_as1() throws Exception
   {
-    runModelVerifier("despot", "song_aip/aip3_syn", "as1.wmod", true);
+    runModelVerifier("despot", "song_aip", "aip3_syn", "as1.wmod", true);
   }
 
   public void testSICProperty5Verifier_aip3_syn_as2() throws Exception
   {
-    runModelVerifier("despot", "song_aip/aip3_syn", "as2.wmod", true);
+    runModelVerifier("despot", "song_aip", "aip3_syn", "as2.wmod", true);
   }
 
   public void testSICProperty5Verifier_aip3_syn_as3() throws Exception
   {
-    runModelVerifier("despot", "song_aip/aip3_syn", "as3.wmod", true);
+    runModelVerifier("despot", "song_aip", "aip3_syn", "as3.wmod", true);
   }
 
   public void testSICProperty5Verifier_aip3_syn_io() throws Exception
   {
-    runModelVerifier("despot", "song_aip/aip3_syn", "io.wmod", true);
+    runModelVerifier("despot", "song_aip", "aip3_syn", "io.wmod", true);
   }
 
   public void testSICProperty5Verifier_aip3_syn_tu1() throws Exception
   {
-    runModelVerifier("despot", "song_aip/aip3_syn", "tu1.wmod", true);
+    runModelVerifier("despot", "song_aip", "aip3_syn", "tu1.wmod", true);
   }
 
   public void testSICProperty5Verifier_aip3_syn_tu2() throws Exception
   {
-    runModelVerifier("despot", "song_aip/aip3_syn", "tu2.wmod", true);
+    runModelVerifier("despot", "song_aip", "aip3_syn", "tu2.wmod", true);
   }
 
   public void testSICProperty5Verifier_aip3_syn_tu3() throws Exception
   {
-    runModelVerifier("despot", "song_aip/aip3_syn", "tu3.wmod", true);
+    runModelVerifier("despot", "song_aip", "aip3_syn", "tu3.wmod", true);
   }
 
   public void testSICProperty5Verifier_aip3_syn_tu4() throws Exception
   {
-    runModelVerifier("despot", "song_aip/aip3_syn", "tu4.wmod", true);
+    runModelVerifier("despot", "song_aip", "aip3_syn", "tu4.wmod", true);
   }
 
   // tbed_hisc
@@ -293,7 +317,7 @@ public abstract class AbstractSICProperty5VerifierTest
 
       // tests that in the end state of the trace all interfaces have the answer
       // in question enabled
-      if (HISCAttributes.isInterface(aut.getAttributes())) {
+      if (HISCAttributeFactory.isInterface(aut.getAttributes())) {
         boolean answerEnabled = false;
         final Collection<TransitionProxy> transitions = aut.getTransitions();
         for (final TransitionProxy transition : transitions) {
@@ -380,8 +404,8 @@ public abstract class AbstractSICProperty5VerifierTest
     for (final EventProxy event : events) {
       if (event != answer) {
         final Map<String,String> attribs = event.getAttributes();
-        if (HISCAttributes.getEventType(attribs) !=
-            HISCAttributes.EventType.DEFAULT) {
+        if (HISCAttributeFactory.getEventType(attribs) !=
+            HISCAttributeFactory.EventType.DEFAULT) {
           disabledevents.add(event);
         }
       }

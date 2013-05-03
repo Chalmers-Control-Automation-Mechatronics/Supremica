@@ -82,6 +82,7 @@ public final class ModuleSequenceElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public ModuleSequenceElement clone()
   {
     return (ModuleSequenceElement) super.clone();

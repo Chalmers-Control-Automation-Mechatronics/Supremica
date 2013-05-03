@@ -1,46 +1,85 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="machine">
-<EventDeclList>
-  <EventDecl Name="start" Kind="CONTROLLABLE"
-             Scope="REQUIRED_PARAMETER"/>
-  <EventDecl Name="finish" Kind="UNCONTROLLABLE"
-             Scope="REQUIRED_PARAMETER"/>
-  <EventDecl Name="break" Kind="UNCONTROLLABLE"
-             Scope="REQUIRED_PARAMETER"/>
-  <EventDecl Name="repair" Kind="CONTROLLABLE"
-             Scope="REQUIRED_PARAMETER"/>
-  <EventDecl Name=":accepting" Kind="PROPOSITION"
-             Scope="REQUIRED_PARAMETER"/>
-</EventDeclList>
-<ComponentList>
-<SimpleComponent Kind="PLANT">
-  <SimpleIdentifier Name="machine"/>
-  <Graph>
-  <NodeList>
-    <SimpleNode Name="idle" Initial="true">
-      <EventList>
-        <SimpleIdentifier Name=":accepting"/>
-      </EventList>
-    </SimpleNode>
-    <SimpleNode Name="working"/>
-    <SimpleNode Name="down"/>
-  </NodeList>
-  <EdgeList>
-    <Edge Source="idle" Target="working">
-      <LabelBlock><SimpleIdentifier Name="start"/></LabelBlock>
-    </Edge>
-    <Edge Source="working" Target="idle">
-      <LabelBlock><SimpleIdentifier Name="finish"/></LabelBlock>
-    </Edge>
-    <Edge Source="working" Target="down">
-      <LabelBlock><SimpleIdentifier Name="break"/></LabelBlock>
-    </Edge>
-    <Edge Source="down" Target="idle">
-      <LabelBlock><SimpleIdentifier Name="repair"/></LabelBlock>
-    </Edge>
-  </EdgeList>
-  </Graph>
-</SimpleComponent>
-</ComponentList>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="machine" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="start"/>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="finish"/>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="break"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="repair"/>
+        <EventDecl Kind="PROPOSITION" Scope="REQUIRED_PARAMETER" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="machine">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="32"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-14"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="working">
+                        <PointGeometry>
+                            <Point X="64" Y="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-33" Y="4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="down">
+                        <PointGeometry>
+                            <Point X="160" Y="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-19" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="idle" Target="working">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="74" Y="63"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="working" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-21" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="98" Y="78"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="working" Target="down">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-19" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="down" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
 </Module>

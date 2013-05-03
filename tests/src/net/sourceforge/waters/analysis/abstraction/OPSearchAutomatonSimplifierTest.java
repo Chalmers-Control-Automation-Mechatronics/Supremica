@@ -13,8 +13,8 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -50,7 +50,7 @@ public class OPSearchAutomatonSimplifierTest
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     mSimplifier = new OPSearchAutomatonSimplifier(factory, translator);
     mSimplifier.setOutputName("result");
-    mIsomorphismChecker = new IsomorphismChecker(factory, true);
+    mIsomorphismChecker = new IsomorphismChecker(factory, true, true);
   }
 
   protected void tearDown() throws Exception
@@ -66,108 +66,128 @@ public class OPSearchAutomatonSimplifierTest
   //# Test Cases
   public void testOPempty() throws Exception
   {
-    runOPSearch("alpharemoval_8.wmod", true);
+    runOPSearch("alpharemoval_8.wmod");
   }
 
   public void testOP1() throws Exception
   {
-    runOPSearch("op_1.wmod", false);
+    runOPSearch("op01.wmod");
   }
 
   public void testOP2() throws Exception
   {
-    runOPSearch("op_2.wmod", true);
+    runOPSearch("op02.wmod");
   }
 
   public void testOP3() throws Exception
   {
-    runOPSearch("op_3.wmod", false);
+    runOPSearch("op03.wmod");
   }
 
   public void testOP3a() throws Exception
   {
-    runOPSearch("tauTransRemovalFromNonAlpha_3.wmod", true);
+    runOPSearch("tauTransRemovalFromNonAlpha_3.wmod");
   }
 
   public void testOP4() throws Exception
   {
-    runOPSearch("op_4.wmod", true);
+    runOPSearch("op04.wmod");
   }
 
   public void testOP5() throws Exception
   {
-    runOPSearch("op_5.wmod", true);
+    runOPSearch("op05.wmod");
   }
 
   public void testOP6() throws Exception
   {
-    runOPSearch("op_6.wmod", true);
+    runOPSearch("op06.wmod");
   }
 
   public void testOP7() throws Exception
   {
-    runOPSearch("op_7.wmod", true);
+    runOPSearch("op07.wmod");
   }
 
   public void testOP8() throws Exception
   {
-    runOPSearch("op_8.wmod", true);
+    runOPSearch("op08.wmod");
   }
 
   public void testOP9() throws Exception
   {
-    runOPSearch("op_9.wmod", true);
+    runOPSearch("op09.wmod");
   }
 
   public void testOP10() throws Exception
   {
-    runOPSearch("op_10.wmod", true);
+    runOPSearch("op10.wmod");
   }
 
   public void testOP11() throws Exception
   {
-    runOPSearch("op_11.wmod", true);
+    runOPSearch("op11.wmod");
   }
 
   public void testOP12() throws Exception
   {
-    runOPSearch("op_12.wmod", true);
+    runOPSearch("op12.wmod");
   }
 
   public void testOP13() throws Exception
   {
-    runOPSearch("op_13.wmod", true);
+    runOPSearch("op13.wmod");
   }
 
   public void testOP14() throws Exception
   {
-    runOPSearch("op_14.wmod", true);
+    runOPSearch("op14.wmod");
   }
 
   public void testOP15() throws Exception
   {
-    runOPSearch("op_15.wmod", true);
+    runOPSearch("op15.wmod");
   }
 
   public void testOP15a() throws Exception
   {
-    runOPSearch("op_15a.wmod", true);
+    runOPSearch("op15a.wmod");
   }
 
   public void testOP16() throws Exception
   {
-    runOPSearch("op_16.wmod", true);
+    runOPSearch("op16.wmod");
   }
 
   public void testOP17() throws Exception
   {
-    runOPSearch("op_17.wmod", true);
+    runOPSearch("op17.wmod");
+  }
+
+  public void testOP18() throws Exception
+  {
+    runOPSearch("op18.wmod");
+  }
+
+  public void testOP19() throws Exception
+  {
+    runOPSearch("op19.wmod");
+  }
+
+  public void testOP20() throws Exception
+  {
+    runOPSearch("op20.wmod");
+  }
+
+  public void testOP21() throws Exception
+  {
+    runOPSearch("op21.wmod");
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private void runOPSearch(final String name, final boolean expect)
+  private void runOPSearch(final String name)
     throws Exception
   {
     final ProductDESProxy des = getCompiledDES("tests", "abstraction", name);
