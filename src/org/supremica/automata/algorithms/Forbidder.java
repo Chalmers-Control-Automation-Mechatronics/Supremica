@@ -17,6 +17,7 @@ import org.supremica.automata.Arc;
 import org.supremica.automata.State;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.DumpState;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.ForbiddenEvent;
 import org.supremica.automata.algorithms.SearchStates;
@@ -196,6 +197,11 @@ public class Forbidder
      ***/
     private void addForbiddenEvent(final int a, final int index, final ForbiddenEvent x_event)
     {
+		addForbiddenEvent(a, index, x_event, false); // Do not use dump state, use self-loop
+	}
+
+    private void addForbiddenEvent(final int a, final int index, final ForbiddenEvent x_event, final boolean use_dump)
+    {
         // Get automaton
         final Automaton automaton = the_automata[a];
         // Add the event - beware, adding an existig event throws exception
@@ -207,15 +213,26 @@ public class Forbidder
         final State state = search_states.getState(a, index);
         // This should have a corresponding state in automaton
         final State curr_state = automaton.getStateWithName(state.getName());
-        if(curr_state == null) // if not found, somethig is _seriously_ wrong
+        if(curr_state == null) // if not found, something is _seriously_ wrong
         {
             logger.debug("Cannot find state " + state.getName() + " in automaton " + automaton.getName());
+            return;
         }
-        // add self-loop - if not already there
+        // if no transition on this event already there
         if(curr_state.doesDefine(x_event) == false)
         {
-            automaton.addArc(new Arc(curr_state, curr_state, x_event));
-            logger.debug("Selflooping " + automaton.getName() + ": " + curr_state.getName());
+			if(use_dump == false) // make self-loop
+            {
+				automaton.addArc(new Arc(curr_state, curr_state, x_event));
+            	logger.debug("Selflooping " + automaton.getName() + ": " + curr_state.getName() + " on event " + x_event.getLabel());
+			}
+			else // use dump state
+			{
+				// Get dump state
+				DumpState dump_state = automaton.getDumpState(true);	// true means, create if not there
+				automaton.addArc(new Arc(curr_state, dump_state, x_event));
+            	logger.debug("Dumping " + automaton.getName() + ": " + curr_state.getName() + " on event " + x_event.getLabel());
+			}
         }
     }
 
@@ -227,7 +244,7 @@ public class Forbidder
         final Automaton spec = new Automaton(x_event.getLabel()); // same name as the event-label
         spec.setType(AutomatonType.SPECIFICATION);
         spec.getAlphabet().addEvent(x_event);
-        final State init_state = new State("q0");
+        final State init_state = new State("x0");
         init_state.setInitial(true);
         init_state.setAccepting(true);
         spec.addState(init_state);
