@@ -2267,33 +2267,26 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-    boolean isOnlyNonSelfLoopAutomaton(final AutomatonProxy aut)
-    {
-      switch (mNumNonSelfloopAutomata) {
-      case 0:
-        return true;
-      case 1:
-        return mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP;
-      default:
-        return false;
-      }
-    }
-
-    boolean isOnlyNonSelfLoopCandidate(final Candidate cand)
+    /**
+     * Checks whether this event can be considered outside-only-selfloop
+     * when composing and simplifying the given candidate.
+     * @param  candidate  Candidate containing automata being composed and
+     *         simplified.
+     * @return <CODE>true</CODE> if all automata containing this event in
+     *         non-selfloop transitions are contained in the given candidate.
+     */
+    boolean isOnlyNonSelfLoopCandidate(final Candidate candidate)
     {
       int remaining = mNumNonSelfloopAutomata;
-      if(remaining > cand.getNumberOfAutomata())
-      {
-        return false;
-      }
-      else if(remaining == 0){
+      if (remaining == 0) {
         return true;
+      } else if (remaining > candidate.getNumberOfAutomata()) {
+        return false;
       } else {
-        for(final AutomatonProxy aut : cand.getAutomata())
-        {
-          if(mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP){
+        for (final AutomatonProxy aut : candidate.getAutomata()) {
+          if (mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP) {
             remaining--;
-            if(remaining ==0){
+            if (remaining == 0) {
               return true;
             }
           }
