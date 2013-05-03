@@ -261,5 +261,4 @@ class EFSMTRSimplifier
   private final TransitionRelationSimplifier mSimplifier;
   private final CompilerOperatorTable mOperatorTable;
 
-
 }

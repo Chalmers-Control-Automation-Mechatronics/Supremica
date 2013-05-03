@@ -28,6 +28,7 @@ class ChainVariableSelectionHeuristic
   public EFSMVariable selectVariable (final EFSMSystem system)
     throws AnalysisException, EvalException
   {
+    mCache = null;
     final List<EFSMVariable> variableList = system.getVariables();
     switch (variableList.size()) {
     case 0:
@@ -38,10 +39,10 @@ class ChainVariableSelectionHeuristic
       break;
     }
     final EFSMVariableContext context = system.getVariableContext();
-    final Map<EFSMVariable,EFSMTransitionRelation> cache =
+    mCache =
       new HashMap<EFSMVariable,EFSMTransitionRelation>(variableList.size());
     for (final VariableSelectionHeuristic heuristic : mVariableSelectionHeuristicList) {
-      heuristic.setup(context, cache);
+      heuristic.setup(context, mCache);
     }
     final int heuristicSize = mVariableSelectionHeuristicList.size();
     double[] smallest = new double[heuristicSize];
@@ -81,8 +82,18 @@ class ChainVariableSelectionHeuristic
     return smallestVar;
   }
 
+  public EFSMTransitionRelation getUnfoldedResult(final EFSMVariable var)
+  {
+    if (mCache == null) {
+      return null;
+    } else {
+      return mCache.get(var);
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
   private final List<VariableSelectionHeuristic> mVariableSelectionHeuristicList;
+  private Map<EFSMVariable,EFSMTransitionRelation> mCache;
 }

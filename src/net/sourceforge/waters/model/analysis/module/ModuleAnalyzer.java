@@ -14,6 +14,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
@@ -50,7 +51,7 @@ public interface ModuleAnalyzer
    *         could not be completed due to errors in the model or due to
    *         resource limitations.
    */
-  public boolean run() throws AnalysisException;
+  public boolean run() throws EvalException, AnalysisException;
 
 
   //#########################################################################

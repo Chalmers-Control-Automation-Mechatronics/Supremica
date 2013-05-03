@@ -26,7 +26,7 @@ abstract class CompositionSelectionHeuristic
 
   //#########################################################################
   //# Invocation
-  public List<EFSMTransitionRelation> selectTransition(final EFSMSystem system)
+  public List<EFSMTransitionRelation> selectComposition(final EFSMSystem system)
     throws AnalysisException, EvalException
   {
     final List<EFSMVariable> variablesList = system.getVariables();

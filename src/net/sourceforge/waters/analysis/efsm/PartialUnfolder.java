@@ -87,6 +87,7 @@ public class PartialUnfolder
     final CompiledRange range = var.getRange();
     mInputEventEncoding = efsmRel.getEventEncoding();
     final ListBufferTransitionRelation rel = efsmRel.getTransitionRelation();
+    rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final int numInputStates = rel.getNumberOfStates();
     final SimpleExpressionProxy varName = var.getVariableName();
     mUnfoldedVariableNamePrimed =
