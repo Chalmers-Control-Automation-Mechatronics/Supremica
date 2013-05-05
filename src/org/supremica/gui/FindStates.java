@@ -400,7 +400,7 @@ class FindStatesTable
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTable.class);
 	private Automata automata;
-	private JFrame frame;
+	private FindStatesFrame frame;
 	@SuppressWarnings("unused")
 	private StateMatcherAcceptingCellEditor acceptingEditor;
 	@SuppressWarnings("unused")
@@ -430,10 +430,12 @@ class FindStatesTable
 	private void deleteAutomaton(int row)
 	{
 		automata.removeAutomaton(getAutomaton(row));
+		frame.updateForbidButton(automata.isAllAutomataPlants());
 	}
 
 	private void doRepaint()
 	{
+		frame.updateForbidButton(automata.isAllAutomataPlants());
 		repaint();
 	}
 
@@ -654,7 +656,7 @@ class FindStatesTable
 		return sorter;
 	}
 
-	public FindStatesTable(Automata a, JFrame frame)
+	public FindStatesTable(Automata a, FindStatesFrame frame)
 	{
 		super(makeTableModel(a));
 
@@ -777,6 +779,7 @@ class FreeFormPanel
 	private String tip = "Search with a free form regexp";
 	private JTextField reg_exp;
 	private JTextField sep_str;
+	private JCheckBox pairwise_equal;
 	@SuppressWarnings("unused")
 	private boolean ok = false;
 
@@ -874,6 +877,9 @@ class FreeFormPanel
 		yBox.add(Box.createVerticalGlue());
 		yBox.add(x2Box);
 		yBox.add(Box.createVerticalGlue());
+		
+		yBox.add(pairwise_equal = new JCheckBox("Forbid pairwise equally named states", false));
+		
 		p1.add(yBox, BorderLayout.NORTH);
 		add("Center", p1);
 	}
@@ -951,6 +957,55 @@ class FixedFormPanel
 	}
 }
 
+class SettingsPanel
+	extends JPanel
+	implements FindStatesTab
+{
+	private static final long serialVersionUID = 1L;
+	private final String title = "Settings";
+	private final String tip = "Advanced settings for finding and forbidding states";
+	private final JCheckBox use_dump = new JCheckBox("Use dump state instead of self-loop");
+	
+	SettingsPanel()
+	{
+		/* Should disable the Find and Forbid States button when focused, but...
+		setFocusable(true);
+
+		addFocusListener(new FocusListener() 
+		{
+ 
+			public void focusGained(FocusEvent e) 
+			{
+			}
+			public void focusLost(FocusEvent e) 
+			{
+            }
+		});
+		 * 
+		 */
+		add(use_dump);
+	}
+	
+	public String getTitle()
+	{
+		return title;
+	}
+	
+	public String getTip()
+	{
+		return tip;
+	}
+	
+	public StateMatcher getMatcher()
+	{
+		return null;
+	}
+	
+	public boolean useDump()
+	{
+		return use_dump.isSelected();
+	}
+}
 // -----------------------------------------
 class FindStatesFrame
 	extends JFrame
@@ -967,7 +1022,8 @@ class FindStatesFrame
 	@SuppressWarnings("unused")
 	private ForbidButton forbid_button = null;
 	private VisualProject theVisualProject = null;
-
+	private SettingsPanel settingsPanel = new SettingsPanel();
+	
 	private static void debug(String s)
 	{
 		logger.debug(s);
@@ -984,17 +1040,22 @@ class FindStatesFrame
 
 		FixedFormPanel fixedformPanel = new FixedFormPanel(table);
 		FreeFormPanel freeformPanel = new FreeFormPanel();
-
+//		settingsPanel = new SettingsPanel();
+		
 		tabbedPane = new JTabbedPane();
 
 		tabbedPane.addTab(fixedformPanel.getTitle(), null, fixedformPanel, fixedformPanel.getTip());
 		tabbedPane.addTab(freeformPanel.getTitle(), null, freeformPanel, freeformPanel.getTip());
-
+		tabbedPane.addTab(settingsPanel.getTitle(), null, settingsPanel, settingsPanel.getTip());
+		
 		JPanel buttonPanel = new JPanel();
 
 		buttonPanel.add(quit_button = new CancelButton());
 		buttonPanel.add(find_button = Utility.setDefaultButton(this, new FindButton()));
-		buttonPanel.add(forbid_button = new ForbidButton());
+		buttonPanel.add(forbid_button = new ForbidButton());	
+		
+		// We only allow forbidding plant states, if you have specs, plantify first
+		forbid_button.setEnabled(selectedAutomata.isAllAutomataPlants());
 
 		Container contentPane = getContentPane();
 
@@ -1002,6 +1063,10 @@ class FindStatesFrame
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 	}
 
+	void updateForbidButton(boolean b)
+	{
+		forbid_button.setEnabled(b);
+	}
 	private Automata getAutomata()
 	{
 		return automata;
@@ -1045,7 +1110,7 @@ class FindStatesFrame
 		public ForbidButton()
 		{
 			super("Forbid");
-			setToolTipText("Forbid found states");
+			setToolTipText("Forbid found states. Only for plants. Plantify first if you have to.");
 
 			addActionListener(new ActionListener()
 			{
@@ -1126,7 +1191,7 @@ class FindStatesFrame
 
 				if(present)
 				{
-					PresentStates present_states = new PresentStates(this, ss, getAutomata(), theVisualProject);
+					PresentStates present_states = new PresentStates(this, ss, getAutomata(), theVisualProject, settingsPanel.useDump());
 					present_states.start(); // From the docs: Causes this thread to begin execution;
 											// the Java Virtual Machine calls the run method of this thread.
 											// The result is that two threads are running concurrently: the
@@ -1136,7 +1201,7 @@ class FindStatesFrame
 				else
 				{
 					ss.join(); // wait for ss to stop
-					new Forbidder(getAutomata(), ss, theVisualProject);
+					new Forbidder(getAutomata(), ss, theVisualProject, settingsPanel.useDump()); // false meaning, do not use dump state
 					// forbidder.start();
 					// Should Forbidder be a thread of its own, monitorable/interruptable?
 				}

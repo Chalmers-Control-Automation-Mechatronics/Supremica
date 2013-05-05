@@ -15,6 +15,7 @@ package org.supremica.automata.algorithms;
 import org.supremica.log.*;
 import org.supremica.automata.Arc;
 import org.supremica.automata.State;
+import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.DumpState;
@@ -37,22 +38,28 @@ public class Forbidder
     private final VisualProject the_project;
     private final Automaton[] the_specs;
     private int num_automata;
+	private boolean use_dump = false; // default is to use self-loop and not dump state
 
-    public Forbidder(final Automata automata, final int[] selects, final SearchStates ss, final VisualProject project)
+    public Forbidder(final Automata automata, final int[] selects, final SearchStates ss, final VisualProject project, boolean use_dump)
     {
-        // this.the_automata = new Automata(automata); // makes a deep copy, hopefully order-preserving
-        //** We are not guaranteed that this copy constructor will preserve order,
-        //** We have to manage this ourselves, alas! we use an array Automaton[]
-        this.copyAutomata(automata);
         this.selected_indices = selects;
         this.search_states = ss;
         this.the_project = project;
         this.the_specs = new Automaton[selected_indices.length];
+		this.use_dump = use_dump;
+		
+		// this.the_automata = new Automata(automata); // makes a deep copy, hopefully order-preserving
+        //** We are not guaranteed that this copy constructor will preserve order,
+        //** We have to manage this ourselves, alas! we use an array Automaton[]
+        this.copyAutomata(automata);
 
+		/**
+		 * From May 2013, we only handle plant states, so fiddleAutomata() is not needed, see below.
+		 */
         // for each automaton, make it a plant if not already, then rename
-        fiddleAutomata();
+        // fiddleAutomata();
 
-        // for each global state, create a forbidden event, selfloop it at each corresponding local state
+        // for each global state, create a forbidden event, selfloop or dump it at each corresponding local state
         for(int i = 0; i < selected_indices.length; ++i)
         {
             final int index = selected_indices[i];	// get index for global state
@@ -97,19 +104,23 @@ public class Forbidder
      * This one has no selection, this is taken to mean the cross-product between the found states
      * This is true for fixed-form searches, but not necessarily for free-from(?)
      **/
-    public Forbidder(final Automata automata, final SearchStates ss, final VisualProject project)
+    public Forbidder(final Automata automata, final SearchStates ss, final VisualProject project, boolean use_dump)
     {
+		this.selected_indices = null;
+        this.search_states = ss;
+        this.the_project = project;
+        this.the_specs = new Automaton[1];
+		this.use_dump = use_dump;
         // this.the_automata = new Automata(automata); // makes a deep copy, hopefully order-preserving
         //** We are not guaranteed that this copy constructor will preserve order,
         //** We have to manage this ourselves, alas! we use an array Automaton[]
         this.copyAutomata(automata);
-        this.selected_indices = null;
-        this.search_states = ss;
-        this.the_project = project;
-        this.the_specs = new Automaton[1];
 
-        // for each automaton, make it a plantif not already, then rename
-        fiddleAutomata();
+		/**
+		 * From May 2013, we only handle plant states, so fiddleAutomata() is not needed, see below.
+		 */
+        // for each automaton, make it a plant if not already, then rename
+        // fiddleAutomata();
 
         // Now we have a single project-global unique forbidden event,
         final ForbiddenEvent x_event = new ForbiddenEvent(the_project.getUniqueEventLabel(FORBIDDEN_EVENT_PREFIX));
@@ -167,15 +178,32 @@ public class Forbidder
         for(int i = 0; i < num_automata; ++i)
         {
             the_automata[i] = new Automaton(automata.getAutomatonAt(i));
+            // rename copy - this was moved from fiddleAutomata(), see below
+			final String old_name = automata.getAutomatonAt(i).getName();
+			assert(old_name != null);
+			final String new_name = the_project.getUniqueAutomatonName(FORBIDDEN_AUTOMATA_PREFIX + old_name);
+			assert(new_name != null);
+            the_automata[i].setName(new_name);			
         }
     }
 
     /**
      * Plantify specs
      * Rename all copies
-     **/
+     **//* As of May 2013, we only handle forbiding plant states. Plantify any spec first.
+	 * Reason is that to plantify correctly, you need to have the correct plant alphabet
+	 * So, you need to select all teh plants, plus teh specs for plantify to work
+	 * But then... you do not really want all those extra plant states if you are only to forbid spec states
+	 * So. Plantify the specs firs with the relevant plant alphabet, then you do state forbidding
     private void fiddleAutomata()
     {
+		// Collect the uc alphabet
+		Alphabet uc_alpha = new Alphabet();
+		for(int i = 0; i < num_automata; ++i)
+		{
+			if(the_automata[i].isPlant())
+				uc_alpha.union(the_automata[i].getAlphabet().getUncontrollableAlphabet());
+		}
         // for each automaton, make it a plant if not already
         for(int i = 0; i < num_automata; ++i)
         {
@@ -183,24 +211,20 @@ public class Forbidder
 
             final String old_name = automaton.getName();
 
-	    if(automaton.isSpecification() || automaton.isSupervisor())
-	    {
-		MinimizationHelper.plantify(automaton);
-	    }
+			if(automaton.isSpecification() || automaton.isSupervisor())
+			{
+				Plantifier.plantify(automaton, uc_alpha);
+			}
             // rename copy
             automaton.setName(the_project.getUniqueAutomatonName(FORBIDDEN_AUTOMATA_PREFIX + old_name));
         }
     }
-
+	************/
+	
     /**
      * Add forbidden event, with some sanity checks
      ***/
     private void addForbiddenEvent(final int a, final int index, final ForbiddenEvent x_event)
-    {
-		addForbiddenEvent(a, index, x_event, false); // Do not use dump state, use self-loop
-	}
-
-    private void addForbiddenEvent(final int a, final int index, final ForbiddenEvent x_event, final boolean use_dump)
     {
         // Get automaton
         final Automaton automaton = the_automata[a];

@@ -179,8 +179,9 @@ public class Automata
     /**
      * Adds the automaton aut to this Automata. If there already is an automaton with the
      * same name as aut, aut is NOT added.
+	 * Returns false if aut has same name as an existing automaton
      */
-    public void addAutomaton(final Automaton aut)
+    public boolean addAutomaton(final Automaton aut)
     {
         if (!containsAutomaton(aut.getName()))
         {
@@ -188,7 +189,9 @@ public class Automata
             nameMap.put(aut.getName(), aut);
             aut.addListener(this);
             notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
+			return true;
         }
+		return false;
     }
 
     /**
@@ -205,9 +208,9 @@ public class Automata
 
     /**
      * Iterates over all automata in automata.
-     * If an automaton with the same name is not in the cureent
+     * If an automaton with the same name is not in the current
      * automata then the automata is added. If there already is an automaton
-     * then that automaton is replace with the new one.
+     * then that automaton is replaced with the new one.
      * @param automata
      */
     public void updateAutomata(final Automata automata)

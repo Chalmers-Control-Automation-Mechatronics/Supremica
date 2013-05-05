@@ -235,13 +235,15 @@ class PresentStatesFrame
 		extends JButton
 	{
 		private static final long serialVersionUID = 1L;
-
-		public ForbidButton()
+		private boolean use_dump;
+		
+		public ForbidButton(boolean use_dump)
 		{
 			super("Forbid");
 			setToolTipText("Forbid selected states"); // if none selected, should forbid all?
 			setEnabled(false);
-
+			this.use_dump = use_dump;
+			
 			addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -303,7 +305,7 @@ class PresentStatesFrame
 			}
 			**/ 
 			@SuppressWarnings("unused")
-			Forbidder forbidder = new Forbidder(automata, table.getSelectedRows(), search_states, theVisualProject);
+			Forbidder forbidder = new Forbidder(automata, table.getSelectedRows(), search_states, theVisualProject, use_dump);
 		}
 	}
 /*
@@ -324,7 +326,7 @@ class PresentStatesFrame
 				}
 		}
 */
-	public PresentStatesFrame(SearchStates ss, Automata a, VisualProject theVisualProject)
+	public PresentStatesFrame(SearchStates ss, Automata a, VisualProject theVisualProject, boolean use_dump)
 	{
 		this.search_states = ss;
 		this.automata = a;
@@ -335,7 +337,8 @@ class PresentStatesFrame
 
 //              route_button = new RouteButton();
 //              route_button.setEnabled(false);
-		forbid_button = new ForbidButton();
+		forbid_button = new ForbidButton(use_dump);
+		forbid_button.setEnabled(a.isAllAutomataPlants());
 		table = new PresentStatesTable(ss, automata, theVisualProject);
 
 		table.setSelectionListener(this);
@@ -406,8 +409,9 @@ public class PresentStates
 	private Automata automata = null;
 	private boolean dispose_frame = false;
 	private VisualProject theVisualProject;
-
-	public PresentStates(JFrame frame, SearchStates ss, Automata a, VisualProject theVisualProject)
+	private boolean use_dump = false;
+	
+	public PresentStates(JFrame frame, SearchStates ss, Automata a, VisualProject theVisualProject, boolean use_dump)
 	{
 		super(ss);	// PresentStates is a Presenter, which is a Thread. Calling start() on PresentStates
 					// invokes Presenter::run() which waits for ss to finish, before calling taskStopped()
@@ -417,13 +421,14 @@ public class PresentStates
 		this.searchs = ss;
 		this.automata = a;
 		this.theVisualProject = theVisualProject;
+		this.use_dump = use_dump;
 	}
 
 	public void taskFinished()
 	{
 		if (searchs.numberFound() > 0)
 		{
-			frame = new PresentStatesFrame(searchs, automata, theVisualProject);
+			frame = new PresentStatesFrame(searchs, automata, theVisualProject, use_dump);
 		}
 		else    // it was not stopped but none found
 		{

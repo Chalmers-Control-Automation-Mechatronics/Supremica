@@ -162,7 +162,7 @@ public class AnalyzerPanel
         {
             newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
 
-            if (newName == null)
+            if (newName == null)	// user cancelled
             {
                 return null;
             }
@@ -198,9 +198,28 @@ public class AnalyzerPanel
 
     public int addAutomata(final Automata theAutomata)
     {
+		return addAutomata(theAutomata, false);
+	}
+	public int addAutomata(final Automata theAutomata, boolean sanityCheck)
+	{
         final int size = mVisualProject.nbrOfAutomata();
-        mVisualProject.addAutomata(theAutomata);
-        return mVisualProject.nbrOfAutomata() - size;
+		if(sanityCheck == false) // just do it the old unsafe way, this fails ungracefully if adding automata named the same as an existing one
+		{
+			mVisualProject.addAutomata(theAutomata);
+			return mVisualProject.nbrOfAutomata() - size;
+		}
+		
+		// Here we do it the nice and graceful way
+		for(Automaton aut : theAutomata)
+		{
+			while(mVisualProject.addAutomaton(aut) == false)
+			{
+				final String name = getNewAutomatonName("Sorry, an automaton named " + aut.getName() + " already exists", aut.getComment());
+				if(name == null) // then the user cancelled
+					break;	// handle the next one
+			}
+		}
+		return mVisualProject.nbrOfAutomata() - size;	// number of added automata
     }
 
     public int addProject(final Project project)

@@ -5,16 +5,19 @@ import javax.swing.Action;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 import org.supremica.automata.Automata;
+import org.supremica.automata.algorithms.Plantifier;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.gui.ide.IDE;
-
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 /**
  * A new action
  */
 public class AnalyzerPlantifyAction
     extends IDEAction
 {
-    private static final long serialVersionUID = 1L;
+    private Logger logger = LoggerFactory.createLogger(AnalyzerPlantifyAction.class);
+	private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
@@ -43,7 +46,20 @@ public class AnalyzerPlantifyAction
      */
     public void doAction()
     {
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
-        MinimizationHelper.plantify(selectedAutomata);
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        // MinimizationHelper.plantify(selectedAutomata);
+		final Plantifier p = new Plantifier(selectedAutomata);
+		p.plantify();
+		final Automata a = p.getPlantifiedPlants();
+
+		try
+		{
+			ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(a, true);
+			// ide.getIDE().repaint();
+		}
+		catch (final Exception ex)
+		{
+			logger.error(ex);
+		}
     }
 }
