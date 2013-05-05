@@ -12,18 +12,16 @@
 
 package org.supremica.automata.algorithms;
 
-import org.supremica.log.*;
 import org.supremica.automata.Arc;
-import org.supremica.automata.State;
-import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.DumpState;
 import org.supremica.automata.AutomatonType;
+import org.supremica.automata.DumpState;
 import org.supremica.automata.ForbiddenEvent;
-import org.supremica.automata.algorithms.SearchStates;
+import org.supremica.automata.State;
 import org.supremica.gui.VisualProject;
-import org.supremica.automata.algorithms.minimization.MinimizationHelper;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 public class Forbidder
 {
@@ -40,14 +38,14 @@ public class Forbidder
     private int num_automata;
 	private boolean use_dump = false; // default is to use self-loop and not dump state
 
-    public Forbidder(final Automata automata, final int[] selects, final SearchStates ss, final VisualProject project, boolean use_dump)
+    public Forbidder(final Automata automata, final int[] selects, final SearchStates ss, final VisualProject project, final boolean use_dump)
     {
         this.selected_indices = selects;
         this.search_states = ss;
         this.the_project = project;
         this.the_specs = new Automaton[selected_indices.length];
 		this.use_dump = use_dump;
-		
+
 		// this.the_automata = new Automata(automata); // makes a deep copy, hopefully order-preserving
         //** We are not guaranteed that this copy constructor will preserve order,
         //** We have to manage this ourselves, alas! we use an array Automaton[]
@@ -104,7 +102,7 @@ public class Forbidder
      * This one has no selection, this is taken to mean the cross-product between the found states
      * This is true for fixed-form searches, but not necessarily for free-from(?)
      **/
-    public Forbidder(final Automata automata, final SearchStates ss, final VisualProject project, boolean use_dump)
+    public Forbidder(final Automata automata, final SearchStates ss, final VisualProject project, final boolean use_dump)
     {
 		this.selected_indices = null;
         this.search_states = ss;
@@ -183,7 +181,7 @@ public class Forbidder
 			assert(old_name != null);
 			final String new_name = the_project.getUniqueAutomatonName(FORBIDDEN_AUTOMATA_PREFIX + old_name);
 			assert(new_name != null);
-            the_automata[i].setName(new_name);			
+            the_automata[i].setName(new_name);
         }
     }
 
@@ -220,7 +218,7 @@ public class Forbidder
         }
     }
 	************/
-	
+
     /**
      * Add forbidden event, with some sanity checks
      ***/
@@ -253,7 +251,7 @@ public class Forbidder
 			else // use dump state
 			{
 				// Get dump state
-				DumpState dump_state = automaton.getDumpState(true);	// true means, create if not there
+				final DumpState dump_state = automaton.getDumpState(true);	// true means, create if not there
 				automaton.addArc(new Arc(curr_state, dump_state, x_event));
             	logger.debug("Dumping " + automaton.getName() + ": " + curr_state.getName() + " on event " + x_event.getLabel());
 			}

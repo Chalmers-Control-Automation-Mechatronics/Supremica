@@ -1,28 +1,34 @@
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
+import javax.swing.Action;
 import javax.swing.ImageIcon;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.Plantifier;
-import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
+
+
 /**
- * A new action
+ * The plantification action to convert specifications into plants.
+ *
+ * @author Martin Fabian
  */
+
 public class AnalyzerPlantifyAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(AnalyzerPlantifyAction.class);
+    private final Logger logger = LoggerFactory.createLogger(AnalyzerPlantifyAction.class);
 	private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
      */
-    public AnalyzerPlantifyAction(List<IDEAction> actionList)
+    public AnalyzerPlantifyAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -36,7 +42,8 @@ public class AnalyzerPlantifyAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/plant16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -44,6 +51,7 @@ public class AnalyzerPlantifyAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
         final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
