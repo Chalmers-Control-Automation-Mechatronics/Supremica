@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.AlphaDeterminisationTRSimplifier;
@@ -25,7 +26,6 @@ import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -139,7 +139,7 @@ class TRConflictEquivalenceAbstractionProcedure
    *                      operation.
    * @param simplifier    The transition relation simplifier implementing
    *                      the abstraction.
-   * @param forceMarkings Whether or not all event encoding should be forced
+   * @param forceMarkings Whether or not all event encodings should be forced
    *                      to include the default marking and, in case of
    *                      generalised nonblocking, precondition marking.
    */
@@ -148,8 +148,7 @@ class TRConflictEquivalenceAbstractionProcedure
      final ChainTRSimplifier simplifier,
      final boolean forceMarkings)
   {
-    super(analyzer, simplifier);
-    mForceMarkings = forceMarkings;
+    super(analyzer, simplifier, forceMarkings);
   }
 
 
@@ -165,29 +164,18 @@ class TRConflictEquivalenceAbstractionProcedure
   //#########################################################################
   //# Overrides for TRSimplifierAbstractionProcedure
   @Override
-  EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                    final EventProxy tau)
+  protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
+                                              final EventProxy tau,
+                                              final Candidate candidate)
   {
-    final KindTranslator translator = getKindTranslator();
-    final EventEncoding eventEnc = super.createEventEncoding(aut, tau);
-    final EventProxy defaultMarking = getUsedDefaultMarking();
-    int defaultMarkingID = eventEnc.getEventCode(defaultMarking);
-    if (defaultMarkingID < 0 && mForceMarkings) {
-      defaultMarkingID =
-        eventEnc.addEvent(defaultMarking, translator, EventEncoding.STATUS_UNUSED);
-    }
+    final EventEncoding enc = super.createEventEncoding(events, tau, candidate);
     final EventProxy preconditionMarking = getUsedPreconditionMarking();
-    mPreconditionMarkingID = -1;
-    if (preconditionMarking != null) {
-      mPreconditionMarkingID = eventEnc.getEventCode(preconditionMarking);
-      if (mPreconditionMarkingID < 0 && mForceMarkings) {
-        mPreconditionMarkingID =
-          eventEnc.addEvent(preconditionMarking, translator, EventEncoding.STATUS_UNUSED);
-      }
+    if (preconditionMarking == null) {
+      mPreconditionMarkingID = -1;
+    } else {
+      mPreconditionMarkingID = enc.getEventCode(preconditionMarking);
     }
-    final TransitionRelationSimplifier simplifier = getSimplifier();
-    simplifier.setPropositions(mPreconditionMarkingID, defaultMarkingID);
-    return eventEnc;
+    return enc;
   }
 
   @Override
@@ -217,13 +205,6 @@ class TRConflictEquivalenceAbstractionProcedure
 
   //#########################################################################
   //# Data Members
-  /**
-   * Whether or not all event encoding should be forced to include the
-   * default marking and, in case of generalised nonblocking, precondition
-   * marking.
-   */
-  private final boolean mForceMarkings;
-
   /**
    * The precondition marking ID used for the current event encoding.
    */

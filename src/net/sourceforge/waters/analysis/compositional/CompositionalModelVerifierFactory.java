@@ -71,6 +71,7 @@ public class CompositionalModelVerifierFactory
     addArgument(new PreselectingMethodArgument());
     addArgument(new SelectingMethodArgument());
     addArgument(new SubsumptionArgument());
+    addArgument(new SpecialEventsArgument());
     addArgument(new NoDeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
   }
@@ -440,6 +441,32 @@ public class CompositionalModelVerifierFactory
       final AbstractCompositionalModelVerifier composer =
         (AbstractCompositionalModelVerifier) verifier;
       composer.setSubumptionEnabled(true);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class SpecialEventsArgument
+  private static class SpecialEventsArgument extends CommandLineArgumentFlag
+  {
+
+    //#######################################################################
+    //# Constructors
+    private SpecialEventsArgument()
+    {
+      super("-se", "Use selfloop-only events");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configure(final ModelVerifier verifier)
+    {
+      final AbstractCompositionalModelVerifier composer =
+        (AbstractCompositionalModelVerifier) verifier;
+      composer.setUsingSpecialEvents(true);
     }
 
   }

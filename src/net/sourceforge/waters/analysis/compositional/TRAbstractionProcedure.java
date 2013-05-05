@@ -10,7 +10,6 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,12 +33,24 @@ abstract class TRAbstractionProcedure
 
   //#########################################################################
   //# Constructor
+  /**
+   * Creates a new abstraction procedure.
+   * @param analyzer      The model analyser running the main analysis
+   *                      operation.
+   * @param simplifier    The transition relation simplifier implementing
+   *                      the abstraction.
+   * @param forceMarkings Whether or not all event encodings should be forced
+   *                      to include the default marking and, in case of
+   *                      generalised nonblocking, precondition marking.
+   */
   TRAbstractionProcedure
     (final AbstractCompositionalModelAnalyzer analyzer,
-     final TransitionRelationSimplifier simplifier)
+     final TransitionRelationSimplifier simplifier,
+     final boolean forceMarkings)
   {
     super(analyzer);
     mSimplifier = simplifier;
+    mForceMarkings = forceMarkings;
   }
 
 
@@ -48,14 +59,15 @@ abstract class TRAbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
-                     final List<AbstractionStep> steps, final Candidate cand)
+                     final List<AbstractionStep> steps,
+                     final Candidate candidate)
     throws AnalysisException
   {
     try {
       assert local.size() <= 1 : "At most one tau event supported!";
       final Iterator<EventProxy> iter = local.iterator();
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
-      final EventEncoding eventEnc = createEventEncoding(aut, tau);
+      final EventEncoding eventEnc = createEventEncoding(aut, tau, candidate);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
       final int config = mSimplifier.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
@@ -128,19 +140,40 @@ abstract class TRAbstractionProcedure
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                    final EventProxy tau)
+  //# Overrides for AbstractAbstractionProcedure
+  @Override
+  protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
+                                              final EventProxy tau,
+                                              final Candidate candidate)
   {
     final KindTranslator translator = getKindTranslator();
-    Collection<EventProxy> filter = getPropositions();
-    if (filter == null) {
-      filter = Collections.emptyList();
+    final EventEncoding enc = super.createEventEncoding(events, tau, candidate);
+    final EventProxy defaultMarking = getUsedDefaultMarking();
+    int defaultMarkingID = -1;
+    if (defaultMarking != null) {
+      defaultMarkingID = enc.getEventCode(defaultMarking);
+      if (defaultMarkingID < 0 && mForceMarkings) {
+        defaultMarkingID =
+          enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_UNUSED);
+      }
     }
-    return new EventEncoding(aut, translator, tau, filter,
-                             EventEncoding.FILTER_PROPOSITIONS);
+    final EventProxy preconditionMarking = getUsedPreconditionMarking();
+    int preconditionMarkingID = -1;
+    if (preconditionMarking != null) {
+      preconditionMarkingID = enc.getEventCode(preconditionMarking);
+      if (preconditionMarkingID < 0 && mForceMarkings) {
+        preconditionMarkingID =
+          enc.addEvent(preconditionMarking, translator,
+                       EventEncoding.STATUS_UNUSED);
+      }
+    }
+    mSimplifier.setPropositions(preconditionMarkingID, defaultMarkingID);
+    return enc;
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
   abstract AbstractionStep createStep
     (final AutomatonProxy input,
      final StateEncoding inputStateEnc,
@@ -152,5 +185,11 @@ abstract class TRAbstractionProcedure
   //#########################################################################
   //# Data Members
   private final TransitionRelationSimplifier mSimplifier;
+  /**
+   * Whether or not all event encodings should be forced to include the
+   * default marking and, in case of generalised nonblocking, precondition
+   * marking.
+   */
+  private final boolean mForceMarkings;
 
 }

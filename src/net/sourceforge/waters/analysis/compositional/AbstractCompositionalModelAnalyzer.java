@@ -174,10 +174,11 @@ public abstract class AbstractCompositionalModelAnalyzer
     mAbstractionProcedureFactory = abstractionFactory;
     mPreselectingMethodFactory = preselectingMethodFactory;
     mSelectingMethodFactory = selectingMethodFactory;
-    // Default for all model analysers---please do not change.
+    // Defaults for all model analysers---please do not change.
     mPreselectingMethod = MustL;
     mSelectingMethod = MinS;
     mSubsumptionEnabled = false;
+    mUsingSpecialEvents = false;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
     mInternalTransitionLimit = super.getTransitionLimit();
@@ -311,16 +312,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
-   * Returns whether subsumption is enabled in the selecting heuristic.
-   * @see #setSubumptionEnabled(boolean)
-   * @see SelectingMethod
-   */
-  public boolean isSubsumptionEnabled()
-  {
-    return mSubsumptionEnabled;
-  }
-
-  /**
    * Sets whether subsumption is enabled in the selecting heuristic.
    * If subsumption is enabled, and the heuristic returns a candidate that
    * is subsumed by another candidate, the a new candidate will be selected
@@ -332,6 +323,37 @@ public abstract class AbstractCompositionalModelAnalyzer
   public void setSubumptionEnabled(final boolean enable)
   {
     mSubsumptionEnabled = enable;
+  }
+
+  /**
+   * Returns whether subsumption is enabled in the selecting heuristic.
+   * @see #setSubumptionEnabled(boolean)
+   * @see SelectingMethod
+   */
+  public boolean isSubsumptionEnabled()
+  {
+    return mSubsumptionEnabled;
+  }
+
+  /**
+   * Sets whether special events are to be considered in abstraction.
+   * If enabled, compositional minimisation will not only exploit local
+   * events (used only in the subsystem being simplified), but also
+   * selfloop-only events (used only as selfloops outside of the subsystem
+   * being simplified.
+   */
+  public void setUsingSpecialEvents(final boolean enable)
+  {
+    mUsingSpecialEvents = enable;
+  }
+
+  /**
+   * Returns whether special events are considered in abstraction.
+   * @see #setUsesSpecialEvents(boolean)
+   */
+  public boolean isUsingSpecialEvents()
+  {
+    return mUsingSpecialEvents;
   }
 
   /**
@@ -347,7 +369,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * Returns whether deadlock states are pruned.
    * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
    */
-  public boolean getPruningDeadlocks()
+  public boolean isPruningDeadlocks()
   {
     return mSynchronousProductBuilder.getPruningDeadlocks();
   }
@@ -2818,6 +2840,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private final SelectingMethodFactory mSelectingMethodFactory;
   private SelectingMethod mSelectingMethod;
   private boolean mSubsumptionEnabled;
+  private boolean mUsingSpecialEvents;
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;

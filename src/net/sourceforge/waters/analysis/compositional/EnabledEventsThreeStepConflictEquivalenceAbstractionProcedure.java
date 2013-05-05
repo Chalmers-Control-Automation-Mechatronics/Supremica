@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -184,7 +183,8 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
-                     final List<AbstractionStep> steps, final Candidate cand)
+                     final List<AbstractionStep> steps,
+                     final Candidate candidate)
     throws AnalysisException
   {
     try {
@@ -238,7 +238,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       }
 
       //create Event Encoding in right order with all enabled events at front of list
-      final EventEncoding eventEnc = createEventEncoding(eventsList, tau);
+      final EventEncoding eventEnc = createEventEncoding(eventsList, tau, candidate);
 
     //read selfLoop info at beginning of 3step:
       final CompositionalConflictChecker eventsAnalyzer = (CompositionalConflictChecker)getAnalyzer();
@@ -249,7 +249,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         final CompositionalConflictChecker.EventInfo eventInfo  = eventsAnalyzer.getEventInfo(event);
         if(eventInfo != null && event != tau)
         //check if event is the only nonSelfLoop is this automaton
-        if(eventInfo.isOnlyNonSelfLoopCandidate(cand)) {
+        if(eventInfo.isOnlyNonSelfLoopCandidate(candidate)) {
           eventEnc.setProperEventStatus(eventEnc.getEventCode(event),
                                         EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
 
@@ -410,25 +410,16 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
   //#########################################################################
   //# Auxiliary Methods
-  protected EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                              final EventProxy tau)
-  {
-    final Collection<EventProxy> events = aut.getEvents();
-    return createEventEncoding(events, tau);
-  }
-
+  @Override
   protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
-                                              final EventProxy tau)
+                                              final EventProxy tau,
+                                              final Candidate candidate)
   {
-    final KindTranslator translator = getKindTranslator();
+    final EventEncoding enc = super.createEventEncoding(events, tau, candidate);
     final EventProxy defaultMarking = getUsedDefaultMarking();
-    final Collection<EventProxy> filter =
-      Collections.singletonList(defaultMarking);
-    final EventEncoding enc =
-      new EventEncoding(events, translator, tau, filter,
-                        EventEncoding.FILTER_PROPOSITIONS);
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
+      final KindTranslator translator = getKindTranslator();
       enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_UNUSED);
     }
     mCompleteChain.setDefaultMarkingID(defaultMarkingID);

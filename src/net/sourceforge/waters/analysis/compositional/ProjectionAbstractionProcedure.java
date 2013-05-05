@@ -75,7 +75,7 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
      final TransitionRelationSimplifier simplifier,
      final SubsetConstructionTRSimplifier subset)
   {
-    super(verifier, simplifier);
+    super(verifier, simplifier, false);
     mSubsetConstructionTRSimplifier = subset;
   }
 
@@ -95,7 +95,8 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
-                     final List<AbstractionStep> steps, final Candidate cand)
+                     final List<AbstractionStep> steps,
+                     final Candidate candidate)
     throws AnalysisException
   {
     final CompositionalSafetyVerifier verifier = getAnalyzer();
@@ -109,7 +110,7 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
           break;
         }
       }
-      final EventEncoding eventEnc = createEventEncoding(aut, tau);
+      final EventEncoding eventEnc = createEventEncoding(aut, tau, candidate);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
       final int config = simplifier.getPreferredInputConfiguration();
       final ListBufferTransitionRelation rel =

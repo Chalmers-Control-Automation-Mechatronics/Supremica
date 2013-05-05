@@ -10,7 +10,6 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -71,12 +70,12 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
     preChain.add(silentInRemover);
+    final int limit = analyzer.getInternalTransitionLimit();
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     preChain.add(silentOutRemover);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
-    final int limit = analyzer.getInternalTransitionLimit();
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     preChain.add(incomingEquivalenceSimplifier);
     final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
@@ -92,15 +91,6 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     } else {
       certainConflictsRemover = null;
     }
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-    (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
-    bisimulator.setTransitionLimit(limit);
-    postChain.add(bisimulator);
     if (includeNonAlphaDeterminisation) {
       final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
         new NonAlphaDeterminisationTRSimplifier();
@@ -109,6 +99,15 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
       nonAlphaDeterminiser.setTransitionLimit(limit);
       postChain.add(nonAlphaDeterminiser);
     }
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator.setTransitionLimit(limit);
+    postChain.add(bisimulator);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
@@ -150,7 +149,8 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
-                     final List<AbstractionStep> steps, final Candidate cand)
+                     final List<AbstractionStep> steps,
+                     final Candidate candidate)
     throws AnalysisException
   {
     try {
@@ -158,7 +158,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
       final ProductDESProxyFactory factory = getFactory();
       final Iterator<EventProxy> iter = local.iterator();
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
-      final EventEncoding eventEnc = createEventEncoding(aut, tau);
+      final EventEncoding eventEnc = createEventEncoding(aut, tau, candidate);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
       final int config = mPreChain.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
@@ -301,18 +301,16 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
 
   //#########################################################################
   //# Auxiliary Methods
+  @Override
   protected EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                              final EventProxy tau)
+                                              final EventProxy tau,
+                                              final Candidate candidate)
   {
-    final KindTranslator translator = getKindTranslator();
+    final EventEncoding enc = super.createEventEncoding(aut, tau, candidate);
     final EventProxy defaultMarking = getUsedDefaultMarking();
-    final Collection<EventProxy> filter =
-      Collections.singletonList(defaultMarking);
-    final EventEncoding enc =
-      new EventEncoding(aut, translator, tau, filter,
-                        EventEncoding.FILTER_PROPOSITIONS);
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
+      final KindTranslator translator = getKindTranslator();
       enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_UNUSED);
     }
     mCompleteChain.setDefaultMarkingID(defaultMarkingID);
