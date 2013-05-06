@@ -65,61 +65,68 @@ public class EFSMConflictCheckerTest
   public void testEFSMCompiler1()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm1");
+    checkConflict("tests", "efsm", "efsm1", true);
   }
 
   public void testEFSMCompiler2()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm2");
+    checkConflict("tests", "efsm", "efsm2", true);
   }
 
   public void testEFSMCompiler5()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm5");
+    checkConflict("tests", "efsm", "efsm5", true);
   }
 
   public void testEFSMCompiler8()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm8");
+    checkConflict("tests", "efsm", "efsm8", true);
   }
 
   public void testEFSMCompiler10()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm10");
+    checkConflict("tests", "efsm", "efsm10", true);
   }
 
   public void testEFSMCompiler11()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm11");
+    checkConflict("tests", "efsm", "efsm11", true);
   }
 
   public void testEFSMCompiler12()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm12");
+    checkConflict("tests", "efsm", "efsm12", true);
   }
 
   public void testEFSMCompiler13()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm13");
+    checkConflict("tests", "efsm", "efsm13", false);
   }
 
   public void testEFSMCompiler14()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm14");
+    checkConflict("tests", "efsm", "efsm14", false);
   }
 
   public void testEFSMCompiler15()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm15");
+    checkConflict("tests", "efsm", "efsm15", true);
+  }
+
+
+  public void testEFSMCompiler16()
+    throws IOException, WatersException
+  {
+    checkConflict("tests", "efsm", "efsm16", true);
   }
 
   //#########################################################################
@@ -143,14 +150,16 @@ public class EFSMConflictCheckerTest
   }
 
   private void checkConflict(final String dirname,
-                       final String subdirname,
-                       final String name)
+                             final String subdirname,
+                             final String name,
+                             final boolean expected)
     throws IOException, WatersException
   {
     final File root = getWatersInputRoot();
     final File dir = new File(root, dirname);
     final File subdir = new File(dir, subdirname);
-    checkConflict(subdir, name, null, false);
+    final boolean result = checkConflict(subdir, name, null, false);
+    assertEquals("Unexpected result from conflict check!", expected, result);
   }
 
   private boolean checkConflict(final File dir,

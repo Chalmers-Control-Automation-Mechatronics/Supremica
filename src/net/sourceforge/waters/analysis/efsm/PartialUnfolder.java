@@ -16,6 +16,7 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -73,14 +74,32 @@ public class PartialUnfolder
                                 final EFSMVariableContext rootContext)
     throws EvalException, AnalysisException
   {
+    final List<ConstraintList> empty = Collections.emptyList();
+    return unfold(efsmRel, var, rootContext, empty);
+  }
+
+  EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
+                                final EFSMVariable var,
+                                final EFSMVariableContext rootContext,
+                                final List<ConstraintList> selfloops)
+    throws EvalException, AnalysisException
+  {
     mRootContext = rootContext;
     mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable,
                                                        mRootContext);
     mInputTransitionRelation = efsmRel;
     mUnfoldedVariable = var;
+    final SimpleExpressionProxy varName = var.getVariableName();
     mConstraintPropagator =
       new ConstraintPropagator(mFactory, mOperatorTable,
                                mUnfoldingVariableContext);
+    mUnfoldedSelfloops =
+      new ArrayList<ConstraintList>(selfloops.size());
+    for (final ConstraintList selfloop : selfloops) {
+      if (mOccursChecker.occurs(varName, selfloop)) {
+        mUnfoldedSelfloops.add(selfloop);
+      }
+    }
 
     final SimpleExpressionProxy initStatePredicate =
       var.getInitialStatePredicate();
@@ -89,7 +108,6 @@ public class PartialUnfolder
     final ListBufferTransitionRelation rel = efsmRel.getTransitionRelation();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final int numInputStates = rel.getNumberOfStates();
-    final SimpleExpressionProxy varName = var.getVariableName();
     mUnfoldedVariableNamePrimed =
       mFactory.createUnaryExpressionProxy(mOperatorTable.getNextOperator(),
                                           varName);
@@ -257,6 +275,23 @@ public class PartialUnfolder
           }
         }
       }
+      for (final ConstraintList update : mUnfoldedSelfloops) {
+        int targetValue = 0;
+        for (final SimpleExpressionProxy rangeValue : mRangeValues) {
+          mUnfoldingVariableContext.setPrimedValue(rangeValue);
+          mConstraintPropagator.init(update);
+          mConstraintPropagator.propagate();
+          if (!mConstraintPropagator.isUnsatisfiable()) {
+            final ConstraintList unfoldedUpdate =
+              mConstraintPropagator.getAllConstraints();
+            final int unfoldedEvent =
+              mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
+            final long targetPair = source | ((long) targetValue << 32);
+            newTransition(source, unfoldedEvent, targetPair);
+          }
+          targetValue++;
+        }
+      }
     }
 
     abstract void newTransition(int source, int event, long pair);
@@ -348,6 +383,7 @@ public class PartialUnfolder
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final UnfoldingVariableContext mUnfoldingVariableContext;
   private boolean mSourceInfoEnabled;
+  private List<ConstraintList> mUnfoldedSelfloops;
 
   private EFSMVariableContext mRootContext;
   private EFSMTransitionRelation mInputTransitionRelation;

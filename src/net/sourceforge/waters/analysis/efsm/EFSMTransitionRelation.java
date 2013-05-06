@@ -32,9 +32,6 @@ public class EFSMTransitionRelation implements Comparable<EFSMTransitionRelation
     mTransitionRelation = rel;
     mEventEncoding = events;
     mVariables = variables;
-    for (final EFSMVariable var : variables) {
-      var.addTransitionRelation(this);
-    }
     mNodeList = nodes;
   }
 
@@ -78,6 +75,13 @@ public class EFSMTransitionRelation implements Comparable<EFSMTransitionRelation
   public Collection<EFSMVariable> getVariables()
   {
     return mVariables;
+  }
+
+  public void register()
+  {
+    for (final EFSMVariable var : mVariables) {
+      var.addTransitionRelation(this);
+    }
   }
 
   public void dispose() {

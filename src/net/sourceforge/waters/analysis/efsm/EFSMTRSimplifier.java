@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.efsm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
@@ -122,7 +123,7 @@ class EFSMTRSimplifier
    *                      the abstraction.
    */
   private EFSMTRSimplifier(final TransitionRelationSimplifier simplifier,
-                   final CompilerOperatorTable op)
+                           final CompilerOperatorTable op)
   {
     mSimplifier = simplifier;
     mOperatorTable = op;
@@ -136,6 +137,10 @@ class EFSMTRSimplifier
     return mSimplifier;
   }
 
+  List<ConstraintList> getSelfloopedUpdates()
+  {
+    return mSelfloopedUpdates;
+  }
 
   //#########################################################################
   //# Invocation
@@ -149,18 +154,21 @@ class EFSMTRSimplifier
       final int numTrans = rel.getNumberOfTransitions();
       final int numMarkings = rel.getNumberOfMarkings();
       mSimplifier.setTransitionRelation(rel);
+      mSelfloopedUpdates = new ArrayList<ConstraintList>();
       if (mSimplifier.run()) {
         rel = mSimplifier.getTransitionRelation();
-        final int newNumStates = rel.getNumberOfReachableStates();
-        if (newNumStates == numStates &&
+        final int newNumReachableStates = rel.getNumberOfReachableStates();
+        final int newNumStates = rel.getNumberOfStates();
+        if (newNumReachableStates == numStates &&
             rel.getNumberOfTransitions() == numTrans &&
             rel.getNumberOfMarkings() == numMarkings) {
           return null;
         }
         final EFSMEventEncoding eventEncoding = efsmTR.getEventEncoding();
         final int numEvents = eventEncoding.size();
-        int newNumEvents = 0;
+        int newNumEvents = 1;
         final boolean[] usedEvents = new boolean[numEvents];
+        usedEvents[0] = true;
         final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
         while (iter.advance()) {
           final int currentEvent = iter.getCurrentEvent();
@@ -178,17 +186,21 @@ class EFSMTRSimplifier
             if (usedEvents[i]) {
               final ConstraintList update = eventEncoding.getUpdate(i);
               newEventEncoding.createEventId(update);
+            } else if ((rel.getProperEventStatus(i) &
+                        EventEncoding.STATUS_UNUSED) != 0){
+              final ConstraintList update = eventEncoding.getUpdate(i);
+              mSelfloopedUpdates.add(update);
             }
           }
         }
         final int[] stateEncoding;
-        if (newNumStates == numStates) {
+        if (newNumReachableStates == numStates) {
           stateEncoding = null;
         } else {
-          stateEncoding = new int[numStates];
+          stateEncoding = new int[newNumStates];
           Arrays.fill(stateEncoding, -1);
           int newCode = 0;
-          for (int s=0; s < numStates; s++) {
+          for (int s=0; s < newNumStates; s++) {
             if (rel.isReachable(s)) {
               stateEncoding[s] = newCode;
               newCode++;
@@ -196,16 +208,16 @@ class EFSMTRSimplifier
           }
         }
         final ListBufferTransitionRelation newRel;
-        if (newNumStates == numStates && newNumEvents == numEvents) {
+        if (newNumReachableStates == numStates && newNumEvents == numEvents) {
           newRel = rel;
         } else {
           newRel = new ListBufferTransitionRelation(rel.getName(),
                                                     rel.getKind(),
                                                     newNumEvents,
                                                     rel.getNumberOfPropositions(),
-                                                    newNumStates,
+                                                    newNumReachableStates,
                                                     rel.getConfiguration());
-          for (int s=0; s < numStates; s++) {
+          for (int s=0; s < newNumStates; s++) {
             final int newCode = stateEncoding == null ? s : stateEncoding[s];
             if (newCode >= 0) {
               if (rel.isInitial(s)) {
@@ -218,8 +230,7 @@ class EFSMTRSimplifier
               }
             }
           }
-          final TransitionIterator newIter = rel.createAllTransitionsReadOnlyIterator();
-          while (newIter.advance()) {
+          while (iter.advance()) {
             final int source = iter.getCurrentSourceState();
             final int newSource = stateEncoding == null ? source : stateEncoding[source];
             final int target = iter.getCurrentTargetState();
@@ -260,5 +271,6 @@ class EFSMTRSimplifier
   //# Data Members
   private final TransitionRelationSimplifier mSimplifier;
   private final CompilerOperatorTable mOperatorTable;
+  private List<ConstraintList> mSelfloopedUpdates;
 
 }
