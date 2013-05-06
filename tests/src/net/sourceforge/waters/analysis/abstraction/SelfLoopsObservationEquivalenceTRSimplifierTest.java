@@ -58,7 +58,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    return new SelfLoopsObservationEquivalenceTRSimplifier();
+    return new ObservationEquivalenceTRSimplifier();
   }
 
   @Override
@@ -81,9 +81,9 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
 
   }
   @Override
-  protected SelfLoopsObservationEquivalenceTRSimplifier getTransitionRelationSimplifier()
+  protected ObservationEquivalenceTRSimplifier getTransitionRelationSimplifier()
   {
-    return (SelfLoopsObservationEquivalenceTRSimplifier) super.getTransitionRelationSimplifier();
+    return (ObservationEquivalenceTRSimplifier) super.getTransitionRelationSimplifier();
   }
 
 
@@ -170,10 +170,10 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
 
   public void test_oeq_4() throws Exception
   {
-    final SelfLoopsObservationEquivalenceTRSimplifier simplifier =
+    final ObservationEquivalenceTRSimplifier simplifier =
       getTransitionRelationSimplifier();
     simplifier.setTransitionRemovalMode
-      (SelfLoopsObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_4.wmod";
@@ -230,10 +230,10 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
 
   public void test_oeq_11() throws Exception
   {
-    final SelfLoopsObservationEquivalenceTRSimplifier simplifier =
+    final ObservationEquivalenceTRSimplifier simplifier =
       getTransitionRelationSimplifier();
     simplifier.setTransitionRemovalMode
-      (SelfLoopsObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_11.wmod";
@@ -242,10 +242,10 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
 
   public void test_oeq_12() throws Exception
   {
-    final SelfLoopsObservationEquivalenceTRSimplifier simplifier =
+    final ObservationEquivalenceTRSimplifier simplifier =
       getTransitionRelationSimplifier();
     simplifier.setTransitionRemovalMode
-      (SelfLoopsObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "oeq_12.wmod";

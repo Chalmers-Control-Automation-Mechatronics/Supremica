@@ -25,7 +25,6 @@ import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SelfLoopsObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -58,7 +57,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     createThreeStepConflictEquivalenceAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer,
        final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
-       final SelfLoopsObservationEquivalenceTRSimplifier.Equivalence slEquivalence,
+       final ObservationEquivalenceTRSimplifier.Equivalence slEquivalence,
        final boolean includeNonAlphaDeterminisation,
        final boolean useLimitedCertainConflicts,
        final boolean useAlwaysEnabledLimitedCertainConflicts)
@@ -117,13 +116,14 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     bisimulator.setTransitionRemovalMode(ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode(ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
+    bisimulator.setUsingSpecialEvents(false); // Do not use selfloop-only
     postChain.add(bisimulator);
 
-    final SelfLoopsObservationEquivalenceTRSimplifier slBisimulator =
-      new SelfLoopsObservationEquivalenceTRSimplifier();
+    final ObservationEquivalenceTRSimplifier slBisimulator =
+      new ObservationEquivalenceTRSimplifier();
     slBisimulator.setEquivalence(slEquivalence);
-    slBisimulator.setTransitionRemovalMode(SelfLoopsObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    slBisimulator.setMarkingMode(SelfLoopsObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    slBisimulator.setTransitionRemovalMode(ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    slBisimulator.setMarkingMode(ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     slBisimulator.setTransitionLimit(limit);
     postChain.add(slBisimulator);
 

@@ -91,14 +91,6 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     } else {
       certainConflictsRemover = null;
     }
-    if (includeNonAlphaDeterminisation) {
-      final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-        new NonAlphaDeterminisationTRSimplifier();
-      nonAlphaDeterminiser.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-      nonAlphaDeterminiser.setTransitionLimit(limit);
-      postChain.add(nonAlphaDeterminiser);
-    }
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
@@ -108,6 +100,14 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
     postChain.add(bisimulator);
+    if (includeNonAlphaDeterminisation) {
+      final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
+        new NonAlphaDeterminisationTRSimplifier();
+      nonAlphaDeterminiser.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+      nonAlphaDeterminiser.setTransitionLimit(limit);
+      postChain.add(nonAlphaDeterminiser);
+    }
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
