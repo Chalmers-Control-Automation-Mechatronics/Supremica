@@ -1852,19 +1852,8 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Inner Enumeration Equivalence
-
-  /*
   /**
    * Possible equivalences for partitioning a transition relation.
-
- * Jean-Claude Fernandez. An Implementation of an Efficient Algorithm for
- * Bisimulation Equivalence. Science of Computer Programming,
- * <STRONG>13</STRONG>, 219-236, 1990.<BR>
- * J. E. Hopcroft. An <I>n</I>&nbsp;log&nbsp;<I>n</I> Algorithm for Minimizing
- * States in a Finite Automaton. In: Z. Kohavi and A. Paz, eds., Theory of
- * Machines and Computations, Academic Press, New York, 397-419, 1971.<BR>
- * Jaana Eloranta. Minimizing the Number of Transitions with Respect to
- * Observation Equivalence. BIT, <STRONG>31</STRONG>(4), 397-419, 1991.
    */
   public enum Equivalence
   {
@@ -1929,7 +1918,8 @@ public class ObservationEquivalenceTRSimplifier
       }
     },
     /**
-     * Observation equivalence. Equivalent states must be able to reach
+     * Observation equivalence (also called observational equivalence or
+     * weak bisimulation). Equivalent states must be able to reach
      * equivalent successors for all traces of observable events including the
      * empty trace. This setting is the default.
      */

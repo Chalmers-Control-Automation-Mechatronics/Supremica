@@ -50,7 +50,12 @@ public enum ConflictAbstractionProcedureFactory
            OBSERVATION_EQUIVALENCE, false, false, true);
     }
   },
-
+  /**
+   * <P>Minimisation considers events that are known to be always-enabled or
+   * only-selfloop outside of the automaton being simplified. This is the
+   * same abstraction sequence as {@link #NB}, with special events enabled
+   * and additional steps in the chain to measure performance.</P>
+   */
   EENB {
     @Override
     public AbstractionProcedure createAbstractionProcedure
@@ -59,11 +64,9 @@ public enum ConflictAbstractionProcedureFactory
       return EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure.
         createThreeStepConflictEquivalenceAbstractionProcedure
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
-            WEAK_OBSERVATION_EQUIVALENCE, ObservationEquivalenceTRSimplifier.Equivalence.
            WEAK_OBSERVATION_EQUIVALENCE, false, true, true);
     }
   },
-
   /**
     * <P>Minimisation is performed according to a sequence of abstraction
    * rules for generalised nonblocking proposed, but using weak observation
@@ -165,7 +168,7 @@ public enum ConflictAbstractionProcedureFactory
     }
   },
   /**
-   * Automata are minimised according using <I>observer projection</I>.
+   * Automata are minimised using <I>observer projection</I>.
    * The present implementation determines a coarsest causal reporter
    * map satisfying the observer property. Nondeterminism in the projected
    * automata is not resolved, nondeterministic abstractions are used instead.

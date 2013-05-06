@@ -57,7 +57,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     createThreeStepConflictEquivalenceAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer,
        final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
-       final ObservationEquivalenceTRSimplifier.Equivalence slEquivalence,
        final boolean includeNonAlphaDeterminisation,
        final boolean useLimitedCertainConflicts,
        final boolean useAlwaysEnabledLimitedCertainConflicts)
@@ -121,7 +120,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
     final ObservationEquivalenceTRSimplifier slBisimulator =
       new ObservationEquivalenceTRSimplifier();
-    slBisimulator.setEquivalence(slEquivalence);
+    slBisimulator.setEquivalence(equivalence);
     slBisimulator.setTransitionRemovalMode(ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     slBisimulator.setMarkingMode(ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     slBisimulator.setTransitionLimit(limit);
