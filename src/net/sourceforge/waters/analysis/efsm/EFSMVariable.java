@@ -155,8 +155,12 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
 
   public EFSMTransitionRelation getTransitionRelation()
   {
-    assert mTransitionRelations.size() == 1;
-    return mTransitionRelations.iterator().next();
+    if (mTransitionRelations.size() == 0) {
+      return null;
+    } else {
+      assert mTransitionRelations.size() == 1;
+      return mTransitionRelations.iterator().next();
+    }
   }
 
   public Collection<EFSMTransitionRelation> getTransitionRelations()

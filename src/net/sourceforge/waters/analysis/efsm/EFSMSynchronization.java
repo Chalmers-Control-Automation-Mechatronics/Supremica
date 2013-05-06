@@ -38,6 +38,8 @@ public class EFSMSynchronization
   {
     final ListBufferTransitionRelation rel1 = efsmTR1.getTransitionRelation();
     final ListBufferTransitionRelation rel2 = efsmTR2.getTransitionRelation();
+    rel1.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    rel2.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final int reachableStates1 = rel1.getNumberOfReachableStates();
     final int reachableStates2 = rel2.getNumberOfReachableStates();
     final int finalStateNum = reachableStates1 * reachableStates2;

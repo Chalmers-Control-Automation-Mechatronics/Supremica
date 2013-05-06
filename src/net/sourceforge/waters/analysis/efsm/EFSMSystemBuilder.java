@@ -387,6 +387,7 @@ public class EFSMSystemBuilder
         mEFSMVariableCollector.collectAllVariables(mEventEncoding, variables);
         final EFSMTransitionRelation efsmTransitionRelation =
           new EFSMTransitionRelation(rel, mEventEncoding, variables, mNodeList);
+        efsmTransitionRelation.register();
         mResultEFSMSystem.addTransitionRelation(efsmTransitionRelation);
         return efsmTransitionRelation;
       } catch (final OverflowException exception) {
