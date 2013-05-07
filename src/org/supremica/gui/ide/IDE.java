@@ -111,6 +111,12 @@ public class IDE
     // Show Version number
     info("Supremica version: " + (new Version()));
 
+	// Show memory
+	final int MB = 1024*1024;
+	info("Free/Total/Max mem: " + Runtime.getRuntime().freeMemory()/MB + "/"
+							   + Runtime.getRuntime().totalMemory()/MB + "/"
+							   + Runtime.getRuntime().maxMemory()/MB + " MB");
+	
     // Initialise XML_RPC
     if (Config.XML_RPC_ACTIVE.isTrue()) {
       try {
