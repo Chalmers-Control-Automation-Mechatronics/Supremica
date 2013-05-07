@@ -21,7 +21,9 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
@@ -37,6 +39,7 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
@@ -94,6 +97,7 @@ public class ConstraintPropagator
       new RelationNormalizationComparator(optable, mContext);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(factory, optable, false);
+    mPrimedVariableCollector = new PrimedVariableCollector(optable, root);
     mNormalizer = RelationNormalizationRule.createNormalRule(factory, optable);
     mNegator = RelationNormalizationRule.createNegatingRule(factory, optable);
     mNormalizationRules = new SimplificationRule[] {
@@ -123,6 +127,8 @@ public class ConstraintPropagator
     mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>();
     mNormalizedConstraints =
       new TreeSet<SimpleExpressionProxy>(mListComparator);
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mPrimedVariables = new ProxyAccessorHashSet<UnaryExpressionProxy>(eq);
     mIsUnsatisfiable = false;
   }
 
@@ -141,6 +147,7 @@ public class ConstraintPropagator
     mListComparator = propagator.mListComparator;
     mEquationComparator = propagator.mEquationComparator;
     mSimpleExpressionCompiler = propagator.mSimpleExpressionCompiler;
+    mPrimedVariableCollector = propagator.mPrimedVariableCollector;
     mNormalizer = propagator.mNormalizer;
     mNegator = propagator.mNegator;
     mNormalizationRules = propagator.mNormalizationRules;
@@ -150,6 +157,9 @@ public class ConstraintPropagator
     mNormalizedConstraints =
       new TreeSet<SimpleExpressionProxy>(mListComparator);
     mNormalizedConstraints.addAll(propagator.mNormalizedConstraints);
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mPrimedVariables = new ProxyAccessorHashSet<UnaryExpressionProxy>
+      (eq, propagator.mPrimedVariables);
     mIsUnsatisfiable = propagator.mIsUnsatisfiable;
   }
 
@@ -200,6 +210,7 @@ public class ConstraintPropagator
     mContext.reset();
     mUnprocessedConstraints.clear();
     mNormalizedConstraints.clear();
+    mPrimedVariables.clear();
     mIsUnsatisfiable = false;
   }
 
@@ -248,6 +259,8 @@ public class ConstraintPropagator
     assert constraint != null;
     if (!mIsUnsatisfiable) {
       mUnprocessedConstraints.add(constraint);
+      mPrimedVariableCollector.collectPrimedVariables(constraint,
+                                                      mPrimedVariables);
     }
   }
 
@@ -405,6 +418,7 @@ public class ConstraintPropagator
       final List<SimpleExpressionProxy> list =
         new ArrayList<SimpleExpressionProxy>(mNormalizedConstraints);
       mContext.addAllConstraints(list, pretty);
+      addPrimedVariables(list);
       Collections.sort(list, mListComparator);
       return new ConstraintList(list);
     }
@@ -532,6 +546,37 @@ public class ConstraintPropagator
     throws EvalException
   {
     return mSimpleExpressionCompiler.estimateRange(expr, mContext);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Adds back in primed variables.
+   * This method checks for primed variables that have been removed
+   * by the constraint propagator and adds terms x'==x' to the given list
+   * of constraints for all variables x that were present in the original
+   * input but which have been removed from the list.
+   */
+  private void addPrimedVariables(final List<SimpleExpressionProxy> list)
+  {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ProxyAccessorSet<UnaryExpressionProxy> remainingPrimed =
+      new ProxyAccessorHashSet<UnaryExpressionProxy>(eq, mPrimedVariables.size());
+    mPrimedVariableCollector.collectPrimedVariables(list, remainingPrimed);
+    final ModuleProxyCloner cloner = mFactory.getCloner();
+    final BinaryOperator op = mOperatorTable.getEqualsOperator();
+    for (final UnaryExpressionProxy var : mPrimedVariables) {
+      if (!remainingPrimed.containsProxy(var)) {
+        final UnaryExpressionProxy lhs =
+          (UnaryExpressionProxy) cloner.getClone(var);
+        final UnaryExpressionProxy rhs =
+          (UnaryExpressionProxy) cloner.getClone(var);
+        final BinaryExpressionProxy constraint =
+          mFactory.createBinaryExpressionProxy(op, lhs, rhs);
+        list.add(constraint);
+      }
+    }
   }
 
 
@@ -1162,6 +1207,7 @@ public class ConstraintPropagator
   private final Comparator<SimpleExpressionProxy> mListComparator;
   private final Comparator<SimpleExpressionProxy> mEquationComparator;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+  private final PrimedVariableCollector mPrimedVariableCollector;
   private final RelationNormalizationRule mNormalizer;
   private final RelationNormalizationRule mNegator;
   private final SimplificationRule[] mNormalizationRules;
@@ -1169,6 +1215,7 @@ public class ConstraintPropagator
 
   private final List<SimpleExpressionProxy> mUnprocessedConstraints;
   private final Collection<SimpleExpressionProxy> mNormalizedConstraints;
+  private final ProxyAccessorSet<UnaryExpressionProxy> mPrimedVariables;
   private boolean mIsUnsatisfiable;
 
 }
