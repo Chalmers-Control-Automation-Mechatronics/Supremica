@@ -22,6 +22,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
@@ -32,6 +33,7 @@ import net.sourceforge.waters.model.compiler.context.OccursChecker;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -83,28 +85,38 @@ public class PartialUnfolder
                                 final EFSMSystem system)
     throws EvalException, AnalysisException
   {
+    mUnfoldedEventCache =
+      new TLongIntHashMap(0, 0.5f, UNKNOWN_UNFOLDING, UNKNOWN_UNFOLDING);
+    mKnownAfterValueCache =
+      new TLongIntHashMap(0, 0.5f, UNKNOWN_UNFOLDING, UNKNOWN_UNFOLDING);
     mRootContext = system.getVariableContext();
     mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable,
                                                        mRootContext);
     mInputTransitionRelation = efsmRel;
     mUnfoldedVariable = var;
+    mInputEventEncoding = efsmRel.getEventEncoding();
     final SimpleExpressionProxy varName = var.getVariableName();
     mConstraintPropagator =
       new ConstraintPropagator(mFactory, mOperatorTable,
                                mUnfoldingVariableContext);
+
     final EFSMEventEncoding selfloops = system.getSelfloops();
-    mUnfoldedSelfloops = new ArrayList<ConstraintList>(selfloops.size());
+    TIntArrayList mSelfloops = null;
     for (int event = EventEncoding.NONTAU; event < selfloops.size(); event++) {
       final ConstraintList selfloop = selfloops.getUpdate(event);
       if (mOccursChecker.occurs(varName, selfloop)) {
-        mUnfoldedSelfloops.add(selfloop);
+        if (mSelfloops == null) {
+          mSelfloops = new TIntArrayList();
+          mInputEventEncoding = new EFSMEventEncoding(mInputEventEncoding);
+        }
+        final int selfloopEvent = mInputEventEncoding.createEventId(selfloop);
+        mSelfloops.add(selfloopEvent);
       }
     }
 
     final SimpleExpressionProxy initStatePredicate =
       var.getInitialStatePredicate();
     final CompiledRange range = var.getRange();
-    mInputEventEncoding = efsmRel.getEventEncoding();
     final ListBufferTransitionRelation rel = efsmRel.getTransitionRelation();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final int numInputStates = rel.getNumberOfStates();
@@ -145,7 +157,16 @@ public class PartialUnfolder
     final int numInitialStates = mUnfoldedStateList.size();
     mUnfoldedEventEncoding =
       new EFSMEventEncoding(rel.getNumberOfProperEvents());
-
+    mSourceShift = AutomatonTools.log2(rel.getNumberOfProperEvents());
+    final int rangeBits = AutomatonTools.log2(mRangeValues.size());
+    final int encodingSize = mSourceShift + 2 * rangeBits;
+    if (encodingSize > 64) {
+      final String msg =
+        "Unfolded transition encoding requires " + encodingSize +
+        " bits, 64 is the maximum!";
+      throw new OverflowException(msg);
+    }
+    mTargetShift = mSourceShift + rangeBits;
     final StateExpander expander1 = new StateExpander() {
       @Override
       void newTransition(final int source, final int event, final long pair)
@@ -213,11 +234,98 @@ public class PartialUnfolder
 
 
   //#########################################################################
-  //# Access to Results
-  public List<ConstraintList> getUnfoldedSelfloops()
+  //# Auxiliary Methods
+  private int getUnfoldedEvent(final int event, final int beforeValue, final int afterValue)
+    throws EvalException
   {
-    return mUnfoldedSelfloops;
+    final long key = event | ((long) beforeValue << mSourceShift) |
+      ((long)afterValue<< mTargetShift);
+    final int foundValue = mUnfoldedEventCache.get(key);
+    if (foundValue >= 0) {
+      return foundValue;
+    } else if (foundValue == UNSATISFIED_UNFOLDING) {
+      return foundValue;
+    } else {
+      mUnfoldingVariableContext.setCurrentValue(mRangeValues.get(beforeValue));
+      mUnfoldingVariableContext.setPrimedValue(mRangeValues.get(afterValue));
+      final ConstraintList update = mInputEventEncoding.getUpdate(event);
+      mConstraintPropagator.init(update);
+      mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
+      mConstraintPropagator.propagate();
+      if (!mConstraintPropagator.isUnsatisfiable()) {
+        final ConstraintList unfoldedUpdate =
+          mConstraintPropagator.getAllConstraints();
+        final int newEvent = mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
+        mUnfoldedEventCache.put(key, newEvent);
+        return newEvent;
+      } else {
+        mUnfoldedEventCache.put(key, UNSATISFIED_UNFOLDING);
+        return UNSATISFIED_UNFOLDING;
+      }
+    }
   }
+
+  @SuppressWarnings("unused")
+  private int getKnownAfterValue(final int event, final int beforeValue)
+    throws EvalException
+  {
+    final long key = event | ((long) beforeValue << mSourceShift);
+    final int foundValue = mKnownAfterValueCache.get(key);
+    if (foundValue >= 0) {
+      return foundValue;
+    } else if (foundValue == UNKNOWN_AFTER_VALUE) {
+      return foundValue;
+    } else {
+      final ConstraintList update = mInputEventEncoding.getUpdate(event);
+      mUnfoldingVariableContext.setCurrentValue(mRangeValues.get(beforeValue));
+      mUnfoldingVariableContext.setPrimedValue(null);
+      mConstraintPropagator.init(update);
+      mConstraintPropagator.propagate();
+      if (mConstraintPropagator.isUnsatisfiable()) {
+        mKnownAfterValueCache.put(key, UNSATISFIED_UNFOLDING);
+        return UNSATISFIED_UNFOLDING;
+      }
+      final VariableContext context = mConstraintPropagator.getContext();
+      final SimpleExpressionProxy afterExpr =
+        context.getBoundExpression(mUnfoldedVariableNamePrimed);
+      int afterValue = -1;
+      if (afterExpr != null) {
+        final CompiledRange range = mUnfoldedVariable.getRange();
+        afterValue = range.indexOf(afterExpr);
+        if (afterValue >= 0) {
+          mUnfoldingVariableContext.setPrimedValue(afterExpr);
+          mConstraintPropagator.init(update);
+          mConstraintPropagator.propagate();
+        }
+      }
+      if (afterValue < 0 &&
+          !mOccursChecker.occurs(mUnfoldedVariableNamePrimed, update)) {
+        afterValue = beforeValue;
+      }
+      if (afterValue < 0) {
+        mKnownAfterValueCache.put(key, UNKNOWN_AFTER_VALUE);
+        return UNKNOWN_AFTER_VALUE;
+      }
+      mKnownAfterValueCache.put(key, afterValue);
+      mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
+      final ConstraintList unfoldedUpdate =
+        mConstraintPropagator.getAllConstraints();
+      final int newEvent = mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
+      final long eventKey = event |
+                            ((long) beforeValue << mSourceShift) |
+                            ((long) afterValue << mTargetShift);
+      mUnfoldedEventCache.put(eventKey, newEvent);
+      return afterValue;
+    }
+  }
+
+
+  //#########################################################################
+  //# Access to Results
+//  public List<ConstraintList> getUnfoldedSelfloops()
+//  {
+//    return mUnfoldedSelfloops;
+//  }
 
 
   //#########################################################################
@@ -240,65 +348,70 @@ public class PartialUnfolder
     {
       final long pair = mUnfoldedStateList.get(source);
       final int sourceState = (int) (pair & 0xffffffffL);
-      final int sourceValue = (int) (pair >> 32);
+      final int beforeValue = (int) (pair >> 32);
       mUnfoldingVariableContext
-        .setCurrentValue(mRangeValues.get(sourceValue));
+        .setCurrentValue(mRangeValues.get(beforeValue));
       mIterator.resetState(sourceState);
       while (mIterator.advance()) {
         final int event = mIterator.getCurrentEvent();
         final int targetState = mIterator.getCurrentTargetState();
-        final ConstraintList update = mInputEventEncoding.getUpdate(event);
-        if (mOccursChecker.occurs(mUnfoldedVariableNamePrimed, update)) {
-          int targetValue = 0;
-          for (final SimpleExpressionProxy rangeValue : mRangeValues) {
-            mUnfoldingVariableContext.setPrimedValue(rangeValue);
-            mConstraintPropagator.init(update);
-            mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
-            mConstraintPropagator.propagate();
-            if (!mConstraintPropagator.isUnsatisfiable()) {
-              final ConstraintList unfoldedUpdate =
-                mConstraintPropagator.getAllConstraints();
-              final int unfoldedEvent =
-                mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
-              final long targetPair =
-                targetState | ((long) targetValue << 32);
-              newTransition(source, unfoldedEvent, targetPair);
-            }
-            targetValue++;
-          }
-        } else {
-          mConstraintPropagator.init(update);
-          mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
-          mConstraintPropagator.propagate();
-          if (!mConstraintPropagator.isUnsatisfiable()) {
-            final ConstraintList unfoldedUpdate =
-              mConstraintPropagator.getAllConstraints();
-            final int unfoldedEvent =
-              mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
-            final long targetPair = targetState | ((long) sourceValue << 32);
-            newTransition(source, unfoldedEvent, targetPair);
-          }
-        }
+        expand(source, beforeValue, event, targetState);
       }
-      for (final ConstraintList update : mUnfoldedSelfloops) {
-        int targetValue = 0;
-        for (final SimpleExpressionProxy rangeValue : mRangeValues) {
-          mUnfoldingVariableContext.setPrimedValue(rangeValue);
-          mConstraintPropagator.init(update);
-          mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
-          mConstraintPropagator.propagate();
-          if (!mConstraintPropagator.isUnsatisfiable()) {
-            final ConstraintList unfoldedUpdate =
-              mConstraintPropagator.getAllConstraints();
-            final int unfoldedEvent =
-              mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
-            final long targetPair = source | ((long) targetValue << 32);
-            newTransition(source, unfoldedEvent, targetPair);
-          }
-          targetValue++;
+      if (mSelfloops != null) {
+        for (int index = 0; index < mSelfloops.size(); index ++) {
+          final int selfloopEvent = mSelfloops.get(index);
+          expand(source, beforeValue, selfloopEvent, sourceState);
         }
       }
     }
+
+    private void expand(final int source, final int beforeValue,
+                        final int event, final int targetState)
+      throws EvalException
+    {
+      final ConstraintList update = mInputEventEncoding.getUpdate(event);
+      if (mOccursChecker.occurs(mUnfoldedVariableNamePrimed, update)) {
+        for (int afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
+          final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, afterValue);
+          if (unfoldedEvent >= 0) {
+            final long targetPair = targetState | ((long) afterValue << 32);
+            newTransition(source, unfoldedEvent, targetPair);
+          }
+        }
+      } else {
+        final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, 0);
+        if (unfoldedEvent >= 0) {
+          final long targetPair = targetState | ((long) beforeValue << 32);
+          newTransition(source, unfoldedEvent, targetPair);
+        }
+      }
+    }
+
+    /*
+    private void expand(final int source, final int beforeValue,
+                        final int event, final int targetState)
+      throws EvalException
+    {
+      int afterValue = getKnownAfterValue(event, beforeValue);
+      if (afterValue == UNSATISFIED_UNFOLDING) {
+        // no transition
+      } else if (afterValue == UNKNOWN_AFTER_VALUE) {
+        for (afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
+          final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, afterValue);
+          if (unfoldedEvent >= 0) {
+            final long targetPair = targetState | ((long) afterValue << 32);
+            newTransition(source, unfoldedEvent, targetPair);
+          }
+        }
+      } else {
+        final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, afterValue);
+        if (unfoldedEvent >= 0) {
+          final long targetPair = targetState | ((long) afterValue << 32);
+          newTransition(source, unfoldedEvent, targetPair);
+        }
+      }
+    }
+    */
 
     abstract void newTransition(int source, int event, long pair);
 
@@ -389,8 +502,12 @@ public class PartialUnfolder
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final UnfoldingVariableContext mUnfoldingVariableContext;
   private boolean mSourceInfoEnabled;
-  private List<ConstraintList> mUnfoldedSelfloops;
+  private TIntArrayList mSelfloops;
 
+  private TLongIntHashMap mUnfoldedEventCache;
+  private TLongIntHashMap mKnownAfterValueCache;
+  private int mSourceShift;
+  private int mTargetShift;
   private EFSMVariableContext mRootContext;
   private EFSMTransitionRelation mInputTransitionRelation;
   private EFSMEventEncoding mInputEventEncoding;
@@ -402,5 +519,9 @@ public class PartialUnfolder
   private EFSMEventEncoding mUnfoldedEventEncoding;
   private ConstraintPropagator mConstraintPropagator;
   private EFSMVariableCollector mEFSMVariableCollector;
+
+  private static final int UNKNOWN_UNFOLDING = -2;
+  private static final int UNSATISFIED_UNFOLDING = -1;
+  private static final int UNKNOWN_AFTER_VALUE= -3;
 
 }

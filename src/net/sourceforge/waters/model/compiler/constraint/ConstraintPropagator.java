@@ -331,7 +331,8 @@ public class ConstraintPropagator
    * simplifications rules until no further simplification is possible.
    * It changes the state of the constraint propagator to reflect any
    * changes, and the results can be retrieved using the methods
-   * {@link #isUnsatisfiable()} and {@link #getAllConstraints()}.
+   * {@link #isUnsatisfiable()}, {@link #getAllConstraints()}, and
+   * {@link #getContext()}.
    */
   public void propagate()
     throws EvalException
@@ -448,6 +449,12 @@ public class ConstraintPropagator
     }
   }
 
+  /**
+   * Retrieves the constrained variable context.
+   * This method returns a variable context that results from constraint
+   * propagation. It may contain additional bindings or ranges that are
+   * further constrained than in the original context.
+   */
   public VariableContext getContext()
   {
     return mContext;

@@ -261,7 +261,8 @@ public class EFSMSystemBuilder
           mSimpleExpressionCompiler.eval(type, null);
         final CompiledRange range =
           mSimpleExpressionCompiler.getRangeValue(value);
-        final EFSMVariable EFSMvar = new EFSMVariable(var, range, mFactory);
+        final EFSMVariable EFSMvar =
+          new EFSMVariable(var, range, mFactory, mOperatorTable);
         mVariableContext.addVariable(EFSMvar);
         mResultEFSMSystem.addVariable(EFSMvar);
         return EFSMvar;

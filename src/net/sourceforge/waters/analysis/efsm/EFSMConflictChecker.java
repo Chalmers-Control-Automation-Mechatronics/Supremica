@@ -177,7 +177,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
 
     if (mCompositionSelectionHeuristic == null) {
       mCompositionSelectionHeuristic =
-        new MaxTrueCompositionSelectionHeuristic(factory, mCompilerOperatorTable);
+        new MinSynchCompositionSelectionHeuristic(factory, mCompilerOperatorTable);
     }
 
     if (mEFSMTRSimplifierFactory == null) {
@@ -286,8 +286,6 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         final EFSMTransitionRelation unfoldTR =
           mPartialUnfolder.unfold(varEFSMTransitionRelation, varSelected,
                                   mCurrentEFSMSystem);
-        final List<ConstraintList> unfoldedSelfloops =
-          mPartialUnfolder.getUnfoldedSelfloops();
         EFSMTransitionRelation unfoldSimplified = null;
         if (efsmTransitionRelationList.size() > 1) {
           unfoldSimplified = simplify(unfoldTR);
@@ -296,7 +294,6 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
           unfoldSimplified = unfoldTR;
         }
         mCurrentEFSMSystem.removeVariable(varSelected);
-        mCurrentEFSMSystem.removeSelfloops(unfoldedSelfloops);
         unfoldSimplified.register();
         varEFSMTransitionRelation.dispose();
         final ListIterator<EFSMTransitionRelation> unfoldIter =

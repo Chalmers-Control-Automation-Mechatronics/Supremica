@@ -40,6 +40,14 @@ public class EFSMEventEncoding
     mUpdateList.add(empty);
   }
 
+  public EFSMEventEncoding(final EFSMEventEncoding encoding) {
+    this(encoding.size());
+    for (int event=EventEncoding.NONTAU; event < encoding.size(); event++) {
+      final ConstraintList update = encoding.getUpdate(event);
+      createEventId(update);
+    }
+  }
+
 
   //#########################################################################
   //# Simple Access

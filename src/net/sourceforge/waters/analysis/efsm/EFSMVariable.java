@@ -38,38 +38,20 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
   //# Constructors
   EFSMVariable(final VariableComponentProxy var,
                final CompiledRange range,
-               final ModuleProxyFactory factory)
+               final ModuleProxyFactory factory,
+               final CompilerOperatorTable op)
   {
     mIsNext = false;
     mComponent = var;
     mRange = range;
     final ModuleProxyCloner cloner = factory.getCloner();
-    mVariableName = (SimpleExpressionProxy) cloner.getClone(var.getIdentifier());
+    final IdentifierProxy ident = var.getIdentifier();
+    mVariableName = (SimpleExpressionProxy) cloner.getClone(ident);
+    final SimpleExpressionProxy temp = (SimpleExpressionProxy) cloner.getClone(ident);
+    final UnaryOperator next = op.getNextOperator();
+    mPrimedVariableName = factory.createUnaryExpressionProxy(next, temp);
     mInitialStatePredicate =
       (SimpleExpressionProxy) cloner.getClone(var.getInitialStatePredicate());
-    mTransitionRelations = new THashSet<EFSMTransitionRelation>();
-  }
-
-  EFSMVariable(final boolean isnext,
-               final ComponentProxy comp,
-               final CompiledRange range,
-               final ModuleProxyFactory factory,
-               final CompilerOperatorTable optable,
-               final SimpleExpressionProxy initialStatePredicate)
-  {
-    mIsNext = isnext;
-    mComponent = comp;
-    mRange = range;
-    final IdentifierProxy ident = mComponent.getIdentifier();
-    if (mIsNext) {
-      final UnaryOperator nextop = optable.getNextOperator();
-      mVariableName = factory.createUnaryExpressionProxy(nextop, ident);
-    } else {
-      mVariableName = ident;
-    }
-    final ModuleProxyCloner cloner = factory.getCloner();
-    mInitialStatePredicate = (SimpleExpressionProxy)
-      cloner.getClone(initialStatePredicate);
     mTransitionRelations = new THashSet<EFSMTransitionRelation>();
   }
 
@@ -112,6 +94,11 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
   SimpleExpressionProxy getVariableName()
   {
     return mVariableName;
+  }
+
+  SimpleExpressionProxy getPrimedVariableName()
+  {
+    return mPrimedVariableName;
   }
 
   boolean isNext()
@@ -175,6 +162,7 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
   private final ComponentProxy mComponent;
   private final CompiledRange mRange;
   private final SimpleExpressionProxy mVariableName;
+  private final SimpleExpressionProxy mPrimedVariableName;
   private final SimpleExpressionProxy mInitialStatePredicate;
   private final Set<EFSMTransitionRelation> mTransitionRelations;
 

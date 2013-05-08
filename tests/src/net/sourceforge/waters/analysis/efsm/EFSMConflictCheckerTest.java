@@ -182,6 +182,11 @@ public class EFSMConflictCheckerTest
     checkConflict("efa", "prime_sieve5", true);
   }
 
+  public void testPrimeSieve6()
+    throws IOException, WatersException
+  {
+    checkConflict("efa", "prime_sieve6", true);
+  }
   //#########################################################################
   //# Customisation
   void configure(final EFSMConflictChecker checker)
@@ -241,7 +246,7 @@ public class EFSMConflictCheckerTest
     final EFSMConflictChecker conflictChecker =
       new EFSMConflictChecker(module, mModuleFactory);
     configure(conflictChecker);
-    conflictChecker.setInternalTransitionLimit(20000000);
+    conflictChecker.setInternalTransitionLimit(5000000);
     return conflictChecker.run();
   }
 
