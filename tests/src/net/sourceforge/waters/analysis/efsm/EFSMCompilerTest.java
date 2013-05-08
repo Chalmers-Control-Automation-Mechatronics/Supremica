@@ -185,6 +185,24 @@ public class EFSMCompilerTest
     compile("tests", "efsm", "efsm15");
   }
 
+  public void testEFSMCompiler16()
+    throws IOException, WatersException
+  {
+    compile("tests", "efsm", "efsm16");
+  }
+
+  public void testEFSMCompiler17()
+    throws IOException, WatersException
+  {
+    compile("tests", "efsm", "efsm17");
+  }
+
+  public void testEFSMCompiler18()
+    throws IOException, WatersException
+  {
+    compile("tests", "efsm", "efsm18");
+  }
+
   //#########################################################################
   //# Customisation
   void configure(final EFSMCompiler compiler)

@@ -30,19 +30,29 @@ class ChainVariableSelectionHeuristic
   {
     mCache = null;
     final List<EFSMVariable> variableList = system.getVariables();
-    switch (variableList.size()) {
+    int countLocal = 0;
+    EFSMVariable lastLocal = null;
+    for (final EFSMVariable var : variableList) {
+      if (var.isLocal()) {
+        countLocal++;
+        lastLocal = var;
+        if (countLocal > 1) {
+          break;
+        }
+      }
+    }
+    switch (countLocal) {
     case 0:
       return null;
     case 1:
-      return variableList.get(0);
+      return lastLocal;
     default:
       break;
     }
-    final EFSMVariableContext context = system.getVariableContext();
     mCache =
       new HashMap<EFSMVariable,EFSMTransitionRelation>(variableList.size());
     for (final VariableSelectionHeuristic heuristic : mVariableSelectionHeuristicList) {
-      heuristic.setup(context, mCache);
+      heuristic.setup(system, mCache);
     }
     final int heuristicSize = mVariableSelectionHeuristicList.size();
     double[] smallest = new double[heuristicSize];
@@ -79,6 +89,7 @@ class ChainVariableSelectionHeuristic
         }
       }
     }
+    assert smallestVar.isLocal();
     return smallestVar;
   }
 

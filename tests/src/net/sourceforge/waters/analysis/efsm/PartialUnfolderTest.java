@@ -282,13 +282,13 @@ public class PartialUnfolderTest
     final EFSMTransitionRelation efsmTransitionRelation =
       efsmTransitionRelationList.get(0);
     final EFSMVariable unfoldedVariable = system.getVariables().get(0);
-    final EFSMVariableContext context = system.getVariableContext();
     final EFSMTransitionRelation resultTransitionRelation =
       mPartialUnfolder.unfold(efsmTransitionRelation, unfoldedVariable,
-                              context);
+                              system);
     final List<EFSMTransitionRelation> list =
       Collections.singletonList(resultTransitionRelation);
     resultTransitionRelation.setName(RESULT);
+    final EFSMVariableContext context = system.getVariableContext();
     final EFSMSystem resultSystem =
       new EFSMSystem(module.getName(), system.getVariables(), list, context);
     final ModuleProxy resultModuleProxy = mImporter.importModule(resultSystem);

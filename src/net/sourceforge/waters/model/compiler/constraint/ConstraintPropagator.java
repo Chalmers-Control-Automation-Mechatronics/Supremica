@@ -297,6 +297,30 @@ public class ConstraintPropagator
     }
   }
 
+  /**
+   * Removes the given variable from the set of primed variables to be
+   * returned. This will prevent expressions x'==x' to appear in the
+   * constraint propagator output.
+   * @param  varname  The name of the variable to be removed,
+   *                  with or without prime.
+   * @return <CODE>true<CODE> if a variable was found and removed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removePrimedVariable(final SimpleExpressionProxy varname)
+  {
+    if (varname instanceof UnaryExpressionProxy) {
+      final UnaryExpressionProxy unary = (UnaryExpressionProxy) varname;
+      return mPrimedVariables.removeProxy(unary);
+    } else if (varname instanceof IdentifierProxy) {
+      final UnaryOperator prime = mOperatorTable.getNextOperator();
+      final UnaryExpressionProxy unary =
+        mFactory.createUnaryExpressionProxy(prime, varname);
+      return mPrimedVariables.removeProxy(unary);
+    } else {
+      return false;
+    }
+  }
+
 
   //#########################################################################
   //# Invocation

@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.efsm;
 
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;
@@ -64,7 +66,6 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
                              final ModuleProxyFactory factory)
   {
     super(model, marking, factory);
-
   }
 
 
@@ -129,8 +130,12 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
 
   public int getInternalTransitionLimit()
   {
-    // TODO Auto-generated method stub
-    return 0;
+    return mInternalTransitionLimit;
+  }
+
+  public void setInternalTransitionLimit(final int limit)
+  {
+    mInternalTransitionLimit = limit;
   }
 
   public CompilerOperatorTable getOperatorTable()
@@ -156,12 +161,15 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     if (mChainVariableSelectionHeuristic == null) {
       final List <VariableSelectionHeuristic> defaultVariableSelectionHeuristicList =
         new ArrayList<VariableSelectionHeuristic>();
-      final MaxTrueVariableSelectionHeuristic maxT =
-        new MaxTrueVariableSelectionHeuristic(factory, mCompilerOperatorTable);
-      defaultVariableSelectionHeuristicList.add(maxT);
-      final MinStatesVariableSelectionHeuristic minS =
-        new MinStatesVariableSelectionHeuristic(factory, mCompilerOperatorTable);
-      defaultVariableSelectionHeuristicList.add(minS);
+//      final MaxTrueVariableSelectionHeuristic maxT =
+//        new MaxTrueVariableSelectionHeuristic(factory, mCompilerOperatorTable);
+//      defaultVariableSelectionHeuristicList.add(maxT);
+//      final MinStatesVariableSelectionHeuristic minS =
+//        new MinStatesVariableSelectionHeuristic(factory, mCompilerOperatorTable);
+//      defaultVariableSelectionHeuristicList.add(minS);
+      final EstimatedMinStatesVariableSelectionHeuristic minES =
+        new EstimatedMinStatesVariableSelectionHeuristic(factory, mCompilerOperatorTable);
+      defaultVariableSelectionHeuristicList.add(minES);
       mChainVariableSelectionHeuristic=
         new ChainVariableSelectionHeuristic
         (factory, mCompilerOperatorTable, defaultVariableSelectionHeuristicList);
@@ -173,13 +181,12 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     }
 
     if (mEFSMTRSimplifierFactory == null) {
-      mEFSMTRSimplifierFactory = EFSMTRSimplifierFactory.GNB;
+      mEFSMTRSimplifierFactory = EFSMTRSimplifierFactory.NB;
     }
     mSimplifier = mEFSMTRSimplifierFactory.createAbstractionProcedure(this);
     mPartialUnfolder = new PartialUnfolder(factory, mCompilerOperatorTable);
     mEFSMSynchronization = new EFSMSynchronization(factory);
     mNonblockingChecker = new EFSMTRNonblockingChecker();
-    mSelfloopedUpdates = new ArrayList<ConstraintList>();
     mEFSMSystemQueue = new PriorityQueue<EFSMSystem>();
     mNextSubsystemNumber = 1;
   }
@@ -196,7 +203,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     mPartialUnfolder = null;
     mEFSMSynchronization = null;
     mNonblockingChecker = null;
-    mSelfloopedUpdates = null;
+    mEFSMVariableCollector = null;
     mCurrentEFSMSystem = null;
     mEFSMSystemQueue = null;
     super.tearDown();
@@ -216,6 +223,9 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       compiler.setConfiguredDefaultMarking(getConfiguredDefaultMarking());
       mCurrentEFSMSystem = compiler.compile(binding);
       mSystemName = mCurrentEFSMSystem.getName();
+      final EFSMVariableContext context = mCurrentEFSMSystem.getVariableContext();
+      mEFSMVariableCollector =
+        new EFSMVariableCollector(mCompilerOperatorTable, context);
       final List<EFSMTransitionRelation> efsmTransitionRelationList =
         mCurrentEFSMSystem.getTransitionRelations();
       final ListIterator<EFSMTransitionRelation> iter =
@@ -273,9 +283,11 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
           mCurrentEFSMSystem.removeVariable(varSelected);
           continue;
         }
-        final EFSMVariableContext context = mCurrentEFSMSystem.getVariableContext();
         final EFSMTransitionRelation unfoldTR =
-          mPartialUnfolder.unfold(varEFSMTransitionRelation, varSelected, context);
+          mPartialUnfolder.unfold(varEFSMTransitionRelation, varSelected,
+                                  mCurrentEFSMSystem);
+        final List<ConstraintList> unfoldedSelfloops =
+          mPartialUnfolder.getUnfoldedSelfloops();
         EFSMTransitionRelation unfoldSimplified = null;
         if (efsmTransitionRelationList.size() > 1) {
           unfoldSimplified = simplify(unfoldTR);
@@ -284,6 +296,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
           unfoldSimplified = unfoldTR;
         }
         mCurrentEFSMSystem.removeVariable(varSelected);
+        mCurrentEFSMSystem.removeSelfloops(unfoldedSelfloops);
         unfoldSimplified.register();
         varEFSMTransitionRelation.dispose();
         final ListIterator<EFSMTransitionRelation> unfoldIter =
@@ -344,7 +357,10 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     final EFSMVariableContext context = mCurrentEFSMSystem.getVariableContext();
     final EFSMTransitionRelation result =
       mSimplifier.run(currentEFSMTransitionRelation, context);
-    mSelfloopedUpdates.addAll(mSimplifier.getSelfloopedUpdates());
+    final EFSMEventEncoding selfloops = mCurrentEFSMSystem.getSelfloops();
+    for (final ConstraintList update : mSimplifier.getSelfloopedUpdates()) {
+      selfloops.createEventId(update);
+    }
     return result;
   }
 
@@ -404,18 +420,25 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       new THashSet<EFSMVariable>(efsmVariableListSize);
     final Queue<EFSMVariable> visitedEFSMVariableList =
       new LinkedList<EFSMVariable>();
+    List<Set<EFSMVariable>> selfloopData = null;
+    final TIntHashSet visitedSelfloopSet = new TIntHashSet();
     final EFSMTransitionRelation firstTR = efsmTRList.get(0);
     visitedEFSMTRSet.add(firstTR);
     visitedEFSMTRList.add(firstTR);
-    while (!visitedEFSMTRList.isEmpty()) {
-      final EFSMTransitionRelation nextTR = visitedEFSMTRList.remove();
-      final Collection<EFSMVariable> nextVariableList = nextTR.getVariables();
-      for (final EFSMVariable var : nextVariableList) {
-        if (visitedEFSMVariableSet.add(var)) {
-          if (visitedEFSMVariableSet.size() == efsmVariableListSize) {
-            return system;
-          } else {
-            visitedEFSMVariableList.add(var);
+    while (!visitedEFSMTRList.isEmpty() || !visitedEFSMVariableList.isEmpty()) {
+      while (!visitedEFSMTRList.isEmpty()) {
+        final EFSMTransitionRelation nextTR = visitedEFSMTRList.remove();
+        final Collection<EFSMVariable> nextVariableList = nextTR.getVariables();
+        for (final EFSMVariable var : nextVariableList) {
+          if (visitedEFSMVariableSet.add(var)) {
+            if (visitedEFSMVariableSet.size() < efsmVariableListSize) {
+              visitedEFSMVariableList.add(var);
+            } else if (visitedEFSMTRSet.size() < efsmTRListSize) {
+              visitedEFSMVariableList.add(var);
+              break;
+            } else {
+              return system;
+            }
           }
         }
       }
@@ -425,10 +448,47 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
           nextVariable.getTransitionRelations();
         for (final EFSMTransitionRelation tr : nextEFSMTRList) {
           if (visitedEFSMTRSet.add(tr)) {
-            if (visitedEFSMTRSet.size() == efsmTRListSize) {
-              return system;
-            } else {
+            if (visitedEFSMTRSet.size() < efsmTRListSize) {
               visitedEFSMTRList.add(tr);
+            } else if (visitedEFSMVariableSet.size() < efsmVariableListSize) {
+              visitedEFSMTRList.add(tr);
+              break;
+            } else {
+              return system;
+            }
+          }
+        }
+      }
+      if (visitedEFSMTRList.isEmpty()) {
+        final EFSMEventEncoding selfloops = system.getSelfloops();
+        if (selfloopData == null) {
+          selfloopData = new ArrayList<Set<EFSMVariable>>(selfloops.size());
+          selfloopData.add(null);  // this is for tau
+          for (int event=EventEncoding.NONTAU; event < selfloops.size(); event++) {
+            final ConstraintList update = selfloops.getUpdate(event);
+            final Set<EFSMVariable> variables = new THashSet<EFSMVariable>();
+            mEFSMVariableCollector.collectAllVariables(update, variables);
+            selfloopData.add(variables);
+          }
+        }
+        for (int event=EventEncoding.NONTAU; event < selfloops.size(); event++) {
+          final Set<EFSMVariable> variables = selfloopData.get(event);
+          boolean found = false;
+          for (final EFSMVariable var : variables) {
+            if (visitedEFSMVariableSet.contains(var)){
+              found = true;
+            }
+          }
+          if (found) {
+            visitedSelfloopSet.add(event);
+            for (final EFSMVariable var : variables) {
+              if (visitedEFSMVariableSet.add(var)) {
+                if (visitedEFSMTRSet.size() == efsmTRListSize &&
+                    visitedEFSMVariableSet.size() == efsmVariableListSize) {
+                  return system;
+                }
+                visitedEFSMVariableList.add(var);
+              }
             }
           }
         }
@@ -457,15 +517,29 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         efsmVariableList2.add(var);
       }
     }
+    final EFSMEventEncoding selfloops = system.getSelfloops();
+    final EFSMEventEncoding selfloops1 =
+      new EFSMEventEncoding(visitedSelfloopSet.size() + 1);
+    final EFSMEventEncoding selfloops2 =
+      new EFSMEventEncoding(selfloops.size() - visitedSelfloopSet.size() + 1);
+    for (int event=EventEncoding.NONTAU; event < selfloops.size(); event++) {
+      final ConstraintList update = selfloops.getUpdate(event);
+      if (visitedSelfloopSet.contains(event)) {
+        selfloops1.createEventId(update);
+      } else {
+        selfloops2.createEventId(update);
+      }
+    }
+
     final String name1 = mSystemName + "-" + mNextSubsystemNumber;
     mNextSubsystemNumber++;
     final String name2 = mSystemName + "-" + mNextSubsystemNumber;
     mNextSubsystemNumber ++;
     final EFSMVariableContext context = system.getVariableContext();
     final EFSMSystem efsmSystem1 =
-      new EFSMSystem(name1, efsmVariableList1, efsmTRList1, context);
+      new EFSMSystem(name1, efsmVariableList1, efsmTRList1, selfloops1, context);
     final EFSMSystem efsmSystem2 =
-      new EFSMSystem(name2, efsmVariableList2, efsmTRList2, context);
+      new EFSMSystem(name2, efsmVariableList2, efsmTRList2, selfloops2, context);
     mEFSMSystemQueue.add(efsmSystem1);
     return splitSubsystem(efsmSystem2);
   }
@@ -473,16 +547,18 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
 
   //#########################################################################
   //# Data Members
-  private DocumentManager mDocumentManager;
-  private EFSMTRSimplifier mSimplifier;
-  private List<ConstraintList> mSelfloopedUpdates;
   private CompilerOperatorTable mCompilerOperatorTable;
   private EFSMTRSimplifierFactory mEFSMTRSimplifierFactory;
   private ChainVariableSelectionHeuristic mChainVariableSelectionHeuristic;
+  private int mInternalTransitionLimit = Integer.MAX_VALUE;
+
+  private DocumentManager mDocumentManager;
+  private EFSMTRSimplifier mSimplifier;
   private PartialUnfolder mPartialUnfolder;
   private CompositionSelectionHeuristic mCompositionSelectionHeuristic;
   private EFSMSynchronization mEFSMSynchronization;
   private EFSMTRNonblockingChecker mNonblockingChecker;
+  private EFSMVariableCollector mEFSMVariableCollector;
   private Queue<EFSMSystem> mEFSMSystemQueue;
   private String mSystemName;
   private int mNextSubsystemNumber;

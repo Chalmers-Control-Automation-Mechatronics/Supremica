@@ -9,10 +9,15 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 
 /**
@@ -41,10 +46,21 @@ public class EFSMSystem implements Comparable<EFSMSystem>
                     final List<EFSMTransitionRelation> transitionRelations,
                     final EFSMVariableContext context)
   {
+    this(name, variables, transitionRelations, new EFSMEventEncoding(),
+         context);
+  }
+
+  public EFSMSystem(final String name,
+                    final List<EFSMVariable> variables,
+                    final List<EFSMTransitionRelation> transitionRelations,
+                    final EFSMEventEncoding selfloops,
+                    final EFSMVariableContext context)
+  {
     mTransitionRelations = transitionRelations;
     mVariables = variables;
     mName = name;
     mVariableContext = context;
+    mSelfloops = selfloops;
   }
 
   //#########################################################################
@@ -82,6 +98,27 @@ public class EFSMSystem implements Comparable<EFSMSystem>
     return mVariableContext;
   }
 
+  public EFSMEventEncoding getSelfloops()
+  {
+    return mSelfloops;
+  }
+
+  public void removeSelfloops(final List<ConstraintList> selfloops)
+  {
+    if (!selfloops.isEmpty()) {
+      final Set<ConstraintList> selfloopSet = new THashSet<ConstraintList>(selfloops);
+      final EFSMEventEncoding newSelfloops =
+        new EFSMEventEncoding(mSelfloops.size() - selfloops.size() + 1);
+      for (int event=EventEncoding.NONTAU; event < mSelfloops.size(); event++) {
+        final ConstraintList update = mSelfloops.getUpdate(event);
+        if (!selfloopSet.contains(update)) {
+          newSelfloops.createEventId(update);
+        }
+      }
+      mSelfloops = newSelfloops;
+    }
+  }
+
   public double getEstimatedSize()
   {
     double size = 1;
@@ -115,6 +152,7 @@ public class EFSMSystem implements Comparable<EFSMSystem>
   private final List<EFSMTransitionRelation> mTransitionRelations;
   private final List<EFSMVariable> mVariables;
   private final EFSMVariableContext mVariableContext;
+  private EFSMEventEncoding mSelfloops;
 
 
   //#########################################################################

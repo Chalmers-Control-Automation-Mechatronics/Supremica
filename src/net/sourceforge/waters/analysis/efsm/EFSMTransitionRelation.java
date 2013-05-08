@@ -90,6 +90,9 @@ public class EFSMTransitionRelation implements Comparable<EFSMTransitionRelation
     }
   }
 
+
+  //#########################################################################
+  //# Interface java.util.Comparable
   @Override
   public int compareTo(final EFSMTransitionRelation efsmTR)
   {
@@ -97,6 +100,16 @@ public class EFSMTransitionRelation implements Comparable<EFSMTransitionRelation
     final String name2 = efsmTR.getName();
     return name1.compareTo(name2);
   }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return mTransitionRelation.getName() + "\n" + mTransitionRelation.toString();
+  }
+
 
   //#########################################################################
   //# Data Members

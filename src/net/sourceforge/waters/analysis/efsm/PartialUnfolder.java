@@ -16,9 +16,9 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -67,24 +67,23 @@ public class PartialUnfolder
     mUnfoldingVariableContext = new UnfoldingVariableContext();
   }
 
+
+  //#########################################################################
+  //# Configuration
+  public void setSourceInfoEnabled(final boolean enabled)
+  {
+    mSourceInfoEnabled = enabled;
+  }
+
+
   //#########################################################################
   //# Invocation
   EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
                                 final EFSMVariable var,
-                                final EFSMVariableContext rootContext)
+                                final EFSMSystem system)
     throws EvalException, AnalysisException
   {
-    final List<ConstraintList> empty = Collections.emptyList();
-    return unfold(efsmRel, var, rootContext, empty);
-  }
-
-  EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
-                                final EFSMVariable var,
-                                final EFSMVariableContext rootContext,
-                                final List<ConstraintList> selfloops)
-    throws EvalException, AnalysisException
-  {
-    mRootContext = rootContext;
+    mRootContext = system.getVariableContext();
     mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable,
                                                        mRootContext);
     mInputTransitionRelation = efsmRel;
@@ -93,9 +92,10 @@ public class PartialUnfolder
     mConstraintPropagator =
       new ConstraintPropagator(mFactory, mOperatorTable,
                                mUnfoldingVariableContext);
-    mUnfoldedSelfloops =
-      new ArrayList<ConstraintList>(selfloops.size());
-    for (final ConstraintList selfloop : selfloops) {
+    final EFSMEventEncoding selfloops = system.getSelfloops();
+    mUnfoldedSelfloops = new ArrayList<ConstraintList>(selfloops.size());
+    for (int event = EventEncoding.NONTAU; event < selfloops.size(); event++) {
+      final ConstraintList selfloop = selfloops.getUpdate(event);
       if (mOccursChecker.occurs(varName, selfloop)) {
         mUnfoldedSelfloops.add(selfloop);
       }
@@ -210,11 +210,14 @@ public class PartialUnfolder
     return new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
                                       variables, nodeList);
   }
-  public void setSourceInfoEnabled(final boolean enabled)
-  {
-    mSourceInfoEnabled = enabled;
-  }
 
+
+  //#########################################################################
+  //# Access to Results
+  public List<ConstraintList> getUnfoldedSelfloops()
+  {
+    return mUnfoldedSelfloops;
+  }
 
 
   //#########################################################################
@@ -250,6 +253,7 @@ public class PartialUnfolder
           for (final SimpleExpressionProxy rangeValue : mRangeValues) {
             mUnfoldingVariableContext.setPrimedValue(rangeValue);
             mConstraintPropagator.init(update);
+            mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
             mConstraintPropagator.propagate();
             if (!mConstraintPropagator.isUnsatisfiable()) {
               final ConstraintList unfoldedUpdate =
@@ -264,6 +268,7 @@ public class PartialUnfolder
           }
         } else {
           mConstraintPropagator.init(update);
+          mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
           mConstraintPropagator.propagate();
           if (!mConstraintPropagator.isUnsatisfiable()) {
             final ConstraintList unfoldedUpdate =
@@ -280,6 +285,7 @@ public class PartialUnfolder
         for (final SimpleExpressionProxy rangeValue : mRangeValues) {
           mUnfoldingVariableContext.setPrimedValue(rangeValue);
           mConstraintPropagator.init(update);
+          mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
           mConstraintPropagator.propagate();
           if (!mConstraintPropagator.isUnsatisfiable()) {
             final ConstraintList unfoldedUpdate =

@@ -37,7 +37,7 @@ abstract class VariableSelectionHeuristic
     default:
       break;
     }
-    mContext = system.getVariableContext();
+    mSystem = system;
     mUnfoldingCache =
       new HashMap<EFSMVariable,EFSMTransitionRelation>(variableList.size());
     double smallest = Double.POSITIVE_INFINITY;
@@ -80,17 +80,17 @@ abstract class VariableSelectionHeuristic
       return cached;
     } else {
       final EFSMTransitionRelation unfolded =
-        mUnfolder.unfold(var.getTransitionRelation(), var, mContext);
+        mUnfolder.unfold(var.getTransitionRelation(), var, mSystem);
       mUnfoldingCache.put(var, unfolded);
       return unfolded;
     }
   }
 
-  protected void setup(final EFSMVariableContext context,
+  protected void setup(final EFSMSystem system,
                        final Map<EFSMVariable,EFSMTransitionRelation> cache)
   {
     mUnfoldingCache = cache;
-    mContext = context;
+    mSystem = system;
   }
 
 
@@ -99,6 +99,6 @@ abstract class VariableSelectionHeuristic
   private final PartialUnfolder mUnfolder;
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
-  private EFSMVariableContext mContext;
+  private EFSMSystem mSystem;
   private Map<EFSMVariable,EFSMTransitionRelation> mUnfoldingCache;
 }

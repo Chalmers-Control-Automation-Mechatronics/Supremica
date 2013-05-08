@@ -108,7 +108,9 @@ public class OnlySilentOutgoingTRSimplifier
         }
       }
     }
-    applyResultPartitionAutomatically();
+    if (modified) {
+      applyResultPartitionAutomatically();
+    }
     return modified;
   }
 

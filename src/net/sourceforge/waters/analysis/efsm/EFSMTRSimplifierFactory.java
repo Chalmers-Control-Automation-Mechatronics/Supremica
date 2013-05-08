@@ -32,10 +32,9 @@ public enum EFSMTRSimplifierFactory
 
   //#########################################################################
   //# Enumeration
-
   /**
-    * <P>Minimisation is performed according to a sequence of abstraction
-   * rules for generalised nonblocking proposed, but using weak observation
+   * <P>Minimisation is performed according to a sequence of abstraction
+   * rules for generalised nonblocking, but using weak observation
    * equivalence instead of observation equivalence.</P>
    * <P><I>Reference:</I> Robi Malik, Ryan Leduc. A Compositional Approach
    * for Verifying Generalised Nonblocking, Proc. 7th International
@@ -48,6 +47,21 @@ public enum EFSMTRSimplifierFactory
       (final EFSMConflictChecker analyzer)
     {
       return EFSMTRSimplifier.createGeneralisedNonblockingProcedure
+        (ObservationEquivalenceTRSimplifier.Equivalence.
+         WEAK_OBSERVATION_EQUIVALENCE,
+         analyzer.getInternalTransitionLimit(), analyzer.getOperatorTable());
+    }
+  },
+  /**
+   * <P>Minimisation is performed according to a sequence of abstraction
+   * rules for standard nonblocking.</P>
+   */
+  NB {
+    @Override
+    public EFSMTRSimplifier createAbstractionProcedure
+      (final EFSMConflictChecker analyzer)
+    {
+      return EFSMTRSimplifier.createStandardNonblockingProcedure
         (ObservationEquivalenceTRSimplifier.Equivalence.
          WEAK_OBSERVATION_EQUIVALENCE,
          analyzer.getInternalTransitionLimit(), analyzer.getOperatorTable());

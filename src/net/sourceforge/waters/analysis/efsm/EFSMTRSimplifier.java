@@ -9,12 +9,15 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
@@ -108,6 +111,46 @@ class EFSMTRSimplifier
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
     nonAlphaDeterminiser.setTransitionLimit(limit);
     chain.add(nonAlphaDeterminiser);
+    final MarkingSaturationTRSimplifier saturator =
+      new MarkingSaturationTRSimplifier();
+    chain.add(saturator);
+    return new EFSMTRSimplifier(chain, op);
+  }
+
+
+  public static EFSMTRSimplifier
+    createStandardNonblockingProcedure
+      (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+       final int limit,
+       final CompilerOperatorTable op)
+  {
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final MarkingRemovalTRSimplifier markingRemover =
+      new MarkingRemovalTRSimplifier();
+    chain.add(markingRemover);
+    final TauLoopRemovalTRSimplifier tauLoopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(tauLoopRemover);
+    final SilentIncomingTRSimplifier silentInRemover =
+      new SilentIncomingTRSimplifier();
+    silentInRemover.setRestrictsToUnreachableStates(true);
+    chain.add(silentInRemover);
+    final OnlySilentOutgoingTRSimplifier silentOutRemover =
+      new OnlySilentOutgoingTRSimplifier();
+    chain.add(silentOutRemover);
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    incomingEquivalenceSimplifier.setTransitionLimit(limit);
+    chain.add(incomingEquivalenceSimplifier);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode
+    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+    (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator.setTransitionLimit(limit);
+    chain.add(bisimulator);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
@@ -230,6 +273,7 @@ class EFSMTRSimplifier
               }
             }
           }
+          iter.reset();
           while (iter.advance()) {
             final int source = iter.getCurrentSourceState();
             final int newSource = stateEncoding == null ? source : stateEncoding[source];
@@ -250,7 +294,7 @@ class EFSMTRSimplifier
         if (newNumEvents == numEvents) {
           newVariables = efsmTR.getVariables();
         } else {
-          newVariables = new ArrayList<EFSMVariable>(efsmTR.getVariables().size());
+          newVariables = new THashSet<EFSMVariable>(efsmTR.getVariables().size());
           final EFSMVariableCollector variableCollector =
             new EFSMVariableCollector (mOperatorTable, context);
           variableCollector.collectAllVariables(newEventEncoding, newVariables);

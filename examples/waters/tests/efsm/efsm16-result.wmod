@@ -1,69 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="efsm16" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Distributed prime number sieve.
-This is the basic version with two sieve processes for primes 2 and 3.
-It handles numbers up to 24.
-The number of reachable states is 759250075, and the diameter is 58.
-
-Source generates numbers and sends them to the first sieve process sieve2.
-There is one sieve process for each prime number p,
-which upon receiving a new number x, tests whether x is divisible by p.
-If it is, x is discarded, otherwise x is sent to the next sieve process.
-Any numbers passing through all sieves are primes, and sent to the sink for printing.
-
-source:
-do
-  x[0] = random_number
-  await c[2]==0
-  c[2] = x[0]
-loop
-
-sieve[p] for p=2,3:
-do
-  await c[p] &gt; 0
-  x[p] = c[p]
-  c[p] = 0 
-  if x==p || x[p] mod p != 0 then
-    await c[next(p)] == 0
-    c[next(p)] = x
-  end
-loop
-
-sink:
-do
-  await c[5] &gt; 0
-  print c[5]
-  c[5] = 0
-loop</ns2:Comment>
-    <ConstantAliasList>
-        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
-            <ConstantAliasExpression>
-                <IntConstant Value="8"/>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-    </ConstantAliasList>
+<Module Name="efsm16-result" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau2"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau3"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau0"/>
-        <EventDecl Kind="CONTROLLABLE" Name="print"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau2x2"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau2c2"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau2c3"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau3c3"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau3x3"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau3c5"/>
-        <EventDecl Kind="CONTROLLABLE" Name="taup"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau0x0"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau0c2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau:source"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau:sieve2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau:sink"/>
     </EventDeclList>
     <ComponentList>
         <VariableComponent Deterministic="false" Name="x0">
             <VariableRange>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
-                    <SimpleIdentifier Name="N"/>
+                    <IntConstant Value="8"/>
                 </BinaryExpression>
             </VariableRange>
             <VariableInitial>
@@ -73,8 +21,50 @@ loop</ns2:Comment>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
+        <VariableComponent Deterministic="false" Name="c2">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="8"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="c2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Deterministic="false" Name="x2">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="8"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Deterministic="false" Name="c3">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="8"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="c3"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="source">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>
@@ -107,7 +97,7 @@ loop</ns2:Comment>
                 <EdgeList>
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau0x0"/>
+                            <SimpleIdentifier Name="tau:source"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="4" Y="-20"/>
                             </LabelGeometry>
@@ -130,7 +120,7 @@ loop</ns2:Comment>
                     </Edge>
                     <Edge Source="S2" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau0c2"/>
+                            <SimpleIdentifier Name="tau:source"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-46" Y="-21"/>
                             </LabelGeometry>
@@ -142,12 +132,14 @@ loop</ns2:Comment>
                             <Point X="161" Y="192"/>
                         </SplineGeometry>
                         <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="c2"/>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <UnaryExpression Operator="'">
+                                        <SimpleIdentifier Name="c2"/>
+                                    </UnaryExpression>
                                     <SimpleIdentifier Name="x0"/>
                                 </BinaryExpression>
-                            </Actions>
+                            </Guards>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-47" Y="-7"/>
                             </LabelGeometry>
@@ -155,7 +147,7 @@ loop</ns2:Comment>
                     </Edge>
                     <Edge Source="S1" Target="S2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau0"/>
+                            <SimpleIdentifier Name="tau:source"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="5" Y="-20"/>
                             </LabelGeometry>
@@ -175,22 +167,8 @@ loop</ns2:Comment>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <VariableComponent Name="c2">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <SimpleIdentifier Name="N"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="c2"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="sieve2">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="q0">
                         <EventList>
@@ -255,16 +233,16 @@ loop</ns2:Comment>
                 <EdgeList>
                     <Edge Source="q0" Target="q1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau2"/>
+                            <SimpleIdentifier Name="tau:sieve2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="&gt;">
+                                <BinaryExpression Operator="&lt;=">
+                                    <IntConstant Value="1"/>
                                     <SimpleIdentifier Name="c2"/>
-                                    <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
@@ -274,18 +252,20 @@ loop</ns2:Comment>
                     </Edge>
                     <Edge Source="q1" Target="q2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau2x2"/>
+                            <SimpleIdentifier Name="tau:sieve2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="x2"/>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <UnaryExpression Operator="'">
+                                        <SimpleIdentifier Name="x2"/>
+                                    </UnaryExpression>
                                     <SimpleIdentifier Name="c2"/>
                                 </BinaryExpression>
-                            </Actions>
+                            </Guards>
                             <LabelGeometry Anchor="NW">
                                 <Point X="2" Y="1"/>
                             </LabelGeometry>
@@ -293,7 +273,7 @@ loop</ns2:Comment>
                     </Edge>
                     <Edge Source="q2" Target="q3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau2c2"/>
+                            <SimpleIdentifier Name="tau:sieve2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="1" Y="-18"/>
                             </LabelGeometry>
@@ -302,12 +282,14 @@ loop</ns2:Comment>
                             <Point X="160" Y="272"/>
                         </EndPointGeometry>
                         <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="c2"/>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <UnaryExpression Operator="'">
+                                        <SimpleIdentifier Name="c2"/>
+                                    </UnaryExpression>
                                     <IntConstant Value="0"/>
                                 </BinaryExpression>
-                            </Actions>
+                            </Guards>
                             <LabelGeometry Anchor="NW">
                                 <Point X="2" Y="1"/>
                             </LabelGeometry>
@@ -315,7 +297,7 @@ loop</ns2:Comment>
                     </Edge>
                     <Edge Source="q4" Target="q5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau2"/>
+                            <SimpleIdentifier Name="tau:sieve2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="1" Y="-18"/>
                             </LabelGeometry>
@@ -323,21 +305,21 @@ loop</ns2:Comment>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="!=">
+                                    <IntConstant Value="0"/>
                                     <BinaryExpression Operator="%">
                                         <SimpleIdentifier Name="x2"/>
                                         <IntConstant Value="2"/>
                                     </BinaryExpression>
-                                    <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-1"/>
+                                <Point X="5" Y="-2"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Source="q5" Target="q6">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau2"/>
+                            <SimpleIdentifier Name="tau:sieve2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="1" Y="-18"/>
                             </LabelGeometry>
@@ -356,7 +338,7 @@ loop</ns2:Comment>
                     </Edge>
                     <Edge Source="q4" Target="q0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau2"/>
+                            <SimpleIdentifier Name="tau:sieve2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-29" Y="10"/>
                             </LabelGeometry>
@@ -381,7 +363,7 @@ loop</ns2:Comment>
                     </Edge>
                     <Edge Source="q6" Target="q0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau2c3"/>
+                            <SimpleIdentifier Name="tau:sieve2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-32" Y="21"/>
                             </LabelGeometry>
@@ -390,20 +372,22 @@ loop</ns2:Comment>
                             <Point X="44" Y="266"/>
                         </SplineGeometry>
                         <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="c3"/>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <UnaryExpression Operator="'">
+                                        <SimpleIdentifier Name="c3"/>
+                                    </UnaryExpression>
                                     <SimpleIdentifier Name="x2"/>
                                 </BinaryExpression>
-                            </Actions>
+                            </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-30" Y="38"/>
+                                <Point X="-30" Y="37"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Source="q3" Target="q5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau2"/>
+                            <SimpleIdentifier Name="tau:sieve2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="4" Y="-18"/>
                             </LabelGeometry>
@@ -428,7 +412,7 @@ loop</ns2:Comment>
                     </Edge>
                     <Edge Source="q3" Target="q4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau2"/>
+                            <SimpleIdentifier Name="tau:sieve2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="5" Y="-13"/>
                             </LabelGeometry>
@@ -448,36 +432,8 @@ loop</ns2:Comment>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <VariableComponent Name="x2">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <SimpleIdentifier Name="N"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="x2"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-        </VariableComponent>
-        <VariableComponent Name="c3">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <SimpleIdentifier Name="N"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="c3"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="sink">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>
@@ -502,7 +458,7 @@ loop</ns2:Comment>
                 <EdgeList>
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="taup"/>
+                            <SimpleIdentifier Name="tau:sink"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="4" Y="-16"/>
                             </LabelGeometry>
@@ -512,9 +468,9 @@ loop</ns2:Comment>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="&gt;">
+                                <BinaryExpression Operator="&lt;=">
+                                    <IntConstant Value="1"/>
                                     <SimpleIdentifier Name="c3"/>
-                                    <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
@@ -524,7 +480,7 @@ loop</ns2:Comment>
                     </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="print"/>
+                            <SimpleIdentifier Name="tau:sink"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-42" Y="-14"/>
                             </LabelGeometry>
@@ -533,12 +489,14 @@ loop</ns2:Comment>
                             <Point X="176" Y="136"/>
                         </SplineGeometry>
                         <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="c3"/>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <UnaryExpression Operator="'">
+                                        <SimpleIdentifier Name="c3"/>
+                                    </UnaryExpression>
                                     <IntConstant Value="0"/>
                                 </BinaryExpression>
-                            </Actions>
+                            </Guards>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-39" Y="0"/>
                             </LabelGeometry>

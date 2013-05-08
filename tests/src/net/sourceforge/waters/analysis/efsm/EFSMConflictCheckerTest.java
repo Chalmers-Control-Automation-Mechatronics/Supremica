@@ -122,11 +122,64 @@ public class EFSMConflictCheckerTest
     checkConflict("tests", "efsm", "efsm15", true);
   }
 
-
   public void testEFSMCompiler16()
     throws IOException, WatersException
   {
     checkConflict("tests", "efsm", "efsm16", true);
+  }
+
+  public void testEFSMCompiler17()
+    throws IOException, WatersException
+  {
+    checkConflict("tests", "efsm", "efsm17", false);
+  }
+
+  public void testEFSMCompiler18()
+    throws IOException, WatersException
+  {
+    checkConflict("tests", "efsm", "efsm18", true);
+  }
+
+  public void testEFSMCompiler19()
+    throws IOException, WatersException
+  {
+    checkConflict("tests", "efsm", "efsm19", false);
+  }
+
+  public void testEFSMCompiler20()
+    throws IOException, WatersException
+  {
+    checkConflict("tests", "efsm", "efsm20", true);
+  }
+
+  public void testPrimeSieve2a()
+    throws IOException, WatersException
+  {
+    checkConflict("efa", "prime_sieve2a", true);
+  }
+
+  public void testPrimeSieve2()
+    throws IOException, WatersException
+  {
+    checkConflict("efa", "prime_sieve2", true);
+  }
+
+  public void testPrimeSieve3()
+    throws IOException, WatersException
+  {
+    checkConflict("efa", "prime_sieve3", true);
+  }
+
+  public void testPrimeSieve4()
+    throws IOException, WatersException
+  {
+    checkConflict("efa", "prime_sieve4", true);
+  }
+
+  public void testPrimeSieve5()
+    throws IOException, WatersException
+  {
+    checkConflict("efa", "prime_sieve5", true);
   }
 
   //#########################################################################
@@ -139,14 +192,12 @@ public class EFSMConflictCheckerTest
 
   //#########################################################################
   //# Utilities
-
-  @SuppressWarnings("unused")
-  private void checkConflict(final String dirname, final String name)
+  private void checkConflict(final String dirname, final String name, final boolean expected)
     throws IOException, WatersException
   {
     final File root = getWatersInputRoot();
     final File dir = new File(root, dirname);
-    checkConflict(dir, name, null, false);
+    checkConflict(dir, name, null, expected);
   }
 
   private void checkConflict(final String dirname,
@@ -190,6 +241,7 @@ public class EFSMConflictCheckerTest
     final EFSMConflictChecker conflictChecker =
       new EFSMConflictChecker(module, mModuleFactory);
     configure(conflictChecker);
+    conflictChecker.setInternalTransitionLimit(20000000);
     return conflictChecker.run();
   }
 
