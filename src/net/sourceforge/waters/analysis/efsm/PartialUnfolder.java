@@ -16,6 +16,7 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Formatter;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -85,6 +86,9 @@ public class PartialUnfolder
                                 final EFSMSystem system)
     throws EvalException, AnalysisException
   {
+    System.err.println("Unfolding: " + efsmRel.getName() + " \\ " + var.getName() + " ...");
+    System.err.println(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
+    final long start = System.currentTimeMillis();
     mUnfoldedEventCache =
       new TLongIntHashMap(0, 0.5f, UNKNOWN_UNFOLDING, UNKNOWN_UNFOLDING);
     mKnownAfterValueCache =
@@ -228,8 +232,15 @@ public class PartialUnfolder
       (efsmRel.getVariables().size());
 
     mEFSMVariableCollector.collectAllVariables(mUnfoldedEventEncoding, variables);
-    return new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
-                                      variables, nodeList);
+    final EFSMTransitionRelation result =
+      new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
+                                 variables, nodeList);
+    final long stop = System.currentTimeMillis();
+    final float difftime = 0.001f * (stop - start);
+    @SuppressWarnings("resource")
+    final Formatter formatter = new Formatter(System.err);
+    formatter.format("%d states, %.3f seconds\n", unfoldedRel.getNumberOfStates(), difftime);
+    return result;
   }
 
 
