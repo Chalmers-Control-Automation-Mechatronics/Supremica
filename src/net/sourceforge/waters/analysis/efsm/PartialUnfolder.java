@@ -103,6 +103,7 @@ public class PartialUnfolder
     mConstraintPropagator =
       new ConstraintPropagator(mFactory, mOperatorTable,
                                mUnfoldingVariableContext);
+    mPropagatorCalls = 0;
 
     final EFSMEventEncoding selfloops = system.getSelfloops();
     TIntArrayList mSelfloops = null;
@@ -239,7 +240,8 @@ public class PartialUnfolder
     final float difftime = 0.001f * (stop - start);
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(System.err);
-    formatter.format("%d states, %.3f seconds\n", unfoldedRel.getNumberOfStates(), difftime);
+    formatter.format("%d states, %d propagator calls, %.3f seconds\n",
+                     unfoldedRel.getNumberOfStates(), mPropagatorCalls, difftime);
     return result;
   }
 
@@ -263,6 +265,7 @@ public class PartialUnfolder
       mConstraintPropagator.init(update);
       mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
       mConstraintPropagator.propagate();
+      mPropagatorCalls++;
       if (!mConstraintPropagator.isUnsatisfiable()) {
         final ConstraintList unfoldedUpdate =
           mConstraintPropagator.getAllConstraints();
@@ -276,7 +279,6 @@ public class PartialUnfolder
     }
   }
 
-  @SuppressWarnings("unused")
   private int getKnownAfterValue(final int event, final int beforeValue)
     throws EvalException
   {
@@ -292,6 +294,7 @@ public class PartialUnfolder
       mUnfoldingVariableContext.setPrimedValue(null);
       mConstraintPropagator.init(update);
       mConstraintPropagator.propagate();
+      mPropagatorCalls++;
       if (mConstraintPropagator.isUnsatisfiable()) {
         mKnownAfterValueCache.put(key, UNSATISFIED_UNFOLDING);
         return UNSATISFIED_UNFOLDING;
@@ -307,6 +310,7 @@ public class PartialUnfolder
           mUnfoldingVariableContext.setPrimedValue(afterExpr);
           mConstraintPropagator.init(update);
           mConstraintPropagator.propagate();
+          mPropagatorCalls++;
         }
       }
       if (afterValue < 0 &&
@@ -376,6 +380,7 @@ public class PartialUnfolder
       }
     }
 
+    /*
     private void expand(final int source, final int beforeValue,
                         final int event, final int targetState)
       throws EvalException
@@ -397,8 +402,8 @@ public class PartialUnfolder
         }
       }
     }
+    */
 
-    /*
     private void expand(final int source, final int beforeValue,
                         final int event, final int targetState)
       throws EvalException
@@ -422,7 +427,6 @@ public class PartialUnfolder
         }
       }
     }
-    */
 
     abstract void newTransition(int source, int event, long pair);
 
@@ -530,6 +534,8 @@ public class PartialUnfolder
   private EFSMEventEncoding mUnfoldedEventEncoding;
   private ConstraintPropagator mConstraintPropagator;
   private EFSMVariableCollector mEFSMVariableCollector;
+
+  private int mPropagatorCalls;
 
   private static final int UNKNOWN_UNFOLDING = -2;
   private static final int UNSATISFIED_UNFOLDING = -1;
