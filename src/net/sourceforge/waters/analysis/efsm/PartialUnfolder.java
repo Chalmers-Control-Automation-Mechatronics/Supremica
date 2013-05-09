@@ -90,9 +90,9 @@ public class PartialUnfolder
     System.err.println(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
     final long start = System.currentTimeMillis();
     mUnfoldedEventCache =
-      new TLongIntHashMap(0, 0.5f, UNKNOWN_UNFOLDING, UNKNOWN_UNFOLDING);
+      new TLongIntHashMap(0, 0.5f, MISSING_CACHE_ENTRY, MISSING_CACHE_ENTRY);
     mKnownAfterValueCache =
-      new TLongIntHashMap(0, 0.5f, UNKNOWN_UNFOLDING, UNKNOWN_UNFOLDING);
+      new TLongIntHashMap(0, 0.5f, MISSING_CACHE_ENTRY, MISSING_CACHE_ENTRY);
     mRootContext = system.getVariableContext();
     mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable,
                                                        mRootContext);
@@ -103,7 +103,9 @@ public class PartialUnfolder
     mConstraintPropagator =
       new ConstraintPropagator(mFactory, mOperatorTable,
                                mUnfoldingVariableContext);
-    mPropagatorCalls = 0;
+    mPropagatorCalls1 = 0;
+    mPropagatorCalls2 = 0;
+    mPropagatorCalls3 = 0;
 
     final EFSMEventEncoding selfloops = system.getSelfloops();
     TIntArrayList mSelfloops = null;
@@ -240,8 +242,12 @@ public class PartialUnfolder
     final float difftime = 0.001f * (stop - start);
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(System.err);
-    formatter.format("%d states, %d propagator calls, %.3f seconds\n",
-                     unfoldedRel.getNumberOfStates(), mPropagatorCalls, difftime);
+    formatter.format("%d states, %d propagator1 calls, %.3f seconds\n",
+                     unfoldedRel.getNumberOfStates(), mPropagatorCalls1, difftime);
+    formatter.format("%d states, %d propagator2 calls, %.3f seconds\n",
+                     unfoldedRel.getNumberOfStates(), mPropagatorCalls2, difftime);
+    formatter.format("%d states, %d propagator3 calls, %.3f seconds\n",
+                     unfoldedRel.getNumberOfStates(), mPropagatorCalls3, difftime);
     return result;
   }
 
@@ -254,9 +260,7 @@ public class PartialUnfolder
     final long key = event | ((long) beforeValue << mSourceShift) |
       ((long)afterValue<< mTargetShift);
     final int foundValue = mUnfoldedEventCache.get(key);
-    if (foundValue >= 0) {
-      return foundValue;
-    } else if (foundValue == UNSATISFIED_UNFOLDING) {
+    if (foundValue != MISSING_CACHE_ENTRY) {
       return foundValue;
     } else {
       mUnfoldingVariableContext.setCurrentValue(mRangeValues.get(beforeValue));
@@ -265,7 +269,7 @@ public class PartialUnfolder
       mConstraintPropagator.init(update);
       mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
       mConstraintPropagator.propagate();
-      mPropagatorCalls++;
+      mPropagatorCalls1++;
       if (!mConstraintPropagator.isUnsatisfiable()) {
         final ConstraintList unfoldedUpdate =
           mConstraintPropagator.getAllConstraints();
@@ -284,9 +288,7 @@ public class PartialUnfolder
   {
     final long key = event | ((long) beforeValue << mSourceShift);
     final int foundValue = mKnownAfterValueCache.get(key);
-    if (foundValue >= 0) {
-      return foundValue;
-    } else if (foundValue == UNKNOWN_AFTER_VALUE) {
+    if (foundValue != MISSING_CACHE_ENTRY) {
       return foundValue;
     } else {
       final ConstraintList update = mInputEventEncoding.getUpdate(event);
@@ -294,7 +296,7 @@ public class PartialUnfolder
       mUnfoldingVariableContext.setPrimedValue(null);
       mConstraintPropagator.init(update);
       mConstraintPropagator.propagate();
-      mPropagatorCalls++;
+      mPropagatorCalls2++;
       if (mConstraintPropagator.isUnsatisfiable()) {
         mKnownAfterValueCache.put(key, UNSATISFIED_UNFOLDING);
         return UNSATISFIED_UNFOLDING;
@@ -310,7 +312,7 @@ public class PartialUnfolder
           mUnfoldingVariableContext.setPrimedValue(afterExpr);
           mConstraintPropagator.init(update);
           mConstraintPropagator.propagate();
-          mPropagatorCalls++;
+          mPropagatorCalls3++;
         }
       }
       if (afterValue < 0 &&
@@ -379,30 +381,6 @@ public class PartialUnfolder
         }
       }
     }
-
-    /*
-    private void expand(final int source, final int beforeValue,
-                        final int event, final int targetState)
-      throws EvalException
-    {
-      final ConstraintList update = mInputEventEncoding.getUpdate(event);
-      if (mOccursChecker.occurs(mUnfoldedVariableNamePrimed, update)) {
-        for (int afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
-          final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, afterValue);
-          if (unfoldedEvent >= 0) {
-            final long targetPair = targetState | ((long) afterValue << 32);
-            newTransition(source, unfoldedEvent, targetPair);
-          }
-        }
-      } else {
-        final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, 0);
-        if (unfoldedEvent >= 0) {
-          final long targetPair = targetState | ((long) beforeValue << 32);
-          newTransition(source, unfoldedEvent, targetPair);
-        }
-      }
-    }
-    */
 
     private void expand(final int source, final int beforeValue,
                         final int event, final int targetState)
@@ -535,10 +513,12 @@ public class PartialUnfolder
   private ConstraintPropagator mConstraintPropagator;
   private EFSMVariableCollector mEFSMVariableCollector;
 
-  private int mPropagatorCalls;
+  private int mPropagatorCalls1;
+  private int mPropagatorCalls2;
+  private int mPropagatorCalls3;
 
-  private static final int UNKNOWN_UNFOLDING = -2;
   private static final int UNSATISFIED_UNFOLDING = -1;
-  private static final int UNKNOWN_AFTER_VALUE= -3;
+  private static final int UNKNOWN_AFTER_VALUE = -2;
+  private static final int MISSING_CACHE_ENTRY = -3;
 
 }

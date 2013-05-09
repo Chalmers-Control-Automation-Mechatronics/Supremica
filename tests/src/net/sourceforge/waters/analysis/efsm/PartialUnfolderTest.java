@@ -164,7 +164,6 @@ public class PartialUnfolderTest
     runPartialUnfolder(group, subdir, name);
   }
 
-
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runPartialUnfolder
