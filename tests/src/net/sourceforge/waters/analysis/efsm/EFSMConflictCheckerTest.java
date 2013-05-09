@@ -246,7 +246,7 @@ public class EFSMConflictCheckerTest
     final EFSMConflictChecker conflictChecker =
       new EFSMConflictChecker(module, mModuleFactory);
     configure(conflictChecker);
-    conflictChecker.setInternalTransitionLimit(5000000);
+//    conflictChecker.setInternalTransitionLimit(5000000);
     return conflictChecker.run();
   }
 
