@@ -66,6 +66,7 @@ public class PartialUnfolder
     mFactory = factory;
     mOperatorTable = op;
     mOccursChecker = OccursChecker.getInstance();
+    mEFSMVariableFinder = new EFSMVariableFinder(op);
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, op);
     mUnfoldingVariableContext = new UnfoldingVariableContext();
   }
@@ -90,9 +91,9 @@ public class PartialUnfolder
     System.err.println(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
     final long start = System.currentTimeMillis();
     mUnfoldedEventCache =
-      new TLongIntHashMap(0, 0.5f, UNKNOWN_UNFOLDING, UNKNOWN_UNFOLDING);
+      new TLongIntHashMap(0, 0.5f, MISSING_CACHE_ENTRY, MISSING_CACHE_ENTRY);
     mKnownAfterValueCache =
-      new TLongIntHashMap(0, 0.5f, UNKNOWN_UNFOLDING, UNKNOWN_UNFOLDING);
+      new TLongIntHashMap(0, 0.5f, MISSING_CACHE_ENTRY, MISSING_CACHE_ENTRY);
     mRootContext = system.getVariableContext();
     mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable,
                                                        mRootContext);
@@ -118,6 +119,7 @@ public class PartialUnfolder
         mSelfloops.add(selfloopEvent);
       }
     }
+    mUpdateInfo = new UpdateInfo[mInputEventEncoding.size()];
 
     final SimpleExpressionProxy initStatePredicate =
       var.getInitialStatePredicate();
@@ -240,7 +242,7 @@ public class PartialUnfolder
     final float difftime = 0.001f * (stop - start);
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(System.err);
-    formatter.format("%d states, %d propagator calls, %.3f seconds\n",
+    formatter.format("%d states, %d propagator1 calls, %.3f seconds\n",
                      unfoldedRel.getNumberOfStates(), mPropagatorCalls, difftime);
     return result;
   }
@@ -254,9 +256,7 @@ public class PartialUnfolder
     final long key = event | ((long) beforeValue << mSourceShift) |
       ((long)afterValue<< mTargetShift);
     final int foundValue = mUnfoldedEventCache.get(key);
-    if (foundValue >= 0) {
-      return foundValue;
-    } else if (foundValue == UNSATISFIED_UNFOLDING) {
+    if (foundValue != MISSING_CACHE_ENTRY) {
       return foundValue;
     } else {
       mUnfoldingVariableContext.setCurrentValue(mRangeValues.get(beforeValue));
@@ -284,9 +284,7 @@ public class PartialUnfolder
   {
     final long key = event | ((long) beforeValue << mSourceShift);
     final int foundValue = mKnownAfterValueCache.get(key);
-    if (foundValue >= 0) {
-      return foundValue;
-    } else if (foundValue == UNKNOWN_AFTER_VALUE) {
+    if (foundValue != MISSING_CACHE_ENTRY) {
       return foundValue;
     } else {
       final ConstraintList update = mInputEventEncoding.getUpdate(event);
@@ -312,10 +310,6 @@ public class PartialUnfolder
           mConstraintPropagator.propagate();
           mPropagatorCalls++;
         }
-      }
-      if (afterValue < 0 &&
-          !mOccursChecker.occurs(mUnfoldedVariableNamePrimed, update)) {
-        afterValue = beforeValue;
       }
       if (afterValue < 0) {
         mKnownAfterValueCache.put(key, UNKNOWN_AFTER_VALUE);
@@ -380,50 +374,69 @@ public class PartialUnfolder
       }
     }
 
-    /*
     private void expand(final int source, final int beforeValue,
                         final int event, final int targetState)
       throws EvalException
     {
-      final ConstraintList update = mInputEventEncoding.getUpdate(event);
-      if (mOccursChecker.occurs(mUnfoldedVariableNamePrimed, update)) {
-        for (int afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
-          final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, afterValue);
-          if (unfoldedEvent >= 0) {
-            final long targetPair = targetState | ((long) afterValue << 32);
-            newTransition(source, unfoldedEvent, targetPair);
-          }
-        }
-      } else {
-        final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, 0);
-        if (unfoldedEvent >= 0) {
-          final long targetPair = targetState | ((long) beforeValue << 32);
-          newTransition(source, unfoldedEvent, targetPair);
-        }
+      UpdateInfo info = mUpdateInfo[event];
+      if (info == null) {
+        mUpdateInfo[event] = info = new UpdateInfo(event);
       }
-    }
-    */
-
-    private void expand(final int source, final int beforeValue,
-                        final int event, final int targetState)
-      throws EvalException
-    {
-      int afterValue = getKnownAfterValue(event, beforeValue);
-      if (afterValue == UNSATISFIED_UNFOLDING) {
-        // no transition
-      } else if (afterValue == UNKNOWN_AFTER_VALUE) {
-        for (afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
-          final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, afterValue);
-          if (unfoldedEvent >= 0) {
+      if (!info.containsUnfoldedVariable()) {
+        // update does not contain x (unfolded var)
+        int unfoldedEvent = info.getUnfoldedEventNumber();
+        if (unfoldedEvent >= 0) {
+          // update does not contain x' or after-value is known
+          final int afterValue = info.getKnownAfterValue();
+          if (afterValue == UNCHANGED_AFTER_VALUE) {
+            final long targetPair = targetState | ((long) beforeValue << 32);
+            newTransition(source, unfoldedEvent, targetPair);
+          } else {
             final long targetPair = targetState | ((long) afterValue << 32);
             newTransition(source, unfoldedEvent, targetPair);
           }
+        } else {
+          // update does not contain x but x',
+          // and different after-values are possible
+          for (int afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
+            unfoldedEvent = getUnfoldedEvent(event, 0, afterValue);
+            if (unfoldedEvent >= 0) {
+              final long targetPair = targetState | ((long) afterValue << 32);
+              newTransition(source, unfoldedEvent, targetPair);
+            }
+          }
         }
       } else {
-        final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, afterValue);
-        if (unfoldedEvent >= 0) {
-          final long targetPair = targetState | ((long) afterValue << 32);
-          newTransition(source, unfoldedEvent, targetPair);
+        // update contains x
+        if (!info.containsUnfoldedPrimedVariable()) {
+          // update contains x but not x'
+          final int unfoldedEvent = getUnfoldedEvent(event, beforeValue, 0);
+          if (unfoldedEvent >= 0) {
+            final long targetPair = targetState | ((long) beforeValue << 32);
+            newTransition(source, unfoldedEvent, targetPair);
+          }
+        } else {
+          // update contains x and x'
+          int afterValue = getKnownAfterValue(event, beforeValue);
+          if (afterValue == UNSATISFIED_UNFOLDING) {
+            // no transition
+          } else if (afterValue == UNKNOWN_AFTER_VALUE) {
+            for (afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
+              final int unfoldedEvent =
+                getUnfoldedEvent(event, beforeValue, afterValue);
+              if (unfoldedEvent >= 0) {
+                final long targetPair = targetState | ((long) afterValue << 32);
+                newTransition(source, unfoldedEvent, targetPair);
+              }
+            }
+          } else {
+            final int unfoldedEvent =
+              getUnfoldedEvent(event, beforeValue, afterValue);
+            if (unfoldedEvent >= 0) {
+              final long targetPair = targetState | ((long) afterValue << 32);
+              newTransition(source, unfoldedEvent, targetPair);
+            }
+          }
         }
       }
     }
@@ -509,11 +522,99 @@ public class PartialUnfolder
     private SimpleExpressionProxy mPrimedValue;
   }
 
+
+
+  //#########################################################################
+  //# Inner Class StateExpander
+  private class UpdateInfo
+  {
+    //#######################################################################
+    //# Constructor
+    private UpdateInfo(final int event) throws EvalException
+    {
+      final ConstraintList update = mInputEventEncoding.getUpdate(event);
+      mEFSMVariableFinder.findVariable(update, mUnfoldedVariable);
+      mContainsUnfoldedVariable = mEFSMVariableFinder.containsVariable();
+      mContainsUnfoldedPrimedVariable =
+        mEFSMVariableFinder.containsPrimedVariable();
+      if (!mContainsUnfoldedVariable) {
+        if (!mContainsUnfoldedPrimedVariable) {
+          mUnfoldedEventNumber = mUnfoldedEventEncoding.createEventId(update);
+          mKnownAfterValue = UNCHANGED_AFTER_VALUE;
+        } else {
+          mUnfoldingVariableContext.setPrimedValue(null);
+          mConstraintPropagator.init(update);
+          mConstraintPropagator.propagate();
+          mPropagatorCalls++;
+          assert !mConstraintPropagator.isUnsatisfiable();
+          final VariableContext context = mConstraintPropagator.getContext();
+          final SimpleExpressionProxy afterExpr =
+            context.getBoundExpression(mUnfoldedVariableNamePrimed);
+          mUnfoldedEventNumber = MISSING_CACHE_ENTRY;
+          mKnownAfterValue = UNKNOWN_AFTER_VALUE;
+          if (afterExpr != null) {
+            final CompiledRange range = mUnfoldedVariable.getRange();
+            final int afterValue = range.indexOf(afterExpr);
+            if (afterValue >= 0) {
+              mKnownAfterValue = afterValue;
+              mUnfoldingVariableContext.setPrimedValue(afterExpr);
+              mConstraintPropagator.init(update);
+              mConstraintPropagator.propagate();
+              mPropagatorCalls++;
+              mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
+              final ConstraintList unfoldedUpdate =
+                mConstraintPropagator.getAllConstraints();
+              mUnfoldedEventNumber =
+                mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
+            }
+          }
+        }
+      } else {
+        mUnfoldedEventNumber = MISSING_CACHE_ENTRY;
+        if (!mContainsUnfoldedPrimedVariable) {
+          mKnownAfterValue = UNCHANGED_AFTER_VALUE;
+        } else {
+          mKnownAfterValue = UNKNOWN_AFTER_VALUE;
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private boolean containsUnfoldedVariable()
+    {
+      return mContainsUnfoldedVariable;
+    }
+
+    private boolean containsUnfoldedPrimedVariable()
+    {
+      return mContainsUnfoldedPrimedVariable;
+    }
+
+    private int getUnfoldedEventNumber()
+    {
+      return mUnfoldedEventNumber;
+    }
+
+    private int getKnownAfterValue()
+    {
+      return mKnownAfterValue;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final boolean mContainsUnfoldedVariable;
+    private final boolean mContainsUnfoldedPrimedVariable;
+    private int mUnfoldedEventNumber;
+    private int mKnownAfterValue;
+  }
+
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final OccursChecker mOccursChecker;
+  private final EFSMVariableFinder mEFSMVariableFinder;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final UnfoldingVariableContext mUnfoldingVariableContext;
   private boolean mSourceInfoEnabled;
@@ -521,6 +622,7 @@ public class PartialUnfolder
 
   private TLongIntHashMap mUnfoldedEventCache;
   private TLongIntHashMap mKnownAfterValueCache;
+  private UpdateInfo[] mUpdateInfo;
   private int mSourceShift;
   private int mTargetShift;
   private EFSMVariableContext mRootContext;
@@ -537,8 +639,9 @@ public class PartialUnfolder
 
   private int mPropagatorCalls;
 
-  private static final int UNKNOWN_UNFOLDING = -2;
   private static final int UNSATISFIED_UNFOLDING = -1;
-  private static final int UNKNOWN_AFTER_VALUE= -3;
+  private static final int UNKNOWN_AFTER_VALUE = -2;
+  private static final int UNCHANGED_AFTER_VALUE = -3;
+  private static final int MISSING_CACHE_ENTRY = -4;
 
 }
