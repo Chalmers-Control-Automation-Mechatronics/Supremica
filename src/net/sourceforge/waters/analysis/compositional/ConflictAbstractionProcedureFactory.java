@@ -45,9 +45,9 @@ public enum ConflictAbstractionProcedureFactory
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return ThreeStepConflictEquivalenceAbstractionProcedure.
-        createThreeStepConflictEquivalenceAbstractionProcedure
+        createNBAbstractionProcedure
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
-           OBSERVATION_EQUIVALENCE, false, false, true);
+           OBSERVATION_EQUIVALENCE, false, true);
     }
   },
   /**
@@ -107,9 +107,9 @@ public enum ConflictAbstractionProcedureFactory
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return ThreeStepConflictEquivalenceAbstractionProcedure.
-        createThreeStepConflictEquivalenceAbstractionProcedure
+        createNBAbstractionProcedure
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, false, true, false);
+           WEAK_OBSERVATION_EQUIVALENCE, true, false);
     }
   },
   /**
@@ -127,9 +127,9 @@ public enum ConflictAbstractionProcedureFactory
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return ThreeStepConflictEquivalenceAbstractionProcedure.
-        createThreeStepConflictEquivalenceAbstractionProcedure
+        createNBAAbstractionProcedure
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, true, true, false);
+           WEAK_OBSERVATION_EQUIVALENCE);
     }
   },
   /**
@@ -148,9 +148,9 @@ public enum ConflictAbstractionProcedureFactory
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return ThreeStepConflictEquivalenceAbstractionProcedure.
-        createThreeStepConflictEquivalenceAbstractionProcedure
+        createNBAbstractionProcedure
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, false, true, true);
+           WEAK_OBSERVATION_EQUIVALENCE, true, true);
     }
   },
   /**

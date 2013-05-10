@@ -23,6 +23,7 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.certainconf.CertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -51,10 +52,9 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
   //#########################################################################
   //# Factory Methods
   public static ThreeStepConflictEquivalenceAbstractionProcedure
-    createThreeStepConflictEquivalenceAbstractionProcedure
+    createNBAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer,
        final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
-       final boolean includeNonAlphaDeterminisation,
        final boolean useLimitedCertainConflicts,
        final boolean useProperCertainConflicts)
   {
@@ -100,20 +100,65 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
     postChain.add(bisimulator);
-    if (includeNonAlphaDeterminisation) {
-      final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-        new NonAlphaDeterminisationTRSimplifier();
-      nonAlphaDeterminiser.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-      nonAlphaDeterminiser.setTransitionLimit(limit);
-      postChain.add(nonAlphaDeterminiser);
-    }
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
     return new ThreeStepConflictEquivalenceAbstractionProcedure
       (analyzer, preChain, limitedCertainConflictsRemover,
        certainConflictsRemover, postChain);
+  }
+
+  public static ThreeStepConflictEquivalenceAbstractionProcedure
+    createNBAAbstractionProcedure
+      (final AbstractCompositionalModelAnalyzer analyzer,
+       final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
+  {
+    final int limit = analyzer.getInternalTransitionLimit();
+    final ChainTRSimplifier preChain = new ChainTRSimplifier();
+    final ChainTRSimplifier postChain = new ChainTRSimplifier();
+    final TauLoopRemovalTRSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    preChain.add(loopRemover);
+    final MarkingRemovalTRSimplifier markingRemover =
+      new MarkingRemovalTRSimplifier();
+    preChain.add(markingRemover);
+    final TransitionRemovalTRSimplifier transitionRemover =
+      new TransitionRemovalTRSimplifier();
+    transitionRemover.setTransitionLimit(limit);
+    preChain.add(transitionRemover);
+    final SilentIncomingTRSimplifier silentInRemover =
+      new SilentIncomingTRSimplifier();
+    silentInRemover.setRestrictsToUnreachableStates(true);
+    preChain.add(silentInRemover);
+    final OnlySilentOutgoingTRSimplifier silentOutRemover =
+      new OnlySilentOutgoingTRSimplifier();
+    preChain.add(silentOutRemover);
+    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover =
+      new LimitedCertainConflictsTRSimplifier();
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER);
+    bisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+    bisimulator.setTransitionLimit(limit);
+    postChain.add(bisimulator);
+    final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
+      new NonAlphaDeterminisationTRSimplifier();
+    nonAlphaDeterminiser.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+    nonAlphaDeterminiser.setTransitionLimit(limit);
+    postChain.add(nonAlphaDeterminiser);
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    incomingEquivalenceSimplifier.setTransitionLimit(limit);
+    postChain.add(incomingEquivalenceSimplifier);
+    final MarkingSaturationTRSimplifier saturator =
+      new MarkingSaturationTRSimplifier();
+    postChain.add(saturator);
+    return new ThreeStepConflictEquivalenceAbstractionProcedure
+      (analyzer, preChain, limitedCertainConflictsRemover, null, postChain);
   }
 
 
