@@ -152,6 +152,12 @@ public class EFSMConflictCheckerTest
     checkConflict("tests", "efsm", "efsm20", true);
   }
 
+  public void testPslBig()
+    throws IOException, WatersException
+  {
+    checkConflict("tests", "efsm", "pslBig", true);
+  }
+
   public void testPrimeSieve2a()
     throws IOException, WatersException
   {
@@ -187,6 +193,8 @@ public class EFSMConflictCheckerTest
   {
     checkConflict("efa", "prime_sieve6", true);
   }
+
+
   //#########################################################################
   //# Customisation
   void configure(final EFSMConflictChecker checker)

@@ -184,6 +184,8 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       mEFSMTRSimplifierFactory = EFSMTRSimplifierFactory.NB;
     }
     mSimplifier = mEFSMTRSimplifierFactory.createAbstractionProcedure(this);
+    mVariablePartitionComputer =
+      new EFSMVariablePartitionComputer(factory, mCompilerOperatorTable);
     mPartialUnfolder = new PartialUnfolder(factory, mCompilerOperatorTable);
     mEFSMSynchronization = new EFSMSynchronization(factory);
     mNonblockingChecker = new EFSMTRNonblockingChecker();
@@ -200,6 +202,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     mCompositionSelectionHeuristic = null;
     mEFSMTRSimplifierFactory = null;
     mSimplifier = null;
+    mVariablePartitionComputer = null;
     mPartialUnfolder = null;
     mEFSMSynchronization = null;
     mNonblockingChecker = null;
@@ -283,9 +286,11 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
           mCurrentEFSMSystem.removeVariable(varSelected);
           continue;
         }
+        final List<int[]> partition =
+          mVariablePartitionComputer.computePartition(varSelected, mCurrentEFSMSystem);
         final EFSMTransitionRelation unfoldTR =
           mPartialUnfolder.unfold(varEFSMTransitionRelation, varSelected,
-                                  mCurrentEFSMSystem);
+                                  mCurrentEFSMSystem, partition);
         EFSMTransitionRelation unfoldSimplified = null;
         if (efsmTransitionRelationList.size() > 1) {
           unfoldSimplified = simplify(unfoldTR);
@@ -551,6 +556,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
 
   private DocumentManager mDocumentManager;
   private EFSMTRSimplifier mSimplifier;
+  private EFSMVariablePartitionComputer mVariablePartitionComputer;
   private PartialUnfolder mPartialUnfolder;
   private CompositionSelectionHeuristic mCompositionSelectionHeuristic;
   private EFSMSynchronization mEFSMSynchronization;

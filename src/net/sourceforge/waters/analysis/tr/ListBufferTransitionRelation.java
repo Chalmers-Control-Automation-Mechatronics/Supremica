@@ -261,7 +261,7 @@ public class ListBufferTransitionRelation
    *          relation.
    * @param numProperEvents
    *          The number of proper events (i.e., not propositions) used by the
-   *          new transition relation.
+   *          new transition relation, including tau.
    * @param numPropositions
    *          The number of propositions used by the new transition relation.
    * @param numStates
