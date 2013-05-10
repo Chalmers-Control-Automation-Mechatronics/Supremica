@@ -163,6 +163,14 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testAGVMF() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "agv_mf";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testBallProcess() throws Exception
   {
     final String group = "tests";

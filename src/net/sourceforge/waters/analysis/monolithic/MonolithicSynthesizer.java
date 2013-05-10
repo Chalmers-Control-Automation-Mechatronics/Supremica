@@ -401,10 +401,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             }
           }
         } else {
-          mReduction.simplifyAutomaton(mTransitionRelation);
-          aut =
-            mTransitionRelation.createAutomaton(getFactory(),
-                                                getEventEncoding());
+          mReduction.removeBadStateTransitions(mTransitionRelation);
+          mTransitionRelation.removeProperSelfLoopEvents();
+          mTransitionRelation.removeRedundantPropositions();
+          aut = mTransitionRelation.createAutomaton(getFactory(),
+                                                    getEventEncoding());
           des = AutomatonTools.createProductDESProxy(aut, getFactory());
         }
         return setProxyResult(des);
