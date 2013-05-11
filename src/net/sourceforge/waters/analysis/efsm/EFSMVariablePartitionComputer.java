@@ -9,15 +9,20 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -25,6 +30,7 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -72,6 +78,7 @@ public class EFSMVariablePartitionComputer
     // where A contains only x (unfolded variable) and
     // B does not contain x.
     mRelevantUpdates = new ArrayList<ConstraintList>();
+    mMergibleUpdates = new THashSet<ConstraintList>();
     final EFSMTransitionRelation efsmTR = var.getTransitionRelation();
     final EFSMEventEncoding encoding = efsmTR.getEventEncoding();
     if (!checkEventEncoding(encoding)) {
@@ -82,7 +89,72 @@ public class EFSMVariablePartitionComputer
       return null;
     }
 
-    // 2. Create a transition relation for the variable automaton ...
+    // 2. Merge updates if possible ...
+    if (!mMergibleUpdates.isEmpty()) {
+      final EFSMEventEncoding mergedEventEncoding =
+        new EFSMEventEncoding(mRelevantUpdates.size());
+      for (final ConstraintList update : mRelevantUpdates) {
+        if (!mMergibleUpdates.contains(update)) {
+          mergedEventEncoding.createEventId(update);
+        }
+      }
+      final TIntObjectHashMap<List<ConstraintList>> mergedUpdates =
+        new TIntObjectHashMap<List<ConstraintList>>();
+      final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
+      final TransitionIterator iter = rel.createAnyReadOnlyIterator();
+      for (int fromState = 0; fromState < rel.getNumberOfStates(); fromState++) {
+        iter.resetState(fromState);
+        mergedUpdates.clear();
+        while (iter.advance()) {
+          final int event = iter.getCurrentEvent();
+          final ConstraintList update = encoding.getUpdate(event);
+          if (mMergibleUpdates.contains(update)) {
+            final int toState = iter.getCurrentToState();
+            List<ConstraintList> list = mergedUpdates.get(toState);
+            if (list == null) {
+              list = new ArrayList<ConstraintList>();
+              mergedUpdates.put(toState, list);
+            }
+            list.add(update);
+          }
+        }
+        final Comparator<SimpleExpressionProxy> comparator =
+          new ExpressionComparator(mCompilerOperatorTable);
+        final TIntObjectIterator<List<ConstraintList>> hIter =
+          mergedUpdates.iterator();
+        while (hIter.hasNext()) {
+          hIter.advance();
+          final List<ConstraintList> list = hIter.value();
+          if (list.size() == 1) {
+            final ConstraintList mergedUpdate = list.get(0);
+            mergedEventEncoding.createEventId(mergedUpdate);
+          } else {
+            final List<SimpleExpressionProxy> disjunction =
+              new ArrayList<SimpleExpressionProxy>(list.size());
+            for (final ConstraintList update : list) {
+              final SimpleExpressionProxy expr = update.createExpression
+              (mFactory, mCompilerOperatorTable.getAndOperator());
+              disjunction.add(expr);
+            }
+            final ConstraintList disjunctiveUpdate = new ConstraintList(disjunction);
+            disjunctiveUpdate.sort(comparator);
+            final SimpleExpressionProxy expr = disjunctiveUpdate.createExpression
+              (mFactory, mCompilerOperatorTable.getOrOperator());
+            final List<SimpleExpressionProxy> singleton = Collections.singletonList(expr);
+            final ConstraintList mergedUpdate = new ConstraintList(singleton);
+            mergedEventEncoding.createEventId(mergedUpdate);
+          }
+        }
+      }
+      final int mergedSize = mergedEventEncoding.size();
+      mRelevantUpdates =  new ArrayList<ConstraintList>(mergedSize);
+      for (int event = EventEncoding.NONTAU; event < mergedSize; event++) {
+        final ConstraintList update = mergedEventEncoding.getUpdate(event);
+        mRelevantUpdates.add(update);
+      }
+    }
+
+    // 3. Create a transition relation for the variable automaton ...
     final String name = var.getName();
     final int numEvents = mRelevantUpdates.size() + 1;
     final int numStates = var.getRange().size();
@@ -160,7 +232,7 @@ public class EFSMVariablePartitionComputer
       event++;
     }
 
-    // 3. Calculate partition using bisimulation algorithm
+    // 4. Calculate partition using bisimulation algorithm
     mBisimulator.setTransitionRelation(rel);
     if (mBisimulator.run()) {
       final List<int[]> partition = mBisimulator.getResultPartition();
@@ -193,6 +265,7 @@ public class EFSMVariablePartitionComputer
     final List<SimpleExpressionProxy> constraints = update.getConstraints();
     final List<SimpleExpressionProxy> relevantConstraints =
       new ArrayList<SimpleExpressionProxy>(constraints.size());
+    boolean mergible = true;
     for (final SimpleExpressionProxy expr : constraints) {
       variables.clear();
       mEFSMVariableCollector.collectAllVariables(expr, variables);
@@ -203,15 +276,23 @@ public class EFSMVariablePartitionComputer
         } else {
           relevantConstraints.add(expr);
         }
+      } else if (!variables.isEmpty()) {
+        mergible = false;
       }
     }
     if (!relevantConstraints.isEmpty()) {
       final ConstraintList relevantUpdate = new ConstraintList(relevantConstraints);
       mRelevantUpdates.add(relevantUpdate);
+      if (mergible) {
+        mMergibleUpdates.add(relevantUpdate);
+      }
     }
     return true;
   }
 
+
+  //#########################################################################
+  //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mCompilerOperatorTable;
   private EFSMVariableCollector mEFSMVariableCollector;
@@ -222,6 +303,7 @@ public class EFSMVariablePartitionComputer
 
   private EFSMVariable mEFSMVariable;
   private List<ConstraintList> mRelevantUpdates;
+  private Set<ConstraintList> mMergibleUpdates;
   private List<? extends SimpleExpressionProxy> mRangeValues;
 
 }
