@@ -83,7 +83,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     enabledEventsSilentIncomingSimplifier.setRestrictsToUnreachableStates(true);
     preChain.add(enabledEventsSilentIncomingSimplifier);
 
-
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     preChain.add(silentOutRemover);

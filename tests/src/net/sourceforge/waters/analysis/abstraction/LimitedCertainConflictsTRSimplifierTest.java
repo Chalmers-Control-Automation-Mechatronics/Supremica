@@ -9,12 +9,12 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 /**
@@ -45,6 +45,7 @@ public class LimitedCertainConflictsTRSimplifierTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest
+  @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     return new LimitedCertainConflictsTRSimplifier();
@@ -198,6 +199,24 @@ public class LimitedCertainConflictsTRSimplifierTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "limitedCertainConflicts_13.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_limitedCertainConflicts_14()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "limitedCertainConflicts_14.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_limitedCertainConflicts_15()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "limitedCertainConflicts_15.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

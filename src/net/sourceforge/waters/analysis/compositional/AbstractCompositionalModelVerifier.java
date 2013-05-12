@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -154,6 +156,27 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Configuration
+  /**
+   * Sets whether counterexample checking is enabled.
+   * If enabled, the generated counterexample is checked for correctness
+   * after each step during counterexample. This is a very slow process,
+   * and only recommend for testing and debugging.
+   * This setting is disabled by default.
+   */
+  public void setTraceCheckingEnabled(final boolean checking)
+  {
+    mTraceCheckingEnabled = checking;
+  }
+
+  /**
+   * Returns whether counterexample checking is enabled.
+   * @see #setTraceCheckingEnabled(boolean) setTraceCheckingEnabled()
+   */
+  public boolean isTraceCheckingEnabled()
+  {
+    return mTraceCheckingEnabled;
+  }
+
   protected void setMonolithicVerifier(final ModelVerifier verifier)
   {
     mMonolithicVerifier = verifier;
@@ -432,19 +455,21 @@ public abstract class AbstractCompositionalModelVerifier
     final int size = mAbstractionSteps.size();
     final ListIterator<AbstractionStep> iter =
       mAbstractionSteps.listIterator(size);
-    /*
-    final Collection<AutomatonProxy> check =
-      new THashSet<AutomatonProxy>(currentAutomata);
-    testCounterExample(traceSteps, check);
-    */
+    final Collection<AutomatonProxy> check;
+    if (mTraceCheckingEnabled) {
+      check = new THashSet<AutomatonProxy>(currentAutomata);
+      testCounterExample(traceSteps, check);
+    } else {
+      check = null;
+    }
     while (iter.hasPrevious()) {
       final AbstractionStep step = iter.previous();
       traceSteps = step.convertTraceSteps(traceSteps);
-      /*
-      check.removeAll(step.getResultAutomata());
-      check.addAll(step.getOriginalAutomata());
-      testCounterExample(traceSteps, check);
-      */
+      if (mTraceCheckingEnabled) {
+        check.removeAll(step.getResultAutomata());
+        check.addAll(step.getOriginalAutomata());
+        testCounterExample(traceSteps, check);
+      }
     }
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> modelAutomata = model.getAutomata();
@@ -556,6 +581,8 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Data Members
+  private boolean mTraceCheckingEnabled = false;
+
   private ModelVerifier mMonolithicVerifier;
   private ModelVerifier mCurrentMonolithicVerifier;
   private List<AbstractionStep> mAbstractionSteps;
