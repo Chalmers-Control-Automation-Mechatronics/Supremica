@@ -62,7 +62,9 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     mPreselecting = preselectingHeuristic;
     mSelecting = selectingHeuristic;
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
+
     mConflictChecker = new EnabledEventsCompositionalConflictChecker(factory);
+    mConflictChecker.setUsingSpecialEvents(true);
   }
 
 

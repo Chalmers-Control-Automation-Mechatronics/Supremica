@@ -27,6 +27,7 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -69,6 +70,9 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
     preChain.add(markingRemover);
+    final TransitionRemovalTRSimplifier transitionRemover =
+      new TransitionRemovalTRSimplifier();
+    preChain.add(transitionRemover);
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
@@ -207,7 +211,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           eventInfo  = enabledEventsAnalyzer.getEventInfo(event);
         if(eventInfo != null)
         //check if event is always enabled or this automaton is only disabler
-        if(eventInfo.isSingleDisablingAutomaton(aut)) {
+        if(eventInfo.isSingleDisablingCandidate(candidate)) {
           eventsList.add(event);
           // Count how many enabled events there are
           if(event != tau) {   //Tau is added to the list here but not counted as always Enabled.
@@ -220,7 +224,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         //Get event info somewhere
         final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
         //Adds the prepositions and other events.
-        if (eventInfo == null || !eventInfo.isSingleDisablingAutomaton(aut)) {
+        if (eventInfo == null || !eventInfo.isSingleDisablingCandidate(candidate)) {
           eventsList.add(events);
         }
 

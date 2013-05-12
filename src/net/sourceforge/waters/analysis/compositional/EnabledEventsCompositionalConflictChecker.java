@@ -462,6 +462,15 @@ public class EnabledEventsCompositionalConflictChecker extends
              (mDisablingAutomata.size() == 1 && mDisablingAutomata.contains(aut));
     }
 
+    /**
+     *
+     * returns true if the candidate is the only disabling candidate
+     */
+    boolean isSingleDisablingCandidate(final Candidate candidate)
+    {
+      return candidate.getAutomata().containsAll(mDisablingAutomata);
+    }
+
     @Override
     void removeAutomata(final Collection<AutomatonProxy> victims)
     {
