@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.expr;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -85,6 +86,12 @@ public abstract class AbstractExpressionTest extends TestCase
     throws ParseException
   {
     testExpression("1---100", mExpr_1minusmm100, Operator.TYPE_INT);
+  }
+
+  public void testExpression_1mod2()
+    throws ParseException
+  {
+    testExpression("a % 2", mExpr_amod2, Operator.TYPE_INT);
   }
 
   public void testExpression_1plus1_nospace()
@@ -303,6 +310,12 @@ public abstract class AbstractExpressionTest extends TestCase
         Operator.TYPE_INT);
   }
 
+  public void testExpression_notamod2()
+    throws ParseException
+  {
+    testExpression("!(a % 2)", mExpr_notamod2, Operator.TYPE_BOOLEAN);
+  }
+
   public void testExpression_1_multi()
     throws ParseException
   {
@@ -420,6 +433,7 @@ public abstract class AbstractExpressionTest extends TestCase
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
   {
     final ModuleProxyFactory factory = getFactory();
@@ -430,6 +444,7 @@ public abstract class AbstractExpressionTest extends TestCase
     final BinaryOperator plus = optable.getBinaryOperator("+");
     final BinaryOperator minus = optable.getBinaryOperator("-");
     final BinaryOperator times = optable.getBinaryOperator("*");
+    final BinaryOperator mod = optable.getBinaryOperator("%");
     final BinaryOperator equals = optable.getBinaryOperator("==");
     final BinaryOperator range = optable.getBinaryOperator("..");
     final UnaryOperator not = optable.getUnaryOperator("!");
@@ -493,9 +508,13 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_m_a = factory.createUnaryExpressionProxy(uminus, mExpr_a.clone());
     mExpr_aminus1 = factory.createBinaryExpressionProxy
       (minus, mExpr_a.clone(), mExpr_1.clone());
+    mExpr_amod2 = factory.createBinaryExpressionProxy
+      (mod, mExpr_a.clone(), mExpr_2.clone());;
     mExpr_aprime = factory.createUnaryExpressionProxy(prime, mExpr_a.clone());
     mExpr_aprimeplus1 = factory.createBinaryExpressionProxy
       (plus, mExpr_aprime.clone(), mExpr_1.clone());
+    mExpr_notamod2 = factory.createUnaryExpressionProxy
+      (not, mExpr_amod2.clone());
     mExpr_notaprime = factory.createUnaryExpressionProxy
       (not, mExpr_aprime.clone());
     idlist.add(mExpr_a.clone());
@@ -520,6 +539,7 @@ public abstract class AbstractExpressionTest extends TestCase
                                                         mExpr_event_1.clone());
   }
 
+  @Override
   protected void tearDown()
   {
     mParser = null;
@@ -540,7 +560,6 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_1plus1eq2 = null;
     mExpr_1plus1plus2 = null;
     mExpr_1plusm2 = null;
-    mExpr_garble1plusgarble2 = null;
     mExpr_1times2 = null;
     mExpr_1to2 = null;
     mExpr_2eq1plus1 = null;
@@ -551,11 +570,14 @@ public abstract class AbstractExpressionTest extends TestCase
     mExpr_2plus1 = null;
     mExpr_2plus1minusa = null;
     mExpr_2plus1plus1 = null;
+    mExpr_garble1plusgarble2 = null;
     mExpr_m100tom2 = null;
     mExpr_m_a = null;
     mExpr_aminus1 = null;
+    mExpr_amod2 = null;
     mExpr_aprime = null;
     mExpr_aprimeplus1 = null;
+    mExpr_notamod2 = null;
     mExpr_notaprime = null;
     mExpr_a_b_c = null;
     mExpr_event_1 = null;
@@ -602,9 +624,11 @@ public abstract class AbstractExpressionTest extends TestCase
   private SimpleIdentifierProxy mExpr_garble2;
   private SimpleExpressionProxy mExpr_m100tom2;
   private SimpleExpressionProxy mExpr_m_a;
+  private SimpleExpressionProxy mExpr_amod2;
   private SimpleExpressionProxy mExpr_aprime;
   private SimpleExpressionProxy mExpr_aprimeplus1;
   private SimpleExpressionProxy mExpr_aminus1;
+  private SimpleExpressionProxy mExpr_notamod2;
   private SimpleExpressionProxy mExpr_notaprime;
   private SimpleExpressionProxy mExpr_a_b_c;
   private IndexedIdentifierProxy mExpr_event_1;

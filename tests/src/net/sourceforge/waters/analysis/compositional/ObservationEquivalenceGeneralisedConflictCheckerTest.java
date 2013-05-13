@@ -39,6 +39,7 @@ public class ObservationEquivalenceGeneralisedConflictCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ConflictChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
@@ -48,6 +49,7 @@ public class ObservationEquivalenceGeneralisedConflictCheckerTest
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
+    checker.setTraceCheckingEnabled(true);
     return checker;
   }
 

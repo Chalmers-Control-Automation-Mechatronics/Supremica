@@ -130,6 +130,7 @@ public class ConstraintPropagator
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mPrimedVariables = new ProxyAccessorHashSet<UnaryExpressionProxy>(eq);
     mIsUnsatisfiable = false;
+    mNumberOfInvocations = 0;
   }
 
   /**
@@ -161,6 +162,7 @@ public class ConstraintPropagator
     mPrimedVariables = new ProxyAccessorHashSet<UnaryExpressionProxy>
       (eq, propagator.mPrimedVariables);
     mIsUnsatisfiable = propagator.mIsUnsatisfiable;
+    mNumberOfInvocations = 0;
   }
 
 
@@ -337,6 +339,7 @@ public class ConstraintPropagator
   public void propagate()
     throws EvalException
   {
+    mNumberOfInvocations++;
     outer:
     while (!mIsUnsatisfiable) {
       if (!mUnprocessedConstraints.isEmpty()) {
@@ -458,6 +461,16 @@ public class ConstraintPropagator
   public VariableContext getContext()
   {
     return mContext;
+  }
+
+
+  /**
+   * Returns the number of times the {@link #propagate()} method of this
+   * constraint propagator has been called since its creation.
+   */
+  public int getNumberOfInvocations()
+  {
+    return mNumberOfInvocations;
   }
 
 
@@ -1248,5 +1261,6 @@ public class ConstraintPropagator
   private final Collection<SimpleExpressionProxy> mNormalizedConstraints;
   private final ProxyAccessorSet<UnaryExpressionProxy> mPrimedVariables;
   private boolean mIsUnsatisfiable;
+  private int mNumberOfInvocations;
 
 }

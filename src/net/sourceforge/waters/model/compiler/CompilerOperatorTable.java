@@ -277,6 +277,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public BinaryExpressionProxy createExpression
       (final ModuleProxyFactory factory,
        final SimpleExpressionProxy lhs,
@@ -286,6 +287,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return factory.createBinaryExpressionProxy(text, this, lhs, rhs);
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -330,6 +332,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public int getPriority()
     {
       return PRIORITY_UNARY;
@@ -337,11 +340,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.UnaryOperator
+    @Override
     public boolean isPrefix()
     {
       return true;
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final UnaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -377,21 +382,25 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getLHSTypes()
     {
       return Operator.TYPE_INT;
     }
 
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_INT;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       return lhsType & rhsType & Operator.TYPE_INT;
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -415,6 +424,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getAssociativity()
     {
       return BinaryOperator.ASSOC_LEFT;
@@ -435,11 +445,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_PLUS;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_PLUS;
@@ -447,11 +459,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public boolean isSymmetric()
     {
       return true;
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -478,6 +492,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    @Override
     int eval(final int lhs, final int rhs)
     {
       return lhs + rhs;
@@ -493,11 +508,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_MINUS;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_PLUS;
@@ -505,11 +522,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public boolean isSymmetric()
     {
       return false;
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -543,6 +562,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    @Override
     int eval(final int lhs, final int rhs)
     {
       return lhs - rhs;
@@ -558,11 +578,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_TIMES;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_TIMES;
@@ -570,11 +592,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public boolean isSymmetric()
     {
       return true;
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -629,6 +653,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    @Override
     int eval(final int lhs, final int rhs)
     {
       return lhs * rhs;
@@ -644,11 +669,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_DIVIDE;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_TIMES;
@@ -656,6 +683,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public boolean isSymmetric()
     {
       return false;
@@ -663,6 +691,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    @Override
     int eval(final int lhs, final int rhs)
       throws DivisionByZeroException
     {
@@ -683,11 +712,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_MODULO;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_TIMES;
@@ -695,6 +726,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public boolean isSymmetric()
     {
       return false;
@@ -702,6 +734,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    @Override
     int eval(final int lhs, final int rhs)
       throws DivisionByZeroException
     {
@@ -727,16 +760,19 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.UnaryOperator
+    @Override
     public int getArgTypes()
     {
       return Operator.TYPE_INT;
     }
 
+    @Override
     public int getReturnTypes(final int argType)
     {
       return argType & Operator.TYPE_INT;
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final UnaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -768,6 +804,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_MINUS;
@@ -775,6 +812,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractUnaryIntOperator
+    @Override
     int eval(final int arg)
     {
       return -arg;
@@ -795,21 +833,25 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getLHSTypes()
     {
       return Operator.TYPE_ANY;
     }
 
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_ANY;
     }
 
+    @Override
     public boolean isSymmetric()
     {
       return true;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       if ((lhsType & rhsType) != 0) {
@@ -819,11 +861,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
+    @Override
     public int getAssociativity()
     {
       return BinaryOperator.ASSOC_RIGHT;
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -864,11 +908,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_EQUALS;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_EQUALS;
@@ -876,6 +922,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Base Class AbstractBinaryEqualsOperator
+    @Override
     boolean getEqualsResult()
     {
       return true;
@@ -892,11 +939,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_NOTEQUALS;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_EQUALS;
@@ -904,6 +953,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Base Class AbstractBinaryEqualsOperator
+    @Override
     boolean getEqualsResult()
     {
       return false;
@@ -924,21 +974,25 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getLHSTypes()
     {
       return Operator.TYPE_INT;
     }
 
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_INT;
     }
 
+    @Override
     public boolean isSymmetric()
     {
       return false;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       if ((lhsType & rhsType & Operator.TYPE_INT) != 0) {
@@ -948,6 +1002,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -977,11 +1032,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getPriority()
     {
       return PRIORITY_EQUALS;
     }
 
+    @Override
     public int getAssociativity()
     {
       return BinaryOperator.ASSOC_RIGHT;
@@ -1005,6 +1062,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_GREATER_THAN;
@@ -1012,11 +1070,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    @Override
     boolean includesEquality()
     {
       return false;
     }
 
+    @Override
     boolean eval(final int lhs, final int rhs)
     {
       return lhs > rhs;
@@ -1033,6 +1093,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_GREATER_EQUALS;
@@ -1040,11 +1101,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    @Override
     boolean includesEquality()
     {
       return true;
     }
 
+    @Override
     boolean eval(final int lhs, final int rhs)
     {
       return lhs >= rhs;
@@ -1060,6 +1123,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_LESS_THAN;
@@ -1067,11 +1131,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    @Override
     boolean includesEquality()
     {
       return false;
     }
 
+    @Override
     boolean eval(final int lhs, final int rhs)
     {
       return lhs < rhs;
@@ -1088,6 +1154,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_LESS_EQUALS;
@@ -1095,11 +1162,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    @Override
     boolean includesEquality()
     {
       return true;
     }
 
+    @Override
     boolean eval(final int lhs, final int rhs)
     {
       return lhs <= rhs;
@@ -1120,26 +1189,36 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getLHSTypes()
     {
-      return Operator.TYPE_BOOLEAN;
+      return Operator.TYPE_BOOLEAN | Operator.TYPE_INT;
     }
 
+    @Override
     public int getRHSTypes()
     {
-      return Operator.TYPE_BOOLEAN;
+      return Operator.TYPE_BOOLEAN | Operator.TYPE_INT;
     }
 
+    @Override
     public boolean isSymmetric()
     {
       return true;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
-      return lhsType & rhsType & Operator.TYPE_BOOLEAN;
+      if ((lhsType & (Operator.TYPE_BOOLEAN | Operator.TYPE_INT)) != 0 &&
+          (rhsType & (Operator.TYPE_BOOLEAN | Operator.TYPE_INT)) != 0) {
+        return Operator.TYPE_BOOLEAN;
+      } else {
+        return 0;
+        }
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -1163,6 +1242,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getAssociativity()
     {
       return BinaryOperator.ASSOC_LEFT;
@@ -1183,11 +1263,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_AND;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_AND;
@@ -1195,6 +1277,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -1225,6 +1308,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryBooleanOperator
+    @Override
     boolean eval(final boolean lhs, final boolean rhs)
     {
       return lhs && rhs;
@@ -1240,11 +1324,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_OR;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_OR;
@@ -1252,6 +1338,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -1282,6 +1369,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryBooleanOperator
+    @Override
     boolean eval(final boolean lhs, final boolean rhs)
     {
       return lhs || rhs;
@@ -1302,16 +1390,23 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.UnaryOperator
+    @Override
     public int getArgTypes()
     {
-      return Operator.TYPE_BOOLEAN;
+      return Operator.TYPE_BOOLEAN | Operator.TYPE_INT;
     }
 
+    @Override
     public int getReturnTypes(final int argType)
     {
-      return argType & Operator.TYPE_BOOLEAN;
+      if ((argType & (Operator.TYPE_BOOLEAN | Operator.TYPE_INT)) != 0) {
+        return Operator.TYPE_BOOLEAN;
+      } else {
+        return 0;
+      }
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final UnaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -1343,6 +1438,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_NOT;
@@ -1350,6 +1446,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractUnaryBooleanOperator
+    @Override
     boolean eval(final boolean arg)
     {
       return !arg;
@@ -1366,11 +1463,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_RANGE;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_RANGE;
@@ -1379,26 +1478,31 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getAssociativity()
     {
       return BinaryOperator.ASSOC_NONE;
     }
 
+    @Override
     public int getLHSTypes()
     {
       return Operator.TYPE_INT;
     }
 
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_INT;
     }
 
+    @Override
     public boolean isSymmetric()
     {
       return false;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       if ((lhsType & rhsType & Operator.TYPE_INT) != 0) {
@@ -1408,6 +1512,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -1443,6 +1548,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public int getPriority()
     {
       return PRIORITY_ASSIGNMENT;
@@ -1450,21 +1556,25 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getLHSTypes()
     {
       return Operator.TYPE_NAME;
     }
 
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_ANY;
     }
 
+    @Override
     public boolean isSymmetric()
     {
       return false;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       if ((lhsType & Operator.TYPE_NAME) != 0) {
@@ -1474,6 +1584,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       }
     }
 
+    @Override
     public int getAssociativity()
     {
       return BinaryOperator.ASSOC_RIGHT;
@@ -1490,6 +1601,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_ASSIGNMENT;
@@ -1506,11 +1618,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_INT;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       if ((rhsType & Operator.TYPE_INT) != 0) {
@@ -1522,6 +1636,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_INCREMENT;
@@ -1538,11 +1653,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_INT;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       if ((rhsType & Operator.TYPE_INT) != 0) {
@@ -1554,6 +1671,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_DECREMENT;
@@ -1570,11 +1688,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_BOOLEAN;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       if ((rhsType & Operator.TYPE_BOOLEAN) != 0) {
@@ -1586,6 +1706,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_ANDWITH;
@@ -1602,11 +1723,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_BOOLEAN;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       if ((rhsType & Operator.TYPE_BOOLEAN) != 0) {
@@ -1618,6 +1741,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_ORWITH;
@@ -1638,11 +1762,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_QUAL;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_QUAL;
@@ -1650,31 +1776,37 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    @Override
     public int getLHSTypes()
     {
       return Operator.TYPE_NAME;
     }
 
+    @Override
     public int getRHSTypes()
     {
       return Operator.TYPE_NAME;
     }
 
+    @Override
     public boolean isSymmetric()
     {
       return false;
     }
 
+    @Override
     public int getReturnTypes(final int lhsType, final int rhsType)
     {
       return lhsType & rhsType & Operator.TYPE_NAME;
     }
 
+    @Override
     public int getAssociativity()
     {
       return BinaryOperator.ASSOC_RIGHT;
     }
 
+    @Override
     public QualifiedIdentifierProxy createExpression
       (final ModuleProxyFactory factory,
        final SimpleExpressionProxy lhs,
@@ -1685,6 +1817,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
         (text, (IdentifierProxy) lhs, (IdentifierProxy) rhs);
     }
 
+    @Override
     public SimpleExpressionProxy simplify
       (final BinaryExpressionProxy expr,
        final AbstractSimpleExpressionSimplifier simplifier)
@@ -1717,11 +1850,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
     public String getName()
     {
       return OPNAME_NEXT;
     }
 
+    @Override
     public int getPriority()
     {
       return PRIORITY_NEXT;
@@ -1729,16 +1864,19 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.UnaryOperator
+    @Override
     public boolean isPrefix()
     {
       return false;
     }
 
+    @Override
     public int getArgTypes()
     {
       return Operator.TYPE_NAME;
     }
 
+    @Override
     public int getReturnTypes(final int argType)
     {
       return argType & Operator.TYPE_INDEX;

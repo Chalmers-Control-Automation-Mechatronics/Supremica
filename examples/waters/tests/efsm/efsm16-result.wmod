@@ -348,13 +348,12 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==">
+                                <UnaryExpression Operator="!">
                                     <BinaryExpression Operator="%">
                                         <SimpleIdentifier Name="x2"/>
                                         <IntConstant Value="2"/>
                                     </BinaryExpression>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
+                                </UnaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-26" Y="26"/>
