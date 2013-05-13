@@ -210,7 +210,10 @@
         <include name="net/sourceforge/waters/**/*.class"/>
         <include name="net/sourceforge/waters/**/*.xsd"/>
         <include name="net/sourceforge/waters/**/*.xsl"/>
-        <exclude name="net/sourceforge/waters/analysis/**"/>
+        <exclude name="net/sourceforge/waters/analysis/bdd/**"/>
+        <exclude name="net/sourceforge/waters/analysis/comp552/**"/>
+        <exclude name="net/sourceforge/waters/analysis/distributed/**"/>
+        <exclude name="net/sourceforge/waters/analysis/po/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/samples/**"/>
@@ -616,7 +619,6 @@
       </packageset>
       <packageset dir="${supremica.src}">
         <include name="net/sourceforge/waters/**"/>
-        <exclude name="net/sourceforge/waters/analysis/modular/supremica/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/external/promela/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
@@ -640,6 +642,15 @@
     <mkdir dir="${javadoc552}/src"/>
     <copy todir="${javadoc552}/src">
       <fileset dir="${supremica.src}">
+        <exclude name="net/sourceforge/waters/analysis/**"/>
+        <include name="net/sourceforge/waters/model/**"/>
+        <exclude name="net/sourceforge/waters/model/analysis/**"/>
+        <include name="net/sourceforge/waters/plain/**"/>
+        <include name="net/sourceforge/waters/external/valid/**"/>
+      </fileset>
+    </copy>
+    <copy todir="${javadoc552}/src">
+      <fileset dir="${supremica.src}">
         <include
           name="net/sourceforge/waters/analysis/comp552/BDDConflictChecker.java"/>
         <include
@@ -649,10 +660,6 @@
         <include name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.java"/>
         <include
           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
-        <include name="net/sourceforge/waters/model/**"/>
-        <exclude name="net/sourceforge/waters/model/analysis/**"/>
-        <include name="net/sourceforge/waters/plain/**"/>
-        <include name="net/sourceforge/waters/external/valid/**"/>
       </fileset>
     </copy>
     <javadoc destdir="${javadoc552}" windowtitle="Waters API">
