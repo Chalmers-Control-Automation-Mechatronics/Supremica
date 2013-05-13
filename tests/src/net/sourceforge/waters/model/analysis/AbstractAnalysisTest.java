@@ -56,6 +56,7 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     super(name);
   }
 
+  @Override
   protected void setUp() throws Exception
   {
     super.setUp();

@@ -38,13 +38,14 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-public class EFSMVariablePartitionComputer
+public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
 {
   //#########################################################################
   //# Constructors
   public EFSMVariablePartitionComputer(final ModuleProxyFactory factory,
                                        final CompilerOperatorTable op)
   {
+    super(false);
     mFactory = factory;
     mCompilerOperatorTable = op;
     mEFSMVariableFinder = new EFSMVariableFinder(op);
@@ -59,192 +60,205 @@ public class EFSMVariablePartitionComputer
   {
     System.err.println("Computing partition for " + var.getName() + " (" +
                        var.getRange().size() + " states) ...");
+    final EFSMSimplifierStatistics statistics = getStatistics();
+    statistics.recordStart(var);
+    final long start = System.currentTimeMillis();
     mEFSMVariable = var;
-    mEFSMVariableCollector =
-      new EFSMVariableCollector(mCompilerOperatorTable,
-                                system.getVariableContext());
-    mUnfoldingVariableContext =
-      new UnfoldingVariableContext(mCompilerOperatorTable,
-                                   system.getVariableContext(), var);
-    mConstraintPropagator = new ConstraintPropagator(mFactory,
-                                                     mCompilerOperatorTable,
-                                                     mUnfoldingVariableContext);
-    mRangeValues = var.getRange().getValues();
-    final SimpleExpressionProxy efsmVariableName = var.getVariableName();
-    final SimpleExpressionProxy efsmVariableNamePrimed = var.getPrimedVariableName();
+    List<int[]> partition = null;
+    try {
+      setUp();
+      mEFSMVariableCollector =
+        new EFSMVariableCollector(mCompilerOperatorTable,
+                                  system.getVariableContext());
+      mUnfoldingVariableContext =
+        new UnfoldingVariableContext(mCompilerOperatorTable,
+                                     system.getVariableContext(), var);
+      mConstraintPropagator = new ConstraintPropagator(mFactory,
+                                                       mCompilerOperatorTable,
+                                                       mUnfoldingVariableContext);
+      mRangeValues = var.getRange().getValues();
+      final SimpleExpressionProxy efsmVariableName = var.getVariableName();
+      final SimpleExpressionProxy efsmVariableNamePrimed = var.getPrimedVariableName();
 
-    // 1. Check whether updates are feasible, and collect them ...
-    // An update is feasible if it can be written as A & B,
-    // where A contains only x (unfolded variable) and
-    // B does not contain x.
-    mRelevantUpdates = new ArrayList<ConstraintList>();
-    mMergibleUpdates = new THashSet<ConstraintList>();
-    final EFSMTransitionRelation efsmTR = var.getTransitionRelation();
-    final EFSMEventEncoding encoding = efsmTR.getEventEncoding();
-    if (!checkEventEncoding(encoding)) {
-      return null;
-    }
-    final EFSMEventEncoding selfloops = system.getSelfloops();
-    if (!checkEventEncoding(selfloops)) {
-      return null;
-    }
+      // 1. Check whether updates are feasible, and collect them ...
+      // An update is feasible if it can be written as A & B,
+      // where A contains only x (unfolded variable) and
+      // B does not contain x.
+      mRelevantUpdates = new ArrayList<ConstraintList>();
+      mMergibleUpdates = new THashSet<ConstraintList>();
+      final EFSMTransitionRelation efsmTR = var.getTransitionRelation();
+      final EFSMEventEncoding encoding = efsmTR.getEventEncoding();
+      if (!checkEventEncoding(encoding)) {
+        return null;
+      }
+      final EFSMEventEncoding selfloops = system.getSelfloops();
+      if (!checkEventEncoding(selfloops)) {
+        return null;
+      }
 
-    // 2. Merge updates if possible ...
-    if (!mMergibleUpdates.isEmpty()) {
-      final EFSMEventEncoding mergedEventEncoding =
-        new EFSMEventEncoding(mRelevantUpdates.size());
+      // 2. Merge updates if possible ...
+      if (!mMergibleUpdates.isEmpty()) {
+        final EFSMEventEncoding mergedEventEncoding =
+          new EFSMEventEncoding(mRelevantUpdates.size());
+        for (final ConstraintList update : mRelevantUpdates) {
+          if (!mMergibleUpdates.contains(update)) {
+            mergedEventEncoding.createEventId(update);
+          }
+        }
+        final TIntObjectHashMap<List<ConstraintList>> mergedUpdates =
+          new TIntObjectHashMap<List<ConstraintList>>();
+        final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
+        final TransitionIterator iter = rel.createAnyReadOnlyIterator();
+        for (int fromState = 0; fromState < rel.getNumberOfStates(); fromState++) {
+          iter.resetState(fromState);
+          mergedUpdates.clear();
+          while (iter.advance()) {
+            final int event = iter.getCurrentEvent();
+            final ConstraintList update = encoding.getUpdate(event);
+            if (mMergibleUpdates.contains(update)) {
+              final int toState = iter.getCurrentToState();
+              List<ConstraintList> list = mergedUpdates.get(toState);
+              if (list == null) {
+                list = new ArrayList<ConstraintList>();
+                mergedUpdates.put(toState, list);
+              }
+              list.add(update);
+            }
+          }
+          final Comparator<SimpleExpressionProxy> comparator =
+            new ExpressionComparator(mCompilerOperatorTable);
+          final TIntObjectIterator<List<ConstraintList>> hIter =
+            mergedUpdates.iterator();
+          while (hIter.hasNext()) {
+            hIter.advance();
+            final List<ConstraintList> list = hIter.value();
+            if (list.size() == 1) {
+              final ConstraintList mergedUpdate = list.get(0);
+              mergedEventEncoding.createEventId(mergedUpdate);
+            } else {
+              final List<SimpleExpressionProxy> disjunction =
+                new ArrayList<SimpleExpressionProxy>(list.size());
+              for (final ConstraintList update : list) {
+                final SimpleExpressionProxy expr = update.createExpression
+                  (mFactory, mCompilerOperatorTable.getAndOperator());
+                disjunction.add(expr);
+              }
+              final ConstraintList disjunctiveUpdate = new ConstraintList(disjunction);
+              disjunctiveUpdate.sort(comparator);
+              final SimpleExpressionProxy expr = disjunctiveUpdate.createExpression
+                (mFactory, mCompilerOperatorTable.getOrOperator());
+              final List<SimpleExpressionProxy> singleton = Collections.singletonList(expr);
+              final ConstraintList mergedUpdate = new ConstraintList(singleton);
+              mergedEventEncoding.createEventId(mergedUpdate);
+            }
+          }
+        }
+        final int mergedSize = mergedEventEncoding.size();
+        mRelevantUpdates =  new ArrayList<ConstraintList>(mergedSize);
+        for (int event = EventEncoding.NONTAU; event < mergedSize; event++) {
+          final ConstraintList update = mergedEventEncoding.getUpdate(event);
+          mRelevantUpdates.add(update);
+        }
+      }
+
+      // 3. Create a transition relation for the variable automaton ...
+      final String name = var.getName();
+      final int numEvents = mRelevantUpdates.size() + 1;
+      final int numStates = var.getRange().size();
+      final int config = ListBufferTransitionRelation.CONFIG_PREDECESSORS;
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(name, ComponentKind.PLANT,
+                                         numEvents, 0, numStates, config);
+      int event = EventEncoding.NONTAU;
       for (final ConstraintList update : mRelevantUpdates) {
-        if (!mMergibleUpdates.contains(update)) {
-          mergedEventEncoding.createEventId(update);
-        }
-      }
-      final TIntObjectHashMap<List<ConstraintList>> mergedUpdates =
-        new TIntObjectHashMap<List<ConstraintList>>();
-      final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
-      final TransitionIterator iter = rel.createAnyReadOnlyIterator();
-      for (int fromState = 0; fromState < rel.getNumberOfStates(); fromState++) {
-        iter.resetState(fromState);
-        mergedUpdates.clear();
-        while (iter.advance()) {
-          final int event = iter.getCurrentEvent();
-          final ConstraintList update = encoding.getUpdate(event);
-          if (mMergibleUpdates.contains(update)) {
-            final int toState = iter.getCurrentToState();
-            List<ConstraintList> list = mergedUpdates.get(toState);
-            if (list == null) {
-              list = new ArrayList<ConstraintList>();
-              mergedUpdates.put(toState, list);
-            }
-            list.add(update);
-          }
-        }
-        final Comparator<SimpleExpressionProxy> comparator =
-          new ExpressionComparator(mCompilerOperatorTable);
-        final TIntObjectIterator<List<ConstraintList>> hIter =
-          mergedUpdates.iterator();
-        while (hIter.hasNext()) {
-          hIter.advance();
-          final List<ConstraintList> list = hIter.value();
-          if (list.size() == 1) {
-            final ConstraintList mergedUpdate = list.get(0);
-            mergedEventEncoding.createEventId(mergedUpdate);
-          } else {
-            final List<SimpleExpressionProxy> disjunction =
-              new ArrayList<SimpleExpressionProxy>(list.size());
-            for (final ConstraintList update : list) {
-              final SimpleExpressionProxy expr = update.createExpression
-              (mFactory, mCompilerOperatorTable.getAndOperator());
-              disjunction.add(expr);
-            }
-            final ConstraintList disjunctiveUpdate = new ConstraintList(disjunction);
-            disjunctiveUpdate.sort(comparator);
-            final SimpleExpressionProxy expr = disjunctiveUpdate.createExpression
-              (mFactory, mCompilerOperatorTable.getOrOperator());
-            final List<SimpleExpressionProxy> singleton = Collections.singletonList(expr);
-            final ConstraintList mergedUpdate = new ConstraintList(singleton);
-            mergedEventEncoding.createEventId(mergedUpdate);
-          }
-        }
-      }
-      final int mergedSize = mergedEventEncoding.size();
-      mRelevantUpdates =  new ArrayList<ConstraintList>(mergedSize);
-      for (int event = EventEncoding.NONTAU; event < mergedSize; event++) {
-        final ConstraintList update = mergedEventEncoding.getUpdate(event);
-        mRelevantUpdates.add(update);
-      }
-    }
-
-    // 3. Create a transition relation for the variable automaton ...
-    final String name = var.getName();
-    final int numEvents = mRelevantUpdates.size() + 1;
-    final int numStates = var.getRange().size();
-    final int config = ListBufferTransitionRelation.CONFIG_PREDECESSORS;
-    final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(name, ComponentKind.PLANT,
-                                       numEvents, 0, numStates, config);
-    int event = EventEncoding.NONTAU;
-    for (final ConstraintList update : mRelevantUpdates) {
-      mEFSMVariableFinder.findVariable(update, mEFSMVariable);
-      if (!mEFSMVariableFinder.containsVariable()) {
-        // Unprimed variable not in update --- no need for any transitions
-      } else if (!mEFSMVariableFinder.containsPrimedVariable()) {
-        // Only unprimed variable in update --- refine initial partition
-        mUnfoldingVariableContext.setCurrentValue(null);
-        mConstraintPropagator.init(update);
-        mConstraintPropagator.propagate();
-        assert !mConstraintPropagator.isUnsatisfiable();
-        final VariableContext context = mConstraintPropagator.getContext();
-        SimpleExpressionProxy beforeExpr =
-          context.getBoundExpression(efsmVariableName);
-        int beforeValue = -1;
-        if (beforeExpr != null) {
-          final CompiledRange range = mEFSMVariable.getRange();
-          beforeValue = range.indexOf(beforeExpr);
-        }
-        if (beforeValue >= 0) {
-          rel.addTransition(beforeValue, event, beforeValue);
-        } else {
-          for (beforeValue = 0; beforeValue < mRangeValues.size(); beforeValue++) {
-            beforeExpr = mRangeValues.get(beforeValue);
-            mUnfoldingVariableContext.setCurrentValue(beforeExpr);
-            mConstraintPropagator.init(update);
-            mConstraintPropagator.propagate();
-            if (!mConstraintPropagator.isUnsatisfiable()) {
-              rel.addTransition(beforeValue, event, beforeValue);
-            }
-          }
-        }
-      } else {
-        // Both primed and unprimed variable in update --- create transitions
-        int beforeValue = 0;
-        for (final SimpleExpressionProxy beforeExpr : mRangeValues) {
-          mUnfoldingVariableContext.setCurrentValue(beforeExpr);
-          mUnfoldingVariableContext.setPrimedValue(null);
+        mEFSMVariableFinder.findVariable(update, mEFSMVariable);
+        if (!mEFSMVariableFinder.containsVariable()) {
+          // Unprimed variable not in update --- no need for any transitions
+        } else if (!mEFSMVariableFinder.containsPrimedVariable()) {
+          // Only unprimed variable in update --- refine initial partition
+          mUnfoldingVariableContext.setCurrentValue(null);
           mConstraintPropagator.init(update);
           mConstraintPropagator.propagate();
-          if (mConstraintPropagator.isUnsatisfiable()) {
-            continue;
-          }
+          assert !mConstraintPropagator.isUnsatisfiable();
           final VariableContext context = mConstraintPropagator.getContext();
-          SimpleExpressionProxy afterExpr =
-            context.getBoundExpression(efsmVariableNamePrimed);
-          int afterValue = -1;
-          if (afterExpr != null) {
+          SimpleExpressionProxy beforeExpr =
+            context.getBoundExpression(efsmVariableName);
+          int beforeValue = -1;
+          if (beforeExpr != null) {
             final CompiledRange range = mEFSMVariable.getRange();
-            afterValue = range.indexOf(afterExpr);
+            beforeValue = range.indexOf(beforeExpr);
           }
-          if (afterValue >= 0) {
-            rel.addTransition(beforeValue, event, afterValue);
+          if (beforeValue >= 0) {
+            rel.addTransition(beforeValue, event, beforeValue);
           } else {
-            for (afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
-              afterExpr = mRangeValues.get(afterValue);
-              mUnfoldingVariableContext.setPrimedValue(afterExpr);
+            for (beforeValue = 0; beforeValue < mRangeValues.size(); beforeValue++) {
+              beforeExpr = mRangeValues.get(beforeValue);
+              mUnfoldingVariableContext.setCurrentValue(beforeExpr);
               mConstraintPropagator.init(update);
               mConstraintPropagator.propagate();
               if (!mConstraintPropagator.isUnsatisfiable()) {
-                rel.addTransition(beforeValue, event, afterValue);
+                rel.addTransition(beforeValue, event, beforeValue);
               }
             }
           }
-          beforeValue++;
+        } else {
+          // Both primed and unprimed variable in update --- create transitions
+          int beforeValue = 0;
+          for (final SimpleExpressionProxy beforeExpr : mRangeValues) {
+            mUnfoldingVariableContext.setCurrentValue(beforeExpr);
+            mUnfoldingVariableContext.setPrimedValue(null);
+            mConstraintPropagator.init(update);
+            mConstraintPropagator.propagate();
+            if (mConstraintPropagator.isUnsatisfiable()) {
+              continue;
+            }
+            final VariableContext context = mConstraintPropagator.getContext();
+            SimpleExpressionProxy afterExpr =
+              context.getBoundExpression(efsmVariableNamePrimed);
+            int afterValue = -1;
+            if (afterExpr != null) {
+              final CompiledRange range = mEFSMVariable.getRange();
+              afterValue = range.indexOf(afterExpr);
+            }
+            if (afterValue >= 0) {
+              rel.addTransition(beforeValue, event, afterValue);
+            } else {
+              for (afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
+                afterExpr = mRangeValues.get(afterValue);
+                mUnfoldingVariableContext.setPrimedValue(afterExpr);
+                mConstraintPropagator.init(update);
+                mConstraintPropagator.propagate();
+                if (!mConstraintPropagator.isUnsatisfiable()) {
+                  rel.addTransition(beforeValue, event, afterValue);
+                }
+              }
+            }
+            beforeValue++;
+          }
         }
+        event++;
       }
-      event++;
-    }
 
-    // 4. Calculate partition using bisimulation algorithm
-    mBisimulator.setTransitionRelation(rel);
-    if (mBisimulator.run()) {
-      final List<int[]> partition = mBisimulator.getResultPartition();
+      // 4. Calculate partition using bisimulation algorithm
+      mBisimulator.setTransitionRelation(rel);
+      if (mBisimulator.run()) {
+        partition = mBisimulator.getResultPartition();
+        return partition;
+      } else {
+        return null;
+      }
+    } finally {
+      final long stop = System.currentTimeMillis();
+      final long difftime = stop-start;
+      recordRunTime(difftime);
       if (partition == null) {
+        statistics.recordFinish(var, null);
         System.err.println("NULL result partition");
       } else {
+        statistics.recordFinish(var, partition);
         System.err.println("Result partition size " + partition.size());
       }
-      return partition;
-    } else {
-      System.err.println("No result partition");
-      return null;
+      tearDown();
     }
   }
 
