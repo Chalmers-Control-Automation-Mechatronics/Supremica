@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
@@ -33,6 +32,7 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 import org.supremica.gui.ide.IDE;
@@ -67,16 +67,15 @@ public class IDEPasteAction
     putValue(Action.SHORT_DESCRIPTION, "Insert the clipboard contents");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_P);
     putValue(Action.ACCELERATOR_KEY,
-	     KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON,
-	     new ImageIcon(IDE.class.getResource
-			   ("/toolbarButtonGraphics/general/Paste16.gif")));
+             KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_PASTE);
     setEnabled(false);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     try {
@@ -113,6 +112,7 @@ public class IDEPasteAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {

@@ -16,13 +16,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 
@@ -35,7 +36,7 @@ import org.supremica.gui.ide.IDE;
  * formats as long as their contents can be converted into a single module. For
  * external files containing more than one module, the import action
  * ({@link ImportAction}) must be used.
- * 
+ *
  * @author Robi Malik
  */
 
@@ -50,14 +51,14 @@ public class OpenAction extends net.sourceforge.waters.gui.actions.IDEAction
     putValue(Action.NAME, "Open ...");
     putValue(Action.SHORT_DESCRIPTION, "Open/import a module");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
-    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O,
-        ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON, new ImageIcon(IDE.class
-        .getResource("/toolbarButtonGraphics/general/Open16.gif")));
+    putValue(Action.ACCELERATOR_KEY,
+             KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_OPEN);
   }
 
   // #######################################################################
   // # Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     // Get the state and dialog ...

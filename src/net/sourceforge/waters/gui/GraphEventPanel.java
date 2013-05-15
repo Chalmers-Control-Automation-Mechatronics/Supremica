@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+
 import javax.swing.Action;
 import javax.swing.DropMode;
 import javax.swing.Icon;
@@ -44,6 +45,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+
 import net.sourceforge.waters.gui.actions.IDEAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
@@ -64,6 +66,7 @@ import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.ReplaceInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
@@ -109,8 +112,9 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
  * @author Gian Perrone, Robi Malik
  */
 
-public class GraphEventPanel extends NonTypingTable implements FocusListener,
-  SelectionOwner
+public class GraphEventPanel
+  extends NonTypingTable
+  implements FocusListener, SelectionOwner
 {
 
   //#########################################################################
@@ -182,14 +186,17 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     manager.installCutCopyPasteActions(this);
   }
 
-//#########################################################################
+
+  //#########################################################################
   //#Simple Access
   public FocusTracker getFocusTracker(){
     return mRoot.getModuleWindowInterface().getRootWindow().getFocusTracker();
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
+  @Override
   public UndoInterface getUndoInterface(final Action action)
   {
     if (action instanceof IDECutAction || action instanceof IDEDeleteAction) {
@@ -199,22 +206,26 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public boolean hasNonEmptySelection()
   {
     return getSelectedRowCount() > 0;
   }
 
+  @Override
   public boolean canSelectMore()
   {
     return getSelectedRowCount() < getRowCount();
   }
 
+  @Override
   public boolean isSelected(final Proxy proxy)
   {
     final int row = getRow(proxy);
     return isRowSelected(row);
   }
 
+  @Override
   public List<IdentifierSubject> getCurrentSelection()
   {
     final EventTableModel model = (EventTableModel) getModel();
@@ -235,6 +246,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     return list;
   }
 
+  @Override
   public List<IdentifierSubject> getAllSelectableItems()
   {
     final EventTableModel model = (EventTableModel) getModel();
@@ -248,6 +260,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     return list;
   }
 
+  @Override
   public IdentifierSubject getSelectionAnchor()
   {
     if (getSelectedRowCount() > 0) {
@@ -260,11 +273,13 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public Proxy getSelectableAncestor(final Proxy item)
   {
     return item;
   }
 
+  @Override
   public void clearSelection(final boolean propagate)
   {
     clearSelection();
@@ -274,6 +289,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public void replaceSelection(final List<? extends Proxy> items)
   {
     boolean propagate = false;
@@ -288,6 +304,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     addToSelection(items);
   }
 
+  @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
     final List<Proxy> others = new LinkedList<Proxy>();
@@ -315,6 +332,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     surface.addToSelection(others);
   }
 
+  @Override
   public void removeFromSelection(final List<? extends Proxy> items)
   {
     final List<Proxy> others = new LinkedList<Proxy>();
@@ -342,6 +360,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     surface.removeFromSelection(others);
   }
 
+  @Override
   public boolean canPaste(final Transferable transferable)
   {
     try {
@@ -379,6 +398,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
@@ -418,6 +438,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     return inserts;
   }
 
+  @Override
   public boolean canDelete(final List<? extends Proxy> items)
   {
     for (final Proxy proxy : items) {
@@ -428,6 +449,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     return false;
   }
 
+  @Override
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
     final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
@@ -454,6 +476,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public void insertItems(final List<InsertInfo> inserts)
   {
     for (final InsertInfo insert : inserts) {
@@ -474,6 +497,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public void deleteItems(final List<InsertInfo> inserts)
   {
     for (final InsertInfo insert : inserts) {
@@ -493,6 +517,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public void scrollToVisible(final List<? extends Proxy> items)
   {
     Rectangle bounds = null;
@@ -515,6 +540,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public void activate()
   {
     if (!isFocusOwner()) {
@@ -524,6 +550,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public void close()
   {
     final EventTableModel model = (EventTableModel) getModel();
@@ -532,6 +559,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
   //#######################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
+  @Override
   public void attach(final Observer observer)
   {
     if (mObservers == null) {
@@ -540,6 +568,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     mObservers.add(observer);
   }
 
+  @Override
   public void detach(final Observer observer)
   {
     mObservers.remove(observer);
@@ -548,6 +577,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     if (mObservers != null) {
@@ -562,6 +592,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
   //#########################################################################
   //# Overrides for Base Class javax.swing.JTable
+  @Override
   public void tableChanged(final TableModelEvent event)
   {
     super.tableChanged(event);
@@ -583,6 +614,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public String getToolTipText(final MouseEvent event)
   {
     final Point point = event.getPoint();
@@ -595,6 +627,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public boolean getScrollableTracksViewportHeight()
   {
     final Container viewport = getParent();
@@ -603,6 +636,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
   //#########################################################################
   //# Interface java.awt.event.FocusListener
+  @Override
   public void focusGained(final FocusEvent event)
   {
     if (!event.isTemporary()) {
@@ -610,6 +644,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     }
   }
 
+  @Override
   public void focusLost(final FocusEvent event)
   {
     if (!event.isTemporary()) {
@@ -633,6 +668,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
         return;
       }
       SwingUtilities.invokeLater(new Runnable() {
+        @Override
         public void run()
         {
           if (!isEditing()) {
@@ -671,6 +707,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
         return;
       }
       SwingUtilities.invokeLater(new Runnable() {
+        @Override
         public void run()
         {
           if (!isEditing()) {
@@ -738,17 +775,19 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     final int width1 = calculateWidth1();
 
     final TableColumn column0 = getColumnModel().getColumn(0);
-    column0.setMinWidth(MINCOLUMNWIDTH0);
-    column0.setPreferredWidth(COLUMNWIDTH0);
-    column0.setMaxWidth(COLUMNWIDTH0);
+    final int minwidth0 = IconLoader.ICON_EVENT.getIconWidth();
+    final int width0 = minwidth0 + 4;
+    column0.setMinWidth(minwidth0);
+    column0.setPreferredWidth(width0);
+    column0.setMaxWidth(width0);
     column0.setResizable(false);
 
     final TableColumn column1 = getColumnModel().getColumn(1);
     column1.setMinWidth(MINCOLUMNWIDTH1);
     column1.setPreferredWidth(width1);
 
-    final int totalwidth = COLUMNWIDTH0 + width1;
-    final int minwidth = MINCOLUMNWIDTH0 + MINCOLUMNWIDTH1;
+    final int totalwidth = width0 + width1;
+    final int minwidth = minwidth0 + MINCOLUMNWIDTH1;
     final Dimension prefsize = new Dimension(totalwidth, height);
     final Dimension minsize = new Dimension(minwidth, 3 * getRowHeight());
     setPreferredSize(prefsize);
@@ -781,6 +820,49 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     return maxwidth;
   }
 
+  private void setupSelectionDragHack()
+  {
+    // Bracket the other mouse listeners so we may inject our lie
+    final MouseListener[] ls = getMouseListeners();
+    for (final MouseListener l : ls) {
+      removeMouseListener(l);
+    }
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(final MouseEvent e)
+      {
+        mMousingRow = rowAtPoint(e.getPoint());
+        mMousingInProgress = true;
+      }
+    });
+    for (final MouseListener l : ls) {
+      addMouseListener(l);
+    }
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(final MouseEvent e)
+      {
+        requestFocusInWindow();
+        mMousingInProgress = false;
+      }
+    });
+  }
+
+  @Override
+  public boolean isCellSelected(final int row, final int column)
+  {
+    if (mMousingInProgress && row == mMousingRow) {
+      // Only lie to the canStartDrag caller. We tell the truth to everyone else.
+      final StackTraceElement[] elms = Thread.currentThread().getStackTrace();
+      for (int i = 0; i < 3; i++) {
+        if (elms[i].getMethodName().equals("canStartDrag")) {
+          return mMousingInProgress;
+        }
+      }
+    }
+    return super.isCellSelected(row, column);
+  }
+
 
   //#########################################################################
   //# Local Class RendererNoFocus
@@ -799,6 +881,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
+    @Override
     public Component getTableCellRendererComponent(final JTable table,
                                                    final Object value,
                                                    final boolean isSelected,
@@ -835,6 +918,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
+    @Override
     public Component getTableCellRendererComponent(final JTable table,
                                                    final Object value,
                                                    final boolean isSelected,
@@ -867,6 +951,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
     //#######################################################################
     //# Interface java.awt.event.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       final Point point = event.getPoint();
@@ -886,11 +971,13 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       }
     }
 
+    @Override
     public void mousePressed(final MouseEvent event)
     {
       maybeShowPopup(event);
     }
 
+    @Override
     public void mouseReleased(final MouseEvent event)
     {
       maybeShowPopup(event);
@@ -923,6 +1010,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
     //#######################################################################
     //# Interface javax.swing.ListSelectionListener
+    @Override
     public void valueChanged(final ListSelectionEvent event)
     {
       final ListSelectionModel selmodel =
@@ -943,6 +1031,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
         // Ignore extra messages ...
       } else {
         SwingUtilities.invokeLater(new Runnable() {
+          @Override
           public void run()
           {
             fireSelectionChanged();
@@ -957,16 +1046,18 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
   //# Local Class GraphEventPanelEventHandler
   //# (Uses inner class to prevent users other than EventTableModel
   //# from calling these methods.)
-  private class GraphEventPanelEventHandler implements GraphEventHandler,
-    FocusListener
+  private class GraphEventPanelEventHandler
+    implements GraphEventHandler, FocusListener
   {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.GraphEventHandler
+    @Override
     public void addEvent(final IdentifierSubject neo)
     {
       if (isEditing()) {
         SwingUtilities.invokeLater(new Runnable() {
+          @Override
           public void run()
           {
             addEvent(neo);
@@ -979,10 +1070,12 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       }
     }
 
+    @Override
     public void removeEvent(final IdentifierSubject victim)
     {
       if (isEditing()) {
         SwingUtilities.invokeLater(new Runnable() {
+          @Override
           public void run()
           {
             removeEvent(victim);
@@ -1001,11 +1094,13 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       }
     }
 
+    @Override
     public void replaceEvent(final IdentifierSubject old,
                              final IdentifierSubject neo)
     {
       if (isEditing()) {
         SwingUtilities.invokeLater(new Runnable() {
+          @Override
           public void run()
           {
             replaceEvent(old, neo);
@@ -1034,6 +1129,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
     /**
      * Does nothing.
      */
+    @Override
     public void focusGained(final FocusEvent event)
     {
     }
@@ -1042,10 +1138,12 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
      * Called when the editor cell has lost the focus. In this case, we had
      * better check if there is any empty list cell to clean up.
      */
+    @Override
     public void focusLost(final FocusEvent event)
     {
       if (!event.isTemporary()) {
         SwingUtilities.invokeLater(new Runnable() {
+          @Override
           public void run()
           {
             final EventTableModel model = (EventTableModel) getModel();
@@ -1083,6 +1181,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       return null;
@@ -1090,6 +1189,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -1100,6 +1200,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       return null;
     }
 
+    @Override
     public Object visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
@@ -1110,6 +1211,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       return null;
     }
 
+    @Override
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -1124,6 +1226,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       return null;
     }
 
+    @Override
     public Object visitEventListExpressionProxy(final EventListExpressionProxy expr)
       throws VisitorException
     {
@@ -1135,6 +1238,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       return null;
     }
 
+    @Override
     public Object visitNodeProxy(final NodeProxy node)
       throws VisitorException
     {
@@ -1193,6 +1297,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       return null;
@@ -1200,6 +1305,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -1210,6 +1316,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       return null;
     }
 
+    @Override
     public Object visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
@@ -1220,6 +1327,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       return null;
     }
 
+    @Override
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -1234,6 +1342,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       return null;
     }
 
+    @Override
     public Object visitEventListExpressionProxy(final EventListExpressionProxy expr)
       throws VisitorException
     {
@@ -1245,6 +1354,7 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
       return null;
     }
 
+    @Override
     public Object visitNodeProxy(final NodeProxy node)
       throws VisitorException
     {
@@ -1353,51 +1463,6 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
 
   }
 
-  private void setupSelectionDragHack()
-  {
-    // Bracket the other mouse listeners so we may inject our lie
-    final MouseListener[] ls = getMouseListeners();
-    for (final MouseListener l : ls) {
-      removeMouseListener(l);
-    }
-    addMouseListener(new MouseAdapter() {
-      @Override
-      public void mousePressed(final MouseEvent e)
-      {
-        mousingRow = rowAtPoint(e.getPoint());
-        mousingInProgress = true;
-      }
-    });
-    for (final MouseListener l : ls) {
-      addMouseListener(l);
-    }
-    addMouseListener(new MouseAdapter() {
-      @Override
-      public void mousePressed(final MouseEvent e)
-      {
-        requestFocusInWindow();
-        mousingInProgress = false;
-      }
-    });
-  }
-
-  @Override
-  public boolean isCellSelected(final int row, final int column)
-  {
-    if (mousingInProgress && row == mousingRow) {
-      // Only lie to the canStartDrag caller. We tell the truth to everyone else.
-      final StackTraceElement[] elms = Thread.currentThread().getStackTrace();
-      for (int i = 0; i < 3; i++) {
-        if (elms[i].getMethodName().equals("canStartDrag")) {
-          return mousingInProgress;
-        }
-      }
-    }
-    return super.isCellSelected(row, column);
-  }
-
-  private int mousingRow;
-  private boolean mousingInProgress;
 
   //#########################################################################
   //# Data Members
@@ -1408,15 +1473,15 @@ public class GraphEventPanel extends NonTypingTable implements FocusListener,
   private final EventTableModel mModel;
   private List<Observer> mObservers;
 
+  private int mMousingRow;
+  private boolean mMousingInProgress;
+
+
   //#########################################################################
   //# Class Constants
-  private static final int COLUMNWIDTH0 = 24;
-  private static final int MINCOLUMNWIDTH0 = 20;
   private static final int COLUMNWIDTH1 = 96;
   private static final int MINCOLUMNWIDTH1 = 24;
 
   private static final long serialVersionUID = 1L;
-
-
 
 }

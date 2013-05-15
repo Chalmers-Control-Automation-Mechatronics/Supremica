@@ -12,6 +12,7 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
+
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
@@ -20,6 +21,7 @@ import net.sourceforge.waters.gui.dialog.ParameterBindingEditorDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.module.ParameterBindingElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
@@ -47,11 +49,13 @@ public class InsertParameterBindingAction
     super(ide);
     putValue(Action.NAME, "New Parameter Binding ...");
     putValue(Action.SHORT_DESCRIPTION, "Add parameter binding to the module");
+    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_BINDING);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final ModuleWindowInterface root = getActiveModuleWindowInterface();

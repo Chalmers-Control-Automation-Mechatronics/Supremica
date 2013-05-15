@@ -12,6 +12,7 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
@@ -43,12 +44,13 @@ public class InsertEventLabelAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_L);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_EVENT);
+    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_EVENT);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final GraphEventPanel panel = getActiveGraphEventPanel();

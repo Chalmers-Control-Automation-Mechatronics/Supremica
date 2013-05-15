@@ -62,6 +62,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
        final boolean useLimitedCertainConflicts,
        final boolean useAlwaysEnabledLimitedCertainConflicts)
   {
+    final int limit = analyzer.getInternalTransitionLimit();
     final ChainTRSimplifier preChain = new ChainTRSimplifier();
     final ChainTRSimplifier postChain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
@@ -72,6 +73,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     preChain.add(markingRemover);
     final TransitionRemovalTRSimplifier transitionRemover =
       new TransitionRemovalTRSimplifier();
+    transitionRemover.setTransitionLimit(limit);
     preChain.add(transitionRemover);
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
@@ -88,7 +90,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     preChain.add(silentOutRemover);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
-    final int limit = analyzer.getInternalTransitionLimit();
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     preChain.add(incomingEquivalenceSimplifier);
 

@@ -122,13 +122,14 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
     preChain.add(markingRemover);
+    final TransitionRemovalTRSimplifier transitionRemover =
+      new TransitionRemovalTRSimplifier();
+    transitionRemover.setTransitionLimit(limit);
+    preChain.add(transitionRemover);
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
     preChain.add(silentInRemover);
-    final TransitionRemovalTRSimplifier transitionRemover =
-      new TransitionRemovalTRSimplifier();
-    preChain.add(transitionRemover);
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     preChain.add(silentOutRemover);
