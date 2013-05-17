@@ -47,30 +47,13 @@
                         <SimpleIdentifier Name="I"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="chg_value">
-                                <SimpleIdentifier Name="I"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="new_value">
-                                <SimpleIdentifier Name="I"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="reset">
-                                <SimpleIdentifier Name="I"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="timeout">
-                                <SimpleIdentifier Name="I"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="timer">
-                                <SimpleIdentifier Name="I"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="FLIP">
                                 <PointGeometry>
-                                    <Point Y="176" X="256"/>
+                                    <Point X="256" Y="176"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="7" X="11"/>
+                                    <Point X="11" Y="7"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Initial="true" Name="INIT">
@@ -78,31 +61,31 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="96" X="256"/>
+                                    <Point X="256" Y="96"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="6" X="11"/>
+                                    <Point X="11" Y="6"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="CHG">
                                 <PointGeometry>
-                                    <Point Y="336" X="256"/>
+                                    <Point X="256" Y="336"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="7" X="12"/>
+                                    <Point X="12" Y="7"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="WAIT">
                                 <PointGeometry>
-                                    <Point Y="256" X="256"/>
+                                    <Point X="256" Y="256"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="6" X="11"/>
+                                    <Point X="11" Y="6"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="INIT" Source="CHG">
+                            <Edge Source="CHG" Target="INIT">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="new_value">
                                         <SimpleIdentifier Name="I"/>
@@ -111,14 +94,14 @@
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="69" X="11"/>
+                                        <Point X="11" Y="69"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="217" X="159"/>
+                                    <Point X="159" Y="217"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="INIT" Source="INIT">
+                            <Edge Source="INIT" Target="INIT">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="reset">
                                         <SimpleIdentifier Name="I"/>
@@ -127,73 +110,73 @@
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-17" X="5"/>
+                                        <Point X="5" Y="-17"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="96" X="296"/>
+                                    <Point X="296" Y="96"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="FLIP" Source="INIT">
+                            <Edge Source="INIT" Target="FLIP">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="new_value">
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-7" X="4"/>
+                                        <Point X="4" Y="-7"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="CHG" Source="WAIT">
+                            <Edge Source="WAIT" Target="CHG">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="timeout">
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-6" X="5"/>
+                                        <Point X="5" Y="-6"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="INIT" Source="WAIT">
+                            <Edge Source="WAIT" Target="INIT">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="new_value">
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="30" X="-19"/>
+                                        <Point X="-19" Y="30"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="177" X="191"/>
+                                    <Point X="191" Y="177"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="INIT" Source="FLIP">
+                            <Edge Source="FLIP" Target="INIT">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="new_value">
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="21" X="-48"/>
+                                        <Point X="-48" Y="21"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="137" X="223"/>
+                                    <Point X="223" Y="137"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="WAIT" Source="FLIP">
+                            <Edge Source="FLIP" Target="WAIT">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="timer">
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-6" X="6"/>
+                                        <Point X="6" Y="-6"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="216" X="256"/>
+                                    <Point X="256" Y="216"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="FLIP" Source="FLIP">
+                            <Edge Source="FLIP" Target="FLIP">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="reset">
                                         <SimpleIdentifier Name="I"/>
@@ -202,11 +185,11 @@
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-15" X="3"/>
+                                        <Point X="3" Y="-15"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="177" X="296"/>
+                                    <Point X="296" Y="177"/>
                                 </SplineGeometry>
                             </Edge>
                         </EdgeList>
@@ -222,36 +205,31 @@
                         <SimpleIdentifier Name="I"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="new_value">
-                                <SimpleIdentifier Name="I"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Initial="true" Name="s0">
                                 <EventList>
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="195" X="183"/>
+                                    <Point X="183" Y="195"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="24" X="-8"/>
+                                    <Point X="-8" Y="24"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="s0" Source="s0">
+                            <Edge Source="s0" Target="s0">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="new_value">
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="7" X="14"/>
+                                        <Point X="14" Y="7"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="168" X="210"/>
+                                    <Point X="210" Y="168"/>
                                 </SplineGeometry>
                             </Edge>
                         </EdgeList>
@@ -267,24 +245,13 @@
                         <SimpleIdentifier Name="I"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="reset">
-                                <SimpleIdentifier Name="I"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="timeout">
-                                <SimpleIdentifier Name="I"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="timer">
-                                <SimpleIdentifier Name="I"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="on">
                                 <PointGeometry>
-                                    <Point Y="48" X="144"/>
+                                    <Point X="144" Y="48"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="5" X="12"/>
+                                    <Point X="12" Y="5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Initial="true" Name="off">
@@ -292,28 +259,28 @@
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="48" X="48"/>
+                                    <Point X="48" Y="48"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="5" X="-25"/>
+                                    <Point X="-25" Y="5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="on" Source="off">
+                            <Edge Source="off" Target="on">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="timer">
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="6" X="-16"/>
+                                        <Point X="-16" Y="6"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="65" X="97"/>
+                                    <Point X="97" Y="65"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="off" Source="on">
+                            <Edge Source="on" Target="off">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="reset">
                                         <SimpleIdentifier Name="I"/>
@@ -322,11 +289,11 @@
                                         <SimpleIdentifier Name="I"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-29" X="-21"/>
+                                        <Point X="-21" Y="-29"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="32" X="96"/>
+                                    <Point X="96" Y="32"/>
                                 </SplineGeometry>
                             </Edge>
                         </EdgeList>
@@ -337,19 +304,60 @@
         <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
             <Graph>
                 <NodeList>
-                    <SimpleNode Name="CHG.off"/>
-                    <SimpleNode Name="FLIP.off"/>
-                    <SimpleNode Name="FLIP.on"/>
+                    <SimpleNode Name="CHG.off">
+                        <PointGeometry>
+                            <Point X="53" Y="145"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="FLIP.off">
+                        <PointGeometry>
+                            <Point X="208" Y="142"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="FLIP.on">
+                        <PointGeometry>
+                            <Point X="280" Y="79"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Initial="true" Name="INIT.off">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
+                        <PointGeometry>
+                            <Point X="131" Y="89"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="INIT.on"/>
-                    <SimpleNode Name="WAIT.on"/>
+                    <SimpleNode Name="INIT.on">
+                        <PointGeometry>
+                            <Point X="206" Y="66"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="WAIT.on">
+                        <PointGeometry>
+                            <Point X="139" Y="167"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="INIT.off" Source="CHG.off">
+                    <Edge Source="CHG.off" Target="INIT.off">
                         <LabelBlock>
                             <IndexedIdentifier Name="chg_value">
                                 <IntConstant Value="1"/>
@@ -357,23 +365,41 @@
                             <IndexedIdentifier Name="new_value">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="82" Y="113"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="INIT.off" Source="FLIP.off">
+                    <Edge Source="FLIP.off" Target="INIT.off">
                         <LabelBlock>
                             <IndexedIdentifier Name="new_value">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="168" Y="127"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="WAIT.on" Source="FLIP.off">
+                    <Edge Source="FLIP.off" Target="WAIT.on">
                         <LabelBlock>
                             <IndexedIdentifier Name="timer">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="175" Y="165"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="FLIP.off" Source="FLIP.on">
+                    <Edge Source="FLIP.on" Target="FLIP.off">
                         <LabelBlock>
                             <IndexedIdentifier Name="reset">
                                 <IntConstant Value="1"/>
@@ -381,30 +407,54 @@
                             <IndexedIdentifier Name="timeout">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="254" Y="114"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="INIT.on" Source="FLIP.on">
+                    <Edge Source="FLIP.on" Target="INIT.on">
                         <LabelBlock>
                             <IndexedIdentifier Name="new_value">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="248" Y="76"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="FLIP.off" Source="INIT.off">
+                    <Edge Source="INIT.off" Target="FLIP.off">
                         <LabelBlock>
                             <IndexedIdentifier Name="new_value">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="170" Y="105"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="FLIP.on" Source="INIT.on">
+                    <Edge Source="INIT.on" Target="FLIP.on">
                         <LabelBlock>
                             <IndexedIdentifier Name="new_value">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="251" Y="54"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="INIT.off" Source="INIT.on">
+                    <Edge Source="INIT.on" Target="INIT.off">
                         <LabelBlock>
                             <IndexedIdentifier Name="reset">
                                 <IntConstant Value="1"/>
@@ -412,20 +462,35 @@
                             <IndexedIdentifier Name="timeout">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="166" Y="67"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="CHG.off" Source="WAIT.on">
+                    <Edge Source="WAIT.on" Target="CHG.off">
                         <LabelBlock>
                             <IndexedIdentifier Name="timeout">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="89" Y="164"/>
+                        </SplineGeometry>
                     </Edge>
-                    <Edge Target="INIT.on" Source="WAIT.on">
+                    <Edge Source="WAIT.on" Target="INIT.on">
                         <LabelBlock>
                             <IndexedIdentifier Name="new_value">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>
