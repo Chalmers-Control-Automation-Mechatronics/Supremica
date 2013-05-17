@@ -98,7 +98,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     preChain.add(enabledEventsSilentContinuationSimplifier);
 
     final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
-
     if (useLimitedCertainConflicts) {
       limitedCertainConflictsRemover =
         new LimitedCertainConflictsTRSimplifier();
