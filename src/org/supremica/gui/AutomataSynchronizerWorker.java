@@ -55,6 +55,7 @@ import java.util.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.ide.actions.IDEActionInterface;
+import org.supremica.properties.Config;
 import org.supremica.util.ActionTimer;
 
 public class AutomataSynchronizerWorker
@@ -91,7 +92,7 @@ public class AutomataSynchronizerWorker
             
             try
             {
-                theSynchronizer = new AutomataSynchronizer(theAutomata, syncOptions);
+                theSynchronizer = new AutomataSynchronizer(theAutomata, syncOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
             }
             catch (Exception e)
             {

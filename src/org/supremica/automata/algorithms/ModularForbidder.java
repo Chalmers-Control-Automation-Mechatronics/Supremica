@@ -295,7 +295,7 @@ public class ModularForbidder
             if(subState.getAutomataInSubState().getSpecificationAutomata().nbrOfAutomata() > 1)
             {
                 AutomataSynchronizer PSCspec;
-                PSCspec = new AutomataSynchronizer(subState.getAutomataInSubState().getSpecificationAutomata(),synchronizationOptions);
+                PSCspec = new AutomataSynchronizer(subState.getAutomataInSubState().getSpecificationAutomata(),synchronizationOptions, false);
                 PSCspec.execute();
 
                 final Automaton newSpec = PSCspec.getAutomaton();

@@ -72,7 +72,7 @@ public class DeadEventsDetector
 
     public DeadEventsDetector(Automata automata)
     {
-		AutomataSynchronizer synchronizer = new AutomataSynchronizer(automata, new SynchronizationOptions());
+		AutomataSynchronizer synchronizer = new AutomataSynchronizer(automata, new SynchronizationOptions(), false);
        	synchronizer.execute();
        	mAutomaton = synchronizer.getAutomaton();
     }

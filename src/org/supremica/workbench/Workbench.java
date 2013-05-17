@@ -336,7 +336,7 @@ class SynchButton
         synch_ops.setRememberDisabledEvents(false); // don't redirect disabled events to dump-state
         try
         {    // wb.syncher *should* be null here - we assume this!
-            wb.syncher = new AutomataSynchronizer(wb.automata, synch_ops);
+            wb.syncher = new AutomataSynchronizer(wb.automata, synch_ops, Config.SYNTHESIS_SUP_AS_PLANT.get());
             wb.syncher.execute();
             wb.automaton = wb.syncher.getAutomaton();
             // Which behavior is the "correct" one?  If we set the
@@ -442,7 +442,7 @@ class CompareButton
             // We need this ugly thing to be able to find the proper state name after composition...
             candidateSupervisor.normalizeStateIdentities();
             plantsAndSupervisors.addAutomaton(candidateSupervisor);
-            wb.syncher = new AutomataSynchronizer(plantsAndSupervisors, synch_ops);
+            wb.syncher = new AutomataSynchronizer(plantsAndSupervisors, synch_ops, Config.SYNTHESIS_SUP_AS_PLANT.get());
             wb.syncher.execute();
             Automaton aut = wb.syncher.getAutomaton();
             for (Iterator<State> it = aut.stateIterator(); it.hasNext(); )

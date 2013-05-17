@@ -162,7 +162,7 @@ public class OperationBasedSystems
                             i++;
                     }
                     SynchronizationOptions options = new SynchronizationOptions();
-                    AutomataSynchronizer as = new AutomataSynchronizer(specAut, options);
+                    AutomataSynchronizer as = new AutomataSynchronizer(specAut, options, false);
                     as.execute();
 
                     output.addAutomaton(as.getAutomaton());

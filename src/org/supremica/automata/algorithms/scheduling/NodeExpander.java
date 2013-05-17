@@ -386,7 +386,7 @@ public class NodeExpander
 		
 		try 
 		{
-			AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+			AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(theAutomata, syncOptions, false);
 			onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
 			onlineSynchronizer.initialize();
 

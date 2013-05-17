@@ -154,13 +154,17 @@ public class AutomataSynchronizerHelper
     private HashMap<String,Integer> autName2indexTable = new HashMap<String, Integer>();
 
 
-    public AutomataSynchronizerHelper(final Automata theAutomata, final SynchronizationOptions syncOptions)
+    public AutomataSynchronizerHelper(final Automata theAutomata, final SynchronizationOptions syncOptions, boolean sups_as_plants)
     {
-        this(theAutomata,syncOptions,null,null);
+        this(theAutomata,syncOptions,null,null,sups_as_plants);
     }
 
     @SuppressWarnings("deprecation")
-	public AutomataSynchronizerHelper(final Automata theAutomata, final SynchronizationOptions syncOptions, final HashMap<Arc,EdgeSubject>[] arc2EdgeTable, final HashMap<String,Integer> autName2indexTable)
+	public AutomataSynchronizerHelper(final Automata theAutomata, 
+								final SynchronizationOptions syncOptions,
+								final HashMap<Arc,EdgeSubject>[] arc2EdgeTable, 
+								final HashMap<String,Integer> autName2indexTable,
+								boolean sups_as_plants)
     {
         if(syncOptions.getEFAMode())
         {
@@ -192,7 +196,7 @@ public class AutomataSynchronizerHelper
         // Calculate the automataIndexForm (a more efficient representation of an automata)
         try
         {
-            theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton);
+            theAutomataIndexForm = new AutomataIndexForm(theAutomata, theAutomaton, sups_as_plants);
         }
         catch (final Exception e)
         {

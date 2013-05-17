@@ -117,7 +117,7 @@ public class SimulatorExecuter
         animationSignals = new AnimationSignals(animation);
         
         SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
-        helper = new AutomataSynchronizerHelper(project, syncOptions);
+        helper = new AutomataSynchronizerHelper(project, syncOptions, false);
         AutomataIndexMap indexMap = helper.getIndexMap();
         
         // Build the initial state

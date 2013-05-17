@@ -79,7 +79,7 @@ public class SyncBuilder
     {
         try
         {
-            theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
+            theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions, false);
             
             theSynchronizer.execute();
             
@@ -96,7 +96,7 @@ public class SyncBuilder
     {
         try
         {
-            theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions);
+            theSynchronizer = new AutomataSynchronizer(selectedAutomata, synchronizationOptions, false);
             
             theSynchronizer.execute();
             

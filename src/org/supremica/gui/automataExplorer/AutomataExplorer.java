@@ -90,7 +90,7 @@ public class AutomataExplorer
         syncOptions.setRequireConsistentControllability(false);
         
         // Get helper
-        helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
+        helper = new AutomataSynchronizerHelper(theAutomata, syncOptions, false);
         
         indexMap = new AutomataIndexMap(theAutomata);
         

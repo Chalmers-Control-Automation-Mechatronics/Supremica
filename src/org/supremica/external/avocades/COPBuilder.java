@@ -1338,7 +1338,7 @@ public class COPBuilder {
         try{
         	automaton = AutomataSynchronizer.
         					synchronizeAutomata(supremicaProject,
-        			                            synchronizationOptions);
+        			                            synchronizationOptions, false);
         }catch(final Exception e){
         	e.printStackTrace();
         }

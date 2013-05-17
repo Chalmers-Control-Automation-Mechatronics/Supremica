@@ -253,7 +253,7 @@ public class AutomataVerifier
           }
           // We're gonna do some synchronization! Initialize a synchronization helper!
           // Only some of the below algorithms use this helper?
-          synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+          synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions, false);
           synchHelper.setExecutionDialog(executionDialog);
           // Work!
           if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
@@ -297,7 +297,7 @@ public class AutomataVerifier
             // We're gonna do some serious synchronization! Initialize a synchronization helper!
             synchronizationOptions.setForbidUncontrollableStates(false);
             synchronizationOptions.setExpandForbiddenStates(true);
-            synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+            synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions, false);
             synchHelper.setExecutionDialog(executionDialog);
             // Work!
             return monolithicNonblockingVerification();

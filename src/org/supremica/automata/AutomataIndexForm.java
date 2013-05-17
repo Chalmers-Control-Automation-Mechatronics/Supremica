@@ -119,9 +119,10 @@ public final class AutomataIndexForm
     /**
      *@param  theAutomata The automata to be synchronized.
      *@param  theAutomaton The synchronized automaton.
+	 *@param sups_as_plants Defines whether we are to regard supervisors as plants or not
      *@exception  Exception Description of the Exception
      */
-    public AutomataIndexForm(final Automata theAutomata, final Automaton theAutomaton)
+    public AutomataIndexForm(final Automata theAutomata, final Automaton theAutomaton, boolean sups_as_plants)
     throws Exception
     {
         this.theAutomata = theAutomata;
@@ -134,7 +135,7 @@ public final class AutomataIndexForm
 
         //theAutomaton.setIndices();
 
-        generateAutomataIndices(theAutomata);
+        generateAutomataIndices(theAutomata, sups_as_plants);
 
         try
         {
@@ -225,7 +226,7 @@ public final class AutomataIndexForm
      * Give each automaton a unique index Remember that this index
      * must be consistent with getAutomatonAt(int) in Automata
      */
-    public void generateAutomataIndices(final Automata theAutomata)
+    private void generateAutomataIndices(final Automata theAutomata, boolean sups_as_plants)
     {
         typeIsPlantTable = new boolean[theAutomata.size()];
         typeIsSupSpecTable = new boolean[theAutomata.size()];
@@ -237,13 +238,20 @@ public final class AutomataIndexForm
             final int i = indexMap.getAutomatonIndex(currAutomaton);
             final AutomatonType currAutomatonType = currAutomaton.getType();
 
+			/* Unfortunately things are not as clear-cut. We really only have specs and plants, and sometimes
+			 * we want to treat supervisors as specs and sometimes as plants. A config switch was added
+			 *//*
             typeIsPlantTable[i] = currAutomatonType == AutomatonType.PLANT;
             typeIsSupSpecTable[i] = ((currAutomatonType == AutomatonType.SUPERVISOR) || (currAutomatonType == AutomatonType.SPECIFICATION));
+			 */
+			logger.debug("AutomataIndexForm - sups as plants? " + (sups_as_plants ? "yes" : "no"));
+			typeIsPlantTable[i] = (currAutomatonType == AutomatonType.PLANT || (currAutomatonType == AutomatonType.SUPERVISOR && sups_as_plants));
+            typeIsSupSpecTable[i] = ((currAutomatonType == AutomatonType.SUPERVISOR && !sups_as_plants) || (currAutomatonType == AutomatonType.SPECIFICATION));			
             automataSize[i] = currAutomaton.nbrOfStates();
         }
     }
 
-    /**
+    /** Seems to never been used // MF
      * Defines the typeIsPlantTable to "point to" the automata in plantAutomata
      * in spite of what these automata (or the other automata in theAutomata,
      * for that matter) really are!! The other automata are considered Supervisors.
@@ -251,7 +259,7 @@ public final class AutomataIndexForm
      *@param plantAutomata The automata that should be considered plants.
      * The other automata are considered upervisors.
      */
-    public void defineTypeIsPlantTable(final Automata plantAutomata)
+    private void defineTypeIsPlantTable(final Automata plantAutomata)
     {
         for (int i = 0, j = 0; i < theAutomata.size(); i++)
         {

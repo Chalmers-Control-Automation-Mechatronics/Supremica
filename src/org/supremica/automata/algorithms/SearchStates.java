@@ -49,7 +49,7 @@ public class SearchStates
         syncOptions.setRequireConsistentControllability(false);
         syncOptions.setBuildAutomaton(false);    // don't build teh automaton until absolutely necessary
         
-        this.syncher = new AutomataSynchronizer(automata, syncOptions);
+        this.syncher = new AutomataSynchronizer(automata, syncOptions, false);
         this.matcher = m;
         this.container = makeContainer();    // Must create the container, in case the thread is stopped
     }

@@ -23,7 +23,7 @@ public class SynchronizationStepper
     {
         this.theAutomata = theAutomata;
         
-        synchHelper = new AutomataSynchronizerHelper(theAutomata, synchOptions);
+        synchHelper = new AutomataSynchronizerHelper(theAutomata, synchOptions, false);
         synchHelper.initialize();
         
         synchronizer = new AutomataSynchronizerExecuter(synchHelper);

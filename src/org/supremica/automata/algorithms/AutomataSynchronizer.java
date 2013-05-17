@@ -82,24 +82,25 @@ public class AutomataSynchronizer
     private int automatonIndex = 0;
 
 
-    public AutomataSynchronizer(final ListSubject<AbstractSubject> components, final SynchronizationOptions options)
+    private AutomataSynchronizer(final ListSubject<AbstractSubject> components, final SynchronizationOptions options)
     {
         options.setEFAMode(true);
         final Automata automata = removeGuardsActionsFromEFAs(components);
         this.theAutomata = automata;
         this.syncOptions = options;
 
-        synchHelper = new AutomataSynchronizerHelper(automata, options,arc2edgeTable,autName2indexTable);
+        synchHelper = new AutomataSynchronizerHelper(automata, options,arc2edgeTable,autName2indexTable, false);
 
         initialize();
     }
 
-    public AutomataSynchronizer(final Automata automata, final SynchronizationOptions options)
+    public AutomataSynchronizer(final Automata automata, final SynchronizationOptions options, boolean sups_as_plants)
     {
+		logger.debug("AutomataSynchronizer - sups as plants?" + (sups_as_plants ? "yes" : "no"));
         this.theAutomata = automata;
         this.syncOptions = options;
         syncOptions.setEFAMode(false);
-        synchHelper = new AutomataSynchronizerHelper(automata, options);
+        synchHelper = new AutomataSynchronizerHelper(automata, options, sups_as_plants);
 
         initialize();
     }
@@ -262,11 +263,11 @@ public class AutomataSynchronizer
      * @param automata the Automata to be synchronized.
      * @return Automaton representing the synchronous composition.
      */
-    public static Automaton synchronizeAutomata(final Automata automata)
+    public static Automaton synchronizeAutomata(final Automata automata, final boolean sups_as_plants)
     throws Exception
     {
         final SynchronizationOptions options = SynchronizationOptions.getDefaultSynchronizationOptions();
-        return synchronizeAutomata(automata, options);
+        return synchronizeAutomata(automata, options, sups_as_plants);
     }
 
     /**
@@ -276,11 +277,11 @@ public class AutomataSynchronizer
      * @param options the SynchronizationOptions that should be used.
      * @return Automaton representing the synchronous composition.
      */
-    public static Automaton synchronizeAutomata(final Automata automata, final SynchronizationOptions options)
+    public static Automaton synchronizeAutomata(final Automata automata, final SynchronizationOptions options, final boolean sups_as_plants)
     throws Exception
     {
         options.setEFAMode(false);
-        final AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, options);
+        final AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, options, sups_as_plants);
         return synchronizeAutomata(helper);
     }
 

@@ -113,7 +113,8 @@ public class IDE
 
 	// Show memory
 	final int MB = 1024*1024;
-	info("Free/Total/Max mem: " + Runtime.getRuntime().freeMemory()/MB + "/"
+	info("JVM:" + System.getProperty("java.version") 
+			+ ", Free/Total/Max mem: " + Runtime.getRuntime().freeMemory()/MB + "/"
 							   + Runtime.getRuntime().totalMemory()/MB + "/"
 							   + Runtime.getRuntime().maxMemory()/MB + " MB");
 	
