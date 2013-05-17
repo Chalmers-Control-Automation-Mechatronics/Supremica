@@ -153,14 +153,12 @@ public class AnalyzerPanel
         return mDocumentContainer.getIDE().getActions();
     }
 
+	// This duplicates code in Supremica (and Supremica implements it from Gui)
     public String getNewAutomatonName(final String msg, final String nameSuggestion)
     {
-        boolean finished = false;
-        String newName = "";
-
-        while (!finished)
+        while (true)
         {
-            newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
+            String newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
 
             if (newName == null)	// user cancelled
             {
@@ -176,11 +174,9 @@ public class AnalyzerPanel
             }
             else
             {
-                finished = true;
+				return newName;
             }
         }
-
-        return newName;
     }
 
 
@@ -200,6 +196,7 @@ public class AnalyzerPanel
     {
 		return addAutomata(theAutomata, false);
 	}
+	
 	public int addAutomata(final Automata theAutomata, boolean sanityCheck)
 	{
         final int size = mVisualProject.nbrOfAutomata();
@@ -214,9 +211,11 @@ public class AnalyzerPanel
 		{
 			while(mVisualProject.addAutomaton(aut) == false)
 			{
-				final String name = getNewAutomatonName("Sorry, an automaton named " + aut.getName() + " already exists", aut.getComment());
+				final String name = getNewAutomatonName("Automaton exists: " + aut.getName(), aut.getComment());
 				if(name == null) // then the user cancelled
 					break;	// handle the next one
+				
+				aut.setName(name);
 			}
 		}
 		return mVisualProject.nbrOfAutomata() - size;	// number of added automata

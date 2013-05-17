@@ -762,14 +762,12 @@ public class Supremica
         return newComment;
     }
     
+	// This duplicates code in AnalyzerPanel, why?
     public String getNewAutomatonName(String msg, String nameSuggestion)
     {
-        boolean finished = false;
-        String newName = "";
-        
-        while (!finished)
+        while (true)
         {
-            newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
+            String newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
             
             if (newName == null)
             {
@@ -785,11 +783,9 @@ public class Supremica
             }
             else
             {
-                finished = true;
+                return newName;
             }
         }
-        
-        return newName;
     }
     
     @SuppressWarnings("unused")

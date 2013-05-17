@@ -42,14 +42,15 @@ public class Plantifier
 		logger.debug("Plantifier: " + the_plants.size() + " num plantified plants generated");
 		return the_plants;
 	}
-	// Main entry point, this one makes copies
+	// Main entry point, this one makes copies and treats supervisors as specs
 	public void plantify()
     {
-		plantify(true);
+		plantify(true, false);
 	}
 
 	// If copy == false, no copies are made, the existing specs are manipulated
-	public void plantify(final boolean copy)
+	// If sups_as_plants == true, supervisors are treated as plants, not specs
+	public void plantify(final boolean copy, final boolean sups_as_plants)
 	{
 		logger.debug("plantify(Automata) - new version, does not assume spec uc-alpha is subset of plant alpha");
 
@@ -57,7 +58,7 @@ public class Plantifier
 
 		for(final Automaton aut : the_automata)
 		{
-			if(aut.isPlant())	// should also include supervisor?
+			if(aut.isPlant() || (sups_as_plants && aut.isSupervisor()))
 			{
 				uc_alpha.union(aut.getAlphabet().getUncontrollableAlphabet());
 			}
@@ -65,13 +66,13 @@ public class Plantifier
 
 		if(uc_alpha.size() == 0)
 		{
-			logger.info("Number of uncontrollable plant events are zero - nothing to plantify");
-			return;
+			logger.info("Number of uncontrollable plant events are zero - nothing really to plantify");
+			// return; // We should still rename and make plants of all specs (and supervisors if !sups_as_plants)
 		}
 
         for (final Automaton aut : the_automata)
         {
-			if (aut.isSpecification() || aut.isSupervisor())	// should not include supervisor?
+			if (aut.isSpecification() || (!sups_as_plants && aut.isSupervisor()))
 			{
 				Automaton a = null;
 				if(copy)
@@ -117,8 +118,8 @@ public class Plantifier
 		uc_alpha.intersect(ucAlpha);
 		if(uc_alpha.size() == 0)
 		{
-			logger.info("No common uc-events - nothing to plantify");
-			return;
+			logger.info("No plant uc-events in " + aut.getName() + " - nothing to plantify");
+			// return; // We should still rename and make plants of all specs (and supervisors if !sups_as_plants)
 		}
 		do_plantify(aut, uc_alpha);
     }
