@@ -81,6 +81,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     mConflictChecker.setMonolithicStateLimit(finalStateLimit);
     mConflictChecker.setPreselectingMethod(mPreselecting);
     mConflictChecker.setSelectingMethod(mSelecting);
+    mConflictChecker.setUsingSpecialEvents(true);
     mPrintWriter.println("InternalStateLimit," + internalStateLimit +
                          ",InternalTransitionLimit," +
                          internalTransitionLimit +
@@ -221,24 +222,18 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   {
     testOnlySelfLoop01();
     testFailedTrafficLights();
-
-    synthesiseTbedNoderailB();                                //
     synthesisAGV();
     synthesisAGVB();
     synthesissAip0Alps();
     synthesissRhoneSubPatch0();
     synthesisFenCaiWon09B();
-    synthesisFenCaiWon09Synth();//
+    synthesisFenCaiWon09Synth();
     synthesissFms2003();
     synthesiseFischertechnik();
     synthesiseIPC();
     synthesiseCentralLockingKoordwspBlock();
-    synthesiseTbedCtct();     //
-    synthesiseTbedNoderailB();
-    synthesiseCentralLockingVerriegel3b();//
-
-
-
+    synthesiseTbedCtct();
+    synthesiseCentralLockingVerriegel3b();
 
     testBigBmw();
     testFischertechnik();
@@ -511,12 +506,6 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   }
 
   // Train testbed
-
-  private void synthesiseTbedNoderailB() throws Exception
-  {
-    runModel("tests", "incremental_suite", "tbed_noderail_block.wmod",false);
-  }
-
 
   private void synthesiseTbedCtct() throws Exception
   {

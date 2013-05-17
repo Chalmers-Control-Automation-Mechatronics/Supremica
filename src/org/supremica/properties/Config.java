@@ -190,7 +190,10 @@ public final class Config
               "Include RAS support");
 
     // GUI_EDITOR
-    //public static final BooleanProperty GUI_EDITOR_USE_SPRING_EMBEDDER = new BooleanProperty(PropertyType.GUI_EDITOR, "useSpringEmbedder", true, "Use spring embedder for automatic graph layout");
+    public static final ObjectProperty GUI_EDITOR_ICONSET =
+      new ObjectProperty(PropertyType.GUI_EDITOR, "iconSet", "waters",
+                         "Icon set (requires restart)",
+                         new Object[] {"waters", "16x16", "20x20"});
     public static final ColorProperty GUI_EDITOR_BACKGROUND_COLOR =
       new ColorProperty(PropertyType.GUI_EDITOR, "backgroundColor",
                         Color.WHITE, "Automaton background colour");

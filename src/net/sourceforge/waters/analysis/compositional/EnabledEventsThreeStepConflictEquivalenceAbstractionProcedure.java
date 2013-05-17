@@ -27,6 +27,7 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -61,6 +62,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
        final boolean useLimitedCertainConflicts,
        final boolean useAlwaysEnabledLimitedCertainConflicts)
   {
+    final int limit = analyzer.getInternalTransitionLimit();
     final ChainTRSimplifier preChain = new ChainTRSimplifier();
     final ChainTRSimplifier postChain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
@@ -69,6 +71,10 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
     preChain.add(markingRemover);
+    final TransitionRemovalTRSimplifier transitionRemover =
+      new TransitionRemovalTRSimplifier();
+    transitionRemover.setTransitionLimit(limit);
+    preChain.add(transitionRemover);
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
@@ -79,13 +85,11 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     enabledEventsSilentIncomingSimplifier.setRestrictsToUnreachableStates(true);
     preChain.add(enabledEventsSilentIncomingSimplifier);
 
-
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     preChain.add(silentOutRemover);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
-    final int limit = analyzer.getInternalTransitionLimit();
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     preChain.add(incomingEquivalenceSimplifier);
 
@@ -94,7 +98,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     preChain.add(enabledEventsSilentContinuationSimplifier);
 
     final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
-
     if (useLimitedCertainConflicts) {
       limitedCertainConflictsRemover =
         new LimitedCertainConflictsTRSimplifier();
@@ -201,32 +204,30 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
       int numEnabledEvents = 0;
       //for all the events
-      for(final EventProxy event : aut.getEvents()) {
+      for (final EventProxy event : aut.getEvents()) {
         //Get event info somewhere
-        final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo
-          eventInfo  = enabledEventsAnalyzer.getEventInfo(event);
-        if(eventInfo != null)
-        //check if event is always enabled or this automaton is only disabler
-        if(eventInfo.isSingleDisablingAutomaton(aut)) {
-          eventsList.add(event);
-          // Count how many enabled events there are
-          if(event != tau) {   //Tau is added to the list here but not counted as always Enabled.
-            numEnabledEvents++;
+        final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo =
+          enabledEventsAnalyzer.getEventInfo(event);
+        if (eventInfo != null) {
+          //check if event is always enabled or this automaton is only disabler
+          if (eventInfo.isSingleDisablingCandidate(candidate)) {
+            eventsList.add(event);
+            // Count how many enabled events there are
+            if (event != tau) { //Tau is added to the list here but not counted as always Enabled.
+              numEnabledEvents++;
+            }
           }
         }
       }
-
       for(final EventProxy events : aut.getEvents()) {
-        //Get event info somewhere
         final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
-        //Adds the prepositions and other events.
-        if (eventInfo == null || !eventInfo.isSingleDisablingAutomaton(aut)) {
+        //Adds the propositions and other events.
+        if (eventInfo == null || !eventInfo.isSingleDisablingCandidate(candidate)) {
           eventsList.add(events);
         }
-
       }
 
-      //Tell the simplifiers how many enabled events there are
+      // Tell the simplifiers how many enabled events there are
       mEnabledEventsSilentContinuationSimplifier.
         setNumberOfEnabledEvents(numEnabledEvents);
       mEnabledEventsSilentIncomingSimplifier.
@@ -235,29 +236,12 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         mEnabledEventsLimitedCertainConflictsSimplifier.
           setNumberOfEnabledEvents(numEnabledEvents);
       }
-
-      //create Event Encoding in right order with all enabled events at front of list
-      final EventEncoding eventEnc = createEventEncoding(eventsList, tau, candidate);
-
-    //read selfLoop info at beginning of 3step:
-      final CompositionalConflictChecker eventsAnalyzer = (CompositionalConflictChecker)getAnalyzer();
-
-      //for all events
-      for(final EventProxy event : aut.getEvents()) {
-        //Get event info
-        final CompositionalConflictChecker.EventInfo eventInfo  = eventsAnalyzer.getEventInfo(event);
-        if(eventInfo != null && event != tau)
-        //check if event is the only nonSelfLoop is this automaton
-        if(eventInfo.isOnlyNonSelfLoopCandidate(candidate)) {
-          eventEnc.setProperEventStatus(eventEnc.getEventCode(event),
-                                        EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
-
-        }
-      }
-
+      // Create Event Encoding in right order with all enabled events at front of list
+      final EventEncoding eventEnc =
+        createEventEncoding(eventsList, tau, candidate);
       ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(aut, eventEnc,
-                                         inputStateEnc, config);
+        new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
+
       final AbstractCompositionalModelAnalyzer analyzer = getAnalyzer();
       analyzer.showDebugLog(rel);
       final int numStates = rel.getNumberOfStates();

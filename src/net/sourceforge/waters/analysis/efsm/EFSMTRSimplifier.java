@@ -26,6 +26,7 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.abstraction.OmegaRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
@@ -185,6 +186,19 @@ class EFSMTRSimplifier
   {
     return mSelfloopedUpdates;
   }
+
+  /**
+   * Stores statistics in the given list. This method is used to
+   * collect detailed statistics for each individual simplifier invoked by
+   * this simplifier.
+   * @param  list           Statistics records are added to the end of this
+   *                        list, in order of invocation of the simplifiers.
+   */
+  public void collectStatistics(final List<TRSimplifierStatistics> list)
+  {
+    mSimplifier.collectStatistics(list);
+  }
+
 
   //#########################################################################
   //# Invocation

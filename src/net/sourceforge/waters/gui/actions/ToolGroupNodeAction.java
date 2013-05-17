@@ -11,6 +11,8 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.gui.ControlledToolbar;
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -22,11 +24,8 @@ public class ToolGroupNodeAction
   //# Constructors
   public ToolGroupNodeAction(final IDE ide)
   {
-    super(ide,
-	  "Group nodes",
-	  "Create group nodes",
-	  "/icons/waters/nodegroup16.gif",
-	  ControlledToolbar.Tool.GROUPNODE);
+    super(ide, "Group nodes", "Create group nodes",
+          IconLoader.ICON_TOOL_GROUP_NODE, ControlledToolbar.Tool.GROUPNODE);
   }
 
 

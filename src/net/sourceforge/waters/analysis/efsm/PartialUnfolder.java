@@ -22,6 +22,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -50,7 +51,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class PartialUnfolder
+public class PartialUnfolder extends AbstractEFSMAlgorithm
 {
 
   //#########################################################################
@@ -58,6 +59,7 @@ public class PartialUnfolder
   public PartialUnfolder(final ModuleProxyFactory factory,
                          final CompilerOperatorTable op)
   {
+    super(true);
     mFactory = factory;
     mOperatorTable = op;
     mOccursChecker = OccursChecker.getInstance();
@@ -76,17 +78,19 @@ public class PartialUnfolder
 
   //#########################################################################
   //# Invocation
-  public void setUp()
+  @Override
+  public void setUp() throws AnalysisException
   {
-
+    super.setUp();
   }
 
+  @Override
   public void tearDown()
   {
     mValueToClass = null;
     mClassToValue = null;
+    super.tearDown();
   }
-
 
   EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
                                 final EFSMVariable var,
@@ -102,11 +106,15 @@ public class PartialUnfolder
                                 final List<int[]> partition)
     throws EvalException, AnalysisException
   {
+    System.err.println("Unfolding: " + efsmRel.getName() + " \\ " + var.getName() + " ...");
+    System.err.println(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
+    final long start = System.currentTimeMillis();
+    final EFSMSimplifierStatistics statistics = getStatistics();
+    statistics.recordStart(efsmRel);
+    EFSMTransitionRelation result = null;
     try {
-      System.err.println("Unfolding: " + efsmRel.getName() + " \\ " + var.getName() + " ...");
-      System.err.println(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
-      final long start = System.currentTimeMillis();
       mUnfoldedVariable = var;
+      setUp();
       final CompiledRange range = var.getRange();
       mRangeValues = range.getValues();
       mUnfoldedEventCache =
@@ -129,6 +137,7 @@ public class PartialUnfolder
         }
         mReducedRangeSize = partition.size();
       }
+      checkAbort();
       mUnfoldingVariableContext =
         new UnfoldingVariableContext(mOperatorTable, mRootContext, mUnfoldedVariable);
       mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable,
@@ -269,18 +278,26 @@ public class PartialUnfolder
       (efsmRel.getVariables().size());
 
       mEFSMVariableCollector.collectAllVariables(mUnfoldedEventEncoding, variables);
-      final EFSMTransitionRelation result =
-        new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
-                                   variables, nodeList);
-      final long stop = System.currentTimeMillis();
-      final float difftime = 0.001f * (stop - start);
-      @SuppressWarnings("resource")
-      final Formatter formatter = new Formatter(System.err);
-      formatter.format("%d states, %d propagator1 calls, %.3f seconds\n",
-                       unfoldedRel.getNumberOfStates(), mPropagatorCalls, difftime);
+      result = new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
+                                          variables, nodeList);
       return result;
 
     } finally {
+      final long stop = System.currentTimeMillis();
+      final long difftime = stop - start;
+      @SuppressWarnings("resource")
+      final Formatter formatter = new Formatter(System.err);
+      if(result != null) {
+        final ListBufferTransitionRelation unfoldedRel = result.getTransitionRelation();
+        formatter.format("%d states, %d propagator1 calls, %.3f seconds\n",
+                         unfoldedRel.getNumberOfStates(), mPropagatorCalls,
+                         0.001f * difftime);
+        statistics.recordFinish(result, true);
+      } else {
+        System.err.println("fail");
+        statistics.recordOverflow();
+      }
+      recordRunTime(difftime);
       tearDown();
     }
   }
@@ -402,8 +419,10 @@ public class PartialUnfolder
 
     //#######################################################################
     //# Access
-    private void expandState(final int source) throws EvalException
+    private void expandState(final int source)
+      throws EvalException, AbortException
     {
+      checkAbort();
       final long pair = mUnfoldedStateList.get(source);
       final int sourceState = (int) (pair & 0xffffffffL);
       final int beforeClass = (int) (pair >> 32);

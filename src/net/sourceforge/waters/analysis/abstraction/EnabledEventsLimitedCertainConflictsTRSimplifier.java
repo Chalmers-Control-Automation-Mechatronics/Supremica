@@ -194,9 +194,13 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
     mPredecessorsIterator = rel.createPredecessorsReadOnlyIterator();   //Creates iterator to move through it.
     mMaxLevel = COREACHABLE;
     int level = BLOCKING;
-    int numCoreachable = findCoreachableStates(level);          //Does a pretest to check if the whole thing needs to be run
     int numReachable = rel.getNumberOfReachableStates();
-    if (numCoreachable == numReachable) {           //if it has no blocking states
+    if (numReachable <= 1) {
+      return false;
+    }
+    int numCoreachable = findCoreachableStates(level);
+
+    if (numCoreachable == numReachable) { //if it has no blocking states
       return false;
     }
     mMaxLevel = BLOCKING;
@@ -329,10 +333,31 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
 
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     numReachable = rel.getNumberOfReachableStates();
-    if (numCoreachable == 0) {
+    int blockingInit = -1;
+    if (numCoreachable < numReachable && numCoreachable > 0) {
+      // Some reachable states are blocking. Is one of them initial?
+      for (int state = 0; state < numStates; state++) {
+        if (mStateInfo[state] != COREACHABLE && rel.isInitial(state)) {
+          blockingInit = state;
+          break;
+        }
+      }
+    }
+    if (blockingInit >= 0) {
+      // There is a blocking initial state.
+      // Mark all other states as unreachable.
+      for (int state = 0; state < numStates; state++) {
+        if (state == blockingInit) {
+          rel.removeOutgoingTransitions(state);
+        } else {
+          rel.setReachable(state, false);
+        }
+      }
+      result = true;
+    } else if (numCoreachable == 0) {
       // No coreachable states. Merge all reachable states into a single
       // blocking state, and be sure to remove all transitions.
-      if (numReachable > 1) {
+  if (numReachable > 1) {
         result = true;
         final int[] clazz = new int[numReachable];
         int index = 0;

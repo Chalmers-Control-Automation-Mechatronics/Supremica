@@ -17,9 +17,9 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
+
 import javax.swing.Action;
 import javax.swing.KeyStroke;
-import javax.swing.ImageIcon;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 
@@ -32,6 +32,7 @@ import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.base.Proxy;
 
 import org.supremica.gui.ide.IDE;
@@ -74,16 +75,15 @@ public class IDECutAction
              "Delete selection and place into clipboard");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
     putValue(Action.ACCELERATOR_KEY,
-	     KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON,
-	     new ImageIcon(IDE.class.getResource
-			   ("/toolbarButtonGraphics/general/Cut16.gif")));
+             KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_CUT);
     setEnabled(false);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final FocusTracker tracker = getFocusTracker();
@@ -121,6 +121,7 @@ public class IDECutAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
@@ -146,6 +147,7 @@ public class IDECutAction
 
   //#########################################################################
   //# Interface java.awt.datatransfer.ClipboardOwner
+  @Override
   public void lostOwnership(final Clipboard clipboard,
                             final Transferable contents)
   {

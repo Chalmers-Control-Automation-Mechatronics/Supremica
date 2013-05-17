@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
@@ -29,7 +30,7 @@ import org.supremica.gui.ide.ImportDialog;
  * The action triggering the import dialog ({@link ImportDialog}). The import
  * dialog enables the user to import and convert external files containing a
  * hierarchy of modules, as opposed to a single module.
- * 
+ *
  * @see ImportDialog, OpenAction
  * @author Robi Malik
  */
@@ -45,12 +46,14 @@ public class ImportAction extends net.sourceforge.waters.gui.actions.IDEAction
     putValue(Action.NAME, "Import ...");
     putValue(Action.SHORT_DESCRIPTION, "Import modules");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_I);
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_IMPORT);
     mCurrentSource = null;
     mCurrentTarget = null;
   }
 
   // #########################################################################
   // # Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final IDE ide = getIDE();

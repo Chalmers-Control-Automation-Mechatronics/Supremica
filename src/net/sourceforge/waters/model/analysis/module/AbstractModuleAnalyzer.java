@@ -83,7 +83,7 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
     return mBinding;
   }
 
-  public void setBinding(final List<ParameterBindingProxy> binding)
+  public void setBindings(final List<ParameterBindingProxy> binding)
   {
     mBinding = binding;
   }

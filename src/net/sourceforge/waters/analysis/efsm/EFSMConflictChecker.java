@@ -183,11 +183,16 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     if (mEFSMTRSimplifierFactory == null) {
       mEFSMTRSimplifierFactory = EFSMTRSimplifierFactory.NB;
     }
-    mSimplifier = mEFSMTRSimplifierFactory.createAbstractionProcedure(this);
+    final EFSMConflictCheckerAnalysisResult result = getAnalysisResult();
+    mEFSMSynchronization = new EFSMSynchronization(factory);
+    result.addSynchronousProductStatistics(mEFSMSynchronization.getStatistics());
     mVariablePartitionComputer =
       new EFSMVariablePartitionComputer(factory, mCompilerOperatorTable);
+    result.addPartitioningStatistics(mVariablePartitionComputer.getStatistics());
     mPartialUnfolder = new PartialUnfolder(factory, mCompilerOperatorTable);
-    mEFSMSynchronization = new EFSMSynchronization(factory);
+    result.addUnfoldingStatistics(mPartialUnfolder.getStatistics());
+    mSimplifier = mEFSMTRSimplifierFactory.createAbstractionProcedure(this);
+    result.setSimplifierStatistics(mSimplifier);
     mNonblockingChecker = new EFSMTRNonblockingChecker();
     mEFSMSystemQueue = new PriorityQueue<EFSMSystem>();
     mNextSubsystemNumber = 1;
@@ -212,6 +217,18 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     super.tearDown();
   }
 
+  @Override
+  protected EFSMConflictCheckerAnalysisResult createAnalysisResult()
+  {
+    return new EFSMConflictCheckerAnalysisResult();
+  }
+
+  @Override
+  public EFSMConflictCheckerAnalysisResult getAnalysisResult()
+  {
+    return (EFSMConflictCheckerAnalysisResult) super.getAnalysisResult();
+  }
+
 
   @Override
   public boolean run()
@@ -225,6 +242,8 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         new EFSMCompiler(mDocumentManager, module);
       compiler.setConfiguredDefaultMarking(getConfiguredDefaultMarking());
       mCurrentEFSMSystem = compiler.compile(binding);
+      final EFSMConflictCheckerAnalysisResult result = getAnalysisResult();
+      result.setEFSMSystem(mCurrentEFSMSystem);
       mSystemName = mCurrentEFSMSystem.getName();
       final EFSMVariableContext context = mCurrentEFSMSystem.getVariableContext();
       mEFSMVariableCollector =
@@ -236,11 +255,11 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       while (iter.hasNext()) {
         final EFSMTransitionRelation currentEFSMTransitionRelation =
           iter.next();
-        final EFSMTransitionRelation result =
+        final EFSMTransitionRelation efsmTR =
           simplify(currentEFSMTransitionRelation);
-        if (result != null) {
-          iter.set(result);
-          result.register();
+        if (efsmTR != null) {
+          iter.set(efsmTR);
+          efsmTR.register();
           currentEFSMTransitionRelation.dispose();
         }
       }
@@ -264,6 +283,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   private boolean runCompositionalMinimization()
     throws AnalysisException, EvalException
   {
+    final EFSMConflictCheckerAnalysisResult result = getAnalysisResult();
     while (!mCurrentEFSMSystem.getTransitionRelations().isEmpty()) {
       if (isCurrentSubsystemTrivial()) {
         if (getAnalysisResult().isFinished()) {
@@ -280,6 +300,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       final EFSMVariable varSelected =
         mChainVariableSelectionHeuristic.selectVariable(mCurrentEFSMSystem);
       if (varSelected != null) {
+        result.addCompositionAttempt();
         final EFSMTransitionRelation varEFSMTransitionRelation =
           varSelected.getTransitionRelation();
         if (varEFSMTransitionRelation == null) {
@@ -291,6 +312,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         final EFSMTransitionRelation unfoldTR =
           mPartialUnfolder.unfold(varEFSMTransitionRelation, varSelected,
                                   mCurrentEFSMSystem, partition);
+        result.addEFSMTransitionRelation(unfoldTR);
         EFSMTransitionRelation unfoldSimplified = null;
         if (efsmTransitionRelationList.size() > 1) {
           unfoldSimplified = simplify(unfoldTR);
@@ -315,13 +337,15 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
             varEFSMTransitionRelation.getVariables().size()) {
           splitCurrentSubsystem();
         }
-      } else if (efsmTransitionRelationList.size() > 1){
+      } else if (efsmTransitionRelationList.size() > 1) {
+        result.addCompositionAttempt();
         final List<EFSMTransitionRelation> selectedTR =
           mCompositionSelectionHeuristic.selectComposition(mCurrentEFSMSystem);
         final EFSMTransitionRelation TR1 = selectedTR.get(0);
         final EFSMTransitionRelation TR2 = selectedTR.get(1);
         final EFSMTransitionRelation synchTR =
           mEFSMSynchronization.synchronize(TR1, TR2);
+        result.addEFSMTransitionRelation(synchTR);
         final EFSMVariableContext context =
           mCurrentEFSMSystem.getVariableContext();
         EFSMTransitionRelation synchSimplified =
@@ -345,8 +369,8 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         }
       } else if (efsmTransitionRelationList.size() == 1){
         final EFSMTransitionRelation finalEFSMTR = efsmTransitionRelationList.get(0);
-        final boolean result = mNonblockingChecker.run(finalEFSMTR);
-        return setBooleanResult(result);
+        final boolean nonblocking = mNonblockingChecker.run(finalEFSMTR);
+        return setBooleanResult(nonblocking);
       }
     }
     return setSatisfiedResult();
@@ -566,4 +590,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   private String mSystemName;
   private int mNextSubsystemNumber;
   private EFSMSystem mCurrentEFSMSystem;
+
+
+
 }

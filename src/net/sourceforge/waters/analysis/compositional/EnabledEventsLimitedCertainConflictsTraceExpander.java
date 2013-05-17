@@ -324,17 +324,21 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     while (true) {
       record = queue.remove();
       scode = record.getState();
+      final int slevel = mSimplifier.getLevel(scode);
       //iter.reset(scode, tau);               //we want to iterate over always enabled as well
       iter.resetState(scode);
       iter.resetEvents(0, mNumEnabledEvents);
       while (iter.advance()) {
-        scode = iter.getCurrentTargetState();
-        // iter.getCurrentEvent();
-        if (visited.add(scode)) {
+        final int tcode = iter.getCurrentTargetState();
+                if (visited.add(tcode)) {
+                  final int tlevel = mSimplifier.getLevel(tcode);
+                  if (tlevel < 0 || tlevel > slevel) {
+                    continue;
+                  }
           final int event = iter.getCurrentEvent();
           final SearchRecord newRecord =
-            new SearchRecord(scode, 0, event, record);
-          if (mSimplifier.getLevel(scode) >=0 && mSimplifier.getLevel(scode) <= level) {
+            new SearchRecord(tcode, 0, event, record);
+                   if (tlevel <= level) {
             record = newRecord;
             break search;
           }

@@ -48,6 +48,7 @@ public class CompositionalLanguageInclusionCheckerTest
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
+    checker.setTraceCheckingEnabled(true);
     return checker;
   }
 

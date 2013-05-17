@@ -11,10 +11,12 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.dialog.InstanceEditorDialog;
+import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -39,11 +41,13 @@ public class InsertInstanceAction
     super(ide);
     putValue(Action.NAME, "New Instance ...");
     putValue(Action.SHORT_DESCRIPTION, "Add an instance to the module");
+    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_INSTANCE);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final ModuleWindowInterface root = getActiveModuleWindowInterface();

@@ -11,9 +11,11 @@ package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
+
+import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
@@ -30,15 +32,15 @@ public class SaveAction extends AbstractSaveAction
     putValue(Action.NAME, "Save");
     putValue(Action.SHORT_DESCRIPTION, "Save the module");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
-	putValue(Action.ACCELERATOR_KEY,
-			 KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource
-              ("/toolbarButtonGraphics/general/Save16.gif")));
+    putValue(Action.ACCELERATOR_KEY,
+             KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_SAVE);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final IDE ide = getIDE();
@@ -49,6 +51,7 @@ public class SaveAction extends AbstractSaveAction
 
   //#########################################################################
   //# Enabling and Disabling
+  @Override
   String getShortDescription(final String type)
   {
     return "Save the " + type;

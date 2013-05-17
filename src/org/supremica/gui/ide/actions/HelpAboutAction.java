@@ -1,38 +1,42 @@
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
-import org.supremica.gui.ide.AboutDialog;
-import org.supremica.log.*;
 import java.util.List;
-import javax.swing.ImageIcon;
-import org.supremica.gui.ide.IDE;
+
+import javax.swing.Action;
+
+import net.sourceforge.waters.gui.util.IconLoader;
+
+import org.supremica.gui.ide.AboutDialog;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 public class HelpAboutAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    
+
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(HelpAboutAction.class);
-    
-    public HelpAboutAction(List<IDEAction> actionList)
+
+    public HelpAboutAction(final List<IDEAction> actionList)
     {
         super(actionList);
-        
         putValue(Action.NAME, "About Supremica...");
         putValue(Action.SHORT_DESCRIPTION, "About Supremica");
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/About16.gif")));
+        putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_ABOUT);
     }
-    
-    public void actionPerformed(ActionEvent e)
+
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
-    
+
+    @Override
     public void doAction()
     {
-        AboutDialog aboutDialog = new AboutDialog(ide.getFrame());
+        final AboutDialog aboutDialog = new AboutDialog(ide.getFrame());
         aboutDialog.setVisible(true);
     }
 }

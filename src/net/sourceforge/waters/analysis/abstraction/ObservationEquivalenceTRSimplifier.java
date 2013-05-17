@@ -1179,11 +1179,11 @@ public class ObservationEquivalenceTRSimplifier
         @Override
         public boolean execute(final int event)
         {
-          final boolean followTau =
+          final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
             (rel.getProperEventStatus(event) &
              EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           TIntHashSet visitedStates = null;
-          if (followTau) {
+          if (outsideOnlySelfloop) {
             if (mEquivalence.respectsTau()) {
               mTauIterator.reset();
             } else {
@@ -1197,7 +1197,7 @@ public class ObservationEquivalenceTRSimplifier
             while (transIter.advance()) {
               final int pred = transIter.getCurrentSourceState();
               // Store pred in cache so we do not visit it twice.
-              if (followTau) {
+              if (outsideOnlySelfloop) {
                 if (mEquivalence.respectsTau()) {
                   mTauIterator.addVisitedState(pred);
                 } else {
@@ -1212,7 +1212,7 @@ public class ObservationEquivalenceTRSimplifier
             }
           }
           // Special treatment for other selfloop-only events
-          if (followTau) {
+          if (outsideOnlySelfloop) {
             if (mEquivalence.respectsTau()) {
               // If considering tau as silent event:
               // Add all states backwards reachable by tau as predecessors.

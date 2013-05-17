@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -69,6 +70,19 @@ abstract class CompositionSelectionHeuristic
   public abstract double getHeuristicValue(List<EFSMTransitionRelation> candidate)
     throws AnalysisException, EvalException;
 
+
   //#########################################################################
-  //# Data Members
+  //# Invocation
+  @Override
+  public String toString()
+  {
+    final String className = ProxyTools.getShortClassName(this);
+    if (className.endsWith("CompositionSelectionHeuristic")) {
+      final int len = "CompositionSelectionHeuristic".length();
+      return className.substring(0, className.length()-len);
+    } else {
+      return className;
+    }
+  }
+
 }

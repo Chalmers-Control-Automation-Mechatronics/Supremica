@@ -90,14 +90,6 @@ public abstract class AbstractStandardConflictCheckerTest
   }
 
 
-  public void test_onlySelfLoop01() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "nasty";
-    final String name = "onlySelfLoop01.wmod";
-    runModelVerifier(group, subdir, name, true);
-  }
-
   //#########################################################################
   //# Test Cases --- nondeterministic
   public void testNondeterministicCombinations() throws Exception
@@ -303,6 +295,22 @@ public abstract class AbstractStandardConflictCheckerTest
     final String dir = "nasty";
     final String name = "onestate.wmod";
     runModelVerifier(group, dir, name, true);
+  }
+
+  public void test_onlySelfLoop01() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "nasty";
+    final String name = "onlySelfLoop01.wmod";
+    runModelVerifier(group, subdir, name, true);
+  }
+
+  public void test_onlySelfLoop02() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "nasty";
+    final String name = "onlySelfLoop02.wmod";
+    runModelVerifier(group, subdir, name, true);
   }
 
   public void testOrphanEvents() throws Exception

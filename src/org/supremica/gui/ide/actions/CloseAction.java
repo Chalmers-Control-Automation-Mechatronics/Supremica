@@ -38,6 +38,7 @@ public class CloseAction
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
         final IDE ide = getIDE();
@@ -49,6 +50,7 @@ public class CloseAction
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Observer
+    @Override
     public void update(final EditorChangedEvent event)
     {
         switch (event.getKind()) {
@@ -65,7 +67,7 @@ public class CloseAction
         }
     }
 
-    
+
 	//#######################################################################
     //# Class Constants
 	private static final long serialVersionUID = 1L;
