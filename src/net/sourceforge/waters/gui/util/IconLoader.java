@@ -49,22 +49,28 @@ public class IconLoader
 
   //#########################################################################
   //# Class Constants
-  private static final String NAME_AUTOMATON = "waters/automaton16";
   private static final String NAME_BINDING = "binding";
+  private static final String NAME_CONSOLE_DEBUG = "debug";
+  private static final String NAME_CONSOLE_ERROR = "error";
+  private static final String NAME_CONSOLE_INFO = "info";
+  private static final String NAME_CONSOLE_WARNING = "warning";
   private static final String NAME_CONSTANT = "named_constant";
   private static final String NAME_CONTROLLABLE_OBSERVABLE =
     "controllable";
   private static final String NAME_CONTROLLABLE_UNOBSERVABLE =
-    "waters/controllable_unobs";
+    "controllable_unobservable";
   private static final String NAME_EVENT = "event";
   private static final String NAME_EVENT_ALIAS = "event_alias";
+  private static final String NAME_FOREACH = "foreach";
   private static final String NAME_FORBIDDEN = "ForbiddenState16";
   private static final String NAME_INSTANCE = "instance";
+  private static final String NAME_NEW_AUTOMATON = "new_automaton";
   private static final String NAME_NEW_BINDING = "new_binding";
   private static final String NAME_NEW_CONSTANT = "new_named_constant";
   private static final String NAME_NEW_EVENT = "new_event";
   private static final String NAME_NEW_EVENT_ALIAS = "new_event_alias";
   private static final String NAME_NEW_INSTANCE = "new_instance";
+  private static final String NAME_NEW_VARIABLE = "new_variable";
   private static final String NAME_PLANT = "plant";
   private static final String NAME_PROPERTY = "property";
   private static final String NAME_PROPOSITION = "waters/proposition";
@@ -99,36 +105,41 @@ public class IconLoader
   private static final String NAME_UNCONTROLLABLE_OBSERVABLE =
     "uncontrollable";
   private static final String NAME_UNCONTROLLABLE_UNOBSERVABLE =
-    "waters/uncontrollable_unobs";
-  private static final String NAME_VARIABLE = "waters/variable";
+    "uncontrollable_unobservable";
+  private static final String NAME_VARIABLE = "variable";
   private static final String NAME_CROSS = "waters/cross16";
   private static final String NAME_TICK = "waters/tick16";
-  private static final String NAME_WARNING = "RedFlag";
-  private static final String NAME_YELLOWWARNING = "OrangeFlag";
 
 
   //#########################################################################
   //# Class Constants
   // Editor
-  public static final ImageIcon ICON_AUTOMATON = getSupremicaIcon(NAME_AUTOMATON);
   public static final ImageIcon ICON_CONSTANT = getWatersIcon(NAME_CONSTANT);
+  public static final ImageIcon ICON_CONSOLE_DEBUG = getWatersIcon(NAME_CONSOLE_DEBUG);
+  public static final ImageIcon ICON_CONSOLE_ERROR = getWatersIcon(NAME_CONSOLE_ERROR);
+  public static final ImageIcon ICON_CONSOLE_INFO = getWatersIcon(NAME_CONSOLE_INFO);
+  public static final ImageIcon ICON_CONSOLE_WARNING = getWatersIcon(NAME_CONSOLE_WARNING);
   public static final ImageIcon ICON_BINDING = getWatersIcon(NAME_BINDING);
   public static final ImageIcon ICON_CONTROLLABLE_OBSERVABLE =
     getWatersIcon(NAME_CONTROLLABLE_OBSERVABLE);
   public static final ImageIcon ICON_CONTROLLABLE_UNOBSERVABLE =
-    getSupremicaIcon(NAME_CONTROLLABLE_UNOBSERVABLE);
+    getWatersIcon(NAME_CONTROLLABLE_UNOBSERVABLE);
   public static final ImageIcon ICON_EVENT = getWatersIcon(NAME_EVENT);
   public static final ImageIcon ICON_EVENT_ALIAS = getWatersIcon(NAME_EVENT_ALIAS);
   public static final ImageIcon ICON_FORBIDDEN = getSupremicaIcon(NAME_FORBIDDEN);
-  public static final ImageIcon ICON_FOREACH = null;
+  public static final ImageIcon ICON_FOREACH = getWatersIcon(NAME_FOREACH);
   public static final ImageIcon ICON_INSTANCE = getWatersIcon(NAME_INSTANCE);
+  public static final ImageIcon ICON_NEW_AUTOMATON =
+    getWatersIcon(NAME_NEW_AUTOMATON);
   public static final ImageIcon ICON_NEW_BINDING = getWatersIcon(NAME_NEW_BINDING);
   public static final ImageIcon ICON_NEW_CONSTANT = getWatersIcon(NAME_NEW_CONSTANT);
   public static final ImageIcon ICON_NEW_EVENT = getWatersIcon(NAME_NEW_EVENT);
   public static final ImageIcon ICON_NEW_EVENT_ALIAS = getWatersIcon(NAME_NEW_EVENT_ALIAS);
   public static final ImageIcon ICON_NEW_INSTANCE = getWatersIcon(NAME_NEW_INSTANCE);
+  public static final ImageIcon ICON_NEW_VARIABLE = getWatersIcon(NAME_NEW_VARIABLE);
   public static final ImageIcon ICON_PLANT = getWatersIcon(NAME_PLANT);
   public static final ImageIcon ICON_PROPERTY = getWatersIcon(NAME_PROPERTY);
+  // TODO Replace this by computed icon:
   public static final ImageIcon ICON_PROPOSITION = getSupremicaIcon(NAME_PROPOSITION);
   public static final ImageIcon ICON_SPEC = getWatersIcon(NAME_SPEC);
   public static final ImageIcon ICON_SUPERVISOR = getWatersIcon(NAME_SUPERVISOR);
@@ -153,8 +164,8 @@ public class IconLoader
   public static final ImageIcon ICON_UNCONTROLLABLE_OBSERVABLE =
     getWatersIcon(NAME_UNCONTROLLABLE_OBSERVABLE);
   public static final ImageIcon ICON_UNCONTROLLABLE_UNOBSERVABLE =
-    getSupremicaIcon(NAME_UNCONTROLLABLE_UNOBSERVABLE);
-  public static final ImageIcon ICON_VARIABLE = getSupremicaIcon(NAME_VARIABLE);
+    getWatersIcon(NAME_UNCONTROLLABLE_UNOBSERVABLE);
+  public static final ImageIcon ICON_VARIABLE = getWatersIcon(NAME_VARIABLE);
 
   // Simulator
   public static final ImageIcon ICON_SIMULATOR_BACK =
@@ -171,17 +182,17 @@ public class IconLoader
     getSupremicaIcon(NAME_SIMULATOR_TO_START);
   public static final ImageIcon ICON_TABLE_NORMAL_AUTOMATON = null;
   public static final ImageIcon ICON_TABLE_ENABLED_AUTOMATON = getSupremicaIcon(NAME_TICK);
-  public static final ImageIcon ICON_TABLE_WARNING_PROPERTY = getSupremicaIcon(NAME_YELLOWWARNING);
-  public static final ImageIcon ICON_TABLE_ERROR_AUTOMATON = getSupremicaIcon(NAME_WARNING);
+  public static final ImageIcon ICON_TABLE_WARNING_PROPERTY = ICON_CONSOLE_WARNING;
+  public static final ImageIcon ICON_TABLE_ERROR_AUTOMATON = ICON_CONSOLE_WARNING;
   public static final ImageIcon ICON_TABLE_DISABLED_PROPERTY = getSupremicaIcon(NAME_CROSS);
-  public static final ImageIcon ICON_EVENTTREE_BLOCKING_EVENT = getSupremicaIcon(NAME_WARNING);
+  public static final ImageIcon ICON_EVENTTREE_BLOCKING_EVENT = ICON_CONSOLE_WARNING;
   public static final ImageIcon ICON_EVENTTREE_INVALID_EVENT = getSupremicaIcon(NAME_CROSS);
   public static final ImageIcon ICON_EVENTTREE_VALID_EVENT = getSupremicaIcon(NAME_TICK);
-  public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_EVENT = getSupremicaIcon(NAME_YELLOWWARNING);
+  public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_EVENT = ICON_CONSOLE_WARNING;
   public static final ImageIcon ICON_EVENTTREE_DISABLED_AUTOMATON = getSupremicaIcon(NAME_CROSS);
   public static final ImageIcon ICON_EVENTTREE_ENABLED_AUTOMATON = getSupremicaIcon(NAME_TICK);
-  public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_PROPERTY = getSupremicaIcon(NAME_YELLOWWARNING);
+  public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_PROPERTY = ICON_CONSOLE_WARNING;
 
-  public static final Icon ICON_EVENTTREE_BLOCKING_AUTOMATON = getSupremicaIcon(NAME_WARNING);
+  public static final Icon ICON_EVENTTREE_BLOCKING_AUTOMATON = ICON_CONSOLE_WARNING;
 
 }

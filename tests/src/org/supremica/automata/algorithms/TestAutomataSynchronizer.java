@@ -53,14 +53,18 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.testhelpers.*;
-import org.supremica.automata.*;
-import org.supremica.automata.IO.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.Project;
+import org.supremica.automata.IO.ProjectBuildFromXML;
+import org.supremica.testhelpers.TestFiles;
 
 public class TestAutomataSynchronizer
 	extends TestCase
 {
-	public TestAutomataSynchronizer(String name)
+	public TestAutomataSynchronizer(final String name)
 	{
 		super(name);
 	}
@@ -69,7 +73,8 @@ public class TestAutomataSynchronizer
 	 * Sets up the test fixture.
 	 * Called before every test case method.
 	 */
-	protected void setUp()
+	@Override
+  protected void setUp()
 	{
 	}
 
@@ -77,7 +82,8 @@ public class TestAutomataSynchronizer
 	 * Tears down the test fixture.
 	 * Called after every test case method.
 	 */
-	protected void tearDown()
+	@Override
+  protected void tearDown()
 	{
 	}
 
@@ -87,7 +93,7 @@ public class TestAutomataSynchronizer
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite(TestAutomataSynchronizer.class);
+		final TestSuite suite = new TestSuite(TestAutomataSynchronizer.class);
 		return suite;
 	}
 
@@ -95,22 +101,22 @@ public class TestAutomataSynchronizer
 	{
 		try
 		{
-			ProjectBuildFromXML builder = new ProjectBuildFromXML();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+			final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+			final Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
 
 			// Note that (strictly) it is NOT (only) synchronization we're testing
 			// here (since we forbid uncontrollable states)!
-			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			final SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
 			syncOptions.setForbidUncontrollableStates(true);
 
 			// Test Prioritized synchronization, although all events are prioritized in this example
 			{
-				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions, false);
+				final AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 8);
-				Automaton theAutomaton = synchronizer.getAutomaton();
-				Alphabet theAlphabet = theAutomaton.getAlphabet();
+				final Automaton theAutomaton = synchronizer.getAutomaton();
+				final Alphabet theAlphabet = theAutomaton.getAlphabet();
 				assertTrue("Type", theAutomaton.getType() == AutomatonType.PLANT);
 				assertTrue("nbrOfStates", theAutomaton.nbrOfStates() == 8);
 				assertTrue("nbrOfAcceptingStates", theAutomaton.nbrOfAcceptingStates() == 2);
@@ -127,7 +133,7 @@ public class TestAutomataSynchronizer
 			}
 
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			ex.printStackTrace();
 			assertTrue(false);
@@ -139,23 +145,23 @@ public class TestAutomataSynchronizer
 		try
 		{
 
-			ProjectBuildFromXML builder = new ProjectBuildFromXML();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+			final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+			final Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
 
 			// Note that (strictly) it is NOT synchronization we're testing
 			// here (since we forbid uncontrollable states)!
-			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			final SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
 			syncOptions.setForbidUncontrollableStates(true);
 
 			// Test Full synchronization
 			{
 				syncOptions.setSynchronizationType(SynchronizationType.FULL);
-				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions, false);
+				final AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 8);
-				Automaton theAutomaton = synchronizer.getAutomaton();
-				Alphabet theAlphabet = theAutomaton.getAlphabet();
+				final Automaton theAutomaton = synchronizer.getAutomaton();
+				final Alphabet theAlphabet = theAutomaton.getAlphabet();
 				assertTrue(theAutomaton.getType() == AutomatonType.PLANT);
 				assertTrue(theAutomaton.nbrOfStates() == 8);
 				assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
@@ -171,7 +177,7 @@ public class TestAutomataSynchronizer
 				assertTrue(theAlphabet.nbrOfUnobservableEvents() == 0);
 			}
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			ex.printStackTrace();
 			assertTrue(false);
@@ -183,23 +189,23 @@ public class TestAutomataSynchronizer
 		try
 		{
 
-			ProjectBuildFromXML builder = new ProjectBuildFromXML();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+			final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+			final Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
 
 			// Note that (strictly) it is NOT synchronization we're testing
 			// here (since we forbid uncontrollable states)!
-			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			final SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
 			syncOptions.setForbidUncontrollableStates(true);
 
 			// Test Broadcast synchronization
 			{
 				syncOptions.setSynchronizationType(SynchronizationType.BROADCAST);
-				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions, false);
+				final AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 12);
-				Automaton theAutomaton = synchronizer.getAutomaton();
-				Alphabet theAlphabet = theAutomaton.getAlphabet();
+				final Automaton theAutomaton = synchronizer.getAutomaton();
+				final Alphabet theAlphabet = theAutomaton.getAlphabet();
 				assertTrue(theAutomaton.getType() == AutomatonType.PLANT);
 				assertTrue(theAutomaton.nbrOfStates() == 12);
 				assertTrue(theAutomaton.nbrOfAcceptingStates() == 4);
@@ -216,7 +222,7 @@ public class TestAutomataSynchronizer
 			}
 
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			ex.printStackTrace();
 			assertTrue(false);
@@ -229,13 +235,13 @@ public class TestAutomataSynchronizer
 		try
 		{
 
-			ProjectBuildFromXML builder = new ProjectBuildFromXML();
+			final ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
 
 			// Note that (strictly) it is NOT synchronization we're testing
 			// here (since we forbid uncontrollable states)!
-			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			final SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
 			syncOptions.setForbidUncontrollableStates(true);
 
 			// Test synchronization of nondeterministic automata
@@ -244,19 +250,19 @@ public class TestAutomataSynchronizer
 				Automata aut = new Automata();
 				aut.addAutomaton(theProject.getAutomaton("A"));
 				aut.addAutomaton(theProject.getAutomaton("B"));
-				Automaton result = AutomataSynchronizer.synchronizeAutomata(aut, false);
+				Automaton result = AutomataSynchronizer.synchronizeAutomata(aut);
 				assertTrue(result.nbrOfStates() == 7);
 				assertTrue(result.nbrOfTransitions() == 6);
 
 				aut = new Automata();
 				aut.addAutomaton(theProject.getAutomaton("A2"));
 				aut.addAutomaton(theProject.getAutomaton("B2"));
-				result = AutomataSynchronizer.synchronizeAutomata(aut, false);
+				result = AutomataSynchronizer.synchronizeAutomata(aut);
 				assertTrue(result.nbrOfStates() == 4);
 				assertTrue(result.nbrOfTransitions() == 6);
 			}
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			ex.printStackTrace();
 			assertTrue(false);

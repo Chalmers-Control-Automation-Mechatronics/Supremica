@@ -113,11 +113,11 @@ public class IDE
 
 	// Show memory
 	final int MB = 1024*1024;
-	info("JVM:" + System.getProperty("java.version") 
+	info("JVM:" + System.getProperty("java.version")
 			+ ", Free/Total/Max mem: " + Runtime.getRuntime().freeMemory()/MB + "/"
 							   + Runtime.getRuntime().totalMemory()/MB + "/"
 							   + Runtime.getRuntime().maxMemory()/MB + " MB");
-	
+
     // Initialise XML_RPC
     if (Config.XML_RPC_ACTIVE.isTrue()) {
       try {
@@ -133,16 +133,19 @@ public class IDE
 
   //#########################################################################
   //# Simple Access
+  @Override
   public String getName()
   {
     return IDENAME;
   }
 
+  @Override
   public JFrame getFrame()
   {
     return this;
   }
 
+  @Override
   public IDE getIDE()
   {
     return this;
@@ -153,6 +156,7 @@ public class IDE
     return mToolBar;
   }
 
+  @Override
   public Actions getActions()
   {
     return mActions;
@@ -189,6 +193,7 @@ public class IDE
   /**
    * Overridden to exit safely when the application window is closed.
    */
+  @Override
   protected void processWindowEvent(final WindowEvent event)
   {
     if (event.getID() == WindowEvent.WINDOW_CLOSING) {
@@ -204,6 +209,7 @@ public class IDE
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
@@ -228,16 +234,19 @@ public class IDE
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
+  @Override
   public void attach(final Observer observer)
   {
     mObservers.add(observer);
   }
 
+  @Override
   public void detach(final Observer observer)
   {
     mObservers.remove(observer);
   }
 
+  @Override
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     // Just in case they try to register or unregister observers
@@ -253,6 +262,7 @@ public class IDE
   //#########################################################################
   //# Public Shortcuts
   //# (use with caution --- these should be considered as @deprecated)
+  @Override
   public DocumentContainer getActiveDocumentContainer()
   {
     if (mDocumentContainerManager == null) {
@@ -262,6 +272,7 @@ public class IDE
     }
   }
 
+  @Override
   public EditorWindowInterface getActiveEditorWindowInterface()
   {
     return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
@@ -278,16 +289,19 @@ public class IDE
 
   //#########################################################################
   //# Interface org.supremica.gui.ide.IDEReportInterface
+  @Override
   public void error(final String msg)
   {
     LOGGER.error(msg);
   }
 
+  @Override
   public void error(final String msg, final Throwable t)
   {
     LOGGER.error(msg, t);
   }
 
+  @Override
   public void info(final String msg)
   {
     LOGGER.info(msg);
@@ -298,6 +312,7 @@ public class IDE
     LOGGER.warn(msg);
   }
 
+  @Override
   public void debug(final String msg)
   {
     LOGGER.debug(msg);
@@ -395,6 +410,7 @@ public class IDE
 
     //#######################################################################
     //# Interface net.sourceforge.window.subject.base.ModelObserver
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       if (event.getSource() == mModule &&
@@ -403,6 +419,7 @@ public class IDE
       }
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.RENDERING_PRIORITY;

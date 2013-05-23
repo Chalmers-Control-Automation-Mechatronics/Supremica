@@ -26,6 +26,7 @@ import net.sourceforge.waters.gui.actions.IDECopyAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
+import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.SimulationBackToStartAction;
 import net.sourceforge.waters.gui.actions.SimulationJumpToEndAction;
@@ -105,6 +106,7 @@ public class IDEToolBar
   /**
    * Gets the current graph drawing tool.
    */
+  @Override
   public ControlledToolbar.Tool getTool()
   {
     return mTool;
@@ -128,16 +130,19 @@ public class IDEToolBar
 
   //#######################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
+  @Override
   public void attach(final Observer observer)
   {
     mObservers.add(observer);
   }
 
+  @Override
   public void detach(final Observer observer)
   {
     mObservers.remove(observer);
   }
 
+  @Override
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     // Just in case they try to register or unregister observers
@@ -152,6 +157,7 @@ public class IDEToolBar
 
   //#######################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
@@ -203,11 +209,9 @@ public class IDEToolBar
       if (panel instanceof EditorPanel) {
         addSeparator();
         addAction(actions.getAction(InsertSimpleComponentAction.class));
-        //Need better icons first for these two :-(
+        //Need better icons first for this :-(
         //addAction(actions.getAction(InsertVariableAction.class));
-        //addAction(actions.getAction(InsertEventDeclAction.class));
-        //addSeparator();
-        //addAction(actions.editorStopEmbedderAction);
+        addAction(actions.getAction(InsertEventDeclAction.class));
         addSeparator();
         add(mSelectToolButton);
         add(mNodeToolButton);

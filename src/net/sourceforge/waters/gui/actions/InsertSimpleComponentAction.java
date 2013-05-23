@@ -12,6 +12,7 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
@@ -45,12 +46,13 @@ public class InsertSimpleComponentAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.ALT_MASK));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_AUTOMATON);
+    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_AUTOMATON);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final ModuleWindowInterface root = getActiveModuleWindowInterface();
