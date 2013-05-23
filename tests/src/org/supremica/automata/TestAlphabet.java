@@ -198,8 +198,8 @@ public class TestAlphabet
             Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
             
             // Test equality
-            Automaton plant = AutomataSynchronizer.synchronizeAutomata(theProject.getPlantAutomata());
-            Automaton spec = AutomataSynchronizer.synchronizeAutomata(theProject.getSpecificationAutomata());
+            Automaton plant = AutomataSynchronizer.synchronizeAutomata(theProject.getPlantAutomata(), false);
+            Automaton spec = AutomataSynchronizer.synchronizeAutomata(theProject.getSpecificationAutomata(), false);
             assertTrue(plant.getAlphabet() instanceof Alphabet);
             assertTrue(spec.getAlphabet() instanceof Alphabet);
 //            System.err.println("spec: " + spec.getAlphabet().toString());

@@ -102,7 +102,7 @@ public class TestAutomatonSynthesizer
 			assertTrue(theProject.nbrOfAutomata() == 3);
 			SynchronizationOptions syncOptions = new SynchronizationOptions();
 
-			AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+			AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions, false);
 			synchronizer.execute();
 			assertTrue(synchronizer.getNumberOfStates() == 8);
 			Automaton theAutomaton = synchronizer.getAutomaton();

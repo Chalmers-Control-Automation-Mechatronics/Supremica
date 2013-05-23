@@ -132,7 +132,7 @@ public class TestAutomatonMinimizer
             final Project theProject = builder.build(TestFiles.getFile(TestFiles.MachineBufferMachine));
             final SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
             syncOptions.setForbidUncontrollableStates(true);
-            final AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+            final AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions, false);
             synchronizer.execute();
             final Automaton synch = synchronizer.getAutomaton();
             final Alphabet alpha = synch.getAlphabet();

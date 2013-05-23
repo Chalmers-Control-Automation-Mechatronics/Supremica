@@ -106,7 +106,7 @@ public class TestAutomataSynchronizer
 
 			// Test Prioritized synchronization, although all events are prioritized in this example
 			{
-				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions, false);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 8);
 				Automaton theAutomaton = synchronizer.getAutomaton();
@@ -151,7 +151,7 @@ public class TestAutomataSynchronizer
 			// Test Full synchronization
 			{
 				syncOptions.setSynchronizationType(SynchronizationType.FULL);
-				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions, false);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 8);
 				Automaton theAutomaton = synchronizer.getAutomaton();
@@ -195,7 +195,7 @@ public class TestAutomataSynchronizer
 			// Test Broadcast synchronization
 			{
 				syncOptions.setSynchronizationType(SynchronizationType.BROADCAST);
-				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
+				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions, false);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 12);
 				Automaton theAutomaton = synchronizer.getAutomaton();
@@ -244,14 +244,14 @@ public class TestAutomataSynchronizer
 				Automata aut = new Automata();
 				aut.addAutomaton(theProject.getAutomaton("A"));
 				aut.addAutomaton(theProject.getAutomaton("B"));
-				Automaton result = AutomataSynchronizer.synchronizeAutomata(aut);
+				Automaton result = AutomataSynchronizer.synchronizeAutomata(aut, false);
 				assertTrue(result.nbrOfStates() == 7);
 				assertTrue(result.nbrOfTransitions() == 6);
 
 				aut = new Automata();
 				aut.addAutomaton(theProject.getAutomaton("A2"));
 				aut.addAutomaton(theProject.getAutomaton("B2"));
-				result = AutomataSynchronizer.synchronizeAutomata(aut);
+				result = AutomataSynchronizer.synchronizeAutomata(aut, false);
 				assertTrue(result.nbrOfStates() == 4);
 				assertTrue(result.nbrOfTransitions() == 6);
 			}
