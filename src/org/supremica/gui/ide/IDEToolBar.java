@@ -28,6 +28,7 @@ import net.sourceforge.waters.gui.actions.IDEDeleteAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
+import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.SimulationBackToStartAction;
 import net.sourceforge.waters.gui.actions.SimulationJumpToEndAction;
 import net.sourceforge.waters.gui.actions.SimulationReplayStepAction;
@@ -208,10 +209,9 @@ public class IDEToolBar
     if (panel != null) {
       if (panel instanceof EditorPanel) {
         addSeparator();
-        addAction(actions.getAction(InsertSimpleComponentAction.class));
-        //Need better icons first for this :-(
-        //addAction(actions.getAction(InsertVariableAction.class));
         addAction(actions.getAction(InsertEventDeclAction.class));
+        addAction(actions.getAction(InsertSimpleComponentAction.class));
+        addAction(actions.getAction(InsertVariableAction.class));
         addSeparator();
         add(mSelectToolButton);
         add(mNodeToolButton);

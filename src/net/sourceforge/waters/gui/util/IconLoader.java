@@ -54,7 +54,7 @@ public class IconLoader
   private static final String NAME_CONSOLE_ERROR = "error";
   private static final String NAME_CONSOLE_INFO = "info";
   private static final String NAME_CONSOLE_WARNING = "warning";
-  private static final String NAME_CONSTANT = "named_constant";
+  private static final String NAME_CONSTANT = "constant";
   private static final String NAME_CONTROLLABLE_OBSERVABLE =
     "controllable";
   private static final String NAME_CONTROLLABLE_UNOBSERVABLE =
@@ -66,9 +66,10 @@ public class IconLoader
   private static final String NAME_INSTANCE = "instance";
   private static final String NAME_NEW_AUTOMATON = "new_automaton";
   private static final String NAME_NEW_BINDING = "new_binding";
-  private static final String NAME_NEW_CONSTANT = "new_named_constant";
+  private static final String NAME_NEW_CONSTANT = "new_constant";
   private static final String NAME_NEW_EVENT = "new_event";
   private static final String NAME_NEW_EVENT_ALIAS = "new_event_alias";
+  private static final String NAME_NEW_FOREACH = "new_foreach";
   private static final String NAME_NEW_INSTANCE = "new_instance";
   private static final String NAME_NEW_VARIABLE = "new_variable";
   private static final String NAME_PLANT = "plant";
@@ -135,6 +136,7 @@ public class IconLoader
   public static final ImageIcon ICON_NEW_CONSTANT = getWatersIcon(NAME_NEW_CONSTANT);
   public static final ImageIcon ICON_NEW_EVENT = getWatersIcon(NAME_NEW_EVENT);
   public static final ImageIcon ICON_NEW_EVENT_ALIAS = getWatersIcon(NAME_NEW_EVENT_ALIAS);
+  public static final ImageIcon ICON_NEW_FOREACH = getWatersIcon(NAME_NEW_FOREACH);
   public static final ImageIcon ICON_NEW_INSTANCE = getWatersIcon(NAME_NEW_INSTANCE);
   public static final ImageIcon ICON_NEW_VARIABLE = getWatersIcon(NAME_NEW_VARIABLE);
   public static final ImageIcon ICON_PLANT = getWatersIcon(NAME_PLANT);
