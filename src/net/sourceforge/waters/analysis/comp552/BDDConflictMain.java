@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //##########################################################################
-//# PROJECT: COMP452/552-12A Assignment 3
+//# PROJECT: COMP452/552-13A Assignment 3
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   BDDConflictMain
 //##########################################################################
@@ -123,6 +123,7 @@ public class BDDConflictMain
           final TraceProxy counterex = checker.getCounterExample();
           System.out.println(counterex.toString());
         }
+        System.gc();  // Garbage collect all BDDs so init() can be called again.
       }
 
     } catch (final Throwable exception) {

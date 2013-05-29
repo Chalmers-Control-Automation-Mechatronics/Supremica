@@ -297,7 +297,6 @@ public class ConflictAssess
       mProgressPrinter.println("result " + mNumCorrectAnswers);
     } catch (final OutOfMemoryError error) {
       checker = null;
-      System.gc();
       printException(error);
       mProgressPrinter.println("result " + mNumCorrectAnswers);
       return;
@@ -308,6 +307,7 @@ public class ConflictAssess
     } finally {
       mProgressPrinter.flush();
       mSecurityManager.setEnabled(false);
+      System.gc();  // Garbage collect all BDDs so init() can be called again.
     }
 
     synchronized (this) {
@@ -817,6 +817,7 @@ public class ConflictAssess
 
     //#######################################################################
     //# Interface java.lang.Runnable
+    @Override
     public void run()
     {
       try {

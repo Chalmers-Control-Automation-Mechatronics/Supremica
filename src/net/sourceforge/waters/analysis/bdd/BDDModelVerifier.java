@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -188,6 +188,7 @@ public abstract class BDDModelVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
@@ -250,6 +251,8 @@ public abstract class BDDModelVerifier
     mTransitionPartitioning = null;
     mLevels = null;
     mCurrentReorderIndex = mNextReorderIndex = -1;
+    System.gc();  // Garbage-collect all BDDs
+                  // so a new BDDFactory can be created later ...
   }
 
   @Override

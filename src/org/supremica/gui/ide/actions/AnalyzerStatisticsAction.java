@@ -1,13 +1,15 @@
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
+import javax.swing.Action;
+
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.gui.ide.IDE;
 
 /**
  * A new action
@@ -20,7 +22,7 @@ public class AnalyzerStatisticsAction
     /**
      * Constructor.
      */
-    public AnalyzerStatisticsAction(List<IDEAction> actionList)
+    public AnalyzerStatisticsAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -31,10 +33,11 @@ public class AnalyzerStatisticsAction
         putValue(Action.SHORT_DESCRIPTION, "Statistics");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Information16.gif")));
+        putValue(Action.SMALL_ICON, IconLoader.ICON_CONSOLE_INFO);
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -42,12 +45,13 @@ public class AnalyzerStatisticsAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
-        int nbrOfAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().nbrOfAutomata();
+        final int nbrOfAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().nbrOfAutomata();
         //gui.info("Number of automata: " + nbrOfAutomata);
 
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, true))
         {
             return;
@@ -56,9 +60,9 @@ public class AnalyzerStatisticsAction
         ide.getIDE().info("Number of selected automata: " + selectedAutomata.size() + " (" + nbrOfAutomata + ")");
         ide.getIDE().info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
 
-        for (Automaton currAutomaton : selectedAutomata)
+        for (final Automaton currAutomaton : selectedAutomata)
         {
-            StringBuffer statusStr = new StringBuffer();
+            final StringBuffer statusStr = new StringBuffer();
 
             statusStr.append("Status for automaton: " + currAutomaton.getName());
 
@@ -69,7 +73,7 @@ public class AnalyzerStatisticsAction
             //statusStr.append("\n\tNumber of mutually accepting states: " + currAutomaton.nbrOfMutuallyAcceptingStates());
             statusStr.append("\n\tnumber of forbidden states: " + currAutomaton.nbrOfForbiddenStates());
 
-            int acceptingAndForbiddenStates = currAutomaton.nbrOfAcceptingAndForbiddenStates();
+            final int acceptingAndForbiddenStates = currAutomaton.nbrOfAcceptingAndForbiddenStates();
             if (acceptingAndForbiddenStates > 0)
             {
                 statusStr.append("\n\tnumber of accepting AND forbidden states: " + acceptingAndForbiddenStates);
@@ -77,7 +81,7 @@ public class AnalyzerStatisticsAction
 
             if (currAutomaton.isDeterministic())
             {
-                Alphabet redundantEvents = currAutomaton.getRedundantEvents();
+                final Alphabet redundantEvents = currAutomaton.getRedundantEvents();
                 if (redundantEvents.nbrOfEvents() > 0)
                     statusStr.append("\n\talphabet of redundant events: " + redundantEvents);
                 statusStr.append("\n\tthe automaton is deterministic");
@@ -96,7 +100,7 @@ public class AnalyzerStatisticsAction
         {
             double potentialNumberOfStates = 1.0;
 
-            for (Automaton currAutomaton : selectedAutomata)
+            for (final Automaton currAutomaton : selectedAutomata)
             {
                 potentialNumberOfStates = potentialNumberOfStates * currAutomaton.nbrOfStates();
             }
