@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="prime_sieve4fail" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="prime_sieve4b" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Distributed prime number sieve.
 This is version has four sieve processes for primes 2, 3, 5, and 7.
 It handles numbers up to 120.
-The number of reachable states is approximately 118088582663751140000,
+This is a blocking version, with broken sink.
+The number of reachable states is approximately 117071257580230280000,
 and the diameter is 166.
 
 Source generates numbers and sends them to the first sieve process sieve2.

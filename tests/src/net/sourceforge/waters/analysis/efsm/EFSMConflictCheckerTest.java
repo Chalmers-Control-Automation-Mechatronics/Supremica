@@ -182,6 +182,12 @@ public class EFSMConflictCheckerTest
     checkConflict("efa", "prime_sieve4", true);
   }
 
+  public void testPrimeSieve4fail()
+    throws IOException, WatersException
+  {
+    checkConflict("efa", "prime_sieve4b", false);
+  }
+
   public void testPrimeSieve5()
     throws IOException, WatersException
   {
