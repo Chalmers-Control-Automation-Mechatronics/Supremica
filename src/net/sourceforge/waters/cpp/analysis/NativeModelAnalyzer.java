@@ -63,6 +63,8 @@ public abstract class NativeModelAnalyzer
   //# Native Methods
   public native void requestAbort();
 
+  public static native long getPeakMemoryUsage();
+
 
   //#########################################################################
   //# Auxiliary Methods for Native Code

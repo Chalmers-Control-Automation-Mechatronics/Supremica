@@ -892,3 +892,18 @@ Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_requestAbort
     explorer->requestAbort();
   }
 }
+
+
+JNIEXPORT jlong JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_getPeakMemoryUsage
+  (JNIEnv *env, jclass clazz)
+{
+#ifndef __MINGW32__
+  struct rusage rusage;
+  if (getrusage(RUSAGE_SELF, &rusage) == 0) {
+    jlong usage = rusage.ru_maxrss << 10;
+    return usage;
+  }
+#endif
+  return -1;
+}
