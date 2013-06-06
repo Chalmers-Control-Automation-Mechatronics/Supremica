@@ -50,7 +50,7 @@ public class EFSMConflictCheckerTest
 
   //#########################################################################
   //# Handcrafting Test Cases
-  public void testCompile_empty_1()
+  public void testEmpty()
     throws EvalException, AnalysisException
   {
     final String name = "empty";
@@ -59,6 +59,7 @@ public class EFSMConflictCheckerTest
     final boolean result = checkConflict(module);
     assertTrue("Empty system is reported as blocking!", result);
   }
+
 
   //#########################################################################
   //# Successful Test Cases using EFA
@@ -140,16 +141,16 @@ public class EFSMConflictCheckerTest
     checkConflict("tests", "efsm", "efsm18", true);
   }
 
-  public void testEFSMCompiler19()
+  public void testEFSMConflict1()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm19", false);
+    checkConflict("tests", "efsm", "conflict01", false);
   }
 
-  public void testEFSMCompiler20()
+  public void testEFSMConflict2()
     throws IOException, WatersException
   {
-    checkConflict("tests", "efsm", "efsm20", true);
+    checkConflict("tests", "efsm", "conflict02", true);
   }
 
   public void testPslBig()
@@ -182,12 +183,6 @@ public class EFSMConflictCheckerTest
     checkConflict("efa", "prime_sieve4", true);
   }
 
-  public void testPrimeSieve4fail()
-    throws IOException, WatersException
-  {
-    checkConflict("efa", "prime_sieve4b", false);
-  }
-
   public void testPrimeSieve5()
     throws IOException, WatersException
   {
@@ -200,6 +195,11 @@ public class EFSMConflictCheckerTest
     checkConflict("efa", "prime_sieve6", true);
   }
 
+  public void pslBigWithManyRestartTrans()
+    throws IOException, WatersException
+  {
+    checkConflict("efa", "pslBigWithManyRestartTrans", false);
+  }
 
   //#########################################################################
   //# Customisation

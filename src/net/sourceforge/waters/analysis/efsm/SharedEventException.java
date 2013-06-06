@@ -9,7 +9,7 @@
 package net.sourceforge.waters.analysis.efsm;
 
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -36,8 +36,8 @@ public class SharedEventException extends EvalException {
    * defined.
    */
   public SharedEventException(final SimpleExpressionProxy ident,
-                              final SimpleComponentProxy comp1,
-                              final SimpleComponentProxy comp2)
+                              final ComponentProxy comp1,
+                              final ComponentProxy comp2)
   {
     super("Event '" + ident.toString() + "' is used in components '" +
           comp1.getName() + "' and '" + comp2.getName() +

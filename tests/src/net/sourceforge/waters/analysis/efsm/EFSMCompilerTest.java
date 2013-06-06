@@ -128,13 +128,15 @@ public class EFSMCompilerTest
   public void testEFSMCompiler6()
     throws IOException, WatersException
   {
-    compileError("tests", "efsm", "efsm6",null,SharedEventException.class, "'a'");
+    compileError("tests", "efsm", "efsm6", null,
+                 SharedEventException.class, "'a'");
   }
 
   public void testEFSMCompiler7()
     throws IOException, WatersException
   {
-    compileError("tests", "efsm", "efsm7",null,SharedEventException.class, "'a'");
+    compileError("tests", "efsm", "efsm7", null,
+                 SharedEventException.class, "'a'");
   }
 
   public void testEFSMCompiler8()
@@ -146,7 +148,8 @@ public class EFSMCompilerTest
   public void testEFSMCompiler9()
     throws IOException, WatersException
   {
-    compileError("tests", "efsm", "efsm9",null,SharedEventException.class, "'a'");
+    compileError("tests", "efsm", "efsm9", null,
+                 SharedEventException.class, "'a'");
   }
 
   public void testEFSMCompiler10()
@@ -203,6 +206,20 @@ public class EFSMCompilerTest
     compile("tests", "efsm", "efsm18");
   }
 
+  public void testEFSMCompiler19()
+    throws IOException, WatersException
+  {
+    compile("tests", "efsm", "efsm19");
+  }
+
+  public void testEFSMCompiler20()
+    throws IOException, WatersException
+  {
+    compileError("tests", "efsm", "efsm20", null,
+                 SharedEventException.class, ":accepting");
+  }
+
+
   //#########################################################################
   //# Customisation
   void configure(final EFSMCompiler compiler)
@@ -214,6 +231,7 @@ public class EFSMCompilerTest
   {
     return "result";
   }
+
 
   //#########################################################################
   //# Utilities

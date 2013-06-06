@@ -1,6 +1,7 @@
 package net.sourceforge.waters.analysis.efsm;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -49,7 +51,7 @@ public class EFSMSystemImporter
                             final CompilerOperatorTable optable)
   {
     mModuleFactory = factory;
-    mOptable = optable;
+    mOperatorTable = optable;
   }
 
   public ModuleProxy importModule(final EFSMSystem system)
@@ -74,7 +76,7 @@ public class EFSMSystemImporter
         mModuleFactory.createSimpleIdentifierProxy(variableName);
       final CompiledRange range = variable.getRange();
       final SimpleExpressionProxy type =
-        range.createExpression(mModuleFactory, mOptable);
+        range.createExpression(mModuleFactory, mOperatorTable);
       final SimpleExpressionProxy initialStatePredicate =
         variable.getInitialStatePredicate();
       final VariableComponentProxy var = mModuleFactory.createVariableComponentProxy
@@ -144,14 +146,7 @@ public class EFSMSystemImporter
         final int source = iter.getCurrentSourceState();
         final int target = iter.getCurrentTargetState();
         final ConstraintList update = efsmEvents.getUpdate(event);
-        final List<SimpleExpressionProxy> guards = update.getConstraints();
-        final GuardActionBlockProxy guardActionBlock;
-        if(guards.size() == 0) {
-          guardActionBlock = null;
-        } else {
-          guardActionBlock =
-            mModuleFactory.createGuardActionBlockProxy(guards, null, null);
-        }
+        final GuardActionBlockProxy guardActionBlock = createGuard(update);
         final SimpleIdentifierProxy ident =
           mModuleFactory.createSimpleIdentifierProxy(eventName);
         final List<SimpleIdentifierProxy> identList =
@@ -179,9 +174,34 @@ public class EFSMSystemImporter
       (system.getName(), null, null, null, eventList, null, compList);
   }
 
+
+  //#########################################################################
+  //# Auxiliary Method
+  private GuardActionBlockProxy createGuard(final ConstraintList constraints)
+  {
+    if (constraints.isTrue()) {
+      return null;
+    } else {
+      final BinaryOperator op = mOperatorTable.getAndOperator();
+      SimpleExpressionProxy guard = null;
+      for (final SimpleExpressionProxy constraint : constraints.getConstraints()) {
+        if (guard == null) {
+          guard = constraint;
+        } else {
+          guard = mModuleFactory.createBinaryExpressionProxy
+            (op, guard, constraint);
+        }
+      }
+      final Collection<SimpleExpressionProxy> guards =
+        Collections.singletonList(guard);
+      return mModuleFactory.createGuardActionBlockProxy(guards, null, null);
+    }
+  }
+
+
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mModuleFactory;
-  private final CompilerOperatorTable mOptable;
+  private final CompilerOperatorTable mOperatorTable;
 
 }

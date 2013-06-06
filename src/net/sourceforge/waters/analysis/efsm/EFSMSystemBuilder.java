@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
@@ -51,6 +52,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
@@ -81,6 +83,8 @@ public class EFSMSystemBuilder
     mInputModule = module;
     final String moduleName = module.getName();
     mVariableContext = new EFSMVariableContext(module, mOperatorTable);
+    mMarkedVariables = new ArrayList<EFSMVariable>();
+    mVariableMarkingPredicates = new ArrayList<SimpleExpressionProxy>();
     final int size = module.getComponentList().size();
     mResultEFSMSystem = new EFSMSystem(moduleName, mVariableContext, size);
   }
@@ -99,6 +103,7 @@ public class EFSMSystemBuilder
       // Pass 3 ...
       final Pass3Visitor pass3 = new Pass3Visitor();
       mInputModule.acceptVisitor(pass3);
+      createMarkingTR();
       return mResultEFSMSystem;
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
@@ -109,6 +114,7 @@ public class EFSMSystemBuilder
       }
     }
   }
+
 
   //#########################################################################
   //# Configuration
@@ -135,6 +141,31 @@ public class EFSMSystemBuilder
 
   //#########################################################################
   //# Auxiliary Methods
+  private void createMarkingTR()
+  {
+    if (!mMarkedVariables.isEmpty()) {
+      try {
+        final EFSMEventEncoding eventEncoding = new EFSMEventEncoding(2);
+        final ConstraintList markingUpdate =
+          new ConstraintList(mVariableMarkingPredicates);
+        final int event = eventEncoding.createEventId(markingUpdate);
+        final String name = ":marking:" + mDefaultMarking.toString();
+        final ListBufferTransitionRelation rel =
+          new ListBufferTransitionRelation
+            (name, ComponentKind.PLANT, 2, 1, 2,
+             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        rel.setInitial(0, true);
+        rel.setMarked(1, 0, true);
+        rel.addTransition(0, event, 1);
+        final EFSMTransitionRelation efsmTR =
+          new EFSMTransitionRelation(rel, eventEncoding, mMarkedVariables);
+        mResultEFSMSystem.addTransitionRelation(efsmTR);
+      } catch (final OverflowException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class Pass1Visitor
@@ -215,7 +246,8 @@ public class EFSMSystemBuilder
     }
 
     @Override
-    public EFSMVariable visitVariableComponentProxy(final VariableComponentProxy var)
+    public EFSMVariable visitVariableComponentProxy
+      (final VariableComponentProxy var)
     {
       return null;
     }
@@ -237,41 +269,6 @@ public class EFSMSystemBuilder
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
-    public Object visitModuleProxy(final ModuleProxy module)
-      throws VisitorException
-    {
-      final List<Proxy> components = module.getComponentList();
-      return visitCollection(components);
-    }
-
-    @Override
-    public EFSMVariable visitSimpleComponentProxy(final SimpleComponentProxy var)
-    {
-      return null;
-    }
-
-    @Override
-    public EFSMVariable visitVariableComponentProxy(final VariableComponentProxy var)
-      throws VisitorException
-    {
-      try {
-        final SimpleExpressionProxy type = var.getType();
-        type.acceptVisitor(this);
-        final SimpleExpressionProxy value =
-          mSimpleExpressionCompiler.eval(type, null);
-        final CompiledRange range =
-          mSimpleExpressionCompiler.getRangeValue(value);
-        final EFSMVariable EFSMvar =
-          new EFSMVariable(var, range, mFactory, mOperatorTable);
-        mVariableContext.addVariable(EFSMvar);
-        mResultEFSMSystem.addVariable(EFSMvar);
-        return EFSMvar;
-      } catch (final EvalException exception) {
-        throw wrap(exception);
-      }
-    }
-
-    @Override
     public Object visitEnumSetExpressionProxy(final EnumSetExpressionProxy expr)
       throws VisitorException
     {
@@ -286,11 +283,65 @@ public class EFSMSystemBuilder
     }
 
     @Override
+    public Object visitModuleProxy(final ModuleProxy module)
+      throws VisitorException
+    {
+      final List<Proxy> components = module.getComponentList();
+      return visitCollection(components);
+    }
+
+    @Override
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
+    {
+      return null;
+    }
+
+    @Override
     public Object visitSimpleExpressionProxy(final SimpleExpressionProxy simple)
     {
       return null;
     }
 
+    @Override
+    public EFSMVariable visitVariableComponentProxy
+      (final VariableComponentProxy var)
+      throws VisitorException
+    {
+      try {
+        final SimpleExpressionProxy type = var.getType();
+        type.acceptVisitor(this);
+        final SimpleExpressionProxy value =
+          mSimpleExpressionCompiler.eval(type, null);
+        final CompiledRange range =
+          mSimpleExpressionCompiler.getRangeValue(value);
+        mCurrentVariable =
+          new EFSMVariable(var, range, mFactory, mOperatorTable);
+        mVariableContext.addVariable(mCurrentVariable);
+        mResultEFSMSystem.addVariable(mCurrentVariable);
+        visitCollection(var.getVariableMarkings());
+        return mCurrentVariable;
+      } catch (final EvalException exception) {
+        throw wrap(exception);
+      }
+    }
+
+    @Override
+    public EFSMVariable visitVariableMarkingProxy
+      (final VariableMarkingProxy marking)
+    {
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final IdentifierProxy prop = marking.getProposition();
+      if (eq.equals(prop, mDefaultMarking)) {
+        final SimpleExpressionProxy pred = marking.getPredicate();
+        mVariableMarkingPredicates.add(pred);
+        mMarkedVariables.add(mCurrentVariable);
+      }
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private EFSMVariable mCurrentVariable;
   }
 
 
@@ -322,12 +373,21 @@ public class EFSMSystemBuilder
     }
 
     @Override
-    public EFSMTransitionRelation visitSimpleComponentProxy(final SimpleComponentProxy comp)
+    public EFSMTransitionRelation visitSimpleComponentProxy
+      (final SimpleComponentProxy comp)
       throws VisitorException
     {
       try {
         final GraphProxy graph = comp.getGraph();
         visitGraphProxy(graph);
+        if (mUsesMarking && !mMarkedVariables.isEmpty()) {
+          // Throw an exception because markings in variables and
+          // automata together are not yet supported.
+          final EFSMVariable var = mMarkedVariables.get(0);
+          final SharedEventException exception =
+            new SharedEventException(mDefaultMarking, comp, var.getComponent());
+          throw new VisitorException(exception);
+        }
         ListBufferTransitionRelation rel = createTransitionRelation(comp);
         if (mIsOptimizationEnabled) {
           rel.removeRedundantPropositions();
@@ -337,7 +397,6 @@ public class EFSMSystemBuilder
             final TObjectIntHashMap<SimpleNodeProxy> newStateMap =
               new TObjectIntHashMap<SimpleNodeProxy>(newNumStates,
                                                      0.5f, -1);
-
             final List<SimpleNodeProxy> newNodeList;
             if (mNodeList == null) {
               newNodeList = null;
@@ -362,7 +421,8 @@ public class EFSMSystemBuilder
             int newNumEvents = 1;
             final boolean[] usedEvents = new boolean[oldNumEvents];
             usedEvents[EventEncoding.TAU] = true;
-            final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+            final TransitionIterator iter =
+              rel.createAllTransitionsReadOnlyIterator();
             while (iter.advance()) {
               final int currentEvent = iter.getCurrentEvent();
               if (!usedEvents[currentEvent]) {
@@ -394,59 +454,6 @@ public class EFSMSystemBuilder
       } catch (final OverflowException exception) {
         throw wrap(exception);
       }
-    }
-
-    private ListBufferTransitionRelation createTransitionRelation
-      (final SimpleComponentProxy comp)
-      throws OverflowException
-    {
-      final GraphProxy graph = comp.getGraph();
-      final String name = comp.getName();
-      final int eventSize = mEventEncoding.size();
-      final ComponentKind kind = comp.getKind();
-      final int numProps = mUsesMarking ? 1 : 0;
-      final ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(name,
-                                         kind,
-                                         eventSize,
-                                         numProps,
-                                         mStateMap.size(),
-                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
-      while (iter.hasNext()) {
-        iter.advance();
-        final SimpleNodeProxy node = iter.key();
-        final int code = iter.value();
-        if (node.isInitial()) {
-          rel.setInitial(code, true);
-        }
-        if (mUsesMarking
-            && containsMarkingProposition(node.getPropositions())) {
-          rel.setMarked(code, 0, true);
-        }
-      }
-      final Collection<EdgeProxy> edges = graph.getEdges();
-      for (final EdgeProxy edge : edges) {
-        final GuardActionBlockProxy update = edge.getGuardActionBlock();
-        final ConstraintList simplifiedList =
-          mSimplifiedGuardActionBlockMap.getByProxy(update);
-        if (simplifiedList == null) {
-          continue;
-        }
-        final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
-        final int sourceState = mStateMap.get(source);
-        if (sourceState < 0) {
-          continue;
-        }
-        final int event = mEventEncoding.getEventId(simplifiedList);
-        if (event < 0) {
-          continue;
-        }
-        final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
-        final int targetState = mStateMap.get(target);
-        rel.addTransition(sourceState, event, targetState);
-      }
-      return rel;
     }
 
     @Override
@@ -527,18 +534,73 @@ public class EFSMSystemBuilder
     }
 
     @Override
-    public EFSMVariable visitVariableComponentProxy(final VariableComponentProxy var)
+    public EFSMVariable visitVariableComponentProxy
+      (final VariableComponentProxy var)
     {
       return null;
     }
 
     //#######################################################################
     //# Auxiliary Methods
-    private boolean containsMarkingProposition(final EventListExpressionProxy list)
+    private boolean containsMarkingProposition
+      (final EventListExpressionProxy list)
     {
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
       return eq.contains(list.getEventIdentifierList(), mDefaultMarking);
+    }
+
+    private ListBufferTransitionRelation createTransitionRelation
+      (final SimpleComponentProxy comp)
+      throws OverflowException
+    {
+      final GraphProxy graph = comp.getGraph();
+      final String name = comp.getName();
+      final int eventSize = mEventEncoding.size();
+      final ComponentKind kind = comp.getKind();
+      final int numProps = mUsesMarking ? 1 : 0;
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(name,
+                                         kind,
+                                         eventSize,
+                                         numProps,
+                                         mStateMap.size(),
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
+      while (iter.hasNext()) {
+        iter.advance();
+        final SimpleNodeProxy node = iter.key();
+        final int code = iter.value();
+        if (node.isInitial()) {
+          rel.setInitial(code, true);
+        }
+        if (mUsesMarking &&
+            containsMarkingProposition(node.getPropositions())) {
+          rel.setMarked(code, 0, true);
+        }
+      }
+      final Collection<EdgeProxy> edges = graph.getEdges();
+      for (final EdgeProxy edge : edges) {
+        final GuardActionBlockProxy update = edge.getGuardActionBlock();
+        final ConstraintList simplifiedList =
+          mSimplifiedGuardActionBlockMap.getByProxy(update);
+        if (simplifiedList == null) {
+          continue;
+        }
+        final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
+        final int sourceState = mStateMap.get(source);
+        if (sourceState < 0) {
+          continue;
+        }
+        final int event = mEventEncoding.getEventId(simplifiedList);
+        if (event < 0) {
+          continue;
+        }
+        final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
+        final int targetState = mStateMap.get(target);
+        rel.addTransition(sourceState, event, targetState);
+      }
+      return rel;
     }
 
     //#######################################################################
@@ -565,6 +627,9 @@ public class EFSMSystemBuilder
   private boolean mIsOptimizationEnabled;
 
   private final EFSMVariableContext mVariableContext;
+  private final List<EFSMVariable> mMarkedVariables;
+  private final List<SimpleExpressionProxy> mVariableMarkingPredicates;
   private final EFSMSystem mResultEFSMSystem;
+
 
 }
