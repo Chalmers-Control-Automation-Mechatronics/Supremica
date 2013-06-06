@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -40,15 +41,13 @@ class IdentifierResult extends ParseResult {
   //#########################################################################
   //# Overrides for Abstract Baseclass
   //# net.sourceforge.waters.model.expr.ParseResult
+  @Override
   int getTypeMask()
   {
-    if (mIndexes.isEmpty()) {
-      return Operator.TYPE_ANY;
-    } else {
-      return Operator.TYPE_NAME;
-    }
+    return Operator.TYPE_ANY;
   }
 
+  @Override
   IdentifierProxy createProxy(final ModuleProxyFactory factory,
                               final String text)
   {
