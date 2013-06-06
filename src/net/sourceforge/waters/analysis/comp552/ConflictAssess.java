@@ -122,6 +122,8 @@ public class ConflictAssess
         } else if (key.equals("in")) {
           mStartIndex = Integer.parseInt(parts[1]) + 1;
           crash = true;
+        } else if (key.equals("abort")) {
+          crash = false;
         } else if (key.equals("result")) {
           mNumCorrectAnswers = Integer.parseInt(parts[1]);
           crash = false;
@@ -886,19 +888,20 @@ public class ConflictAssess
     public void run()
     {
       try {
-        while (true) {
+        do {
           Thread.sleep(5000);
-          final long usage = NativeModelAnalyzer.getPeakMemoryUsage();
-          if (usage > mLimit) {
-            terminate("OUT OF MEMORY");
-            break;
-          }
+        } while (NativeModelAnalyzer.getPeakMemoryUsage() <= mLimit);
+        synchronized (ConflictAssess.this) {
+          mReportPrinter.println("OUT OF MEMORY");
+          mProgressPrinter.println("abort");
         }
+        close();
       } catch (final InterruptedException exception) {
         terminate("FATAL ERROR (InterruptedException)");
+      } finally {
+        mSecurityManager.setEnabled(false);
+        System.exit(0);
       }
-      mSecurityManager.setEnabled(false);
-      System.exit(0);
     }
 
     //#######################################################################
