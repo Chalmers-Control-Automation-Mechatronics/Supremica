@@ -115,6 +115,9 @@ File originally created: Mon Mar 25 08:38:55 CET 2013</ns2:Comment>
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="pm">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point X="287" Y="288"/>
                         </PointGeometry>
