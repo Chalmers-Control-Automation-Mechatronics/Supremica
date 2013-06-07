@@ -215,6 +215,8 @@ class EFSMTRSimplifier
       final int numTrans = rel.getNumberOfTransitions();
       final int numMarkings = rel.getNumberOfMarkings();
       mSimplifier.setTransitionRelation(rel);
+      final int prop = rel.isUsedProposition(0) ? 0 : -1;
+      mSimplifier.setDefaultMarkingID(prop);
       mSelfloopedUpdates = new ArrayList<ConstraintList>();
       if (mSimplifier.run()) {
         rel = mSimplifier.getTransitionRelation();
