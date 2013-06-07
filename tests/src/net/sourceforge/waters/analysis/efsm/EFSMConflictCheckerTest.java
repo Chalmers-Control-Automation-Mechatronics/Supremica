@@ -153,12 +153,6 @@ public class EFSMConflictCheckerTest
     checkConflict("tests", "efsm", "conflict02", true);
   }
 
-  public void testPslBig()
-    throws IOException, WatersException
-  {
-    checkConflict("tests", "efsm", "pslBig", true);
-  }
-
   public void testPrimeSieve2a()
     throws IOException, WatersException
   {
@@ -201,11 +195,30 @@ public class EFSMConflictCheckerTest
     checkConflict("efa", "prime_sieve6", true);
   }
 
-  public void pslBigWithManyRestartTrans()
+  public void testPsl()
     throws IOException, WatersException
   {
-    checkConflict("efa", "pslBigWithManyRestartTrans", false);
+    checkConflict("tests", "psl", "psl", false);
   }
+
+  public void testPslBig()
+    throws IOException, WatersException
+  {
+    checkConflict("tests", "psl", "pslBig", false);
+  }
+
+  public void testPslBigWithManyRestartTrans()
+    throws IOException, WatersException
+  {
+    checkConflict("tests", "psl", "pslBigWithManyRestartTrans", false);
+  }
+
+  public void testTransferLine22()
+    throws IOException, WatersException
+  {
+    checkConflict("tests", "efsm", "transferline2-2", false);
+  }
+
 
   //#########################################################################
   //# Customisation
