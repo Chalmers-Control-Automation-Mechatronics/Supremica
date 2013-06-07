@@ -367,10 +367,19 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         if (splitting) {
           splitCurrentSubsystem();
         }
-      } else if (efsmTransitionRelationList.size() == 1){
-        final EFSMTransitionRelation finalEFSMTR = efsmTransitionRelationList.get(0);
-        final boolean nonblocking = mNonblockingChecker.run(finalEFSMTR);
-        return setBooleanResult(nonblocking);
+      } else if (efsmTransitionRelationList.size() == 1) {
+        // If there is only one EFSM left:
+        // - if it is blocking, then we are done.
+        // - if it is nonblocking, check the next disjoint subsystem.
+        final EFSMTransitionRelation finalEFSMTR =
+          efsmTransitionRelationList.get(0);
+        if (!mNonblockingChecker.run(finalEFSMTR)) {
+          return setBooleanResult(false);
+        } else if (mEFSMSystemQueue.isEmpty()) {
+          break;
+        } else {
+          mCurrentEFSMSystem = mEFSMSystemQueue.remove();
+        }
       }
     }
     return setSatisfiedResult();
