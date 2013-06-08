@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   TRConflictEquivalenceAbstractionProcedure
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efsm
+//# CLASS:   EFSMTRSimplifier
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -29,7 +29,6 @@ import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -40,13 +39,8 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 /**
  * <P>An abstraction procedure based on a transition relation simplifier
- * ({@link ChainTRSimplifier}) used by a compositional conflict checker
- * ({@link CompositionalConflictChecker}).</P>
- *
- * <P>This class supports both standard and generalised nonblocking.
- * The two cases are distinguished by calling the method {@link
- * #getUsedPreconditionMarking()}, which return a non-null event
- * when a proper generalised nonblocking check is carried out.</P>
+ * ({@link ChainTRSimplifier}) used by the EFSM conflict checker
+ * ({@link EFSMConflictChecker}).</P>
  *
  * @author Robi Malik
  */
@@ -127,12 +121,12 @@ class EFSMTRSimplifier
        final CompilerOperatorTable op)
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final MarkingRemovalTRSimplifier markingRemover =
-      new MarkingRemovalTRSimplifier();
-    chain.add(markingRemover);
     final TauLoopRemovalTRSimplifier tauLoopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(tauLoopRemover);
+    final MarkingRemovalTRSimplifier markingRemover =
+      new MarkingRemovalTRSimplifier();
+    chain.add(markingRemover);
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
@@ -232,7 +226,8 @@ class EFSMTRSimplifier
         int newNumEvents = 1;
         final boolean[] usedEvents = new boolean[numEvents];
         usedEvents[0] = true;
-        final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+        final TransitionIterator iter =
+          rel.createAllTransitionsReadOnlyIterator();
         while (iter.advance()) {
           final int currentEvent = iter.getCurrentEvent();
           if (!usedEvents[currentEvent]) {
@@ -245,13 +240,13 @@ class EFSMTRSimplifier
           newEventEncoding = eventEncoding;
         } else {
           newEventEncoding = new EFSMEventEncoding(newNumEvents);
-          for (int i=EventEncoding.NONTAU; i < numEvents; i++) {
-            if (usedEvents[i]) {
-              final ConstraintList update = eventEncoding.getUpdate(i);
+          for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+            if (usedEvents[e]) {
+              final ConstraintList update = eventEncoding.getUpdate(e);
               newEventEncoding.createEventId(update);
-            } else if ((rel.getProperEventStatus(i) &
+            } else if ((rel.getProperEventStatus(e) &
                         EventEncoding.STATUS_UNUSED) != 0){
-              final ConstraintList update = eventEncoding.getUpdate(i);
+              final ConstraintList update = eventEncoding.getUpdate(e);
               mSelfloopedUpdates.add(update);
             }
           }
@@ -296,9 +291,11 @@ class EFSMTRSimplifier
           iter.reset();
           while (iter.advance()) {
             final int source = iter.getCurrentSourceState();
-            final int newSource = stateEncoding == null ? source : stateEncoding[source];
+            final int newSource =
+              stateEncoding == null ? source : stateEncoding[source];
             final int target = iter.getCurrentTargetState();
-            final int newTarget = stateEncoding == null ? target : stateEncoding[target];
+            final int newTarget =
+              stateEncoding == null ? target : stateEncoding[target];
             final int event = iter.getCurrentEvent();
             final int newEvent;
             if (newNumEvents == numEvents) {
