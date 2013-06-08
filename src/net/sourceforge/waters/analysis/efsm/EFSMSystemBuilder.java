@@ -160,6 +160,7 @@ public class EFSMSystemBuilder
         final EFSMTransitionRelation efsmTR =
           new EFSMTransitionRelation(rel, eventEncoding, mMarkedVariables);
         mResultEFSMSystem.addTransitionRelation(efsmTR);
+        efsmTR.register();
       } catch (final OverflowException exception) {
         throw new WatersRuntimeException(exception);
       }

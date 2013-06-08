@@ -30,7 +30,6 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.OccursChecker;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
@@ -62,7 +61,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
     super(true);
     mFactory = factory;
     mOperatorTable = op;
-    mOccursChecker = OccursChecker.getInstance();
     mEFSMVariableFinder = new EFSMVariableFinder(op);
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, op);
   }
@@ -150,17 +148,17 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
                                  mUnfoldingVariableContext);
       mPropagatorCalls = 0;
 
-      final EFSMEventEncoding selfloops = system.getSelfloops();
-      TIntArrayList mSelfloops = null;
-      for (int event = EventEncoding.NONTAU; event < selfloops.size(); event++) {
-        final ConstraintList selfloop = selfloops.getUpdate(event);
-        if (mOccursChecker.occurs(varName, selfloop)) {
-          if (mSelfloops == null) {
-            mSelfloops = new TIntArrayList();
-            mInputEventEncoding = new EFSMEventEncoding(mInputEventEncoding);
-          }
-          final int selfloopEvent = mInputEventEncoding.createEventId(selfloop);
-          mSelfloops.add(selfloopEvent);
+      final EFSMEventEncoding selfloops = mUnfoldedVariable.getSelfloops();
+      if (selfloops.size() > 1) {
+        // There are proper selfloop updates. These updates must be considered
+        // as selfloops on every state of the unfolded EFSM. Create event IDs
+        // for all selfloops and remember them in the list mSelfloops.
+        mSelfloops = new TIntArrayList();
+        mInputEventEncoding = new EFSMEventEncoding(mInputEventEncoding);
+        for (int e = EventEncoding.NONTAU; e < selfloops.size(); e++) {
+          final ConstraintList update = selfloops.getUpdate(e);
+          final int ecode = mInputEventEncoding.createEventId(update);
+          mSelfloops.add(ecode);
         }
       }
       mUpdateInfo = new UpdateInfo[mInputEventEncoding.size()];
@@ -611,7 +609,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
-  private final OccursChecker mOccursChecker;
   private final EFSMVariableFinder mEFSMVariableFinder;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private boolean mSourceInfoEnabled;

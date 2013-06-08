@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.analysis.efa
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efsm
 //# CLASS:   EFSMTransitionRelation
 //###########################################################################
 //# $Id$
@@ -39,9 +39,8 @@ public class EFSMTransitionRelation implements Comparable<EFSMTransitionRelation
                                 final EFSMEventEncoding events,
                                 final Collection<EFSMVariable> variables)
   {
-    this(rel,events,variables,null);
+    this(rel, events, variables, null);
   }
-
 
 
   //#########################################################################
@@ -77,6 +76,10 @@ public class EFSMTransitionRelation implements Comparable<EFSMTransitionRelation
     return mVariables;
   }
 
+  /**
+   * Registers this transition relation by adding its reference to all
+   * its variables.
+   */
   public void register()
   {
     for (final EFSMVariable var : mVariables) {
@@ -84,7 +87,12 @@ public class EFSMTransitionRelation implements Comparable<EFSMTransitionRelation
     }
   }
 
-  public void dispose() {
+  /**
+   * Deregisters this transition relation by removing its reference from all
+   * its variables.
+   */
+  public void dispose()
+  {
     for (final EFSMVariable var : mVariables) {
       var.removeTransitionRelation(this);
     }

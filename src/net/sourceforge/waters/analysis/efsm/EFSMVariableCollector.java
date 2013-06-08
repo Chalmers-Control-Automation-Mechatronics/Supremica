@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFAVariableCollector
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.model.compiler.efsm
+//# CLASS:   EFSMVariableCollector
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -47,49 +47,55 @@ class EFSMVariableCollector
   //#########################################################################
   //# Invocation
   /**
-   * Collects all unprimed variables in the given expression.
+   * Collects all variables in the given expression.
    * @param  expr     The expression to be searched.
-   * @param  vars     Found variables will be added to this collection.
+   * @param  vars     All variables will be added to this collection.
    */
-  void collectUnprimedVariables(final SimpleExpressionProxy expr,
-                                final Collection<EFSMVariable> vars)
+  void collectAllVariables(final SimpleExpressionProxy expr,
+                           final Collection<EFSMVariable> vars)
   {
-    try {
-      mUnprimedVariables = vars;
-      collect(expr);
-    } finally {
-      mUnprimedVariables = null;
-    }
+    collectAllVariables(expr, vars, vars);
   }
 
   /**
-   * Collects all primed variables in the given expression.
-   * @param  expr     The expression to be searched.
-   * @param  vars     Found variables will be added in their non-primed form
-   *                  to this collection.
+   * Collects all variables in the given constraint list.
+   * @param  update   The constraint list to be searched.
+   * @param  vars     All variables will be added to this collection.
    */
-  void collectPrimedVariables(final SimpleExpressionProxy expr,
-                              final Collection<EFSMVariable> vars)
+  void collectAllVariables(final ConstraintList update,
+                           final Collection<EFSMVariable> vars)
   {
-    try {
-      mPrimedVariables = vars;
-      collect(expr);
-    } finally {
-      mPrimedVariables = null;
-    }
+    collectAllVariables(update, vars, vars);
+  }
+
+  /**
+   * Collects all variables in the given event encoding.
+   * @param  update   The event encoding to be searched.
+   * @param  vars     All variables will be added to this collection.
+   */
+  void collectAllVariables(final EFSMEventEncoding encoding,
+                           final Collection<EFSMVariable> vars)
+  {
+    collectAllVariables(encoding, vars, vars);
   }
 
   /**
    * Collects all variables in the given expression.
    * @param  expr     The expression to be searched.
-   * @param  variables All variables will be added to this collection.
+   * @param  unprimed Unprimed variables will be added to this collection.
+   *                  This may be <CODE>null</CODE> to suppress collecting
+   *                  unprimed variables.
+   * @param  primed   Primed variables will be added to this collection.
+   *                  This may be <CODE>null</CODE> to suppress collecting
+   *                  primed variables.
    */
   void collectAllVariables(final SimpleExpressionProxy expr,
-                           final Collection<EFSMVariable> variables)
+                           final Collection<EFSMVariable> unprimed,
+                           final Collection<EFSMVariable> primed)
   {
     try {
-      mUnprimedVariables = variables;
-      mPrimedVariables = variables;
+      mUnprimedVariables = unprimed;
+      mPrimedVariables = primed;
       collect(expr);
     } finally {
       mUnprimedVariables = null;
@@ -97,22 +103,45 @@ class EFSMVariableCollector
     }
   }
 
+  /**
+   * Collects all variables in the given constraint list.
+   * @param  update   The constraint list to be searched.
+   * @param  unprimed Unprimed variables will be added to this collection.
+   *                  This may be <CODE>null</CODE> to suppress collecting
+   *                  unprimed variables.
+   * @param  primed   Primed variables will be added to this collection.
+   *                  This may be <CODE>null</CODE> to suppress collecting
+   *                  primed variables.
+   */
   void collectAllVariables(final ConstraintList update,
-                           final Collection<EFSMVariable> variables)
+                           final Collection<EFSMVariable> unprimed,
+                           final Collection<EFSMVariable> primed)
   {
     for (final SimpleExpressionProxy expr : update.getConstraints()) {
-      collectAllVariables(expr, variables);
+      collectAllVariables(expr, unprimed, primed);
     }
   }
 
+  /**
+   * Collects all variables in the given event encoding.
+   * @param  update   The event encoding to be searched.
+   * @param  unprimed Unprimed variables will be added to this collection.
+   *                  This may be <CODE>null</CODE> to suppress collecting
+   *                  unprimed variables.
+   * @param  primed   Primed variables will be added to this collection.
+   *                  This may be <CODE>null</CODE> to suppress collecting
+   *                  primed variables.
+   */
   void collectAllVariables(final EFSMEventEncoding encoding,
-                           final Collection<EFSMVariable> variables)
+                           final Collection<EFSMVariable> unprimed,
+                           final Collection<EFSMVariable> primed)
   {
     for (int i = 0; i < encoding.size(); i++) {
       final ConstraintList update = encoding.getUpdate(i);
-      collectAllVariables(update, variables);
+      collectAllVariables(update, unprimed, primed);
     }
   }
+
 
   //#########################################################################
   //# Auxiliary Methods

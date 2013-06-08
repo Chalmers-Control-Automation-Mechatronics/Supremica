@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
 //# CLASS:   EFSMVariablePartitionComputer
 //###########################################################################
@@ -55,7 +55,8 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
 
   }
 
-  public List<int[]> computePartition(final EFSMVariable var, final EFSMSystem system)
+  public List<int[]> computePartition(final EFSMVariable var,
+                                      final EFSMSystem system)
     throws EvalException, AnalysisException
   {
     System.err.println("Computing partition for " + var.getName() + " (" +
@@ -91,7 +92,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
       if (!checkEventEncoding(encoding)) {
         return null;
       }
-      final EFSMEventEncoding selfloops = system.getSelfloops();
+      final EFSMEventEncoding selfloops = var.getSelfloops();
       if (!checkEventEncoding(selfloops)) {
         return null;
       }
@@ -264,8 +265,8 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
 
   private boolean checkEventEncoding(final EFSMEventEncoding encoding)
   {
-    for(int i = EventEncoding.NONTAU; i < encoding.size(); i++) {
-      final ConstraintList update = encoding.getUpdate(i);
+    for (int e = EventEncoding.NONTAU; e < encoding.size(); e++) {
+      final ConstraintList update = encoding.getUpdate(e);
       if (!checkUpdate(update)) {
         return false;
       }
@@ -285,7 +286,6 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
       mEFSMVariableCollector.collectAllVariables(expr, variables);
       if (variables.contains(mEFSMVariable)){
         if (variables.size() > 1) {
-          System.err.println("Failed update: " + update.toString());
           return false;
         } else {
           relevantConstraints.add(expr);
@@ -295,7 +295,8 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
       }
     }
     if (!relevantConstraints.isEmpty()) {
-      final ConstraintList relevantUpdate = new ConstraintList(relevantConstraints);
+      final ConstraintList relevantUpdate =
+        new ConstraintList(relevantConstraints);
       mRelevantUpdates.add(relevantUpdate);
       if (mergible) {
         mMergibleUpdates.add(relevantUpdate);

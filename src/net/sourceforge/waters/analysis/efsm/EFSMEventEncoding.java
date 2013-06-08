@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.analysis.efa
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efsm
 //# CLASS:   EFSMEventEncoding
 //###########################################################################
 //# $Id$
@@ -20,17 +20,18 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-public class EFSMEventEncoding
+
+class EFSMEventEncoding
 {
 
   //#########################################################################
   //# Constructors
-  public EFSMEventEncoding()
+  EFSMEventEncoding()
   {
     this(DEFAULT_SIZE);
   }
 
-  public EFSMEventEncoding(final int size)
+  EFSMEventEncoding(final int size)
   {
     mEventMap = new TObjectIntHashMap<ConstraintList>(size, 0.5f, -1);
     mUpdateList = new ArrayList<ConstraintList>(size);
@@ -40,7 +41,8 @@ public class EFSMEventEncoding
     mUpdateList.add(empty);
   }
 
-  public EFSMEventEncoding(final EFSMEventEncoding encoding) {
+  EFSMEventEncoding(final EFSMEventEncoding encoding)
+  {
     this(encoding.size());
     for (int event=EventEncoding.NONTAU; event < encoding.size(); event++) {
       final ConstraintList update = encoding.getUpdate(event);
@@ -51,22 +53,22 @@ public class EFSMEventEncoding
 
   //#########################################################################
   //# Simple Access
-  public int size ()
+  int size ()
   {
     return mEventMap.size();
   }
 
-  public int getEventId(final ConstraintList update)
+  int getEventId(final ConstraintList update)
   {
     return mEventMap.get(update);
   }
 
-  public ConstraintList getUpdate(final int event)
+  ConstraintList getUpdate(final int event)
   {
     return mUpdateList.get(event);
   }
 
-  public int createEventId(final ConstraintList update)
+  int createEventId(final ConstraintList update)
   {
     final int id = mEventMap.get(update);
     if (id >= 0) {
@@ -76,6 +78,17 @@ public class EFSMEventEncoding
       mEventMap.put(update, event);
       mUpdateList.add(update);
       return event;
+    }
+  }
+
+  /**
+   * Adds all updates found in the given event encoding to this event
+   * encoding.
+   */
+  void merge(final EFSMEventEncoding enc)
+  {
+    for (final ConstraintList update : enc.mUpdateList) {
+      createEventId(update);
     }
   }
 
