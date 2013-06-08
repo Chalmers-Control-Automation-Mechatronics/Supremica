@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="transferline2-2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Transferline model with multiple rework cycles according to Max H. de Queiroz and Jose E. R. Cury.
-This is an EFA version of the model with a parametrisable number N of rework cycles.
-The model includes manually designed least restrsupervisors, as well as a synthesized superviser used to check them.</ns2:Comment>
+<Module Name="transferline_efsm_block" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Parameterisable transferline model, EFSM version without shared events.
+The model takes parameters:
+- Number of functional blocks: N
+- Buffer capacity: M
+This model does not contain a sink automaton and is blocking.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="REQUIRED_PARAMETER" Name="N">
             <ConstantAliasExpression>
@@ -182,31 +184,12 @@ The model includes manually designed least restrsupervisors, as well as a synthe
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <VariableComponent>
-            <IndexedIdentifier Name="b1">
-                <IntConstant Value="1"/>
-            </IndexedIdentifier>
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <SimpleIdentifier Name="M"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <IndexedIdentifier Name="b1">
-                        <IntConstant Value="1"/>
-                    </IndexedIdentifier>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-        </VariableComponent>
         <ForeachComponent Name="I">
             <BinaryExpression Operator="..">
                 <IntConstant Value="0"/>
                 <BinaryExpression Operator="-">
                     <SimpleIdentifier Name="N"/>
-                    <IntConstant Value="2"/>
+                    <IntConstant Value="1"/>
                 </BinaryExpression>
             </BinaryExpression>
             <ComponentList>
@@ -544,5 +527,24 @@ The model includes manually designed least restrsupervisors, as well as a synthe
                 </VariableComponent>
             </ComponentList>
         </ForeachComponent>
+        <VariableComponent>
+            <IndexedIdentifier Name="b1">
+                <SimpleIdentifier Name="N"/>
+            </IndexedIdentifier>
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="M"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <IndexedIdentifier Name="b1">
+                        <SimpleIdentifier Name="N"/>
+                    </IndexedIdentifier>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
     </ComponentList>
 </Module>
