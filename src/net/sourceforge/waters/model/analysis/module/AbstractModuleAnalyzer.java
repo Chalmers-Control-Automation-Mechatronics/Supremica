@@ -78,14 +78,14 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
     clearAnalysisResult();
   }
 
-  public List<ParameterBindingProxy> getBinding()
+  public List<ParameterBindingProxy> getBindings()
   {
-    return mBinding;
+    return mBindings;
   }
 
   public void setBindings(final List<ParameterBindingProxy> binding)
   {
-    mBinding = binding;
+    mBindings = binding;
   }
 
   public void setKindTranslator(final KindTranslator translator)
@@ -285,6 +285,6 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
   private int mTransitionLimit;
   private long mStartTime;
   private boolean mIsAborting;
-  List<ParameterBindingProxy> mBinding;
+  List<ParameterBindingProxy> mBindings;
 
 }

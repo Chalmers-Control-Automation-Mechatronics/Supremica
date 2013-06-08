@@ -186,6 +186,18 @@ public class EFSMConflictCheckerTest
     checkTransferLine("transferline_efsm", 2, 2, true);
   }
 
+  public void testTransferLine12Block()
+    throws IOException, WatersException
+  {
+    checkTransferLine("transferline_efsm_block", 1, 2, false);
+  }
+
+  public void testTransferLine21Block()
+    throws IOException, WatersException
+  {
+    checkTransferLine("transferline_efsm_block", 2, 1, false);
+  }
+
   public void testTransferLine22Block()
     throws IOException, WatersException
   {
@@ -265,7 +277,7 @@ public class EFSMConflictCheckerTest
 
 
   //#########################################################################
-  //# Paremeterised Tests
+  //# Parametrised Tests
   private void checkTransferLine(final String name,
                                  final int n, final int m,
                                  final boolean expect)
@@ -338,6 +350,7 @@ public class EFSMConflictCheckerTest
     final EFSMConflictChecker conflictChecker =
       new EFSMConflictChecker(module, mModuleFactory);
     configure(conflictChecker);
+    conflictChecker.setBindings(bindings);
     final boolean result = conflictChecker.run();
     assertEquals("Unexpected result from conflict check!", expected, result);
     return result;

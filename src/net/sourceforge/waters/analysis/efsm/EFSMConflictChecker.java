@@ -238,7 +238,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     try {
       setUp();
       final ModuleProxy module = getModel();
-      final List<ParameterBindingProxy> binding = getBinding();
+      final List<ParameterBindingProxy> binding = getBindings();
       final EFSMCompiler compiler =
         new EFSMCompiler(mDocumentManager, module);
       compiler.setConfiguredDefaultMarking(getConfiguredDefaultMarking());
@@ -309,13 +309,15 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
           continue;
         }
         final List<int[]> partition =
-          mVariablePartitionComputer.computePartition(varSelected, mCurrentEFSMSystem);
+          mVariablePartitionComputer.computePartition(varSelected,
+                                                      mCurrentEFSMSystem);
         final EFSMTransitionRelation unfoldTR =
           mPartialUnfolder.unfold(varEFSMTransitionRelation, varSelected,
                                   mCurrentEFSMSystem, partition);
         result.addEFSMTransitionRelation(unfoldTR);
         EFSMTransitionRelation unfoldSimplified = null;
-        if (efsmTransitionRelationList.size() > 1) {
+        if (efsmTransitionRelationList.size() > 1 ||
+            mCurrentEFSMSystem.getVariables().size() > 1) {
           unfoldSimplified = simplify(unfoldTR);
         }
         if (unfoldSimplified == null) {
@@ -347,10 +349,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         final EFSMTransitionRelation synchTR =
           mEFSMSynchronization.synchronize(TR1, TR2);
         result.addEFSMTransitionRelation(synchTR);
-        final EFSMVariableContext context =
-          mCurrentEFSMSystem.getVariableContext();
-        EFSMTransitionRelation synchSimplified =
-          mSimplifier.run(synchTR, context);
+        EFSMTransitionRelation synchSimplified = simplify(synchTR);
         final boolean splitting;
         if (synchSimplified == null) {
           synchSimplified = synchTR;
@@ -395,21 +394,17 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     // i.e., updates that appear as selfloop and all states and nowhere else,
     // we must record them on the variables, so they can be considered later
     // in partial unfolding.
-    final Collection<ConstraintList> selfloops =
-      mSimplifier.getSelfloopedUpdates();
-    if (!selfloops.isEmpty()) {
-      for (final ConstraintList update : mSimplifier.getSelfloopedUpdates()) {
-        final Collection<EFSMVariable> unprimed = new THashSet<EFSMVariable>();
-        final Collection<EFSMVariable> primed = new THashSet<EFSMVariable>();
-        mEFSMVariableCollector.collectAllVariables(update, unprimed, primed);
-        // Skipping pure guards ...
-        if (!primed.isEmpty()) {
-          for (final EFSMVariable var : unprimed) {
-            var.addSelfloop(update);
-          }
-          for (final EFSMVariable var : primed) {
-            var.addSelfloop(update);
-          }
+    for (final ConstraintList update : mSimplifier.getSelfloopedUpdates()) {
+      final Collection<EFSMVariable> unprimed = new THashSet<EFSMVariable>();
+      final Collection<EFSMVariable> primed = new THashSet<EFSMVariable>();
+      mEFSMVariableCollector.collectAllVariables(update, unprimed, primed);
+      // Skipping pure guards ...
+      if (!primed.isEmpty()) {
+        for (final EFSMVariable var : unprimed) {
+          var.addSelfloop(update);
+        }
+        for (final EFSMVariable var : primed) {
+          var.addSelfloop(update);
         }
       }
     }
@@ -557,6 +552,20 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       }
     }
     mCurrentEFSMSystem.removeVariable(var);
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @SuppressWarnings("unused")
+  private void checkBlocking(final EFSMTransitionRelation efsmTR)
+  {
+    if (efsmTR != null) {
+      final boolean nonblocking = mNonblockingChecker.run(efsmTR);
+      if (!nonblocking) {
+        System.err.println("BLOCKING!!!");
+      }
+    }
   }
 
 
