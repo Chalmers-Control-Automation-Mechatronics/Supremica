@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
 //# CLASS:   PartialUnfolder
 //###########################################################################
@@ -204,7 +204,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       final int numInitialStates = mUnfoldedStateList.size();
       mUnfoldedEventEncoding =
         new EFSMEventEncoding(rel.getNumberOfProperEvents());
-      mSourceShift = AutomatonTools.log2(rel.getNumberOfProperEvents());
+      mSourceShift = AutomatonTools.log2(mInputEventEncoding.size());
       final int rangeBits = AutomatonTools.log2(mReducedRangeSize);
       final int encodingSize = mSourceShift + rangeBits +
         AutomatonTools.log2(mRangeValues.size());
@@ -265,16 +265,14 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         }
         expander2.expandState(s);
         if (mSourceInfoEnabled && EFSMNodeList != null) {
-
           final int value = (int) (pair >> 32);
           final String name = EFSMNodeList.get(efsmState).getName() + ":" + value;
           final SimpleNodeProxy node = mFactory.createSimpleNodeProxy(name);
           nodeList.add(node);
         }
       }
-      final Collection<EFSMVariable> variables = new THashSet<EFSMVariable>
-      (efsmRel.getVariables().size());
-
+      final Collection<EFSMVariable> variables =
+        new THashSet<EFSMVariable>(efsmRel.getVariables().size());
       mEFSMVariableCollector.collectAllVariables(mUnfoldedEventEncoding, variables);
       result = new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
                                           variables, nodeList);
@@ -285,9 +283,10 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       final long difftime = stop - start;
       @SuppressWarnings("resource")
       final Formatter formatter = new Formatter(System.err);
-      if(result != null) {
-        final ListBufferTransitionRelation unfoldedRel = result.getTransitionRelation();
-        formatter.format("%d states, %d propagator1 calls, %.3f seconds\n",
+      if (result != null) {
+        final ListBufferTransitionRelation unfoldedRel =
+          result.getTransitionRelation();
+        formatter.format("%d states, %d propagator calls, %.3f seconds\n",
                          unfoldedRel.getNumberOfStates(), mPropagatorCalls,
                          0.001f * difftime);
         statistics.recordFinish(result, true);
@@ -400,6 +399,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       return mValueToClass[value];
     }
   }
+
 
   //#########################################################################
   //# Inner Class StateExpander
@@ -521,7 +521,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
 
 
   //#########################################################################
-  //# Inner Class StateExpander
+  //# Inner Class UpdateInfo
   private class UpdateInfo
   {
     //#######################################################################
@@ -604,6 +604,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
     private int mUnfoldedEventNumber;
     private int mKnownAfterValue;
   }
+
 
   //#########################################################################
   //# Data Members

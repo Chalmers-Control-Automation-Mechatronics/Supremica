@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="unfolding6" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="unfolding08" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
@@ -10,6 +10,9 @@
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point X="80" Y="144"/>
                         </PointGeometry>
@@ -18,9 +21,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
                             <Point X="80" Y="224"/>
                         </PointGeometry>
@@ -43,14 +43,14 @@
                                     <UnaryExpression Operator="'">
                                         <SimpleIdentifier Name="x"/>
                                     </UnaryExpression>
-                                    <BinaryExpression Operator="+">
+                                    <BinaryExpression Operator="-">
                                         <SimpleIdentifier Name="y"/>
                                         <IntConstant Value="1"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="10" Y="-23"/>
+                                <Point X="7" Y="-14"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -65,11 +65,11 @@
                             <Guards>
                                 <BinaryExpression Operator="&lt;">
                                     <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="3"/>
+                                    <IntConstant Value="2"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="-19"/>
+                                <Point X="-33" Y="-18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -80,7 +80,7 @@
             <VariableRange>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
-                    <IntConstant Value="3"/>
+                    <IntConstant Value="2"/>
                 </BinaryExpression>
             </VariableRange>
             <VariableInitial>
@@ -94,7 +94,7 @@
             <VariableRange>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
-                    <IntConstant Value="2"/>
+                    <IntConstant Value="3"/>
                 </BinaryExpression>
             </VariableRange>
             <VariableInitial>
@@ -108,65 +108,57 @@
             <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0:0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
-                            <Point X="560" Y="64"/>
+                            <Point X="70" Y="88"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1:0">
+                        <PointGeometry>
+                            <Point X="121" Y="62"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1:1">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
-                            <Point X="912" Y="272"/>
+                            <Point X="68" Y="159"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1:2">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
                         <PointGeometry>
-                            <Point X="560" Y="272"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="4" Y="-28"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S1:3">
-                        <EventList>
-                            <SimpleIdentifier Name=":accepting"/>
-                        </EventList>
-                        <PointGeometry>
-                            <Point X="176" Y="288"/>
+                            <Point X="178" Y="154"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S0:1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
-                            <Point X="848" Y="688"/>
+                            <Point X="117" Y="188"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S0:2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
-                            <Point X="544" Y="608"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="3" Y="3"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S0:3">
-                        <PointGeometry>
-                            <Point X="352" Y="672"/>
+                            <Point X="180" Y="98"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="5" Y="5"/>
@@ -174,6 +166,28 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
+                    <Edge Source="S0:0" Target="S1:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="93" Y="72"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="y"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="20"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
                     <Edge Source="S0:0" Target="S1:1">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau:after"/>
@@ -182,13 +196,13 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="753" Y="109"/>
+                            <Point X="55" Y="123"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
                                     <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="0"/>
+                                    <IntConstant Value="2"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
@@ -203,9 +217,34 @@
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="122" Y="123"/>
+                        </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="y"/>
+                                    <IntConstant Value="3"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="20"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="S1:0" Target="S0:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="84" Y="53"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&lt;=">
                                     <SimpleIdentifier Name="y"/>
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
@@ -215,7 +254,7 @@
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Source="S0:0" Target="S1:3">
+                    <Edge Source="S1:1" Target="S0:1">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau:after"/>
                             <LabelGeometry Anchor="NW">
@@ -223,13 +262,57 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="320" Y="107"/>
+                            <Point X="79" Y="194"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&lt;=">
+                                    <SimpleIdentifier Name="y"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="20"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="S1:2" Target="S0:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="183" Y="125"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&lt;=">
+                                    <SimpleIdentifier Name="y"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="20"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="S0:1" Target="S1:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="121" Y="125"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
                                     <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="2"/>
+                                    <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
@@ -245,13 +328,13 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="905" Y="521"/>
+                            <Point X="90" Y="177"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
                                     <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="0"/>
+                                    <IntConstant Value="2"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
@@ -263,25 +346,25 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="tau:after"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-111" Y="-107"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="790" Y="482"/>
+                            <Point X="154" Y="183"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
                                     <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="1"/>
+                                    <IntConstant Value="3"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-85" Y="-66"/>
+                                <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Source="S0:1" Target="S1:3">
+                    <Edge Source="S0:2" Target="S1:0">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau:after"/>
                             <LabelGeometry Anchor="NW">
@@ -289,13 +372,13 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="478" Y="635"/>
+                            <Point X="157" Y="68"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
                                     <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="2"/>
+                                    <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
@@ -311,13 +394,13 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="725" Y="490"/>
+                            <Point X="122" Y="126"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
                                     <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="0"/>
+                                    <IntConstant Value="2"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
@@ -329,135 +412,23 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="tau:after"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-17" Y="-70"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="513" Y="482"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="==">
-                                    <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="9" Y="-17"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="S0:2" Target="S1:3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:after"/>
-                            <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="290" Y="381"/>
+                            <Point X="204" Y="127"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
                                     <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="2"/>
+                                    <IntConstant Value="3"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="S0:3" Target="S1:1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:after"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="25" Y="-47"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="665" Y="673"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="==">
-                                    <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="14" Y="-21"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="S0:3" Target="S1:2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:after"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-41" Y="-62"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="441" Y="426"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="==">
-                                    <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-33"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="S0:3" Target="S1:3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:after"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="258" Y="532"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="==">
-                                    <SimpleIdentifier Name="y"/>
-                                    <IntConstant Value="2"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="S1:1" Target="S0:1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:after"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="1047" Y="511"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="S1:2" Target="S0:2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:after"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="596" Y="439"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="S1:3" Target="S0:3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="tau:after"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="164" Y="527"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
