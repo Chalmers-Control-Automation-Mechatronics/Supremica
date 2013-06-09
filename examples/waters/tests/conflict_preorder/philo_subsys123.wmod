@@ -1,0 +1,4065 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="philo_subsys123" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Subsystem abstraction of dining philosophers model, part of conflict preorder checker benchmark.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+            <ConstantAliasExpression>
+                <IntConstant Value="6"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="take">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="-">
+                        <SimpleIdentifier Name="N"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+                <EnumSetExpression Text="[U,L]">
+                    <SimpleIdentifier Name="U"/>
+                    <SimpleIdentifier Name="L"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="put">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="-">
+                        <SimpleIdentifier Name="N"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+                <EnumSetExpression Text="[U,L]">
+                    <SimpleIdentifier Name="U"/>
+                    <SimpleIdentifier Name="L"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="hungry">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="-">
+                        <SimpleIdentifier Name="N"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="subsys123">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="324" Y="267"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <PointGeometry>
+                            <Point X="435" Y="242"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q10">
+                        <PointGeometry>
+                            <Point X="444" Y="513"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q11">
+                        <PointGeometry>
+                            <Point X="192" Y="282"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q12">
+                        <PointGeometry>
+                            <Point X="200" Y="228"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q13">
+                        <PointGeometry>
+                            <Point X="125" Y="651"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q14">
+                        <PointGeometry>
+                            <Point X="459" Y="361"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q15">
+                        <PointGeometry>
+                            <Point X="379" Y="478"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q16">
+                        <PointGeometry>
+                            <Point X="356" Y="204"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q17">
+                        <PointGeometry>
+                            <Point X="288" Y="216"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q18">
+                        <PointGeometry>
+                            <Point X="86" Y="218"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q19">
+                        <PointGeometry>
+                            <Point X="351" Y="600"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <PointGeometry>
+                            <Point X="262" Y="615"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q20">
+                        <PointGeometry>
+                            <Point X="449" Y="281"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q21">
+                        <PointGeometry>
+                            <Point X="303" Y="182"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q22">
+                        <PointGeometry>
+                            <Point X="357" Y="246"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q23">
+                        <PointGeometry>
+                            <Point X="135" Y="223"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q24">
+                        <PointGeometry>
+                            <Point X="350" Y="375"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q25">
+                        <PointGeometry>
+                            <Point X="277" Y="540"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q26">
+                        <PointGeometry>
+                            <Point X="265" Y="433"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q27">
+                        <PointGeometry>
+                            <Point X="319" Y="431"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q28">
+                        <PointGeometry>
+                            <Point X="229" Y="243"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q29">
+                        <PointGeometry>
+                            <Point X="151" Y="670"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q3">
+                        <PointGeometry>
+                            <Point X="352" Y="316"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q30">
+                        <PointGeometry>
+                            <Point X="227" Y="327"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q31">
+                        <PointGeometry>
+                            <Point X="114" Y="140"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q32">
+                        <PointGeometry>
+                            <Point X="123" Y="312"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q33">
+                        <PointGeometry>
+                            <Point X="130" Y="249"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q34">
+                        <PointGeometry>
+                            <Point X="66" Y="724"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q35">
+                        <PointGeometry>
+                            <Point X="421" Y="215"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q36">
+                        <PointGeometry>
+                            <Point X="369" Y="189"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q37">
+                        <PointGeometry>
+                            <Point X="442" Y="352"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q38">
+                        <PointGeometry>
+                            <Point X="378" Y="516"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q39">
+                        <PointGeometry>
+                            <Point X="372" Y="167"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q4">
+                        <PointGeometry>
+                            <Point X="145" Y="56"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q40">
+                        <PointGeometry>
+                            <Point X="207" Y="286"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q41">
+                        <PointGeometry>
+                            <Point X="300" Y="216"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q42">
+                        <PointGeometry>
+                            <Point X="65" Y="239"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q43">
+                        <PointGeometry>
+                            <Point X="234" Y="467"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q44">
+                        <PointGeometry>
+                            <Point X="287" Y="466"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q45">
+                        <PointGeometry>
+                            <Point X="376" Y="582"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q46">
+                        <PointGeometry>
+                            <Point X="272" Y="260"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q47">
+                        <PointGeometry>
+                            <Point X="388" Y="261"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q48">
+                        <PointGeometry>
+                            <Point X="216" Y="395"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q49">
+                        <PointGeometry>
+                            <Point X="155" Y="583"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q5">
+                        <PointGeometry>
+                            <Point X="143" Y="93"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q50">
+                        <PointGeometry>
+                            <Point X="295" Y="423"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q51">
+                        <PointGeometry>
+                            <Point X="59" Y="678"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q52">
+                        <PointGeometry>
+                            <Point X="139" Y="319"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q53">
+                        <PointGeometry>
+                            <Point X="229" Y="607"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q54">
+                        <PointGeometry>
+                            <Point X="321" Y="539"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q55">
+                        <PointGeometry>
+                            <Point X="425" Y="314"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q56">
+                        <PointGeometry>
+                            <Point X="385" Y="536"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q57">
+                        <PointGeometry>
+                            <Point X="488" Y="293"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q58">
+                        <PointGeometry>
+                            <Point X="354" Y="183"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q59">
+                        <PointGeometry>
+                            <Point X="121" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q6">
+                        <PointGeometry>
+                            <Point X="469" Y="182"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q60">
+                        <PointGeometry>
+                            <Point X="376" Y="562"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q61">
+                        <PointGeometry>
+                            <Point X="195" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q62">
+                        <PointGeometry>
+                            <Point X="406" Y="247"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q63">
+                        <PointGeometry>
+                            <Point X="449" Y="230"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q64">
+                        <PointGeometry>
+                            <Point X="263" Y="453"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q65">
+                        <PointGeometry>
+                            <Point X="80" Y="694"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q66">
+                        <PointGeometry>
+                            <Point X="161" Y="315"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q67">
+                        <PointGeometry>
+                            <Point X="312" Y="586"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q68">
+                        <PointGeometry>
+                            <Point X="370" Y="269"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q69">
+                        <PointGeometry>
+                            <Point X="242" Y="71"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q7">
+                        <PointGeometry>
+                            <Point X="423" Y="97"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q70">
+                        <PointGeometry>
+                            <Point X="225" Y="90"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q71">
+                        <PointGeometry>
+                            <Point X="221" Y="582"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q72">
+                        <PointGeometry>
+                            <Point X="422" Y="367"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q73">
+                        <PointGeometry>
+                            <Point X="345" Y="485"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q74">
+                        <PointGeometry>
+                            <Point X="400" Y="151"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q75">
+                        <PointGeometry>
+                            <Point X="483" Y="353"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q76">
+                        <PointGeometry>
+                            <Point X="407" Y="480"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q77">
+                        <PointGeometry>
+                            <Point X="345" Y="90"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q78">
+                        <PointGeometry>
+                            <Point X="417" Y="591"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q79">
+                        <PointGeometry>
+                            <Point X="503" Y="250"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q8">
+                        <PointGeometry>
+                            <Point X="204" Y="145"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q80">
+                        <PointGeometry>
+                            <Point X="53" Y="206"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q81">
+                        <PointGeometry>
+                            <Point X="132" Y="693"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q82">
+                        <PointGeometry>
+                            <Point X="351" Y="540"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q83">
+                        <PointGeometry>
+                            <Point X="466" Y="307"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q84">
+                        <PointGeometry>
+                            <Point X="239" Y="230"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q85">
+                        <PointGeometry>
+                            <Point X="163" Y="206"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q86">
+                        <PointGeometry>
+                            <Point X="148" Y="397"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q87">
+                        <PointGeometry>
+                            <Point X="87" Y="600"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q88">
+                        <PointGeometry>
+                            <Point X="310" Y="564"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q89">
+                        <PointGeometry>
+                            <Point X="295" Y="243"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q9">
+                        <PointGeometry>
+                            <Point X="506" Y="335"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0" Target="q26">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="290" Y="349"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q0" Target="q47">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="357" Y="262"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q0" Target="q89">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q1" Target="q35">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="437" Y="222"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q1" Target="q62">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="427" Y="241"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q1" Target="q68">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="410" Y="259"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q10" Target="q38">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="418" Y="520"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q10" Target="q9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="491" Y="429"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q11" Target="q26">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="220" Y="359"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q11" Target="q32">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="148" Y="296"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q11" Target="q40">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="196" Y="285"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q12" Target="q11">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="189" Y="254"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q12" Target="q33">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="158" Y="237"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q12" Target="q50">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q13" Target="q49">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="134" Y="620"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q13" Target="q51">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q14" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="454" Y="304"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q14" Target="q37">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q14" Target="q72">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="447" Y="371"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q14" Target="q83">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="473" Y="337"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q15" Target="q14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="429" Y="425"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q15" Target="q38">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="385" Y="499"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q15" Target="q73">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="365" Y="484"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q16" Target="q21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="331" Y="184"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q16" Target="q8">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q16" Target="q89">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q17" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q17" Target="q11">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="234" Y="247"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q17" Target="q41">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="293" Y="209"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q18" Target="q32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="93" Y="264"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q18" Target="q42">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="65" Y="225"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q19" Target="q2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="307" Y="621"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q19" Target="q38">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="367" Y="566"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q2" Target="q25">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="266" Y="584"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q2" Target="q29">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="206" Y="652"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q20" Target="q16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="411" Y="238"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q20" Target="q3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="406" Y="300"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q21" Target="q12">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="247" Y="194"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q21" Target="q17">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="292" Y="191"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q21" Target="q68">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q22" Target="q36">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="355" Y="208"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q22" Target="q46">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="310" Y="238"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q22" Target="q89">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="327" Y="242"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q23" Target="q40">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q23" Target="q42">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="86" Y="215"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q23" Target="q59">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="121" Y="203"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q24" Target="q22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="359" Y="309"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q24" Target="q3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="354" Y="347"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q24" Target="q48">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="282" Y="387"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q25" Target="q24">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="317" Y="463"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q25" Target="q49">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q26" Target="q27">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="292" Y="435"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q26" Target="q43">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="243" Y="452"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q26" Target="q53">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="238" Y="524"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q26" Target="q54">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="289" Y="490"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q27" Target="q44">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="304" Y="453"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q27" Target="q45">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="346" Y="515"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q27" Target="q50">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q27" Target="q56">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="356" Y="488"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q28" Target="q23">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="180" Y="221"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q28" Target="q41">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="263" Y="218"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q28" Target="q61">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="210" Y="220"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q29" Target="q49">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="149" Y="631"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q29" Target="q65">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="113" Y="689"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q3" Target="q30">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="288" Y="326"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q3" Target="q89">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="331" Y="275"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q30" Target="q28">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="225" Y="285"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q30" Target="q66">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="190" Y="323"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q31" Target="q18">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="90" Y="172"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q31" Target="q33">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="110" Y="190"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q32" Target="q43">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="166" Y="396"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q32" Target="q52">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="122" Y="319"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q33" Target="q32">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="114" Y="280"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q33" Target="q64">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="181" Y="358"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q34" Target="q51">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="54" Y="707"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q34" Target="q65">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="68" Y="715"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q35" Target="q16">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="395" Y="202"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q35" Target="q22">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="393" Y="223"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q35" Target="q39">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="405" Y="179"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q36" Target="q17">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="329" Y="194"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q36" Target="q58">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="365" Y="176"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q36" Target="q62">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="395" Y="211"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q37" Target="q20">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="454" Y="318"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q37" Target="q24">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="399" Y="365"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q37" Target="q35">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="438" Y="280"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q38" Target="q25">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q38" Target="q37">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="418" Y="437"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q39" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="415" Y="193"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q39" Target="q21">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="338" Y="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q39" Target="q36">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="376" Y="169"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q4" Target="q31">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="122" Y="88"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q4" Target="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="139" Y="66"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q40" Target="q12">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="199" Y="256"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q40" Target="q27">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="267" Y="358"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q40" Target="q52">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="171" Y="312"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q41" Target="q21">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q41" Target="q40">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q41" Target="q47">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="349" Y="232"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q42" Target="q52">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="92" Y="280"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q42" Target="q80">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="47" Y="221"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q43" Target="q44">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="257" Y="473"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q43" Target="q71">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="221" Y="529"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q43" Target="q73">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="285" Y="483"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q44" Target="q60">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="337" Y="517"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q44" Target="q64">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="272" Y="466"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q44" Target="q76">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="350" Y="488"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q45" Target="q60">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="383" Y="581"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q45" Target="q67">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="346" Y="606"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q45" Target="q78">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="401" Y="599"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q46" Target="q28">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="248" Y="252"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q46" Target="q58">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="305" Y="209"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q46" Target="q84">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="255" Y="240"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q47" Target="q27">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="358" Y="347"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q47" Target="q68">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q47" Target="q74">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="401" Y="199"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q48" Target="q30">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="216" Y="362"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q48" Target="q46">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="241" Y="329"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q48" Target="q86">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="176" Y="399"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q49" Target="q48">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="178" Y="491"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q49" Target="q87">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="115" Y="595"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q5" Target="q33">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="119" Y="165"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q50" Target="q26">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q50" Target="q64">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q50" Target="q67">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="297" Y="512"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q50" Target="q82">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="322" Y="486"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q51" Target="q87">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="64" Y="641"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q52" Target="q33">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="125" Y="285"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q52" Target="q44">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="204" Y="399"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q53" Target="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="242" Y="622"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q53" Target="q71">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="220" Y="601"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q53" Target="q81">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="180" Y="660"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q54" Target="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q54" Target="q56">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q54" Target="q73">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="333" Y="516"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q55" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="375" Y="294"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q55" Target="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="391" Y="318"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q55" Target="q57">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q56" Target="q76">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="407" Y="514"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q56" Target="q78">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="409" Y="571"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q56" Target="q82">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="373" Y="546"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q57" Target="q47">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="449" Y="272"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q57" Target="q79">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="510" Y="270"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q57" Target="q83">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="488" Y="301"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q58" Target="q39">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="364" Y="163"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q58" Target="q41">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="326" Y="190"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q58" Target="q63">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="411" Y="192"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q59" Target="q12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="157" Y="199"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q59" Target="q80">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="78" Y="190"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q6" Target="q35">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="453" Y="191"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q6" Target="q7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="457" Y="129"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q6" Target="q74">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="444" Y="155"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q60" Target="q10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="420" Y="546"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q60" Target="q88">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="346" Y="573"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q61" Target="q21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="246" Y="182"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q61" Target="q59">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="154" Y="189"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q62" Target="q0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="372" Y="270"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q62" Target="q22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="385" Y="241"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q62" Target="q63">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="436" Y="232"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q63" Target="q1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="452" Y="233"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q63" Target="q47">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q63" Target="q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="471" Y="201"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q64" Target="q15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q64" Target="q43">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="244" Y="465"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q64" Target="q88">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="283" Y="516"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q65" Target="q87">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="77" Y="651"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q66" Target="q61">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="171" Y="256"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q67" Target="q19">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="331" Y="606"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q67" Target="q53">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="272" Y="618"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q67" Target="q88">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q68" Target="q0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="347" Y="270"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q68" Target="q16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="367" Y="234"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q68" Target="q50">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="328" Y="344"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q69" Target="q4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="192" Y="51"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q69" Target="q70">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="231" Y="70"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q69" Target="q8">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="216" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q7" Target="q39">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="401" Y="120"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q7" Target="q77">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="388" Y="81"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q70" Target="q12">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q70" Target="q5">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="181" Y="81"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q71" Target="q13">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q71" Target="q25">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q72" Target="q24">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="389" Y="376"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q72" Target="q55">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="428" Y="344"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q72" Target="q62">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="417" Y="308"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q72" Target="q75">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="461" Y="370"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q73" Target="q25">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="309" Y="516"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q73" Target="q72">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="387" Y="430"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q73" Target="q76">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="381" Y="488"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q74" Target="q16">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="387" Y="174"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q74" Target="q69">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="325" Y="97"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q74" Target="q77">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="379" Y="108"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q75" Target="q14">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="481" Y="364"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q75" Target="q57">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="499" Y="324"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q75" Target="q63">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="481" Y="290"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q75" Target="q9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="507" Y="349"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q76" Target="q10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="434" Y="500"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q76" Target="q15">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="399" Y="482"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q76" Target="q75">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="459" Y="423"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q77" Target="q21">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="323" Y="125"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q77" Target="q70">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="286" Y="78"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q78" Target="q10">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="442" Y="560"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q78" Target="q19">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="389" Y="609"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q79" Target="q20">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="486" Y="264"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q79" Target="q74">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="464" Y="191"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q8" Target="q12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q8" Target="q31">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="154" Y="132"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q8" Target="q85">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="178" Y="168"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q80" Target="q33">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="81" Y="227"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q81" Target="q13">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="123" Y="678"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q81" Target="q29">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="140" Y="689"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q81" Target="q34">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="718"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q82" Target="q15">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="380" Y="519"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q82" Target="q19">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="353" Y="579"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q82" Target="q54">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="336" Y="547"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q83" Target="q20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="467" Y="293"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q83" Target="q55">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="452" Y="312"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q83" Target="q68">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q84" Target="q39">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="301" Y="177"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q84" Target="q61">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="215" Y="209"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q85" Target="q11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="170" Y="242"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q85" Target="q18">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="117" Y="206"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q85" Target="q23">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="142" Y="208"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q86" Target="q66">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="146" Y="358"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q86" Target="q84">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="176" Y="304"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q87" Target="q86">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="107" Y="500"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q88" Target="q38">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="345" Y="542"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q88" Target="q71">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="263" Y="580"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q89" Target="q17">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="289" Y="227"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q89" Target="q28">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q89" Target="q85">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="223" Y="228"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q9" Target="q37">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="483" Y="344"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q9" Target="q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="510" Y="253"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q9" Target="q79">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="521" Y="291"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="abs123">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="all_eat">
+                        <PointGeometry>
+                            <Point X="384" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="eUhL">
+                        <PointGeometry>
+                            <Point X="288" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="3" Y="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="eL">
+                        <PointGeometry>
+                            <Point X="192" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="2" Y="-18"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="eLhU">
+                        <PointGeometry>
+                            <Point X="288" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="3" Y="-18"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hU">
+                        <PointGeometry>
+                            <Point X="192" Y="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-26" Y="-1"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="eU">
+                        <PointGeometry>
+                            <Point X="192" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="4" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hUL">
+                        <PointGeometry>
+                            <Point X="288" Y="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-29" Y="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hLeU">
+                        <PointGeometry>
+                            <Point X="384" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-37" Y="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hL">
+                        <PointGeometry>
+                            <Point X="192" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-26" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="edge_hungry">
+                        <PointGeometry>
+                            <Point X="240" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-87" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hUeL">
+                        <PointGeometry>
+                            <Point X="384" Y="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-36" Y="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hLU">
+                        <PointGeometry>
+                            <Point X="288" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-31" Y="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="idle" Target="hU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="133" Y="322"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="idle" Target="hL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="126" Y="98"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="all_eat" Target="eL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-11" Y="15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="333" Y="101"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="all_eat" Target="eU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-8" Y="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="331" Y="309"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eUhL" Target="all_eat">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-65" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="356" Y="267"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eUhL" Target="hL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="22" Y="110"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="265" Y="121"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eL" Target="idle">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-16" Y="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="eL" Target="eLhU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="eLhU" Target="all_eat">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-61" Y="-7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="358" Y="147"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eLhU" Target="hU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="21" Y="-138"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="262" Y="297"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="hU" Target="eU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hU" Target="hUL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hU" Target="edge_hungry">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="176" Y="294"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eU" Target="idle">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="eU" Target="eUhL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hUL" Target="eUhL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hUL" Target="hUeL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hLeU" Target="all_eat">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="-57"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hL" Target="eL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hL" Target="edge_hungry">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-47" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="177" Y="124"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="hL" Target="hLU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="edge_hungry" Target="eUhL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-47" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="edge_hungry" Target="eLhU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-46" Y="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hUeL" Target="all_eat">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hLU" Target="eLhU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hLU" Target="hLeU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="4"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

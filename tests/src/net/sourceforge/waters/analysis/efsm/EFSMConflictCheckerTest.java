@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
 //# CLASS:   EFSMCompilerTest
 //###########################################################################
@@ -9,32 +9,26 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.WatersException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 
 public class EFSMConflictCheckerTest
-  extends AbstractWatersTest
+  extends AbstractAnalysisTest
 {
   //#########################################################################
   //# Entry points in junit.framework.TestCase
@@ -54,8 +48,9 @@ public class EFSMConflictCheckerTest
   public void testEmpty()
     throws EvalException, AnalysisException
   {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
     final String name = "empty";
-    final ModuleProxy module = mModuleFactory.createModuleProxy
+    final ModuleProxy module = factory.createModuleProxy
       (name, null, null, null, null, null, null);
     checkConflict(module, true);
   }
@@ -283,15 +278,16 @@ public class EFSMConflictCheckerTest
                                  final boolean expect)
     throws IOException, WatersException
   {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
     final List<ParameterBindingProxy> bindings =
       new ArrayList<ParameterBindingProxy>(2);
-    final IntConstantProxy constN = mModuleFactory.createIntConstantProxy(n);
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
     final ParameterBindingProxy bindingN =
-      mModuleFactory.createParameterBindingProxy("N", constN);
+      factory.createParameterBindingProxy("N", constN);
     bindings.add(bindingN);
-    final IntConstantProxy constM = mModuleFactory.createIntConstantProxy(m);
+    final IntConstantProxy constM = factory.createIntConstantProxy(m);
     final ParameterBindingProxy bindingM =
-      mModuleFactory.createParameterBindingProxy("M", constM);
+      factory.createParameterBindingProxy("M", constM);
     bindings.add(bindingM);
     final ModuleProxy module = loadModule("tests", "efsm", name);
     checkConflict(module, bindings, expect);
@@ -302,41 +298,13 @@ public class EFSMConflictCheckerTest
   //# Customisation
   void configure(final EFSMConflictChecker checker)
   {
-
   }
 
 
   //#########################################################################
   //# Utilities
-  private ModuleProxy loadModule(final String dirname, final String subdirname, final String name)
-    throws IOException, WatersException
-  {
-    final File root = getWatersInputRoot();
-    final File dir = new File(root, dirname);
-    final File subdir = new File(dir, subdirname);
-    final String extname = name + mModuleMarshaller.getDefaultExtension();
-    final File filename = new File(subdir, extname);
-    return loadModule(filename);
-  }
-
-  private ModuleProxy loadModule(final String dirname, final String name)
-    throws IOException, WatersException
-  {
-    final File root = getWatersInputRoot();
-    final File dir = new File(root, dirname);
-    final String extname = name + mModuleMarshaller.getDefaultExtension();
-    final File filename = new File(dir, extname);
-    return loadModule(filename);
-  }
-
-  private ModuleProxy loadModule(final File filename)
-    throws IOException, WatersException
-  {
-    final URI uri = filename.toURI();
-    return mModuleMarshaller.unmarshal(uri);
-  }
-
-  private boolean checkConflict(final ModuleProxy module, final boolean expected)
+  private boolean checkConflict(final ModuleProxy module,
+                                final boolean expected)
     throws EvalException, AnalysisException
   {
     return checkConflict(module, null, expected);
@@ -347,8 +315,9 @@ public class EFSMConflictCheckerTest
                                 final boolean expected)
     throws EvalException, AnalysisException
   {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
     final EFSMConflictChecker conflictChecker =
-      new EFSMConflictChecker(module, mModuleFactory);
+      new EFSMConflictChecker(module, factory);
     configure(conflictChecker);
     conflictChecker.setBindings(bindings);
     final boolean result = conflictChecker.run();
@@ -356,48 +325,4 @@ public class EFSMConflictCheckerTest
     return result;
   }
 
-  @SuppressWarnings("unused")
-  private ParameterBindingProxy createBinding(final String name,
-                                              final int value)
-  {
-    final IntConstantProxy expr = mModuleFactory.createIntConstantProxy(value);
-    return mModuleFactory.createParameterBindingProxy(name, expr);
-  }
-
-
-  //#########################################################################
-  //# Overrides for junit.framework.TestCase
-  @Override
-  protected void setUp()
-    throws Exception
-  {
-    super.setUp();
-    mModuleFactory = ModuleElementFactory.getInstance();
-    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
-    mDocumentManager = new DocumentManager();
-    mDocumentManager.registerMarshaller(mModuleMarshaller);
-    mDocumentManager.registerUnmarshaller(mModuleMarshaller);
-  }
-
-  @Override
-  protected void tearDown()
-    throws Exception
-  {
-    mModuleFactory = null;
-    mModuleMarshaller = null;
-    mDocumentManager = null;
-    super.tearDown();
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private ModuleProxyFactory mModuleFactory;
-  private JAXBModuleMarshaller mModuleMarshaller;
-  private DocumentManager mDocumentManager;
-
 }
-
-
-

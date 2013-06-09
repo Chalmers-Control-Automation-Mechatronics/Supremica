@@ -374,7 +374,7 @@ public class EventEncoding
   }
 
   /**
-   * Returns the event code for the given event.
+   * Returns the event code for the given event or proposition.
    * @return The integer encoding the given event, or <CODE>-1</CODE>
    *         if the event is not in the encoding.
    */

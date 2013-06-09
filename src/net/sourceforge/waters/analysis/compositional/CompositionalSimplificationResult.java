@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -48,11 +47,13 @@ public class CompositionalSimplificationResult
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProxyResult
+  @Override
   public ProductDESProxy getComputedProxy()
   {
     return mProductDES;
   }
 
+  @Override
   public void setComputedProxy(final ProductDESProxy des)
   {
     setSatisfied(des != null);
@@ -62,32 +63,22 @@ public class CompositionalSimplificationResult
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProductDESResult
+  @Override
   public ProductDESProxy getComputedProductDES()
   {
     return getComputedProxy();
   }
 
+  @Override
   public Collection<AutomatonProxy> getComputedAutomata()
   {
     return mSimplifiedAutomata;
   }
 
+  @Override
   public void setComputedProductDES(final ProductDESProxy des)
   {
     setComputedProxy(des);
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.analysis.DefaultAnalysisResult
-  @Override
-  public void merge(final AnalysisResult other)
-  {
-    super.merge(other);
-    final CompositionalSimplificationResult result =
-      (CompositionalSimplificationResult) other;
-    final Collection<AutomatonProxy> automata = result.getComputedAutomata();
-    mSimplifiedAutomata.addAll(automata);
   }
 
 

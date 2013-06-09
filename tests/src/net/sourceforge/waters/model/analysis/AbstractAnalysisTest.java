@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -76,52 +78,54 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   //#########################################################################
   //# Compiling
-  protected ProductDESProxy getCompiledDES(final String group,
-                                           final String name)
+  protected ModuleProxy loadModule(final String... names)
+    throws IOException, WatersException
+  {
+    File dir = getWatersInputRoot();
+    final int numDirs = names.length - 1;
+    for (int i = 0; i < numDirs; i++) {
+      final String name = names[i];
+      dir = new File(dir, name);
+    }
+    final String extname =
+      names[numDirs] + mModuleMarshaller.getDefaultExtension();
+    final File filename = new File(dir, extname);
+    return loadModule(filename);
+  }
+
+  protected ModuleProxy loadModule(final File filename)
+    throws IOException, WatersException
+  {
+    final URI uri = filename.toURI();
+    return mModuleMarshaller.unmarshal(uri);
+  }
+
+
+  protected ProductDESProxy getCompiledDES(final String... names)
     throws Exception
   {
-    return getCompiledDES(group, name, (List<ParameterBindingProxy>) null);
+    return getCompiledDESRaw(null, names);
   }
 
   protected ProductDESProxy getCompiledDES
-    (final String group,
-     final String name,
-     final List<ParameterBindingProxy> bindings)
+    (final List<ParameterBindingProxy> bindings,
+     final String... names)
     throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    return getCompiledDES(groupdir, name, bindings);
+    return getCompiledDESRaw(bindings, names);
   }
 
-  protected ProductDESProxy getCompiledDES(final String group,
-                                           final String subdir,
-                                           final String name)
+  protected ProductDESProxy getCompiledDESRaw
+    (final List<ParameterBindingProxy> bindings, final String[] names)
     throws Exception
   {
-    return getCompiledDES(group, subdir, name, null);
-  }
-
-  protected ProductDESProxy getCompiledDES
-    (final String group,
-     final String subdir,
-     final String name,
-     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    return getCompiledDES(groupdir, subdir, name, bindings);
-  }
-
-  protected ProductDESProxy getCompiledDES
-    (final File groupdir,
-     final String subdir,
-     final String name,
-     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
+    File dir = getWatersInputRoot();
+    final int numDirs = names.length - 1;
+    for (int i = 0; i < numDirs; i++) {
+      final String name = names[i];
+      dir = new File(dir, name);
+    }
+    final String name = names[numDirs];
     return getCompiledDES(dir, name, bindings);
   }
 
@@ -189,6 +193,11 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   //#########################################################################
   //# Utilities
+  protected ModuleProxyFactory getModuleProxyFactory()
+  {
+    return mModuleProxyFactory;
+  }
+
   protected ProductDESProxyFactory getProductDESProxyFactory()
   {
     return mProductDESProxyFactory;

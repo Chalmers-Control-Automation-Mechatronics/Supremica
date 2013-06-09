@@ -70,22 +70,26 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
 
   //#########################################################################
   //# Simple Access Methods
+  @Override
   public ProductDESProxyFactory getFactory()
   {
     return mFactory;
   }
 
+  @Override
   public ProductDESProxy getModel()
   {
     return mModel;
   }
 
+  @Override
   public void setModel(final ProductDESProxy model)
   {
     mModel = model;
     clearAnalysisResult();
   }
 
+  @Override
   public void setModel(final AutomatonProxy aut)
   {
     final ProductDESProxy des =
@@ -93,6 +97,7 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
     setModel(des);
   }
 
+  @Override
   public void setKindTranslator(final KindTranslator translator)
   {
     if (mKindTranslator != translator) {
@@ -101,36 +106,43 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
     }
   }
 
+  @Override
   public KindTranslator getKindTranslator()
   {
     return mKindTranslator;
   }
 
+  @Override
   public void setNodeLimit(final int limit)
   {
     mNodeLimit = limit;
   }
 
+  @Override
   public int getNodeLimit()
   {
     return mNodeLimit;
   }
 
+  @Override
   public void setTransitionLimit(final int limit)
   {
     mTransitionLimit = limit;
   }
 
+  @Override
   public int getTransitionLimit()
   {
     return mTransitionLimit;
   }
 
+  @Override
   public AnalysisResult getAnalysisResult()
   {
     return mAnalysisResult;
   }
 
+  @Override
   public void clearAnalysisResult()
   {
     mAnalysisResult = null;
@@ -139,11 +151,13 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
   public void requestAbort()
   {
     mIsAborting = true;
   }
 
+  @Override
   public boolean isAborting()
   {
     return mIsAborting;
@@ -282,9 +296,9 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
 
   /**
    * Stores any available statistics on this analyser's last run in the
-   * analysis result. This default implementation presently does nothing.
-   * It needs to be overridden by subclasses, who should always call the
-   * superclass method first.
+   * analysis result. This default implementation only records the runtime
+   * and memory usage. To provide more statistics, it should be overridden
+   * by subclasses, who should always call the superclass method first.
    */
   protected void addStatistics()
   {
