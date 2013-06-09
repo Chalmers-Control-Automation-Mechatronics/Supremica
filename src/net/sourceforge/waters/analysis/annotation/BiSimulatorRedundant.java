@@ -1012,7 +1012,7 @@ public class BiSimulatorRedundant
       mTrans.mergewithannotations(sec.mStates);
       STATESREMOVED += sec.mStates.length -1;
     }
-    System.out.println("STATESREMOVED: " + (mStates - mP.size()));
+    // System.out.println("STATESREMOVED: " + (mStates - mP.size()));
     if (mP.size() == 0) {
       assert(false);
     }

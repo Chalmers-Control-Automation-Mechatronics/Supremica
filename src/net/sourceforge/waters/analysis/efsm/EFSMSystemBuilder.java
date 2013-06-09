@@ -160,6 +160,7 @@ public class EFSMSystemBuilder
         final EFSMTransitionRelation efsmTR =
           new EFSMTransitionRelation(rel, eventEncoding, mMarkedVariables);
         mResultEFSMSystem.addTransitionRelation(efsmTR);
+        efsmTR.register();
       } catch (final OverflowException exception) {
         throw new WatersRuntimeException(exception);
       }
@@ -380,7 +381,11 @@ public class EFSMSystemBuilder
       try {
         final GraphProxy graph = comp.getGraph();
         visitGraphProxy(graph);
-        if (mUsesMarking && !mMarkedVariables.isEmpty()) {
+        ListBufferTransitionRelation rel = createTransitionRelation(comp);
+        if (mIsOptimizationEnabled) {
+          rel.removeRedundantPropositions();
+        }
+        if (rel.isUsedProposition(0) && !mMarkedVariables.isEmpty()) {
           // Throw an exception because markings in variables and
           // automata together are not yet supported.
           final EFSMVariable var = mMarkedVariables.get(0);
@@ -388,9 +393,7 @@ public class EFSMSystemBuilder
             new SharedEventException(mDefaultMarking, comp, var.getComponent());
           throw new VisitorException(exception);
         }
-        ListBufferTransitionRelation rel = createTransitionRelation(comp);
         if (mIsOptimizationEnabled) {
-          rel.removeRedundantPropositions();
           final boolean hasUnreachableStates = rel.checkReachability();
           if (hasUnreachableStates) {
             final int newNumStates = rel.getNumberOfReachableStates();

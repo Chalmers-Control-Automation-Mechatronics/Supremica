@@ -4,8 +4,8 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -31,40 +31,40 @@ abstract class CompositionSelectionHeuristic
     throws AnalysisException, EvalException
   {
     final List<EFSMVariable> variablesList = system.getVariables();
-    final Set<List<EFSMTransitionRelation>> candidates =
+    final Collection<List<EFSMTransitionRelation>> visitedCandidates =
       new THashSet<List<EFSMTransitionRelation>>();
+    double smallestValue = Double.POSITIVE_INFINITY;
+    List<EFSMTransitionRelation> smallestCandidate = null;
     for (final EFSMVariable var : variablesList) {
       final Collection<EFSMTransitionRelation> efsmTRSet =
         var.getTransitionRelations();
       final List<EFSMTransitionRelation> efsmTRList =
         new ArrayList<EFSMTransitionRelation>(efsmTRSet);
+      Collections.sort(efsmTRList);
       for (int i = 0; i < efsmTRList.size(); i++) {
         for (int j = i + 1; j < efsmTRList.size(); j++) {
           final EFSMTransitionRelation efsmTR1 = efsmTRList.get(i);
           final EFSMTransitionRelation efsmTR2 = efsmTRList.get(j);
-          final List<EFSMTransitionRelation> list =
+          final List<EFSMTransitionRelation> candidate =
             new ArrayList<EFSMTransitionRelation>(2);
           if (efsmTR1.compareTo(efsmTR2) <= 0) {
-            list.add(efsmTR1);
-            list.add(efsmTR2);
+            candidate.add(efsmTR1);
+            candidate.add(efsmTR2);
           } else {
-            list.add(efsmTR2);
-            list.add(efsmTR1);
+            candidate.add(efsmTR2);
+            candidate.add(efsmTR1);
           }
-          candidates.add(list);
+          if (visitedCandidates.add(candidate)) {
+            final double candidateValue = getHeuristicValue(candidate);
+            if (candidateValue < smallestValue) {
+              smallestValue = candidateValue;
+              smallestCandidate = candidate;
+            }
+          }
         }
       }
     }
-    double smallest = Double.POSITIVE_INFINITY;
-    List<EFSMTransitionRelation> smallestpair = null;
-    for (final List<EFSMTransitionRelation> candidate : candidates) {
-      final double candidateValue = getHeuristicValue(candidate);
-      if (candidateValue < smallest) {
-        smallest = candidateValue;
-        smallestpair = candidate;
-      }
-    }
-    return smallestpair;
+    return smallestCandidate;
   }
 
   public abstract double getHeuristicValue(List<EFSMTransitionRelation> candidate)

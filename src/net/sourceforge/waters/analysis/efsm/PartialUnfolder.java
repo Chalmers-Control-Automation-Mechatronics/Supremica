@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
 //# CLASS:   PartialUnfolder
 //###########################################################################
@@ -30,7 +30,6 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.OccursChecker;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
@@ -62,7 +61,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
     super(true);
     mFactory = factory;
     mOperatorTable = op;
-    mOccursChecker = OccursChecker.getInstance();
     mEFSMVariableFinder = new EFSMVariableFinder(op);
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, op);
   }
@@ -150,17 +148,17 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
                                  mUnfoldingVariableContext);
       mPropagatorCalls = 0;
 
-      final EFSMEventEncoding selfloops = system.getSelfloops();
-      TIntArrayList mSelfloops = null;
-      for (int event = EventEncoding.NONTAU; event < selfloops.size(); event++) {
-        final ConstraintList selfloop = selfloops.getUpdate(event);
-        if (mOccursChecker.occurs(varName, selfloop)) {
-          if (mSelfloops == null) {
-            mSelfloops = new TIntArrayList();
-            mInputEventEncoding = new EFSMEventEncoding(mInputEventEncoding);
-          }
-          final int selfloopEvent = mInputEventEncoding.createEventId(selfloop);
-          mSelfloops.add(selfloopEvent);
+      final EFSMEventEncoding selfloops = mUnfoldedVariable.getSelfloops();
+      if (selfloops.size() > 1) {
+        // There are proper selfloop updates. These updates must be considered
+        // as selfloops on every state of the unfolded EFSM. Create event IDs
+        // for all selfloops and remember them in the list mSelfloops.
+        mSelfloops = new TIntArrayList();
+        mInputEventEncoding = new EFSMEventEncoding(mInputEventEncoding);
+        for (int e = EventEncoding.NONTAU; e < selfloops.size(); e++) {
+          final ConstraintList update = selfloops.getUpdate(e);
+          final int ecode = mInputEventEncoding.createEventId(update);
+          mSelfloops.add(ecode);
         }
       }
       mUpdateInfo = new UpdateInfo[mInputEventEncoding.size()];
@@ -206,7 +204,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       final int numInitialStates = mUnfoldedStateList.size();
       mUnfoldedEventEncoding =
         new EFSMEventEncoding(rel.getNumberOfProperEvents());
-      mSourceShift = AutomatonTools.log2(rel.getNumberOfProperEvents());
+      mSourceShift = AutomatonTools.log2(mInputEventEncoding.size());
       final int rangeBits = AutomatonTools.log2(mReducedRangeSize);
       final int encodingSize = mSourceShift + rangeBits +
         AutomatonTools.log2(mRangeValues.size());
@@ -267,16 +265,14 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         }
         expander2.expandState(s);
         if (mSourceInfoEnabled && EFSMNodeList != null) {
-
           final int value = (int) (pair >> 32);
           final String name = EFSMNodeList.get(efsmState).getName() + ":" + value;
           final SimpleNodeProxy node = mFactory.createSimpleNodeProxy(name);
           nodeList.add(node);
         }
       }
-      final Collection<EFSMVariable> variables = new THashSet<EFSMVariable>
-      (efsmRel.getVariables().size());
-
+      final Collection<EFSMVariable> variables =
+        new THashSet<EFSMVariable>(efsmRel.getVariables().size());
       mEFSMVariableCollector.collectAllVariables(mUnfoldedEventEncoding, variables);
       result = new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
                                           variables, nodeList);
@@ -287,9 +283,10 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       final long difftime = stop - start;
       @SuppressWarnings("resource")
       final Formatter formatter = new Formatter(System.err);
-      if(result != null) {
-        final ListBufferTransitionRelation unfoldedRel = result.getTransitionRelation();
-        formatter.format("%d states, %d propagator1 calls, %.3f seconds\n",
+      if (result != null) {
+        final ListBufferTransitionRelation unfoldedRel =
+          result.getTransitionRelation();
+        formatter.format("%d states, %d propagator calls, %.3f seconds\n",
                          unfoldedRel.getNumberOfStates(), mPropagatorCalls,
                          0.001f * difftime);
         statistics.recordFinish(result, true);
@@ -402,6 +399,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       return mValueToClass[value];
     }
   }
+
 
   //#########################################################################
   //# Inner Class StateExpander
@@ -523,7 +521,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
 
 
   //#########################################################################
-  //# Inner Class StateExpander
+  //# Inner Class UpdateInfo
   private class UpdateInfo
   {
     //#######################################################################
@@ -607,11 +605,11 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
     private int mKnownAfterValue;
   }
 
+
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
-  private final OccursChecker mOccursChecker;
   private final EFSMVariableFinder mEFSMVariableFinder;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private boolean mSourceInfoEnabled;

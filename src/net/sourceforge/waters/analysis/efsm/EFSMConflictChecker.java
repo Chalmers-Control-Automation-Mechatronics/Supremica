@@ -10,17 +10,18 @@
 package net.sourceforge.waters.analysis.efsm;
 
 import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.BFSSeachSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -237,7 +238,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     try {
       setUp();
       final ModuleProxy module = getModel();
-      final List<ParameterBindingProxy> binding = getBinding();
+      final List<ParameterBindingProxy> binding = getBindings();
       final EFSMCompiler compiler =
         new EFSMCompiler(mDocumentManager, module);
       compiler.setConfiguredDefaultMarking(getConfiguredDefaultMarking());
@@ -304,23 +305,25 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         final EFSMTransitionRelation varEFSMTransitionRelation =
           varSelected.getTransitionRelation();
         if (varEFSMTransitionRelation == null) {
-          mCurrentEFSMSystem.removeVariable(varSelected);
+          removeVariable(varSelected);
           continue;
         }
         final List<int[]> partition =
-          mVariablePartitionComputer.computePartition(varSelected, mCurrentEFSMSystem);
+          mVariablePartitionComputer.computePartition(varSelected,
+                                                      mCurrentEFSMSystem);
         final EFSMTransitionRelation unfoldTR =
           mPartialUnfolder.unfold(varEFSMTransitionRelation, varSelected,
                                   mCurrentEFSMSystem, partition);
         result.addEFSMTransitionRelation(unfoldTR);
         EFSMTransitionRelation unfoldSimplified = null;
-        if (efsmTransitionRelationList.size() > 1) {
+        if (efsmTransitionRelationList.size() > 1 ||
+            mCurrentEFSMSystem.getVariables().size() > 1) {
           unfoldSimplified = simplify(unfoldTR);
         }
         if (unfoldSimplified == null) {
           unfoldSimplified = unfoldTR;
         }
-        mCurrentEFSMSystem.removeVariable(varSelected);
+        removeVariable(varSelected);
         unfoldSimplified.register();
         varEFSMTransitionRelation.dispose();
         final ListIterator<EFSMTransitionRelation> unfoldIter =
@@ -346,10 +349,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         final EFSMTransitionRelation synchTR =
           mEFSMSynchronization.synchronize(TR1, TR2);
         result.addEFSMTransitionRelation(synchTR);
-        final EFSMVariableContext context =
-          mCurrentEFSMSystem.getVariableContext();
-        EFSMTransitionRelation synchSimplified =
-          mSimplifier.run(synchTR, context);
+        EFSMTransitionRelation synchSimplified = simplify(synchTR);
         final boolean splitting;
         if (synchSimplified == null) {
           synchSimplified = synchTR;
@@ -367,10 +367,17 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         if (splitting) {
           splitCurrentSubsystem();
         }
-      } else if (efsmTransitionRelationList.size() == 1){
-        final EFSMTransitionRelation finalEFSMTR = efsmTransitionRelationList.get(0);
-        final boolean nonblocking = mNonblockingChecker.run(finalEFSMTR);
-        return setBooleanResult(nonblocking);
+      } else if (efsmTransitionRelationList.size() == 1) {
+        // If there is only one EFSM left:
+        // - if it is blocking, then we are done.
+        // - if it is nonblocking, check the next disjoint subsystem.
+        final EFSMTransitionRelation finalEFSMTR =
+          efsmTransitionRelationList.get(0);
+        if (!mNonblockingChecker.run(finalEFSMTR)) {
+          return setBooleanResult(false);
+        } else {
+          mCurrentEFSMSystem.removeTransitionRelation(finalEFSMTR);
+        }
       }
     }
     return setSatisfiedResult();
@@ -383,9 +390,23 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     final EFSMVariableContext context = mCurrentEFSMSystem.getVariableContext();
     final EFSMTransitionRelation result =
       mSimplifier.run(currentEFSMTransitionRelation, context);
-    final EFSMEventEncoding selfloops = mCurrentEFSMSystem.getSelfloops();
+    // If the simplifier has detected and removed selfloops,
+    // i.e., updates that appear as selfloop and all states and nowhere else,
+    // we must record them on the variables, so they can be considered later
+    // in partial unfolding.
     for (final ConstraintList update : mSimplifier.getSelfloopedUpdates()) {
-      selfloops.createEventId(update);
+      final Collection<EFSMVariable> unprimed = new THashSet<EFSMVariable>();
+      final Collection<EFSMVariable> primed = new THashSet<EFSMVariable>();
+      mEFSMVariableCollector.collectAllVariables(update, unprimed, primed);
+      // Skipping pure guards ...
+      if (!primed.isEmpty()) {
+        for (final EFSMVariable var : unprimed) {
+          var.addSelfloop(update);
+        }
+        for (final EFSMVariable var : primed) {
+          var.addSelfloop(update);
+        }
+      }
     }
     return result;
   }
@@ -399,8 +420,8 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
       if (rel.isUsedProposition(0)) {
         boolean someMarked = false;
-        for (int i=0; i < rel.getNumberOfStates(); i++) {
-          if (rel.isMarked(i, 0)) {
+        for (int s = 0; s < rel.getNumberOfStates(); s++) {
+          if (rel.isMarked(s, 0)) {
             someMarked = true;
             break;
           }
@@ -429,145 +450,122 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
 
   private EFSMSystem splitSubsystem(final EFSMSystem system)
   {
-    final List<EFSMTransitionRelation> efsmTRList =
+    final List<EFSMTransitionRelation> trList =
       system.getTransitionRelations();
-    final int efsmTRListSize = efsmTRList.size();
-    if (efsmTRListSize == 0) {
+    final int trListSize = trList.size();
+    if (trListSize == 0) {
       return system;
     }
-    final Set<EFSMTransitionRelation> visitedEFSMTRSet =
-      new THashSet<EFSMTransitionRelation>(efsmTRListSize);
-    final Queue<EFSMTransitionRelation> visitedEFSMTRList =
-      new LinkedList<EFSMTransitionRelation>();
-    final List<EFSMVariable> efsmVariableList =
-      system.getVariables();
-    final int efsmVariableListSize = efsmVariableList.size();
-    final Set<EFSMVariable> visitedEFSMVariableSet =
-      new THashSet<EFSMVariable>(efsmVariableListSize);
-    final Queue<EFSMVariable> visitedEFSMVariableList =
-      new LinkedList<EFSMVariable>();
-    List<Set<EFSMVariable>> selfloopData = null;
-    final TIntHashSet visitedSelfloopSet = new TIntHashSet();
-    final EFSMTransitionRelation firstTR = efsmTRList.get(0);
-    visitedEFSMTRSet.add(firstTR);
-    visitedEFSMTRList.add(firstTR);
-    while (!visitedEFSMTRList.isEmpty() || !visitedEFSMVariableList.isEmpty()) {
-      while (!visitedEFSMTRList.isEmpty()) {
-        final EFSMTransitionRelation nextTR = visitedEFSMTRList.remove();
-        final Collection<EFSMVariable> nextVariableList = nextTR.getVariables();
-        for (final EFSMVariable var : nextVariableList) {
-          if (visitedEFSMVariableSet.add(var)) {
-            if (visitedEFSMVariableSet.size() < efsmVariableListSize) {
-              visitedEFSMVariableList.add(var);
-            } else if (visitedEFSMTRSet.size() < efsmTRListSize) {
-              visitedEFSMVariableList.add(var);
-              break;
-            } else {
-              return system;
-            }
-          }
-        }
-      }
-      while (!visitedEFSMVariableList.isEmpty()) {
-        final EFSMVariable nextVariable = visitedEFSMVariableList.remove();
-        final Collection<EFSMTransitionRelation> nextEFSMTRList =
-          nextVariable.getTransitionRelations();
-        for (final EFSMTransitionRelation tr : nextEFSMTRList) {
-          if (visitedEFSMTRSet.add(tr)) {
-            if (visitedEFSMTRSet.size() < efsmTRListSize) {
-              visitedEFSMTRList.add(tr);
-            } else if (visitedEFSMVariableSet.size() < efsmVariableListSize) {
-              visitedEFSMTRList.add(tr);
-              break;
-            } else {
-              return system;
-            }
-          }
-        }
-      }
-      if (visitedEFSMTRList.isEmpty()) {
-        final EFSMEventEncoding selfloops = system.getSelfloops();
-        if (selfloopData == null) {
-          selfloopData = new ArrayList<Set<EFSMVariable>>(selfloops.size());
-          selfloopData.add(null);  // this is for tau
-          for (int event=EventEncoding.NONTAU; event < selfloops.size(); event++) {
-            final ConstraintList update = selfloops.getUpdate(event);
-            final Set<EFSMVariable> variables = new THashSet<EFSMVariable>();
-            mEFSMVariableCollector.collectAllVariables(update, variables);
-            selfloopData.add(variables);
-          }
-        }
-        for (int event=EventEncoding.NONTAU; event < selfloops.size(); event++) {
-          final Set<EFSMVariable> variables = selfloopData.get(event);
-          boolean found = false;
-          for (final EFSMVariable var : variables) {
-            if (visitedEFSMVariableSet.contains(var)){
-              found = true;
-            }
-          }
-          if (found) {
-            visitedSelfloopSet.add(event);
-            for (final EFSMVariable var : variables) {
-              if (visitedEFSMVariableSet.add(var)) {
-                if (visitedEFSMTRSet.size() == efsmTRListSize &&
-                    visitedEFSMVariableSet.size() == efsmVariableListSize) {
-                  return system;
-                }
-                visitedEFSMVariableList.add(var);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    final List<EFSMTransitionRelation> efsmTRList1 =
-      new ArrayList<EFSMTransitionRelation>(visitedEFSMTRSet.size());
-    final List<EFSMTransitionRelation> efsmTRList2 =
-      new ArrayList<EFSMTransitionRelation>(efsmTRListSize - visitedEFSMTRSet.size());
-    for (final EFSMTransitionRelation tr : efsmTRList) {
-      if (visitedEFSMTRSet.contains(tr)) {
-        efsmTRList1.add(tr);
+    final BFSSeachSpace<EFSMTransitionRelation> trSearchSpace =
+      new BFSSeachSpace<EFSMTransitionRelation>(trListSize);
+    final EFSMTransitionRelation firstTR = trList.get(0);
+    trSearchSpace.add(firstTR);
+    final List<EFSMVariable> varList = system.getVariables();
+    final int varListSize = varList.size();
+    final BFSSeachSpace<EFSMVariable> varSearchSpace =
+      new BFSSeachSpace<EFSMVariable>(varListSize);
+    while (!trSearchSpace.isEmpty() || !varSearchSpace.isEmpty()) {
+      if (trSearchSpace.isEmpty()) {
+        final EFSMVariable var = varSearchSpace.remove();
+        trSearchSpace.addAll(var.getTransitionRelations());
+        final EFSMEventEncoding selfloops = var.getSelfloops();
+        mEFSMVariableCollector.collectAllVariables(selfloops, varSearchSpace);
       } else {
-        efsmTRList2.add(tr);
+        final EFSMTransitionRelation tr = trSearchSpace.remove();
+        varSearchSpace.addAll(tr.getVariables());
+      }
+      if (trSearchSpace.visitedSize() == trListSize &&
+          varSearchSpace.visitedSize() == varListSize) {
+        return system;
       }
     }
-    final List<EFSMVariable> efsmVariableList1 =
-      new ArrayList<EFSMVariable>(visitedEFSMVariableSet.size());
-    final List<EFSMVariable> efsmVariableList2 =
-      new ArrayList<EFSMVariable>(efsmVariableListSize - visitedEFSMVariableSet.size());
-    for (final EFSMVariable var : efsmVariableList) {
-      if (visitedEFSMVariableSet.contains(var)) {
-        efsmVariableList1.add(var);
-      } else {
-        efsmVariableList2.add(var);
-      }
-    }
-    final EFSMEventEncoding selfloops = system.getSelfloops();
-    final EFSMEventEncoding selfloops1 =
-      new EFSMEventEncoding(visitedSelfloopSet.size() + 1);
-    final EFSMEventEncoding selfloops2 =
-      new EFSMEventEncoding(selfloops.size() - visitedSelfloopSet.size() + 1);
-    for (int event=EventEncoding.NONTAU; event < selfloops.size(); event++) {
-      final ConstraintList update = selfloops.getUpdate(event);
-      if (visitedSelfloopSet.contains(event)) {
-        selfloops1.createEventId(update);
-      } else {
-        selfloops2.createEventId(update);
-      }
-    }
-
     final String name1 = mSystemName + "-" + mNextSubsystemNumber;
     mNextSubsystemNumber++;
     final String name2 = mSystemName + "-" + mNextSubsystemNumber;
     mNextSubsystemNumber ++;
+    final int trVisitedSize = trSearchSpace.visitedSize();
+    final List<EFSMTransitionRelation> trList1 =
+      new ArrayList<EFSMTransitionRelation>(trVisitedSize);
+    final List<EFSMTransitionRelation> trList2 =
+      new ArrayList<EFSMTransitionRelation>(trListSize - trVisitedSize);
+    for (final EFSMTransitionRelation tr : trList) {
+      if (trSearchSpace.isVisited(tr)) {
+        trList1.add(tr);
+      } else {
+        trList2.add(tr);
+      }
+    }
+    final int varVisitedSize = varSearchSpace.visitedSize();
+    final List<EFSMVariable> varList1 =
+      new ArrayList<EFSMVariable>(varVisitedSize);
+    final List<EFSMVariable> varList2 =
+      new ArrayList<EFSMVariable>(varListSize - varVisitedSize);
+    for (final EFSMVariable var : varList) {
+      if (varSearchSpace.isVisited(var)) {
+        varList1.add(var);
+      } else {
+        varList2.add(var);
+      }
+    }
     final EFSMVariableContext context = system.getVariableContext();
-    final EFSMSystem efsmSystem1 =
-      new EFSMSystem(name1, efsmVariableList1, efsmTRList1, selfloops1, context);
-    final EFSMSystem efsmSystem2 =
-      new EFSMSystem(name2, efsmVariableList2, efsmTRList2, selfloops2, context);
-    mEFSMSystemQueue.add(efsmSystem1);
-    return splitSubsystem(efsmSystem2);
+    final EFSMSystem system1 =
+      new EFSMSystem(name1, varList1, trList1, context);
+    final EFSMSystem system2 =
+      new EFSMSystem(name2, varList2, trList2, context);
+    mEFSMSystemQueue.add(system1);
+    return splitSubsystem(system2);
+  }
+
+  /**
+   * Removes the given variable from the current EFSM system,
+   * and cleans up references to its selfloops mentioned in other variables.
+   * This method is called after partial unfolding.
+   * Any selfloops will be added back in after simplification.
+   * @param var
+   */
+  private void removeVariable(final EFSMVariable var)
+  {
+    final EFSMEventEncoding selfloops = var.getSelfloops();
+    if (selfloops.size() > 1) {
+      final Map<EFSMVariable,List<ConstraintList>> victims =
+        new HashMap<EFSMVariable,List<ConstraintList>>();
+      for (int e = EventEncoding.NONTAU; e < selfloops.size(); e++) {
+        final ConstraintList update = selfloops.getUpdate(e);
+        final Collection<EFSMVariable> vars = new THashSet<EFSMVariable>();
+        mEFSMVariableCollector.collectAllVariables(update, vars);
+        for (final EFSMVariable otherVar : vars) {
+          if (otherVar != var) {
+            List<ConstraintList> list = victims.get(otherVar);
+            if (list == null) {
+              list = new LinkedList<ConstraintList>();
+              victims.put(otherVar, list);
+            }
+            list.add(update);
+          }
+        }
+      }
+      for (final Map.Entry<EFSMVariable,List<ConstraintList>> entry :
+           victims.entrySet()) {
+        final EFSMVariable otherVar = entry.getKey();
+        final List<ConstraintList> list = entry.getValue();
+        otherVar.removeSelfloops(list);
+      }
+    }
+    mCurrentEFSMSystem.removeVariable(var);
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @SuppressWarnings("unused")
+  private void checkBlocking(final EFSMTransitionRelation efsmTR)
+  {
+    if (efsmTR != null) {
+      final boolean nonblocking = mNonblockingChecker.run(efsmTR);
+      if (!nonblocking) {
+        System.err.println("BLOCKING!!!");
+      }
+    }
   }
 
 
