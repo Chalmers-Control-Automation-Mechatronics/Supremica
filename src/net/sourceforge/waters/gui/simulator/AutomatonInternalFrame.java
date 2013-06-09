@@ -48,17 +48,19 @@ public class AutomatonInternalFrame
     pack();
     // Store the initial reference position after the window is open.
     SwingUtilities.invokeLater(new Runnable() {
+      @Override
       public void run() {
         storeReferenceFrame();
       }
     });
-    this.setFrameIcon(ModuleContext.getComponentKindIcon(aut.getKind()));
+    setFrameIcon(ModuleContext.getComponentKindIcon(aut.getKind(), true));
     container.getModule().addModelObserver(this);
   }
 
 
   //##########################################################################
   //# Overrides for javax.swing.JInternalFrame
+  @Override
   public void dispose()
   {
     mParent.removeAutomaton(this.getTitle());
@@ -118,6 +120,7 @@ public class AutomatonInternalFrame
     }
   }
 
+  @Override
   public JDesktopPane getDesktopPane()
   {
     return mParent;
@@ -153,7 +156,8 @@ public class AutomatonInternalFrame
     if (canResize())
     {
       this.pack(); // This code automatically resizes the Internal Frame to the size it was when it started
-      SwingUtilities.invokeLater(new Thread(){public void run(){AutomatonInternalFrame.this.repaint();}});
+      SwingUtilities.invokeLater(new Thread(){@Override
+      public void run(){AutomatonInternalFrame.this.repaint();}});
       storeReferenceFrame();
     }
   }
@@ -167,6 +171,7 @@ public class AutomatonInternalFrame
 
   //#########################################################################
   //# Interface ModelObserver
+  @Override
   public void modelChanged(final ModelChangeEvent event)
   {
     if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED) {
@@ -175,6 +180,7 @@ public class AutomatonInternalFrame
     }
   }
 
+  @Override
   public int getModelObserverPriority()
   {
     return ModelObserver.RENDERING_PRIORITY;
@@ -194,6 +200,7 @@ public class AutomatonInternalFrame
      * have been completed, so we store the new location of the reference
      * frame.
      */
+    @Override
     public void mouseReleased(final MouseEvent event)
     {
       if (event.getButton() == MouseEvent.BUTTON1) {
@@ -216,6 +223,7 @@ public class AutomatonInternalFrame
      * When the window has been moved, we must update the reference frame,
      * but not if the movement happens while resizing.
      */
+    @Override
     public void componentMoved(final ComponentEvent event)
     {
       final Rectangle bounds = getBounds();
@@ -232,6 +240,7 @@ public class AutomatonInternalFrame
      * ratio of the graph, but only if a reference frame is available, and
      * the spring embedder is not running.
      */
+    @Override
     public void componentResized(final ComponentEvent event)
     {
       if (mOldBounds != null && !mDisplayPane.isEmbedderRunning()) {

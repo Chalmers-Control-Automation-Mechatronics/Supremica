@@ -49,21 +49,36 @@
  */
 package org.supremica.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import org.supremica.automata.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+
+import net.sourceforge.waters.gui.util.IconLoader;
+
+import org.supremica.automata.Project;
 
 public class ActionAndControlViewer
 	extends JFrame
 {
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JMenuBar menuBar = new JMenuBar();
-	private ActionAndControlViewerPanel thePanel;
-	private Project theProject;
+	private final JPanel contentPane;
+	private final JMenuBar menuBar = new JMenuBar();
+	private final ActionAndControlViewerPanel thePanel;
+	private final Project theProject;
 
-	public ActionAndControlViewer(Project theProject)
+	public ActionAndControlViewer(final Project theProject)
 		throws Exception
 	{
 		this.theProject = theProject;
@@ -74,19 +89,18 @@ public class ActionAndControlViewer
 		// contentPane.add(toolBar, BorderLayout.NORTH);
 		setTitle("Execution parameters: " + theProject.getName());
 		setSize(200, 500);
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-				setVisible(false);
-
-				//dispose();
-			}
-		});
+        addWindowListener(new WindowAdapter() {
+          @Override
+          public void windowClosing(final WindowEvent e)
+          {
+            setVisible(false);
+            //dispose();
+          }
+        });
 
 		// Center the window
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension frameSize = getSize();
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		final Dimension frameSize = getSize();
 
 		if (frameSize.height > screenSize.height)
 		{
@@ -99,7 +113,8 @@ public class ActionAndControlViewer
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-		setIconImage(Supremica.cornerImage);
+        final Image image = IconLoader.ICON_APPLICATION.getImage();
+		setIconImage(image);
 		initMenubar();
 		contentPane.add(thePanel, BorderLayout.CENTER);
 	}
@@ -109,20 +124,21 @@ public class ActionAndControlViewer
 		setJMenuBar(menuBar);
 
 		// File
-		JMenu menuFile = new JMenu();
+		final JMenu menuFile = new JMenu();
 
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 
 		// File.Close
-		JMenuItem menuFileClose = new JMenuItem();
+		final JMenuItem menuFileClose = new JMenuItem();
 
 		menuFileClose.setText("Close");
 		menuFile.add(menuFileClose);
 		menuBar.add(menuFile);
 		menuFileClose.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				setVisible(false);
 
@@ -131,20 +147,21 @@ public class ActionAndControlViewer
 		});
 
 		// Edit
-		JMenu menuEdit = new JMenu();
+		final JMenu menuEdit = new JMenu();
 
 		menuEdit.setText("Edit");
 		menuEdit.setMnemonic(KeyEvent.VK_E);
 
 		// Edit.ClearActions
-		JMenuItem menuEditClearActions = new JMenuItem();
+		final JMenuItem menuEditClearActions = new JMenuItem();
 
 		menuEditClearActions.setText("Clear execution parameters");
 		menuEdit.add(menuEditClearActions);
 		menuBar.add(menuEdit);
 		menuEdit.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				if (theProject != null)
 				{

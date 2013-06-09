@@ -193,7 +193,7 @@ public final class Config
     public static final ObjectProperty GUI_EDITOR_ICONSET =
       new ObjectProperty(PropertyType.GUI_EDITOR, "iconSet", "waters",
                          "Icon set (requires restart)",
-                         new Object[] {"waters", "16x16", "20x20"});
+                         new Object[] {"waters", "16x16", "20x20", "24x24"});
     public static final ColorProperty GUI_EDITOR_BACKGROUND_COLOR =
       new ColorProperty(PropertyType.GUI_EDITOR, "backgroundColor",
                         Color.WHITE, "Automaton background colour");

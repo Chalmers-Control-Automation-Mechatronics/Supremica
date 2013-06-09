@@ -504,17 +504,27 @@ public class ModuleContext
 
   //#########################################################################
   //# Static Methods
-  public static Icon getComponentKindIcon(final ComponentKind kind)
+  /**
+   * Gets an icon to represent a component of the given kind.
+   * @param kind    The type ({@link ComponentKind#PLANT}, etc.) of the
+   *                component to be displayed.
+   * @param window  <CODE>true</CODE> if a small icon to be used for a frame
+   *                should be returned;
+   *                <CODE>false</CODE> for a standard icon in the configured
+   *                resolution.
+   */
+  public static Icon getComponentKindIcon(final ComponentKind kind,
+                                          final boolean window)
   {
     switch (kind) {
     case PLANT:
-      return IconLoader.ICON_PLANT;
+      return window ? IconLoader.ICON_WINDOW_PLANT : IconLoader.ICON_PLANT;
     case PROPERTY:
-      return IconLoader.ICON_PROPERTY;
+      return window ? IconLoader.ICON_WINDOW_PROPERTY : IconLoader.ICON_PROPERTY;
     case SPEC:
-      return IconLoader.ICON_SPEC;
+      return window ? IconLoader.ICON_WINDOW_SPEC : IconLoader.ICON_SPEC;
     case SUPERVISOR:
-      return IconLoader.ICON_SUPERVISOR;
+      return window ? IconLoader.ICON_WINDOW_SUPERVISOR : IconLoader.ICON_SUPERVISOR;
     default:
       throw new IllegalArgumentException("Unknown component kind: " + kind
                                          + "!");
@@ -1128,7 +1138,7 @@ public class ModuleContext
     public Icon visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       final ComponentKind kind = comp.getKind();
-      return getComponentKindIcon(kind);
+      return getComponentKindIcon(kind, false);
     }
 
     @Override

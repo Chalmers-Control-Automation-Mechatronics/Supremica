@@ -24,8 +24,23 @@ public class IconLoader
   //# Static Class Methods
   private static final ImageIcon getWatersIcon(final String name)
   {
-    final Class<?> cls = IconLoader.class;
     final String subdir = Config.GUI_EDITOR_ICONSET.getAsString();
+    return getWatersIcon(subdir, name);
+  }
+
+  private static final ImageIcon getWindowIcon(final String name)
+  {
+    String subdir = Config.GUI_EDITOR_ICONSET.getAsString();
+    if (Character.isDigit(subdir.charAt(0))) {
+      subdir = "16x16";
+    }
+    return getWatersIcon(subdir, name);
+  }
+
+  private static final ImageIcon getWatersIcon(final String subdir,
+                                               final String name)
+  {
+    final Class<?> cls = IconLoader.class;
     final String prefix = "/icons/" + subdir + "/" + name;
     final URL pngResource = cls.getResource(prefix + ".png");
     if (pngResource != null) {
@@ -49,6 +64,7 @@ public class IconLoader
 
   //#########################################################################
   //# Class Constants
+  private static final String NAME_APPLICATION = "application";
   private static final String NAME_BINDING = "binding";
   private static final String NAME_CONSOLE_DEBUG = "debug";
   private static final String NAME_CONSOLE_ERROR = "error";
@@ -72,17 +88,16 @@ public class IconLoader
   private static final String NAME_NEW_FOREACH = "new_foreach";
   private static final String NAME_NEW_INSTANCE = "new_instance";
   private static final String NAME_NEW_VARIABLE = "new_variable";
+  private static final String NAME_NO = "no";
   private static final String NAME_PLANT = "plant";
   private static final String NAME_PROPERTY = "property";
   private static final String NAME_PROPOSITION = "waters/proposition";
-  private static final String NAME_SIMULATOR_BACK = "waters/simulator_back";
-  private static final String NAME_SIMULATOR_REPLAY = "waters/simulator_replay";
-  private static final String NAME_SIMULATOR_RESET = "waters/simulator_reset";
-  private static final String NAME_SIMULATOR_STEP = "waters/simulator_step";
-  private static final String NAME_SIMULATOR_TO_END =
-    "waters/simulator_to_end";
-  private static final String NAME_SIMULATOR_TO_START =
-    "waters/simulator_to_start";
+  private static final String NAME_SIMULATOR_BACK = "simulator_back";
+  private static final String NAME_SIMULATOR_REPLAY = "simulator_replay";
+  private static final String NAME_SIMULATOR_RESET = "simulator_reset";
+  private static final String NAME_SIMULATOR_STEP = "simulator_step";
+  private static final String NAME_SIMULATOR_TO_END = "simulator_to_end";
+  private static final String NAME_SIMULATOR_TO_START = "simulator_to_start";
   private static final String NAME_SPEC = "specification";
   private static final String NAME_SUPERVISOR = "supervisor";
   private static final String NAME_TOOL_ABOUT = "about";
@@ -108,13 +123,13 @@ public class IconLoader
   private static final String NAME_UNCONTROLLABLE_UNOBSERVABLE =
     "uncontrollable_unobservable";
   private static final String NAME_VARIABLE = "variable";
-  private static final String NAME_CROSS = "waters/cross16";
-  private static final String NAME_TICK = "waters/tick16";
+  private static final String NAME_YES = "yes";
 
 
   //#########################################################################
   //# Class Constants
   // Editor
+  public static final ImageIcon ICON_APPLICATION = getWindowIcon(NAME_APPLICATION);
   public static final ImageIcon ICON_CONSTANT = getWatersIcon(NAME_CONSTANT);
   public static final ImageIcon ICON_CONSOLE_DEBUG = getWatersIcon(NAME_CONSOLE_DEBUG);
   public static final ImageIcon ICON_CONSOLE_ERROR = getWatersIcon(NAME_CONSOLE_ERROR);
@@ -139,6 +154,7 @@ public class IconLoader
   public static final ImageIcon ICON_NEW_FOREACH = getWatersIcon(NAME_NEW_FOREACH);
   public static final ImageIcon ICON_NEW_INSTANCE = getWatersIcon(NAME_NEW_INSTANCE);
   public static final ImageIcon ICON_NEW_VARIABLE = getWatersIcon(NAME_NEW_VARIABLE);
+  public static final ImageIcon ICON_NO = getWatersIcon(NAME_NO);
   public static final ImageIcon ICON_PLANT = getWatersIcon(NAME_PLANT);
   public static final ImageIcon ICON_PROPERTY = getWatersIcon(NAME_PROPERTY);
   // TODO Replace this by computed icon:
@@ -168,31 +184,38 @@ public class IconLoader
   public static final ImageIcon ICON_UNCONTROLLABLE_UNOBSERVABLE =
     getWatersIcon(NAME_UNCONTROLLABLE_UNOBSERVABLE);
   public static final ImageIcon ICON_VARIABLE = getWatersIcon(NAME_VARIABLE);
+  public static final ImageIcon ICON_WINDOW_PLANT = getWindowIcon(NAME_PLANT);
+  public static final ImageIcon ICON_WINDOW_PROPERTY =
+    getWindowIcon(NAME_PROPERTY);
+  public static final ImageIcon ICON_WINDOW_SPEC = getWindowIcon(NAME_SPEC);
+  public static final ImageIcon ICON_WINDOW_SUPERVISOR =
+    getWindowIcon(NAME_SUPERVISOR);
+  public static final ImageIcon ICON_YES = getWatersIcon(NAME_YES);
 
   // Simulator
   public static final ImageIcon ICON_SIMULATOR_BACK =
-    getSupremicaIcon(NAME_SIMULATOR_BACK);
+    getWatersIcon(NAME_SIMULATOR_BACK);
   public static final ImageIcon ICON_SIMULATOR_REPLAY =
-    getSupremicaIcon(NAME_SIMULATOR_REPLAY);
+    getWatersIcon(NAME_SIMULATOR_REPLAY);
   public static final ImageIcon ICON_SIMULATOR_RESET =
-    getSupremicaIcon(NAME_SIMULATOR_RESET);
+    getWatersIcon(NAME_SIMULATOR_RESET);
   public static final ImageIcon ICON_SIMULATOR_STEP =
-    getSupremicaIcon(NAME_SIMULATOR_STEP);
+    getWatersIcon(NAME_SIMULATOR_STEP);
   public static final ImageIcon ICON_SIMULATOR_TO_END =
-    getSupremicaIcon(NAME_SIMULATOR_TO_END);
+    getWatersIcon(NAME_SIMULATOR_TO_END);
   public static final ImageIcon ICON_SIMULATOR_TO_START =
-    getSupremicaIcon(NAME_SIMULATOR_TO_START);
+    getWatersIcon(NAME_SIMULATOR_TO_START);
   public static final ImageIcon ICON_TABLE_NORMAL_AUTOMATON = null;
-  public static final ImageIcon ICON_TABLE_ENABLED_AUTOMATON = getSupremicaIcon(NAME_TICK);
+  public static final ImageIcon ICON_TABLE_ENABLED_AUTOMATON = ICON_YES;
   public static final ImageIcon ICON_TABLE_WARNING_PROPERTY = ICON_CONSOLE_WARNING;
   public static final ImageIcon ICON_TABLE_ERROR_AUTOMATON = ICON_CONSOLE_WARNING;
-  public static final ImageIcon ICON_TABLE_DISABLED_PROPERTY = getSupremicaIcon(NAME_CROSS);
+  public static final ImageIcon ICON_TABLE_DISABLED_PROPERTY = ICON_NO;
   public static final ImageIcon ICON_EVENTTREE_BLOCKING_EVENT = ICON_CONSOLE_WARNING;
-  public static final ImageIcon ICON_EVENTTREE_INVALID_EVENT = getSupremicaIcon(NAME_CROSS);
-  public static final ImageIcon ICON_EVENTTREE_VALID_EVENT = getSupremicaIcon(NAME_TICK);
+  public static final ImageIcon ICON_EVENTTREE_INVALID_EVENT = ICON_NO;
+  public static final ImageIcon ICON_EVENTTREE_VALID_EVENT = ICON_YES;
   public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_EVENT = ICON_CONSOLE_WARNING;
-  public static final ImageIcon ICON_EVENTTREE_DISABLED_AUTOMATON = getSupremicaIcon(NAME_CROSS);
-  public static final ImageIcon ICON_EVENTTREE_ENABLED_AUTOMATON = getSupremicaIcon(NAME_TICK);
+  public static final ImageIcon ICON_EVENTTREE_DISABLED_AUTOMATON = ICON_NO;
+  public static final ImageIcon ICON_EVENTTREE_ENABLED_AUTOMATON = ICON_YES;
   public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_PROPERTY = ICON_CONSOLE_WARNING;
 
   public static final Icon ICON_EVENTTREE_BLOCKING_AUTOMATON = ICON_CONSOLE_WARNING;

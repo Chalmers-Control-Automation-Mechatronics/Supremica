@@ -67,7 +67,7 @@ public class AutomatonLeafNode extends DefaultMutableTreeNode
       return IconLoader.ICON_VARIABLE;
     } else {
       final ComponentKind kind = aut.getKind();
-      return ModuleContext.getComponentKindIcon(kind);
+      return ModuleContext.getComponentKindIcon(kind, false);
     }
   }
 

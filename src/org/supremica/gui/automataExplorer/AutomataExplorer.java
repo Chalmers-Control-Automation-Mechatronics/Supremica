@@ -49,12 +49,24 @@
  */
 package org.supremica.gui.automataExplorer;
 
-import org.supremica.gui.*;
-import org.supremica.automata.algorithms.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Iterator;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexFormHelper;
@@ -62,56 +74,60 @@ import org.supremica.automata.AutomataIndexMap;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
+import org.supremica.automata.algorithms.AutomataSynchronizerExecuter;
+import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.gui.Utility;
 
 public class AutomataExplorer
     extends JFrame
     implements AutomatonListener
 {
     private static final long serialVersionUID = 1L;
-    private Automata theAutomata;
-    private BorderLayout layout = new BorderLayout();
-    private JPanel contentPane;
-    private JMenuBar menuBar = new JMenuBar();
-    private AutomataStateViewer stateViewer;
-    private AutomataExplorerController controller;
-    private AutomataSynchronizerHelper helper;
-    
-    private AutomataSynchronizerExecuter onlineSynchronizer;
-    private AutomataIndexMap indexMap;
-    
-    public AutomataExplorer(Automata theAutomata)
+    private final Automata theAutomata;
+    private final BorderLayout layout = new BorderLayout();
+    private final JPanel contentPane;
+    private final JMenuBar menuBar = new JMenuBar();
+    private final AutomataStateViewer stateViewer;
+    private final AutomataExplorerController controller;
+    private final AutomataSynchronizerHelper helper;
+
+    private final AutomataSynchronizerExecuter onlineSynchronizer;
+    private final AutomataIndexMap indexMap;
+
+    public AutomataExplorer(final Automata theAutomata)
     throws Exception
     {
         this.theAutomata = theAutomata;
-        
+
         // Get current options
-        SynchronizationOptions syncOptions = new SynchronizationOptions();
+        final SynchronizationOptions syncOptions = new SynchronizationOptions();
         syncOptions.setBuildAutomaton(false);
         syncOptions.setRequireConsistentControllability(false);
-        
+
         // Get helper
         helper = new AutomataSynchronizerHelper(theAutomata, syncOptions, false);
-        
+
         indexMap = new AutomataIndexMap(theAutomata);
-        
+
         // Build the initial state
         Automaton currAutomaton;
         State currInitialState;
-        int[] initialState = AutomataIndexFormHelper.createState(this.theAutomata.size());
-        
+        final int[] initialState = AutomataIndexFormHelper.createState(this.theAutomata.size());
+
         // + 1 status field
-        Iterator<Automaton> autIt = this.theAutomata.iterator();
-        
+        final Iterator<Automaton> autIt = this.theAutomata.iterator();
+
         while (autIt.hasNext())
         {
-            currAutomaton = (Automaton) autIt.next();
+            currAutomaton = autIt.next();
             currInitialState = currAutomaton.getInitialState();
 //			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
             initialState[indexMap.getAutomatonIndex(currAutomaton)] = indexMap.getStateIndex(currAutomaton, currInitialState);
         }
-        
+
         AutomataExplorerHelper.setInitialState(initialState);
-        
+
         //onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
         onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
         onlineSynchronizer.initialize();
@@ -119,99 +135,109 @@ public class AutomataExplorer
         helper.setCoExecuter(onlineSynchronizer);
         theAutomata.getListeners().addListener(this);
         setBackground(Color.white);
-        
-        contentPane = (JPanel) getContentPane();        
+
+        contentPane = (JPanel) getContentPane();
         contentPane.setLayout(layout);
-        
+
         // contentPane.add(toolBar, BorderLayout.NORTH);
         setTitle("AutomataExplorer");
         Utility.setupFrame(this, 400, 500);
         addWindowListener(new WindowAdapter()
         {
-            public void windowClosing(WindowEvent e)
+            @Override
+            public void windowClosing(final WindowEvent e)
             {
                 setVisible(false);
-                
+
                 //dispose();
             }
         });
         initMenubar();
-        
+
         // / stateViewer = new StateViewer(theAutomaton);
-        stateViewer = new AutomataStateViewer(helper);        
+        stateViewer = new AutomataStateViewer(helper);
         contentPane.add(stateViewer, BorderLayout.CENTER);
-        
+
         // / controller = new ExplorerController(stateViewer, theAutomaton);
         controller = new AutomataExplorerController(stateViewer, helper);
-        
+
         contentPane.add(controller, BorderLayout.SOUTH);
         stateViewer.setController(controller);
         stateViewer.goToInitialState();
     }
-    
+
     public void initialize()
     {
-        setIconImage(Supremica.cornerImage);
+        final Image image = IconLoader.ICON_APPLICATION.getImage();
+        setIconImage(image);
         stateViewer.initialize();
     }
-    
+
     private void initMenubar()
     {
         setJMenuBar(menuBar);
-        
+
         // File
-        JMenu menuFile = new JMenu();
-        
+        final JMenu menuFile = new JMenu();
+
         menuFile.setText("File");
         menuFile.setMnemonic(KeyEvent.VK_F);
-        
+
         // File.Close
-        JMenuItem menuFileClose = new JMenuItem();
-        
+        final JMenuItem menuFileClose = new JMenuItem();
+
         menuFileClose.setText("Close");
         menuFile.add(menuFileClose);
         menuBar.add(menuFile);
         menuFileClose.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            @Override
+            public void actionPerformed(final ActionEvent e)
             {
                 setVisible(false);
-                
+
                 //dispose();
             }
         });
     }
-    
-    public void updated(Object o)
+
+    @Override
+    public void updated(final Object o)
     {
     }
-    
-    public void stateAdded(Automaton aut, State q)
-    {
-        updated(aut);
-    }
-    
-    public void stateRemoved(Automaton aut, State q)
+
+    @Override
+    public void stateAdded(final Automaton aut, final State q)
     {
         updated(aut);
     }
-    
-    public void arcAdded(Automaton aut, Arc a)
+
+    @Override
+    public void stateRemoved(final Automaton aut, final State q)
     {
         updated(aut);
     }
-    
-    public void arcRemoved(Automaton aut, Arc a)
+
+    @Override
+    public void arcAdded(final Automaton aut, final Arc a)
     {
         updated(aut);
     }
-    
-    public void attributeChanged(Automaton aut)
+
+    @Override
+    public void arcRemoved(final Automaton aut, final Arc a)
     {
         updated(aut);
     }
-    
-    public void automatonRenamed(Automaton aut, String oldName)
+
+    @Override
+    public void attributeChanged(final Automaton aut)
+    {
+        updated(aut);
+    }
+
+    @Override
+    public void automatonRenamed(final Automaton aut, final String oldName)
     {
         updated(aut);
     }
