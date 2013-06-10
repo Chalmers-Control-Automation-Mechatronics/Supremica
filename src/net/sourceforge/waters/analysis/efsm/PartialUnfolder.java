@@ -149,7 +149,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       mPropagatorCalls = 0;
 
       final EFSMEventEncoding selfloops = mUnfoldedVariable.getSelfloops();
-      if (selfloops.size() > 1) {
+      if (selfloops.size() > 0) {
         // There are proper selfloop updates. These updates must be considered
         // as selfloops on every state of the unfolded EFSM. Create event IDs
         // for all selfloops and remember them in the list mSelfloops.
@@ -444,6 +444,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
                         final int event, final int targetState)
       throws EvalException
     {
+
       UpdateInfo info = mUpdateInfo[event];
       if (info == null) {
         mUpdateInfo[event] = info = new UpdateInfo(event);
@@ -509,6 +510,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
           }
         }
       }
+
     }
 
     abstract void newTransition(int source, int event, long pair);
