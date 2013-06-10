@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TLongHashSet;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -234,7 +234,9 @@ public class SynthesisObservationEquivalenceTRSimplifier
     if (mOmegaState >= 0) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
       rel.setReachable(mOmegaState, false);
-      rel.setUsedEvent(EventEncoding.TAU, false);
+      final byte status = rel.getProperEventStatus(EventEncoding.TAU);
+      rel.setProperEventStatus
+        (EventEncoding.TAU, (byte) (status | EventEncoding.STATUS_UNUSED));
       mNumClasses--;
       mNumReachableStates--;
     }
@@ -325,7 +327,9 @@ public class SynthesisObservationEquivalenceTRSimplifier
       }
       omegaClass.enqueue();
       omegaClass.setUpStateToClass();
-      rel.setUsedEvent(EventEncoding.TAU, true);
+      final byte status = rel.getProperEventStatus(EventEncoding.TAU);
+      rel.setProperEventStatus
+        (EventEncoding.TAU, (byte) (status & ~EventEncoding.STATUS_UNUSED));
       rel.setReachable(mOmegaState, true);
       mNumReachableStates++;
     } else {
@@ -527,6 +531,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
     //#######################################################################
     //# Interface java.util.Comparable<EquivalenceClass>
+    @Override
     public int compareTo(final EquivalenceClass splitter)
     {
       return mSize - splitter.getSize();
@@ -588,7 +593,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
       // Uncontrollable shared events
       for (int event = firstShared; event <= lastSharedUncont; event++) {
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           final TransitionIterator transIter = mUncontrollableEventIterator;
           transIter.resetEvent(event);
           splitOn(transIter);
@@ -602,12 +607,13 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
       // Controllable shared events
       for (int event = firstSharedCont; event <= lastSharedCont; event++) {
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           splitOnControllable(event);
         }
       }
       // ... including omega
-      if (rel.isUsedEvent(EventEncoding.TAU)) {
+      if ((rel.getProperEventStatus(EventEncoding.TAU) &
+           EventEncoding.STATUS_UNUSED) == 0) {
         splitOnControllable(EventEncoding.TAU);
       }
       // Controllable local events
@@ -1264,3 +1270,4 @@ public class SynthesisObservationEquivalenceTRSimplifier
   private TIntArrayList mTempClass;
 
 }
+

@@ -64,16 +64,19 @@ class AutomataTableModel
 
   // #########################################################################
   // # Interface javax.swing.table.TableModel
+  @Override
   public int getColumnCount()
   {
     return 5;
   }
 
+  @Override
   public int getRowCount()
   {
     return getSimulation().getOrderedAutomata().size();
   }
 
+  @Override
   public Class<?> getColumnClass(final int column)
   {
     switch (column) {
@@ -93,11 +96,13 @@ class AutomataTableModel
     }
   }
 
+  @Override
   public Object getValueAt(final int row, final int col)
   {
     return mRawData.get(row).get(col);
   }
 
+  @Override
   public String getColumnName(final int columnVal)
   {
     switch (columnVal) {
@@ -118,6 +123,7 @@ class AutomataTableModel
 
   // ##########################################################################
   // # Interface net.sourceforge.waters.gui.simulator.SimulationObserver
+  @Override
   public void simulationChanged(final SimulationChangeEvent event)
   {
     getRawData();
@@ -127,6 +133,7 @@ class AutomataTableModel
 
   //##########################################################################
   //# Interface InternalFrameObserver
+  @Override
   public void onFrameEvent(final InternalFrameEvent event)
   {
     // This should identify the cells that have changed and then fire
@@ -161,7 +168,7 @@ class AutomataTableModel
         if (container.getSourceInfoMap().get(aut).getSourceObject().getClass() == VariableComponentSubject.class)
           row.add(IconLoader.ICON_VARIABLE);
         else
-          row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
+          row.add(ModuleContext.getComponentKindIcon(aut.getKind(), false));
         row.add(aut.getName());
         row.add(getSimulation().getAutomatonActivityIcon(aut));
         final StateProxy state = getSimulation().getCurrentState(aut);

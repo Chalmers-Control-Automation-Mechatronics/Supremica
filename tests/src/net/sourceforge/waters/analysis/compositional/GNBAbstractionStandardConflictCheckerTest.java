@@ -13,7 +13,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -49,6 +49,7 @@ public class GNBAbstractionStandardConflictCheckerTest
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
+    checker.setTraceCheckingEnabled(true);
     return checker;
   }
 

@@ -13,7 +13,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractLanguageInclusionCheckerTest;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -48,6 +48,7 @@ public class CompositionalLanguageInclusionCheckerTest
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
+    checker.setTraceCheckingEnabled(true);
     return checker;
   }
 

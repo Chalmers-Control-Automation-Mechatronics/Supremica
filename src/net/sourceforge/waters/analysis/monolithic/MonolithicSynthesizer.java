@@ -9,13 +9,14 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TLongHashSet;
-import gnu.trove.TLongIterator;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -36,15 +37,16 @@ import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.AbstractProductDESBuilder;
+import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
-import net.sourceforge.waters.model.analysis.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.ProxyResult;
-import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -294,6 +296,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             mTransitionRelation.setMarked(index - 1, mEventToIndex.get(prop),
                                           true);
           }
+          if (i < mNumInitialStates) {
+            mTransitionRelation.setInitial(index - 1, true);
+          }
         } else {
           mStateMap[i] = mNumGoodStates;// the index of the bad state
         }
@@ -326,7 +331,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           mAutomataList = new ArrayList<AutomatonProxy>();
           mReduction.setUpClasses();
           if (mReduction.setUpEventList() == 0) {
-            mReduction.removeUncontrollableSelfloops(mTransitionRelation);
             aut =
               mReduction
                 .createOneStateAutomaton(mReduction.mDisabledEventList);
@@ -348,11 +352,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                 e1.add(mReduction.mEventList.get(i));
                 mReduction.setUpClasses();
                 if (!mReduction.mainProcedure(e1)) {
-                  mAutomataList.clear();
-                  mReduction.removeBadStateTransitions(mTransitionRelation);
-                  mTransitionRelation.setReachable(mNumGoodStates, false);
-                  mReduction
-                    .removeUncontrollableSelfloops(mTransitionRelation);
+                  mReduction.simplifyAutomaton(mTransitionRelation);
                   aut =
                     mTransitionRelation.createAutomaton(getFactory(),
                                                         getEventEncoding());
@@ -361,16 +361,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                   break;
                 }
                 mReduction.mergeTransitionRelation(copy, false);
-                mReduction.removeUncontrollableSelfloops(copy);
+                mReduction.removeSelfloops(copy);
                 copy.setName("Supervisor:<" + mEvents[e1.get(0)].getName()
                              + ">");
                 aut = copy.createAutomaton(getFactory(), getEventEncoding());
                 mAutomataList.add(aut);
               }
             } else {
-              mReduction.removeBadStateTransitions(mTransitionRelation);
-              mReduction.removeUncontrollableSelfloops(mTransitionRelation);
-              mTransitionRelation.setReachable(mNumGoodStates, false);
+              mReduction.simplifyAutomaton(mTransitionRelation);
               aut =
                 mTransitionRelation.createAutomaton(getFactory(),
                                                     getEventEncoding());
@@ -404,11 +402,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           }
         } else {
           mReduction.removeBadStateTransitions(mTransitionRelation);
-          mReduction.removeUncontrollableSelfloops(mTransitionRelation);
-          mTransitionRelation.setReachable(mNumGoodStates, false);
-          aut =
-            mTransitionRelation.createAutomaton(getFactory(),
-                                                getEventEncoding());
+          mTransitionRelation.removeProperSelfLoopEvents();
+          mTransitionRelation.removeRedundantPropositions();
+          aut = mTransitionRelation.createAutomaton(getFactory(),
+                                                    getEventEncoding());
           des = AutomatonTools.createProductDESProxy(aut, getFactory());
         }
         return setProxyResult(des);
@@ -580,7 +577,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         mDeadlock[a][snum] = stateProps.isEmpty();
         snum++;
       }
-      ndTuple1[a] = initials.toNativeArray();
+      ndTuple1[a] = initials.toArray();
       final TIntArrayList[][] autTransitionLists =
         new TIntArrayList[mNumProperEvents + 1][numStates];
       final TIntArrayList[][] autTransitionListsRvs =
@@ -613,13 +610,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           for (int source = 0; source < numStates; source++) {
             final TIntArrayList list = autTransitionLists[e][source];
             if (list != null) {
-              transitions[a][e][source] = list.toNativeArray();
+              transitions[a][e][source] = list.toArray();
             }
           }
           for (int target = 0; target < numStates; target++) {
             final TIntArrayList listRvs = autTransitionListsRvs[e][target];
             if (listRvs != null) {
-              reverseTransitions[a][e][target] = listRvs.toNativeArray();
+              reverseTransitions[a][e][target] = listRvs.toArray();
             }
           }
         }
@@ -691,9 +688,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mBadStates = new BitSet(mNumStates);
     mSafeStates = new BitSet(mNumStates);
     final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
-    mGlobalVisited = new TObjectIntHashMap<int[]>(strategy);
+    mGlobalVisited = new TObjectIntCustomHashMap<int[]>(strategy);
     mGlobalVisited.ensureCapacity(tableSize);
-    mLocalVisited = new THashSet<int[]>(strategy);
+    mLocalVisited = new WatersHashSet<int[]>(strategy);
     mGlobalStack = new ArrayDeque<int[]>();
     mLocalStack = new ArrayDeque<int[]>();
     mBackTrace = new ArrayDeque<int[]>();
@@ -1694,28 +1691,30 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public void mergeTransitionRelation(final ListBufferTransitionRelation rel,
                                         final boolean isMonolithic)
     {
-      for (int i = 0; i < mNumInitialStates; i++) {
-        rel.setInitial(i, true);
-      }
       if (!isMonolithic) {
         removeBadStateTransitions(rel);
       }
-      final List<int[]> mergedStates = new ArrayList<int[]>();
+      final List<int[]> mergingStates = new ArrayList<int[]>();
       for (int i = 0; i < mNumGoodStates; i++) {
         final int listID = mStateToClass[i];
         if (mClasses.getFirst(listID) == i) {
           final int[] states = mClasses.toArray(listID);
-          mergedStates.add(states);
+          mergingStates.add(states);
         }
       }
       if (isMonolithic) {
         final int[] states = new int[1];
         states[0] = mNumGoodStates;
-        mNumGoodStates = mergedStates.size();
-        mergedStates.add(states);
+        mNumGoodStates = mergingStates.size();
+        mergingStates.add(states);
       }
-      rel.merge(mergedStates);
+      rel.merge(mergingStates);
       rel.removeProperSelfLoopEvents();
+    }
+
+    public void simplifyAutomaton(final ListBufferTransitionRelation rel){
+      removeBadStateTransitions(rel);
+      removeSelfloops(rel);
     }
 
     public void removeBadStateTransitions(final ListBufferTransitionRelation rel)
@@ -1728,9 +1727,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           iter.remove();
         }
       }
+      rel.setReachable(mNumGoodStates, false);
     }
 
-    public void removeUncontrollableSelfloops(final ListBufferTransitionRelation rel)
+    public void removeSelfloops(final ListBufferTransitionRelation rel)
     {
       for (int e = 1; e <= mNumUncontrollableEvents; e++) {
         final TransitionIterator iter =
@@ -1742,10 +1742,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             break;
           }
         }
-        if(isSelfloopOnly){
+        if (isSelfloopOnly) {
           rel.removeEvent(e);
         }
       }
+      rel.removeProperSelfLoopEvents();
     }
 
     private AutomatonProxy createOneStateAutomaton(final TIntArrayList eventList)
@@ -1857,7 +1858,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private int mDeadlockState;
 
   private List<int[]> mStateTuples;
-  private TObjectIntHashMap<int[]> mGlobalVisited;
+  private TObjectIntCustomHashMap<int[]> mGlobalVisited;
   private Deque<int[]> mGlobalStack;
   private Deque<int[]> mLocalStack;
   private Deque<int[]> mBackTrace;
@@ -1898,3 +1899,4 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private static final int MAX_TABLE_SIZE = 500000;
   private static final int SIZE_INT = 32;
 }
+

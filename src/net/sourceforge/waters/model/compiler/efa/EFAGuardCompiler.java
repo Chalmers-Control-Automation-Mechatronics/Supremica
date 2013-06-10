@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
@@ -28,13 +29,13 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
-class EFAGuardCompiler
+public class EFAGuardCompiler
 {
 
   //#########################################################################
   //# Constructors
-  EFAGuardCompiler(final ModuleProxyFactory factory,
-                   final CompilerOperatorTable optable)
+  public EFAGuardCompiler(final ModuleProxyFactory factory,
+                          final CompilerOperatorTable optable)
   {
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mFactory = factory;
@@ -46,7 +47,7 @@ class EFAGuardCompiler
 
   //#########################################################################
   //# Guard Compilation
-  ConstraintList getCompiledGuard(final GuardActionBlockProxy block)
+  public ConstraintList getCompiledGuard(final GuardActionBlockProxy block)
     throws EvalException
   {
     final ProxyAccessor<GuardActionBlockProxy> accessor =

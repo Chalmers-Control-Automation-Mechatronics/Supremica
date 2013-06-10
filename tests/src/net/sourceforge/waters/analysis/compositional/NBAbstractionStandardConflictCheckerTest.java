@@ -13,7 +13,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -39,6 +39,7 @@ public class NBAbstractionStandardConflictCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ConflictChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
@@ -48,6 +49,7 @@ public class NBAbstractionStandardConflictCheckerTest
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
+    checker.setTraceCheckingEnabled(true);
     return checker;
   }
 

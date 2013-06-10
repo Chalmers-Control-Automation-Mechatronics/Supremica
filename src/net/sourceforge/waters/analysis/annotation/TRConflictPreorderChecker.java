@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +28,9 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
 /**
@@ -38,7 +41,7 @@ import net.sourceforge.waters.model.analysis.Abortable;
  * Preorder. Proc. 10th Workshop on the Foundations of Coordination Languages
  * and Software Architecture, FOCLASA 2011, 34-48, Aachen, Germany, 2011.</P>
  *
- * @author Simon Ware
+ * @author Simon Ware, Robi Malik
  */
 
 public class TRConflictPreorderChecker
@@ -85,6 +88,11 @@ public class TRConflictPreorderChecker
     return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
   }
 
+  public ConflictPreorderResult getAnalysisResult()
+  {
+    return mAnalysisResult;
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -99,21 +107,118 @@ public class TRConflictPreorderChecker
   public boolean isLessConflicting()
     throws AbortException
   {
-    final TIntHashSet first = new TIntHashSet();
-    final TIntHashSet second = new TIntHashSet();
-    for (int s = 0; s < mFirstRelation.getNumberOfStates(); s++) {
-      if (mFirstRelation.isInitial(s)) {
-        first.add(s);
+    try {
+      setUp();
+      final TIntHashSet first = new TIntHashSet();
+      final TIntHashSet second = new TIntHashSet();
+      for (int s = 0; s < mFirstRelation.getNumberOfStates(); s++) {
+        if (mFirstRelation.isInitial(s)) {
+          first.add(s);
+        }
       }
-    }
-    for (int s = 0; s < mSecondRelation.getNumberOfStates(); s++) {
-      if (mSecondRelation.isInitial(s)) {
-        second.add(s);
+      for (int s = 0; s < mSecondRelation.getNumberOfStates(); s++) {
+        if (mSecondRelation.isInitial(s)) {
+          second.add(s);
+        }
       }
+      checkAbort();
+      final TIntHashSet init1 = calculateTauReachable(first, mFirstRelation);
+      final TIntHashSet init2 = calculateTauReachable(second, mSecondRelation);
+      final LCPair init = createPair(init1, init2);
+      final boolean result = isLessConflicting(init);
+      return setBooleanResult(result);
+    } finally {
+      tearDown();
     }
-    checkAbort();
-    return isLessConflicting(createPair(calculateTauReachable(first, mFirstRelation),
-                                        calculateTauReachable(second, mSecondRelation)));
+  }
+
+
+  //#########################################################################
+  //# Coordination
+  /**
+   * Initialises the model analyser for a new run.
+   * This method should be called by all subclasses at the beginning of
+   * each {@link ModelAnalyzer#run() run()}. If overridden, the overriding
+   * method should call the superclass methods first.
+   * @throws AnalysisException
+   */
+  private void setUp()
+  {
+    mIsAborting = false;
+    mAnalysisResult = new ConflictPreorderResult();
+    mAnalysisResult.addPair(mFirstRelation, mSecondRelation);
+    mStartTime = System.currentTimeMillis();
+  }
+
+  /**
+   * Resets the model analyser at the end of a run.
+   * This method should be called by all subclasses upon completion of
+   * each {@link ModelAnalyzer#run() run()}, even if an exception is
+   * thrown. If overridden, the overriding method should call the superclass
+   * methods last.
+   */
+  private void tearDown()
+  {
+    mIsAborting = false;
+    addStatistics();
+  }
+
+  /**
+   * Stores the given Boolean value on the analysis result and marks the run
+   * as completed.
+   * @return The given Boolean value.
+   */
+  private boolean setBooleanResult(final boolean value)
+  {
+    mAnalysisResult.setSatisfied(value);
+    addStatistics();
+    return value;
+  }
+
+  /**
+   * Stores the given exception on the analysis result and marks the run
+   * as completed.
+   * @return The given exception.
+   */
+  private AnalysisException setExceptionResult
+    (final AnalysisException exception)
+  {
+    if (mAnalysisResult != null) {
+      mAnalysisResult.setException(exception);
+      addStatistics();
+    }
+    return exception;
+  }
+
+
+  /**
+   * Stores any available statistics on this analyser's last run in the
+   * analysis result.
+   */
+  private void addStatistics()
+  {
+    if (mAnalysisResult != null) {
+      final long current = System.currentTimeMillis();
+      mAnalysisResult.setRuntime(current - mStartTime);
+      final long usage = DefaultAnalysisResult.getCurrentMemoryUsage();
+      mAnalysisResult.updatePeakMemoryUsage(usage);
+    }
+  }
+
+  /**
+   * Checks whether the model analyser has been requested to abort,
+   * and if so, performs the abort by throwing an {@link AbortException}.
+   * This method should be called periodically by any model analyser that
+   * supports being aborted by user request.
+   */
+  private void checkAbort()
+    throws AbortException
+  {
+    if (mIsAborting) {
+      final AbortException exception = new AbortException();
+      setExceptionResult(exception);
+      throw exception;
+    }
   }
 
 
@@ -148,7 +253,7 @@ public class TRConflictPreorderChecker
     final TIntHashSet taureach = new TIntHashSet(set.toArray());
     final TIntArrayList togo = new TIntArrayList(set.toArray());
     while (!togo.isEmpty()) {
-      final int state = togo.remove(togo.size() - 1);
+      final int state = togo.removeAt(togo.size() - 1);
       final TransitionIterator ti = trans.createSuccessorsReadOnlyIterator(state,
                                                                      EventEncoding.TAU);
       while (ti.advance()) {
@@ -252,10 +357,12 @@ public class TRConflictPreorderChecker
     throws AbortException
   {
     boolean modified = true;
+    int level = 0;
     while (modified) {
+      mAnalysisResult.addLevel(level++, mFirstLC.size());
       modified = false;
       final TIntArrayList makelc = new TIntArrayList();
-      final Set<MCTriple> MCTriples = new THashSet<MCTriple>();
+      final Set<MCTriple> mcTriples = new THashSet<MCTriple>();
       final List<MCTriple> tobeexpanded = new ArrayList<MCTriple>();
       for (int s = 0; s < mStates.size(); s++) {
         if (!mFirstLC.contains(s)) {
@@ -265,7 +372,7 @@ public class TRConflictPreorderChecker
           final TIntHashSet moreset = state.mSecondSet;
           if (moreset.contains(-1)) {
             final MCTriple triple = new MCTriple(mStates.get(s), -1);
-            MCTriples.add(triple);
+            mcTriples.add(triple);
             tobeexpanded.add(triple);
           }
         }
@@ -290,12 +397,13 @@ public class TRConflictPreorderChecker
               final TIntHashSet statesuccessors = calculateSuccessor(newset, e, mSecondRelation);
               if (statesuccessors.contains(triple.mState)) {
                 final MCTriple add = new MCTriple(mStates.get(pred), state);
-                if (MCTriples.add(add)) {tobeexpanded.add(add);}
+                if (mcTriples.add(add)) {tobeexpanded.add(add);}
               }
             }
           }
         }
       }
+      mAnalysisResult.addMCTriples(mcTriples.size());
       for (int i = 0; i < makelc.size(); i++) {
         final int state = makelc.get(i);
         final LCPair tup = mStates.get(state);
@@ -303,7 +411,7 @@ public class TRConflictPreorderChecker
         while (it2.hasNext()) {
           final int propstate = it2.next();
           final MCTriple triple = new MCTriple(tup, propstate);
-          if (!MCTriples.contains(triple)) {
+          if (!mcTriples.contains(triple)) {
             mFirstLC.add(state);
             modified = true;
           }
@@ -327,6 +435,7 @@ public class TRConflictPreorderChecker
     // adds the certain conflict states to the calculation
     getState(createPair(new TIntHashSet(), tuple.mSecondSet));
     expandStates();
+    mAnalysisResult.addLCPairs(mStates.size());
     calculateLCStates();
     final TIntHashSet explored = new TIntHashSet();
     final TIntArrayList toexplore = new TIntArrayList();
@@ -334,7 +443,7 @@ public class TRConflictPreorderChecker
     toexplore.add(initial);
     while (!toexplore.isEmpty()) {
       checkAbort();
-      final int s = toexplore.remove(toexplore.size() -1);
+      final int s = toexplore.removeAt(toexplore.size() -1);
       LCPair state = mStates.get(s);
       if (state.mFirstSet.isEmpty()) {continue;}
       if (state.mFirstSet.size() > 1) {
@@ -355,7 +464,7 @@ public class TRConflictPreorderChecker
         visited2.add(s);
         states.add(s);
         while (!states.isEmpty()) {
-          final int snum = states.remove(0);
+          final int snum = states.removeAt(0);
           state = mStates.get(snum);
           for (int e = 0; e < mSuccessors.get(snum).size(); e++) {
             if (e == EventEncoding.TAU) {continue;}
@@ -396,22 +505,6 @@ public class TRConflictPreorderChecker
     }
     return tset;
   }
-
-  /**
-   * Checks whether the model analyser has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AbortException}.
-   * This method should be called periodically by any model analyser that
-   * supports being aborted by user request.
-   */
-  private void checkAbort()
-    throws AbortException
-  {
-    if (mIsAborting) {
-      final AbortException exception = new AbortException();
-      throw exception;
-    }
-  }
-
 
   //#########################################################################
   //# Inner Class LCPair
@@ -510,6 +603,10 @@ public class TRConflictPreorderChecker
   private final TIntHashSet mSecondBlocking;
   private final int mMarking;
   private int mExpanded;
+
+  private ConflictPreorderResult mAnalysisResult;
+  private long mStartTime;
   private boolean mIsAborting;
 
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -244,16 +244,16 @@ public class CompositionalSimplifier
     //# Overrides for net.sourceforge.waters.analysis.abstraction.
     //# AbstractCompositionalModelVerifier.EventInfo
     @Override
-    protected boolean isTau()
+    protected boolean canBeTau()
     {
       final EventProxy event = getEvent();
       return !mPreservedEvents.contains(event);
     }
 
     @Override
-    protected boolean isLocal()
+    protected boolean canBeLocal()
     {
-      return isTau();
+      return canBeTau();
     }
   }
 
@@ -266,3 +266,4 @@ public class CompositionalSimplifier
   private Set<EventProxy> mPreservedEvents = Collections.emptySet();
 
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;

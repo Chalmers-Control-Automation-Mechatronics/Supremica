@@ -66,7 +66,8 @@ public final class SynthesizerOptions
     private boolean reduceSupervisors;
     private boolean localizeSupervisors;
     private boolean rememberDisabledUncontrollableEvents;
-
+	private boolean supervisorsAsPlants;
+			
     private boolean bddExtractSupervisor;
 
     public boolean oneEventAtATime = false;
@@ -86,6 +87,7 @@ public final class SynthesizerOptions
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
             Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
             Config.SYNTHESIS_LOCALIZE_SUPERVISORS.get(),
+			Config.SYNTHESIS_SUP_AS_PLANT.get(),
             Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get());
     }
 
@@ -98,7 +100,7 @@ public final class SynthesizerOptions
     private SynthesizerOptions(final SynthesisType synthesisType, final SynthesisAlgorithm synthesisAlgorithm,
     		final boolean purge, final boolean removeUnnecessarySupervisors, final boolean maximallyPermissive,
     		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors, 
-    		final boolean localizeSupervisors, final boolean bddExtractSupervisor)
+    		final boolean localizeSupervisors, final boolean supervisorsAsPlants, final boolean bddExtractSupervisor)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -108,6 +110,7 @@ public final class SynthesizerOptions
         this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
         this.reduceSupervisors = reduceSupervisors;
         this.localizeSupervisors = localizeSupervisors;
+		this.supervisorsAsPlants = supervisorsAsPlants;
         this.bddExtractSupervisor = bddExtractSupervisor;
     }
 
@@ -125,10 +128,11 @@ public final class SynthesizerOptions
 
     public String validOptions()
     {
-        if (synthesisType == null)
+        /* if (synthesisType == null)
         {
             return "Unknown synthesis type.";
-        }
+        }*/
+		assert(synthesisType != null);
 
         if (synthesisAlgorithm == SynthesisAlgorithm.BDD)
         {
@@ -263,6 +267,10 @@ public final class SynthesizerOptions
 
     /**
      * Stores the current set of options in SupremicaProperties.
+	 * MF -- I am not at all sure that we should do this, changing the options 
+	 * MF -- when synthesizing should only be temporal, or at most hold for the
+	 * MMF -- current session of Supremica. I do not think that it should change
+	 * MF -- the global configuration. But this is now the way we have always done it, so...
      */
     public void saveOptions()
     {
@@ -274,6 +282,7 @@ public final class SynthesizerOptions
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
         Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
         Config.SYNTHESIS_LOCALIZE_SUPERVISORS.set(localizeSupervisors);
+		Config.SYNTHESIS_SUP_AS_PLANT.set(supervisorsAsPlants);
         Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.set(bddExtractSupervisor);
 
     }
@@ -284,17 +293,14 @@ public final class SynthesizerOptions
     public static SynthesizerOptions getDefaultSynthesizerOptions()
     {
         return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR, 
-                                      true, true, true, true, true, true, false);
+                                      true, true, true, true, true, true, false, false);
     }
-
-
-
 
     public static SynthesizerOptions getDefaultSynthesizerOptionsS()
     {
 
         return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.SYNTHESISA, 
-                                      true, true, true, false, false, true, false);
+                                      true, true, true, false, false, true, false, false);
     }
     /**
      * Returns the default options for synthesis.
@@ -302,11 +308,12 @@ public final class SynthesizerOptions
     public static SynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
     {
         final SynthesizerOptions options = getDefaultSynthesizerOptions();
-	options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
+		options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
         options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
         options.removeUnnecessarySupervisors = true;
         options.reduceSupervisors = true;
         options.localizeSupervisors = true;
+		options.supervisorsAsPlants = false; // This has always been the default, but probably always wrong!
 
         return options;
     }

@@ -1,6 +1,6 @@
 package net.sourceforge.waters.external.promela;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;

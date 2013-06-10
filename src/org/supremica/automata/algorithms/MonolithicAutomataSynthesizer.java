@@ -11,6 +11,7 @@ import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
 
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
@@ -113,10 +114,11 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 			synchronizationOptions.setRememberDisabledEvents(true);
 		}
 
-		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING) {
+		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING) 
+		{
 			automata = new Automata(automata);
 			// Only nonblocking? Then everything should be considered
-			// controllable!
+			// controllable! // NOT THE RIGHT WAY TO DO THIS! No fix for it now, though // MF
 			for (Automaton automaton : automata) {
 				for (LabeledEvent event : automaton.getAlphabet()) {
 					event.setControllable(true);
@@ -125,7 +127,7 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 		}
 
 		AutomataSynchronizer syncher = new AutomataSynchronizer(automata,
-				synchronizationOptions);
+				synchronizationOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
 		syncher.getHelper().setExecutionDialog(executionDialog);
 		threadToStop = syncher;
 		syncher.execute();

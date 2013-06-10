@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -104,7 +104,8 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       if (verifier instanceof CompositionalGeneralisedConflictChecker) {
@@ -134,7 +135,8 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       if (verifier instanceof CompositionalGeneralisedConflictChecker) {
@@ -164,7 +166,8 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       if (verifier instanceof CompositionalGeneralisedConflictChecker) {
@@ -194,7 +197,8 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       if (verifier instanceof CompositionalGeneralisedConflictChecker) {
@@ -222,7 +226,8 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final String name = getValue();
       if (verifier instanceof CompositionalGeneralisedConflictChecker) {
@@ -262,7 +267,8 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    protected void configure(final ModelVerifier verifier)
+    @Override
+    public void configure(final ModelVerifier verifier)
     {
       final String name = getValue();
       if (verifier instanceof CompositionalGeneralisedConflictChecker) {

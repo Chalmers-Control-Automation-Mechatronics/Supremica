@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectByteHashMap;
-import gnu.trove.TObjectByteIterator;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.iterator.TObjectByteIterator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,12 +25,12 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.TraceChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -364,14 +364,14 @@ public class CompositionalSafetyVerifier
     //# Overrides for net.sourceforge.waters.analysis.abstraction.
     //# AbstractCompositionalModelVerifier.EventInfo
     @Override
-    protected boolean isTau()
+    protected boolean canBeTau()
     {
       final EventProxy event = getEvent();
       return !mPropertyEventsMap.containsKey(event);
     }
 
     @Override
-    protected boolean isLocal()
+    protected boolean canBeLocal()
     {
       final EventProxy event = getEvent();
       return mPropertyEventsMap.get(event) != REGULAR;
@@ -380,7 +380,7 @@ public class CompositionalSafetyVerifier
     @Override
     protected boolean isSubjectToSelfloopRemoval()
     {
-      return isTau();
+      return canBeTau();
     }
   }
 
@@ -484,3 +484,4 @@ public class CompositionalSafetyVerifier
   static final byte FORBIDDEN = 2;
 
 }
+

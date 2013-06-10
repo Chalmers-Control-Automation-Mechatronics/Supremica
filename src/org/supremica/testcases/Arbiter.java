@@ -268,7 +268,7 @@ public class Arbiter
             
             try
             {
-                Automaton synch = AutomataSynchronizer.synchronizeAutomata(synchAutomata);
+                Automaton synch = AutomataSynchronizer.synchronizeAutomata(synchAutomata, false);
                 
                 synch.setName("Arbiter cell " + arbiterName);
                 arbiters.addAutomaton(synch);

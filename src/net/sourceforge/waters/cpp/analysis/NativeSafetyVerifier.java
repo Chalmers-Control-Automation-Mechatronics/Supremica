@@ -10,9 +10,9 @@
 package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;

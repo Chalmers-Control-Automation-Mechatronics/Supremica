@@ -1,8 +1,8 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -168,3 +168,4 @@ public class RemoveEvents
     return mImpossibleEvent;
   }
 }
+

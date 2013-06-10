@@ -72,16 +72,18 @@ class ObserverProjectionAbstractionProcedure
   //#########################################################################
   //# Overrides for class TRSimplifierAbstractionProcedure
   @Override
-  EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                    final EventProxy tau)
+  protected EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                              final EventProxy tau,
+                                              final Candidate candidate)
   {
-    final EventEncoding eventEnc = super.createEventEncoding(aut, tau);
+    final EventEncoding eventEnc =
+      super.createEventEncoding(aut, tau, candidate);
     final ProductDESProxyFactory factory = getFactory();
     final String name = "vtau:" + aut.getName();
     final EventProxy vtau =
       factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
     final KindTranslator id = IdenticalKindTranslator.getInstance();
-    final int codeOfVTau = eventEnc.addEvent(vtau, id, false);
+    final int codeOfVTau = eventEnc.addEvent(vtau, id, (byte)0);
     mOPSimplifier.setVisibleTau(codeOfVTau);
     return eventEnc;
   }

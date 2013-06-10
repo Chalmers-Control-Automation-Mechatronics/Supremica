@@ -70,7 +70,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.Pipe;
 import java.util.HashMap;
@@ -93,6 +92,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -112,7 +113,7 @@ import org.supremica.util.VPopupMenu;
 public class LogDisplay
     extends AppenderSkeleton
 {
-    
+
     public static LogDisplay getInstance()
     {
         InterfaceManager.getInstance();
@@ -136,28 +137,30 @@ public class LogDisplay
         createIcons();
         mLabel = "";
         mIsFancy = true;
-        
+
         popup = new LoggerPopupMenu(LoggerFactory.getInstance().getLoggerFilter());
 
         // This code used to be in the popup menu -------------
         mTextPane.addMouseListener(new MouseAdapter()
         {
-            public void mousePressed(MouseEvent e)
+            @Override
+            public void mousePressed(final MouseEvent e)
             {
-                
+
                 // This is needed for the Linux platform
                 // where isPopupTrigger is true only on mousePressed.
                 maybeShowPopup(e);
             }
-            
-            public void mouseReleased(MouseEvent e)
+
+            @Override
+            public void mouseReleased(final MouseEvent e)
             {
-                
+
                 // This is for triggering the popup on Windows platforms
                 maybeShowPopup(e);
             }
-            
-            private void maybeShowPopup(MouseEvent e)
+
+            private void maybeShowPopup(final MouseEvent e)
             {
                 if (e.isPopupTrigger())
                 {
@@ -166,44 +169,44 @@ public class LogDisplay
             }
         });
     }
-    
-    
+
+
     //#######################################################################
     //# Initialisation
     private void createAttributes()
     {
         mAttributeMap = new HashMap<Level,MutableAttributeSet>(8);
-        MutableAttributeSet attError = new SimpleAttributeSet();
+        final MutableAttributeSet attError = new SimpleAttributeSet();
         mAttributeMap.put(Level.ERROR, attError);
         StyleConstants.setFontSize(attError, 14);
         StyleConstants.setForeground(attError, Color.red);
-        MutableAttributeSet attWarn = new SimpleAttributeSet();
+        final MutableAttributeSet attWarn = new SimpleAttributeSet();
         mAttributeMap.put(Level.WARN, attWarn);
         StyleConstants.setFontSize(attWarn, 14);
         StyleConstants.setForeground(attWarn, new Color(255, 128, 0));
-        MutableAttributeSet attInfo = new SimpleAttributeSet();
+        final MutableAttributeSet attInfo = new SimpleAttributeSet();
         mAttributeMap.put(Level.INFO, attInfo);
         mAttributeMap.put(SupremicaLevel.VERBOSE, attInfo);
         StyleConstants.setFontSize(attInfo, 14);
         StyleConstants.setForeground(attInfo, new Color(0, 80, 0));
-        MutableAttributeSet attDebug = new SimpleAttributeSet();
+        final MutableAttributeSet attDebug = new SimpleAttributeSet();
         mAttributeMap.put(Level.DEBUG, attDebug);
         StyleConstants.setFontSize(attDebug, 14);
         StyleConstants.setForeground(attDebug, Color.blue);
-        MutableAttributeSet attFatal = new SimpleAttributeSet();
+        final MutableAttributeSet attFatal = new SimpleAttributeSet();
         mAttributeMap.put(Level.FATAL, attFatal);
         StyleConstants.setFontSize(attFatal, 14);
         StyleConstants.setForeground(attFatal, Color.black);
-        MutableAttributeSet attAll = new SimpleAttributeSet();
+        final MutableAttributeSet attAll = new SimpleAttributeSet();
         mAttributeMap.put(Level.ALL, attAll);
         StyleConstants.setFontSize(attAll, 14);
         StyleConstants.setForeground(attAll, Color.blue);
-        MutableAttributeSet attOff = new SimpleAttributeSet();
+        final MutableAttributeSet attOff = new SimpleAttributeSet();
         mAttributeMap.put(Level.OFF, attOff);
         StyleConstants.setFontSize(attOff, 14);
         StyleConstants.setForeground(attOff, Color.red);
     }
-    
+
     private void connectStreams()
     {
         if (mStdOutReader == null)
@@ -217,47 +220,42 @@ public class LogDisplay
         }
         mStdErrReader.setup();
     }
-    
+
     private void createIcons()
     {
         mIconMap = new HashMap<Level,ImageIcon>(8);
-        mIconMap.put(Level.FATAL, getIcon("/icons/BlackFlag.gif"));
-        mIconMap.put(Level.ERROR, getIcon("/icons/RedFlag.gif"));
-        mIconMap.put(Level.WARN, getIcon("/icons/OrangeFlag.gif"));
-        mIconMap.put(SupremicaLevel.VERBOSE, getIcon("/icons/GreenFlag.gif"));
-        mIconMap.put(Level.INFO, getIcon("/icons/GreenFlag.gif"));
-        mIconMap.put(Level.DEBUG, getIcon("/icons/BlueFlag.gif"));
-        mIconMap.put(Level.ALL, getIcon("/icons/BlackFlag.gif"));
-        mIconMap.put(Level.OFF, getIcon("/icons/BlackFlag.gif"));
+        mIconMap.put(Level.FATAL, IconLoader.ICON_CONSOLE_ERROR);
+        mIconMap.put(Level.ERROR, IconLoader.ICON_CONSOLE_ERROR);
+        mIconMap.put(Level.WARN, IconLoader.ICON_CONSOLE_WARNING);
+        mIconMap.put(SupremicaLevel.VERBOSE, IconLoader.ICON_CONSOLE_INFO);
+        mIconMap.put(Level.INFO, IconLoader.ICON_CONSOLE_INFO);
+        mIconMap.put(Level.DEBUG, IconLoader.ICON_CONSOLE_DEBUG);
+        mIconMap.put(Level.ALL, null);
+        mIconMap.put(Level.OFF, null);
     }
-    
-    
+
+
+    @Override
     public void close()
     {
     }
-    
+
     public void clear()
     {
         mTextPane.setText("");
     }
-    
+
     public void cut()
     {
         mTextPane.cut();
     }
-    
+
     public void copy()
     {
         mTextPane.copy();
     }
-    
-    private ImageIcon getIcon(final String name)
-    {
-        final URL url = Supremica.class.getResource(name);
-        return url == null ? null : new ImageIcon(url);
-    }
-    
-    
+
+
     //#######################################################################
     //# Interface org.apache.log4j.Appender
     /**
@@ -265,6 +263,7 @@ public class LogDisplay
      * possible. If not called from the AWT event dispatching thread, the
      * event may be queued for later logging in a thread-safe fashion.
      */
+    @Override
     public void append(final LoggingEvent event)
     {
         if (SwingUtilities.isEventDispatchThread())
@@ -283,7 +282,7 @@ public class LogDisplay
             }
         }
     }
-    
+
     /**
      * Displays the given logging event in the log display.
      * This method changes the GUI data structures and therefore
@@ -315,23 +314,23 @@ public class LogDisplay
             throw new IllegalStateException(exception);
         }
     }
-    
+
     public JComponent getComponent()
     {
         return theTextPaneScrollPane;
     }
-    
+
     public JComponent getComponentWithoutScrollPane()
     {
         return mTextPane;
     }
-    
+
     public String getLabel()
     {
         return mLabel;
     }
-    
-    
+
+
     //#######################################################################
     //# Properties
     public String[] getOptionStrings()
@@ -342,46 +341,48 @@ public class LogDisplay
         COLOR_OPTION_BACKGROUND, FANCY_OPTION,
         FONT_NAME_OPTION, FONT_SIZE_OPTION };
     }
-    
-    private Color parseColor(String v)
+
+    private Color parseColor(final String v)
     {
-        StringTokenizer st = new StringTokenizer(v, ",");
-        int val[] = { 255, 255, 255, 255 };
+        final StringTokenizer st = new StringTokenizer(v, ",");
+        final int val[] = { 255, 255, 255, 255 };
         int i = 0;
-        
+
         while (st.hasMoreTokens())
         {
             val[i] = Integer.parseInt(st.nextToken());
-            
+
             i++;
         }
-        
+
         return new Color(val[0], val[1], val[2], val[3]);
     }
-    
-    public void setLayout(Layout layout)
+
+    @Override
+    public void setLayout(final Layout layout)
     {
         mLayout = layout;
     }
-    
-    public void setName(String name)
+
+    @Override
+    public void setName(final String name)
     {
         this.name = name;
     }
-    
-    private void setTextPane(JTextPane textpane)
+
+    private void setTextPane(final JTextPane textpane)
     {
         mTextPane = textpane;
         mTextPane.setEditable(false);
         mTextPane.setBackground(Color.white);
         mDocument = mTextPane.getStyledDocument();
     }
-    
-    private void setColor(Level p, String v)
+
+    private void setColor(final Level p, final String v)
     {
         StyleConstants.setForeground(mAttributeMap.get(p), parseColor(v));
     }
-    
+
     private void setFontSize(final int size)
     {
         for (final MutableAttributeSet attribs : mAttributeMap.values())
@@ -389,7 +390,7 @@ public class LogDisplay
             StyleConstants.setFontSize(attribs, size);
         }
     }
-    
+
     private void setFontName(final String name)
     {
         for (final MutableAttributeSet attribs : mAttributeMap.values())
@@ -397,67 +398,68 @@ public class LogDisplay
             StyleConstants.setFontFamily(attribs, name);
         }
     }
-    
-    public void setOption(String option, String value)
+
+    public void setOption(final String option, final String value)
     {
         if (option.equalsIgnoreCase(LABEL_OPTION))
         {
             mLabel = value;
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_FATAL))
         {
             setColor(Level.FATAL, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_ERROR))
         {
             setColor(Level.ERROR, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_WARN))
         {
             setColor(Level.WARN, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_INFO))
         {
             setColor(Level.INFO, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_DEBUG))
         {
             setColor(Level.DEBUG, value);
         }
-        
+
         if (option.equalsIgnoreCase(COLOR_OPTION_BACKGROUND))
         {
             mTextPane.setBackground(parseColor(value));
         }
-        
+
         if (option.equalsIgnoreCase(FANCY_OPTION))
         {
             mIsFancy = OptionConverter.toBoolean(value, mIsFancy);
         }
-        
+
         if (option.equalsIgnoreCase(FONT_SIZE_OPTION))
         {
             setFontSize(Integer.parseInt(value));
         }
-        
+
         if (option.equalsIgnoreCase(FONT_NAME_OPTION))
         {
             setFontName(value);
         }
-        
+
         return;
     }
-    
+
+    @Override
     public boolean requiresLayout()
     {
         return true;
     }
-    
+
     class LoggerPopupMenu
         extends VPopupMenu
     {
@@ -468,56 +470,60 @@ public class LogDisplay
         private JCheckBoxMenuItem debugItem = null;
         private JCheckBoxMenuItem warnItem = null;
         private JCheckBoxMenuItem infoItem = null;
-        
+
         // except for access, these are copied straight from gui.Supremica
         private void initPopups()
         {
-            JMenuItem cutItem = new JMenuItem("Cut");
-            
+            final JMenuItem cutItem = new JMenuItem("Cut");
+
             cutItem.addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                @Override
+                public void actionPerformed(final ActionEvent e)
                 {
                     clear();
                 }
             });
             add(cutItem);
-            
-            JMenuItem copyItem = new JMenuItem("Copy");
-            
+
+            final JMenuItem copyItem = new JMenuItem("Copy");
+
             copyItem.addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                @Override
+                public void actionPerformed(final ActionEvent e)
                 {
                     copy();
                 }
             });
             add(copyItem);
             addSeparator();
-            
-            JMenuItem clearItem = new JMenuItem("Clear");
-            
+
+            final JMenuItem clearItem = new JMenuItem("Clear");
+
             clearItem.addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                @Override
+                public void actionPerformed(final ActionEvent e)
                 {
                     clear();
                 }
             });
             add(clearItem);
             addSeparator();
-            
-            JMenu logProperties = new JMenu("Log Configuration");
-            
+
+            final JMenu logProperties = new JMenu("Log Configuration");
+
             add(logProperties);
-            
+
             // FATAL, ERROR, WARN, INFO and DEBUG.
             fatalItem = new JCheckBoxMenuItem("Log Fatal");
-            
+
             fatalItem.setSelected(filter.allowFatal());
             fatalItem.addItemListener(new ItemListener()
             {
-                public void itemStateChanged(ItemEvent e)
+                @Override
+                public void itemStateChanged(final ItemEvent e)
                 {
                     setAllowFatal((e.getStateChange() == ItemEvent.SELECTED)
                     ? true
@@ -525,13 +531,14 @@ public class LogDisplay
                 }
             });
             logProperties.add(fatalItem);
-            
+
             errorItem = new JCheckBoxMenuItem("Log Error");
-            
+
             errorItem.setSelected(filter.allowError());
             errorItem.addItemListener(new ItemListener()
             {
-                public void itemStateChanged(ItemEvent e)
+                @Override
+                public void itemStateChanged(final ItemEvent e)
                 {
                     setAllowError((e.getStateChange() == ItemEvent.SELECTED)
                     ? true
@@ -539,13 +546,14 @@ public class LogDisplay
                 }
             });
             logProperties.add(errorItem);
-            
+
             warnItem = new JCheckBoxMenuItem("Log Warning");
-            
+
             warnItem.setSelected(filter.allowWarn());
             warnItem.addItemListener(new ItemListener()
             {
-                public void itemStateChanged(ItemEvent e)
+                @Override
+                public void itemStateChanged(final ItemEvent e)
                 {
                     setAllowWarn((e.getStateChange() == ItemEvent.SELECTED)
                     ? true
@@ -553,13 +561,14 @@ public class LogDisplay
                 }
             });
             logProperties.add(warnItem);
-            
+
             infoItem = new JCheckBoxMenuItem("Log Info");
-            
+
             infoItem.setSelected(filter.allowInfo());
             infoItem.addItemListener(new ItemListener()
             {
-                public void itemStateChanged(ItemEvent e)
+                @Override
+                public void itemStateChanged(final ItemEvent e)
                 {
                     setAllowInfo((e.getStateChange() == ItemEvent.SELECTED)
                     ? true
@@ -567,13 +576,14 @@ public class LogDisplay
                 }
             });
             logProperties.add(infoItem);
-            
+
             debugItem = new JCheckBoxMenuItem("Log Debug");
-            
+
             debugItem.setSelected(filter.allowDebug());
             debugItem.addItemListener(new ItemListener()
             {
-                public void itemStateChanged(ItemEvent e)
+                @Override
+                public void itemStateChanged(final ItemEvent e)
                 {
                     setAllowDebug((e.getStateChange() == ItemEvent.SELECTED)
                     ? true
@@ -582,66 +592,66 @@ public class LogDisplay
             });
             logProperties.add(debugItem);
         }
-        
-        public LoggerPopupMenu(LoggerFilter filter)
+
+        public LoggerPopupMenu(final LoggerFilter filter)
         {
             this.filter = filter;
-            
+
             initPopups();
         }
-        
+
         public boolean allowInfo()
         {
             return filter.allowInfo();
         }
-        
-        public void setAllowInfo(boolean allow)
+
+        public void setAllowInfo(final boolean allow)
         {
             filter.setAllowInfo(allow);
         }
-        
+
         public boolean allowDebug()
         {
             return filter.allowDebug();
         }
-        
-        public void setAllowDebug(boolean allow)
+
+        public void setAllowDebug(final boolean allow)
         {
             filter.setAllowDebug(allow);
         }
-        
+
         public boolean allowWarn()
         {
             return filter.allowWarn();
         }
-        
-        public void setAllowWarn(boolean allow)
+
+        public void setAllowWarn(final boolean allow)
         {
             filter.setAllowWarn(allow);
         }
-        
+
         public boolean allowError()
         {
             return filter.allowError();
         }
-        
-        public void setAllowError(boolean allow)
+
+        public void setAllowError(final boolean allow)
         {
             filter.setAllowError(allow);
         }
-        
+
         public boolean allowFatal()
         {
             return filter.allowFatal();
         }
-        
-        public void setAllowFatal(boolean allow)
+
+        public void setAllowFatal(final boolean allow)
         {
             filter.setAllowFatal(allow);
         }
     }
-    
-    
+
+
     //#######################################################################
     //# Inner Class EventQueueReader
     /**
@@ -651,7 +661,7 @@ public class LogDisplay
      */
     private class EventQueueReader implements Runnable
     {
-        
+
         //###################################################################
         //# Interface java.lang.Runnable
         /**
@@ -659,6 +669,7 @@ public class LogDisplay
          * log display in a thread-safe manner. This method must be
          * executed from the AWT event dispatching thread.
          */
+        @Override
         public void run()
         {
             synchronized (mEventQueue)
@@ -670,10 +681,10 @@ public class LogDisplay
                 mEventQueue.clear();
             }
         }
-        
+
     }
-    
-    
+
+
     //#######################################################################
     //# Inner Class SystemStreamReader
     /**
@@ -685,7 +696,7 @@ public class LogDisplay
         extends Thread
         implements SupremicaPropertyChangeListener
     {
-        
+
         //###################################################################
         //# Constructor
         /**
@@ -700,7 +711,7 @@ public class LogDisplay
             mProperty = property;
             mProperty.addPropertyChangeListener(this);
         }
-        
+
         //###################################################################
         //# Setup
         /**
@@ -726,7 +737,7 @@ public class LogDisplay
                 exception.printStackTrace(System.err);
             }
         }
-        
+
         /**
          * Reconnects this reader to its system stream depending on
          * Supremica property settings. This methods connects the
@@ -746,21 +757,22 @@ public class LogDisplay
                 disconnect();
             }
         }
-        
+
         private void connect()
         throws IOException
         {
             setSystemOut(mPrintStream);
         }
-        
+
         private void disconnect()
         throws IOException
         {
             setSystemOut(mSystemStream);
         }
-        
+
         //###################################################################
         //# Interface java.lang.Runnable
+        @Override
         public void run()
         {
             try
@@ -779,7 +791,7 @@ public class LogDisplay
                 exception.printStackTrace(System.err);
             }
         }
-        
+
         //###################################################################
         //# Interface org.supremica.properties.SupremicaPropertyChangeListener
         /**
@@ -788,6 +800,7 @@ public class LogDisplay
          * property matches the Supremica property represented by this reader.
          * @see #reconnect()
          */
+        @Override
         public void propertyChanged(final SupremicaPropertyChangeEvent event)
         {
             try
@@ -801,7 +814,7 @@ public class LogDisplay
                 exception.printStackTrace(System.err);
             }
         }
-        
+
         //###################################################################
         //# Reading
         private String readLine()
@@ -824,30 +837,30 @@ public class LogDisplay
             } while (ch != '\n');
             return buffer.length() == 0 ? null : buffer.toString();
         }
-        
+
         //###################################################################
         //# Abstract Methods
         abstract PrintStream getSystemOut();
         abstract void setSystemOut(PrintStream stream);
         abstract String getStreamName();
         abstract void logLine(String line);
-        
+
         //###################################################################
         //# Data Members
         private final PrintStream mSystemStream;
         private final BooleanProperty mProperty;
-        
+
         private InputStream mPipeIn;
         private PrintStream mPrintStream;
-        
+
     }
-    
-    
+
+
     //#######################################################################
     //# Inner Class StdOutReader
     private class StdOutReader extends SystemStreamReader
     {
-        
+
         //###################################################################
         //# Constructor
         private StdOutReader()
@@ -855,41 +868,45 @@ public class LogDisplay
             super(Config.GENERAL_REDIRECT_STDOUT);
             mLogger = LoggerFactory.createLogger(getClass());
         }
-        
+
         //###################################################################
         //# Overrides for Abstract Baseclass SystemStreamReader
+        @Override
         PrintStream getSystemOut()
         {
             return System.out;
         }
-        
+
+        @Override
         void setSystemOut(final PrintStream stream)
         {
             System.setOut(stream);
         }
-        
+
+        @Override
         String getStreamName()
         {
             return "STDOUT";
         }
-        
+
+        @Override
         void logLine(final String line)
         {
             mLogger.info("Stdout: " + line);
         }
-        
+
         //###################################################################
         //# Data Members
         private final Logger mLogger;
-        
+
     }
-    
-    
+
+
     //#######################################################################
     //# Inner Class StdErrReader
     private class StdErrReader extends SystemStreamReader
     {
-        
+
         //###################################################################
         //# Constructor
         private StdErrReader()
@@ -897,48 +914,52 @@ public class LogDisplay
             super(Config.GENERAL_REDIRECT_STDERR);
             mLogger = LoggerFactory.createLogger(getClass());
         }
-        
+
         //###################################################################
         //# Overrides for Abstract Baseclass SystemStreamReader
+        @Override
         PrintStream getSystemOut()
         {
             return System.err;
         }
-        
+
+        @Override
         void setSystemOut(final PrintStream stream)
         {
             System.setErr(stream);
         }
-        
+
+        @Override
         String getStreamName()
         {
             return "STDERR";
         }
-        
+
+        @Override
         void logLine(final String line)
         {
             mLogger.error("Stderr: " + line);
         }
-        
+
         //###################################################################
         //# Data Members
         private final Logger mLogger;
-        
+
     }
-    
-    
+
+
     //#######################################################################
     //# Data Members
-    private JScrollPane theTextPaneScrollPane;
+    private final JScrollPane theTextPaneScrollPane;
     private JTextPane mTextPane;
     private StyledDocument mDocument;
-    private LoggerPopupMenu popup;
+    private final LoggerPopupMenu popup;
     private Layout mLayout;
     private Map<Level,MutableAttributeSet> mAttributeMap;
     private Map<Level,ImageIcon> mIconMap;
     private String mLabel;
     private boolean mIsFancy;
-    
+
     /**
      * Queue of logging events to be displayed as soon as the AWT event
      * dispatching thread becomes available.
@@ -953,13 +974,13 @@ public class LogDisplay
     private final Runnable mEventQueueReader = new EventQueueReader();
     private SystemStreamReader mStdOutReader;
     private SystemStreamReader mStdErrReader;
-    
-    
+
+
     //#######################################################################
     //# Class Variables
     private static LogDisplay theLogDisplay = null;
-    
-    
+
+
     //#######################################################################
     //# Configuration Option Names
     private static final String LABEL_OPTION = "Label";
@@ -972,5 +993,5 @@ public class LogDisplay
     private static final String FANCY_OPTION = "Fancy";
     private static final String FONT_NAME_OPTION = "Font.Name";
     private static final String FONT_SIZE_OPTION = "Font.Size";
-    
+
 }

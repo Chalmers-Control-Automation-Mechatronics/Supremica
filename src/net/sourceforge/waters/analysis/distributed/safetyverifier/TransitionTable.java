@@ -1,6 +1,6 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.Arrays;
 
@@ -21,9 +21,9 @@ import net.sourceforge.waters.analysis.distributed.schemata.TransitionSchema;
  * alphabet for an automaton; if the event is not in the alphabet then
  * the second dimension of the array can be omitted (array[event] ==
  * null).
- * 
+ *
  * This allows fast lookups to check if an event is allowed from a
- * given state. 
+ * given state.
  */
 public class TransitionTable
 {
@@ -32,9 +32,9 @@ public class TransitionTable
    * @param des The model to use
    * @param autId The id of the automaton to use.
    */
-  public TransitionTable(ProductDESSchema des, int autId)
+  public TransitionTable(final ProductDESSchema des, final int autId)
   {
-    AutomatonSchema aut = des.getAutomaton(autId);
+    final AutomatonSchema aut = des.getAutomaton(autId);
     mAutomatonIndex = autId;
     mModel = des;
 
@@ -43,12 +43,12 @@ public class TransitionTable
     mEvents = des.getEventCount();
 
     //Only events in the alphabet will have a state dimension created
-    //for them. All state transitions will be set to -1 initially, to 
+    //for them. All state transitions will be set to -1 initially, to
     //indicate a transition on that event from that state is not possible.
     mTransitions = new int[mEvents][];
     for (int i = 0; i < aut.getEventIdCount(); i++)
       {
-	int event = aut.getEventId(i);
+	final int event = aut.getEventId(i);
 	mTransitions[event] = new int[mStates];
 	for (int j = 0; j < mStates; j++)
 	  {
@@ -58,7 +58,7 @@ public class TransitionTable
 
     for (int i = 0; i < aut.getTransitionCount(); i++)
       {
-	TransitionSchema t = aut.getTransition(i);
+	final TransitionSchema t = aut.getTransition(i);
 	mTransitions[t.getEventId()][t.getSource()] = t.getTarget();
       }
   }
@@ -66,7 +66,7 @@ public class TransitionTable
   /**
    * Check if an event is in the alphabet for this automaton.
    */
-  public boolean isInAlphabet(int event)
+  public boolean isInAlphabet(final int event)
   {
     return mTransitions[event] != null;
   }
@@ -84,8 +84,8 @@ public class TransitionTable
    * @param event Event that occurred.
    * @return The target state if the event is enabled, or -1 if disabled.
    */
-  public int getSuccessorState(int state, int event)
-  { 
+  public int getSuccessorState(final int state, final int event)
+  {
     try
       {
 	if (!isInAlphabet(event))
@@ -93,7 +93,7 @@ public class TransitionTable
 	else
 	  return mTransitions[event][state];
       }
-    catch (IndexOutOfBoundsException e)
+    catch (final IndexOutOfBoundsException e)
       {
 	System.err.println(e);
 	System.err.format("automaton %d state %d event %d\n", mAutomatonIndex, state, event);
@@ -111,23 +111,18 @@ public class TransitionTable
    * @param event event to return predecessors for
    * @return a possibly empty array of predecessor states
    */
-  public int[] getPredecessorStates(int target, int event)
+  public int[] getPredecessorStates(final int target, final int event)
   {
-    if (!isInAlphabet(event))
-      {
-	return new int[0];
+    if (!isInAlphabet(event)) {
+      return new int[0];
+    } else {
+      final TIntArrayList list = new TIntArrayList();
+      for (int i = 0; i < mTransitions[event].length; i++) {
+        if (mTransitions[event][i] == target)
+          list.add(i);
       }
-    else
-      {
-	TIntArrayList list = new TIntArrayList();
-	for (int i = 0; i < mTransitions[event].length; i++)
-	  {
-	    if (mTransitions[event][i] == target)
-	      list.add(i);
-	  }
-
-	return list.toNativeArray();
-      }
+      return list.toArray();
+    }
   }
 
   /**
@@ -139,9 +134,10 @@ public class TransitionTable
     return mAutomatonIndex;
   }
 
+  @Override
   public String toString()
   {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
 
     for (int i = 0; i < mEvents; i++)
       {

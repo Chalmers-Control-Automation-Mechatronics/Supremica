@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.HashFunctions;
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +24,7 @@ import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -126,8 +127,8 @@ public abstract class TRTraceExpander
         mPreconditionMarkingID =
           mEventEncoding.getEventCode(preconditionMarking);
         if (mPreconditionMarkingID < 0) {
-          mPreconditionMarkingID =
-            mEventEncoding.addEvent(preconditionMarking, translator, true);
+          mPreconditionMarkingID = mEventEncoding.addEvent
+            (preconditionMarking, translator, EventEncoding.STATUS_UNUSED);
         }
       }
     }
@@ -641,3 +642,4 @@ public abstract class TRTraceExpander
   private TIntHashSet mTargetSet;
 
 }
+

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.lang.Comparable;
 import java.util.ArrayList;
@@ -670,3 +670,4 @@ public class ProjectingNonBlockingChecker
     LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }
+

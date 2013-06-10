@@ -11,7 +11,7 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.Set;
 
-import net.sourceforge.waters.model.analysis.AutomatonBuilder;
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.EventProxy;
 
 

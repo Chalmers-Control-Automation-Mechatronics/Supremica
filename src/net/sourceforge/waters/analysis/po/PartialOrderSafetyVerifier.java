@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.po;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -26,15 +26,15 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.monolithic.BlockedArrayList;
 import net.sourceforge.waters.analysis.monolithic.StateHashSet;
 import net.sourceforge.waters.model.analysis.AbortException;
-import net.sourceforge.waters.model.analysis.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
+import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -706,7 +706,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
       temp.add(i);
     }
-    return temp.toNativeArray();
+    return temp.toArray();
   }
 
   @SuppressWarnings("unused")
@@ -785,7 +785,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
       break;
     }
-    return ample.toNativeArray();
+    return ample.toArray();
   }
 
   private int[] ample3(final PartialOrderStateTuple current){
@@ -847,7 +847,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         unionSet.add(ample.get(j));
       }
       if (unionSet.size() == mEventCodingList.size()){
-        return ample.toNativeArray();
+        return ample.toArray();
       }
       final TIntHashSet eventsSetMinusUnion = new TIntHashSet();
       for (j = 0; j < mEventCodingList.size(); j++){
@@ -875,7 +875,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
           continue ample;
         }
       }
-      return ample.toNativeArray();
+      return ample.toArray();
     }
     return enabled;
   }
@@ -908,7 +908,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       mLocalSet.add(ampleState[automatonIndex]);
 
       while(stack .size() > 0){
-        final int stateIndex = stack.remove(stack.size() - 1);
+        final int stateIndex = stack.removeAt(stack.size() - 1);
         if(transMap[stateIndex][dependent] != -1){
           mLocalSet.clear();
           mEnabledUnionList.clear();
@@ -1186,3 +1186,4 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   @SuppressWarnings("unused")
   private int mNumIndependentPairings;
 }
+

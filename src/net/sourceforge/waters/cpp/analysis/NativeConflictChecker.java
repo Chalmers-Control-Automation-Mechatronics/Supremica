@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;

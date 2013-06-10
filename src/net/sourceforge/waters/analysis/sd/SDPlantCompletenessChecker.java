@@ -10,8 +10,8 @@
 package net.sourceforge.waters.analysis.sd;
 
 import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

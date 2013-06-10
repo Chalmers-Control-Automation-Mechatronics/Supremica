@@ -1,8 +1,8 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 
 /**
@@ -164,3 +164,4 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator{
     }
 
 }
+

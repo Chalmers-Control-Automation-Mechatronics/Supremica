@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;

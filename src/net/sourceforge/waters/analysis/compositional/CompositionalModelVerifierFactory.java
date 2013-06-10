@@ -11,15 +11,15 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.io.PrintStream;
 
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -71,6 +71,7 @@ public class CompositionalModelVerifierFactory
     addArgument(new PreselectingMethodArgument());
     addArgument(new SelectingMethodArgument());
     addArgument(new SubsumptionArgument());
+    addArgument(new SpecialEventsArgument());
     addArgument(new NoDeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
   }
@@ -112,7 +113,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       final AbstractCompositionalModelVerifier composer =
@@ -141,7 +142,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       final AbstractCompositionalModelVerifier composer =
@@ -170,7 +171,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       final AbstractCompositionalModelVerifier composer =
@@ -199,7 +200,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       final AbstractCompositionalModelVerifier composer =
@@ -229,7 +230,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       final AbstractCompositionalModelVerifier composer =
@@ -259,7 +260,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final int limit = getValue();
       final AbstractCompositionalModelVerifier composer =
@@ -288,7 +289,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final ConflictAbstractionProcedureFactory method = getValue();
       if (verifier instanceof CompositionalConflictChecker) {
@@ -320,7 +321,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       if (verifier instanceof CompositionalConflictChecker) {
         final String name = getValue();
@@ -345,7 +346,7 @@ public class CompositionalModelVerifierFactory
     //#######################################################################
     //# Printing
     @Override
-    protected void dump(final PrintStream stream,
+    public void dump(final PrintStream stream,
                         final ModelVerifier verifier)
     {
       if (verifier instanceof CompositionalConflictChecker) {
@@ -379,7 +380,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       if (verifier instanceof CompositionalConflictChecker) {
         final String name = getValue();
@@ -403,7 +404,7 @@ public class CompositionalModelVerifierFactory
     //#######################################################################
     //# Printing
     @Override
-    protected void dump(final PrintStream stream,
+    public void dump(final PrintStream stream,
                         final ModelVerifier verifier)
     {
       if (verifier instanceof CompositionalConflictChecker) {
@@ -435,11 +436,37 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final AbstractCompositionalModelVerifier composer =
         (AbstractCompositionalModelVerifier) verifier;
       composer.setSubumptionEnabled(true);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class SpecialEventsArgument
+  private static class SpecialEventsArgument extends CommandLineArgumentFlag
+  {
+
+    //#######################################################################
+    //# Constructors
+    private SpecialEventsArgument()
+    {
+      super("-se", "Use selfloop-only events");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configure(final ModelVerifier verifier)
+    {
+      final AbstractCompositionalModelVerifier composer =
+        (AbstractCompositionalModelVerifier) verifier;
+      composer.setUsingSpecialEvents(true);
     }
 
   }
@@ -461,7 +488,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final AbstractCompositionalModelVerifier composer =
         (AbstractCompositionalModelVerifier) verifier;
@@ -487,7 +514,7 @@ public class CompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    protected void configure(final ModelVerifier verifier)
+    public void configure(final ModelVerifier verifier)
     {
       final ProductDESProxyFactory desFactory = verifier.getFactory();
       final ModelVerifierFactory secondaryFactory = getSecondaryFactory();

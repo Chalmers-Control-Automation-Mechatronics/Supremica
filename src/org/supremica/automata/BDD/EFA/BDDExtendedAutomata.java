@@ -4,9 +4,9 @@ package org.supremica.automata.BDD.EFA;
  *
  * @author Sajed Miremadi, Zhennan Fei
  */
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -116,7 +116,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     BDD uncontrollableEventsBDD = null;
     BDD forcibleEventsBDD = null;
     BDD plantAlphabetBDD = null;
-    long nbrOfReachableStates = -1;
+    private long nbrOfReachableStates = -1;
     long nbrOfCoreachableStates = -1;
     long nbrOfNonblockingStates = -1;
     long nbrOfBlockingStates = -1;
@@ -131,8 +131,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     BDD markedValuesBDD = null;
     BDD markedStatesBDD = null;
     BDD initClocksBDD = null;
-    BDD locationInvariantsBDD = null;
-    BDD[][] forwardTransWhereVisUpdated;
+    BDD sourceLocationInvariantsBDD = null;
+    BDD destLocationInvariantsBDD = null;
+    BDD plantSourceLocationInvariantsBDD = null;        
+    BDD specSourceLocationInvariantsBDD = null;  
+    BDD[][] forwardTransWhereVisUpdated;  
     BDD[] allForwardTransWhereVisUpdated;
     BDD[] allBackwardTransWhereVisUpdated;
     BDD[][] forwardTransWhereVHasAppearedInGuard;
@@ -199,7 +202,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         forbiddenValuesBDD = manager.getZeroBDD();
         forbiddenStatesBDD = manager.getZeroBDD();
         plantifiedBlockedLocationsBDD = manager.getZeroBDD();
-        locationInvariantsBDD = manager.getOneBDD();
+        sourceLocationInvariantsBDD = manager.getOneBDD();
+        destLocationInvariantsBDD = manager.getOneBDD();
+        plantSourceLocationInvariantsBDD = manager.getOneBDD();
+        specSourceLocationInvariantsBDD = manager.getOneBDD();
 
         uncontrollableStatesBDD = manager.getZeroBDD();
 
@@ -338,7 +344,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         for (final Object obj : variableOrdering) {
             if (obj instanceof List<?> && !((List<?>) obj).isEmpty()) {
                 eventDomain = manager.createDomain(((List<EventDeclProxy>) obj).size());
-                eventDomain.setName("Events");
+//                eventDomain.setName("Events");
                 numberOfUsedBDDVariables += eventDomain.varNum();
 
                 for (final EventDeclProxy event : ((List<EventDeclProxy>) obj)) {
@@ -433,11 +439,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                 tempClock1ToDestClockPairing.set((bddDomainTemp.vars())[bddDomainTemp.varNum() - 1 - i], (bddDomainDest.vars())[bddDomainDest.varNum() - 1 - i]);
             }
         }
-
+/*
         for (final EventDeclProxy event : unionAlphabet) {
             System.err.println(event.getName() + " index: " + theIndexMap.getEventIndex(event));
         }
-
+*/
 
         initValuesBDD = manager.getOneBDD();
         initClocksBDD = manager.getOneBDD();
@@ -459,8 +465,16 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             bddExAutomaton.initialize();
 
             add(bddExAutomaton);
-            locationInvariantsBDD = locationInvariantsBDD.and(bddExAutomaton.getLocationInvariants());
+            sourceLocationInvariantsBDD = sourceLocationInvariantsBDD.and(bddExAutomaton.getLocationInvariants());
+            if (automaton.isPlant()) {
+                plantSourceLocationInvariantsBDD = plantSourceLocationInvariantsBDD.and(bddExAutomaton.getLocationInvariants());
+            }
+            else
+            {
+                specSourceLocationInvariantsBDD = specSourceLocationInvariantsBDD.and(bddExAutomaton.getLocationInvariants());
+            }
         }
+        destLocationInvariantsBDD = sourceLocationInvariantsBDD.replace(getSourceToDestLocationPairing()).replace(getSourceToDestVariablePairing());
 
 //        BDD bdd1 = manager.getFactory().buildCube(0, sourceVarDomains[0].vars()).and(manager.getFactory().buildCube(1, sourceVarDomains[1].vars()));
 //        BDD bdd2 = manager.getFactory().buildCube(1, sourceVarDomains[0].vars()).and(manager.getFactory().buildCube(2, sourceVarDomains[1].vars()));
@@ -569,21 +583,37 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     void manuallySetVariableOrderingNames() {
         variableOrderingNames = new ArrayList<String>();
+        //Timed manufacturing cell
         variableOrderingNames.add("Events");
-        variableOrderingNames.add("Machine");
-        variableOrderingNames.add("MachLoc");       
-        variableOrderingNames.add("Scheduler");
-        variableOrderingNames.add("time");                 
-        variableOrderingNames.add("V");                
-        variableOrderingNames.add("V_acc");
-        variableOrderingNames.add("clock_t");        
-        variableOrderingNames.add("i");
-        variableOrderingNames.add("Pump");
-        variableOrderingNames.add("clock_w");                
-        variableOrderingNames.add("PumpLoc");        
-        variableOrderingNames.add("clock_z");        
-        variableOrderingNames.add("clock_y");        
+        variableOrderingNames.add("M1");
+        variableOrderingNames.add("c1");
+        variableOrderingNames.add("Spec2");
+        variableOrderingNames.add("Spec1");
+        variableOrderingNames.add("Spec4");
+        variableOrderingNames.add("Spec3");
+//        variableOrderingNames.add("Spec6");
+//        variableOrderingNames.add("Spec5");
+        variableOrderingNames.add("M2");
+        variableOrderingNames.add("c2");
         variableOrderingNames.add("1");
+        //Oil example
+//        variableOrderingNames.add("Events");
+//        variableOrderingNames.add("Machine");
+//        variableOrderingNames.add("MachLoc");       
+//        variableOrderingNames.add("Scheduler");
+//        variableOrderingNames.add("time");                 
+//        variableOrderingNames.add("V");                
+////        variableOrderingNames.add("V_acc");
+//        variableOrderingNames.add("clock_t");        
+//        variableOrderingNames.add("i");
+//        variableOrderingNames.add("Pump");
+//        variableOrderingNames.add("clock_w");                
+//        variableOrderingNames.add("PumpLoc");        
+//        variableOrderingNames.add("clock_z");        
+//        variableOrderingNames.add("clock_y");        
+//        variableOrderingNames.add("1");
+        
+        //Fisher thompson
 //        variableOrderingNames.add("Events");
 //        variableOrderingNames.add("Clock");
 //        variableOrderingNames.add("time");
@@ -622,9 +652,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         if (orgExAutomata.getClocks().contains(var)) {
             tempClockDomains1[varIndex] = manager.createDomain(orgExAutomata.getLargestClockDomain() * 2);
-            System.err.println("tempClock1 variables: " + tempClockDomains1[varIndex].set().toString());
+//            System.err.println("tempClock1 variables: " + tempClockDomains1[varIndex].set().toString());
             tempClockDomains2[varIndex] = manager.createDomain(orgExAutomata.getLargestClockDomain() * 2);
-            System.err.println("tempClock2 variables: " + tempClockDomains2[varIndex].set().toString());
+//            System.err.println("tempClock2 variables: " + tempClockDomains2[varIndex].set().toString());
         }
 
         final BDDDomain tempDomain = manager.createDomain(domain);
@@ -653,7 +683,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             bddVar2AutVarName.put(sourceVars[i], varName);
         }
 
-//        System.err.println("sourceVar variables: "+sourceVarDomain.set().toString());
         BDDBitVecSourceVarsMap.put(theIndexMap.getVariableIndex(var),
                 manager.createSupremicaBDDBitVector(BDDBitVectoryType,
                 orgExAutomata.getMinValueofVar(varName) < 0,
@@ -739,6 +768,24 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         return newBDD;
     }
+    
+    public BDD sourceToDest(final BDD bdd)
+    {
+        final BDD newBDD = bdd.id();
+        newBDD.replaceWith(sourceToDestLocationPairing);
+        newBDD.replaceWith(sourceToDestVariablePairing);
+        
+        return newBDD;
+    }
+    
+    public BDD destToSource(final BDD bdd)
+    {
+        final BDD newBDD = bdd.id();
+        newBDD.replaceWith(destToSourceLocationPairing);
+        newBDD.replaceWith(destToSourceVariablePairing);
+        
+        return newBDD;
+    }    
 
     public BDD getForwardClocksExtension() {
         return forwardClocksExtensionBDD;
@@ -764,9 +811,21 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
     }
 
-    public BDD getLocationInvariants() {
-        return locationInvariantsBDD;
+    public BDD getSourceLocationInvariants() {
+        return sourceLocationInvariantsBDD;
     }
+    
+    public BDD getDestLocationInvariants() {
+        return destLocationInvariantsBDD;
+    }   
+    
+    public BDD getPlantSourceLocationInvariants() {
+        return plantSourceLocationInvariantsBDD;
+    }    
+    
+    public BDD getSpecSourceLocationInvariants() {
+        return specSourceLocationInvariantsBDD;
+    }    
 
     public String getLocVarSuffix() {
         return locaVarSuffix;
@@ -900,9 +959,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     }
 
     public double numberOfReachableStates() {
-        if (nbrOfReachableStates < 0) {
+        if (reachableStatesBDD == null) {
             computeReachableStates();
         }
+        if(nbrOfReachableStates == -1)
+            nbrOfReachableStates = nbrOfStatesIDD(generateIDD(reachableStatesBDD, reachableStatesBDD)).longValue();
+        
         return nbrOfReachableStates;
     }
 
@@ -953,7 +1015,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     }
 
     public BDD getInitialState() {
-        final BDD initLocationInvariants = locationInvariantsBDD.and(initialLocationsBDD);
+        final BDD initLocationInvariants = sourceLocationInvariantsBDD.and(initialLocationsBDD);
         return initLocationInvariants.and(initValuesBDD).and(initClocksBDD);
     }
         
@@ -963,9 +1025,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         {
             markedStatesBDD = markedLocationsBDD.and(getMarkedValuations());
 
-            if (options.getOptimization()) {
-                markedStatesBDD = markedStatesBDD.and(getOptimalTimeBDD());
-            }
+//            if (options.getOptimization()) {
+//                markedStatesBDD = markedStatesBDD.and(getOptimalTimeBDD());
+//            }
 
             if (optVarName != null && !optVarName.isEmpty()) {
                 markedStatesBDD = markedStatesBDD.and(getMinValueOfBDD());
@@ -1056,9 +1118,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return result;
     }
 
-    public void computeOptimalTimeBDD() {
+    public void computeOptimalTimeBDD(BDD safeStates) {
         if (optimalTimeBDD == null) {
-            final BDD bdd = markedStatesBDD.and(getReachableStates());
+            final BDD bdd = getMarkedStates().and(safeStates);
             final TIntArrayList valuations = BDD2valuations(bdd, orgExAutomata.getGlobalClockName());
             if (valuations.isEmpty()) {
                 logger.error("Your guess for the time domain is too small to compute the minimum time. Please try a larger time domain.");
@@ -1072,8 +1134,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
     }
     
-    public BDD getOptimalTimeBDD() {
-        computeOptimalTimeBDD();
+    public BDD getOptimalTimeBDD(BDD safeStates) {
+        computeOptimalTimeBDD(safeStates);
         return optimalTimeBDD;
     }
     
@@ -1095,7 +1157,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return minValueOfVarBDD;
     }    
 
-    private void computeReachableStates() {
+    public void computeReachableStates() {
         if (reachableStatesBDD == null) {
             System.err.println("Computing reachable states...");
             if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
@@ -1108,25 +1170,21 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                 reachableStatesBDD = manager.restrictedForward(getInitialState(), forbiddenStatesBDD);
             }
 
-            //System.err.println("Reachable states computed!" + ": " + reachableStatesBDD.satCount(sourceStateVarSet));
+//            System.out.println("Reachable states computed!" + ": " + reachableStatesBDD.satCount(sourceStateVarSet));
 
-            //nbrOfReachableStates = nbrOfStatesBDD(reachableStatesBDD);
+//            nbrOfReachableStates = (long)reachableStatesBDD.satCount(getSourceStatesVarSet());
             
 //            reachableStatesBDD.printDot();
 //            System.err.println("sat number of reachable states: "+reachableStatesBDD.satCount(sourceStateVarSet));
             
 //            reachableStatesBDD.printDot();
             
-            final IDD idd = generateIDD(reachableStatesBDD, reachableStatesBDD);
-            nbrOfReachableStates = nbrOfStatesIDD(idd).longValue();
-            
             if (!options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD)) {
                 ((BDDMonolithicEdges) getBDDEdges()).makeTheEdgesReachable();
-            }
-            
-            System.err.println(nbrOfReachableStates + " reachable states found.");
+            }            
 
-//            nbrOfReachableStates = -1;
+
+            System.err.println(numberOfReachableStates() + " reachable states found.");           
 
 
 //            logger.info("Number of reachable states in the closed-loop system: "+nbrOfReachableStates);
@@ -1142,7 +1200,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                 coreachableStatesBDD = manager.restrictedBackward(getMarkedStates(), forbiddenStatesBDD);
             }
 
-//            if(options.getOptimization())
+            System.out.println("CoReachable states computed!" + ": " + coreachableStatesBDD.satCount(sourceStateVarSet));
+            //            if(options.getOptimization())
 //            {
 //                coreachableStatesBDD = coreachableStatesBDD.exist(
 //                        getSourceVariableDomain(theIndexMap.getVariableIndexByName(orgExAutomata.getGlobalClockName())).set());
@@ -1162,7 +1221,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
 
         return reachableStatesBDD;
-    }
+    }   
 
     public BDD getCoreachableStates() {
         if (coreachableStatesBDD == null) {
@@ -1173,21 +1232,22 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     }
 
     public BDD getNonblockingControllableStates(final boolean reachable) {
-
-        if(nonblockingControllableStatesBDD == null)
-        {
-            if(synType.equals(SynthesisAlgorithm.MONOLITHICBDD))
-            {
-                nonblockingControllableStatesBDD = manager.nonblockingControllable(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()),reachable);
-                nonblockingControllableStatesBDD = fitIntoClockDomains(nonblockingControllableStatesBDD);
-            }
-            else if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
-            {
-                nonblockingControllableStatesBDD = manager.disjunctiveNonblockingControllable
-                        (manager.getDisjunctiveInitiallyUncontrollableStates().or(getForbiddenLocations()), reachable);
+        if (nonblockingControllableStatesBDD == null) {
+            if (synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
+                 nonblockingControllableStatesBDD = manager.nonblockingControllable(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()), reachable);                
+                // nonblockingControllableStatesBDD = manager.onTheFlySynthesis(getInitialState(), manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()));
+            } else {
+                nonblockingControllableStatesBDD = manager.disjunctiveNonblockingControllable(manager.getDisjunctiveInitiallyUncontrollableStates().or(getForbiddenLocations()), reachable);
             }
 
             System.err.println("Nonblocking and controllable states computed!");
+            
+
+            if(!orgExAutomata.getClocks().isEmpty())
+                nonblockingControllableStatesBDD = fitIntoClockDomains(nonblockingControllableStatesBDD);
+            
+ //           System.out.println("nonblockign and controlloable states computed!" + ": " + nonblockingControllableStatesBDD.satCount(sourceStateVarSet));
+            
 
 //            if(options.getOptimization())
 //            {
@@ -1197,12 +1257,14 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
             //nbrOfNonblockingControllableStates = nbrOfStatesBDD(nonblockingControllableStatesBDD);
 
+//            System.out.println("ggggggg: "+nonblockingControllableStatesBDD.satCount(getSourceStatesVarSet()));
             final IDD idd = generateIDD(nonblockingControllableStatesBDD, nonblockingControllableStatesBDD);
             nbrOfNonblockingControllableStates = nbrOfStatesIDD(idd).longValue();
         }
 
         return nonblockingControllableStatesBDD;
     }
+    
 
     public BDD getControllableStates(final boolean reachable) {
         if (controllableStatesBDD == null) {
@@ -1305,9 +1367,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return output;
     }
 
-    public long getOptimalTime() {
+    public long getOptimalTime(BDD safeStates) {
         if (optimalTime == -1) {
-            computeOptimalTimeBDD();
+            computeOptimalTimeBDD(safeStates);
         }
 
         return optimalTime;
@@ -1856,3 +1918,4 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
        return markedValuesBDD.equals(manager.getOneBDD());
     }
 }
+

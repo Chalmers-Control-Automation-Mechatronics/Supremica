@@ -1,6 +1,6 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-import gnu.trove.THashMap;
+import gnu.trove.map.hash.THashMap;
 import java.util.ArrayList;
 import java.util.List;
 

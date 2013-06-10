@@ -21,7 +21,9 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
@@ -37,16 +39,51 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
+
+/**
+ * <P>A constraint propagator used to simplify expressions found in
+ * guard/action blocks.</P>
+ *
+ * <P>The constraint propagator is initialised with a list of formulas
+ * understood as a conjunction of constraints, and a context providing
+ * values bound to symbols and ranges of variables. It attempts to simplify
+ * these constraints to produce a simpler list of expressions.</P>
+ *
+ * <P>The constraint propagator is not complete. It can handle equality
+ * substitutions, some linear arithmetic, and some Boolean normalisation.
+ * More complex formulas, for example involving disjunctions or non-linear
+ * arithmetic, are not simplified.</P>
+ *
+ * <P>The basic usage pattern of the constraint propagator is as follows.</P>
+ *
+ * <PRE>  {@link ModuleProxyFactory} factory = {@link net.sourceforge.waters.plain.module.ModuleElementFactory#getInstance() ModuleElementFactory.getInstance()};
+ *  {@link CompilerOperatorTable} optable = {@link CompilerOperatorTable#getInstance()};
+ *  ConstraintPropagator propagator =
+ *    new {@link #ConstraintPropagator(ModuleProxyFactory, CompilerOperatorTable, VariableContext) ConstraintPropagator}(factory, optable, context);
+ *  propagator.{@link #addConstraints(ConstraintList) addConstraints}(constraints);  // load constraints
+ *  propagator.{@link #propagate()};  // simplify
+ *  {@link ConstraintList} result = propagator.{@link #getAllConstraints()};  // get result</PRE>
+ *
+ * @author Robi Malik
+ */
 
 public class ConstraintPropagator
 {
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new constraint propagator.
+   * @param factory  Factory used to create expressions.
+   * @param optable  Operator table to provide operators.
+   * @param root     Context providing values of bound symbols and
+   *                 ranges of EFA variables.
+   */
   public ConstraintPropagator
     (final ModuleProxyFactory factory,
      final CompilerOperatorTable optable,
@@ -60,6 +97,7 @@ public class ConstraintPropagator
       new RelationNormalizationComparator(optable, mContext);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(factory, optable, false);
+    mPrimedVariableCollector = new PrimedVariableCollector(optable, root);
     mNormalizer = RelationNormalizationRule.createNormalRule(factory, optable);
     mNegator = RelationNormalizationRule.createNegatingRule(factory, optable);
     mNormalizationRules = new SimplificationRule[] {
@@ -89,9 +127,19 @@ public class ConstraintPropagator
     mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>();
     mNormalizedConstraints =
       new TreeSet<SimpleExpressionProxy>(mListComparator);
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mPrimedVariables = new ProxyAccessorHashSet<UnaryExpressionProxy>(eq);
     mIsUnsatisfiable = false;
+    mNumberOfInvocations = 0;
   }
 
+  /**
+   * Duplicates a constraint propagator.
+   * This constructor creates a new constraint propagator, which is
+   * initialised to exactly the same state as the given constraint
+   * propagator. It has the same context and starts with the same
+   * bindings and formulas.
+   */
   public ConstraintPropagator(final ConstraintPropagator propagator)
   {
     mFactory = propagator.mFactory;
@@ -100,6 +148,7 @@ public class ConstraintPropagator
     mListComparator = propagator.mListComparator;
     mEquationComparator = propagator.mEquationComparator;
     mSimpleExpressionCompiler = propagator.mSimpleExpressionCompiler;
+    mPrimedVariableCollector = propagator.mPrimedVariableCollector;
     mNormalizer = propagator.mNormalizer;
     mNegator = propagator.mNegator;
     mNormalizationRules = propagator.mNormalizationRules;
@@ -109,7 +158,11 @@ public class ConstraintPropagator
     mNormalizedConstraints =
       new TreeSet<SimpleExpressionProxy>(mListComparator);
     mNormalizedConstraints.addAll(propagator.mNormalizedConstraints);
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mPrimedVariables = new ProxyAccessorHashSet<UnaryExpressionProxy>
+      (eq, propagator.mPrimedVariables);
     mIsUnsatisfiable = propagator.mIsUnsatisfiable;
+    mNumberOfInvocations = 0;
   }
 
 
@@ -138,25 +191,54 @@ public class ConstraintPropagator
 
   //#########################################################################
   //# Loading
+  /**
+   * Initialises this constraint propagator.
+   * This method clears any constraints and bindings,
+   * and replaces them by the contents of the given list.
+   * @param clist  New list of constraints to replace previous state.
+   */
   public void init(final ConstraintList clist)
   {
     reset();
     addConstraints(clist);
   }
 
+  /**
+   * Resets this constraint propagator.
+   * This method clears all constraints and bindings.
+   */
   public void reset()
   {
     mContext.reset();
     mUnprocessedConstraints.clear();
     mNormalizedConstraints.clear();
+    mPrimedVariables.clear();
     mIsUnsatisfiable = false;
   }
 
+  /**
+   * <P>Adds the given constraints to this constraint propagator.</P>
+   * <P>This method does not clear any constraints or bindings already
+   * present. It merely adds the new constraints to its list unprocessed
+   * constraints, further restricting the present state.</P>
+   * <P>The additional constraints are not automatically simplified.
+   * To simplify, {@link #propagate()} should be called.</P>
+   * @param clist  List of constraints to be added.
+   */
   public void addConstraints(final ConstraintList clist)
   {
     addConstraints(clist.getConstraints());
   }
 
+  /**
+   * <P>Adds the given constraints to this constraint propagator.</P>
+   * <P>This method does not clear any constraints or bindings already
+   * present. It merely adds the new constraints to its list unprocessed
+   * constraints, further restricting the present state.</P>
+   * <P>The additional constraints are not automatically simplified.
+   * To simplify, {@link #propagate()} should be called.</P>
+   * @param constraints  List of constraints to be added.
+   */
   public void addConstraints
     (final Collection<SimpleExpressionProxy> constraints)
   {
@@ -165,14 +247,38 @@ public class ConstraintPropagator
     }
   }
 
+  /**
+   * <P>Adds the given constraint to this constraint propagator.</P>
+   * <P>This method does not clear any constraints or bindings already
+   * present. It merely adds the new constraint to its list unprocessed
+   * constraints, further restricting the present state.</P>
+   * <P>The additional constraint is not automatically simplified.
+   * To simplify, {@link #propagate()} should be called.</P>
+   * @param constraint  Constraint to be added.
+   */
   public void addConstraint(final SimpleExpressionProxy constraint)
   {
     assert constraint != null;
     if (!mIsUnsatisfiable) {
       mUnprocessedConstraints.add(constraint);
+      mPrimedVariableCollector.collectPrimedVariables(constraint,
+                                                      mPrimedVariables);
     }
   }
 
+  /**
+   * <P>Adds the negation of the given constraint list to this constraint
+   * propagator.</P>
+   * <P>This method does not clear any constraints or bindings
+   * already present. It merely adds the new constraint to its list
+   * unprocessed constraints, further restricting the present state.</P>
+   * <P>The additional constraints are not automatically simplified.
+   * To simplify, {@link #propagate()} should be called.</P>
+   * @param clist  List of constraints to be negated and added.
+   *               If the constraint list contains multiple constraints
+   *               in conjunction, this results in a disjunctive constraint
+   *               added to this constraint propagator.
+   */
   public void addNegation(final ConstraintList clist)
     throws EvalException
   {
@@ -193,12 +299,47 @@ public class ConstraintPropagator
     }
   }
 
+  /**
+   * Removes the given variable from the set of primed variables to be
+   * returned. This will prevent expressions x'==x' to appear in the
+   * constraint propagator output.
+   * @param  varname  The name of the variable to be removed,
+   *                  with or without prime.
+   * @return <CODE>true<CODE> if a variable was found and removed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removePrimedVariable(final SimpleExpressionProxy varname)
+  {
+    if (varname instanceof UnaryExpressionProxy) {
+      final UnaryExpressionProxy unary = (UnaryExpressionProxy) varname;
+      return mPrimedVariables.removeProxy(unary);
+    } else if (varname instanceof IdentifierProxy) {
+      final UnaryOperator prime = mOperatorTable.getNextOperator();
+      final UnaryExpressionProxy unary =
+        mFactory.createUnaryExpressionProxy(prime, varname);
+      return mPrimedVariables.removeProxy(unary);
+    } else {
+      return false;
+    }
+  }
+
 
   //#########################################################################
   //# Invocation
+  /**
+   * Simplifies the current set of constraints.
+   * This method attempts to simplify the given set of constraints under
+   * the current bindings as much as possible. It applies all available
+   * simplifications rules until no further simplification is possible.
+   * It changes the state of the constraint propagator to reflect any
+   * changes, and the results can be retrieved using the methods
+   * {@link #isUnsatisfiable()}, {@link #getAllConstraints()}, and
+   * {@link #getContext()}.
+   */
   public void propagate()
     throws EvalException
   {
+    mNumberOfInvocations++;
     outer:
     while (!mIsUnsatisfiable) {
       if (!mUnprocessedConstraints.isEmpty()) {
@@ -252,17 +393,50 @@ public class ConstraintPropagator
 
   //#########################################################################
   //# Result Retrieval
+  /**
+   * Returns whether the current set of constraints has been found to be
+   * false.
+   * @return <CODE>true</CODE> if it has been found that the given
+   *         constraints cannot be simultaneously true in the current
+   *         context. Otherwise <CODE>false</CODE> is returned, indicating
+   *         the the constraints may be simultaneously true, or it is not
+   *         known whether they are satisfiable.
+   */
   public boolean isUnsatisfiable()
   {
     return mIsUnsatisfiable;
   }
 
+  /**
+   * <P>Returns a constraint list representing the current state of this
+   * constraint propagator. The returned list of expressions describes
+   * all constraints given as formulas as well as any inferred range
+   * constraints, as concisely as possible.</P>
+   * <P>This method calls {@link #getAllConstraints(boolean)} with the
+   * <CODE>pretty</CODE> argument set to&nbsp;<CODE>true</CODE>.
+   * @return List of constraints, or <CODE>null</CODE> if the current
+   *         constraints have been found to be unsatisfiable.
+   */
   public ConstraintList getAllConstraints()
     throws EvalException
   {
     return getAllConstraints(true);
   }
 
+  /**
+   * Returns a constraint list representing the current state of this
+   * constraint propagator. The returned list of expressions describes
+   * all constraints given as formulas as well as any inferred range
+   * constraints, as concisely as possible.
+   * @param  pretty   Whether enumeration constraints should be shortened
+   *                  using inequalities. For example, if a
+   *                  variable&nbsp;<CODE>x</CODE> can take all values from
+   *                  a ten-valued enumeration except <CODE>b</CODE>
+   *                  or&nbsp;<CODE>c</CODE>, this may be represented as
+   *                  <CODE>x&nbsp;!=&nbsp;b&nbsp;& x&nbsp;!=&nbsp;c</CODE>.
+   * @return List of constraints, or <CODE>null</CODE> if the current
+   *         constraints have been found to be unsatisfiable.
+   */
   public ConstraintList getAllConstraints(final boolean pretty)
     throws EvalException
   {
@@ -272,14 +446,31 @@ public class ConstraintPropagator
       final List<SimpleExpressionProxy> list =
         new ArrayList<SimpleExpressionProxy>(mNormalizedConstraints);
       mContext.addAllConstraints(list, pretty);
+      addPrimedVariables(list);
       Collections.sort(list, mListComparator);
       return new ConstraintList(list);
     }
   }
 
+  /**
+   * Retrieves the constrained variable context.
+   * This method returns a variable context that results from constraint
+   * propagation. It may contain additional bindings or ranges that are
+   * further constrained than in the original context.
+   */
   public VariableContext getContext()
   {
     return mContext;
+  }
+
+
+  /**
+   * Returns the number of times the {@link #propagate()} method of this
+   * constraint propagator has been called since its creation.
+   */
+  public int getNumberOfInvocations()
+  {
+    return mNumberOfInvocations;
   }
 
 
@@ -403,6 +594,37 @@ public class ConstraintPropagator
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Adds back in primed variables.
+   * This method checks for primed variables that have been removed
+   * by the constraint propagator and adds terms x'==x' to the given list
+   * of constraints for all variables x that were present in the original
+   * input but which have been removed from the list.
+   */
+  private void addPrimedVariables(final List<SimpleExpressionProxy> list)
+  {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ProxyAccessorSet<UnaryExpressionProxy> remainingPrimed =
+      new ProxyAccessorHashSet<UnaryExpressionProxy>(eq, mPrimedVariables.size());
+    mPrimedVariableCollector.collectPrimedVariables(list, remainingPrimed);
+    final ModuleProxyCloner cloner = mFactory.getCloner();
+    final BinaryOperator op = mOperatorTable.getEqualsOperator();
+    for (final UnaryExpressionProxy var : mPrimedVariables) {
+      if (!remainingPrimed.containsProxy(var)) {
+        final UnaryExpressionProxy lhs =
+          (UnaryExpressionProxy) cloner.getClone(var);
+        final UnaryExpressionProxy rhs =
+          (UnaryExpressionProxy) cloner.getClone(var);
+        final BinaryExpressionProxy constraint =
+          mFactory.createBinaryExpressionProxy(op, lhs, rhs);
+        list.add(constraint);
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class ConstraintContext
   private class ConstraintContext implements VariableContext
   {
@@ -412,7 +634,7 @@ public class ConstraintPropagator
     ConstraintContext(final ConstraintContext context)
     {
       mRootContext = context.mRootContext;
-      final int size = mRootContext.getVariableNames().size();
+      final int size = 2 * mRootContext.getNumberOfVariables();
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
       mBindings =
@@ -443,7 +665,7 @@ public class ConstraintPropagator
       mRootContext = root;
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
-      final int size = root.getVariableNames().size();
+      final int size = 2 * root.getNumberOfVariables();
       mBindings =
         new ProxyAccessorHashMap<SimpleExpressionProxy,AbstractBinding>
           (eq, size);
@@ -451,6 +673,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
+    @Override
     public SimpleExpressionProxy getBoundExpression
       (final SimpleExpressionProxy ident)
     {
@@ -464,11 +687,13 @@ public class ConstraintPropagator
       return mRootContext.getBoundExpression(ident);
     }
 
+    @Override
     public boolean isEnumAtom(final IdentifierProxy ident)
     {
       return mRootContext.isEnumAtom(ident);
     }
 
+    @Override
     public ModuleBindingContext getModuleBindingContext()
     {
       return mRootContext.getModuleBindingContext();
@@ -476,6 +701,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.VariableContext
+    @Override
     public CompiledRange getVariableRange(final SimpleExpressionProxy varname)
     {
       final AbstractBinding binding = mBindings.getByProxy(varname);
@@ -486,9 +712,10 @@ public class ConstraintPropagator
       }
     }
 
-    public Collection<SimpleExpressionProxy> getVariableNames()
+    @Override
+    public int getNumberOfVariables()
     {
-      return mRootContext.getVariableNames();
+      return mRootContext.getNumberOfVariables();
     }
 
     //#######################################################################
@@ -653,6 +880,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Overrides for Base Class java.lang.Object
+    @Override
     public String toString()
     {
       final StringBuffer buffer = new StringBuffer();
@@ -884,6 +1112,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Constraint Retrieval
+    @Override
     void addEquationConstraint(final Collection<SimpleExpressionProxy> result)
     {
       if (isAtomic()) {
@@ -911,6 +1140,7 @@ public class ConstraintPropagator
       super.addEquationConstraint(result);
     }
 
+    @Override
     void addRangeConstraints(final Collection<SimpleExpressionProxy> result,
                              final CompiledRange orig,
                              final boolean pretty)
@@ -974,6 +1204,7 @@ public class ConstraintPropagator
 
     //#######################################################################
     //# Constraint Retrieval
+    @Override
     void addRangeConstraints(final Collection<SimpleExpressionProxy> result,
                              final CompiledRange orig,
                              final boolean pretty)
@@ -1020,6 +1251,7 @@ public class ConstraintPropagator
   private final Comparator<SimpleExpressionProxy> mListComparator;
   private final Comparator<SimpleExpressionProxy> mEquationComparator;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+  private final PrimedVariableCollector mPrimedVariableCollector;
   private final RelationNormalizationRule mNormalizer;
   private final RelationNormalizationRule mNegator;
   private final SimplificationRule[] mNormalizationRules;
@@ -1027,6 +1259,8 @@ public class ConstraintPropagator
 
   private final List<SimpleExpressionProxy> mUnprocessedConstraints;
   private final Collection<SimpleExpressionProxy> mNormalizedConstraints;
+  private final ProxyAccessorSet<UnaryExpressionProxy> mPrimedVariables;
   private boolean mIsUnsatisfiable;
+  private int mNumberOfInvocations;
 
 }

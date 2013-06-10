@@ -12,12 +12,14 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -34,15 +36,14 @@ public class WatersUndoAction
     putValue(Action.SHORT_DESCRIPTION, "Undo the last command");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_U);
     putValue(Action.ACCELERATOR_KEY,
-	     KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON,
-	     new ImageIcon(IDE.class.getResource
-			   ("/toolbarButtonGraphics/general/Undo16.gif")));
+             KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_UNDO);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final UndoInterface umanager = getActiveUndoInterface();
@@ -54,6 +55,7 @@ public class WatersUndoAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {

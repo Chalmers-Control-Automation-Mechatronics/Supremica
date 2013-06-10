@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import junit.framework.TestCase;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
@@ -26,6 +27,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
@@ -339,31 +341,41 @@ public class ConstraintPropagatorTest extends TestCase
   }
 
   public void testPropagate_balllift_3()
-  throws EvalException, ParseException
-{
-  addBooleanVariable("qOut");
-  addBooleanVariable("qOut'");
-  addBooleanVariable("qUp");
-  addBooleanVariable("qUp'");
-  addBooleanVariable("c_iBallDn");
-  final String[] constraints = {"!c_iBallDn",
-                                "qUp' == ((qUp|c_iBallDn) & qOut')"};
-  final String[] expected = {"!c_iBallDn", "qUp' == (qUp & qOut')"};
-  testPropagate(constraints, expected);
-}
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("qOut");
+    addBooleanVariable("qOut'");
+    addBooleanVariable("qUp");
+    addBooleanVariable("qUp'");
+    addBooleanVariable("c_iBallDn");
+    final String[] constraints = {"!c_iBallDn",
+    "qUp' == ((qUp|c_iBallDn) & qOut')"};
+    final String[] expected = {"!c_iBallDn", "qUp' == (qUp & qOut')"};
+    testPropagate(constraints, expected);
+  }
 
   public void testPropagate_outprime()
-  throws EvalException, ParseException
-{
-  final CompiledIntRange range = createIntRange(0, 2);
-  addVariable("level", range);
-  addVariable("level'", range);
-  addBooleanVariable("out");
-  addBooleanVariable("out'");
-  final String[] constraints = {"out'==1"};
-  final String[] expected = {"out'"};
-  testPropagate(constraints, expected);
-}
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 2);
+    addVariable("level", range);
+    addVariable("level'", range);
+    addBooleanVariable("out");
+    addBooleanVariable("out'");
+    final String[] constraints = {"out'==1"};
+    final String[] expected = {"out'"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_keptprime()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 2);
+    addVariable("x'", range);
+    final String[] constraints = {"x'==x'"};
+    final String[] expected = constraints;
+    testPropagate(constraints, expected);
+  }
 
   public void testPropagate_balllift_4()
     throws EvalException, ParseException
@@ -623,10 +635,10 @@ public class ConstraintPropagatorTest extends TestCase
   private CompiledEnumRange createEnumRange(final String[] names)
     throws ParseException
   {
-    final List<IdentifierProxy> list =
-      new ArrayList<IdentifierProxy>(names.length);
+    final List<SimpleIdentifierProxy> list =
+      new ArrayList<SimpleIdentifierProxy>(names.length);
     for (final String name : names) {
-      final IdentifierProxy ident = mParser.parseIdentifier(name);
+      final SimpleIdentifierProxy ident = mParser.parseSimpleIdentifier(name);
       mContext.addAtom(ident);
       list.add(ident);
     }
@@ -705,6 +717,7 @@ public class ConstraintPropagatorTest extends TestCase
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
@@ -714,6 +727,7 @@ public class ConstraintPropagatorTest extends TestCase
     mPropagator = new ConstraintPropagator(factory, optable, mContext);
   }
 
+  @Override
   protected void tearDown()
   {
     mContext = null;

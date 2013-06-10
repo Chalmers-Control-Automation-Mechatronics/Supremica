@@ -9,13 +9,14 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.list.array.TByteArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -132,7 +133,7 @@ public class EventEncoding
    * Creates an empty encoding.
    * This method creates an event encoding without any events or
    * propositions. Events can be added using {@link
-   * #addEvent(EventProxy,KindTranslator,boolean) addEvent()} or {@link
+   * #addEvent(EventProxy,KindTranslator,byte) addEvent()} or {@link
    * #addSilentEvent(EventProxy) addSilentEvent()}.
    */
   public EventEncoding()
@@ -222,21 +223,29 @@ public class EventEncoding
     final int numEvents = events.size();
     mProperEvents = new ArrayList<EventProxy>(numEvents);
     mPropositions = new ArrayList<EventProxy>(numEvents);
+    mProperEventStatus = new TByteArrayList(numEvents);
+    mPropositionStatus = new TByteArrayList(numEvents);
     mEventCodeMap = new TObjectIntHashMap<EventProxy>(numEvents);
     mProperEvents.add(tau);
-    if (tau != null) {
+    if (tau == null) {
+      mProperEventStatus.add((byte) (STATUS_LOCAL | STATUS_UNUSED));
+    } else {
+      mProperEventStatus.add(STATUS_LOCAL);
       mEventCodeMap.put(tau, TAU);
     }
     for (final EventProxy event : events) {
       if (event != tau) {
+        byte status = 0;
         switch (translator.getEventKind(event)) {
         case CONTROLLABLE:
+          status = STATUS_CONTROLLABLE;
         case UNCONTROLLABLE:
           if ((filterMode & FILTER_PROPER_EVENTS) == 0 ||
               filter.contains(event)) {
             final int e = mProperEvents.size();
             mEventCodeMap.put(event, e);
             mProperEvents.add(event);
+            mProperEventStatus.add(status);
           }
           break;
         case PROPOSITION:
@@ -245,6 +254,7 @@ public class EventEncoding
             final int p = mPropositions.size();
             mEventCodeMap.put(event, p);
             mPropositions.add(event);
+            mPropositionStatus.add(STATUS_NONE);
           }
           break;
         default:
@@ -252,12 +262,12 @@ public class EventEncoding
         }
       }
     }
-    mExtraSelfLoops = null;
   }
 
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     final StringBuffer buffer = new StringBuffer("{");
@@ -270,12 +280,11 @@ public class EventEncoding
         } else {
           tau = event;
         }
-        buffer.append(ecode++);
+        buffer.append(ecode);
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
-        if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
-          buffer.append('+');
-        }
+        final byte status = mProperEventStatus.get(ecode++);
+        appendStatusInfo(buffer, status);
       }
     }
     final TObjectIntIterator<EventProxy> iter = mEventCodeMap.iterator();
@@ -293,9 +302,8 @@ public class EventEncoding
         buffer.append(code);
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
-        if (mExtraSelfLoops != null && mExtraSelfLoops.contains(event)) {
-          buffer.append('+');
-        }
+        final byte status = mProperEventStatus.get(code);
+        appendStatusInfo(buffer, status);
       }
     }
     if (mPropositions != null) {
@@ -306,16 +314,32 @@ public class EventEncoding
         } else if (ecode > 0) {
           buffer.append("; ");
         }
-        buffer.append(pcode++);
+        buffer.append(pcode);
         buffer.append('=');
         buffer.append(prop == null ? "(null)" : prop.getName());
-        if (mExtraSelfLoops != null && mExtraSelfLoops.contains(prop)) {
-          buffer.append('+');
-        }
+        final byte status = mPropositionStatus.get(pcode++);
+        appendStatusInfo(buffer, status);
       }
     }
     buffer.append('}');
     return buffer.toString();
+  }
+
+  private void appendStatusInfo(final StringBuffer buffer, final byte status)
+  {
+    if (status != STATUS_NONE) {
+      char sep = '<';
+      byte bit = 1;
+      for (final String name : STATUS_NAMES) {
+        if ((status & bit) != 0) {
+          buffer.append(sep);
+          sep = ',';
+          buffer.append(name);
+        }
+        bit <<= 1;
+      }
+      buffer.append('>');
+    }
   }
 
 
@@ -350,7 +374,7 @@ public class EventEncoding
   }
 
   /**
-   * Returns the event code for the given event.
+   * Returns the event code for the given event or proposition.
    * @return The integer encoding the given event, or <CODE>-1</CODE>
    *         if the event is not in the encoding.
    */
@@ -426,58 +450,104 @@ public class EventEncoding
    *                     or a proposition.
    * @param  translator  Kind translator to distinguish propositions from
    *                     proper events.
-   * @param  selfloop    A flag, indicating whether the additional event should
-   *                     be selflooped (or marked, for propositions) in all
-   *                     states of an automaton using this encoding. This
-   *                     information is stored on the event encoding and needs
-   *                     to be read by any procedures creating transition
-   *                     relations using the encoding.
+   * @param  status      Collection of status flags providing additional
+   *                     information about the event. Should be a combination
+   *                     of the bits {@link #STATUS_CONTROLLABLE},
+   *                     {@link #STATUS_LOCAL},
+   *                     {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                     {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                     {@link #STATUS_UNUSED}.
    * @return The event (or proposition) code that was assigned to the event.
-   * @see #getExtraSelfloops()
    */
   public int addEvent(final EventProxy event,
                       final KindTranslator translator,
-                      final boolean selfloop)
+                      byte status)
   {
     final int code;
     switch (translator.getEventKind(event)) {
     case CONTROLLABLE:
+      status |= STATUS_CONTROLLABLE;
     case UNCONTROLLABLE:
       code = mProperEvents.size();
       mEventCodeMap.put(event, code);
       mProperEvents.add(event);
+      mProperEventStatus.add(status);
       break;
     case PROPOSITION:
       code = mPropositions.size();
       mEventCodeMap.put(event, code);
       mPropositions.add(event);
+      mPropositionStatus.add(status);
       break;
     default:
       throw new IllegalArgumentException
         ("Unknown event kind " + event.getKind() + "!");
     }
-    if (selfloop) {
-      if (mExtraSelfLoops == null) {
-        mExtraSelfLoops = new ArrayList<EventProxy>();
-      }
-      mExtraSelfLoops.add(event);
-    }
     return code;
   }
 
   /**
-   * Gets the list of all events that are considered selflooped in all states
-   * by this encoding. Procedures building up transition relations query this
-   * method to add additional selfloops.
-   * @return The list of events and propositions passed into the
-   *         {@link #addEvent(EventProxy,KindTranslator,boolean) addEvent()}
-   *         with the selfloop parameter set to true.
-   * @see #addEvent(EventProxy,KindTranslator,boolean) addEvent()
+   * Retrieves the status flags for the given proper event.
+   * @param  event  Code of the proper event to be looked up.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfProperEvents()}-1.
+   * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
+   *         {@link #STATUS_LOCAL}, {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *         {@link #STATUS_UNUSED}.
    */
-  public List<EventProxy> getExtraSelfloops()
+  public byte getProperEventStatus(final int event)
   {
-    return mExtraSelfLoops;
+    return mProperEventStatus.get(event);
   }
+
+  /**
+   * Assigns new status flags to the given proper event.
+   * @param  event  Code of the proper event to be modified.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfProperEvents()}-1.
+   * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
+   *                {@link #STATUS_LOCAL},
+   *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link #STATUS_UNUSED}.
+   */
+  public void setProperEventStatus(final int event, final byte status)
+  {
+    mProperEventStatus.set(event, status);
+  }
+
+  /**
+   * Retrieves the status flags for the given proposition.
+   * @param  prop   Code of the proposition to be looked up.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfPropositions()}-1.
+   * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
+   *         {@link #STATUS_LOCAL}, {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *         {@link #STATUS_UNUSED}.
+   */
+  public byte getPropositionStatus(final int prop)
+  {
+    return mPropositionStatus.get(prop);
+  }
+
+  /**
+   * Assigns new status flags to the given proposition.
+   * @param  prop   Code of the proposition to be modified.
+   *                Must be in the range from 0 to
+   *                {@link #getNumberOfPropositions()}-1.
+   * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
+   *                {@link #STATUS_LOCAL},
+   *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link #STATUS_UNUSED}.
+   */
+  public void setPropositionStatus(final int prop, final byte status)
+  {
+    mPropositionStatus.set(prop, status);
+  }
+
 
   /**
    * <P>Adds a silent event to this event encoding.</P>
@@ -495,8 +565,61 @@ public class EventEncoding
   {
     if (mProperEvents.get(TAU) == null) {
       mProperEvents.set(TAU, event);
+      final byte status = mProperEventStatus.get(TAU);
+      mProperEventStatus.set(TAU, (byte) (status & ~STATUS_UNUSED));
     }
     mEventCodeMap.put(event, TAU);
+  }
+
+
+  //#########################################################################
+  //# Event Status
+  /**
+   * Returns whether the given event status bits identify an event as
+   * a controllable in an event encoding.
+   */
+  public static boolean isControllableEvent(final byte status)
+  {
+    return (status & STATUS_CONTROLLABLE) != 0;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
+   * a local event in an event encoding.
+   */
+  public static boolean isLocalEvent(final byte status)
+  {
+    return (status & STATUS_LOCAL) == STATUS_LOCAL;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
+   * outside only-selfloop in an event encoding.
+   * @see #STATUS_OUTSIDE_ONLY_SELFLOOP
+   */
+  public static boolean isOutsideOnlySelfloopEvent(final byte status)
+  {
+    return (status & STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
+   * outside always enabled in an event encoding.
+   * @see #STATUS_OUTSIDE_ALWAYS_ENABLED
+   */
+  public static boolean isOutsideAlwaysEnabledEvent(final byte status)
+  {
+    return (status & STATUS_OUTSIDE_ALWAYS_ENABLED) != 0;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
+   * used (i.e., not unused) in an event encoding.
+   * @see #STATUS_UNUSED
+   */
+  public static boolean isUsedEvent(final byte status)
+  {
+    return (status & STATUS_UNUSED) == 0;
   }
 
 
@@ -505,7 +628,8 @@ public class EventEncoding
   private final List<EventProxy> mProperEvents;
   private final List<EventProxy> mPropositions;
   private final TObjectIntHashMap<EventProxy> mEventCodeMap;
-  private List<EventProxy> mExtraSelfLoops;
+  private final TByteArrayList mProperEventStatus;
+  private final TByteArrayList mPropositionStatus;
 
 
   //#########################################################################
@@ -548,6 +672,46 @@ public class EventEncoding
   public static final int FILTER_ALL =
     FILTER_PROPER_EVENTS | FILTER_PROPOSITIONS;
 
+  /**
+   * An empty status byte to define an event with none of the available
+   * status bits sets.
+   */
+  public static final byte STATUS_NONE = 0x00;
+  /**
+   * A status flag indicating a controllable event.
+   */
+  public static final byte STATUS_CONTROLLABLE = 0x01;
+  /**
+   * A status flag indicating an event that outside of the current automaton
+   * only appears in selfloop transitions.
+   */
+  public static final byte STATUS_OUTSIDE_ONLY_SELFLOOP = 0x02;
+  /**
+   * A status flag indicating an event that outside of the current automaton
+   * is always enabled. The only automaton ever disabling this event is the
+   * current automaton.
+   */
+  public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x04;
+  /**
+   * Status flags indicating a local event.
+   * This is a combination of the bits {@link #STATUS_OUTSIDE_ALWAYS_ENABLED}
+   * and {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}.
+   * A local event is assumed not to be used in any other automaton
+   * except the current one.
+   */
+  public static final byte STATUS_LOCAL =
+    STATUS_OUTSIDE_ONLY_SELFLOOP | STATUS_OUTSIDE_ALWAYS_ENABLED;
+  /**
+   * A status flag indicating an event not in the alphabet of the current
+   * transition relation. This event is assumed to be implicitly selflooped
+   * in all states.
+   */
+  public static final byte STATUS_UNUSED = 0x08;
+
+  private static final String[] STATUS_NAMES = {
+    "CONTROLLABLE", "OUTSIDE_ONLY_SELFLOOP",
+    "OUTSIDE_ALWAYS_ENABLED", "UNUSED"
+  };
 
   private static final Collection<EventProxy> NO_EVENTS =
     Collections.emptySet();

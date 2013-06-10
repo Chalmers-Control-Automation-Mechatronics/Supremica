@@ -5,24 +5,27 @@
 // and the events as children and the states as children
 package org.supremica.gui.treeview;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.supremica.automata.Automaton;
-import org.supremica.gui.Supremica;
 
 public class AutomatonSubTree
     extends SupremicaTreeNode
 {
     private static final long serialVersionUID = 1L;
 
-    private static ImageIcon plantIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/plant.gif"));
-    private static ImageIcon specificationIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/spec.gif"));
-    private static ImageIcon supervisorIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/supervisor.gif"));
-    
-    public AutomatonSubTree(Automaton automaton, boolean includeAlphabet, boolean includeStates)
+    private static ImageIcon plantIcon = IconLoader.ICON_PLANT;
+    private static ImageIcon specificationIcon = IconLoader.ICON_SPEC;
+    private static ImageIcon supervisorIcon = IconLoader.ICON_SUPERVISOR;
+
+    public AutomatonSubTree(final Automaton automaton, final boolean includeAlphabet, final boolean includeStates)
     {
         //super(automaton.getName());
         super(automaton);
-        
+
         // If we are to show either, but not both, the "Alphabet" and/or "State" nodes are unnecessary
         if (includeAlphabet && includeStates)
         {
@@ -38,12 +41,13 @@ public class AutomatonSubTree
             StateSetSubTree.buildSubTree(automaton.getStateSet(), this);
         }
     }
-    
+
+    @Override
     public Icon getOpenIcon()
     {
         //return null;
-        Automaton aut = (Automaton) userObject;
-        
+        final Automaton aut = (Automaton) userObject;
+
         if (aut.isPlant())
         {
             return plantIcon;
@@ -61,13 +65,15 @@ public class AutomatonSubTree
             return null;
         }
     }
-    
+
+    @Override
     public Icon getClosedIcon()
     {
         // Same icon as for open
         return getOpenIcon();
     }
-    
+
+    @Override
     public String toString()
     {
         return ((Automaton) userObject).getName();

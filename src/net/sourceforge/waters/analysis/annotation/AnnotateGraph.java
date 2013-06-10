@@ -1,8 +1,8 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.Set;
 
@@ -87,7 +87,7 @@ public class AnnotateGraph
         mTransitionRelation.setAnnotation(s, anns);
       }
     }
-    System.out.println("mTau: " + mTau);
+    //System.out.println("mTau: " + mTau);
     mTransitionRelation.removeAllAnnotations(mTau);
     mTransitionRelation.removeEvent(mTau);
     STATESTAUSREMOVEDFROM += tausremoved.size();
@@ -165,3 +165,4 @@ public class AnnotateGraph
     TIME += System.currentTimeMillis();
   }*/
 }
+

@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TObjectByteIterator;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.iterator.TObjectByteIterator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,9 +37,9 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.ProductDESResult;
-import net.sourceforge.waters.model.analysis.SupervisorSynthesizer;
-import net.sourceforge.waters.model.analysis.SupervisorTooBigException;
+import net.sourceforge.waters.model.analysis.des.ProductDESResult;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+import net.sourceforge.waters.model.analysis.des.SupervisorTooBigException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -199,26 +199,31 @@ public class CompositionalSynthesizer
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
+  @Override
   public void setOutputName(final String name)
   {
     mOutputName = name;
   }
 
+  @Override
   public String getOutputName()
   {
     return mOutputName;
   }
 
+  @Override
   public void setConstructsResult(final boolean construct)
   {
     mConstructsResult = construct;
   }
 
+  @Override
   public boolean getConstructsResult()
   {
     return mConstructsResult;
   }
 
+  @Override
   public ProductDESProxy getComputedProxy()
   {
     final ProductDESResult result = getAnalysisResult();
@@ -228,6 +233,7 @@ public class CompositionalSynthesizer
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProductDESBuilder
+  @Override
   public ProductDESProxy getComputedProductDES()
   {
     return getComputedProxy();
@@ -236,6 +242,7 @@ public class CompositionalSynthesizer
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run() throws AnalysisException
   {
     try {
@@ -572,7 +579,8 @@ public class CompositionalSynthesizer
     final TransitionIterator iter =
       original.createSuccessorsReadOnlyIterator();
     for (int event = 0; event < numOfEvents; event++) {
-      if (original.isUsedEvent(event)) {
+      if ((original.getProperEventStatus(event) &
+           EventEncoding.STATUS_UNUSED) == 0) {
         int maxCount = 0;
         for (final int[] clazz : partition) {
           final TIntHashSet successors = new TIntHashSet();
@@ -632,7 +640,8 @@ public class CompositionalSynthesizer
     final TransitionIterator simplifiedIter =
       simplified.createAllTransitionsReadOnlyIterator();
     for (int event = 0; event < numOfEvents; event++) {
-      if (original.isUsedEvent(event)) {
+      if ((original.getProperEventStatus(event) &
+           EventEncoding.STATUS_UNUSED) == 0) {
         final EventProxy eventProxy = eventEnc.getProperEvent(event);
         final List<EventProxy> replacement = renaming.get(eventProxy);
         if (replacement == null) {
@@ -648,7 +657,8 @@ public class CompositionalSynthesizer
               distinguisherTransitions.add(trans);
             }
           }
-          if (simplified.isUsedEvent(event)) {
+          if ((simplified.getProperEventStatus(event) &
+               EventEncoding.STATUS_UNUSED) == 0) {
             simplifiedIter.resetEvent(event);
             while (simplifiedIter.advance()) {
               final int s = simplifiedIter.getCurrentSourceState();
@@ -761,7 +771,7 @@ public class CompositionalSynthesizer
     final Collection<EventProxy> events =
       new ArrayList<EventProxy>(numOfEvents);
     for (int event = 0; event < numOfEvents; event++) {
-      if (rel.isUsedEvent(event)) {
+      if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
         final EventProxy eventProxy = eventEnc.getProperEvent(event);
         if (eventMap.get(eventProxy) != null){
           events.addAll(eventMap.get(eventProxy));
@@ -983,7 +993,9 @@ public class CompositionalSynthesizer
                 rel.addTransition(sourceState, firstCode, target);
               }
             }
-            rel.setUsedEvent(nextCode, false);
+            final byte status = rel.getProperEventStatus(nextCode);
+            rel.setProperEventStatus
+              (nextCode, (byte) (status | EventEncoding.STATUS_UNUSED));
           }
         }
       }
@@ -1132,7 +1144,7 @@ public class CompositionalSynthesizer
     //#######################################################################
     //# Event Status
     @Override
-    protected boolean isTau()
+    protected boolean canBeTau()
     {
       return false;
     }
@@ -1199,3 +1211,4 @@ public class CompositionalSynthesizer
   private Set<EventProxy> mRenamedEvents;
 
 }
+

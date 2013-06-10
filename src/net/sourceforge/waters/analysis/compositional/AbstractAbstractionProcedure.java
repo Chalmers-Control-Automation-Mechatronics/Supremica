@@ -10,8 +10,11 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import java.util.Collection;
+import java.util.Collections;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -69,6 +72,45 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
   EventProxy getUsedPreconditionMarking()
   {
     return mAnalyzer.getUsedPreconditionMarking();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  protected EventEncoding createEventEncoding(final AutomatonProxy aut,
+                                              final EventProxy tau,
+                                              final Candidate candidate)
+  {
+    final Collection<EventProxy> events = aut.getEvents();
+    return createEventEncoding(events, tau, candidate);
+  }
+
+  protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
+                                              final EventProxy tau,
+                                              final Candidate candidate)
+  {
+    final KindTranslator translator = getKindTranslator();
+    Collection<EventProxy> filter = getPropositions();
+    if (filter == null) {
+      filter = Collections.emptyList();
+    }
+    final EventEncoding enc =
+      new EventEncoding(events, translator, tau, filter,
+                        EventEncoding.FILTER_PROPOSITIONS);
+    if (mAnalyzer.isUsingSpecialEvents()) {
+      final int numEvents = enc.getNumberOfProperEvents();
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        final EventProxy event = enc.getProperEvent(e);
+        final AbstractCompositionalModelAnalyzer.EventInfo info =
+          mAnalyzer.getEventInfo(event);
+        if (info.isOnlyNonSelfLoopCandidate(candidate)) {
+          final byte status = enc.getProperEventStatus(e);
+          enc.setProperEventStatus
+            (e, (byte) (status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP));
+        }
+      }
+    }
+    return enc;
   }
 
 

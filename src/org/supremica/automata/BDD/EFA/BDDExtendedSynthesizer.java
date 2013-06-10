@@ -1,6 +1,6 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -75,33 +75,28 @@ public class BDDExtendedSynthesizer {
 
         synthesisTimer = new ActionTimer();
 
-        if(options.getOptimization())
-        {
-            synthesisTimer.start();
-            bddAutomata.computeOptimalTimeBDD();
-        }
-
         if(options.getSynthesisType().equals(SynthesisType.CONTROLLABLE))
         {
-            if(!options.getOptimization()) synthesisTimer.start();
+            synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getControllableStates(options.getReachability());
             nbrOfStates = bddAutomata.nbrOfControllableStates;
             synthesisTimer.stop();
         }
         else if(options.getSynthesisType().equals(SynthesisType.NONBLOCKING))
         {
-            if(!options.getOptimization()) synthesisTimer.start();
+            synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getNonblockingStates();
             nbrOfStates = bddAutomata.nbrOfNonblockingStates;
             synthesisTimer.stop();
         }
         else if(options.getSynthesisType().equals(SynthesisType.NONBLOCKINGCONTROLLABLE))
         {
-            if(!options.getOptimization()) synthesisTimer.start();
+            synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getNonblockingControllableStates(options.getReachability());
             nbrOfStates = bddAutomata.nbrOfNonblockingControllableStates;
             synthesisTimer.stop();
         }
+
         else if(options.getSynthesisType().equals(SynthesisType.UNSAFETY))
         {
             synthesisTimer.start();
@@ -242,8 +237,8 @@ public class BDDExtendedSynthesizer {
 
         final TIntArrayList remainingVars = new TIntArrayList(bddAutomata.getManager().getFactory().getVarOrder());
         remainingVars.remove(0, intArray.size());
-        intArray.add(remainingVars.toNativeArray());
-        return intArray.toNativeArray();
+        intArray.add(remainingVars.toArray());
+        return intArray.toArray();
     }
 
     public void addGuardsToAutomata(final ModuleSubject module)
@@ -330,3 +325,4 @@ public class BDDExtendedSynthesizer {
     }
 
 }
+

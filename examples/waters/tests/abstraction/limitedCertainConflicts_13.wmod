@@ -11,10 +11,10 @@
         </ConstantAlias>
     </ConstantAliasList>
     <EventDeclList>
-        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="tau"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletCL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletEL"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvGCL"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="CONTROLLABLE" Name="NoPalletCL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="NoPalletEL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="PalletArvGCL"/>
         <EventDecl Kind="CONTROLLABLE" Name="QPalletAtCL"/>
         <EventDecl Kind="CONTROLLABLE" Name="QPalletAtEL"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
@@ -28,1187 +28,1187 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="111" X="128"/>
+                            <Point X="128" Y="111"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:2">
                         <PointGeometry>
-                            <Point Y="131" X="99"/>
+                            <Point X="99" Y="131"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:3">
                         <PointGeometry>
-                            <Point Y="198" X="193"/>
+                            <Point X="193" Y="198"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:7">
                         <PointGeometry>
-                            <Point Y="219" X="162"/>
+                            <Point X="162" Y="219"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:11">
                         <PointGeometry>
-                            <Point Y="296" X="202"/>
+                            <Point X="202" Y="296"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:12">
                         <PointGeometry>
-                            <Point Y="271" X="301"/>
+                            <Point X="301" Y="271"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:17">
                         <PointGeometry>
-                            <Point Y="317" X="174"/>
+                            <Point X="174" Y="317"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:18">
                         <PointGeometry>
-                            <Point Y="292" X="272"/>
+                            <Point X="272" Y="292"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:19">
                         <PointGeometry>
-                            <Point Y="405" X="312"/>
+                            <Point X="312" Y="405"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:20">
                         <PointGeometry>
-                            <Point Y="306" X="400"/>
+                            <Point X="400" Y="306"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:25">
                         <PointGeometry>
-                            <Point Y="424" X="280"/>
+                            <Point X="280" Y="424"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:26">
                         <PointGeometry>
-                            <Point Y="321" X="371"/>
+                            <Point X="371" Y="321"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:27">
                         <PointGeometry>
-                            <Point Y="432" X="422"/>
+                            <Point X="422" Y="432"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:29">
                         <PointGeometry>
-                            <Point Y="507" X="376"/>
+                            <Point X="376" Y="507"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:30">
                         <PointGeometry>
-                            <Point Y="550" X="319"/>
+                            <Point X="319" Y="550"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:37">
                         <PointGeometry>
-                            <Point Y="445" X="389"/>
+                            <Point X="389" Y="445"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:40">
                         <PointGeometry>
-                            <Point Y="521" X="346"/>
+                            <Point X="346" Y="521"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:41">
                         <PointGeometry>
-                            <Point Y="564" X="291"/>
+                            <Point X="291" Y="564"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:42">
                         <PointGeometry>
-                            <Point Y="612" X="365"/>
+                            <Point X="365" Y="612"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:43">
                         <PointGeometry>
-                            <Point Y="515" X="472"/>
+                            <Point X="472" Y="515"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:44">
                         <PointGeometry>
-                            <Point Y="560" X="417"/>
+                            <Point X="417" Y="560"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:55">
                         <PointGeometry>
-                            <Point Y="625" X="335"/>
+                            <Point X="335" Y="625"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:56">
                         <PointGeometry>
-                            <Point Y="530" X="443"/>
+                            <Point X="443" Y="530"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:57">
                         <PointGeometry>
-                            <Point Y="575" X="388"/>
+                            <Point X="388" Y="575"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:58">
                         <PointGeometry>
-                            <Point Y="612" X="457"/>
+                            <Point X="457" Y="612"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S:69">
                         <PointGeometry>
-                            <Point Y="631" X="426"/>
+                            <Point X="426" Y="631"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S:0" Source="S:0">
+                    <Edge Source="S:0" Target="S:0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="62" X="107"/>
+                            <Point X="107" Y="62"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:2" Source="S:0">
+                    <Edge Source="S:0" Target="S:2">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="123" X="115"/>
+                            <Point X="115" Y="123"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:3" Source="S:0">
+                    <Edge Source="S:0" Target="S:3">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="147" X="161"/>
+                            <Point X="161" Y="147"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:11" Source="S:11">
+                    <Edge Source="S:11" Target="S:11">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="281" X="152"/>
+                            <Point X="152" Y="281"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:17" Source="S:11">
+                    <Edge Source="S:11" Target="S:17">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="314" X="189"/>
+                            <Point X="189" Y="314"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:19" Source="S:11">
+                    <Edge Source="S:11" Target="S:19">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:12" Source="S:12">
+                    <Edge Source="S:12" Target="S:12">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="220" X="315"/>
+                            <Point X="315" Y="220"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:18" Source="S:12">
+                    <Edge Source="S:12" Target="S:18">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="285" X="292"/>
+                            <Point X="292" Y="285"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:19" Source="S:12">
+                    <Edge Source="S:12" Target="S:19">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="333" X="308"/>
+                            <Point X="308" Y="333"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:20" Source="S:12">
+                    <Edge Source="S:12" Target="S:20">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="279" X="356"/>
+                            <Point X="356" Y="279"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:11" Source="S:17">
+                    <Edge Source="S:17" Target="S:11">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="296" X="176"/>
+                            <Point X="176" Y="296"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:17" Source="S:17">
+                    <Edge Source="S:17" Target="S:17">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="317" X="121"/>
+                            <Point X="121" Y="317"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:25" Source="S:17">
+                    <Edge Source="S:17" Target="S:25">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="373" X="219"/>
+                            <Point X="219" Y="373"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:12" Source="S:18">
+                    <Edge Source="S:18" Target="S:12">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="267" X="280"/>
+                            <Point X="280" Y="267"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:18" Source="S:18">
+                    <Edge Source="S:18" Target="S:18">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="241" X="268"/>
+                            <Point X="268" Y="241"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:25" Source="S:18">
+                    <Edge Source="S:18" Target="S:25">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="357" X="270"/>
+                            <Point X="270" Y="357"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:26" Source="S:18">
+                    <Edge Source="S:18" Target="S:26">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="304" X="322"/>
+                            <Point X="322" Y="304"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:19" Source="S:19">
+                    <Edge Source="S:19" Target="S:19">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="381" X="269"/>
+                            <Point X="269" Y="381"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:25" Source="S:19">
+                    <Edge Source="S:19" Target="S:25">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="422" X="298"/>
+                            <Point X="298" Y="422"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:27" Source="S:19">
+                    <Edge Source="S:19" Target="S:27">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="412" X="372"/>
+                            <Point X="372" Y="412"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:29" Source="S:19">
+                    <Edge Source="S:19" Target="S:29">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="453" X="344"/>
+                            <Point X="344" Y="453"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:30" Source="S:19">
+                    <Edge Source="S:19" Target="S:30">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="477" X="310"/>
+                            <Point X="310" Y="477"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:0" Source="S:2">
+                    <Edge Source="S:2" Target="S:0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="105" X="102"/>
+                            <Point X="102" Y="105"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:2" Source="S:2">
+                    <Edge Source="S:2" Target="S:2">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="95" X="60"/>
+                            <Point X="60" Y="95"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:7" Source="S:2">
+                    <Edge Source="S:2" Target="S:7">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="173" X="124"/>
+                            <Point X="124" Y="173"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:20" Source="S:20">
+                    <Edge Source="S:20" Target="S:20">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="266" X="437"/>
+                            <Point X="437" Y="266"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:26" Source="S:20">
+                    <Edge Source="S:20" Target="S:26">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="318" X="394"/>
+                            <Point X="394" Y="318"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:27" Source="S:20">
+                    <Edge Source="S:20" Target="S:27">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="363" X="421"/>
+                            <Point X="421" Y="363"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:19" Source="S:25">
+                    <Edge Source="S:25" Target="S:19">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="403" X="287"/>
+                            <Point X="287" Y="403"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:25" Source="S:25">
+                    <Edge Source="S:25" Target="S:25">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="431" X="228"/>
+                            <Point X="228" Y="431"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:37" Source="S:25">
+                    <Edge Source="S:25" Target="S:37">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:40" Source="S:25">
+                    <Edge Source="S:25" Target="S:40">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="474" X="306"/>
+                            <Point X="306" Y="474"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:41" Source="S:25">
+                    <Edge Source="S:25" Target="S:41">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="497" X="274"/>
+                            <Point X="274" Y="497"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:20" Source="S:26">
+                    <Edge Source="S:26" Target="S:20">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="298" X="384"/>
+                            <Point X="384" Y="298"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:26" Source="S:26">
+                    <Edge Source="S:26" Target="S:26">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="272" X="394"/>
+                            <Point X="394" Y="272"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:37" Source="S:26">
+                    <Edge Source="S:26" Target="S:37">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="379" X="382"/>
+                            <Point X="382" Y="379"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:27" Source="S:27">
+                    <Edge Source="S:27" Target="S:27">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="408" X="471"/>
+                            <Point X="471" Y="408"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:37" Source="S:27">
+                    <Edge Source="S:27" Target="S:37">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="445" X="414"/>
+                            <Point X="414" Y="445"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:43" Source="S:27">
+                    <Edge Source="S:27" Target="S:43">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="469" X="458"/>
+                            <Point X="458" Y="469"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:44" Source="S:27">
+                    <Edge Source="S:27" Target="S:44">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="494" X="428"/>
+                            <Point X="428" Y="494"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:29" Source="S:29">
+                    <Edge Source="S:29" Target="S:29">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="488" X="421"/>
+                            <Point X="421" Y="488"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:40" Source="S:29">
+                    <Edge Source="S:29" Target="S:40">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="522" X="364"/>
+                            <Point X="364" Y="522"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:42" Source="S:29">
+                    <Edge Source="S:29" Target="S:42">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:43" Source="S:29">
+                    <Edge Source="S:29" Target="S:43">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="507" X="430"/>
+                            <Point X="430" Y="507"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:11" Source="S:3">
+                    <Edge Source="S:3" Target="S:11">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:12" Source="S:3">
+                    <Edge Source="S:3" Target="S:12">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="226" X="249"/>
+                            <Point X="249" Y="226"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:3" Source="S:3">
+                    <Edge Source="S:3" Target="S:3">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="146" X="191"/>
+                            <Point X="191" Y="146"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:7" Source="S:3">
+                    <Edge Source="S:3" Target="S:7">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="212" X="180"/>
+                            <Point X="180" Y="212"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:30" Source="S:30">
+                    <Edge Source="S:30" Target="S:30">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="586" X="274"/>
+                            <Point X="274" Y="586"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:41" Source="S:30">
+                    <Edge Source="S:30" Target="S:41">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="570" X="304"/>
+                            <Point X="304" Y="570"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:42" Source="S:30">
+                    <Edge Source="S:30" Target="S:42">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="588" X="338"/>
+                            <Point X="338" Y="588"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:44" Source="S:30">
+                    <Edge Source="S:30" Target="S:44">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="557" X="368"/>
+                            <Point X="368" Y="557"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:27" Source="S:37">
+                    <Edge Source="S:37" Target="S:27">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="425" X="405"/>
+                            <Point X="405" Y="425"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:37" Source="S:37">
+                    <Edge Source="S:37" Target="S:37">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="404" X="423"/>
+                            <Point X="423" Y="404"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:56" Source="S:37">
+                    <Edge Source="S:37" Target="S:56">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="486" X="423"/>
+                            <Point X="423" Y="486"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:57" Source="S:37">
+                    <Edge Source="S:37" Target="S:57">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="510" X="394"/>
+                            <Point X="394" Y="510"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:29" Source="S:40">
+                    <Edge Source="S:40" Target="S:29">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="503" X="354"/>
+                            <Point X="354" Y="503"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:40" Source="S:40">
+                    <Edge Source="S:40" Target="S:40">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="569" X="329"/>
+                            <Point X="329" Y="569"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:55" Source="S:40">
+                    <Edge Source="S:40" Target="S:55">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="579" X="335"/>
+                            <Point X="335" Y="579"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:56" Source="S:40">
+                    <Edge Source="S:40" Target="S:56">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="527" X="396"/>
+                            <Point X="396" Y="527"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:30" Source="S:41">
+                    <Edge Source="S:41" Target="S:30">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="550" X="294"/>
+                            <Point X="294" Y="550"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:41" Source="S:41">
+                    <Edge Source="S:41" Target="S:41">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="596" X="246"/>
+                            <Point X="246" Y="596"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:55" Source="S:41">
+                    <Edge Source="S:41" Target="S:55">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="603" X="304"/>
+                            <Point X="304" Y="603"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:57" Source="S:41">
+                    <Edge Source="S:41" Target="S:57">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="577" X="334"/>
+                            <Point X="334" Y="577"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:42" Source="S:42">
+                    <Edge Source="S:42" Target="S:42">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="669" X="360"/>
+                            <Point X="360" Y="669"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:55" Source="S:42">
+                    <Edge Source="S:42" Target="S:55">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="639" X="352"/>
+                            <Point X="352" Y="639"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:58" Source="S:42">
+                    <Edge Source="S:42" Target="S:58">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="619" X="415"/>
+                            <Point X="415" Y="619"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:43" Source="S:43">
+                    <Edge Source="S:43" Target="S:43">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="516" X="528"/>
+                            <Point X="528" Y="516"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:56" Source="S:43">
+                    <Edge Source="S:43" Target="S:56">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="533" X="471"/>
+                            <Point X="471" Y="533"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:58" Source="S:43">
+                    <Edge Source="S:43" Target="S:58">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="567" X="477"/>
+                            <Point X="477" Y="567"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:44" Source="S:44">
+                    <Edge Source="S:44" Target="S:44">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="580" X="469"/>
+                            <Point X="469" Y="580"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:57" Source="S:44">
+                    <Edge Source="S:44" Target="S:57">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="583" X="411"/>
+                            <Point X="411" Y="583"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:58" Source="S:44">
+                    <Edge Source="S:44" Target="S:58">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="590" X="445"/>
+                            <Point X="445" Y="590"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:42" Source="S:55">
+                    <Edge Source="S:55" Target="S:42">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="619" X="343"/>
+                            <Point X="343" Y="619"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:55" Source="S:55">
+                    <Edge Source="S:55" Target="S:55">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="678" X="314"/>
+                            <Point X="314" Y="678"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:69" Source="S:55">
+                    <Edge Source="S:55" Target="S:69">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletArvGCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="643" X="380"/>
+                            <Point X="380" Y="643"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:43" Source="S:56">
+                    <Edge Source="S:56" Target="S:43">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="514" X="461"/>
+                            <Point X="461" Y="514"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:56" Source="S:56">
+                    <Edge Source="S:56" Target="S:56">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="544" X="499"/>
+                            <Point X="499" Y="544"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:69" Source="S:56">
+                    <Edge Source="S:56" Target="S:69">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="587" X="441"/>
+                            <Point X="441" Y="587"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:44" Source="S:57">
+                    <Edge Source="S:57" Target="S:44">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="563" X="401"/>
+                            <Point X="401" Y="563"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:57" Source="S:57">
+                    <Edge Source="S:57" Target="S:57">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="630" X="395"/>
+                            <Point X="395" Y="630"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:69" Source="S:57">
+                    <Edge Source="S:57" Target="S:69">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="611" X="408"/>
+                            <Point X="408" Y="611"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:58" Source="S:58">
+                    <Edge Source="S:58" Target="S:58">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="651" X="498"/>
+                            <Point X="498" Y="651"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:69" Source="S:58">
+                    <Edge Source="S:58" Target="S:69">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletEL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="641" X="454"/>
+                            <Point X="454" Y="641"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:58" Source="S:69">
+                    <Edge Source="S:69" Target="S:58">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="622" X="443"/>
+                            <Point X="443" Y="622"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:69" Source="S:69">
+                    <Edge Source="S:69" Target="S:69">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="683" X="448"/>
+                            <Point X="448" Y="683"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:17" Source="S:7">
+                    <Edge Source="S:7" Target="S:17">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="267" X="160"/>
+                            <Point X="160" Y="267"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:18" Source="S:7">
+                    <Edge Source="S:7" Target="S:18">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S:3" Source="S:7">
+                    <Edge Source="S:7" Target="S:3">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="194" X="167"/>
+                            <Point X="167" Y="194"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S:7" Source="S:7">
+                    <Edge Source="S:7" Target="S:7">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCL"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="199" X="114"/>
+                            <Point X="114" Y="199"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -1224,16 +1224,16 @@
                     <SimpleIdentifier Name="QPalletAtCL"/>
                     <SimpleIdentifier Name="QPalletAtEL"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="47" X="125"/>
+                        <Point X="125" Y="47"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point Y="48" X="96"/>
+                            <Point X="96" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>

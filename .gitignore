@@ -3,7 +3,7 @@
 /build/
 /dist/
 /logs/
-/nbproject/private/
+/nbproject/
 /resources/
 /src/org/supremica/Version.java
 /src/org/supremica/manufacturingTables/xsd/eop

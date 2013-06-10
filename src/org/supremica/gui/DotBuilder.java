@@ -173,13 +173,15 @@ public class DotBuilder
 
 	private void initializeStreams(String arguments)
 	{
+		final String dot_cmd = Config.DOT_EXECUTE_COMMAND.get() + " " + arguments;
+		
 		try
 		{
-			dotProcess = Runtime.getRuntime().exec(Config.DOT_EXECUTE_COMMAND.get() + " " + arguments);
+			dotProcess = Runtime.getRuntime().exec(dot_cmd);
 		}
 		catch (IOException ex)
 		{
-			logger.error("Cannot run dot. Make sure dot is in the path.", ex);
+			logger.error("Cannot run (" + dot_cmd + "). Is dot in the path?", ex);
 			return;
 		}
 

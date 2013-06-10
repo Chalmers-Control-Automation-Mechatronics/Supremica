@@ -15,14 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
@@ -93,7 +92,7 @@ public class ModuleCompiler
     return des;
   }
 
-  public Map<Proxy,SourceInfo> getSourceInfoMap()
+  public Map<Object,SourceInfo> getSourceInfoMap()
   {
     if (mIsSourceInfoEnabled) {
       return mSourceInfoBuilder.getResultMap();

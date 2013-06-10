@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -414,3 +414,4 @@ public class NodeEditorDialog
   private static final Insets INSETS = new Insets(2,4,2,4);
 
 }
+

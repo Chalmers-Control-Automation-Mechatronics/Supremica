@@ -11,6 +11,8 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.gui.ControlledToolbar;
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -22,11 +24,8 @@ public class ToolSelectAction
   //# Constructors
   public ToolSelectAction(final IDE ide)
   {
-    super(ide,
-	  "Select",
-	  "Select",
-	  "/icons/waters/select16.gif",
-	  ControlledToolbar.Tool.SELECT);
+    super(ide, "Select", "Select", IconLoader.ICON_TOOL_SELECT,
+          ControlledToolbar.Tool.SELECT);
   }
 
 

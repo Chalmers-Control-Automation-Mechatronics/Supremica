@@ -55,25 +55,55 @@
 // Implements the FindStates dialog with regexps
 package org.supremica.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.event.*;
-import java.util.regex.*;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
-import org.supremica.log.*;
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataListener;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.algorithms.FixedformMatcher;
+import org.supremica.automata.algorithms.Forbidder;
+import org.supremica.automata.algorithms.FreeformMatcher;
 import org.supremica.automata.algorithms.SearchStates;
 import org.supremica.automata.algorithms.StateMatcher;
 import org.supremica.automata.algorithms.StateMatcherOptions;
-import org.supremica.automata.algorithms.FreeformMatcher;
-import org.supremica.automata.algorithms.FixedformMatcher;
-import org.supremica.automata.algorithms.Forbidder;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.AutomataListener;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 // ----------------------------------------------------------------------------------
@@ -102,14 +132,14 @@ class FindStatesTableModel
 
 	// private Pattern[] patterns = null;
 	// private PatternCompiler comp = null;
-	private String[] columnNames = { "Automaton", "Type",
+	private final String[] columnNames = { "Automaton", "Type",
 									 "Regular Expression", "Accepting",
 									 "Forbidden", "Deadlock" };
 
 	// private Object[][] cells = null;
-	private Automata automata;
-	private HashMap<Automaton, Pattern> patternMap = new HashMap<Automaton, Pattern>();
-	private HashMap<Automaton, StateMatcherOptions> stateMatcherOptionsMap = new HashMap<Automaton, StateMatcherOptions>();
+	private final Automata automata;
+	private final HashMap<Automaton, Pattern> patternMap = new HashMap<Automaton, Pattern>();
+	private final HashMap<Automaton, StateMatcherOptions> stateMatcherOptionsMap = new HashMap<Automaton, StateMatcherOptions>();
 	public final static int AUTOMATON_COL = 0;
 	public final static int TYPE_COL = AUTOMATON_COL + 1;
 	public final static int REGEXP_COL = TYPE_COL + 1;
@@ -117,7 +147,7 @@ class FindStatesTableModel
 	public final static int FORBIDDEN_COL = ACCEPTING_COL + 1;
 	public final static int DEADLOCK_COL = FORBIDDEN_COL + 1;
 
-	public FindStatesTableModel(Automata a)
+	public FindStatesTableModel(final Automata a)
 	{
 		this.automata = a;
 
@@ -127,22 +157,23 @@ class FindStatesTableModel
 
 		try
 		{    // I know compile _cannot_ throw here, but Java requires me to catch this exception
-			for (Iterator<?> it = a.iterator(); it.hasNext(); )
+			for (final Iterator<?> it = a.iterator(); it.hasNext(); )
 			{
-				Automaton currAutomaton = (Automaton) it.next();
+				final Automaton currAutomaton = (Automaton) it.next();
 
 				patternMap.put(currAutomaton, Pattern.compile(".*"));
 				stateMatcherOptionsMap.put(currAutomaton, new StateMatcherOptions());
 			}
 		}
-		catch (PatternSyntaxException ex)
+		catch (final PatternSyntaxException ex)
 		{
 			logger.error("FindStatesTableModel: This should never happen!", ex);
 			logger.debug(ex.getStackTrace());
 		}
 	}
 
-	public String getColumnName(int col)
+	@Override
+  public String getColumnName(final int col)
 	{
 		return columnNames[col];
 	}
@@ -153,20 +184,23 @@ class FindStatesTableModel
 				return cells[0][col].getClass();
 		}
 */
-	public int getColumnCount()
+	@Override
+  public int getColumnCount()
 	{
 		return columnNames.length;
 	}
 
-	public int getRowCount()
+	@Override
+  public int getRowCount()
 	{
 		// return cells.length;
 		return automata.nbrOfAutomata();
 	}
 
-	public Object getValueAt(int row, int col)
+	@Override
+  public Object getValueAt(final int row, final int col)
 	{
-		Automaton automaton = automata.getAutomatonAt(row);
+		final Automaton automaton = automata.getAutomatonAt(row);
 
 		if (col == AUTOMATON_COL)
 		{
@@ -185,21 +219,21 @@ class FindStatesTableModel
 
 		if (col == ACCEPTING_COL)
 		{
-			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
+			final StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			return currOptions.getAcceptingCondition();
 		}
 
 		if (col == FORBIDDEN_COL)
 		{
-			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
+			final StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			return currOptions.getForbiddenCondition();
 		}
 
 		if (col == DEADLOCK_COL)
 		{
-			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
+			final StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			return currOptions.getDeadlockCondition();
 		}
@@ -209,7 +243,8 @@ class FindStatesTableModel
 		// return cells[row][col];
 	}
 
-	public void setValueAt(Object obj, int row, int col)
+	@Override
+  public void setValueAt(final Object obj, final int row, final int col)
 	{
 
 		// cells[row][col] = obj;
@@ -228,12 +263,12 @@ class FindStatesTableModel
 		{
 			try
 			{
-				Automaton automaton = automata.getAutomatonAt(row);
+				final Automaton automaton = automata.getAutomatonAt(row);
 
 				// patterns[row] = comp.compile((String) obj);
 				patternMap.put(automaton, Pattern.compile((String) obj));
 			}
-			catch (PatternSyntaxException excp)
+			catch (final PatternSyntaxException excp)
 			{
 				JOptionPane.showMessageDialog(null, "Incorrect pattern: " + (String) obj, "Incorrect pattern", JOptionPane.ERROR_MESSAGE);
 				logger.debug("FindStatesTable::Incorrect pattern \"" + (String) obj + "\"");
@@ -242,8 +277,8 @@ class FindStatesTableModel
 		}
 		else if (isAcceptingColumn(col))
 		{
-			Automaton automaton = automata.getAutomatonAt(row);
-			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
+			final Automaton automaton = automata.getAutomatonAt(row);
+			final StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			if (currOptions != null)
 			{
@@ -252,8 +287,8 @@ class FindStatesTableModel
 		}
 		else if (isForbiddenColumn(col))
 		{
-			Automaton automaton = automata.getAutomatonAt(row);
-			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
+			final Automaton automaton = automata.getAutomatonAt(row);
+			final StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			if (currOptions != null)
 			{
@@ -262,8 +297,8 @@ class FindStatesTableModel
 		}
 		else if (isDeadlockColumn(col))
 		{
-			Automaton automaton = automata.getAutomatonAt(row);
-			StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
+			final Automaton automaton = automata.getAutomatonAt(row);
+			final StateMatcherOptions currOptions = stateMatcherOptionsMap.get(automaton);
 
 			if (currOptions != null)
 			{
@@ -272,7 +307,8 @@ class FindStatesTableModel
 		}
 	}
 
-	public boolean isCellEditable(int row, int col)
+	@Override
+  public boolean isCellEditable(final int row, final int col)
 	{
 		if (isAcceptingColumn(col))
 		{
@@ -292,22 +328,22 @@ class FindStatesTableModel
 		return false;
 	}
 
-	public boolean isRegexpColumn(int col)
+	public boolean isRegexpColumn(final int col)
 	{
 		return col == REGEXP_COL;
 	}
 
-	public boolean isAcceptingColumn(int col)
+	public boolean isAcceptingColumn(final int col)
 	{
 		return col == ACCEPTING_COL;
 	}
 
-	public boolean isForbiddenColumn(int col)
+	public boolean isForbiddenColumn(final int col)
 	{
 		return col == FORBIDDEN_COL;
 	}
 
-	public boolean isDeadlockColumn(int col)
+	public boolean isDeadlockColumn(final int col)
 	{
 		return col == DEADLOCK_COL;
 	}
@@ -334,7 +370,7 @@ class FindStatesTableModel
 
 	public Pattern[] getRegexpPatterns()
 	{
-		Pattern[] patterns = new Pattern[automata.size()];
+		final Pattern[] patterns = new Pattern[automata.size()];
 
 		for (int i = 0; i < automata.size(); ++i)
 		{
@@ -346,7 +382,7 @@ class FindStatesTableModel
 
 	public StateMatcherOptions[] getStateMatcherOptions()
 	{
-		StateMatcherOptions[] options = new StateMatcherOptions[automata.size()];
+		final StateMatcherOptions[] options = new StateMatcherOptions[automata.size()];
 
 		for (int i = 0; i < automata.size(); ++i)
 		{
@@ -359,17 +395,19 @@ class FindStatesTableModel
 	// implementation of AutomataListener interface
 	private void updateListeners()
 	{
-		TableModelEvent event = new TableModelEvent(this, 0, automata.nbrOfAutomata() - 1);
+		final TableModelEvent event = new TableModelEvent(this, 0, automata.nbrOfAutomata() - 1);
 
 		fireTableChanged(event);
 	}
 
-	public void automatonAdded(Automata automata, Automaton automaton)
+	@Override
+  public void automatonAdded(final Automata automata, final Automaton automaton)
 	{
 		updateListeners();
 	}
 
-	public void automatonRemoved(Automata automata, Automaton automaton)
+	@Override
+  public void automatonRemoved(final Automata automata, final Automaton automaton)
 	{
 
 		// need to remove its pattern
@@ -378,16 +416,19 @@ class FindStatesTableModel
 		updateListeners();
 	}
 
-	public void automatonRenamed(Automata automata, Automaton automaton)
+	@Override
+  public void automatonRenamed(final Automata automata, final Automaton automaton)
 	{
 		updateListeners();
 	}
 
-	public void actionsOrControlsChanged(Automata automata)
+	@Override
+  public void actionsOrControlsChanged(final Automata automata)
 	{    // Do nothing
 	}
 
-	public void updated(Object theObject)
+	@Override
+  public void updated(final Object theObject)
 	{
 		updateListeners();
 	}
@@ -400,7 +441,7 @@ class FindStatesTable
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(FindStatesTable.class);
 	private Automata automata;
-	private JFrame frame;
+	private FindStatesFrame frame;
 	@SuppressWarnings("unused")
 	private StateMatcherAcceptingCellEditor acceptingEditor;
 	@SuppressWarnings("unused")
@@ -419,21 +460,23 @@ class FindStatesTable
 		return (FindStatesTableModel) getTableSorterModel().getModel();
 	}
 
-	private Automaton getAutomaton(int row)
+	private Automaton getAutomaton(final int row)
 	{
-		String name = (String) getModel().getValueAt(row, FindStatesTableModel.AUTOMATON_COL);
+		final String name = (String) getModel().getValueAt(row, FindStatesTableModel.AUTOMATON_COL);
 
 		return automata.getAutomaton(name);
 	}
 
 	@SuppressWarnings("unused")
-	private void deleteAutomaton(int row)
+	private void deleteAutomaton(final int row)
 	{
 		automata.removeAutomaton(getAutomaton(row));
+		frame.updateForbidButton(automata.isAllAutomataPlants());
 	}
 
 	private void doRepaint()
 	{
+		frame.updateForbidButton(automata.isAllAutomataPlants());
 		repaint();
 	}
 
@@ -450,25 +493,26 @@ class FindStatesTable
 		private static final long serialVersionUID = 1L;
 		int row;
 
-		public RegexpPopupMenu(int r)
+		public RegexpPopupMenu(final int r)
 		{
 			super("RegexpPopup");
 
 			this.row = r;
 
-			JMenuItem edit_item = add("Edit");
+			final JMenuItem edit_item = add("Edit");
 
 			this.add(new JSeparator());
 
-			JMenuItem delete_item = add("Delete");
-			JMenuItem quit_item = add("Cancel");
+			final JMenuItem delete_item = add("Delete");
+			final JMenuItem quit_item = add("Cancel");
 
 			edit_item.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)    // anonymous class
+				@Override
+        public void actionPerformed(final ActionEvent e)    // anonymous class
 				{
-					String str = (String) getModel().getValueAt(row, FindStatesTableModel.REGEXP_COL);
-					RegexpDialog regexp_dialog = new RegexpDialog(null, getAutomaton(row), str);
+					final String str = (String) getModel().getValueAt(row, FindStatesTableModel.REGEXP_COL);
+					final RegexpDialog regexp_dialog = new RegexpDialog(null, getAutomaton(row), str);
 
 					if (regexp_dialog.isOk())
 					{
@@ -480,9 +524,10 @@ class FindStatesTable
 			});
 			delete_item.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)    // anonymous class
+				@Override
+        public void actionPerformed(final ActionEvent e)    // anonymous class
 				{
-					Automaton automaton = getAutomaton(row);
+					final Automaton automaton = getAutomaton(row);
 
 					logger.debug("Removing " + automaton.getName());
 					automata.removeAutomaton(automaton);
@@ -491,7 +536,8 @@ class FindStatesTable
 			});
 			quit_item.addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)    // anonymous class
+				@Override
+        public void actionPerformed(final ActionEvent e)    // anonymous class
 				{
 					frame.dispose();
 				}
@@ -502,14 +548,14 @@ class FindStatesTable
 	class StateMatcherAcceptingCellEditor
 		implements CellEditorListener
 	{
-		private JComboBox<Object> stateMatcherTypeCombo;
-		private FindStatesTableModel theTableModel;
+		private final JComboBox<Object> stateMatcherTypeCombo;
+		private final FindStatesTableModel theTableModel;
 
 		StateMatcherAcceptingCellEditor()
 		{
 			stateMatcherTypeCombo = new JComboBox<Object>();
 
-			Iterator<?> typeIt = StateMatcherOptions.Accepting.iterator();
+			final Iterator<?> typeIt = StateMatcherOptions.Accepting.iterator();
 
 			while (typeIt.hasNext())
 			{
@@ -518,28 +564,30 @@ class FindStatesTable
 
 			theTableModel = getStatesTableModel();
 
-			TableColumnModel columnModel = getColumnModel();
-			TableColumn typeColumn = columnModel.getColumn(theTableModel.getAcceptingColumn());
-			DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
+			final TableColumnModel columnModel = getColumnModel();
+			final TableColumn typeColumn = columnModel.getColumn(theTableModel.getAcceptingColumn());
+			final DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
 
 			cellEditor.setClickCountToStart(2);
 			typeColumn.setCellEditor(cellEditor);
 			cellEditor.addCellEditorListener(this);
 		}
 
-		public void editingCanceled(ChangeEvent e) {}
+		@Override
+    public void editingCanceled(final ChangeEvent e) {}
 
-		public void editingStopped(ChangeEvent e)
+		@Override
+    public void editingStopped(final ChangeEvent e)
 		{
 
 			// logger.info("editing stopped: " + getSelectedRow());
 			if (stateMatcherTypeCombo.getSelectedIndex() >= 0)
 			{
-				StateMatcherOptions.Accepting selectedValue = (StateMatcherOptions.Accepting) stateMatcherTypeCombo.getSelectedItem();
+				final StateMatcherOptions.Accepting selectedValue = (StateMatcherOptions.Accepting) stateMatcherTypeCombo.getSelectedItem();
 
 				if (selectedValue != null)
 				{
-					int selectedRow = getSelectedRow();
+					final int selectedRow = getSelectedRow();
 
 					getModel().setValueAt(selectedValue, selectedRow, theTableModel.getAcceptingColumn());
 				}
@@ -550,14 +598,14 @@ class FindStatesTable
 	class StateMatcherForbiddenCellEditor
 		implements CellEditorListener
 	{
-		private JComboBox<Object>stateMatcherTypeCombo;
-		private FindStatesTableModel theTableModel;
+		private final JComboBox<Object>stateMatcherTypeCombo;
+		private final FindStatesTableModel theTableModel;
 
 		StateMatcherForbiddenCellEditor()
 		{
 			stateMatcherTypeCombo = new JComboBox<Object>();
 
-			Iterator<?> typeIt = StateMatcherOptions.Forbidden.iterator();
+			final Iterator<?> typeIt = StateMatcherOptions.Forbidden.iterator();
 
 			while (typeIt.hasNext())
 			{
@@ -566,28 +614,30 @@ class FindStatesTable
 
 			theTableModel = getStatesTableModel();
 
-			TableColumnModel columnModel = getColumnModel();
-			TableColumn typeColumn = columnModel.getColumn(theTableModel.getForbiddenColumn());
-			DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
+			final TableColumnModel columnModel = getColumnModel();
+			final TableColumn typeColumn = columnModel.getColumn(theTableModel.getForbiddenColumn());
+			final DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
 
 			cellEditor.setClickCountToStart(2);
 			typeColumn.setCellEditor(cellEditor);
 			cellEditor.addCellEditorListener(this);
 		}
 
-		public void editingCanceled(ChangeEvent e) {}
+		@Override
+    public void editingCanceled(final ChangeEvent e) {}
 
-		public void editingStopped(ChangeEvent e)
+		@Override
+    public void editingStopped(final ChangeEvent e)
 		{
 
 			//logger.info("editing stopped: " + getSelectedRow());
 			if (stateMatcherTypeCombo.getSelectedIndex() >= 0)
 			{
-				StateMatcherOptions.Forbidden selectedValue = (StateMatcherOptions.Forbidden) stateMatcherTypeCombo.getSelectedItem();
+				final StateMatcherOptions.Forbidden selectedValue = (StateMatcherOptions.Forbidden) stateMatcherTypeCombo.getSelectedItem();
 
 				if (selectedValue != null)
 				{
-					int selectedRow = getSelectedRow();
+					final int selectedRow = getSelectedRow();
 
 					getModel().setValueAt(selectedValue, selectedRow, theTableModel.getForbiddenColumn());
 				}
@@ -598,14 +648,14 @@ class FindStatesTable
 	class StateMatcherDeadlockCellEditor
 		implements CellEditorListener
 	{
-		private JComboBox<Object> stateMatcherTypeCombo;
-		private FindStatesTableModel theTableModel;
+		private final JComboBox<Object> stateMatcherTypeCombo;
+		private final FindStatesTableModel theTableModel;
 
 		StateMatcherDeadlockCellEditor()
 		{
 			stateMatcherTypeCombo = new JComboBox<Object>();
 
-			Iterator<?> typeIt = StateMatcherOptions.Deadlock.iterator();
+			final Iterator<?> typeIt = StateMatcherOptions.Deadlock.iterator();
 
 			while (typeIt.hasNext())
 			{
@@ -614,26 +664,28 @@ class FindStatesTable
 
 			theTableModel = getStatesTableModel();
 
-			TableColumnModel columnModel = getColumnModel();
-			TableColumn typeColumn = columnModel.getColumn(theTableModel.getDeadlockColumn());
-			DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
+			final TableColumnModel columnModel = getColumnModel();
+			final TableColumn typeColumn = columnModel.getColumn(theTableModel.getDeadlockColumn());
+			final DefaultCellEditor cellEditor = new DefaultCellEditor(stateMatcherTypeCombo);
 
 			cellEditor.setClickCountToStart(2);
 			typeColumn.setCellEditor(cellEditor);
 			cellEditor.addCellEditorListener(this);
 		}
 
-		public void editingCanceled(ChangeEvent e) {}
+		@Override
+    public void editingCanceled(final ChangeEvent e) {}
 
-		public void editingStopped(ChangeEvent e)
+		@Override
+    public void editingStopped(final ChangeEvent e)
 		{
 			if (stateMatcherTypeCombo.getSelectedIndex() >= 0)
 			{
-				StateMatcherOptions.Deadlock selectedValue = (StateMatcherOptions.Deadlock) stateMatcherTypeCombo.getSelectedItem();
+				final StateMatcherOptions.Deadlock selectedValue = (StateMatcherOptions.Deadlock) stateMatcherTypeCombo.getSelectedItem();
 
 				if (selectedValue != null)
 				{
-					int selectedRow = getSelectedRow();
+					final int selectedRow = getSelectedRow();
 
 					if (selectedRow >= 0)
 					{
@@ -645,16 +697,16 @@ class FindStatesTable
 	}
 
 	// Wrap the FindStatesTableModel inside a sort filter
-	private static TableSorter makeTableModel(Automata a)
+	private static TableSorter makeTableModel(final Automata a)
 	{
-		TableSorter sorter = new TableSorter();
+		final TableSorter sorter = new TableSorter();
 
 		sorter.setModel(new FindStatesTableModel(a));
 
 		return sorter;
 	}
 
-	public FindStatesTable(Automata a, JFrame frame)
+	public FindStatesTable(final Automata a, final FindStatesFrame frame)
 	{
 		super(makeTableModel(a));
 
@@ -666,7 +718,8 @@ class FindStatesTable
 		// Note! This code is duplicated (almost) from Supremica.java
 		addMouseListener(new MouseAdapter()
 		{
-			public void mousePressed(MouseEvent e)
+			@Override
+      public void mousePressed(final MouseEvent e)
 			{
 
 				// This is needed for the Linux platform
@@ -674,19 +727,21 @@ class FindStatesTable
 				maybeShowPopup(e);
 			}
 
-			public void mouseReleased(MouseEvent e)
+			@Override
+      public void mouseReleased(final MouseEvent e)
 			{
 
 				// This is for triggering the popup on Windows platforms
 				maybeShowPopup(e);
 			}
 
-			public void mouseClicked(MouseEvent e)
+			@Override
+      public void mouseClicked(final MouseEvent e)
 			{
 				if (e.getClickCount() == 2)
 				{
-					int col = columnAtPoint(e.getPoint());
-					int row = rowAtPoint(e.getPoint());
+					final int col = columnAtPoint(e.getPoint());
+					final int row = rowAtPoint(e.getPoint());
 
 					if (row < 0)
 					{
@@ -695,8 +750,8 @@ class FindStatesTable
 
 					if (col == FindStatesTableModel.REGEXP_COL)
 					{
-						String str = (String) getModel().getValueAt(row, FindStatesTableModel.REGEXP_COL);
-						RegexpDialog regexp_dialog = new RegexpDialog(null, getAutomaton(row), str);
+						final String str = (String) getModel().getValueAt(row, FindStatesTableModel.REGEXP_COL);
+						final RegexpDialog regexp_dialog = new RegexpDialog(null, getAutomaton(row), str);
 
 						if (regexp_dialog.isOk())
 						{
@@ -708,11 +763,11 @@ class FindStatesTable
 				}
 			}
 
-			private void maybeShowPopup(MouseEvent e)
+			private void maybeShowPopup(final MouseEvent e)
 			{
 
 				//logger.info("maybeShowpopup");
-				int row = rowAtPoint(e.getPoint());
+				final int row = rowAtPoint(e.getPoint());
 				//logger.info("row " + row + " col " + col);
 				if (row < 0)
 				{
@@ -729,7 +784,7 @@ class FindStatesTable
 
 				if (e.isPopupTrigger())
 				{
-					RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row);
+					final RegexpPopupMenu regexp_popup = new RegexpPopupMenu(row);
 
 					regexp_popup.show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -773,10 +828,12 @@ class FreeFormPanel
 	implements FindStatesTab
 {
 	private static final long serialVersionUID = 1L;
-	private String title = "Free Form";
-	private String tip = "Search with a free form regexp";
-	private JTextField reg_exp;
-	private JTextField sep_str;
+	private final String title = "Free Form";
+	private final String tip = "Search with a free form regexp";
+	private final JTextField reg_exp;
+	private final JTextField sep_str;
+	@SuppressWarnings("unused")
+    private JCheckBox pairwise_equal;
 	@SuppressWarnings("unused")
 	private boolean ok = false;
 
@@ -791,7 +848,7 @@ class FreeFormPanel
 		repaint();
 	}
 
-	private void replaceSelection(String s)
+	private void replaceSelection(final String s)
 	{
 		reg_exp.replaceSelection(s);
 	}
@@ -803,7 +860,7 @@ class FreeFormPanel
 		private static final long serialVersionUID = 1L;
 		String pattern;
 
-		public RegexpMenuItem(String s, String p)
+		public RegexpMenuItem(final String s, final String p)
 		{
 			super(s + " - " + p);
 
@@ -812,7 +869,8 @@ class FreeFormPanel
 			addActionListener(this);
 		}
 
-		public void actionPerformed(ActionEvent event)
+		@Override
+    public void actionPerformed(final ActionEvent event)
 		{
 			replaceSelection(pattern);
 			doRepaint();
@@ -826,7 +884,7 @@ class FreeFormPanel
 
 		public RegexpMenuBar()
 		{
-			JMenu menu = new JMenu("Expressions");
+			final JMenu menu = new JMenu("Expressions");
 
 			menu.add(new RegexpMenuItem("any string", ".*"));
 			menu.add(new RegexpMenuItem("any uppercase", "[A-Z]"));
@@ -848,12 +906,12 @@ class FreeFormPanel
 		setLayout(new BorderLayout());
 		add(new RegexpMenuBar(), BorderLayout.NORTH);
 
-		JPanel p1 = new JPanel();
+		final JPanel p1 = new JPanel();
 
 		p1.setLayout(new BorderLayout());
 
-		Box yBox = new Box(BoxLayout.Y_AXIS);
-		Box x1Box = new Box(BoxLayout.X_AXIS);
+		final Box yBox = new Box(BoxLayout.Y_AXIS);
+		final Box x1Box = new Box(BoxLayout.X_AXIS);
 
 		x1Box.add(new JLabel("Regexp:"));
 
@@ -861,7 +919,7 @@ class FreeFormPanel
 
 		x1Box.add(reg_exp);
 
-		Box x2Box = new Box(BoxLayout.X_AXIS);
+		final Box x2Box = new Box(BoxLayout.X_AXIS);
 
 		x2Box.add(new JLabel("State Separator: "));
 
@@ -874,29 +932,35 @@ class FreeFormPanel
 		yBox.add(Box.createVerticalGlue());
 		yBox.add(x2Box);
 		yBox.add(Box.createVerticalGlue());
+
+		yBox.add(pairwise_equal = new JCheckBox("Forbid pairwise equally named states", false));
+
 		p1.add(yBox, BorderLayout.NORTH);
 		add("Center", p1);
 	}
 
-	public String getTitle()
+	@Override
+  public String getTitle()
 	{
 		return title;
 	}
 
-	public String getTip()
+	@Override
+  public String getTip()
 	{
 		return tip;
 	}
 
-	public StateMatcher getMatcher()
+	@Override
+  public StateMatcher getMatcher()
 	{
 		try
 		{
-			Pattern pattern = Pattern.compile(reg_exp.getText());
+			final Pattern pattern = Pattern.compile(reg_exp.getText());
 
 			return new FreeformMatcher(pattern, sep_str.getText());
 		}
-		catch (PatternSyntaxException ex)
+		catch (final PatternSyntaxException ex)
 		{
 
 			// debug("FindStatesTable::Incorrect pattern \"" + reg_exp.getText() +"\"");
@@ -907,7 +971,8 @@ class FreeFormPanel
 		}
 	}
 
-	public void setVisible(boolean aFlag)
+	@Override
+  public void setVisible(final boolean aFlag)
 	{
 		super.setVisible(aFlag);
 
@@ -928,29 +993,84 @@ class FixedFormPanel
 	private static final String tip = "Search with state specific content";
 	FindStatesTable table = null;
 
-	FixedFormPanel(FindStatesTable t)
+	FixedFormPanel(final FindStatesTable t)
 	{
 		super(t);
 
 		this.table = t;
 	}
 
-	public String getTitle()
+	@Override
+  public String getTitle()
 	{
 		return title;
 	}
 
-	public String getTip()
+	@Override
+  public String getTip()
 	{
 		return tip;
 	}
 
-	public StateMatcher getMatcher()
+	@Override
+  public StateMatcher getMatcher()
 	{
 		return new FixedformMatcher(table.getRegexpPatterns(), table.getStateMatcherOptions());
 	}
 }
 
+class SettingsPanel
+	extends JPanel
+	implements FindStatesTab
+{
+	private static final long serialVersionUID = 1L;
+	private final String title = "Settings";
+	private final String tip = "Advanced settings for finding and forbidding states";
+	private final JCheckBox use_dump = new JCheckBox("Use dump state instead of self-loop");
+
+	SettingsPanel()
+	{
+		/* Should disable the Find and Forbid States button when focused, but...
+		setFocusable(true);
+
+		addFocusListener(new FocusListener()
+		{
+
+			public void focusGained(FocusEvent e)
+			{
+			}
+			public void focusLost(FocusEvent e)
+			{
+            }
+		});
+		 *
+		 */
+		add(use_dump);
+	}
+
+	@Override
+  public String getTitle()
+	{
+		return title;
+	}
+
+	@Override
+  public String getTip()
+	{
+		return tip;
+	}
+
+	@Override
+  public StateMatcher getMatcher()
+	{
+		return null;
+	}
+
+	public boolean useDump()
+	{
+		return use_dump.isSelected();
+	}
+}
 // -----------------------------------------
 class FindStatesFrame
 	extends JFrame
@@ -964,16 +1084,16 @@ class FindStatesFrame
 	private CancelButton quit_button = null;
 	@SuppressWarnings("unused")
 	private JButton find_button = null;
-	@SuppressWarnings("unused")
 	private ForbidButton forbid_button = null;
 	private VisualProject theVisualProject = null;
+	private final SettingsPanel settingsPanel = new SettingsPanel();
 
-	private static void debug(String s)
+	private static void debug(final String s)
 	{
 		logger.debug(s);
 	}
 
-	public FindStatesFrame(VisualProject theVisualProject, Automata selectedAutomata)
+	public FindStatesFrame(final VisualProject theVisualProject, final Automata selectedAutomata)
 	{
 		Utility.setupFrame(this, 650, 300);
 		setTitle("Find States");
@@ -982,26 +1102,35 @@ class FindStatesFrame
 		this.automata = selectedAutomata;
 		this.table = new FindStatesTable(automata, this);
 
-		FixedFormPanel fixedformPanel = new FixedFormPanel(table);
-		FreeFormPanel freeformPanel = new FreeFormPanel();
+		final FixedFormPanel fixedformPanel = new FixedFormPanel(table);
+		final FreeFormPanel freeformPanel = new FreeFormPanel();
+//		settingsPanel = new SettingsPanel();
 
 		tabbedPane = new JTabbedPane();
 
 		tabbedPane.addTab(fixedformPanel.getTitle(), null, fixedformPanel, fixedformPanel.getTip());
 		tabbedPane.addTab(freeformPanel.getTitle(), null, freeformPanel, freeformPanel.getTip());
+		tabbedPane.addTab(settingsPanel.getTitle(), null, settingsPanel, settingsPanel.getTip());
 
-		JPanel buttonPanel = new JPanel();
+		final JPanel buttonPanel = new JPanel();
 
 		buttonPanel.add(quit_button = new CancelButton());
 		buttonPanel.add(find_button = Utility.setDefaultButton(this, new FindButton()));
 		buttonPanel.add(forbid_button = new ForbidButton());
 
-		Container contentPane = getContentPane();
+		// We only allow forbidding plant states, if you have specs, plantify first
+		forbid_button.setEnabled(selectedAutomata.isAllAutomataPlants());
+
+		final Container contentPane = getContentPane();
 
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 	}
 
+	void updateForbidButton(final boolean b)
+	{
+		forbid_button.setEnabled(b);
+	}
 	private Automata getAutomata()
 	{
 		return automata;
@@ -1024,14 +1153,15 @@ class FindStatesFrame
 			setToolTipText("Go ahead and find");
 			addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)
+				@Override
+        public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
 			});
 		}
 
-		void action(ActionEvent e)
+		void action(final ActionEvent e)
 		{
 			goAhead(true); // find and present
 		}
@@ -1045,18 +1175,19 @@ class FindStatesFrame
 		public ForbidButton()
 		{
 			super("Forbid");
-			setToolTipText("Forbid found states");
+			setToolTipText("Forbid found states. Only for plants. Plantify first if you have to.");
 
 			addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)
+				@Override
+        public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
 			});
 		}
 
-		void action(ActionEvent e)
+		void action(final ActionEvent e)
 		{
 			// for each automaton
 			//	if its seach criteria is "dont care" ignore it [we do not _have_ to do this but it saves efficiency]
@@ -1081,26 +1212,27 @@ class FindStatesFrame
 			setToolTipText("Enough of finding states");
 			addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)
+				@Override
+        public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
 			});
 		}
 
-		void action(ActionEvent e)
+		void action(final ActionEvent e)
 		{
 
 			// debug("CancelButton disposing");
 			dispose();
 		}
 	}
-        
-	private void goAhead(boolean present)
+
+	private void goAhead(final boolean present)
 	{
 		try
 		{
-			StateMatcher matcher = ((FindStatesTab) getSelectedComponent()).getMatcher();
+			final StateMatcher matcher = getSelectedComponent().getMatcher();
 
 			if (matcher != null)
 			{
@@ -1110,7 +1242,7 @@ class FindStatesFrame
 				{
 					ss = new SearchStates(getAutomata(), matcher);
 				}
-				catch (Exception ex)
+				catch (final Exception ex)
 				{
 					logger.error("Exception while constructing SearchState. Operation aborted. " + ex.getMessage());
 					logger.debug(ex.getStackTrace());
@@ -1120,13 +1252,13 @@ class FindStatesFrame
 
 				ss.start();    // Start the search thread
 
-				Monitor monitor = new Monitor("Finding states...", "", ss);
+				final Monitor monitor = new Monitor("Finding states...", "", ss);
 
 				monitor.startMonitor(this, 0, 1000);
 
 				if(present)
 				{
-					PresentStates present_states = new PresentStates(this, ss, getAutomata(), theVisualProject);
+					final PresentStates present_states = new PresentStates(this, ss, getAutomata(), theVisualProject, settingsPanel.useDump());
 					present_states.start(); // From the docs: Causes this thread to begin execution;
 											// the Java Virtual Machine calls the run method of this thread.
 											// The result is that two threads are running concurrently: the
@@ -1136,13 +1268,13 @@ class FindStatesFrame
 				else
 				{
 					ss.join(); // wait for ss to stop
-					new Forbidder(getAutomata(), ss, theVisualProject);
+					new Forbidder(getAutomata(), ss, theVisualProject, settingsPanel.useDump()); // false meaning, do not use dump state
 					// forbidder.start();
 					// Should Forbidder be a thread of its own, monitorable/interruptable?
 				}
 			}
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 
 			// Let it silently die, how the f*** do get these excp specs to work?
@@ -1166,23 +1298,24 @@ public class FindStates
 	}
 
 	// Note, we avoid (short-circut) the ActionMan here... should we?
-	public void actionPerformed(ActionEvent e)
+	@Override
+  public void actionPerformed(final ActionEvent e)
 	{
-		VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();
-		Automata selectedAutomata = ActionMan.getGui().getSelectedAutomata();
+		final VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();
+		final Automata selectedAutomata = ActionMan.getGui().getSelectedAutomata();
 
 		try
 		{
 			execute(theProject, selectedAutomata);
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Exception in Find States. ", ex);
 			logger.debug(ex.getStackTrace());
 		}
 	}
 
-	public void execute(VisualProject theProject, Automata theAutomata)
+	public void execute(final VisualProject theProject, final Automata theAutomata)
 		throws Exception
 	{
 		new FindStatesFrame(theProject, theAutomata).setVisible(true);

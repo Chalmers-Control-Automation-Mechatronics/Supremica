@@ -9,7 +9,7 @@
 
 package org.supremica.gui.ide.actions;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;

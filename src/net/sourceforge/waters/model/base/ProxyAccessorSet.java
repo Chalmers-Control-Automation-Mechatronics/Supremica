@@ -25,7 +25,7 @@ import java.util.Map;
  */
 
 public interface ProxyAccessorSet<P extends Proxy>
-  extends Map<ProxyAccessor<P>,P>
+  extends Map<ProxyAccessor<P>,P>, Iterable<P>
 {
 
   //#########################################################################
@@ -44,6 +44,7 @@ public interface ProxyAccessorSet<P extends Proxy>
 
   public int hashCodeByAccessorEquality();
 
+  @Override
   public Iterator<P> iterator();
 
   public boolean removeProxy(P proxy);

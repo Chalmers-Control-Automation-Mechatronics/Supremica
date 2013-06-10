@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.StateEncoding;
-import net.sourceforge.waters.model.analysis.DefaultAutomatonResult;
+import net.sourceforge.waters.model.analysis.des.DefaultAutomatonResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 

@@ -1,14 +1,15 @@
 package net.sourceforge.waters.analysis.certainconf;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
 
 import net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -51,14 +52,14 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     final int numEvents = rel.getNumberOfProperEvents();
     int index = 0;
     for (int event = 0; event < numEvents; event++) {
-      if (rel.isUsedEvent(event)) {
+      if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
         index++;
       }
     }
     mEventIndexes = new int[index];
     index = 0;
     for (int event = 0; event < numEvents; event++) {
-      if (rel.isUsedEvent(event)) {
+      if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
         mEventIndexes[index++] = event;
       }
     }
@@ -98,7 +99,8 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
 
     if (mInitialBadStates == 0) return false;
 
-    if (rel.isUsedEvent(EventEncoding.TAU)) {
+    if ((rel.getProperEventStatus(EventEncoding.TAU) &
+         EventEncoding.STATUS_UNUSED) == 0) {
       mIsDeterministic = false;
       final TauClosure closure = rel.createSuccessorsTauClosure(mTransitionLimit);
       mTauIterator = closure.createIterator();
@@ -463,7 +465,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         final int defaultID = getDefaultMarkingID();
         final int numStates = rel.getNumberOfStates();
         final TIntHashSet coreachableStates = new TIntHashSet(numStates);
-        final TIntStack unvisitedStates = new TIntStack();
+        final TIntStack unvisitedStates = new TIntArrayStack();
         // Creates a hash set of all states which can reach an omega marked or alpha
         // marked state
         for (int sourceID = 0; sourceID < numStates; sourceID++)
@@ -527,7 +529,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       final int numEvents = eventEnc.getNumberOfEvents();
       final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
       for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
-        if (rel.isUsedEvent(e)) {
+        if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) == 0) {
           final EventProxy event = eventEnc.getProperEvent(e);
           if (event != null) {
             events.add(event);

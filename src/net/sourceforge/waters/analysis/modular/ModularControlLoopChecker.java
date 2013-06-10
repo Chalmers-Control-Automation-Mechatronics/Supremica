@@ -1,17 +1,17 @@
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
@@ -390,3 +390,4 @@ public class ModularControlLoopChecker
   private Set<EventProxy> mLoopEvents;
   private final int mNodesRemaining = 3000000;
 }
+

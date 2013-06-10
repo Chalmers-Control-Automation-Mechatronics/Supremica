@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntProcedure;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.procedure.TIntIntProcedure;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -82,8 +82,8 @@ public class RevBiSimulator
       if (mTrans.hasPredecessors(i)) {notinit.add(i); mStates++; continue States;}
 
     }
-    if (!init.isEmpty()) {mWS.add(new SimpleEquivalenceClass(init.toNativeArray()));}
-    if (!notinit.isEmpty()) {mWS.add(new SimpleEquivalenceClass(notinit.toNativeArray()));}
+    if (!init.isEmpty()) {mWS.add(new SimpleEquivalenceClass(init.toArray()));}
+    if (!notinit.isEmpty()) {mWS.add(new SimpleEquivalenceClass(notinit.toArray()));}
   }
 
   public boolean run()
@@ -318,6 +318,7 @@ public class RevBiSimulator
     }
 
     //TODO maybe keep track of what events an equivalence class has no incoming events from
+    @Override
     public void splitOn()
     {
       mInfo = new TIntIntHashMap[mEventNum];
@@ -366,6 +367,7 @@ public class RevBiSimulator
       }
     }
 
+    @Override
     public TIntIntHashMap getInfo(final int event)
     {
       if (mInfo == null) {
@@ -410,6 +412,7 @@ public class RevBiSimulator
       size = child1.size + child2.size;
     }
 
+    @Override
     public void splitOn()
     {
       final ArrayList<SimpleEquivalenceClass> classes =
@@ -420,6 +423,7 @@ public class RevBiSimulator
         final TIntIntHashMap process = new TIntIntHashMap();
         final TIntIntHashMap info1 = mChild1.getInfo(e);
         info.forEachEntry(new TIntIntProcedure() {
+          @Override
           public boolean execute(final int state, int value) {
             if (value == 0) {
               System.out.println("zero value split");
@@ -472,9 +476,9 @@ public class RevBiSimulator
           System.out.println("X3:" + Arrays.toString(X3));
           System.out.println("X:" + Arrays.toString(sec.mStates));*/
           if (number == 2) {
-            X1 = sec.X1 == null ? null : sec.X1.toNativeArray();
-            X2 = sec.X2 == null ? null : sec.X2.toNativeArray();
-            X3 = sec.X3 == null ? null : sec.X3.toNativeArray();
+            X1 = sec.X1 == null ? null : sec.X1.toArray();
+            X2 = sec.X2 == null ? null : sec.X2.toArray();
+            X3 = sec.X3 == null ? null : sec.X3.toArray();
             if (X1 == null) {
               X1 = X3;
             } else if (X2 == null) {
@@ -482,8 +486,8 @@ public class RevBiSimulator
             }
             addToW(sec, X1, X2);
           } else if(number == 3) {
-            X1 = sec.X1.toNativeArray(); X2 = sec.X2.toNativeArray();
-            X3 = sec.X3.toNativeArray(); sec.mSplit = false;
+            X1 = sec.X1.toArray(); X2 = sec.X2.toArray();
+            X3 = sec.X3.toArray(); sec.mSplit = false;
             addToW(sec, X1, X2, X3);
           }
           sec.X1 = null; sec.X2 = null; sec.X3 = null; sec.mSplit = false;
@@ -496,6 +500,7 @@ public class RevBiSimulator
       if (mChild2 instanceof ComplexEquivalenceClass) {mWC.add((ComplexEquivalenceClass)mChild2);}
     }
 
+    @Override
     public TIntIntHashMap getInfo(final int event)
     {
       if (mInfo == null) {
@@ -512,11 +517,13 @@ public class RevBiSimulator
       }
       final TIntIntHashMap info = new TIntIntHashMap(info1.size());
       info1.forEachEntry(new TIntIntProcedure() {
+        @Override
         public boolean execute(final int state, final int value) {
           info.put(state, value); return true;
         }
       });
       info2.forEachEntry(new TIntIntProcedure() {
+        @Override
         public boolean execute(final int state, final int value) {
           info.adjustOrPutValue(state, value, value); return true;
         }
@@ -527,3 +534,4 @@ public class RevBiSimulator
     }
   }
 }
+

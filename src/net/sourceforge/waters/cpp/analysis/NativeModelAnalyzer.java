@@ -11,8 +11,8 @@ package net.sourceforge.waters.cpp.analysis;
 
 import java.nio.ByteBuffer;
 
-import net.sourceforge.waters.model.analysis.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -62,6 +62,8 @@ public abstract class NativeModelAnalyzer
   //#########################################################################
   //# Native Methods
   public native void requestAbort();
+
+  public static native long getPeakMemoryUsage();
 
 
   //#########################################################################

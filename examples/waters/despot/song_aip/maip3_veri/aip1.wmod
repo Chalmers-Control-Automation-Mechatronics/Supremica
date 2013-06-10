@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="aip1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>The model is nonblocking.
+It has 688099890 reachable states, and the diamater is 272.</ns2:Comment>
     <EventDeclList>
-        <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="ASDwnAS1:1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="ASDwnAS2:1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="CplMvInPalletIO:1"/>
@@ -94,14 +96,14 @@
         <EventDecl Kind="CONTROLLABLE" Name="TrnsfToELTU1:1"/>
         <EventDecl Kind="CONTROLLABLE" Name="TrnsfToELTU2:1"/>
         <EventDecl Kind="CONTROLLABLE" Name="TrnsfToELTU4:1"/>
-        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="finishpallets:1">
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="finishpallets:1">
             <ns2:AttributeMap>
-                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="startpallets:1">
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="startpallets:1">
             <ns2:AttributeMap>
-                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
     </EventDeclList>
@@ -117,12 +119,12 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="startpallets:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="finishpallets:1"/>
                         </LabelBlock>
@@ -146,7 +148,7 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletOutIO:1"/>
                             <SimpleIdentifier Name="NoPalletOutIO:1"/>
@@ -156,47 +158,47 @@
                             <SimpleIdentifier Name="NoPalletType2InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType1InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType2InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s0">
+                    <Edge Source="s0" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletOutIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="MvInPalletType1IO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="MvInPalletType2IO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="MvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
@@ -219,24 +221,24 @@
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletType1InIO:1"/>
                             <SimpleIdentifier Name="NoPalletType1InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType1InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletType2InIO:1"/>
                             <SimpleIdentifier Name="NoPalletType2InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType2InIO:1"/>
                         </LabelBlock>
@@ -258,7 +260,7 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCLTU2:1"/>
                             <SimpleIdentifier Name="QPalletAtELTU2:1"/>
@@ -268,27 +270,27 @@
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s0">
+                    <Edge Source="s0" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s1">
+                    <Edge Source="s1" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU2:1"/>
                             <SimpleIdentifier Name="TrnsfToELTU2:1"/>
@@ -296,37 +298,37 @@
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU2:1"/>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s4">
+                    <Edge Source="s4" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfELToCLTU2:1"/>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s4">
+                    <Edge Source="s4" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                         </LabelBlock>
@@ -347,53 +349,53 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                         </LabelBlock>
@@ -422,66 +424,36 @@
                     <SimpleNode Name="s32"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                             <SimpleIdentifier Name="TrnsfToELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s0">
+                    <Edge Source="s0" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s02" Source="s0">
+                    <Edge Source="s0" Target="s02">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="StnUpAS2:1"/>
-                            <SimpleIdentifier Name="StnDwnAS2:1"/>
-                            <SimpleIdentifier Name="TrnsfToELTU2:1"/>
-                            <SimpleIdentifier Name="ProcPalletAS2:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s11" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="NoTrnsfELTU2:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s12" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletCLTU2:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s2" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s1" Source="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="ProcCplAS2:1"/>
-                            <SimpleIdentifier Name="ProcErrAS2:1"/>
-                            <SimpleIdentifier Name="ASDwnAS2:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
@@ -489,179 +461,209 @@
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s21" Source="s2">
+                    <Edge Source="s1" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s22" Source="s2">
+                    <Edge Source="s1" Target="s12">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
+                            <SimpleIdentifier Name="TrnsfToELTU2:1"/>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
-                            <SimpleIdentifier Name="LibPalletTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s32" Source="s3">
+                    <Edge Source="s2" Target="s21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU2:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s22">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s01">
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS2:1"/>
+                            <SimpleIdentifier Name="ProcErrAS2:1"/>
+                            <SimpleIdentifier Name="ASDwnAS2:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS2:1"/>
+                            <SimpleIdentifier Name="StnDwnAS2:1"/>
+                            <SimpleIdentifier Name="ProcPalletAS2:1"/>
+                            <SimpleIdentifier Name="LibPalletTU2:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU2:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s01" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s01">
+                    <Edge Source="s01" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s02">
+                    <Edge Source="s02" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s02">
+                    <Edge Source="s02" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s11">
+                    <Edge Source="s11" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s11">
+                    <Edge Source="s11" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s11">
+                    <Edge Source="s11" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s12">
+                    <Edge Source="s12" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s12">
+                    <Edge Source="s12" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s12" Source="s12">
+                    <Edge Source="s12" Target="s12">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s02" Source="s12">
+                    <Edge Source="s12" Target="s02">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s21" Source="s21">
+                    <Edge Source="s21" Target="s21">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s21">
+                    <Edge Source="s21" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s21">
+                    <Edge Source="s21" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s22">
+                    <Edge Source="s22" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s21" Source="s22">
+                    <Edge Source="s22" Target="s21">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s22" Source="s22">
+                    <Edge Source="s22" Target="s22">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s12" Source="s22">
+                    <Edge Source="s22" Target="s12">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s31" Source="s31">
+                    <Edge Source="s31" Target="s31">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s31">
+                    <Edge Source="s31" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s21" Source="s31">
+                    <Edge Source="s31" Target="s21">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s32">
+                    <Edge Source="s32" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s31" Source="s32">
+                    <Edge Source="s32" Target="s31">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s32" Source="s32">
+                    <Edge Source="s32" Target="s32">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s22" Source="s32">
+                    <Edge Source="s32" Target="s22">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
@@ -683,37 +685,37 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU1:1"/>
                             <SimpleIdentifier Name="QPalletAtCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU1:1"/>
                             <SimpleIdentifier Name="QPalletAtCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
@@ -736,7 +738,7 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCLTU1:1"/>
                             <SimpleIdentifier Name="QPalletAtELTU1:1"/>
@@ -746,27 +748,27 @@
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s0">
+                    <Edge Source="s0" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s1">
+                    <Edge Source="s1" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU1:1"/>
                             <SimpleIdentifier Name="TrnsfToELTU1:1"/>
@@ -774,37 +776,37 @@
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU1:1"/>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s4">
+                    <Edge Source="s4" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfELToCLTU1:1"/>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s4">
+                    <Edge Source="s4" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                         </LabelBlock>
@@ -825,53 +827,53 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                         </LabelBlock>
@@ -900,66 +902,36 @@
                     <SimpleNode Name="s32"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                             <SimpleIdentifier Name="TrnsfToELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s0">
+                    <Edge Source="s0" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s02" Source="s0">
+                    <Edge Source="s0" Target="s02">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="StnUpAS1:1"/>
-                            <SimpleIdentifier Name="StnDwnAS1:1"/>
-                            <SimpleIdentifier Name="TrnsfToELTU1:1"/>
-                            <SimpleIdentifier Name="ProcPalletAS1:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s11" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="NoTrnsfELTU1:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s12" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="IsPalletCLTU1:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s2" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s1" Source="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="ProcCplAS1:1"/>
-                            <SimpleIdentifier Name="ProcErrAS1:1"/>
-                            <SimpleIdentifier Name="ASDwnAS1:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
@@ -967,179 +939,209 @@
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s21" Source="s2">
+                    <Edge Source="s1" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s22" Source="s2">
+                    <Edge Source="s1" Target="s12">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
+                            <SimpleIdentifier Name="TrnsfToELTU1:1"/>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
-                            <SimpleIdentifier Name="LibPalletTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s32" Source="s3">
+                    <Edge Source="s2" Target="s21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfELTU1:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s22">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s01">
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS1:1"/>
+                            <SimpleIdentifier Name="ProcErrAS1:1"/>
+                            <SimpleIdentifier Name="ASDwnAS1:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUpAS1:1"/>
+                            <SimpleIdentifier Name="StnDwnAS1:1"/>
+                            <SimpleIdentifier Name="ProcPalletAS1:1"/>
+                            <SimpleIdentifier Name="LibPalletTU1:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCLTU1:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s01" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s01">
+                    <Edge Source="s01" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s02">
+                    <Edge Source="s02" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s02">
+                    <Edge Source="s02" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s11">
+                    <Edge Source="s11" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s11">
+                    <Edge Source="s11" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s01" Source="s11">
+                    <Edge Source="s11" Target="s01">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s12">
+                    <Edge Source="s12" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s12">
+                    <Edge Source="s12" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s12" Source="s12">
+                    <Edge Source="s12" Target="s12">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s02" Source="s12">
+                    <Edge Source="s12" Target="s02">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s21" Source="s21">
+                    <Edge Source="s21" Target="s21">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s21">
+                    <Edge Source="s21" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s21">
+                    <Edge Source="s21" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s22">
+                    <Edge Source="s22" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s21" Source="s22">
+                    <Edge Source="s22" Target="s21">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s22" Source="s22">
+                    <Edge Source="s22" Target="s22">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s12" Source="s22">
+                    <Edge Source="s22" Target="s12">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s31" Source="s31">
+                    <Edge Source="s31" Target="s31">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s31">
+                    <Edge Source="s31" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s21" Source="s31">
+                    <Edge Source="s31" Target="s21">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s32">
+                    <Edge Source="s32" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s31" Source="s32">
+                    <Edge Source="s32" Target="s31">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s32" Source="s32">
+                    <Edge Source="s32" Target="s32">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s22" Source="s32">
+                    <Edge Source="s32" Target="s22">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
@@ -1161,37 +1163,37 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU4:1"/>
                             <SimpleIdentifier Name="QPalletAtCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU4:1"/>
                             <SimpleIdentifier Name="QPalletAtCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
@@ -1217,61 +1219,61 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s2">
+                    <Edge Source="s2" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s4">
+                    <Edge Source="s4" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU3:1"/>
                             <SimpleIdentifier Name="TrnsfToEL3_2D:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s5" Source="s5">
+                    <Edge Source="s5" Target="s5">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s6" Source="s5">
+                    <Edge Source="s5" Target="s6">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s7" Source="s5">
+                    <Edge Source="s5" Target="s7">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s6">
+                    <Edge Source="s6" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU3:1"/>
                             <SimpleIdentifier Name="TrnsfToEL3_BD:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s7">
+                    <Edge Source="s7" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU3:1"/>
                             <SimpleIdentifier Name="TrnsfToEL3_1D:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU3:1"/>
                             <SimpleIdentifier Name="TrnsfToEL3_Up:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS1:1"/>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
@@ -1282,22 +1284,22 @@
                             <SimpleIdentifier Name="LibPalletTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="DetStnsUp:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s5" Source="s1">
+                    <Edge Source="s1" Target="s5">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS1:1"/>
                         </LabelBlock>
@@ -1320,48 +1322,48 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s0">
+                    <Edge Source="s0" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="DetStnsUp:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s1">
+                    <Edge Source="s1" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s5" Source="s2">
+                    <Edge Source="s2" Target="s5">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS1:1"/>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
@@ -1369,23 +1371,23 @@
                             <SimpleIdentifier Name="QStnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s4">
+                    <Edge Source="s4" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s4">
+                    <Edge Source="s4" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s5" Source="s5">
+                    <Edge Source="s5" Target="s5">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s5">
+                    <Edge Source="s5" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
@@ -1408,7 +1410,7 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCLTU3:1"/>
                             <SimpleIdentifier Name="QPalletAtELTU3:1"/>
@@ -1416,22 +1418,22 @@
                             <SimpleIdentifier Name="NoPalletCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s0">
+                    <Edge Source="s0" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="DetStnsUp:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL3_Up:1"/>
                             <SimpleIdentifier Name="TrnsfToEL3_1D:1"/>
@@ -1440,33 +1442,33 @@
                             <SimpleIdentifier Name="LibPalletTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s4">
+                    <Edge Source="s4" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfELToCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s4">
+                    <Edge Source="s4" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                         </LabelBlock>
@@ -1487,53 +1489,53 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                         </LabelBlock>
@@ -1557,17 +1559,17 @@
                     <SimpleNode Name="s12"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s10" Source="s0">
+                    <Edge Source="s0" Target="s10">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL3_Up:1"/>
                             <SimpleIdentifier Name="TrnsfToEL3_1D:1"/>
@@ -1575,50 +1577,24 @@
                             <SimpleIdentifier Name="TrnsfToEL3_BD:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s1">
+                    <Edge Source="s1" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfToEL3_Up:1"/>
-                            <SimpleIdentifier Name="TrnsfToEL3_1D:1"/>
-                            <SimpleIdentifier Name="TrnsfToEL3_2D:1"/>
-                            <SimpleIdentifier Name="TrnsfToEL3_BD:1"/>
-                            <SimpleIdentifier Name="ProcPalletAS3:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s1" Source="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="ProcCplAS3:1"/>
-                            <SimpleIdentifier Name="ProcErrAS3:1"/>
-                            <SimpleIdentifier Name="PalletRepdAS3:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s12" Source="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="NoTrnsfELTU3:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s3" Source="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL3_Up:1"/>
                             <SimpleIdentifier Name="TrnsfToEL3_1D:1"/>
@@ -1627,52 +1603,78 @@
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s2" Target="s12">
                         <LabelBlock>
-                            <SimpleIdentifier Name="ProcPalletAS3:1"/>
-                            <SimpleIdentifier Name="LibPalletTU3:1"/>
+                            <SimpleIdentifier Name="NoTrnsfELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s10">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="LibPalletTU3:1"/>
+                            <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s11">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="LibPalletTU3:1"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Target="s11" Source="s11">
-                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfToEL3_Up:1"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_1D:1"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_2D:1"/>
+                            <SimpleIdentifier Name="TrnsfToEL3_BD:1"/>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s10" Source="s11">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s12">
+                    <Edge Source="s3" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:1"/>
+                            <SimpleIdentifier Name="LibPalletTU3:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s10" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s12" Source="s12">
+                    <Edge Source="s11" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s11" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s12">
+                    <Edge Source="s11" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCplAS3:1"/>
+                            <SimpleIdentifier Name="ProcErrAS3:1"/>
+                            <SimpleIdentifier Name="PalletRepdAS3:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s12" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPalletTU3:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s12" Target="s12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPalletAS3:1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s12" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
@@ -1694,37 +1696,37 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU2:1"/>
                             <SimpleIdentifier Name="QPalletAtCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU2:1"/>
                             <SimpleIdentifier Name="QPalletAtCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
@@ -1746,7 +1748,7 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU4:1"/>
                             <SimpleIdentifier Name="NoPalletELTU4:1"/>
@@ -1754,49 +1756,49 @@
                             <SimpleIdentifier Name="NoPalletCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfELToCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToELTU4:1"/>
                             <SimpleIdentifier Name="LibPalletTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU4:1"/>
                         </LabelBlock>
@@ -1817,50 +1819,50 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletType1InIO:1"/>
                             <SimpleIdentifier Name="QPalletType2InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletType1InIO:1"/>
                             <SimpleIdentifier Name="QPalletType2InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletType1InIO:1"/>
                             <SimpleIdentifier Name="QPalletType2InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                         </LabelBlock>
@@ -1884,92 +1886,92 @@
                     <SimpleNode Name="s12"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s10" Source="s0">
+                    <Edge Source="s0" Target="s10">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s1">
+                    <Edge Source="s1" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s12" Source="s2">
+                    <Edge Source="s2" Target="s12">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s10">
+                    <Edge Source="s10" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s11">
+                    <Edge Source="s11" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s10" Source="s11">
+                    <Edge Source="s11" Target="s10">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s12">
+                    <Edge Source="s12" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s11" Source="s12">
+                    <Edge Source="s12" Target="s11">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
@@ -1989,37 +1991,37 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU3:1"/>
                             <SimpleIdentifier Name="QPalletAtCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU3:1"/>
                             <SimpleIdentifier Name="QPalletAtCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
@@ -2041,62 +2043,62 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s1">
+                    <Edge Source="s1" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="RobUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="DoRprAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s3">
+                    <Edge Source="s3" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="RobUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="DoRprAS2:1"/>
                         </LabelBlock>
@@ -2116,23 +2118,23 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletELTU2:1"/>
                             <SimpleIdentifier Name="IsPalletELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU2:1"/>
                             <SimpleIdentifier Name="NoPalletCLTU2:1"/>
@@ -2155,70 +2157,70 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s3">
+                    <Edge Source="s3" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s4">
+                    <Edge Source="s4" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s4">
+                    <Edge Source="s4" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                         </LabelBlock>
@@ -2240,42 +2242,42 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s3">
+                    <Edge Source="s3" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s4">
+                    <Edge Source="s4" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
@@ -2296,52 +2298,52 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
@@ -2363,62 +2365,62 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s1">
+                    <Edge Source="s1" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="QStnUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="RobUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="DoRprAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s3">
+                    <Edge Source="s3" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="RobUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="StnDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="DoRprAS1:1"/>
                         </LabelBlock>
@@ -2438,23 +2440,23 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletELTU1:1"/>
                             <SimpleIdentifier Name="IsPalletELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU1:1"/>
                             <SimpleIdentifier Name="NoPalletCLTU1:1"/>
@@ -2477,70 +2479,70 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s3">
+                    <Edge Source="s3" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s4">
+                    <Edge Source="s4" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s4">
+                    <Edge Source="s4" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                         </LabelBlock>
@@ -2562,42 +2564,42 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s3">
+                    <Edge Source="s3" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s4">
+                    <Edge Source="s4" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
@@ -2618,52 +2620,52 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
@@ -2684,23 +2686,23 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletELTU3:1"/>
                             <SimpleIdentifier Name="IsPalletELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU3:1"/>
                             <SimpleIdentifier Name="NoPalletCLTU3:1"/>
@@ -2723,70 +2725,70 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s3">
+                    <Edge Source="s3" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
                             <SimpleIdentifier Name="PalletRepdAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s4">
+                    <Edge Source="s4" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s4">
+                    <Edge Source="s4" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                         </LabelBlock>
@@ -2808,42 +2810,42 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s3">
+                    <Edge Source="s3" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s4">
+                    <Edge Source="s4" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
@@ -2864,52 +2866,52 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
@@ -2930,23 +2932,23 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletAtCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoPalletELTU4:1"/>
                             <SimpleIdentifier Name="IsPalletELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU4:1"/>
                             <SimpleIdentifier Name="NoPalletCLTU4:1"/>
@@ -2969,62 +2971,62 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s3">
+                    <Edge Source="s3" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s4">
+                    <Edge Source="s4" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s4">
+                    <Edge Source="s4" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                         </LabelBlock>
@@ -3046,62 +3048,62 @@
                     <SimpleNode Name="s4"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletOutIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletOutIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s3">
+                    <Edge Source="s3" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletOutIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s4">
+                    <Edge Source="s4" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletOutIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s4">
+                    <Edge Source="s4" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
@@ -3122,52 +3124,52 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
@@ -3189,34 +3191,34 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletOutIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletType1InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s0">
+                    <Edge Source="s0" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="QPalletType2InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletOutIO:1"/>
                             <SimpleIdentifier Name="NoPalletOutIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType1InIO:1"/>
                             <SimpleIdentifier Name="NoPalletType1InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType2InIO:1"/>
                             <SimpleIdentifier Name="NoPalletType2InIO:1"/>
@@ -3238,22 +3240,22 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="startpallets:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType1InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType1InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType1InIO:1"/>
                         </LabelBlock>
@@ -3274,22 +3276,22 @@
                     <SimpleNode Name="s3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="startpallets:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType2InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType2InIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="IsPalletType2InIO:1"/>
                         </LabelBlock>
@@ -3313,37 +3315,37 @@
                     <SimpleNode Name="s6"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s4" Source="s3">
+                    <Edge Source="s3" Target="s4">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s5" Source="s4">
+                    <Edge Source="s4" Target="s5">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s6" Source="s5">
+                    <Edge Source="s5" Target="s6">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s6">
+                    <Edge Source="s6" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="finishpallets:1"/>
                         </LabelBlock>
@@ -3368,28 +3370,28 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="RobUpAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="DoRprAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS2:1"/>
                             <SimpleIdentifier Name="ProcErrAS2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s1">
+                    <Edge Source="s1" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ASDwnAS2:1"/>
                         </LabelBlock>
@@ -3414,28 +3416,28 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="RobUpAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s3">
+                    <Edge Source="s3" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="DoRprAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS1:1"/>
                             <SimpleIdentifier Name="ProcErrAS1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s1">
+                    <Edge Source="s1" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="ASDwnAS1:1"/>
                         </LabelBlock>
@@ -3454,12 +3456,12 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcPalletAS3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="ProcCplAS3:1"/>
                             <SimpleIdentifier Name="ProcErrAS3:1"/>
@@ -3482,32 +3484,32 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsdTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfELToCLTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s0">
+                    <Edge Source="s0" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToELTU2:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU2:1"/>
                             <SimpleIdentifier Name="TrnsfCplToELTU2:1"/>
@@ -3529,32 +3531,32 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsdTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfELToCLTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s0">
+                    <Edge Source="s0" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToELTU1:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU1:1"/>
                             <SimpleIdentifier Name="TrnsfCplToELTU1:1"/>
@@ -3576,7 +3578,7 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToEL3_Up:1"/>
                             <SimpleIdentifier Name="TrnsfToEL3_1D:1"/>
@@ -3584,28 +3586,28 @@
                             <SimpleIdentifier Name="TrnsfToEL3_BD:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU3:1"/>
                             <SimpleIdentifier Name="TrnsfCplToELTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfELToCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s0">
+                    <Edge Source="s0" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU3:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsdTU3:1"/>
                         </LabelBlock>
@@ -3626,32 +3628,32 @@
                     <SimpleNode Name="s1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfCplToCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s3">
+                    <Edge Source="s3" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="PalletRlsdTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfELToCLTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s0">
+                    <Edge Source="s0" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="LibPalletTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="TrnsfToELTU4:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="NoTrnsfELTU4:1"/>
                             <SimpleIdentifier Name="TrnsfCplToELTU4:1"/>
@@ -3672,23 +3674,23 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="MvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s0">
+                    <Edge Source="s0" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="MvInPalletType1IO:1"/>
                             <SimpleIdentifier Name="MvInPalletType2IO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s1">
+                    <Edge Source="s1" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvOutPalletIO:1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="CplMvInPalletIO:1"/>
                         </LabelBlock>

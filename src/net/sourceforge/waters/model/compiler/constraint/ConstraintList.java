@@ -14,13 +14,16 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
-import net.sourceforge.waters.model.printer.ProxyPrinter;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 
 
 /**
@@ -49,6 +52,7 @@ public class ConstraintList
 
   //#########################################################################
   //# Overrides for Baseclass java.lang.Object
+  @Override
   public String toString()
   {
     try {
@@ -61,6 +65,7 @@ public class ConstraintList
     }
   }
 
+  @Override
   public boolean equals(final Object other)
   {
     if (other != null && other.getClass() == getClass()) {
@@ -73,6 +78,7 @@ public class ConstraintList
     }
   }
 
+  @Override
   public int hashCode()
   {
     final ModuleHashCodeVisitor hash =
@@ -120,6 +126,30 @@ public class ConstraintList
       }
     }
     return false;
+  }
+
+  /**
+   * Creates an expression representing the combination of formulas in this
+   * constraint list.
+   * @param factory  Factory used to create expressions.
+   * @param operator Operator used to combine subterms. This will typically
+   *                 be an AND operator, but others are possible as well.
+   */
+  public SimpleExpressionProxy createExpression(final ModuleProxyFactory factory,
+                                                final BinaryOperator operator)
+  {
+    final ListIterator<SimpleExpressionProxy> iter =
+      mConstraints.listIterator(mConstraints.size());
+    if (iter.hasPrevious()) {
+      SimpleExpressionProxy result = iter.previous();
+      while (iter.hasPrevious()) {
+        final SimpleExpressionProxy previous = iter.previous();
+        result = factory.createBinaryExpressionProxy(operator, previous, result);
+      }
+      return result;
+    } else {
+      return null;
+    }
   }
 
 

@@ -25,11 +25,11 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
@@ -50,14 +50,13 @@ public class GraphSavePDFAction
     putValue(Action.NAME, "Save as PDF ...");
     putValue(Action.SHORT_DESCRIPTION,
              "Save the currently viewed automaton in a PDF file");
-    putValue(Action.SMALL_ICON,
-             new ImageIcon(IDE.class.getResource
-                           ("/toolbarButtonGraphics/general/Print16.gif")));
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_PRINT);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final GraphEditorPanel surface = getActiveGraphEditorPanel();

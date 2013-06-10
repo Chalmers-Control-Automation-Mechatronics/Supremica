@@ -10,6 +10,9 @@
 package net.sourceforge.waters.model.analysis;
 
 import net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;

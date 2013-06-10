@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -122,7 +122,7 @@ public class SynthesisAbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
-                     final List<AbstractionStep> steps)
+                     final List<AbstractionStep> steps, final Candidate cand)
     throws AnalysisException
   {
     try {
@@ -437,3 +437,4 @@ public class SynthesisAbstractionProcedure
     USE_HALFWAY | USE_BISIMULATION | USE_SOE | USE_WSOE;
 
 }
+

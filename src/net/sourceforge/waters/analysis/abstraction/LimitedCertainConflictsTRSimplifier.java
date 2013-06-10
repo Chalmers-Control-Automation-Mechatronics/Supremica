@@ -9,14 +9,15 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -181,8 +182,11 @@ public class LimitedCertainConflictsTRSimplifier
     mPredecessorsIterator = rel.createPredecessorsReadOnlyIterator();
     mMaxLevel = COREACHABLE;
     int level = BLOCKING;
-    int numCoreachable = findCoreachableStates(level);
     int numReachable = rel.getNumberOfReachableStates();
+    if (numReachable <= 1) {
+      return false;
+    }
+    int numCoreachable = findCoreachableStates(level);
     if (numCoreachable == numReachable) {
       return false;
     }
@@ -235,17 +239,18 @@ public class LimitedCertainConflictsTRSimplifier
       }
       // check for proper event transitions to certain conflicts
       nextlevel++;
+      mPredecessorsIterator.resetEvents(EventEncoding.NONTAU, numEvents);
       for (int state = 0; state < numStates; state++) {
         if (mStateInfo[state] >= level && rel.isReachable(state)) {
           checkAbort();
-          mPredecessorsIterator.reset(state, -1);
+          mPredecessorsIterator.resetState(state);
           while (mPredecessorsIterator.advance()) {
-            final int event = mPredecessorsIterator.getCurrentEvent();
             final int pred = mPredecessorsIterator.getCurrentSourceState();
-            if (event != tauID && mStateInfo[pred] == COREACHABLE) {
+            if (mStateInfo[pred] == COREACHABLE) {
               closureIter.resetState(pred);
               while (closureIter.advance()) {
                 final int ppred = closureIter.getCurrentSourceState();
+                final int event = mPredecessorsIterator.getCurrentEvent();
                 succIter.reset(ppred, event);
                 while (succIter.advance()) {
                   if (ppred != pred) {
@@ -305,7 +310,28 @@ public class LimitedCertainConflictsTRSimplifier
 
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     numReachable = rel.getNumberOfReachableStates();
-    if (numCoreachable == 0) {
+    int blockingInit = -1;
+    if (numCoreachable < numReachable && numCoreachable > 0) {
+      // Some reachable states are blocking. Is one of them initial?
+      for (int state = 0; state < numStates; state++) {
+        if (mStateInfo[state] != COREACHABLE && rel.isInitial(state)) {
+          blockingInit = state;
+          break;
+        }
+      }
+    }
+    if (blockingInit >= 0) {
+      // There is a blocking initial state.
+      // Mark all other states as unreachable.
+      for (int state = 0; state < numStates; state++) {
+        if (state == blockingInit) {
+          rel.removeOutgoingTransitions(state);
+        } else {
+          rel.setReachable(state, false);
+        }
+      }
+      result = true;
+    } else if (numCoreachable == 0) {
       // No coreachable states. Merge all reachable states into a single
       // blocking state, and be sure to remove all transitions.
       if (numReachable > 1) {
@@ -343,7 +369,7 @@ public class LimitedCertainConflictsTRSimplifier
       succIter.reset(bstate, -1);
       result |= succIter.advance();
       for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           rel.addTransition(bstate, event, bstate);
         }
       }
@@ -403,7 +429,7 @@ public class LimitedCertainConflictsTRSimplifier
     if (bstate > 0) {
       final int numEvents = rel.getNumberOfProperEvents();
       for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-        if (rel.isUsedEvent(event)) {
+        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
           rel.addTransition(bstate, event, bstate);
         }
       }
@@ -444,7 +470,7 @@ public class LimitedCertainConflictsTRSimplifier
     final int numEvents = eventEnc.getNumberOfEvents();
     final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
     for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
-      if (rel.isUsedEvent(e)) {
+      if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) == 0) {
         final EventProxy event = eventEnc.getProperEvent(e);
         if (event != null) {
           events.add(event);
@@ -550,7 +576,7 @@ public class LimitedCertainConflictsTRSimplifier
     final int defaultID = getDefaultMarkingID();
     if (mStateInfo == null) {
       mStateInfo = new int[numStates];
-      mUnvisitedStates = new TIntStack();
+      mUnvisitedStates = new TIntArrayStack();
       if (level != 0) {
         Arrays.fill(mStateInfo, level);
       }
@@ -561,6 +587,7 @@ public class LimitedCertainConflictsTRSimplifier
         }
       }
     }
+    mPredecessorsIterator.resetEvent(-1);
     int coreachable = 0;
     for (int state = 0; state < numStates; state++) {
       if (rel.isMarked(state, defaultID) &&
@@ -605,3 +632,4 @@ public class LimitedCertainConflictsTRSimplifier
   private static final int COREACHABLE = -1;
 
 }
+

@@ -9,8 +9,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.set.hash.TIntHashSet;
+
 import net.sourceforge.waters.model.base.ProxyTools;
-import gnu.trove.TIntHashSet;
 
 
 /**
@@ -45,8 +46,10 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
     mEvent = event;
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+  @Override
   public void reset()
   {
     assert mEvent >= 0;
@@ -54,6 +57,7 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
     clear();
   }
 
+  @Override
   public void resetEvent(final int event)
   {
     mInnerIterator.resetEvent(event);
@@ -61,6 +65,7 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
     mEvent = event;
   }
 
+  @Override
   public void resetEvents(final int first, final int last)
   {
     if (first == last) {
@@ -72,12 +77,14 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
     }
   }
 
+  @Override
   public void resetState(final int from)
   {
     mInnerIterator.resetState(from);
     clear();
   }
 
+  @Override
   public void reset(final int from, final int event)
   {
     mInnerIterator.reset(from, event);
@@ -85,12 +92,14 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
     mEvent = event;
   }
 
+  @Override
   public void resume(final int from)
   {
     assert mEvent >= 0;
     mInnerIterator.resetState(from);
   }
 
+  @Override
   public boolean advance()
   {
     while (mInnerIterator.advance()) {
@@ -102,35 +111,54 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
     return false;
   }
 
+  @Override
   public int getCurrentEvent()
   {
     return mEvent;
   }
 
+  @Override
   public int getCurrentSourceState()
   {
     return mInnerIterator.getCurrentSourceState();
   }
 
+  @Override
   public int getCurrentToState()
   {
     return mInnerIterator.getCurrentToState();
   }
 
+  @Override
   public int getCurrentTargetState()
   {
     return mInnerIterator.getCurrentTargetState();
   }
 
+  @Override
   public int getCurrentFromState()
   {
     return mInnerIterator.getCurrentFromState();
   }
 
+  @Override
   public void remove()
   {
     mInnerIterator.remove();
   }
+
+
+  //#########################################################################
+  //# Specific Access
+  /**
+   * Adds the given state to the set of states visited by this iterator,
+   * preventing the same state from being produced by successive iterations.
+   */
+  public void addVisitedState(final int state)
+  {
+    mVisited.add(state);
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -144,6 +172,7 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
     }
   }
 
+
   //#########################################################################
   //# Data Members
   private final TransitionIterator mInnerIterator;
@@ -151,3 +180,4 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
   private int mEvent;
 
 }
+

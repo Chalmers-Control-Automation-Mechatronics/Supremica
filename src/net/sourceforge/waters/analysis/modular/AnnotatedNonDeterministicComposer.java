@@ -1,30 +1,29 @@
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import net.sourceforge.waters.analysis.annotation.AnnotatedMemStateProxy;
+import net.sourceforge.waters.analysis.annotation.AnnotationEvent;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.THashSet;
-import java.util.Iterator;
-
-import net.sourceforge.waters.analysis.annotation.AnnotatedMemStateProxy;
-import net.sourceforge.waters.analysis.annotation.AnnotationEvent;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class AnnotatedNonDeterministicComposer
@@ -111,7 +110,7 @@ public class AnnotatedNonDeterministicComposer
         }
         statetoindex.put(s, snum); snum++;
       }
-      currentState[i] = cs.toNativeArray();
+      currentState[i] = cs.toArray();
       // TODO do this smarter later
       final TIntHashSet[] tempanns = new TIntHashSet[snum];
       for (int s = 0; s < tempanns.length; s++) {
@@ -143,7 +142,7 @@ public class AnnotatedNonDeterministicComposer
         for (int k = 0; k < auttransitionslists[j].length; k++) {
           final TIntArrayList list = auttransitionslists[j][k];
           if (list != null) {
-            final int[] targs = list.toNativeArray(); transitions[i][j][k] = targs;
+            final int[] targs = list.toArray(); transitions[i][j][k] = targs;
           }
         }
       }
@@ -163,7 +162,7 @@ public class AnnotatedNonDeterministicComposer
               list[j].mDouble++;
             }
           }
-          list[j].mDouble /= (double)transitions[j][i].length;
+          list[j].mDouble /= transitions[j][i].length;
         } else {
           list[j].mDouble = Double.POSITIVE_INFINITY;
         }
@@ -402,11 +401,13 @@ public class AnnotatedNonDeterministicComposer
       mValues = new int[mInitialSize][];
     }
 
+    @Override
     public boolean isEmpty()
     {
       return mLength == 0;
     }
 
+    @Override
     public void offer(final int[] a)
     {
       if (mLength == mValues.length) {
@@ -421,6 +422,7 @@ public class AnnotatedNonDeterministicComposer
       mLength++;
     }
 
+    @Override
     public int[] take()
     {
       mLength--;
@@ -464,11 +466,13 @@ public class AnnotatedNonDeterministicComposer
       mMap = new HashMap<IntArray, Integer>(num);
     }
 
+    @Override
     public Set<Map.Entry<int[],Integer>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
 
+    @Override
     public Integer get(final Object o)
     {
       final int[] a = (int[]) o;
@@ -487,11 +491,13 @@ public class AnnotatedNonDeterministicComposer
       return mMap.put(new IntArray((int[])o), s);
     }
 
+    @Override
     public Integer put(final int[] a, final Integer s)
     {
       return mMap.put(new IntArray(a), s);
     }
 
+    @Override
     public Collection<Integer> values()
     {
       return mMap.values();
@@ -507,11 +513,13 @@ public class AnnotatedNonDeterministicComposer
       mArray = array;
     }
 
+    @Override
     public int hashCode()
     {
       return Arrays.hashCode(mArray);
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final IntArray oth = (IntArray)o;
@@ -526,6 +534,7 @@ public class AnnotatedNonDeterministicComposer
       return true;
     }
 
+    @Override
     public String toString()
     {
       return Arrays.toString(mArray);
@@ -544,6 +553,7 @@ public class AnnotatedNonDeterministicComposer
       mDouble = d;
     }
 
+    @Override
     public int compareTo(final IntDouble id)
     {
       if (mDouble < id.mDouble) {
@@ -584,6 +594,7 @@ public class AnnotatedNonDeterministicComposer
       return mArray[mIndex];
     }
 
+    @Override
     public int compareTo(final Pointer p)
     {
       return mArray[mIndex].compareTo(p.mArray[p.mIndex]);
@@ -697,3 +708,4 @@ public class AnnotatedNonDeterministicComposer
   private Set<TIntHashSet>[][] mAnnotations;
   private final TIntHashSet mNewInitial = new TIntHashSet();
 }
+

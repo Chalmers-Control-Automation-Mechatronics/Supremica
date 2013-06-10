@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.lang.Comparable;
 import java.util.ArrayList;
@@ -62,8 +62,8 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import net.sourceforge.waters.analysis.LightWeightGraph;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
-import gnu.trove.THashSet;
-import gnu.trove.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.THashMap;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
@@ -800,3 +800,4 @@ public class ProjectingNonBlockingChecker
     LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }
+

@@ -12,6 +12,8 @@ package net.sourceforge.waters.model.analysis;
 import java.io.PrintStream;
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 
 
@@ -61,6 +63,7 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Interface java.util.Comparable
+  @Override
   public int compareTo(final CommandLineArgument arg)
   {
     return mName.compareTo(arg.getName());
@@ -69,7 +72,7 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Simple Access
-  protected String getName()
+  public String getName()
   {
     return mName;
   }
@@ -95,12 +98,12 @@ public abstract class CommandLineArgument
    * fail by calling the {@link #fail(String) fail()} method of the
    * unspecified required argument.</P>
    */
-  protected boolean isRequired()
+  public boolean isRequired()
   {
     return mIsRequired;
   }
 
-  protected boolean isUsed()
+  public boolean isUsed()
   {
     return mIsUsed;
   }
@@ -113,17 +116,17 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Parsing
-  protected abstract void parse(Iterator<String> iter);
+  public abstract void parse(Iterator<String> iter);
 
-  protected void configure(final ModelVerifier verifier)
+  public void configure(final ModelVerifier verifier)
   {
   }
 
-  protected void configure(final ModuleCompiler compiler)
+  public void configure(final ModuleCompiler compiler)
   {
   }
 
-  protected void postConfigure(final ModelVerifier verifier)
+  public void postConfigure(final ModelVerifier verifier)
     throws AnalysisException
   {
   }
@@ -131,7 +134,7 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Printing
-  protected void dump(final PrintStream stream, final ModelVerifier verifier)
+  public void dump(final PrintStream stream, final ModelVerifier verifier)
   {
     final String name = getName();
     final String template = getArgumentTemplate();
@@ -171,7 +174,7 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Exception Handling
-  protected static void fail(final String msg)
+  public static void fail(final String msg)
   {
     System.err.println(msg);
     System.exit(1);

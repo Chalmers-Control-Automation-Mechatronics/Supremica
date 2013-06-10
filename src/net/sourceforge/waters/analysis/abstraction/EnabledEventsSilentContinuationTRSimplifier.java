@@ -9,14 +9,14 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-import gnu.trove.HashFunctions;
-import gnu.trove.TIntHashSet;
-
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TauClosure;
@@ -56,6 +56,9 @@ public class EnabledEventsSilentContinuationTRSimplifier
   }
 
 
+
+
+
   //#########################################################################
   //# Configuration
   /**
@@ -80,6 +83,11 @@ public class EnabledEventsSilentContinuationTRSimplifier
     return mTransitionLimit;
   }
 
+  /**
+   * Sets the number of always enabled events. Always enabled events are events
+   * that are not disabled by any other current automaton.
+   * @param numEnabledEvents
+   */
   public void setNumberOfEnabledEvents(final int numEnabledEvents)
   {
 
@@ -101,16 +109,24 @@ public class EnabledEventsSilentContinuationTRSimplifier
     return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
   }
 
+  @Override
   public boolean isPartitioning()
   {
     return true;
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
-    final TRSimplifierStatistics stats =
-      new TRSimplifierStatistics(this, true, false);
+    final EnabledEventsStatistics stats =
+      new EnabledEventsStatistics(this, true, false);
     return setStatistics(stats);
+  }
+
+  @Override
+  public EnabledEventsStatistics getStatistics()
+  {
+    return (EnabledEventsStatistics) super.getStatistics();
   }
 
 
@@ -121,27 +137,25 @@ public class EnabledEventsSilentContinuationTRSimplifier
   throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (!rel.isUsedEvent(EventEncoding.TAU) && mNumberOfEnabledEvents == 0) {
+    if ((rel.getProperEventStatus(EventEncoding.TAU) &
+         EventEncoding.STATUS_UNUSED) != 0 &&
+        mNumberOfEnabledEvents == 0) {
       return false;
     }
     final int numStates = rel.getNumberOfStates();
     final BitSet candidates = new BitSet(numStates);
 
-    //The old stuff
-    //final TransitionIterator iter =                                 //This is typical transition relation
-    //  rel.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);      //loop over all TAU TAU TAU transitions in  tr buffer
-
     final TransitionIterator iter =
       rel.createAllTransitionsReadOnlyIterator();
     iter.resetEvents(0, mNumberOfEnabledEvents);        //Iterating over events with outgoing Tau or always enabled events.
 
-    while (iter.advance()) {        //for each transition
+    while (iter.advance()) {                                //for each transition
       final int source = iter.getCurrentSourceState();      //find source state
-      candidates.set(source);                       //candidates will have one bit for each state with outgoing transition
+      candidates.set(source);                               //candidates will have one bit for each state with outgoing transition
     }           //great big string of 0s and 1s which say if state has an outgoing transition or not
     final int numCandidates = candidates.cardinality();
-    if (numCandidates == 0) {           //if there are no outgoing transitions
-      return false;                     //can't simplify
+    if (numCandidates == 0) {                               //if there are no outgoing transitions
+      return false;                                         //can't simplify
     }
     final WatersIntHashingStrategy strategy = //something in hashingstrategy does the rule //group together incoming equivalence states
       new IncomingEquivalenceStateHash();
@@ -188,6 +202,19 @@ public class EnabledEventsSilentContinuationTRSimplifier
     }
   }
 
+
+
+  @Override
+  protected void recordStart()
+  {
+    super.recordStart();
+    final EnabledEventsStatistics stats = getStatistics();
+    if (stats != null) {
+      stats.recordNumEnabledEvents(mNumberOfEnabledEvents);
+    }
+  }
+
+
   @Override
   protected void applyResultPartition()
     throws AnalysisException
@@ -197,6 +224,8 @@ public class EnabledEventsSilentContinuationTRSimplifier
     rel.removeTauSelfLoops();
     rel.removeProperSelfLoopEvents();
   }
+
+
 
 
   //#########################################################################
@@ -221,6 +250,7 @@ public class EnabledEventsSilentContinuationTRSimplifier
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.abstraction.WatersIntHashingStrategy
+    @Override
     public int computeHashCode(final int root)
     {
       if (root == mPreviousRoot) {
@@ -268,6 +298,7 @@ public class EnabledEventsSilentContinuationTRSimplifier
       }
     }
 
+    @Override
     public boolean equals(final int root1, final int root2) //checks if two states can be merged by rule
     {
       try {
@@ -366,3 +397,4 @@ public class EnabledEventsSilentContinuationTRSimplifier
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mNumberOfEnabledEvents;
 }
+

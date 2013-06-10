@@ -59,7 +59,7 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.ProductDESResult;
+import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -434,11 +434,11 @@ public class AutomataSynthesizer
             new CompositionalSynthesizer(des, factory, translator,
                                          SynthesisAbstractionProcedureFactory.WSOE);
           synthesizer.setConfiguredDefaultMarking(marking);
-          synthesizer.setInternalStateLimit(10000);
+          synthesizer.setInternalStateLimit(5000);
            synthesizer.setPreselectingMethod
              (AbstractCompositionalModelAnalyzer.MustL);
            synthesizer.setSelectingMethod
-             (AbstractCompositionalModelAnalyzer.MinSync);
+             (AbstractCompositionalModelAnalyzer.MinS);
           synthesizer.run();
           final ProductDESResult watersResult =
             synthesizer.getAnalysisResult();

@@ -11,8 +11,8 @@ package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.analysis.annotation.ProjectingNonBlockingChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

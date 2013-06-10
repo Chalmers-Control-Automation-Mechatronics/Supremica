@@ -317,9 +317,17 @@ public abstract class BDDAbstractManager {
                 if (v2.isConst()) {
                     return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(), false).getResult().divmod(v2.val(), true), getZeroBDD());
                 } else {
-                    throw new IllegalArgumentException("Divisor is not constant");
+                    throw new IllegalArgumentException("Divisor is not constant!");
                 }
-            } else {
+            }else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getTimesOperator())) {
+                final SupremicaBDDBitVector v2 = expr2BDDBitVec(bexpr.getRight(), false).getResult().copy();
+                if (v2.isConst()) {
+                    return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(), false).getResult().mulfixed(v2.val()), getZeroBDD());
+                } else {
+                    throw new IllegalArgumentException("Factor is not constant!");
+                }
+            }  
+            else {
                 throw new IllegalArgumentException(bexpr + ":" + bexpr.getOperator() + " is not known!");
             }
             //I have added the other operators to SupremicaBDDBitVector... they should be verified though.
@@ -535,11 +543,9 @@ public abstract class BDDAbstractManager {
         BDD nextStates = transitions.relprod(states.id(), bddExAutomata.getSourceStatesVarSet());
         if (!bddExAutomata.orgExAutomata.getClocks().isEmpty() && !clocks.isZero()) {
             nextStates = timeEvolDest(nextStates, clocks);
-        }
-
+        }                
         nextStates.replaceWith(bddExAutomata.getDestToSourceLocationPairing());
         nextStates.replaceWith(bddExAutomata.getDestToSourceVariablePairing());
-
         return nextStates;
     }
     
@@ -558,9 +564,7 @@ public abstract class BDDAbstractManager {
         output = output.and(clocksEvol);
         output = output.exist(bddExAutomata.getDestClockVarSet());
         output = output.replace(bddExAutomata.tempClock1ToDestClockPairing).exist(bddExAutomata.tempClock1Varset);
-        BDD destInvariants = bddExAutomata.getLocationInvariants().replace(bddExAutomata.getSourceToDestLocationPairing());
-        destInvariants = destInvariants.replace(bddExAutomata.getSourceToDestVariablePairing());
-        return output.and(destInvariants);
+        return output.and(bddExAutomata.getDestLocationInvariants());
     }
 
     BDD timeEvolSource(final BDD states, final BDD clocksEvol) {
@@ -572,6 +576,6 @@ public abstract class BDDAbstractManager {
 
         output.replaceWith(bddExAutomata.getDestToSourceLocationPairing());
         output.replaceWith(bddExAutomata.getDestToSourceVariablePairing());
-        return output.and(bddExAutomata.getLocationInvariants());
+        return output;
     }
 }

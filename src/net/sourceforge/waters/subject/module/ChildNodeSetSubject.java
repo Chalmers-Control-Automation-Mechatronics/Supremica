@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.subject.module;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.AbstractSet;
 import java.util.Collection;
@@ -361,3 +361,4 @@ class ChildNodeSetSubject
   private Set<NodeSubject> mProxySet;
 
 }
+

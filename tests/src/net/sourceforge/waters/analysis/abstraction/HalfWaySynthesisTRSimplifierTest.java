@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -299,3 +299,4 @@ public class HalfWaySynthesisTRSimplifierTest
   private int mDefaultMarkingID;
   private final boolean mSettingRenamed = true;
 }
+

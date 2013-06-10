@@ -9,11 +9,10 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntHashingStrategy;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntIterator;
+import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -31,7 +30,6 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -92,10 +90,11 @@ public abstract class TransitionListBuffer
    *         not fit in the 32 bits available.
    */
   public TransitionListBuffer(final int numEvents,
-                              final int numStates)
+                              final int numStates,
+                              final byte[] eventStatus)
     throws OverflowException
   {
-    this(numEvents, numStates, MAX_BLOCK_SIZE);
+    this(numEvents, numStates, eventStatus, MAX_BLOCK_SIZE);
   }
 
 
@@ -114,6 +113,7 @@ public abstract class TransitionListBuffer
    */
   public TransitionListBuffer(final int numEvents,
                               final int numStates,
+                              final byte[] eventStatus,
                               final int numTrans)
     throws OverflowException
   {
@@ -144,6 +144,7 @@ public abstract class TransitionListBuffer
     mBlocks.add(block);
     mRecycleStart = NULL;
     mNextFreeIndex = NODE_SIZE;
+    mEventStatus = eventStatus;
   }
 
   /**
@@ -166,6 +167,7 @@ public abstract class TransitionListBuffer
     mStateEventTransitions = buffer.mStateEventTransitions;
     mRecycleStart = buffer.mRecycleStart;
     mNextFreeIndex = buffer.mNextFreeIndex;
+    mEventStatus = buffer.mEventStatus;
   }
 
 
@@ -230,7 +232,8 @@ public abstract class TransitionListBuffer
    */
   public boolean addTransition(final int from, final int event, final int to)
   {
-    if (event == EventEncoding.TAU && from == to) {
+    if (from == to &&
+        EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
       return false;
     }
     final int newData = (to << mStateShift) | event;
@@ -281,7 +284,7 @@ public abstract class TransitionListBuffer
       return false;
     }
     final TIntHashSet existing = new TIntHashSet();
-    if (event == EventEncoding.TAU) {
+    if (EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
       existing.add(from);
     }
     int list = createList(from, event);
@@ -495,19 +498,26 @@ public abstract class TransitionListBuffer
       if (next != NULL) {
         heap.add(i);
       }
-      if (prevData != data || newList == tail) {
-        final int pair = allocatePair();
-        setNext(tail, pair);
-        tail = pair;
-        setDataAndNext(pair, data, NULL);
-        prevData = data;
-        if (i > 0) {
-          addition = true;
-          if (reverse != null) {
-            final int state = data >>> mStateShift;
-            final int event = data & mEventMask;
-            reverse.addTransition(state, event, dest);
-          }
+      if (prevData == data && newList != tail) {
+        // Suppress duplicates coming in from other lists
+        continue;
+      }
+      final int state = data >>> mStateShift;
+      final int event = data & mEventMask;
+      if (state == dest &&
+          EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
+        // Suppress tau and outside always-enabled selfloops
+        continue;
+      }
+      final int pair = allocatePair();
+      setNext(tail, pair);
+      tail = pair;
+      setDataAndNext(pair, data, NULL);
+      prevData = data;
+      if (i > 0) {
+        addition = true;
+        if (reverse != null) {
+          reverse.addTransition(state, event, dest);
         }
       }
     }
@@ -611,7 +621,8 @@ public abstract class TransitionListBuffer
          ProxyTools.getShortClassName(this) +
          " (only configured for " + mNumEvents + " events)!");
     }
-    final boolean tau = (newID == EventEncoding.TAU);
+    final boolean selfloop =
+      EventEncoding.isOutsideAlwaysEnabledEvent(mEventStatus[newID]);
     final TIntHashSet found = new TIntHashSet();
     final TransitionIterator iter1 = createReadOnlyIterator();
     final TransitionIterator iter2 = createModifyingIterator();
@@ -635,8 +646,8 @@ public abstract class TransitionListBuffer
       iter1.reset(state, oldID);
       while (iter1.advance()) {
         final int to = iter1.getCurrentToState();
-        if (tau && state == to) {
-          // nothing --- suppress tau selfloops ...
+        if (selfloop && state == to) {
+          // nothing --- suppress tau and outside always-enabled selfloops ...
         } else if (found.add(to)) {
           if (list == NULL) {
             list = createList(state, newID);
@@ -894,7 +905,6 @@ public abstract class TransitionListBuffer
     final Comparator<TransitionProxy> comparator =
       new TransitionComparator(eventEnc, stateEnc);
     Collections.sort(transitions, comparator);
-    final int tau = EventEncoding.TAU;
     int from0 = -1;
     int e0 = -1;
     int data0 = -1;
@@ -905,7 +915,9 @@ public abstract class TransitionListBuffer
       if (e >= 0) {
         final StateProxy fromState = getFromState(trans);
         final StateProxy toState = getToState(trans);
-        if (e == tau && fromState == toState) {
+        if (fromState == toState &&
+            EventEncoding.isOutsideAlwaysEnabledEvent(mEventStatus[e])) {
+          // Suppress tau and outside always-enabled selfloops
           continue;
         }
         final int from = stateEnc.getStateCode(fromState);
@@ -928,13 +940,14 @@ public abstract class TransitionListBuffer
         list = prepend(list, data);
       }
     }
-    final List<EventProxy> extra = eventEnc.getExtraSelfloops();
-    if (extra != null) {
-      final int numStates = getNumberOfStates();
-      for (final EventProxy event : extra) {
-        if (event.getKind() != EventKind.PROPOSITION &&
-            !events.contains(event)) {
-          final int e = eventEnc.getEventCode(event);
+
+    final int numStates = getNumberOfStates();
+    final int numEvents = eventEnc.getNumberOfProperEvents();
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte status = eventEnc.getProperEventStatus(e);
+      if ((status & EventEncoding.STATUS_UNUSED) != 0) {
+        final EventProxy event = eventEnc.getProperEvent(e);
+        if (!events.contains(event)) {
           for (int s = 0; s < numStates; s++) {
             addTransition(s, e, s);
           }
@@ -1070,7 +1083,8 @@ public abstract class TransitionListBuffer
    *          the new merged state.
    * @see ListBufferTransitionRelation#merge(List) ListBufferTransitionRelation.merge()
    */
-  public void merge(final List<int[]> partition, final int extraStates)
+  public void merge(final List<int[]> partition,
+                    final int extraStates)
   {
     mStateEventTransitions.clear();
     final int[] recoding = new int[mStateTransitions.length];
@@ -1089,8 +1103,8 @@ public abstract class TransitionListBuffer
     final int[] newStateTransitions = new int[numClasses];
     final int eventShift = AutomatonTools.log2(mNumStates);
     final int stateMask = (1 << eventShift) - 1;
-    final int tau = EventEncoding.TAU;
     final TIntHashSet transitions = new TIntHashSet();
+
     code = 0;
     for (final int[] clazz : partition) {
       int list;
@@ -1103,7 +1117,10 @@ public abstract class TransitionListBuffer
           final int data = block[offset + OFFSET_DATA];
           final int event = data & mEventMask;
           final int target = recoding[data >>> mStateShift];
-          if (event != tau || code != target) { // suppress tau-selfloops
+          final boolean selfloop =
+            EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event]);
+          if (!selfloop || code != target) {
+            // suppress tau-selfloops and only-other selfloops
             final int trans = (event << eventShift) | target;
             transitions.add(trans);
           }
@@ -1857,33 +1874,13 @@ public abstract class TransitionListBuffer
 
 
   //#########################################################################
-  //# Inner Class IdentityHashingStrategy
-  private static class IdentityHashingStrategy
-    implements TIntHashingStrategy
-  {
-
-    //#######################################################################
-    //# Interface gnu.trove.TIntHashingStrategy
-    @Override
-    public int computeHashCode(final int key)
-    {
-      return key;
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 1L;
-
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final int mBlockShift;
   private final int mBlockMask;
   private final int mBlockSize;
 
   private final int mNumEvents;
+  private final byte[] mEventStatus;
   private final int mStateShift;
   private final int mEventMask;
   private final List<int[]> mBlocks;
@@ -1897,9 +1894,6 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Class Constants
-  public static final TIntHashingStrategy HASH_STRATEGY =
-    new IdentityHashingStrategy();
-
   public static final int NULL = 0;
 
   private static final int OFFSET_NEXT = 0;

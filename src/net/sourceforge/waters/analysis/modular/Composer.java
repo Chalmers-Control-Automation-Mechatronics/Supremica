@@ -1,7 +1,8 @@
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -25,18 +26,17 @@ import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import gnu.trove.THashSet;
 
 
 public class Composer
 {
-  public static AutomatonProxy removeBlocked(Set<EventProxy> blocked, AutomatonProxy aut,
-                                             ProductDESProxyFactory factory)
+  public static AutomatonProxy removeBlocked(final Set<EventProxy> blocked, final AutomatonProxy aut,
+                                             final ProductDESProxyFactory factory)
   {
-    Collection<EventProxy> events = new THashSet<EventProxy>(aut.getEvents());
+    final Collection<EventProxy> events = new THashSet<EventProxy>(aut.getEvents());
     if (!events.removeAll(blocked)) {return aut;}
-    Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
-    for (TransitionProxy t : aut.getTransitions()) {
+    final Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
+    for (final TransitionProxy t : aut.getTransitions()) {
       if (!blocked.contains(t.getEvent())) {trans.add(t);}
     }
     final AutomatonProxy result = factory.createAutomatonProxy(aut.getName(), aut.getKind(),
@@ -44,7 +44,7 @@ public class Composer
                                                           trans);
     return result;
   }
-  
+
   public Composer(final ProductDESProxy model, final ProductDESProxyFactory factory,
                   final EventProxy marked)
   {
@@ -136,7 +136,7 @@ public class Composer
               list[j].mDouble++;
             }
           }
-          list[j].mDouble /= (double)transitions[j][i].length;
+          list[j].mDouble /= transitions[j][i].length;
         } else {
           list[j].mDouble = Double.POSITIVE_INFINITY;
         }
@@ -230,7 +230,7 @@ public class Composer
         if (mBackTransitions[i][cs] == null) {
           continue;
         }
-        final int[] sucs = mBackTransitions[i][cs].toNativeArray();
+        final int[] sucs = mBackTransitions[i][cs].toArray();
         for (int j = 0; j < sucs.length; j++) {
           final int suc = sucs[j];
           if (!reachable[suc]) {
@@ -250,7 +250,7 @@ public class Composer
             if (mBackTransitions[i][k] == null) {
               continue;
             }
-            final int[] sucs = mBackTransitions[i][k].toNativeArray();
+            final int[] sucs = mBackTransitions[i][k].toArray();
             for (int j = 0; j < sucs.length; j++) {
               final int suc = sucs[j];
               // that which use to point to this state now points to the dump state
@@ -325,10 +325,10 @@ public class Composer
     }
     return true;
   }
-  
+
   public Set<EventProxy> BlockedEvents()
   {
-    Set<EventProxy> blocked = new THashSet<EventProxy>();
+    final Set<EventProxy> blocked = new THashSet<EventProxy>();
     for (int e = 0; e < events.length; e++) {
       if (!mPossible[e]) {blocked.add(events[e]);}
     }
@@ -352,6 +352,7 @@ public class Composer
       this(name, null);
     }
 
+    @Override
     public Collection<EventProxy> getPropositions()
     {
       if (mEvent == null) {
@@ -361,16 +362,19 @@ public class Composer
       }
     }
 
+    @Override
     public boolean isInitial()
     {
       return mName == 0;
     }
 
+    @Override
     public MemStateProxy clone()
     {
       return new MemStateProxy(mName, mEvent);
     }
 
+    @Override
     public String getName()
     {
       return Integer.toString(mName);
@@ -385,6 +389,7 @@ public class Composer
       return false;
     }
 
+    @Override
     public boolean refequals(final NamedProxy o)
     {
       if (o instanceof MemStateProxy) {
@@ -395,11 +400,13 @@ public class Composer
       }
     }
 
+    @Override
     public int refHashCode()
     {
       return mName;
     }
 
+    @Override
     public Object acceptVisitor(final ProxyVisitor visitor)
       throws VisitorException
     {
@@ -407,16 +414,19 @@ public class Composer
       return desvisitor.visitStateProxy(this);
     }
 
+    @Override
     public Class<StateProxy> getProxyInterface()
     {
       return StateProxy.class;
     }
 
+    @Override
     public int compareTo(final NamedProxy n)
     {
       return n.getName().compareTo(getName());
     }
 
+    @Override
     public String toString()
     {
       return "S:" + mName;
@@ -496,11 +506,13 @@ public class Composer
       mValues = new int[mInitialSize][];
     }
 
+    @Override
     public boolean isEmpty()
     {
       return mLength == 0;
     }
 
+    @Override
     public void offer(final int[] a)
     {
       if (mLength == mValues.length) {
@@ -515,6 +527,7 @@ public class Composer
       mLength++;
     }
 
+    @Override
     public int[] take()
     {
       mLength--;
@@ -557,11 +570,13 @@ public class Composer
       mMap = new HashMap<IntArray, MemStateProxy>(num);
     }
 
+    @Override
     public Set<Map.Entry<int[],MemStateProxy>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
 
+    @Override
     public MemStateProxy get(final Object o)
     {
       final int[] a = (int[]) o;
@@ -578,16 +593,19 @@ public class Composer
       return mMap.put(new IntArray((int[])o), s);
     }
 
+    @Override
     public MemStateProxy put(final int[] a, final MemStateProxy s)
     {
       return mMap.put(new IntArray(a), s);
     }
 
+    @Override
     public Collection<MemStateProxy> values()
     {
       return mMap.values();
     }
 
+    @Override
     public String toString()
     {
       return mMap.toString();
@@ -604,11 +622,13 @@ public class Composer
       mMap = new HashMap<IntArray, Integer>(num);
     }
 
+    @Override
     public Set<Map.Entry<int[],Integer>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
 
+    @Override
     public Integer get(final Object o)
     {
       final int[] a = (int[]) o;
@@ -627,11 +647,13 @@ public class Composer
       return mMap.put(new IntArray((int[])o), s);
     }
 
+    @Override
     public Integer put(final int[] a, final Integer s)
     {
       return mMap.put(new IntArray(a), s);
     }
 
+    @Override
     public Collection<Integer> values()
     {
       return mMap.values();
@@ -647,11 +669,13 @@ public class Composer
       mArray = array;
     }
 
+    @Override
     public int hashCode()
     {
       return Arrays.hashCode(mArray);
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final IntArray oth = (IntArray)o;
@@ -666,6 +690,7 @@ public class Composer
       return true;
     }
 
+    @Override
     public String toString()
     {
       return Arrays.toString(mArray);
@@ -684,6 +709,7 @@ public class Composer
       mDouble = d;
     }
 
+    @Override
     public int compareTo(final IntDouble id)
     {
       if (mDouble < id.mDouble) {
@@ -721,3 +747,4 @@ public class Composer
   private int mNewDumpState;
   private int mDumpState = -1;
 }
+

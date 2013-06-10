@@ -1,10 +1,10 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TIntObjectProcedure;
-import gnu.trove.TIntProcedure;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.procedure.TIntObjectProcedure;
+import gnu.trove.procedure.TIntProcedure;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -699,3 +699,4 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
         }
     }
 }
+

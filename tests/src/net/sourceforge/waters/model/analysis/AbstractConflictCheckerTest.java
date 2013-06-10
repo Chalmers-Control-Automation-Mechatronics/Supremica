@@ -18,6 +18,8 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicLanguageInclusionChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;

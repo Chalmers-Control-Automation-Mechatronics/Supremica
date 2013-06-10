@@ -9,17 +9,25 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ProductDESBuilder;
+import net.sourceforge.waters.model.analysis.des.ProductDESResult;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -152,6 +160,14 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "aip0sub1p0";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testAGVMF() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "agv_mf";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -443,11 +459,40 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(group, subdir, name, true);
   }
 
+  public void testTransferLine3() throws Exception
+  {
+    checkTransferline(3);
+  }
+
+  public void testTictactoe() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "tictactoe";
+    runSynthesizer(group, subdir, name, true);
+  }
+
   public void testThreeRobot() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "three_robot";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void test2LinkAlt() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "2linkalt";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  public void testIMS() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "ims";
+    final String name = "ims_uncont";
     runSynthesizer(group, subdir, name, true);
   }
 
@@ -462,6 +507,7 @@ public abstract class AbstractSupervisorSynthesizerTest
 
   //#########################################################################
   //# Test Cases --- BIG
+  /* Too slow (20min) for supervisor reduction
   public void testAip0Sub1P1() throws Exception
   {
     final String group = "tests";
@@ -469,13 +515,39 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String name = "aip0sub1p1";
     runSynthesizer(group, subdir, name, true);
   }
+  */
 
+  public void test2LinkAltBatch() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "2linkalt_batch";
+    runSynthesizer(group, subdir, name, true);
+  }
+
+  /* This one is too big for monolithic synthesis.
   public void testKoordWspSynth() throws Exception
   {
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "koordwsp_synth";
     runSynthesizer(group, subdir, name, true);
+  }
+  */
+
+
+  //#########################################################################
+  //# Parametrised tests
+  private void checkTransferline(final int n) throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "synthesis";
+    final String name = "transferline_N";
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("N", n);
+    bindings.add(binding);
+    runSynthesizer(group, subdir, name, bindings, true);
   }
 
 
@@ -771,6 +843,7 @@ public abstract class AbstractSupervisorSynthesizerTest
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       switch (aut.getKind()) {
@@ -788,6 +861,7 @@ public abstract class AbstractSupervisorSynthesizerTest
       }
     }
 
+    @Override
     public EventKind getEventKind(final EventProxy event)
     {
       switch (event.getKind()) {
@@ -817,3 +891,4 @@ public abstract class AbstractSupervisorSynthesizerTest
   private List<ParameterBindingProxy> mBindings;
 
 }
+

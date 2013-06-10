@@ -1,9 +1,9 @@
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -98,7 +98,7 @@ public class NonDeterministicComposer
         }
         statetoindex.put(s, snum); snum++;
       }
-      currentState[i] = cs.toNativeArray();
+      currentState[i] = cs.toArray();
       // TODO do this smarter later
       final TIntArrayList[][] auttransitionslists =
         new TIntArrayList[events.length][a.getStates().size()];
@@ -119,7 +119,7 @@ public class NonDeterministicComposer
         for (int k = 0; k < auttransitionslists[j].length; k++) {
           final TIntArrayList list = auttransitionslists[j][k];
           if (list != null) {
-            final int[] targs = list.toNativeArray(); transitions[i][j][k] = targs;
+            final int[] targs = list.toArray(); transitions[i][j][k] = targs;
           }
         }
       }
@@ -139,7 +139,7 @@ public class NonDeterministicComposer
               list[j].mDouble++;
             }
           }
-          list[j].mDouble /= (double)transitions[j][i].length;
+          list[j].mDouble /= transitions[j][i].length;
         } else {
           list[j].mDouble = Double.POSITIVE_INFINITY;
         }
@@ -373,11 +373,13 @@ private static class IntBag
       mValues = new int[mInitialSize][];
     }
 
+    @Override
     public boolean isEmpty()
     {
       return mLength == 0;
     }
 
+    @Override
     public void offer(final int[] a)
     {
       if (mLength == mValues.length) {
@@ -392,6 +394,7 @@ private static class IntBag
       mLength++;
     }
 
+    @Override
     public int[] take()
     {
       mLength--;
@@ -435,11 +438,13 @@ private static class IntBag
       mMap = new HashMap<IntArray, Integer>(num);
     }
 
+    @Override
     public Set<Map.Entry<int[],Integer>> entrySet()
     {
       return null; // I don't think i'll be using this method so meh
     }
 
+    @Override
     public Integer get(final Object o)
     {
       final int[] a = (int[]) o;
@@ -458,11 +463,13 @@ private static class IntBag
       return mMap.put(new IntArray((int[])o), s);
     }
 
+    @Override
     public Integer put(final int[] a, final Integer s)
     {
       return mMap.put(new IntArray(a), s);
     }
 
+    @Override
     public Collection<Integer> values()
     {
       return mMap.values();
@@ -478,11 +485,13 @@ private static class IntBag
       mArray = array;
     }
 
+    @Override
     public int hashCode()
     {
       return Arrays.hashCode(mArray);
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final IntArray oth = (IntArray)o;
@@ -497,6 +506,7 @@ private static class IntBag
       return true;
     }
 
+    @Override
     public String toString()
     {
       return Arrays.toString(mArray);
@@ -515,6 +525,7 @@ private static class IntBag
       mDouble = d;
     }
 
+    @Override
     public int compareTo(final IntDouble id)
     {
       if (mDouble < id.mDouble) {
@@ -587,3 +598,4 @@ private static class IntBag
   private TIntHashSet[][] mIntDisabled;
   private final TIntHashSet mNewInitial = new TIntHashSet();
 }
+

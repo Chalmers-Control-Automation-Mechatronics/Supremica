@@ -3,8 +3,8 @@
 
 package net.sourceforge.waters.analysis.sd;
 
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

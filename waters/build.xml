@@ -31,7 +31,7 @@
             location="${supremica.lib}/jsr173_1.0_api.jar"/>
   <property name="log4j.jar" location="${supremica.lib}/log4j.jar"/>
   <property name="junit.jar" location="${supremica.lib}/junit-4.4.jar"/>
-  <property name="trove.jar" location="${supremica.lib}/trove-2.0.4.jar"/>
+  <property name="trove.jar" location="${supremica.lib}/trove-3.0.3.jar"/>
 
   <path id="antlr.compile.classpath" location="${antlr.complete.jar}"/>
   <path id="antlr.runtime.classpath">
@@ -210,7 +210,10 @@
         <include name="net/sourceforge/waters/**/*.class"/>
         <include name="net/sourceforge/waters/**/*.xsd"/>
         <include name="net/sourceforge/waters/**/*.xsl"/>
-        <exclude name="net/sourceforge/waters/analysis/**"/>
+        <exclude name="net/sourceforge/waters/analysis/bdd/**"/>
+        <exclude name="net/sourceforge/waters/analysis/comp552/**"/>
+        <exclude name="net/sourceforge/waters/analysis/distributed/**"/>
+        <exclude name="net/sourceforge/waters/analysis/po/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/samples/**"/>
@@ -344,7 +347,7 @@
 
   <target name="runtest" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -374,7 +377,7 @@
 
   <target name="runtest1" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}" if="native.make">
         <fileset dir="${supremica.testsrc}">
@@ -393,7 +396,7 @@
 
   <target name="runtest2" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -414,7 +417,7 @@
   
   <target name="runtest3" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -433,7 +436,7 @@
   
   <target name="runtest4" depends="test-jar">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -451,7 +454,7 @@
   
   <target name="runtest5" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -469,7 +472,7 @@
   </target>
   
   <target name="runtest6">
-    <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="512m">
+    <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="1024m">
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
@@ -481,7 +484,7 @@
   
   <target name="runtest7" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -499,7 +502,7 @@
 
   <target name="runtest8" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -517,7 +520,7 @@
 
   <target name="runtest9" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -536,7 +539,7 @@
 
   <target name="runtest10" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -555,7 +558,7 @@
 
   <target name="runtest11" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="512m">
+    <junit printsummary="on" fork="true" maxmemory="1024m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -616,7 +619,6 @@
       </packageset>
       <packageset dir="${supremica.src}">
         <include name="net/sourceforge/waters/**"/>
-        <exclude name="net/sourceforge/waters/analysis/modular/supremica/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/external/promela/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
@@ -640,6 +642,15 @@
     <mkdir dir="${javadoc552}/src"/>
     <copy todir="${javadoc552}/src">
       <fileset dir="${supremica.src}">
+        <exclude name="net/sourceforge/waters/analysis/**"/>
+        <include name="net/sourceforge/waters/model/**"/>
+        <exclude name="net/sourceforge/waters/model/analysis/**"/>
+        <include name="net/sourceforge/waters/plain/**"/>
+        <include name="net/sourceforge/waters/external/valid/**"/>
+      </fileset>
+    </copy>
+    <copy todir="${javadoc552}/src">
+      <fileset dir="${supremica.src}">
         <include
           name="net/sourceforge/waters/analysis/comp552/BDDConflictChecker.java"/>
         <include
@@ -649,10 +660,6 @@
         <include name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.java"/>
         <include
           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
-        <include name="net/sourceforge/waters/model/**"/>
-        <exclude name="net/sourceforge/waters/model/analysis/**"/>
-        <include name="net/sourceforge/waters/plain/**"/>
-        <include name="net/sourceforge/waters/external/valid/**"/>
       </fileset>
     </copy>
     <javadoc destdir="${javadoc552}" windowtitle="Waters API">

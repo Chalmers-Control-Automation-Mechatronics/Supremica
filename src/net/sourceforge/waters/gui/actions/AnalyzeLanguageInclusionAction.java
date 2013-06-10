@@ -15,11 +15,11 @@ import java.util.Map;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.model.analysis.AbstractLanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.AbstractLanguageInclusionKindTranslator;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -72,11 +72,13 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
+  @Override
   protected String getCheckName()
   {
     return "Language Inclusion";
   }
 
+  @Override
   protected String getFailureDescription()
   {
     if (mNamedProxy == null)
@@ -85,6 +87,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
       return "does not satisfy property " + mNamedProxy.getName();
   }
 
+  @Override
   protected String getSuccessDescription()
   {
     if (mNamedProxy == null)
@@ -93,6 +96,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
       return "satisfies property " + mNamedProxy.getName();
   }
 
+  @Override
   protected ModelVerifier getModelVerifier
     (final ModelVerifierFactory vfactory,
      final ProductDESProxyFactory desfactory)
@@ -106,7 +110,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
       } else if (mNamedProxy instanceof SimpleComponentSubject) {
         final ModuleContainer container = getActiveModuleContainer();
         if (container != null) {
-          final Map<Proxy,SourceInfo> map = container.getSourceInfoMap();
+          final Map<Object,SourceInfo> map = container.getSourceInfoMap();
           final KindTranslator translator =
               new SingleComponentKindTranslator(map);
           checker.setKindTranslator(translator);
@@ -119,6 +123,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  @Override
   public void modelChanged(final ModelChangeEvent event)
   {
     switch (event.getKind()) {
@@ -137,6 +142,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
     }
   }
 
+  @Override
   public int getModelObserverPriority()
   {
     return ModelObserver.DEFAULT_PRIORITY;
@@ -186,6 +192,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       if (aut == mNamedProxy) {
@@ -206,13 +213,14 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
 
     //#######################################################################
     //# Constructor
-    private SingleComponentKindTranslator(final Map<Proxy,SourceInfo> map)
+    private SingleComponentKindTranslator(final Map<Object,SourceInfo> map)
     {
       mSourceInfo = map;
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       final SourceInfo info = mSourceInfo.get(aut);
@@ -229,7 +237,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
 
     //#######################################################################
     //# Data Members
-    private final Map<Proxy,SourceInfo> mSourceInfo;
+    private final Map<Object,SourceInfo> mSourceInfo;
   }
 
 

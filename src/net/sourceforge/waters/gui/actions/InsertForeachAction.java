@@ -13,16 +13,20 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
+
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.dialog.ForeachEditorDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.plain.module.ForeachElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -47,11 +51,13 @@ public class InsertForeachAction
     putValue(Action.NAME, "New Foreach Block ...");
     putValue(Action.SHORT_DESCRIPTION, "Add a foreach block to the module");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
+    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_FOREACH);
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final ModuleWindowInterface root = getActiveModuleWindowInterface();

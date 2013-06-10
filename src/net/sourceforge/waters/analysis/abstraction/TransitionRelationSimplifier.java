@@ -132,7 +132,7 @@ public interface TransitionRelationSimplifier
   /**
    * Returns whether the abstraction produced by the last {@link #run()}
    * is weak observation equivalent to the input automaton. This information
-   * is used to enabled more efficient trace computation.
+   * is used to enable more efficient trace computation.
    */
   public boolean isObservationEquivalentAbstraction();
 

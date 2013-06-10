@@ -9,9 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntStack;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.BitSet;
 
@@ -121,7 +122,7 @@ public class SilentIncomingTRSimplifier
   {
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (!rel.isUsedEvent(tauID)) {
+    if ((rel.getProperEventStatus(tauID) & EventEncoding.STATUS_UNUSED) != 0) {
       return false;
     } else if (getPreconditionMarkingID() < 0) {
       mTauTestIterator = rel.createSuccessorsReadOnlyIterator();
@@ -159,7 +160,7 @@ public class SilentIncomingTRSimplifier
     final TransitionIterator reader = rel.createSuccessorsReadOnlyIterator();
     final TransitionIterator writer = rel.createSuccessorsModifyingIterator();
     final TIntArrayList targets = new TIntArrayList();
-    final TIntStack stack = new TIntStack();
+    final TIntStack stack = new TIntArrayStack();
     boolean modified = false;
     for (int source = 0; source < numStates; source++) {
       if (rel.isReachable(source)) {
@@ -239,3 +240,4 @@ public class SilentIncomingTRSimplifier
   private TransitionIterator mTauTestIterator;
 
 }
+

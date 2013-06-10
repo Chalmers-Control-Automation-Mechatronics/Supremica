@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -34,13 +34,13 @@ import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -3316,3 +3316,4 @@ public class CompositionalGeneralisedConflictChecker
   private double mComposedModelNumberOfTransitions;
 
 }
+

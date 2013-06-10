@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.Serializable;
 
+import net.sourceforge.waters.model.analysis.des.AbstractLanguageInclusionKindTranslator;
+
 
 /**
  * <P>A kind translator used for language inclusion checking.

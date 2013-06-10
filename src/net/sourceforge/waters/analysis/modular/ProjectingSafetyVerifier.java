@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.lang.Comparable;
 import java.util.ArrayList;
@@ -32,12 +32,12 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.NondeterministicDESException;
-import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
+import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -953,3 +953,4 @@ public class ProjectingSafetyVerifier
     LoggerFactory.createLogger(ProjectingSafetyVerifier.class);
 
 }
+

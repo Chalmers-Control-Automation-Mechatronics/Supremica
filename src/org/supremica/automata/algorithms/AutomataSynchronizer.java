@@ -49,24 +49,40 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.Stoppable;
-import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
-import java.util.*;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
-import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.AutomataIndexMap;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.util.SupremicaException;
 
 public class AutomataSynchronizer
     implements Stoppable
 {
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizer.class);
+
+    private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizer.class);
+
     private Automata theAutomata;
     private AutomataSynchronizerHelper synchHelper;
     private SynchronizationOptions syncOptions;
@@ -82,24 +98,33 @@ public class AutomataSynchronizer
     private int automatonIndex = 0;
 
 
-    public AutomataSynchronizer(final ListSubject<AbstractSubject> components, final SynchronizationOptions options)
+    // Used by tests ~~~ RM
+    public AutomataSynchronizer(final List<? extends Proxy> components,
+                                final SynchronizationOptions options)
     {
         options.setEFAMode(true);
         final Automata automata = removeGuardsActionsFromEFAs(components);
         this.theAutomata = automata;
         this.syncOptions = options;
 
-        synchHelper = new AutomataSynchronizerHelper(automata, options,arc2edgeTable,autName2indexTable);
+        synchHelper = new AutomataSynchronizerHelper(automata, options,arc2edgeTable,autName2indexTable, false);
 
         initialize();
     }
 
-    public AutomataSynchronizer(final Automata automata, final SynchronizationOptions options)
+    public AutomataSynchronizer(final Automata automata,
+                                final SynchronizationOptions options)
     {
+      this(automata, options, false);
+    }
+
+    public AutomataSynchronizer(final Automata automata, final SynchronizationOptions options, final boolean sups_as_plants)
+    {
+		logger.debug("AutomataSynchronizer - sups as plants?" + (sups_as_plants ? "yes" : "no"));
         this.theAutomata = automata;
         this.syncOptions = options;
         syncOptions.setEFAMode(false);
-        synchHelper = new AutomataSynchronizerHelper(automata, options);
+        synchHelper = new AutomataSynchronizerHelper(automata, options, sups_as_plants);
 
         initialize();
     }
@@ -241,6 +266,7 @@ public class AutomataSynchronizer
         synchronizationExecuters = null;
     }
 
+    @Override
     public void requestStop()
     {
         stopRequested = true;
@@ -251,6 +277,7 @@ public class AutomataSynchronizer
         }
     }
 
+    @Override
     public boolean isStopped()
     {
         return stopRequested;
@@ -265,8 +292,20 @@ public class AutomataSynchronizer
     public static Automaton synchronizeAutomata(final Automata automata)
     throws Exception
     {
+        return synchronizeAutomata(automata, false);
+    }
+
+    /**
+     * Method for synchronizing Automata with default options.
+     *
+     * @param automata the Automata to be synchronized.
+     * @return Automaton representing the synchronous composition.
+     */
+    public static Automaton synchronizeAutomata(final Automata automata, final boolean sups_as_plants)
+    throws Exception
+    {
         final SynchronizationOptions options = SynchronizationOptions.getDefaultSynchronizationOptions();
-        return synchronizeAutomata(automata, options);
+        return synchronizeAutomata(automata, options, sups_as_plants);
     }
 
     /**
@@ -276,11 +315,11 @@ public class AutomataSynchronizer
      * @param options the SynchronizationOptions that should be used.
      * @return Automaton representing the synchronous composition.
      */
-    public static Automaton synchronizeAutomata(final Automata automata, final SynchronizationOptions options)
+    public static Automaton synchronizeAutomata(final Automata automata, final SynchronizationOptions options, final boolean sups_as_plants)
     throws Exception
     {
         options.setEFAMode(false);
-        final AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, options);
+        final AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(automata, options, sups_as_plants);
         return synchronizeAutomata(helper);
     }
 
@@ -312,15 +351,15 @@ public class AutomataSynchronizer
     }
 
     @SuppressWarnings("unchecked")
-    public Automata removeGuardsActionsFromEFAs(final ListSubject<AbstractSubject> components)
+    public Automata removeGuardsActionsFromEFAs(final List<? extends Proxy> components)
     {
         final Automata automata = new Automata();
         final HashSet<SimpleComponentSubject> autComps = new HashSet<SimpleComponentSubject>();
 
-        for(final AbstractSubject component : components)
+        for (final Proxy component : components) {
             if(component.toString().contains("NODES") && component.toString().contains("EDGES"))
                 autComps.add((SimpleComponentSubject)component);
-
+        }
         arc2edgeTable = new HashMap[autComps.size()];
 
         for(final SimpleComponentSubject autComp: autComps)

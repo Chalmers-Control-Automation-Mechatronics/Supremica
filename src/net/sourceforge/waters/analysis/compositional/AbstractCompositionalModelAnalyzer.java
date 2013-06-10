@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectByteHashMap;
-import gnu.trove.TObjectByteIterator;
+import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,16 +32,16 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBu
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.AutomatonResult;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.AutomatonResult;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -174,10 +174,11 @@ public abstract class AbstractCompositionalModelAnalyzer
     mAbstractionProcedureFactory = abstractionFactory;
     mPreselectingMethodFactory = preselectingMethodFactory;
     mSelectingMethodFactory = selectingMethodFactory;
-    // Default for all model analysers---please do not change.
+    // Defaults for all model analysers---please do not change.
     mPreselectingMethod = MustL;
     mSelectingMethod = MinS;
     mSubsumptionEnabled = false;
+    mUsingSpecialEvents = false;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
     mInternalTransitionLimit = super.getTransitionLimit();
@@ -311,16 +312,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
-   * Returns whether subsumption is enabled in the selecting heuristic.
-   * @see #setSubumptionEnabled(boolean)
-   * @see SelectingMethod
-   */
-  public boolean isSubsumptionEnabled()
-  {
-    return mSubsumptionEnabled;
-  }
-
-  /**
    * Sets whether subsumption is enabled in the selecting heuristic.
    * If subsumption is enabled, and the heuristic returns a candidate that
    * is subsumed by another candidate, the a new candidate will be selected
@@ -332,6 +323,37 @@ public abstract class AbstractCompositionalModelAnalyzer
   public void setSubumptionEnabled(final boolean enable)
   {
     mSubsumptionEnabled = enable;
+  }
+
+  /**
+   * Returns whether subsumption is enabled in the selecting heuristic.
+   * @see #setSubumptionEnabled(boolean)
+   * @see SelectingMethod
+   */
+  public boolean isSubsumptionEnabled()
+  {
+    return mSubsumptionEnabled;
+  }
+
+  /**
+   * Sets whether special events are to be considered in abstraction.
+   * If enabled, compositional minimisation will not only exploit local
+   * events (used only in the subsystem being simplified), but also
+   * selfloop-only events (used only as selfloops outside of the subsystem
+   * being simplified.
+   */
+  public void setUsingSpecialEvents(final boolean enable)
+  {
+    mUsingSpecialEvents = enable;
+  }
+
+  /**
+   * Returns whether special events are considered in abstraction.
+   * @see #setUsesSpecialEvents(boolean)
+   */
+  public boolean isUsingSpecialEvents()
+  {
+    return mUsingSpecialEvents;
   }
 
   /**
@@ -347,7 +369,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * Returns whether deadlock states are pruned.
    * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
    */
-  public boolean getPruningDeadlocks()
+  public boolean isPruningDeadlocks()
   {
     return mSynchronousProductBuilder.getPruningDeadlocks();
   }
@@ -830,6 +852,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (removed.isEmpty()) {
       return null;
     } else {
+      showRemovedEvents(removed);
       final int numAutomata = mCurrentAutomata.size();
       final List<AutomatonProxy> originals =
         new ArrayList<AutomatonProxy>(numAutomata);
@@ -875,14 +898,14 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
     if (!found) {
-      return aut;
+      return aut;   //If none of the events in removed are present in aut, return aut
     }
     final int numEvents = events.size();
     final Collection<EventProxy> newEvents =
       new ArrayList<EventProxy>(numEvents - 1);
     for (final EventProxy event : events) {
-      if (!removed.contains(event)) {
-        newEvents.add(event);
+      if (!removed.contains(event)) {   //If we are not removing the event
+        newEvents.add(event);           //put it into newEvents list
       }
     }
     final Collection<TransitionProxy> transitions = aut.getTransitions();
@@ -891,9 +914,9 @@ public abstract class AbstractCompositionalModelAnalyzer
       new ArrayList<TransitionProxy>(numTrans);
     for (final TransitionProxy trans : transitions) {
       final EventProxy event = trans.getEvent();
-      if (!removed.contains(event)) {
-        newTransitions.add(trans);
-      } else if (trans.getSource() != trans.getTarget()) {
+      if (!removed.contains(event)) {       //If we are not removing the event
+        newTransitions.add(trans);          //Add the transition to list
+      } else if (trans.getSource() != trans.getTarget()) {  //If we are removing trans that is not self loop
         mHasRemovedProperTransition = true;
       }
     }
@@ -901,7 +924,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     final String name = aut.getName();
     final ComponentKind kind = aut.getKind();
     final Collection<StateProxy> states = aut.getStates();
-    final AutomatonProxy newAut = factory.createAutomatonProxy
+    final AutomatonProxy newAut = factory.createAutomatonProxy  //Create a new automaton with the new events and transitions
       (name, kind, newEvents, states, newTransitions);
     return newAut;
   }
@@ -1000,9 +1023,18 @@ public abstract class AbstractCompositionalModelAnalyzer
     mProcessedSubsystems = new LinkedList<SubSystem>();
   }
 
+  protected void addEventsToAllAutomata()
+    throws OverflowException
+  {
+    for (final AutomatonProxy aut : mCurrentAutomata) {
+      addEventsToAutomata(aut);
+    }
+  }
+
   protected void updateEventsToAutomata
     (final AutomatonProxy autToAdd,
      final List<AutomatonProxy> autToRemove)
+    throws OverflowException
   {
     mCurrentAutomata.removeAll(autToRemove);
     mCurrentAutomata.add(autToAdd);
@@ -1025,6 +1057,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   protected void addEventsToAutomata(final AutomatonProxy aut)
+    throws OverflowException
   {
     final Collection<EventProxy> events = aut.getEvents();
     final int numEvents = events.size();
@@ -1097,13 +1130,28 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
   }
 
+  private void showRemovedEvents(final Collection<EventProxy> events)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final StringBuffer buffer = new StringBuffer();
+      String sep = "Removing events: ";
+      for (final EventProxy event : events) {
+        buffer.append(sep);
+        buffer.append(event.getName());
+        sep = ", ";
+      }
+      logger.debug(buffer);
+    }
+  }
+
 
   //#######################################################################
   //# Private Methods
   /**
    * Finds the set of events that are local to the given automata.
    */
-  private Set<EventProxy> identifyLocalEvents
+  Set<EventProxy> identifyLocalEvents
     (final Collection<AutomatonProxy> automata)
   {
     final Set<EventProxy> events = Candidate.getAllEvents(automata);
@@ -1111,7 +1159,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     while (iter.hasNext()) {
       final EventProxy event = iter.next();
       final EventInfo info = mEventInfoMap.get(event);
-      if (info == null || !info.isLocal() || !info.containedIn(automata)) {
+      if (info == null || !info.isLocal(automata)) {
         iter.remove();
       }
     }
@@ -1227,6 +1275,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   private boolean popEventDisjointSubsystem()
+    throws OverflowException
   {
     final SubSystem next = mPostponedSubsystems.poll();
     if (next == null) {
@@ -1244,13 +1293,12 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   private void loadSubSystem(final SubSystem task)
+    throws OverflowException
   {
     mCurrentAutomata = task.getAutomata();
     mCurrentInternalStateLimit = task.getStateLimit();
     mEventInfoMap.clear();
-    for (final AutomatonProxy aut : mCurrentAutomata) {
-      addEventsToAutomata(aut);
-    }
+    addEventsToAllAutomata();
   }
 
   private void restoreAutomata()
@@ -1382,7 +1430,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       new ArrayList<EventProxy>(numLocal);
     for (final EventProxy event : local) {
       final EventInfo info = mEventInfoMap.get(event);
-      if (info.isLocal() && !info.isTau()) {
+      if (info.canBeLocal() && !info.canBeTau()) {
         notReallyHidden.add(event);
       }
     }
@@ -1401,7 +1449,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     recordStatistics(aut);
     final boolean simplified =
-      mAbstractionProcedure.run(aut, notReallyHidden, steps);
+      mAbstractionProcedure.run(aut, notReallyHidden, steps, candidate);
     if (simplified) {
       final Collection<EventProxy> oldEvents = aut.getEvents();
       final int end = steps.size();
@@ -1444,7 +1492,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     final Collection<EventProxy> hidden = new ArrayList<EventProxy>(numLocal);
     for (final EventProxy event : local) {
       final EventInfo info = mEventInfoMap.get(event);
-      if (info.isTau()) {
+      if (info.canBeTau()) {
         hidden.add(event);
       }
     }
@@ -1472,13 +1520,15 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     final KindTranslator translator = getKindTranslator();
     final EventEncoding eventEnc = new EventEncoding();
-    eventEnc.addSilentEvent(tau);
+    if (tau != null) {
+      eventEnc.addSilentEvent(tau);
+    }
     for (final EventProxy event : aut.getEvents()) {
       if (hidden.contains(event)) {
         eventEnc.addSilentEvent(event);
       } else if (translator.getEventKind(event) != EventKind.PROPOSITION ||
                  (mPropositions != null && mPropositions.contains(event))) {
-        eventEnc.addEvent(event, translator, false);
+        eventEnc.addEvent(event, translator, EventEncoding.STATUS_NONE);
       }
     }
     final StateEncoding stateEnc = new StateEncoding(aut);
@@ -1584,6 +1634,21 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.addUnsuccessfulComposition();
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @SuppressWarnings("unused")
+  private EventInfo getEventInfo(final String name)
+  {
+    for (final Map.Entry<EventProxy,EventInfo> entry : mEventInfoMap.entrySet()) {
+      final EventProxy event = entry.getKey();
+      if (event.getName().equals(name)) {
+        return entry.getValue();
+      }
+    }
+    return null;
   }
 
 
@@ -2003,6 +2068,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparable<SubSystem>
+    @Override
     public int compareTo(final SubSystem other)
     {
       final int aut1 = mAutomata.size();
@@ -2086,7 +2152,7 @@ public abstract class AbstractCompositionalModelAnalyzer
      * {@link EventEncoding#TAU TAU}. Events treated as TAU are removed
      * during synchronous composition.
      */
-    protected boolean isTau()
+    protected boolean canBeTau()
     {
       return true;
     }
@@ -2097,9 +2163,33 @@ public abstract class AbstractCompositionalModelAnalyzer
      * compositions are passed to the abstraction procedure for special
      * treatment.
      */
-    protected boolean isLocal()
+    protected boolean canBeLocal()
     {
       return true;
+    }
+
+    /**
+     * Returns whether this event is used at most by the given automata,
+     * and thus can be hidden after composition of these automata.
+     * @param  automata  Collection of automata to be composed or to
+     *                   form a candidate.
+     */
+    protected boolean isLocal(final Collection<AutomatonProxy> automata)
+    {
+      if (canBeLocal()) {
+        final TObjectByteIterator<AutomatonProxy> iter =
+          mAutomataMap.iterator();
+        while (iter.hasNext()) {
+          iter.advance();
+          final AutomatonProxy aut = iter.key();
+          if (!automata.contains(aut)) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return false;
+      }
     }
 
     /**
@@ -2109,7 +2199,7 @@ public abstract class AbstractCompositionalModelAnalyzer
      */
     protected boolean isSubjectToSelfloopRemoval()
     {
-      return isTau();
+      return canBeTau();
     }
 
     /**
@@ -2141,25 +2231,12 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-    private boolean containedIn(final Collection<AutomatonProxy> automata)
-    {
-      final TObjectByteIterator<AutomatonProxy> iter = mAutomataMap.iterator();
-      while (iter.hasNext()) {
-        iter.advance();
-        final AutomatonProxy aut = iter.key();
-        if (!automata.contains(aut)) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    private int getNumberOfAutomata()
+    int getNumberOfAutomata()
     {
       return mAutomataMap.size();
     }
 
-    private List<AutomatonProxy> getSortedAutomataList()
+    List<AutomatonProxy> getSortedAutomataList()
     {
       if (mSortedAutomataList == null) {
         final int size = mAutomataMap.size();
@@ -2198,8 +2275,8 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-     boolean replaceAutomaton(final AutomatonProxy oldAut,
-                                     final AutomatonProxy newAut)
+    boolean replaceAutomaton(final AutomatonProxy oldAut,
+                             final AutomatonProxy newAut)
     {
       final byte code = mAutomataMap.remove(oldAut);
       if (code == UNKNOWN_SELFLOOP) {
@@ -2209,6 +2286,34 @@ public abstract class AbstractCompositionalModelAnalyzer
         mAutomataMap.put(newAut, code);
         mSortedAutomataList = null;
         return true;
+      }
+    }
+
+    /**
+     * Checks whether this event can be considered outside-only-selfloop
+     * when composing and simplifying the given candidate.
+     * @param  candidate  Candidate containing automata being composed and
+     *         simplified.
+     * @return <CODE>true</CODE> if all automata containing this event in
+     *         non-selfloop transitions are contained in the given candidate.
+     */
+    boolean isOnlyNonSelfLoopCandidate(final Candidate candidate)
+    {
+      int remaining = mNumNonSelfloopAutomata;
+      if (remaining == 0) {
+        return true;
+      } else if (remaining > candidate.getNumberOfAutomata()) {
+        return false;
+      } else {
+        for (final AutomatonProxy aut : candidate.getAutomata()) {
+          if (mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP) {
+            remaining--;
+            if (remaining == 0) {
+              return true;
+            }
+          }
+        }
+        return false;
       }
     }
 
@@ -2258,6 +2363,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface PreselectingHeuristic
+    @Override
     public Collection<Candidate> findCandidates()
     {
       if (mCurrentAutomata.isEmpty()) {
@@ -2321,6 +2427,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparator<AutomatonProxy>
+    @Override
     public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
     {
       final int numtrans1 = aut1.getTransitions().size();
@@ -2352,6 +2459,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparator<AutomatonProxy>
+    @Override
     public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
     {
       final int numstates1 = aut1.getStates().size();
@@ -2378,6 +2486,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface PreselectingHeuristic
+    @Override
     public Collection<Candidate> findCandidates()
     {
       final Collection<Candidate> candidates = new LinkedList<Candidate>();
@@ -2439,6 +2548,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparator<Candidate>
+    @Override
     public int compare(final Candidate cand1, final Candidate cand2)
     {
       final double heu1 = getHeuristicValue(cand1);
@@ -2472,6 +2582,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingHeuristic
+    @Override
     Candidate selectCandidate(final Collection<Candidate> candidates)
     throws AnalysisException
     {
@@ -2525,10 +2636,11 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       return - (double) candidate.getLocalEventCount() /
-               (double) candidate.getNumberOfEvents();
+               candidate.getNumberOfEvents();
     }
 
   }
@@ -2541,10 +2653,11 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       return - (double) candidate.getCommonEventCount() /
-               (double) candidate.getNumberOfEvents();
+               candidate.getNumberOfEvents();
     }
 
   }
@@ -2557,6 +2670,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       final int unionAlphabetSize = candidate.getNumberOfEvents();
@@ -2580,6 +2694,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;
@@ -2609,6 +2724,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Interface java.util.Comparator<Candidate>
+    @Override
     public int compare(final Candidate cand1, final Candidate cand2)
     {
       for (final Comparator<Candidate> heu : mHeuristics) {
@@ -2652,11 +2768,13 @@ public abstract class AbstractCompositionalModelAnalyzer
     //#######################################################################
     //# Interface
     //# net.sourceforge.waters.model.analysis.SynchronousProductStateMap
+    @Override
     public Collection<AutomatonProxy> getInputAutomata()
     {
       return Collections.singletonList(mOriginalAutomaton);
     }
 
+    @Override
     public StateProxy getOriginalState(final StateProxy tuple,
                                        final AutomatonProxy aut)
     {
@@ -2722,6 +2840,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private final SelectingMethodFactory mSelectingMethodFactory;
   private SelectingMethod mSelectingMethod;
   private boolean mSubsumptionEnabled;
+  private boolean mUsingSpecialEvents;
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;
@@ -2803,3 +2922,4 @@ public abstract class AbstractCompositionalModelAnalyzer
   static final byte BLOCKED = 3;
 
 }
+

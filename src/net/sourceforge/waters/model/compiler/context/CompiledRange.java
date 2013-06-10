@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.compiler.context;
 
 import java.util.List;
 
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -31,5 +33,8 @@ public interface CompiledRange {
   public CompiledRange remove(SimpleExpressionProxy value);
 
   public List<? extends SimpleExpressionProxy> getValues();
+
+  public SimpleExpressionProxy createExpression(ModuleProxyFactory factory,
+                                                CompilerOperatorTable optable);
 
 }

@@ -19,7 +19,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ProductDESResult;
+import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.IntConstantProxy;

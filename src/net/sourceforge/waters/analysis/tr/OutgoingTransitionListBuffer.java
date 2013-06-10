@@ -43,10 +43,10 @@ public class OutgoingTransitionListBuffer extends TransitionListBuffer
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public OutgoingTransitionListBuffer(final int numEvents, final int numStates)
+  public OutgoingTransitionListBuffer(final int numEvents, final int numStates, final byte[] eventStatus)
     throws OverflowException
   {
-    super(numEvents, numStates);
+    super(numEvents, numStates, eventStatus);
   }
 
   /**
@@ -64,10 +64,11 @@ public class OutgoingTransitionListBuffer extends TransitionListBuffer
    */
   public OutgoingTransitionListBuffer(final int numEvents,
                                       final int numStates,
+                                      final byte[] eventStatus,
                                       final int numTrans)
     throws OverflowException
   {
-    super(numEvents, numStates, numTrans);
+    super(numEvents, numStates, eventStatus, numTrans);
   }
 
   /**
@@ -85,33 +86,39 @@ public class OutgoingTransitionListBuffer extends TransitionListBuffer
 
   //#########################################################################
   //# Overrides for net.sourceforge.water.analysis.op.TransitionListBuffer
+  @Override
   public StateProxy getFromState(final TransitionProxy trans)
   {
     return trans.getSource();
   }
 
+  @Override
   public StateProxy getToState(final TransitionProxy trans)
   {
     return trans.getTarget();
   }
 
+  @Override
   public int getIteratorSourceState(final TransitionIterator iter)
   {
     return iter.getCurrentFromState();
   }
 
+  @Override
   public int getIteratorTargetState(final TransitionIterator iter)
   {
     return iter.getCurrentToState();
   }
 
 
+  @Override
   public int getOtherIteratorFromState(final TransitionIterator iter)
   {
     return iter.getCurrentSourceState();
   }
 
 
+  @Override
   public int getOtherIteratorToState(final TransitionIterator iter)
   {
     return iter.getCurrentTargetState();

@@ -26,6 +26,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -154,26 +155,31 @@ public class ModuleContainer
       (mSimulatorPropertyChangeListener);
   }
 
+  @Override
   public Component getPanel()
   {
     return mTabPanel;
   }
 
+  @Override
   public EditorPanel getEditorPanel()
   {
     return mEditorPanel;
   }
 
+  @Override
   public AnalyzerPanel getAnalyzerPanel()
   {
     return mAnalyzerPanel;
   }
 
+  @Override
   public Component getActivePanel()
   {
     return mTabPanel.getSelectedComponent();
   }
 
+  @Override
   public String getTypeString()
   {
     return TYPE_STRING;
@@ -182,16 +188,19 @@ public class ModuleContainer
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
+  @Override
   public void attach(final Observer o)
   {
     mObservers.add(o);
   }
 
+  @Override
   public void detach(final Observer o)
   {
     mObservers.remove(o);
   }
 
+  @Override
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     // Just in case they try to register or unregister observers
@@ -211,6 +220,7 @@ public class ModuleContainer
    * If a component is removed from the module, and its automaton
    * is currently displayed, show the comment editor instead.
    */
+  @Override
   public void modelChanged(final ModelChangeEvent event)
   {
     final int kind = event.getKind();
@@ -242,6 +252,7 @@ public class ModuleContainer
     }
   }
 
+  @Override
   public int getModelObserverPriority()
   {
     return ModelObserver.CLEANUP_PRIORITY_0;
@@ -270,7 +281,7 @@ public class ModuleContainer
     return mCompiledDES;
   }
 
-  public Map<Proxy,SourceInfo> getSourceInfoMap()
+  public Map<Object,SourceInfo> getSourceInfoMap()
   {
     if (mCompiledDES == null) {
       return null;
@@ -380,12 +391,14 @@ public class ModuleContainer
 
   //#######################################################################
   //# Interface net.sourceforge.waters.gui.command.UndoInterface
+  @Override
   public void executeCommand(final Command c)
   {
     c.execute();
     addUndoable(new UndoableCommand(c));
   }
 
+  @Override
   public void addUndoable(final UndoableCommand command)
   {
     assert(command.isSignificant());
@@ -396,16 +409,19 @@ public class ModuleContainer
       fireUndoRedoEvent();
   }
 
+  @Override
   public boolean canRedo()
   {
     return mUndoManager.canRedo();
   }
 
+  @Override
   public boolean canUndo()
   {
     return mUndoManager.canUndo();
   }
 
+  @Override
   public void clearList()
   {
     mUndoManager.discardAllEdits();
@@ -413,16 +429,19 @@ public class ModuleContainer
     fireUndoRedoEvent();
   }
 
+  @Override
   public String getRedoPresentationName()
   {
     return mUndoManager.getRedoPresentationName();
   }
 
+  @Override
   public String getUndoPresentationName()
   {
     return mUndoManager.getUndoPresentationName();
   }
 
+  @Override
   public void redo() throws CannotRedoException
   {
     mUndoManager.redo();
@@ -430,6 +449,7 @@ public class ModuleContainer
     fireUndoRedoEvent();
   }
 
+  @Override
   public void undo() throws CannotUndoException
   {
     mUndoManager.undo();
@@ -437,6 +457,7 @@ public class ModuleContainer
     fireUndoRedoEvent();
   }
 
+  @Override
   public void undoAndRemoveLastCommand() throws CannotUndoException
   {
     mUndoManager.undo();
@@ -445,10 +466,12 @@ public class ModuleContainer
     fireUndoRedoEvent();
   }
 
+  @Override
   public void removeLastCommand(){
     mUndoManager.removeLast();
   }
 
+  @Override
   public Command getLastCommand(){
     return mUndoManager.getLastCommand();
   }
@@ -456,6 +479,7 @@ public class ModuleContainer
 
   //#######################################################################
   //# Interface javax.swing.event.ChangeListener
+  @Override
   public void stateChanged(final ChangeEvent event)
   {
     final Component selected = mTabPanel.getSelectedComponent();
@@ -505,6 +529,7 @@ public class ModuleContainer
       implements SupremicaPropertyChangeListener
   {
 
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
@@ -520,6 +545,7 @@ public class ModuleContainer
       implements SupremicaPropertyChangeListener
   {
 
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {

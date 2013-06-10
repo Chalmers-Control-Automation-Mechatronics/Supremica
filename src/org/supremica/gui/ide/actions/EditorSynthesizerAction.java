@@ -50,7 +50,7 @@ public class EditorSynthesizerAction
 
         setEditorActiveRequired(true);
 
-        putValue(Action.NAME, "Symbolic Synthesis/Optimization on TEFAs...");
+        putValue(Action.NAME, "Symbolic (BDD) Synthesis/Optimization on TEFAs...");
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SHORT_DESCRIPTION, "Synthesize a modular supervisor by adding guards to the original automata");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
@@ -216,8 +216,8 @@ public class EditorSynthesizerAction
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
         logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.numberOfReachableStates());
         if(options.getOptimization())
-            logger.info("The minimum time to reach a marked state from the initial state: "+bddSynthesizer.bddAutomata.getOptimalTime()+".");
-
+            logger.info("The minimum time to 'safely' reach a marked state from the initial state: "+bddSynthesizer.bddAutomata.getOptimalTime(bddSynthesizer.getResult())+".");       
+        
         if(!options.getOptVaribale().isEmpty())
         {
             logger.info("The minimum value of variable "+ options.getOptVaribale()+" among the reachable marked states is: "+bddSynthesizer.bddAutomata.getMinValueOfVar()+".");

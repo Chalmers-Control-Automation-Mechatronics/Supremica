@@ -68,9 +68,8 @@ public abstract class NamedSubject
   {
     switch (index) {
     case 1:
-      final String oldName = mName;
-      mName = (String) newValue;
-      return ModelChangeEvent.createNameChanged(this, oldName);
+      final String name = (String) newValue;
+      return assignName(name);
     default:
       return null;
     }
@@ -92,11 +91,13 @@ public abstract class NamedSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.NamedProxy
+  @Override
   public String getName()
   {
     return mName;
   }
 
+  @Override
   public boolean refequals(final NamedProxy partner)
   {
     return getName().equals(partner.getName());
@@ -122,7 +123,20 @@ public abstract class NamedSubject
   public void setName(final String name)
     throws DuplicateNameException, ItemNotFoundException
   {
-    if (!mName.equals(name)) {
+    final ModelChangeEvent event = assignName(name);
+    if (event != null) {
+      event.fire();
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private ModelChangeEvent assignName(final String name)
+  {
+    if (mName.equals(name)) {
+      return null;
+    } else {
       final Subject parent = getParent();
       if (parent instanceof IndexedCollection<?>) {
         final IndexedCollection<?> collection = (IndexedCollection<?>) parent;
@@ -131,7 +145,7 @@ public abstract class NamedSubject
       final ModelChangeEvent event =
         ModelChangeEvent.createNameChanged(this, mName);
       mName = name;
-      event.fire();
+      return event;
     }
   }
 

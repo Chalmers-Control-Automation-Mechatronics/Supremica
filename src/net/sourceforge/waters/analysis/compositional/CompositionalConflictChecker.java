@@ -22,21 +22,21 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.AutomatonResult;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.analysis.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-import net.sourceforge.waters.model.analysis.SafetyDiagnostics;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.SynchronousProductBuilder;
-import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
-import net.sourceforge.waters.model.analysis.TraceChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AutomatonResult;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
+import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -152,12 +152,44 @@ public class CompositionalConflictChecker
      final ProductDESProxyFactory factory,
      final ConflictAbstractionProcedureFactory abstractionFactory)
   {
+    this(model,
+         marking,
+         factory,
+         abstractionFactory,
+         new PreselectingMethodFactory(),
+         new SelectingMethodFactory());
+  }
+
+  /**
+   * Creates a new conflict checker to check whether the given model is
+   * nonblocking.
+   * @param model
+   *          The model to be checked by this conflict checker.
+   * @param marking
+   *          The proposition event that defines which states are marked.
+   *          Every state has a list of propositions attached to it; the
+   *          conflict checker considers only those states as marked that are
+   *          labelled by <CODE>marking</CODE>, i.e., their list of
+   *          propositions must contain this event (exactly the same object).
+   * @param factory
+   *          Factory used for trace construction.
+   * @param abstractionFactory
+   *          Factory to define the abstraction sequence to be used.
+   */
+  public CompositionalConflictChecker
+    (final ProductDESProxy model,
+     final EventProxy marking,
+     final ProductDESProxyFactory factory,
+     final ConflictAbstractionProcedureFactory abstractionFactory,
+     final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory preselectingMethodFactory,
+     final AbstractCompositionalModelAnalyzer.SelectingMethodFactory selectingMethodFactory)
+  {
     super(model,
           factory,
           ConflictKindTranslator.getInstance(),
           abstractionFactory,
-          new PreselectingMethodFactory(),
-          new SelectingMethodFactory());
+          preselectingMethodFactory,
+          selectingMethodFactory);
     setPruningDeadlocks(true);
     setConfiguredDefaultMarking(marking);
   }
@@ -1007,6 +1039,7 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Interface java.util.Comparator<AutomatonProxy>
+    @Override
     public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
     {
       final int numalpha1 =
@@ -1052,6 +1085,7 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Overrides for SelectingHeuristic
+    @Override
     Candidate selectCandidate(final Collection<Candidate> candidates)
     throws AnalysisException
     {
@@ -1097,6 +1131,7 @@ public class CompositionalConflictChecker
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.monolithic.
     //# MonolithicSynchronousProductBuilder.StateCounter
+    @Override
     public void countState(final int[] tuple)
       throws OverflowException
     {
@@ -1121,6 +1156,7 @@ public class CompositionalConflictChecker
       }
     }
 
+    @Override
     public void recordStatistics(final AutomatonResult result)
     {
       result.setPeakNumberOfNodes(mCount);
@@ -1143,6 +1179,7 @@ public class CompositionalConflictChecker
 
     //#######################################################################
     //# Overrides for SelectingComparator
+    @Override
     double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;

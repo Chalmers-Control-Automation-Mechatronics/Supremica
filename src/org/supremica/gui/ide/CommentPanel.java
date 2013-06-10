@@ -14,13 +14,16 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.StyledDocument;
 
 import net.sourceforge.waters.gui.EditorColor;
@@ -29,6 +32,7 @@ import net.sourceforge.waters.gui.command.EditModuleCommentCommand;
 import net.sourceforge.waters.gui.command.EditModuleNameCommand;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.util.CharacterDocumentFilter;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -74,6 +78,9 @@ class CommentPanel extends JPanel
     scroll.setHorizontalScrollBarPolicy
       (ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     add(BorderLayout.CENTER, scroll);
+    final DocumentFilter filter = new XMLDocumentFilter();
+    final AbstractDocument doc = (AbstractDocument) commentPane.getDocument();
+    doc.setDocumentFilter(filter);
     mCommentHandler = new CommentPaneHandler(commentPane);
     mCommentHandler.loadPane();
     commentPane.addFocusListener(mCommentHandler);
@@ -98,6 +105,7 @@ class CommentPanel extends JPanel
 
     //#######################################################################
     //# Interface java.awt.event.FocusListener
+    @Override
     public void focusLost(final FocusEvent event)
     {
       commit();
@@ -153,6 +161,26 @@ class CommentPanel extends JPanel
   }
 
 
+  //########################################################################
+  //# Inner Class XMLDocumentFilter
+  private static class XMLDocumentFilter
+    extends CharacterDocumentFilter
+  {
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.gui.CharacterDocumentFilter
+    @Override
+    protected boolean isAllowedCharacter(final char ch)
+    {
+      return ch == 0x9 || ch == 0xA || ch == 0xD ||
+             ch >= 0x20 && ch <= 0xD7FF ||
+             ch >= 0xE000 && ch <= 0xFFFD ||
+             ch >= 0x10000 && ch <= 0x10FFFF;
+    }
+
+  }
+
+
   //#########################################################################
   //# Inner Class TitlePaneHandler
   private class TitlePaneHandler extends TextPaneHandler
@@ -167,11 +195,13 @@ class CommentPanel extends JPanel
 
     //#######################################################################
     //# Overrides for CommitHandler
+    @Override
     Command createCommand(final String text)
     {
       return new EditModuleNameCommand(mModuleContainer, text);
     }
 
+    @Override
     String getCurrentValue(final ModuleSubject module)
     {
       return module.getName();
@@ -194,11 +224,13 @@ class CommentPanel extends JPanel
 
     //#######################################################################
     //# Overrides for CommitHandler
+    @Override
     Command createCommand(final String text)
     {
       return new EditModuleCommentCommand(mModuleContainer, text);
     }
 
+    @Override
     String getCurrentValue(final ModuleSubject module)
     {
       final String comment = module.getComment();
@@ -213,6 +245,7 @@ class CommentPanel extends JPanel
   private class ModuleChangeHandler implements ModelObserver
   {
 
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       if (event.getSource() == mModuleContainer.getModule()) {
@@ -229,6 +262,7 @@ class CommentPanel extends JPanel
       }
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.RENDERING_PRIORITY;
@@ -241,6 +275,7 @@ class CommentPanel extends JPanel
   //# Inner Class PendingSaveHandler
   private class PendingSaveHandler implements Observer
   {
+    @Override
     public void update(final EditorChangedEvent event)
     {
       if (event.getKind() == EditorChangedEvent.Kind.PENDING_SAVE) {

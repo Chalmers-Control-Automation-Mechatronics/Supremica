@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -224,3 +224,4 @@ public class Determinizer
   private final TIntIntHashMap mInitialToInitial;
 
 }
+

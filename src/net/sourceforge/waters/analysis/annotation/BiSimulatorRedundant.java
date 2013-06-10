@@ -9,15 +9,15 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntProcedure;
-import gnu.trove.TLongArrayList;
-import gnu.trove.TLongHashSet;
-import gnu.trove.TLongObjectHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.procedure.TIntIntProcedure;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -394,8 +394,8 @@ public class BiSimulatorRedundant
         System.out.println("size:" + p.size());
         System.out.println(props);
       }*/
-      if (!marked.isEmpty()) {mWS.add(new SimpleEquivalenceClass(marked.toNativeArray()));}
-      if (!notmarked.isEmpty()) {mWS.add(new SimpleEquivalenceClass(notmarked.toNativeArray()));}
+      if (!marked.isEmpty()) {mWS.add(new SimpleEquivalenceClass(marked.toArray()));}
+      if (!notmarked.isEmpty()) {mWS.add(new SimpleEquivalenceClass(notmarked.toArray()));}
     }
     //System.out.println("initial partitions: " + mWS.size());
     //System.out.println("maut:" + mStates);
@@ -474,7 +474,9 @@ public class BiSimulatorRedundant
           toberemmed.add(longed);
           DoesntSatisfy.add(longed);
           while (!toberemmed.isEmpty()) {
-            final long rem = toberemmed.remove(toberemmed.size() - 1);
+            final int end = toberemmed.size() - 1;
+            final long rem = toberemmed.get(end);
+            toberemmed.removeAt(end);
             needatleastone.remove(rem);
             final TLongHashSet longset = rely.remove(rem);
             if (longset == null) {continue;}
@@ -1010,7 +1012,7 @@ public class BiSimulatorRedundant
       mTrans.mergewithannotations(sec.mStates);
       STATESREMOVED += sec.mStates.length -1;
     }
-    System.out.println("STATESREMOVED: " + (mStates - mP.size()));
+    // System.out.println("STATESREMOVED: " + (mStates - mP.size()));
     if (mP.size() == 0) {
       assert(false);
     }
@@ -1423,6 +1425,7 @@ public class BiSimulatorRedundant
     }
 
     //TODO maybe keep track of what events an equivalence class has no incoming events from
+    @Override
     public void splitOn()
     {
       mInfo = new TIntIntHashMap[mEventNum];
@@ -1471,6 +1474,7 @@ public class BiSimulatorRedundant
       }
     }
 
+    @Override
     public TIntIntHashMap getInfo(final int event)
     {
       if (mInfo == null) {
@@ -1515,6 +1519,7 @@ public class BiSimulatorRedundant
       size = child1.size + child2.size;
     }
 
+    @Override
     public void splitOn()
     {
       final ArrayList<SimpleEquivalenceClass> classes =
@@ -1525,6 +1530,7 @@ public class BiSimulatorRedundant
         final TIntIntHashMap process = new TIntIntHashMap();
         final TIntIntHashMap info1 = mChild1.getInfo(e);
         info.forEachEntry(new TIntIntProcedure() {
+          @Override
           public boolean execute(final int state, int value) {
             if (value == 0) {
               System.out.println("zero value split");
@@ -1577,9 +1583,9 @@ public class BiSimulatorRedundant
           System.out.println("X3:" + Arrays.toString(X3));
           System.out.println("X:" + Arrays.toString(sec.mStates));*/
           if (number == 2) {
-            X1 = sec.X1 == null ? null : sec.X1.toNativeArray();
-            X2 = sec.X2 == null ? null : sec.X2.toNativeArray();
-            X3 = sec.X3 == null ? null : sec.X3.toNativeArray();
+            X1 = sec.X1 == null ? null : sec.X1.toArray();
+            X2 = sec.X2 == null ? null : sec.X2.toArray();
+            X3 = sec.X3 == null ? null : sec.X3.toArray();
             if (X1 == null) {
               X1 = X3;
             } else if (X2 == null) {
@@ -1587,8 +1593,8 @@ public class BiSimulatorRedundant
             }
             addToW(sec, X1, X2);
           } else if(number == 3) {
-            X1 = sec.X1.toNativeArray(); X2 = sec.X2.toNativeArray();
-            X3 = sec.X3.toNativeArray(); sec.mSplit = false;
+            X1 = sec.X1.toArray(); X2 = sec.X2.toArray();
+            X3 = sec.X3.toArray(); sec.mSplit = false;
             addToW(sec, X1, X2, X3);
           }
           sec.X1 = null; sec.X2 = null; sec.X3 = null; sec.mSplit = false;
@@ -1601,6 +1607,7 @@ public class BiSimulatorRedundant
       if (mChild2 instanceof ComplexEquivalenceClass) {mWC.add((ComplexEquivalenceClass)mChild2);}
     }
 
+    @Override
     public TIntIntHashMap getInfo(final int event)
     {
       if (mInfo == null) {
@@ -1617,11 +1624,13 @@ public class BiSimulatorRedundant
       }
       final TIntIntHashMap info = new TIntIntHashMap(info1.size());
       info1.forEachEntry(new TIntIntProcedure() {
+        @Override
         public boolean execute(final int state, final int value) {
           info.put(state, value); return true;
         }
       });
       info2.forEachEntry(new TIntIntProcedure() {
+        @Override
         public boolean execute(final int state, final int value) {
           info.adjustOrPutValue(state, value, value); return true;
         }
@@ -1644,6 +1653,7 @@ public class BiSimulatorRedundant
       mSup = sup;
     }
 
+    @Override
     public int hashCode()
     {
       int hash = mSub;
@@ -1652,6 +1662,7 @@ public class BiSimulatorRedundant
       return hash;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final IntHashInt a = (IntHashInt) o;
@@ -1671,6 +1682,7 @@ public class BiSimulatorRedundant
       mList = list;
     }
 
+    @Override
     public int compareTo(final IntInt id)
     {
       if (mList.size() < id.mList.size()) {
@@ -1693,6 +1705,7 @@ public class BiSimulatorRedundant
       mAnn2 = ann2;
     }
 
+    @Override
     public int hashCode()
     {
       int hash = mAnn1.hashCode();
@@ -1701,6 +1714,7 @@ public class BiSimulatorRedundant
       return hash;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final AnnAnn a = (AnnAnn) o;
@@ -1719,6 +1733,7 @@ public class BiSimulatorRedundant
       mAct2 = act2;
     }
 
+    @Override
     public int hashCode()
     {
       int hash = mAct1.hashCode();
@@ -1727,6 +1742,7 @@ public class BiSimulatorRedundant
       return hash;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final ActAct a = (ActAct) o;
@@ -1734,3 +1750,4 @@ public class BiSimulatorRedundant
     }
   }
 }
+

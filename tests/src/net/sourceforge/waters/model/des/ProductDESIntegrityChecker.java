@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.model.des;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.Set;
 
@@ -197,3 +197,4 @@ public class ProductDESIntegrityChecker
   private Set<EventProxy> mAutomatonEventSet;
 
 }
+

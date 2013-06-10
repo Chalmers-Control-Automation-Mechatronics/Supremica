@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.HashFunctions;
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TauClosure;
@@ -167,6 +167,7 @@ public class ActiveEventsTRSimplifier
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.abstraction.WatersIntHashingStrategy
+    @Override
     public int computeHashCode(final int root)
     {
       if (root == mPreviousRoot) {
@@ -236,6 +237,7 @@ public class ActiveEventsTRSimplifier
       }
     }
 
+    @Override
     public boolean equals(final int root1, final int root2)
     {
       try {
@@ -382,3 +384,4 @@ public class ActiveEventsTRSimplifier
   private int mTransitionLimit = Integer.MAX_VALUE;
 
 }
+

@@ -15,8 +15,8 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
        AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

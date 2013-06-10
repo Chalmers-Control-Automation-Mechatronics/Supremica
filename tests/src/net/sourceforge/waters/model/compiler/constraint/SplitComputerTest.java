@@ -10,21 +10,22 @@
 
 package net.sourceforge.waters.model.compiler.constraint;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
@@ -244,10 +245,10 @@ public class SplitComputerTest extends TestCase
   private CompiledEnumRange createEnumRange(final String[] names)
     throws ParseException
   {
-    final List<IdentifierProxy> list =
-      new ArrayList<IdentifierProxy>(names.length);
+    final List<SimpleIdentifierProxy> list =
+      new ArrayList<SimpleIdentifierProxy>(names.length);
     for (final String name : names) {
-      final IdentifierProxy ident = mParser.parseIdentifier(name);
+      final SimpleIdentifierProxy ident = mParser.parseSimpleIdentifier(name);
       mContext.addAtom(ident);
       list.add(ident);
     }
@@ -303,6 +304,7 @@ public class SplitComputerTest extends TestCase
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
   {
     mFactory = ModuleElementFactory.getInstance();
@@ -312,6 +314,7 @@ public class SplitComputerTest extends TestCase
     mSplitComputer = new SplitComputer(mFactory, mOperatorTable, mContext);
   }
 
+  @Override
   protected void tearDown()
   {
     mFactory = null;

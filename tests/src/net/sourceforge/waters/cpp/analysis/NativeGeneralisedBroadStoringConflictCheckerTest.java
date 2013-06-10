@@ -14,7 +14,7 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.cpp.analysis.ExplorerMode;
 import net.sourceforge.waters.model.analysis.AbstractGeneralisedConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

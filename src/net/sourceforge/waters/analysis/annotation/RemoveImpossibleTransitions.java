@@ -1,8 +1,8 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -204,3 +204,4 @@ public class RemoveImpossibleTransitions
     TIME += System.currentTimeMillis();
   }
 }
+

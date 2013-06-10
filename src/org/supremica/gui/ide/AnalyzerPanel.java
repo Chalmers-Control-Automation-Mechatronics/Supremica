@@ -153,16 +153,14 @@ public class AnalyzerPanel
         return mDocumentContainer.getIDE().getActions();
     }
 
+	// This duplicates code in Supremica (and Supremica implements it from Gui)
     public String getNewAutomatonName(final String msg, final String nameSuggestion)
     {
-        boolean finished = false;
-        String newName = "";
-
-        while (!finished)
+        while (true)
         {
-            newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
+            String newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
 
-            if (newName == null)
+            if (newName == null)	// user cancelled
             {
                 return null;
             }
@@ -176,11 +174,9 @@ public class AnalyzerPanel
             }
             else
             {
-                finished = true;
+				return newName;
             }
         }
-
-        return newName;
     }
 
 
@@ -198,9 +194,31 @@ public class AnalyzerPanel
 
     public int addAutomata(final Automata theAutomata)
     {
+		return addAutomata(theAutomata, false);
+	}
+	
+	public int addAutomata(final Automata theAutomata, boolean sanityCheck)
+	{
         final int size = mVisualProject.nbrOfAutomata();
-        mVisualProject.addAutomata(theAutomata);
-        return mVisualProject.nbrOfAutomata() - size;
+		if(sanityCheck == false) // just do it the old unsafe way, this fails ungracefully if adding automata named the same as an existing one
+		{
+			mVisualProject.addAutomata(theAutomata);
+			return mVisualProject.nbrOfAutomata() - size;
+		}
+		
+		// Here we do it the nice and graceful way
+		for(Automaton aut : theAutomata)
+		{
+			while(mVisualProject.addAutomaton(aut) == false)
+			{
+				final String name = getNewAutomatonName("Automaton exists: " + aut.getName(), aut.getComment());
+				if(name == null) // then the user cancelled
+					break;	// handle the next one
+				
+				aut.setName(name);
+			}
+		}
+		return mVisualProject.nbrOfAutomata() - size;	// number of added automata
     }
 
     public int addProject(final Project project)

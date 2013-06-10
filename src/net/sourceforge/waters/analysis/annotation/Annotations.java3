@@ -3,8 +3,8 @@ package net.sourceforge.waters.analysis;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import gnu.trove.TObjectIdentityHashingStrategy;
@@ -13,9 +13,9 @@ import java.util.Collection;
 import net.sourceforge.waters.model.des.EventProxy;
 import java.util.Set;
 import java.util.ArrayList;
-import gnu.trove.TObjectProcedure;
+import gnu.trove.procedure.TObjectProcedure;
 import java.util.PriorityQueue;
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 public class Annotations
 {
@@ -624,3 +624,4 @@ public class Annotations
     }
   }
 }
+

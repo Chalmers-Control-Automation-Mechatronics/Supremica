@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -43,11 +43,11 @@ import net.sourceforge.waters.analysis.modular.BlockedEvents;
 import net.sourceforge.waters.analysis.modular.NonDeterministicComposer;
 import net.sourceforge.waters.analysis.modular.TransBiSimulator;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
-import net.sourceforge.waters.model.analysis.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -1232,3 +1232,4 @@ public class CompNonBlockingChecker
     LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }
+

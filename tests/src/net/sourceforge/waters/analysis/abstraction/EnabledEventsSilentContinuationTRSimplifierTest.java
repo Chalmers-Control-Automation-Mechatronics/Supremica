@@ -12,6 +12,9 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -19,9 +22,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 /**
@@ -52,11 +52,13 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest
+  @Override
   protected EnabledEventsSilentContinuationTRSimplifier createTransitionRelationSimplifier()
   {
     return new EnabledEventsSilentContinuationTRSimplifier();
   }
 
+  @Override
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
   {
@@ -74,7 +76,7 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     if(event.getKind() == EventKind.UNCONTROLLABLE)
     {
     //put in the order you want to encode
-    //don't need to worry about tau because of the construtor I'm using
+    //don't need to worry about tau because of the constructor I'm using
       events.add(event);
     //Collection<EventProxy> create list of events in right order
 
@@ -102,6 +104,7 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     return new EventEncoding(events, translator, tau);
 
   }
+  @Override
   protected EnabledEventsSilentContinuationTRSimplifier getTransitionRelationSimplifier()
   {
 

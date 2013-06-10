@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="tip3pruning" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test case to check whether to MonolithicSynchronousProductBuilder correctly refrains from pruning of deadlock states in cases where all states are implicitly marked.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name="SIGHTS">
+            <ConstantAliasExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="map_hide"/>
+        <EventDecl Kind="CONTROLLABLE" Name="map_expose"/>
+        <EventDecl Kind="CONTROLLABLE" Name="br_hide"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="br_select_sight_list"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="tau_noclick"/>
+        <EventDecl Kind="CONTROLLABLE" Name="br_expose"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="map_select">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="br_select_rec_list"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="br_select">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="loc_new_location"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="br_expose_3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="exposed">
+                        <PointGeometry>
+                            <Point X="144" Y="192"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-63" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point X="13" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hidden">
+                        <PointGeometry>
+                            <Point X="144" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="14" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="exposed" Target="exposed">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="br_select">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="br_select">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="br_select">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="br_select_rec_list"/>
+                            <SimpleIdentifier Name="br_select_sight_list"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="145" Y="230"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="exposed" Target="hidden">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="map_expose"/>
+                            <SimpleIdentifier Name="br_hide"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-64" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="128" Y="143"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="hidden" Target="exposed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="br_expose"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="159" Y="145"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="hidden" Target="hidden">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="map_expose"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="144" Y="58"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="nbl_noclick">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="ok">
+                        <PointGeometry>
+                            <Point X="272" Y="192"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="12" Y="-15"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point X="15" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="suspend">
+                        <PointGeometry>
+                            <Point X="272" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="14" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="ok" Target="ok">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="br_select">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="br_select">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="br_select">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="br_select_rec_list"/>
+                            <SimpleIdentifier Name="br_select_sight_list"/>
+                            <IndexedIdentifier Name="map_select">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="map_select">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="map_select">
+                                <IntConstant Value="3"/>
+                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="loc_new_location"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-76" Y="-89"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="235" Y="192"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="ok" Target="suspend">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_noclick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

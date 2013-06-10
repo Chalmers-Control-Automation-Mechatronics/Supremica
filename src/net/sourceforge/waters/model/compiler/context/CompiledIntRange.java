@@ -12,7 +12,10 @@ package net.sourceforge.waters.model.compiler.context;
 import java.util.AbstractList;
 import java.util.List;
 
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.plain.module.IntConstantElement;
 
@@ -43,6 +46,7 @@ public class CompiledIntRange implements CompiledRange
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public boolean equals(final Object other)
   {
     if (other != null && getClass() == other.getClass()) {
@@ -53,6 +57,7 @@ public class CompiledIntRange implements CompiledRange
     }
   }
 
+  @Override
   public int hashCode()
   {
     int result = getClass().hashCode();
@@ -63,6 +68,7 @@ public class CompiledIntRange implements CompiledRange
     return result;
   }
 
+  @Override
   public String toString()
   {
     return mLower + ".." + mUpper;
@@ -71,16 +77,19 @@ public class CompiledIntRange implements CompiledRange
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.expr.RangeValue
+  @Override
   public int size()
   {
     return mUpper - mLower + 1;
   }
 
+  @Override
   public boolean isEmpty()
   {
     return mLower > mUpper;
   }
 
+  @Override
   public int indexOf(final SimpleExpressionProxy value)
   {
     if (value instanceof IntConstantProxy) {
@@ -91,11 +100,13 @@ public class CompiledIntRange implements CompiledRange
     }
   }
 
+  @Override
   public boolean contains(final SimpleExpressionProxy value)
   {
     return indexOf(value) >= 0;
   }
 
+  @Override
   public boolean intersects(final CompiledRange range)
   {
     if (range instanceof CompiledIntRange) {
@@ -108,6 +119,7 @@ public class CompiledIntRange implements CompiledRange
     }
   }
 
+  @Override
   public CompiledIntRange intersection(final CompiledRange range)
   {
     if (range instanceof CompiledIntRange) {
@@ -118,6 +130,7 @@ public class CompiledIntRange implements CompiledRange
     }
   }
 
+  @Override
   public CompiledIntRange remove(final SimpleExpressionProxy value)
   {
     if (value instanceof IntConstantProxy) {
@@ -128,9 +141,20 @@ public class CompiledIntRange implements CompiledRange
     }
   }
 
+  @Override
   public List<IntConstantProxy> getValues()
   {
     return new IntRangeList();
+  }
+
+  @Override
+  public SimpleExpressionProxy createExpression(final ModuleProxyFactory factory,
+                                                final CompilerOperatorTable optable)
+  {
+    final IntConstantProxy lower = factory.createIntConstantProxy(mLower);
+    final IntConstantProxy upper = factory.createIntConstantProxy(mUpper);
+    final BinaryOperator op = optable.getRangeOperator();
+    return factory.createBinaryExpressionProxy(op, lower, upper);
   }
 
 
@@ -180,11 +204,13 @@ public class CompiledIntRange implements CompiledRange
 
     //#######################################################################
     //# Interface java.util.List
+    @Override
     public int size()
     {
       return CompiledIntRange.this.size();
     }
 
+    @Override
     public IntConstantProxy get(final int index)
     {
       final int value = mLower + index;

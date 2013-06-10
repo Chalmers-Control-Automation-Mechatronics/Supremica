@@ -14,6 +14,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+
 
 /**
  * An enumeration-value command line argument passed to a
@@ -88,7 +91,7 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
   //#########################################################################
   //# Parsing
   @Override
-  protected void parse(final Iterator<String> iter)
+  public void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
       final String name = iter.next();
@@ -108,7 +111,8 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
 
   //#########################################################################
   //# Printing
-  protected void dump(final PrintStream stream, final ModelVerifier verifier)
+  @Override
+  public void dump(final PrintStream stream, final ModelVerifier verifier)
   {
     super.dump(stream, verifier);
     mEnumFactory.dumpEnumeration(stream, INDENT);

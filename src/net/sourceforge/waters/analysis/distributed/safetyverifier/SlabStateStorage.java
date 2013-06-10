@@ -1,6 +1,6 @@
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 public class SlabStateStorage implements StateStorage
 {
@@ -72,3 +72,4 @@ public class SlabStateStorage implements StateStorage
 
   private static final int INITIAL_CAPACITY = 100000;
 }
+

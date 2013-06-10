@@ -52,6 +52,7 @@ package org.supremica.automata.algorithms;
 import org.supremica.automata.*;
 import org.supremica.log.*;
 import java.util.Iterator;
+import org.supremica.properties.Config;
 
 /**
  * This class is a result of a project in the course Evolutionary Computation,
@@ -246,7 +247,7 @@ public class GeneticAlgorithms
         
         try
         {
-            theSynchronizer = new AutomataSynchronizer(automata, syncOptions);
+            theSynchronizer = new AutomataSynchronizer(automata, syncOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
             
             theSynchronizer.execute();
         }

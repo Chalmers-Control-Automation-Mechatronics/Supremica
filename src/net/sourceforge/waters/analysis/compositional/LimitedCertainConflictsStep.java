@@ -11,9 +11,11 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.abstraction.EnabledEventsLimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.certainconf.CertainConflictsTRSimplifier;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -66,6 +68,28 @@ class LimitedCertainConflictsStep extends AbstractionStep
    }
 
 
+  LimitedCertainConflictsStep
+  (final AbstractCompositionalModelAnalyzer analyzer,
+   final TransitionRelationSimplifier simplifier,
+   final AutomatonProxy resultAut,
+   final AutomatonProxy originalAut,
+   final EventProxy tau,
+   final StateEncoding originalStateEnc,
+   final StateEncoding resultStateEnc,
+   final EventEncoding eventEncoding,
+   final int numEnabledEvents)
+ {
+  super(analyzer, resultAut, originalAut);
+  mSimplifier = simplifier;
+  mTau = tau;
+  mOriginalStateEncoding = originalStateEnc;
+  mResultStateEncoding = resultStateEnc;
+
+  mEventEncoding = eventEncoding;
+  mNumEnabledEvents = numEnabledEvents;
+ }
+
+
   //#########################################################################
   //# Trace Computation
   @Override
@@ -84,6 +108,18 @@ class LimitedCertainConflictsStep extends AbstractionStep
           (verifier, simplifier, mTau, resultAut, mResultStateEncoding,
            originalAut, mOriginalStateEncoding);
       return expander.convertTraceSteps(traceSteps);
+    }
+      else if (mSimplifier instanceof EnabledEventsLimitedCertainConflictsTRSimplifier) {
+        final EnabledEventsLimitedCertainConflictsTRSimplifier simplifier =
+          (EnabledEventsLimitedCertainConflictsTRSimplifier) mSimplifier;
+        final AutomatonProxy resultAut = getResultAutomaton();
+        final AutomatonProxy originalAut = getOriginalAutomaton();
+        final EnabledEventsLimitedCertainConflictsTraceExpander expander =
+          new EnabledEventsLimitedCertainConflictsTraceExpander
+            (verifier, simplifier, mTau, resultAut, mResultStateEncoding,
+             originalAut, mOriginalStateEncoding,
+             mEventEncoding, mNumEnabledEvents);
+        return expander.convertTraceSteps(traceSteps);
     } else if (mSimplifier instanceof CertainConflictsTRSimplifier) {
       final CertainConflictsTRSimplifier simplifier =
         (CertainConflictsTRSimplifier) mSimplifier;
@@ -132,5 +168,9 @@ class LimitedCertainConflictsStep extends AbstractionStep
    * (simplified automaton) to state code in output transition relation.
    */
   private final StateEncoding mResultStateEncoding;
+
+  private EventEncoding mEventEncoding;
+
+  private int mNumEnabledEvents;
 
 }

@@ -1,8 +1,8 @@
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntProcedure;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.procedure.TIntProcedure;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -297,3 +297,4 @@ public class SilentOutGoing
     TIME += System.currentTimeMillis();
   }
 }
+

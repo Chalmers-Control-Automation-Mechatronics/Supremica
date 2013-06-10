@@ -59,7 +59,7 @@ package org.supremica.properties;
 
 import java.awt.Color;
 
-import net.sourceforge.waters.model.analysis.ModelVerifierFactoryLoader;
+import net.sourceforge.waters.model.analysis.des.ModelVerifierFactoryLoader;
 
 import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.BDDPartitioningType;
@@ -190,7 +190,10 @@ public final class Config
               "Include RAS support");
 
     // GUI_EDITOR
-    //public static final BooleanProperty GUI_EDITOR_USE_SPRING_EMBEDDER = new BooleanProperty(PropertyType.GUI_EDITOR, "useSpringEmbedder", true, "Use spring embedder for automatic graph layout");
+    public static final ObjectProperty GUI_EDITOR_ICONSET =
+      new ObjectProperty(PropertyType.GUI_EDITOR, "iconSet", "waters",
+                         "Icon set (requires restart)",
+                         new Object[] {"waters", "16x16", "20x20", "24x24"});
     public static final ColorProperty GUI_EDITOR_BACKGROUND_COLOR =
       new ColorProperty(PropertyType.GUI_EDITOR, "backgroundColor",
                         Color.WHITE, "Automaton background colour");
@@ -299,7 +302,7 @@ public final class Config
     public static final BooleanProperty SYNTHESIS_SAVE_IDD_IN_FILE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "saveIDDInFile", true, "Save the guard-event pairs as an IDD in a file");
     public static final BooleanProperty SYNTHESIS_REACHABILITY = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "reachability", false, "Remove the unreachable states");
     public static final BooleanProperty SYNTHESIS_OPTIMIZATION = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "optimization", false, "Compute the global optimal time");
-
+	public static final BooleanProperty SYNTHESIS_SUP_AS_PLANT = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSupsAsPlants", false, "Consider supervisors as plants");
 
     // ALGORITHMS_MINIMIZATION
     public static final ObjectProperty MINIMIZATION_EQUIVALENCE_RELATION = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationEquivalenceRelation", EquivalenceRelation.LANGUAGEEQUIVALENCE, "Default equivalence relation", EquivalenceRelation.values());

@@ -604,31 +604,31 @@ public class ExpressionParser {
     }
     if ((mask & Operator.TYPE_BOOLEAN) != 0) {
       if (first) {
-	first = false;
+        first = false;
       } else {
-	buffer.append(" or ");
+        buffer.append(" or ");
       }
       buffer.append(TYPENAME_BOOLEAN);
     }
     if ((mask & Operator.TYPE_ATOM) != 0) {
       if (first) {
-	first = false;
+        first = false;
       } else {
-	buffer.append(" or ");
+        buffer.append(" or ");
       }
       buffer.append(TYPENAME_ATOM);
     }
     if ((mask & Operator.TYPE_RANGE) != 0) {
       if (first) {
-	first = false;
+        first = false;
       } else {
-	buffer.append(" or ");
+        buffer.append(" or ");
       }
       buffer.append(TYPENAME_RANGE);
     }
     if ((mask & Operator.TYPE_NAME) != 0) {
       if (first) {
-	first = false;
+        first = false;
       } else {
 	buffer.append(" or ");
       }

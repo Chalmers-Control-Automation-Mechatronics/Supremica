@@ -307,7 +307,7 @@ public class AutomataMinimizer
                     return theAutomata;
                 }
                  
-                min = AutomataSynchronizer.synchronizeAutomata(selection);
+                min = AutomataSynchronizer.synchronizeAutomata(selection, false);
                 if (options.getMinimizationType()
                         == EquivalenceRelation.SYNTHESISABSTRACTION) {
                     min.synthesisHide(hideThese, preserveControllability);
@@ -341,7 +341,7 @@ public class AutomataMinimizer
                         // Synch
                         final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
                         synchOptions.setUseShortStateNames(useShortStateNames);
-                        aut = AutomataSynchronizer.synchronizeAutomata(selectClone, synchOptions);
+                        aut = AutomataSynchronizer.synchronizeAutomata(selectClone, synchOptions, false);
                         aut.setName(name);
                         aut.hide(hideThese, preserveControllability);
                         AutomatonMinimizer.halfWaySynthesis(aut);
@@ -928,7 +928,7 @@ public class AutomataMinimizer
             // Synch
             final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
             synchOptions.setUseShortStateNames(useShortStateNames);
-            aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions);
+            aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions, false);
             // Examine for largest sizes
             if (aut.nbrOfStates() > mostStates)
             {

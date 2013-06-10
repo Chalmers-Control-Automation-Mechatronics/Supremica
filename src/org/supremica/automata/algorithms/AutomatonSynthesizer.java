@@ -53,6 +53,7 @@ import org.supremica.log.*;
 import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.standard.ObserverBuilder;
+import org.supremica.properties.Config;
 
 /**
  * A monolithic synthesizer that can handle non-blocking and controllability problems.
@@ -176,7 +177,7 @@ public class AutomatonSynthesizer
             // observerAndSupervisor.setIndicies();
             SynchronizationOptions observerSynchOptions = new SynchronizationOptions();
             observerSynchOptions.setSynchronizationType(SynchronizationType.FULL);
-            AutomataSynchronizer observerSynchronizer = new AutomataSynchronizer(observerAndSupervisor, observerSynchOptions);
+            AutomataSynchronizer observerSynchronizer = new AutomataSynchronizer(observerAndSupervisor, observerSynchOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
             observerSynchronizer.execute();
             Automaton newSystem = observerSynchronizer.getAutomaton();
             logger.info("Number of states in observer||sup: " + newSystem.nbrOfStates() + " nbr forb states: " + newSystem.nbrOfForbiddenStates());

@@ -13,7 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+
+import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
@@ -30,12 +31,12 @@ public class SaveAsAction extends AbstractSaveAction
     putValue(Action.NAME, "Save As ...");
     putValue(Action.SHORT_DESCRIPTION, "Save the module using a new name");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
-    putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource
-              ("/toolbarButtonGraphics/general/SaveAs16.gif")));
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_SAVE_AS);
   }
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final IDE ide = getIDE();
@@ -45,6 +46,7 @@ public class SaveAsAction extends AbstractSaveAction
 
   //#########################################################################
   //# Enabling and Disabling
+  @Override
   String getShortDescription(final String type)
   {
     return "Save the " + type + "using a new name";

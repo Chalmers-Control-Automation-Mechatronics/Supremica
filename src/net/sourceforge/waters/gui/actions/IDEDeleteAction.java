@@ -14,8 +14,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.List;
+
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.command.Command;
@@ -25,6 +25,7 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.base.Proxy;
 
 import org.supremica.gui.ide.IDE;
@@ -66,18 +67,17 @@ public class IDEDeleteAction
     } else {
       final SelectionOwner panel = getCurrentSelectionOwner();
       mActionArgument = panel.isSelected(arg) ? null : arg;
-    }      
+    }
     putValue(Action.ACCELERATOR_KEY,
-	     KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
-    putValue(Action.SMALL_ICON,
-	     new ImageIcon(IDE.class.getResource
-			   ("/toolbarButtonGraphics/general/Delete16.gif")));
+             KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_DELETE);
     updateEnabledStatus();
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final SelectionOwner panel = getCurrentSelectionOwner();
@@ -103,6 +103,7 @@ public class IDEDeleteAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {

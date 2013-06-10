@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.model.analysis.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -145,7 +145,7 @@ class ConflictHidingStep extends HidingStep
         final Map.Entry<EventProxy,DumpStateSearchData> entry = iter.next();
         final EventProxy event = entry.getKey();
         final DumpStateSearchData data = entry.getValue();
-        if (!alphabet.contains(event)) {
+        if (event != null && !alphabet.contains(event)) {
           final StateProxy state = previousMapOrig.get(aut);
           final boolean dump =
             nonDumpStates != null &&
@@ -168,7 +168,6 @@ class ConflictHidingStep extends HidingStep
         break;
       }
     }
-    assert event != null;
     final AutomatonProxy resultAutomaton = getResultAutomaton();
     final Map<AutomatonProxy,StateProxy> nextMapOrig =
       new HashMap<AutomatonProxy,StateProxy>(nextMapResult);
@@ -257,3 +256,4 @@ class ConflictHidingStep extends HidingStep
   }
 
 }
+

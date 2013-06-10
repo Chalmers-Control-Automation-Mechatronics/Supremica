@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;

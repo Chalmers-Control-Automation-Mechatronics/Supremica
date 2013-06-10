@@ -1,27 +1,28 @@
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.LinkedList;
-import java.util.List;
-import gnu.trove.TLongHashSet;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.StateProxy;
-import gnu.trove.TObjectIntHashMap;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import gnu.trove.THashSet;
-import java.util.Set;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Arrays;
-import gnu.trove.TIntObjectHashMap;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.analysis.annotation.MemStateProxy;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 import java.util.ArrayList;
-import gnu.trove.TLongArrayList;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.analysis.annotation.MemStateProxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class Splitter
@@ -89,6 +90,7 @@ public class Splitter
     final List<EventProxy> events = new ArrayList<EventProxy>(mAut.getEvents());
     Collections.sort(events, new Comparator<EventProxy>()
       {
+        @Override
         public int compare(final EventProxy e1, final EventProxy e2)
         {
           return mPossible.get(e1).size() - mPossible.get(e2).size();
@@ -359,6 +361,7 @@ public class Splitter
       return res;
     }
 
+    @Override
     public Classes clone()
     {
       return new Classes(this);
@@ -468,8 +471,8 @@ public class Splitter
           }
         }
         while (merge1.size() != 0) {
-          final int[] edge1 = split(merge1.remove(merge1.size() - 1));
-          final int[] edge2 = split(merge2.remove(merge2.size() - 1));
+          final int[] edge1 = split(merge1.removeAt(merge1.size() - 1));
+          final int[] edge2 = split(merge2.removeAt(merge2.size() - 1));
           merge(mSuccs[edge1[0]][edge1[1]], mSuccs[edge2[0]][edge2[1]]);
         }
         mHidden[e] = true;
@@ -488,3 +491,4 @@ public class Splitter
     }
   }
 }
+

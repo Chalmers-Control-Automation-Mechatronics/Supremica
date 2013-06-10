@@ -67,7 +67,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.help.CSH;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -81,6 +80,8 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+
+import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.Version;
 import org.supremica.automata.Automata;
@@ -100,12 +101,12 @@ public class Supremica
     implements TableModelListener, Gui, VisualProjectContainerListener
 {
     private static final long serialVersionUID = 1L;
-    private Logger logger = LoggerFactory.createLogger(Supremica.class);
-    private LogDisplay theLogDisplay = LogDisplay.getInstance();
+    private final Logger logger = LoggerFactory.createLogger(Supremica.class);
+    private final LogDisplay theLogDisplay = LogDisplay.getInstance();
     private JPanel contentPane;
-    private MainMenuBar menuBar = new MainMenuBar(this);
-    private MainToolBar toolBar = new MainToolBar(this);
-    private MainPopupMenu mainPopupMenu = new MainPopupMenu(this);
+    private final MainMenuBar menuBar = new MainMenuBar(this);
+    private final MainToolBar toolBar = new MainToolBar(this);
+    private final MainPopupMenu mainPopupMenu = new MainPopupMenu(this);
     private VisualProjectContainer theVisualProjectContainer;
     @SuppressWarnings("unused")
 	private TypeCellEditor typeEditor;
@@ -122,104 +123,103 @@ public class Supremica
     private ContentHelp help = null;
     @SuppressWarnings("unused")
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
-    
+
     // MF -- made publically available
     public static int TABLE_IDENTITY_COLUMN = 0;
     public static int TABLE_TYPE_COLUMN = 1;
     public static int TABLE_STATES_COLUMN = 2;
     public static int TABLE_EVENTS_COLUMN = 3;
-    public static ImageIcon cornerIcon = (new ImageIcon(Supremica.class.getResource("/icons/cornerIcon.gif")));
-    public static Image cornerImage = cornerIcon.getImage();
-    
+
     // Construct the frame
     public Supremica()
     {
         //setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         //setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
+
         theVisualProjectContainer = new VisualProjectContainer();
         theVisualProjectContainer.addListener(this);
-        VisualProject theVisualProject = new VisualProject("");
+        final VisualProject theVisualProject = new VisualProject("");
         theVisualProjectContainer.addProject(theVisualProject);
         setActiveProject(theVisualProject);
         // theVisualProjectContainer = currProject.getVisualProjectContainer();
         // theVisualProjectContainer.addListener(this);
-        
+
         logger.info("Supremica version: " + Version.version());
-        
+
         if (Config.XML_RPC_ACTIVE.isTrue())
         {
             boolean serverStarted = true;
-            
+
             try
             {
                 xmlRpcServer = new Server(theVisualProjectContainer, Config.XML_RPC_PORT.get());
             }
-            catch (Exception e)
+            catch (final Exception e)
             {
                 serverStarted = false;
-                
+
                 logger.warn("Another server already running on port " + Config.XML_RPC_PORT.get() + ". XML-RPC server not started!");
             }
-            
+
             if (serverStarted)
             {
                 logger.info("XML-RPC server running on port " + Config.XML_RPC_PORT.get());
             }
         }
-        
+
         layout = new BorderLayout();
         fullTableModel = getActiveProject().getFullTableModel();
         theTableSorter = new TableSorter(fullTableModel);
         theAutomatonTable = new JTable(theTableSorter);
-        
+
         theAutomatonTable.getTableHeader().setReorderingAllowed(false);
         theTableSorter.addMouseListenerToHeaderInTable(theAutomatonTable);
-        
+
         menuHandler = new MenuHandler(
             /**
              *  theAutomatonTable
              */
             );
         theAutomatonTableScrollPane = new JScrollPane(theAutomatonTable);
-        
-        JViewport vp = theAutomatonTableScrollPane.getViewport();
-        
+
+        final JViewport vp = theAutomatonTableScrollPane.getViewport();
+
         vp.setBackground(Color.white);
         theAutomatonTable.setBackground(Color.white);
-        
+
         splitPaneVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, theAutomatonTableScrollPane, theLogDisplay.getComponent());
         theLogDisplay.getComponent().updateUI();
-        
+
         enableEvents(AWTEvent.WINDOW_EVENT_MASK);
-        
+
         help = new ContentHelp();
-        
+
         try
         {
             jbInit();
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.debug(ex.getStackTrace());
         }
-        
+
         // This code used to be in the popup menu -------------
         theAutomatonTable.addMouseListener(new MouseAdapter()
         {
-            public void mouseClicked(MouseEvent e)
+            @Override
+            public void mouseClicked(final MouseEvent e)
             {
                 if (e.getClickCount() == 2)
                 {
-                    int col = theAutomatonTable.columnAtPoint(e.getPoint());
-                    int row = theAutomatonTable.rowAtPoint(e.getPoint());
-                    
+                    final int col = theAutomatonTable.columnAtPoint(e.getPoint());
+                    final int row = theAutomatonTable.rowAtPoint(e.getPoint());
+
                     if (row < 0)
                     {
                         return;
                     }
-                    
+
                     if (Config.DOT_USE.isTrue())
                     {
                         if (col == TABLE_IDENTITY_COLUMN)
@@ -230,80 +230,82 @@ public class Supremica
                     }
                 }
             }
-            
-            public void mousePressed(MouseEvent e)
+
+            @Override
+            public void mousePressed(final MouseEvent e)
             {
                 // This is needed for the Linux platform
                 // where isPopupTrigger is true only on mousePressed.
                 maybeShowPopup(e);
             }
-            
-            public void mouseReleased(MouseEvent e)
+
+            @Override
+            public void mouseReleased(final MouseEvent e)
             {
                 // This is for triggering the popup on Windows platforms
                 maybeShowPopup(e);
             }
-            
-            private void maybeShowPopup(MouseEvent e)
+
+            private void maybeShowPopup(final MouseEvent e)
             {
                 if (e.isPopupTrigger())
                 {
-                    int currRow = theAutomatonTable.rowAtPoint(e.getPoint());
-                    
+                    final int currRow = theAutomatonTable.rowAtPoint(e.getPoint());
+
                     if (currRow < 0)
                     {
                         return;
                     }
-                    
+
                     if (!theAutomatonTable.isRowSelected(currRow))
                     {
                         theAutomatonTable.clearSelection();
                         theAutomatonTable.setRowSelectionInterval(currRow, currRow);
                     }
-                    
+
                     mainPopupMenu.show(theAutomatonTable.getSelectedRowCount(), e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
-        
+
         // --------------------------------------//
     }
-    
-    public Supremica(String arg)
+
+    public Supremica(final String arg)
     {
         this();
-        
+
         if (arg != null)
         {
             openProjectXMLFile(new File(arg));
         }
     }
-    
+
     // local helper utility
     Gui getGui()
     {
         return this;
     }
-    
-    public void setActiveProject(VisualProject activeProject)
+
+    public void setActiveProject(final VisualProject activeProject)
     {
         theVisualProjectContainer.setActiveProject(activeProject);
         updateTitle();
     }
-    
+
     public VisualProject getActiveProject()
     {
         return theVisualProjectContainer.getActiveProject();
     }
-    
+
     public void updateTitle()
     {
-        Project currProject = getActiveProject();
-        
+        final Project currProject = getActiveProject();
+
         if (currProject != null)
         {
-            String projectName = currProject.getName();
-            
+            final String projectName = currProject.getName();
+
             setTitle("Supremica " + projectName);
         }
         else
@@ -311,18 +313,18 @@ public class Supremica
             setTitle("Supremica");
         }
     }
-    
+
     // Component initialization
     private void jbInit()
     throws Exception
     {
         contentPane = (JPanel) getContentPane();
-        
+
         contentPane.setLayout(layout);
         contentPane.setOpaque(true);
         contentPane.setBackground(Color.white);
         setSize(new Dimension(800, 600));
-        
+
         // theVisualProjectContainer.updateFrameTitles();
         // Enables stylish rollover buttions - JDK 1.4 required
 //              toolBar.setRollover(true);
@@ -333,45 +335,49 @@ public class Supremica
         fullTableModel.addTableModelListener(this);
         theAutomatonTable.addKeyListener(new KeyAdapter()
         {
-            public void keyPressed(KeyEvent e)
+            @Override
+            public void keyPressed(final KeyEvent e)
             {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE)
                 {
                     ActionMan.automataDelete_actionPerformed(getGui());
                 }
             }
-            
-            public void keyReleased(KeyEvent e)
+
+            @Override
+            public void keyReleased(final KeyEvent e)
             {}
-            
-            public void keyTyped(KeyEvent e)
+
+            @Override
+            public void keyTyped(final KeyEvent e)
             {}
         });
-        
+
         typeEditor = new TypeCellEditor(theAutomatonTable, theTableSorter, theVisualProjectContainer);
         helpDisplayer = new CSH.DisplayHelpFromSource(help.getStandardHelpBroker());
-        
+
         // initMenubar();
         setJMenuBar(menuBar);
-        
+
         // initToolbar();
     }
-    
+
     public void initialize()
     {
-        setIconImage(Supremica.cornerImage);
+        final Image image = IconLoader.ICON_APPLICATION.getImage();
+        setIconImage(image);
         setVisible(true);
         splitPaneVertical.setDividerLocation(0.7);
-        
+
         // Set the preferred column width of the automaton table
-        int tableWidth = theAutomatonTable.getWidth();
-        int tableWidthEntity = tableWidth / 12;
-        TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
-        
+        final int tableWidth = theAutomatonTable.getWidth();
+        final int tableWidthEntity = tableWidth / 12;
+        final TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
+
         for (int i = 0; i < theAutomatonTable.getColumnCount(); i++)
         {
-            TableColumn currColumn = theTableColumnModel.getColumn(i);
-            
+            final TableColumn currColumn = theTableColumnModel.getColumn(i);
+
             if (i == 0)
             {
                 currColumn.setPreferredWidth(tableWidthEntity * 5);
@@ -385,143 +391,155 @@ public class Supremica
                 currColumn.setPreferredWidth(tableWidthEntity * 2);
             }
         }
-        
+
         //setVisible(false);
     }
-    
+
     // ** MF ** Implementation of Gui stuff
-    public void error(String msg)
+    @Override
+    public void error(final String msg)
     {
         logger.error(msg);
     }
-    
-    public void error(String msg, Throwable t)
+
+    @Override
+    public void error(final String msg, final Throwable t)
     {
         logger.error(msg, t);
     }
-    
-    public void info(String msg)
+
+    @Override
+    public void info(final String msg)
     {
         logger.info(msg);
     }
-    
-    public void debug(String msg)
+
+    @Override
+    public void debug(final String msg)
     {
         logger.debug(msg);
     }
-    
+
+    @Override
     public void clearSelection()
     {
         theAutomatonTable.clearSelection();
     }
-    
-    public void selectAutomaton(Automaton a)
+
+    public void selectAutomaton(final Automaton a)
     {
         // XXX: where is my implementation dude???
     }
-    
-    public void selectAutomata(Collection<?> whichAutomata)
+
+    @Override
+    public void selectAutomata(final Collection<?> whichAutomata)
     {
         // make it a name set. reason: automata object may be _equal_ but not _same_ :(
-        Collection<String> which = new HashSet<String>();
-        
-        for (Iterator<?> it = whichAutomata.iterator(); it.hasNext(); )
+        final Collection<String> which = new HashSet<String>();
+
+        for (final Iterator<?> it = whichAutomata.iterator(); it.hasNext(); )
         {
-            Automaton a = (Automaton) it.next();
-            
+            final Automaton a = (Automaton) it.next();
+
             which.add(a.getName());
         }
-        
+
         theAutomatonTable.clearSelection();
         theAutomatonTable.getSelectedRows();
         for (int i = 0; i < theAutomatonTable.getRowCount(); i++)
         {
             try
             {
-                int orgIndex = theTableSorter.getOriginalRowIndex(i);
-                Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-                boolean should_select = which.contains(currAutomaton.getName());
-                
+                final int orgIndex = theTableSorter.getOriginalRowIndex(i);
+                final Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+                final boolean should_select = which.contains(currAutomaton.getName());
+
                 if (should_select)
                 {
                     theAutomatonTable.changeSelection(i, 0, true, false);
                 }
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Trying to get an automaton that does not exist. Index: " + i);
                 logger.debug(ex.getStackTrace());
             }
         }
     }
-    
+
     /**
      * Selects the automata indicated by selectionIndices
      */
-    public void selectAutomata(int[] selectionIndices)
+    @Override
+    public void selectAutomata(final int[] selectionIndices)
     {
         // We must set the autoscrolls property false for esthetical reasons
         // but keep it unchanged after the operation for consistency
-        boolean autoscrolls = theAutomatonTable.getAutoscrolls();
-        
+        final boolean autoscrolls = theAutomatonTable.getAutoscrolls();
+
         theAutomatonTable.setAutoscrolls(false);
-        
+
         for (int i = 0; i < selectionIndices.length; i++)
         {
             theAutomatonTable.changeSelection(selectionIndices[i], 0, true, false);
         }
-        
+
         theAutomatonTable.setAutoscrolls(autoscrolls);
     }
-    
+
     /**
      * Unselects automaton indicated by automaton index
      *
      * @param index The relative index of the automaton among the other
      * selected automata. (Should be Automata.getAutomatonIndex)
      */
-    public void unselectAutomaton(int index)
+    @Override
+    public void unselectAutomaton(final int index)
     {
-        int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-        
+        final int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+
         theAutomatonTable.changeSelection(selectedRowIndices[index], 0, true, false);
     }
-    
+
     /**
      * Inverts the selection in theAutomatonTable.
      */
+    @Override
     public void invertSelection()
     {
         // We must set the autoscrolls property false for esthetical reasons
         // but keep it unchanged after the operation for consistency
-        boolean autoscrolls = theAutomatonTable.getAutoscrolls();
-        
+        final boolean autoscrolls = theAutomatonTable.getAutoscrolls();
+
         theAutomatonTable.setAutoscrolls(false);
-        
+
         for (int i = 0; i < theAutomatonTable.getRowCount(); i++)
         {
             theAutomatonTable.changeSelection(i, 0, true, false);
         }
-        
+
         theAutomatonTable.setAutoscrolls(autoscrolls);
     }
-    
+
+    @Override
     public void selectAll()
     {
         theAutomatonTable.selectAll();
     }
-    
-    
+
+
+    @Override
     public JFrame getFrame()
     {
         return this;
     }
-    
+
+    @Override
     public Component getComponent()
     {
         return getFrame();
     }
-    
+
     /**
      * This is a deprecated method, use getSelectedAutomata instead.
      *
@@ -529,56 +547,59 @@ public class Supremica
      *
      *@return  The selectedAutomataAsCollection value
      */
+    @Override
     public Collection<Automaton> getSelectedAutomataAsCollection()
     {
-        int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-        LinkedList<Automaton> selectedAutomata = new LinkedList<Automaton>();
-        
+        final int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+        final LinkedList<Automaton> selectedAutomata = new LinkedList<Automaton>();
+
         for (int i = 0; i < selectedRowIndices.length; i++)
         {
             try
             {
-                int currIndex = selectedRowIndices[i];
-                int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
-                Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-                
+                final int currIndex = selectedRowIndices[i];
+                final int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+                final Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
                 selectedAutomata.add(currAutomaton);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Trying to get an automaton that does not exist. Index: " + i);
                 logger.debug(ex.getStackTrace());
             }
         }
-        
+
         return selectedAutomata;
     }
-    
+
+    @Override
     public Automata getSelectedAutomata()
     {
-        int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-        Automata selectedAutomata = new Automata();
-        
+        final int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+        final Automata selectedAutomata = new Automata();
+
         for (int i = 0; i < selectedRowIndices.length; i++)
         {
             try
             {
-                int currIndex = selectedRowIndices[i];
-                int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
-                Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-                
+                final int currIndex = selectedRowIndices[i];
+                final int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+                final Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
                 selectedAutomata.addAutomaton(currAutomaton);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Trying to get an automaton that does not exist. Index: " + i);
                 logger.debug(ex.getStackTrace());
             }
         }
-        
+
         return selectedAutomata;
     }
-    
+
+    @Override
     public Automata getUnselectedAutomata()
     {
                 /* Simple... but flickery!
@@ -587,23 +608,23 @@ public class Supremica
                    invertSelection();
                    return unSelectedAutomata;
                  */
-        int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-        Automata unselectedAutomata = new Automata();
+        final int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+        final Automata unselectedAutomata = new Automata();
         int j = 0;
-        
+
         for (int i = 0; i < theAutomatonTable.getRowCount(); i++)
         {
             if ((j >= selectedRowIndices.length) || (i != selectedRowIndices[j]))
             {
                 try
                 {
-                    int currIndex = i;
-                    int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
-                    Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-                    
+                    final int currIndex = i;
+                    final int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+                    final Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
                     unselectedAutomata.addAutomaton(currAutomaton);
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.error("Trying to get an automaton that does not exist. Index: " + i);
                     logger.debug(ex.getStackTrace());
@@ -614,109 +635,111 @@ public class Supremica
                 j++;
             }
         }
-        
+
         return unselectedAutomata;
     }
-    
+
     /**
      * Same as getSelectedAutomata but include execution information
      */
+    @Override
     public Project getSelectedProject()
     {
-        int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-        Project selectedProject = new Project();
-        
+        final int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+        final Project selectedProject = new Project();
+
         for (int i = 0; i < selectedRowIndices.length; i++)
         {
             try
             {
-                int currIndex = selectedRowIndices[i];
-                int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
-                Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-                
+                final int currIndex = selectedRowIndices[i];
+                final int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+                final Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
                 selectedProject.addAutomaton(currAutomaton);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Trying to get an automaton that does not exist. Index: " + i);
                 logger.debug(ex.getStackTrace());
             }
         }
-        
-        Project activeProject = getActiveProject();
-        
+
+        final Project activeProject = getActiveProject();
+
         if (activeProject != null)
         {
             selectedProject.addAttributes(activeProject);
-            
+
             //selectedProject.addActions(activeProject.getActions());
             //selectedProject.addControls(activeProject.getControls());
             //selectedProject.setAnimationURL(activeProject.getAnimationURL());
         }
-        
+
         return selectedProject;
     }
-    
+
     public void renameProject()
     {
-        String newName = getNewProjectName();
-        
+        final String newName = getNewProjectName();
+
         if (newName != null)
         {
             getActiveProject().setName(newName);
             getActiveProject().setProjectFile(null);
         }
     }
-    
+
     public void commentProject()
     {
-        String newComment = getNewProjectComment();
-        
+        final String newComment = getNewProjectComment();
+
         if (newComment != null)
         {
             getActiveProject().setComment(newComment);
-            
+
             //getActiveProject().setProjectFile(null);
         }
     }
-    
+
     /**
      * Help.About action performed
      */
     public void helpAbout()
     {
-        AboutBox dlg = new AboutBox(this);
-        Dimension dlgSize = dlg.getPreferredSize();
-        Dimension frmSize = getSize();
-        Point loc = getLocation();
-        
+        final AboutBox dlg = new AboutBox(this);
+        final Dimension dlgSize = dlg.getPreferredSize();
+        final Dimension frmSize = getSize();
+        final Point loc = getLocation();
+
         dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x, (frmSize.height - dlgSize.height) / 2 + loc.y);
         dlg.setModal(true);
         dlg.setVisible(true);
     }
-    
+
     // Overridden so we can exit when window is closed
-    protected void processWindowEvent(WindowEvent e)
+    @Override
+    protected void processWindowEvent(final WindowEvent e)
     {
         super.processWindowEvent(e);
-        
+
         if (e.getID() == WindowEvent.WINDOW_CLOSING)
         {
             ActionMan.fileExit(this);
         }
     }
-    
+
     public String getNewProjectName()
     {
-        String msg = "Enter new project name";
+        final String msg = "Enter new project name";
         boolean finished = false;
-        String oldName = getActiveProject().getName();
+        final String oldName = getActiveProject().getName();
         String newName = "";
-        
+
         while (!finished)
         {
             newName = JOptionPane.showInputDialog(this, msg, oldName);
-            
+
             if (newName == null)
             {
                 return null;
@@ -730,25 +753,25 @@ public class Supremica
                 finished = true;
             }
         }
-        
+
         return newName;
     }
-    
+
     public String getNewProjectComment()
     {
         // String msg = "Enter new project comment";
         boolean finished = false;
-        String oldComment = getActiveProject().getComment();
+        final String oldComment = getActiveProject().getComment();
         String newComment = "";
-        
+
         while (!finished)
         {
-            
+
             // newComment = JOptionPane.showInputDialog(this, msg, oldComment);
-            EditCommentDialog dialog = new EditCommentDialog(this, oldComment);
-            
+            final EditCommentDialog dialog = new EditCommentDialog(this, oldComment);
+
             newComment = dialog.getComment();
-            
+
             if (newComment == null)
             {
                 return null;
@@ -758,19 +781,18 @@ public class Supremica
                 finished = true;
             }
         }
-        
+
         return newComment;
     }
-    
-    public String getNewAutomatonName(String msg, String nameSuggestion)
+
+	// This duplicates code in AnalyzerPanel, why?
+    @Override
+    public String getNewAutomatonName(final String msg, final String nameSuggestion)
     {
-        boolean finished = false;
-        String newName = "";
-        
-        while (!finished)
+        while (true)
         {
-            newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
-            
+            final String newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
+
             if (newName == null)
             {
                 return null;
@@ -785,108 +807,107 @@ public class Supremica
             }
             else
             {
-                finished = true;
+                return newName;
             }
         }
-        
-        return newName;
     }
-    
+
     @SuppressWarnings("unused")
-	private int getIntegerInDialogWindow(String text)
+	private int getIntegerInDialogWindow(final String text)
     {
         boolean finished = false;
         String theInteger = "";
         int theIntValue = -1;
-        
+
         while (!finished)
         {
             theInteger = JOptionPane.showInputDialog(this, text);
-            
+
             try
             {
                 theIntValue = Integer.parseInt(theInteger);
                 finished = true;
             }
-            catch (Exception e)
+            catch (final Exception e)
             {
                 JOptionPane.showMessageDialog(this, "Not a valid integer", "Alert", JOptionPane.ERROR_MESSAGE);
             }
         }
-        
+
         return theIntValue;
     }
-    
-    void openFile(File file)
+
+    void openFile(final File file)
     {
         openProjectXMLFile(file);
     }
-    
-    public void valueChanged(ListSelectionEvent e)
+
+    public void valueChanged(final ListSelectionEvent e)
     {
         if (!e.getValueIsAdjusting())
         {}
     }
-    
-    public void tableChanged(TableModelEvent e)
+
+    @Override
+    public void tableChanged(final TableModelEvent e)
     {
         // logger.debug("Supremica.tableChanged");
         theAutomatonTable.revalidate();
     }
-    
-    public void openProjectXMLFile(File file)
+
+    public void openProjectXMLFile(final File file)
     {
         Project currProject = null;
-        
+
         logger.info("Opening " + file.getAbsolutePath() + " ...");
-        
+
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML(new VisualProjectFactory());
-            
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML(new VisualProjectFactory());
+
             currProject = builder.build(file);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             // this exception is caught while opening
             logger.error("Error while opening " + file.getAbsolutePath() + " " + ex.getMessage());
             logger.debug(ex.getStackTrace());
-            
+
             return;
         }
-        
-        int nbrOfProjectBeforeOpening = getActiveProject().nbrOfAutomata();
-        
+
+        final int nbrOfProjectBeforeOpening = getActiveProject().nbrOfAutomata();
+
         try
         {
-            int nbrOfAddedProject = addAutomata(currProject);
-            
+            final int nbrOfAddedProject = addAutomata(currProject);
+
             logger.info("Successfully opened and added " + nbrOfAddedProject + " automata.");
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Error adding automata " + file.getAbsolutePath() + " " + ex.getMessage());
             logger.debug(ex.getStackTrace());
-            
+
             return;
         }
-        
+
         if (nbrOfProjectBeforeOpening == 0)
         {
-            String projectName = currProject.getName();
-            
+            final String projectName = currProject.getName();
+
             if (projectName != null)
             {
                 getActiveProject().setName(projectName);
-                
+
                 //logger.debug("Project name changed to \"" + projectName + "\"");
             }
         }
-        
+
         if (nbrOfProjectBeforeOpening > 0)
         {
-            File projectFile = getActiveProject().getProjectFile();
-            
+            final File projectFile = getActiveProject().getProjectFile();
+
             if (projectFile != null)
             {
                 getActiveProject().setProjectFile(null);
@@ -897,55 +918,58 @@ public class Supremica
             getActiveProject().setProjectFile(file);
         }
     }
-    
+
+    @Override
     public VisualProjectContainer getVisualProjectContainer()
     {
         return theVisualProjectContainer;
     }
-    
+
     public MainPopupMenu getMainPopupMenu()
     {
         return mainPopupMenu;
     }
-    
-    public void addAttributes(Project otherProject)
+
+    @Override
+    public void addAttributes(final Project otherProject)
     {
-        Project currProject = getActiveProject();
-        
+        final Project currProject = getActiveProject();
+
         currProject.addAttributes(otherProject);
     }
-    
+
 /*
                 public void addActions(Actions theActions)
                 {
                                 Project currProject = getActiveProject();
                                 currProject.addActions(theActions);
                 }
- 
+
                 public void addControls(Controls theControls)
                 {
                                 Project currProject = getActiveProject();
                                 currProject.addControls(theControls);
                 }
- 
+
                 public void setAnimationURL(URL animationURL)
                 {
                                 Project currProject = getActiveProject();
                                 currProject.setAnimationURL(animationURL);
                 }
  */
-    
+
     /**
      * Adds the automata in currAutomata to the display.
      *
      * @param currAutomata the automata to be added.
      */
-    public int addAutomata(Automata currAutomata)
+    @Override
+    public int addAutomata(final Automata currAutomata)
     {
         assert (currAutomata.size() != 0);
-        
+
         int nbrOfAddedAutomata = 0;
-        for (Automaton automaton : currAutomata)
+        for (final Automaton automaton : currAutomata)
         {
             if (addAutomaton(automaton))
             {
@@ -956,24 +980,25 @@ public class Supremica
                 // Must have a way to say, "cancel all"?
             }
         }
-        
+
         return nbrOfAddedAutomata;
     }
-    
-    public int addProject(Project theProject)
+
+    @Override
+    public int addProject(final Project theProject)
 //		throws Exception
     {
-        int nbrOfAutomataBeforeOpening = getVisualProjectContainer().getActiveProject().nbrOfAutomata();
-        int nbrOfAddedAutomata = addAutomata(theProject);
-        
+        final int nbrOfAutomataBeforeOpening = getVisualProjectContainer().getActiveProject().nbrOfAutomata();
+        final int nbrOfAddedAutomata = addAutomata(theProject);
+
         if (theProject != null)
         {
             addAttributes(theProject);
-            
+
             //addActions(theProject.getActions());
             //addControls(theProject.getControls());
             //setAnimationURL(theProject.getAnimationURL());
-            
+
                         /*
                         String animPath = theProject.getAnimationPath();
                         if (animPath != null && !animPath.equals(""))
@@ -981,53 +1006,54 @@ public class Supremica
                                         setAnimationPath(animPath);
                         }*/
         }
-        
+
         if (theProject.getComment() != "")
         {
             JOptionPane.showMessageDialog(this, EncodingHelper.linebreakAdjust(theProject.getComment()), "Project information", JOptionPane.INFORMATION_MESSAGE);
         }
-        
+
         if (theProject.hasAnimation())
         {
             JOptionPane.showMessageDialog(this, "This project includes an animation.", "Project information", JOptionPane.INFORMATION_MESSAGE);
         }
-        
+
         if (nbrOfAutomataBeforeOpening == 0)
         {
-            String projectName = theProject.getName();
-            String projectComment = theProject.getComment();
-            
+            final String projectName = theProject.getName();
+            final String projectComment = theProject.getComment();
+
             if (projectName != null)
             {
                 getVisualProjectContainer().getActiveProject().setName(projectName);
                 getVisualProjectContainer().getActiveProject().setComment(projectComment);
-                
+
                 //gui.info("Project name changed to \"" + projectName + "\"");
                 getVisualProjectContainer().getActiveProject().updateFrameTitles();
             }
         }
-        
+
         return nbrOfAddedAutomata;
     }
-    
+
     /**
      * We need a single entry to add automata to the gui. Here we
      * manage all necessary user interaction
      */
-    public boolean addAutomaton(Automaton currAutomaton)
+    @Override
+    public boolean addAutomaton(final Automaton currAutomaton)
     {
         logger.debug("Supremica::addAutomaton(" + currAutomaton.getName() + ")");
-        
+
         // Force the user to enter a new name if it has no name
         //if (currAutomaton.getName() == null || currAutomaton.getName().equals(""))
         if (!currAutomaton.hasName() || currAutomaton.getName().equals(""))
         {
-            String autName = getNewAutomatonName("Enter a new name", currAutomaton.getComment());
-            
+            final String autName = getNewAutomatonName("Enter a new name", currAutomaton.getComment());
+
             if (autName == null)
             {
                 return false;
-                
+
                 // not added
             }
             else
@@ -1035,58 +1061,63 @@ public class Supremica
                 currAutomaton.setName(autName);
             }
         }
-        
+
         if (getActiveProject().containsAutomaton(currAutomaton.getName()))
         {
-            String autName = currAutomaton.getName();
-            String newName = getActiveProject().getUniqueAutomatonName(autName);
-            
+            final String autName = currAutomaton.getName();
+            final String newName = getActiveProject().getUniqueAutomatonName(autName);
+
             currAutomaton.setName(newName);
             logger.info("Name conflict - '" + autName + "' does already exist. Changed name of new '" + autName + "' to '" + newName + "'.");
         }
-        
+
         try
         {
             // throws Exception if the automaton already exists
             // logger.debug("Supremica.addAutomaton");
             getActiveProject().addAutomaton(currAutomaton);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             // should never occur, we test for this condition already
             logger.error("Error while adding: " + ex.getMessage());
             logger.debug(ex.getStackTrace());
         }
-        
+
         return true;
     }
-    
+
+    @Override
     public void close()
     {
         setVisible(false);
         dispose();
     }
-    
+
     public void destroy()
     {
         close();
     }
-    
-    public void projectAdded(VisualProjectContainer container, Project theProject)
+
+    @Override
+    public void projectAdded(final VisualProjectContainer container, final Project theProject)
     {
         logger.info("Project added: " + theProject.getName());
     }
-    
-    public void projectRemoved(VisualProjectContainer container, Project theProject)
+
+    @Override
+    public void projectRemoved(final VisualProjectContainer container, final Project theProject)
     {
         logger.info("Project removed: " + theProject.getName());
     }
-    
-    public void projectRenamed(VisualProjectContainer container, Project theProject)
+
+    @Override
+    public void projectRenamed(final VisualProjectContainer container, final Project theProject)
     {
         logger.info("Project renamed: " + theProject.getName());
     }
-    
-    public void updated(Object theObject)
+
+    @Override
+    public void updated(final Object theObject)
     {}
 }

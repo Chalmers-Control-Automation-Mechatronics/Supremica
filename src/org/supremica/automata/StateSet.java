@@ -30,7 +30,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import gnu.trove.THashSet;
+import gnu.trove.set.hash.THashSet;
 
 import org.supremica.properties.Config;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -517,3 +517,4 @@ public class StateSet extends AbstractSet<State> implements Cloneable
     }
   }
 }
+

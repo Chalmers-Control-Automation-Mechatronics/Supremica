@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -94,7 +94,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     (final List<TraceStepProxy> traceSteps)
     throws AnalysisException
   {
-    final int numTraceSteps = traceSteps.size();
+    int numTraceSteps = traceSteps.size();
     final ListIterator<TraceStepProxy> iter =
       traceSteps.listIterator(numTraceSteps);
     final TraceStepProxy lastStep = iter.previous();
@@ -102,32 +102,42 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     final Map<AutomatonProxy,StateProxy> lastStepMap = lastStep.getStateMap();
     mReferenceAutomata = new ArrayList<AutomatonProxy>(lastStepMap.keySet());
     final StateProxy lastState = lastStepMap.get(resultAut);
-    List<TraceStepProxy> newTraceSteps =
-      new ArrayList<TraceStepProxy>(traceSteps);
-    final int initResult;
+    List<TraceStepProxy> newTraceSteps;
+    int initResult;
     if (isDumpState(resultAut, lastState)) {
       // Trace goes into certain conflicts.
-      if (iter.hasPrevious()) {
-        // Remove the last step of the trace, so it can be replaced
-        // by something in the real certain conflicts ...
-        // Searching starts from the step before this ...
-        mLastTraceStep = iter.previous();
-        final Map<AutomatonProxy,StateProxy> predMap =
-          mLastTraceStep.getStateMap();
+      // Searching starts from the step before entering certain conflicts.
+      // Everything afterwards gets removed so it can be replaced
+      // by something in the real certain conflicts.
+      // Exception is the initial state, when it is certain conflict:
+      // then searching starts from all initial states.
+      numTraceSteps--;
+      initResult = -1;
+      mLastTraceStep = null;
+      while (iter.hasPrevious()) {
+        final TraceStepProxy predStep = iter.previous();
+        final Map<AutomatonProxy,StateProxy> predMap = predStep.getStateMap();
         final StateProxy predState = predMap.get(resultAut);
-        initResult = getResultAutomatonStateCode(predState);
-      } else {
-        // Starting from initial state, which is certain conflict ...
-        // Searching starts from all initial states ...
-        mLastTraceStep = null;
-        initResult = -1;
+        if (!isDumpState(resultAut, predState)) {
+          initResult = getResultAutomatonStateCode(predState);
+          mLastTraceStep = predStep;
+          break;
+        }
+        numTraceSteps--;
       }
-      newTraceSteps.remove(numTraceSteps - 1);
+      newTraceSteps = new ArrayList<TraceStepProxy>(numTraceSteps);
+      for (final TraceStepProxy step : traceSteps) {
+        if (numTraceSteps-- == 0) {
+          break;
+        }
+        newTraceSteps.add(step);
+      }
     } else {
       // Trace does not go into certain conflicts.
       // We still must try to extend it into certain conflicts ...
       mLastTraceStep = lastStep;
       initResult = getResultAutomatonStateCode(lastState);
+      newTraceSteps = new ArrayList<TraceStepProxy>(traceSteps);
     }
 
     // Rerun certain conflicts simplifier
@@ -302,13 +312,18 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     while (true) {
       record = queue.remove();
       scode = record.getState();
+      final int slevel = mSimplifier.getLevel(scode);
       iter.reset(scode, tau);
       while (iter.advance()) {
-        scode = iter.getCurrentTargetState();
-        if (visited.add(scode)) {
+        final int tcode = iter.getCurrentTargetState();
+        if (visited.add(tcode)) {
+          final int tlevel = mSimplifier.getLevel(tcode);
+          if (tlevel < 0 || tlevel > slevel) {
+            continue;
+          }
           final SearchRecord newRecord =
-            new SearchRecord(scode, 0, tau, record);
-          if (mSimplifier.getLevel(scode) <= level) {
+            new SearchRecord(tcode, 0, tau, record);
+          if (tlevel <= level) {
             record = newRecord;
             break search;
           }
@@ -627,6 +642,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
 
     //#######################################################################
     //# Data Members
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       if (aut == mPropertyAutomaton) {
@@ -636,6 +652,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
       }
     }
 
+    @Override
     public EventKind getEventKind(final EventProxy event)
     {
       if (mParentKindTranslator.getEventKind(event) == EventKind.PROPOSITION) {

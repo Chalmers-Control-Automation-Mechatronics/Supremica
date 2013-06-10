@@ -9,13 +9,15 @@
 
 package net.sourceforge.waters.model.des;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectHashingStrategy;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.strategy.HashingStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+
+import net.sourceforge.waters.analysis.tr.WatersHashSet;
 
 
 /**
@@ -148,7 +150,7 @@ public final class AutomatonTools
       }
     }
     final Set<TransitionProxy> transitions =
-      new THashSet<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
+      new WatersHashSet<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
     for (final TransitionProxy trans : aut.getTransitions()) {
       if (!transitions.add(trans)) {
         return false;
@@ -161,16 +163,18 @@ public final class AutomatonTools
   //#########################################################################
   //# Inner Class TransitionHashingStrategy
   private static class TransitionHashingStrategy
-    implements TObjectHashingStrategy<TransitionProxy>
+    implements HashingStrategy<TransitionProxy>
   {
     //#######################################################################
     //# Interface gnu.trove.TObjectHashingStrategy
+    @Override
     public int computeHashCode(final TransitionProxy trans)
     {
       return trans.getSource().hashCode() + 5 * trans.getEvent().hashCode();
     }
 
 
+    @Override
     public boolean equals(final TransitionProxy trans1,
                           final TransitionProxy trans2)
     {
@@ -187,3 +191,4 @@ public final class AutomatonTools
   }
 
 }
+

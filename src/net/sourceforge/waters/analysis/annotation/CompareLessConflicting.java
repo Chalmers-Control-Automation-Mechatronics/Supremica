@@ -9,12 +9,12 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIterator;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -142,7 +142,8 @@ public class CompareLessConflicting
     final TIntHashSet taureach = new TIntHashSet(set.toArray());
     final TIntArrayList togo = new TIntArrayList(set.toArray());
     while (!togo.isEmpty()) {
-      final int state = togo.remove(togo.size() - 1);
+      final int end = togo.size() - 1;
+      final int state = togo.removeAt(end);
       final TransitionIterator ti = trans.createSuccessorsReadOnlyIterator(state,
                                                                      EventEncoding.TAU);
       while (ti.advance()) {
@@ -330,7 +331,7 @@ public class CompareLessConflicting
     toexplore.add(initial);
     while (!toexplore.isEmpty()) {
       //System.out.println(mStates.size());
-      final int s = toexplore.remove(toexplore.size() -1);
+      final int s = toexplore.removeAt(toexplore.size() -1);
       Tuple state = mStates.get(s);
       if (state.firstset.isEmpty()) {continue;}
       if (state.firstset.size() > 1) {
@@ -354,7 +355,7 @@ public class CompareLessConflicting
         visited2.add(s);
         states.add(s);
         while (!states.isEmpty()) {
-          final int snum = states.remove(0);
+          final int snum = states.removeAt(0);
           state = mStates.get(snum);
           System.out.println("tuple: " + state);
           for (int e = 0; e < mSuccessors.get(snum).size(); e++) {
@@ -413,11 +414,13 @@ public class CompareLessConflicting
       state = s;
     }
 
+    @Override
     public int hashCode()
     {
       return tuple.hashCode() * 13 + state;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final Triple other = (Triple)o;
@@ -449,17 +452,20 @@ public class CompareLessConflicting
       secondset = second;
     }
 
+    @Override
     public int hashCode()
     {
       return firstset.hashCode() * 13 + secondset.hashCode();
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       final Tuple other = (Tuple)o;
       return firstset == other.firstset && secondset == other.secondset;
     }
 
+    @Override
     public String toString()
     {
       return Arrays.toString(firstset.toArray()) + " : " + Arrays.toString(secondset.toArray());
@@ -493,7 +499,8 @@ public class CompareLessConflicting
       final EventEncoding ee = new EventEncoding(lprox,
                                 ConflictKindTranslator.getInstance(), tauproxy);
       if (!lprox.getEvents().contains(mproxy)) {
-        ee.addEvent(mproxy, ConflictKindTranslator.getInstance(), true);
+        ee.addEvent(mproxy, ConflictKindTranslator.getInstance(),
+                    EventEncoding.STATUS_UNUSED);
       }
       final ListBufferTransitionRelation lessbuff =
         new ListBufferTransitionRelation(lprox, ee,
@@ -535,7 +542,7 @@ public class CompareLessConflicting
     final List<int[]> partitions = new ArrayList<int[]>();
     System.out.println(aut.getNumberOfStates() + "vs" + values.size());
     for (final TIntArrayList list : values) {
-      partitions.add(list.toNativeArray());
+      partitions.add(list.toArray());
     }
     aut.merge(partitions);
     return aut;
@@ -591,3 +598,4 @@ public class CompareLessConflicting
   private int mExpanded;
 
 }
+

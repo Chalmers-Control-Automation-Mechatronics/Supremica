@@ -9,16 +9,17 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntStack;
-import gnu.trove.TLongArrayList;
-import gnu.trove.TLongIntHashMap;
-import gnu.trove.TLongLongHashMap;
-import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.map.hash.TLongLongHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,12 +43,12 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersLongHashingStrategy;
 import net.sourceforge.waters.analysis.tr.WatersLongIntHashMap;
 import net.sourceforge.waters.model.analysis.AbortException;
-import net.sourceforge.waters.model.analysis.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
+import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
+import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -192,6 +193,7 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -240,6 +242,7 @@ public class OPSearchAutomatonSimplifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -249,6 +252,7 @@ public class OPSearchAutomatonSimplifier
   //#########################################################################
   //# Overrides for
   //# net.sourceforge.waters.model.analysis.AbstractModelAnalsyser
+  @Override
   protected void setUp()
     throws AnalysisException
   {
@@ -262,6 +266,7 @@ public class OPSearchAutomatonSimplifier
     setUpVerifier();
   }
 
+  @Override
   protected void tearDown()
   {
     super.tearDown();
@@ -955,14 +960,14 @@ public class OPSearchAutomatonSimplifier
             final long succpair = getPair(succ, current2);
             if (!mBFSLongVisited.containsKey(succpair)) {
               if (predinfo == 0) {
-                predinfo = ((long) current1) | (((long) succ) << 32);
+                predinfo = current1 | (((long) succ) << 32);
               }
               mBFSLongVisited.put(succpair, predinfo);
               queue.add(succpair);
             }
           } else if (getPair(succroot, root2) == targetpair) {
             if (predinfo == 0) {
-              predinfo = ((long) current1) | (((long) succ) << 32);
+              predinfo = current1 | (((long) succ) << 32);
             }
             return predinfo;
           }
@@ -1295,7 +1300,7 @@ public class OPSearchAutomatonSimplifier
           }
         }
       }
-      final int[] currentClassArray = currentClass.toNativeArray();
+      final int[] currentClassArray = currentClass.toArray();
       currentClass.clear();
       Collection<EventProxy> props = markingsMap.get(markings);
       if (props == null) {
@@ -1663,7 +1668,7 @@ public class OPSearchAutomatonSimplifier
     {
       mTarjan = new int[numStates];
       mLowLink = new int[numStates];
-      mStack = new TIntStack();
+      mStack = new TIntArrayStack();
       mOnStack = new boolean[numStates];
       mComponents = new ArrayList<StronglyConnectedComponent>();
     }
@@ -1788,6 +1793,7 @@ public class OPSearchAutomatonSimplifier
 
     //#######################################################################
     //# Overrides for java.lang.Object
+    @Override
     public String toString()
     {
       final StringWriter writer = new StringWriter();
@@ -1939,6 +1945,7 @@ public class OPSearchAutomatonSimplifier
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.
     //# WatersLongHashingStrategy
+    @Override
     public int computeHashCode(final long val)
     {
       final int h0 = -2128831035;
@@ -1949,6 +1956,7 @@ public class OPSearchAutomatonSimplifier
       // return 31 * (int) (val + (val >> 16));
     }
 
+    @Override
     public boolean equals(final long val1, final long val2)
     {
       return val1 == val2;
@@ -2010,3 +2018,4 @@ public class OPSearchAutomatonSimplifier
   private static final int OBSERVABLE_TAU = 1;
 
 }
+

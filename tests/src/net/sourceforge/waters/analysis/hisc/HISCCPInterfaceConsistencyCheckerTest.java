@@ -16,7 +16,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -330,7 +330,6 @@ public class HISCCPInterfaceConsistencyCheckerTest
                      "assembly.wmod", true);
   }
 
-
   public void testHISCCP_SimpleManufHISCCP0()
   throws Exception
   {
@@ -341,28 +340,28 @@ public class HISCCPInterfaceConsistencyCheckerTest
   public void testHISCCP_SimpleManufHISCCP1()
   throws Exception
   {
-    runModelVerifier("hisccp", "simple_manuf_hisccp",
+    runModelVerifier("hisccp", "simple_manuf_multi_hisccp",
                      "subsystem.wmod", true);
   }
 
   public void testHISCCP_SimpleManufHISCCP1bad()
   throws Exception
   {
-    runModelVerifier("hisccp", "simple_manuf_hisccp",
+    runModelVerifier("hisccp", "simple_manuf_multi_hisccp",
                      "subsystem_bad.wmod", false);
   }
 
   public void testHISCCP_SimpleManufHISCCP2am()
   throws Exception
   {
-    runModelVerifier("hisccp", "simple_manuf_hisccp",
+    runModelVerifier("hisccp", "simple_manuf_multi_hisccp",
                      "assembly_machine.wmod", true);
   }
 
   public void testHISCCP_SimpleManufHISCCP2pm()
   throws Exception
   {
-    runModelVerifier("hisccp", "simple_manuf_hisccp",
+    runModelVerifier("hisccp", "simple_manuf_multi_hisccp",
                      "polishing_machine.wmod", true);
   }
 

@@ -11,6 +11,8 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.gui.ControlledToolbar;
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -22,11 +24,8 @@ public class ToolNodeAction
   //# Constructors
   public ToolNodeAction(final IDE ide)
   {
-    super(ide,
-	  "Nodes",
-	  "Create simple nodes",
-	  "/icons/waters/node16.gif",
-	  ControlledToolbar.Tool.NODE);
+    super(ide, "Nodes", "Create simple nodes", IconLoader.ICON_TOOL_NODE,
+          ControlledToolbar.Tool.NODE);
   }
 
 

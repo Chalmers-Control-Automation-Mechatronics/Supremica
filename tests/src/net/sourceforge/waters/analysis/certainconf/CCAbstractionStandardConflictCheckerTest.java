@@ -15,7 +15,7 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

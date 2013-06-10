@@ -72,7 +72,7 @@ class OPVerifierAbstractionProcedure
   @Override
   public boolean run(final AutomatonProxy aut,
                      final Collection<EventProxy> local,
-                     final List<AbstractionStep> steps)
+                     final List<AbstractionStep> steps, final Candidate cand)
     throws AnalysisException
   {
     if (!local.isEmpty()) {
@@ -81,7 +81,7 @@ class OPVerifierAbstractionProcedure
       final EventProxy omega = getUsedDefaultMarking();
       mExperiment.runExperiment(aut, tau, omega);
     }
-    return super.run(aut, local, steps);
+    return super.run(aut, local, steps, cand);
   }
 
 

@@ -11,10 +11,12 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 
 import net.sourceforge.waters.gui.ControlledToolbar;
+
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEToolBar;
 
@@ -37,20 +39,20 @@ public abstract class ToolAction
   ToolAction(final IDE ide,
              final String name,
              final String description,
-             final String iconname,
+             final ImageIcon icon,
              final ControlledToolbar.Tool tool)
   {
     super(ide);
     putValue(Action.NAME, name);
     putValue(Action.SHORT_DESCRIPTION, description);
-    putValue(Action.SMALL_ICON,
-             new ImageIcon(IDE.class.getResource(iconname)));
+    putValue(Action.SMALL_ICON, icon);
     mTool = tool;
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final IDE ide = getIDE();

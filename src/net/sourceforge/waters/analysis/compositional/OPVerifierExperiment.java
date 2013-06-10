@@ -9,12 +9,13 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.THashSet;
-import gnu.trove.TIntHashSet;
-import gnu.trove.TIntObjectHashMap;
-import gnu.trove.TLongObjectHashMap;
-import gnu.trove.TObjectHashingStrategy;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.strategy.HashingStrategy;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -217,8 +218,8 @@ public class OPVerifierExperiment
     final int numEvents = events.size();
     final TObjectIntHashMap<EventProxy> eventFanOut =
       new TObjectIntHashMap<EventProxy>(numEvents);
-    final TObjectIntHashMap<TransitionProxy> transitionFanOut =
-      new TObjectIntHashMap<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
+    final TObjectIntCustomHashMap<TransitionProxy> transitionFanOut =
+      new TObjectIntCustomHashMap<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
     boolean det = true;
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     for (final TransitionProxy trans : transitions) {
@@ -602,16 +603,18 @@ public class OPVerifierExperiment
   //#########################################################################
   //# Inner Class TransitionHashingStrategy
   private static class TransitionHashingStrategy
-    implements TObjectHashingStrategy<TransitionProxy>
+    implements HashingStrategy<TransitionProxy>
   {
     //#######################################################################
     //# Interface gnu.trove.TObjectHashingStrategy
+    @Override
     public int computeHashCode(final TransitionProxy trans)
     {
       return trans.getSource().hashCode() + 5 * trans.getEvent().hashCode();
     }
 
 
+    @Override
     public boolean equals(final TransitionProxy trans1,
                           final TransitionProxy trans2)
     {
@@ -622,7 +625,7 @@ public class OPVerifierExperiment
 
     //#######################################################################
     //# Class Constants
-    private static final TransitionHashingStrategy INSTANCE =
+    private static final HashingStrategy<TransitionProxy> INSTANCE =
       new TransitionHashingStrategy();
     private static final long serialVersionUID = 1L;
   }
@@ -640,3 +643,4 @@ public class OPVerifierExperiment
   private boolean mHeaderWritten;
 
 }
+

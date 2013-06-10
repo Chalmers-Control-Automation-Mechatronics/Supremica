@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntHashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.Collection;
 
@@ -71,19 +71,22 @@ public class CanonizeAbstractionRule
     mAlphaMarking = alphaMarking;
   }
 
+  @Override
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tauproxy)
       throws AnalysisException
   {
     final EventEncoding ee = new EventEncoding(autToAbstract, getKindTranslator(), tauproxy);
     if (!autToAbstract.getEvents().contains(mCont)) {
-      ee.addEvent(mCont, getKindTranslator(), false);
+      ee.addEvent(mCont, getKindTranslator(), (byte)0);
     }
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
-      ee.addEvent(mAlphaMarking, getKindTranslator(), true);
+      ee.addEvent(mAlphaMarking, getKindTranslator(),
+                  EventEncoding.STATUS_UNUSED);
     }
     if (!autToAbstract.getEvents().contains(mOmegaMarking)) {
-      ee.addEvent(mOmegaMarking, getKindTranslator(), true);
+      ee.addEvent(mOmegaMarking, getKindTranslator(),
+                  EventEncoding.STATUS_UNUSED);
     }
     final ListBufferTransitionRelation tr =
       new ListBufferTransitionRelation(autToAbstract, ee,
@@ -120,7 +123,7 @@ public class CanonizeAbstractionRule
         }
       }
       while (!tovisit.isEmpty()) {
-        final int state = tovisit.remove(tovisit.size() -1);
+        final int state = tovisit.removeAt(tovisit.size() -1);
         canon.setReachable(state, true);
         final TransitionIterator it = canon.createSuccessorsReadOnlyIterator(state);
         while (it.advance()) {
@@ -143,22 +146,26 @@ public class CanonizeAbstractionRule
     return autToAbstract;
   }
 
+  @Override
   CompositionalGeneralisedConflictChecker.Step createStep(final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
   {
     return null;
   }
 
+  @Override
   public void requestAbort()
   {
     mIsAborting = true;
   }
 
+  @Override
   public boolean isAborting()
   {
     return mIsAborting;
   }
 
+  @Override
   public void cleanup()
   {
     return;
@@ -167,6 +174,7 @@ public class CanonizeAbstractionRule
 
   //########################################################################
   //# Logging
+  @Override
   Logger getLogger()
   {
     final Class<?> clazz = getClass();
@@ -183,3 +191,4 @@ public class CanonizeAbstractionRule
 
   private boolean mIsAborting = false;
 }
+

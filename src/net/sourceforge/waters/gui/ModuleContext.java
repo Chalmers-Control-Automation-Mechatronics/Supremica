@@ -28,10 +28,10 @@ import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -362,6 +362,7 @@ public class ModuleContext
   public String getPastedEventName(final String name)
   {
     final NameChecker checker = new NameChecker() {
+      @Override
       public boolean isNameTaken(final String name)
       {
         return getEventDecl(name) != null;
@@ -385,6 +386,7 @@ public class ModuleContext
                                    final Set<String> alsoUsed)
   {
     final NameChecker checker = new NameChecker() {
+      @Override
       public boolean isNameTaken(final String name)
       {
         return getEventDecl(name) != null || alsoUsed.contains(name);
@@ -410,6 +412,7 @@ public class ModuleContext
       final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
       final String name = simple.getName();
       final NameChecker checker = new NameChecker() {
+        @Override
         public boolean isNameTaken(final String name)
         {
           return getComponent(name) != null;
@@ -442,6 +445,7 @@ public class ModuleContext
       final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
       final String name = simple.getName();
       final NameChecker checker = new NameChecker() {
+        @Override
         public boolean isNameTaken(final String name)
         {
           return wrapper.get(name) != null || alsoUsed.contains(name);
@@ -480,6 +484,7 @@ public class ModuleContext
       final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
       final String name = simple.getName();
       final NameChecker checker = new NameChecker() {
+        @Override
         public boolean isNameTaken(final String name)
         {
           return getComponent(name) != null || alsoUsed.contains(name);
@@ -499,17 +504,27 @@ public class ModuleContext
 
   //#########################################################################
   //# Static Methods
-  public static Icon getComponentKindIcon(final ComponentKind kind)
+  /**
+   * Gets an icon to represent a component of the given kind.
+   * @param kind    The type ({@link ComponentKind#PLANT}, etc.) of the
+   *                component to be displayed.
+   * @param window  <CODE>true</CODE> if a small icon to be used for a frame
+   *                should be returned;
+   *                <CODE>false</CODE> for a standard icon in the configured
+   *                resolution.
+   */
+  public static Icon getComponentKindIcon(final ComponentKind kind,
+                                          final boolean window)
   {
     switch (kind) {
     case PLANT:
-      return IconLoader.ICON_PLANT;
+      return window ? IconLoader.ICON_WINDOW_PLANT : IconLoader.ICON_PLANT;
     case PROPERTY:
-      return IconLoader.ICON_PROPERTY;
+      return window ? IconLoader.ICON_WINDOW_PROPERTY : IconLoader.ICON_PROPERTY;
     case SPEC:
-      return IconLoader.ICON_SPEC;
+      return window ? IconLoader.ICON_WINDOW_SPEC : IconLoader.ICON_SPEC;
     case SUPERVISOR:
-      return IconLoader.ICON_SUPERVISOR;
+      return window ? IconLoader.ICON_WINDOW_SUPERVISOR : IconLoader.ICON_SUPERVISOR;
     default:
       throw new IllegalArgumentException("Unknown component kind: " + kind
                                          + "!");
@@ -706,6 +721,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       final Subject source = event.getSource();
@@ -751,6 +767,7 @@ public class ModuleContext
       }
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.CLEANUP_PRIORITY_1;
@@ -792,6 +809,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       if (causesChange(event)) {
@@ -799,6 +817,7 @@ public class ModuleContext
       }
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.CLEANUP_PRIORITY_1;
@@ -945,6 +964,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Boolean visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
@@ -957,6 +977,7 @@ public class ModuleContext
       return true;
     }
 
+    @Override
     public Boolean visitIdentifierProxy(final IdentifierProxy ident)
     {
       final EventKind kind = guessEventKind(ident);
@@ -1002,6 +1023,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public Icon visitProxy(final Proxy proxy)
     {
       return null;
@@ -1009,11 +1031,13 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public String visitIndexedIdentifierProxy(final IndexedIdentifierProxy ident)
     {
       return ident.getName();
     }
 
+    @Override
     public String visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
     {
       return ident.getName();
@@ -1040,6 +1064,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public Icon visitProxy(final Proxy proxy)
     {
       return null;
@@ -1056,7 +1081,7 @@ public class ModuleContext
     @Override
     public Icon visitEventAliasProxy(final EventAliasProxy var)
     {
-      return IconLoader.ICON_EVENT;
+      return IconLoader.ICON_EVENT_ALIAS;
     }
 
     @Override
@@ -1113,7 +1138,7 @@ public class ModuleContext
     public Icon visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       final ComponentKind kind = comp.getKind();
-      return getComponentKindIcon(kind);
+      return getComponentKindIcon(kind, false);
     }
 
     @Override
@@ -1143,6 +1168,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public String visitProxy(final Proxy proxy)
     {
       return null;
@@ -1150,28 +1176,33 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public String visitEventDeclProxy(final EventDeclProxy decl)
     {
       final EventKind kind = decl.getKind();
       return getEventKindToolTip(kind, true);
     }
 
+    @Override
     public String visitInstanceProxy(final InstanceProxy inst)
     {
       return "Module instance";
     }
 
+    @Override
     public String visitParameterBindingProxy(final ParameterBindingProxy binding)
     {
       return "Parameter binding";
     }
 
+    @Override
     public String visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       final ComponentKind kind = comp.getKind();
       return getComponentKindToolTip(kind);
     }
 
+    @Override
     public String visitVariableComponentProxy(final VariableComponentProxy var)
     {
       return "EFA variable";
@@ -1211,6 +1242,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       return null;
@@ -1218,6 +1250,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
@@ -1226,6 +1259,7 @@ public class ModuleContext
       return null;
     }
 
+    @Override
     public Object visitIdentifierProxy(final IdentifierProxy ident)
     {
       final EventDeclProxy decl = guessEventDecl(ident);
@@ -1389,6 +1423,7 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public ListSubjectWrapper visitProxy(final Proxy proxy)
     {
       return null;
@@ -1396,21 +1431,25 @@ public class ModuleContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public ListSubjectWrapper visitEventDeclProxy(final EventDeclProxy decl)
     {
       return mEventDeclListWrapper;
     }
 
+    @Override
     public ListSubjectWrapper visitEventAliasProxy(final EventAliasProxy decl)
     {
       return mEventAliasListWrapper;
     }
 
+    @Override
     public ListSubjectWrapper visitConstantAliasProxy(final ConstantAliasProxy decl)
     {
       return mConstanAliasListWrapper;
     }
 
+    @Override
     public ListSubjectWrapper visitComponentProxy(final ComponentProxy decl)
     {
       return mComponentListWrapper;
