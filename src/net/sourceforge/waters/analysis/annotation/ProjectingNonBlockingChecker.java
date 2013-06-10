@@ -52,7 +52,6 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -1259,6 +1258,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
             System.out.println(/* n1 + "/" + orig.getNumberOfStates() + "  " + */
                                abstracted.getNumberOfStates() + "/" +
                                orig.getNumberOfStates());
+            /*
             if (orig.getNumberOfStates() + abstracted.getNumberOfStates() >= 1000) {
               count_++;
               final ProductDESProxyFactory factory = getFactory();
@@ -1275,6 +1275,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
               final String name = "anntest" + (count_ < 10 ? "0" : "") + count_;
               MarshallingTools.saveProductDES(buffer, name + ".wdes");
             }
+            */
             /*
             CompareLessConflicting clc = new CompareLessConflicting(orig, abstracted, ee.getEventCode(getConfiguredDefaultMarking()));
             final boolean lc = clc.isLessConflicting();
@@ -1757,7 +1758,6 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   private final RemoveImpossibleTransitions mRIT = null;
   @SuppressWarnings("unused")
   private final MergeEvents mME = null;
-  private int count_ = 0;
 
   // #########################################################################
   // # Class Constants
