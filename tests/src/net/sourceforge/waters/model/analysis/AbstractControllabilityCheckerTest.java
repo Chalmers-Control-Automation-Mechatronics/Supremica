@@ -11,8 +11,8 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -190,7 +190,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "ample_candidate_true.wmod";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void test_AmpleHypercube222() throws Exception
   {
     final String group = "tests";
@@ -198,7 +198,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "ample_hypercube_222.wmod";
     runModelVerifier(group, dir, name, false);
   }
-  
+
   public void test_AmpleHypercube234() throws Exception
   {
     final String group = "tests";
@@ -206,7 +206,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "ample_hypercube_234.wmod";
     runModelVerifier(group, dir, name, false);
   }
-  
+
   public void test_AmpleHypercube333() throws Exception
   {
     final String group = "tests";
@@ -214,7 +214,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "ample_hypercube_333.wmod";
     runModelVerifier(group, dir, name, false);
   }
-  
+
   public void test_AmpleHypercube334() throws Exception
   {
     final String group = "tests";
@@ -222,7 +222,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "ample_hypercube_334.wmod";
     runModelVerifier(group, dir, name, false);
   }
-  
+
   public void test_AmpleHypercube344() throws Exception
   {
     final String group = "tests";
@@ -230,7 +230,7 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "ample_hypercube_344.wmod";
     runModelVerifier(group, dir, name, false);
   }
-  
+
   public void test_AmpleHypercube444() throws Exception
   {
     final String group = "tests";
@@ -238,13 +238,21 @@ public abstract class AbstractControllabilityCheckerTest
     final String name = "ample_hypercube_444.wmod";
     runModelVerifier(group, dir, name, false);
   }
-  
+
   public void test_AmpleHypercubeCont() throws Exception
   {
     final String group = "tests";
     final String dir = "nasty";
     final String name = "ample_hypercube_cont.wmod";
     runModelVerifier(group, dir, name, true);
+  }
+
+  public void test_AmpleStutterTest() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "ample_stutter_test.wmod";
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_BallTimer() throws Exception
@@ -925,6 +933,7 @@ public abstract class AbstractControllabilityCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractAnalysisTest
+  @Override
   protected void configure(final ModuleCompiler compiler)
   {
     final Collection<String> empty = Collections.emptyList();
@@ -936,6 +945,7 @@ public abstract class AbstractControllabilityCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
     throws Exception

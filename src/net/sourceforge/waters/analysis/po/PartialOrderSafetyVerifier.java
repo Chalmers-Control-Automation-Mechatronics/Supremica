@@ -278,7 +278,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
 
       //Begin to compute dependency of events
-      mEventDependencyMap =
+      final PartialOrderEventDependencyKind[][] eventDependencyMap =
         PartialOrderEventDependencyKind.arrayOfDefault(mNumEvents);
 
       for (i = 0; i < mEventCodingList.size(); i++) {
@@ -336,9 +336,9 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
               //two events found to remain exclusive after checking all states in any automaton where they both exist guarantees the independence of those events
               //in the synchronous product, regardless of whether or not they commute in any or all automata
               if (exclusive) {
-                mEventDependencyMap[i][j] =
+                eventDependencyMap[i][j] =
                   PartialOrderEventDependencyKind.EXCLUSIVE;
-                mEventDependencyMap[j][i] =
+                eventDependencyMap[j][i] =
                   PartialOrderEventDependencyKind.EXCLUSIVE;
                 break;
               }
@@ -347,17 +347,17 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
           //if after checking all the states in which both events occur the states are found to commute every time they are both enabled, then those events will be
           //independent in the synchronous product
           if (commuting) {
-            if (mEventDependencyMap[i][j] !=
+            if (eventDependencyMap[i][j] !=
               PartialOrderEventDependencyKind.EXCLUSIVE) {
-              mEventDependencyMap[i][j] =
+              eventDependencyMap[i][j] =
                 PartialOrderEventDependencyKind.COMMUTING;
-              mEventDependencyMap[j][i] =
+              eventDependencyMap[j][i] =
                 PartialOrderEventDependencyKind.COMMUTING;
             }
           }
         }
       }
-
+      int numDependents = 0;
       mReducedEventDependencyMap =
         new PartialOrderEventDependencyTuple[mNumEvents][];
       for (i = 0; i < mNumEvents; i++) {
@@ -365,15 +365,18 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
           new ArrayList<PartialOrderEventDependencyTuple>();
         for (j = 0; j < mNumEvents; j++) {
           if (i != j){
-            if (mEventDependencyMap[i][j] == PartialOrderEventDependencyKind.NONCOMMUTING) {
+            if (eventDependencyMap[i][j] == PartialOrderEventDependencyKind.NONCOMMUTING) {
             temp.add(new PartialOrderEventDependencyTuple
-                     (j, mEventDependencyMap[i][j]));
+                     (j, eventDependencyMap[i][j]));
+            numDependents++;
             }
           }
         }
         mReducedEventDependencyMap[i] =
           temp.toArray(new PartialOrderEventDependencyTuple[temp.size()]);
       }
+      numDependents/=2;
+      mNumIndependentPairings = getTotalEventPairings() - numDependents;
 
       // Compute stuttering of events
       // Set up initial conditions, all events labelled as stuttering
@@ -521,6 +524,10 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     }
   }
 
+  private int getTotalEventPairings(){
+    return (mNumEvents * (mNumEvents - 1)) / 2;
+  }
+
   @Override
   public void tearDown(){
     super.tearDown();
@@ -551,6 +558,11 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   @Override
   protected void addStatistics()
   {
+    //final int totalPairings = getTotalEventPairings();
+    //System.out.println("Number of independent event pairings in " +
+     //                   getModel().getName() + ": "
+     //                   + mNumIndependentPairings + "/" + totalPairings +
+     //                   "\nCycles closed: " + mLoopCount);
     super.addStatistics();
     final VerificationResult result = getAnalysisResult();
     result.setNumberOfAutomata(mNumAutomata);
@@ -658,7 +670,6 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         if (found.mayNeedExpansion()){
           found.setFullyExpand(true);
           mLoopCount++;
-          //mFullyExpanded.add(found);
         }
       }
     }
@@ -844,7 +855,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
           eventsSetMinusUnion.add(j);
         }
       }
-      boolean danger = true;
+      boolean danger = false;
       for (k = 0; k < dependentNonEnabled.size(); k++){
         final int dependent = dependentNonEnabled.get(k);
         for (j = 0; j < mAutomata.length; j++){
@@ -852,8 +863,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
           final byte[] eventList = plant ? mPlantEventList.get(j) :
                           mSpecEventList.get(j - mNumPlants);
           if (eventList[dependent] == 1){
-            if (!canBecomeEnabled(current,dependent,eventsSetMinusUnion,j)){
-              danger = false;
+            if (canBecomeEnabled(current,dependent,eventsSetMinusUnion,j)){
+              danger = true;
               break;
             }
           }
@@ -866,7 +877,6 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
       return ample.toNativeArray();
     }
-    //mFullyExpanded.add(current);
     return enabled;
   }
 
@@ -1123,7 +1133,6 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   //# Data Members
 
   // Ample conditions
-  private PartialOrderEventDependencyKind[][] mEventDependencyMap;
   private PartialOrderEventDependencyTuple[][] mReducedEventDependencyMap;
   final int MAXDEPTH;
 
@@ -1174,4 +1183,6 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   //Statistics
   @SuppressWarnings("unused")
   private int mLoopCount;
+  @SuppressWarnings("unused")
+  private int mNumIndependentPairings;
 }
