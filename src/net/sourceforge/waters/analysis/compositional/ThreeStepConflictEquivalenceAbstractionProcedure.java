@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -31,8 +32,10 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
 
 
 /**
@@ -300,6 +303,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
         final StateEncoding outputStateEnc = new StateEncoding();
         final AutomatonProxy outputAut =
           rel.createAutomaton(factory, eventEnc, outputStateEnc);
+        lastAut = outputAut;
         final AbstractionStep postStep =
           createStep(lastAut, lastStateEnc, outputAut, outputStateEnc,
                      tau, partition, oeq, reduced);
@@ -308,6 +312,22 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
         recordStep(steps, preStep);
         recordStep(steps, lccStep);
         recordStep(steps, ccStep);
+      }
+      if (!steps.isEmpty()) {
+        final int beforeStates = aut.getStates().size();
+        final int afterStates = lastAut.getStates().size();
+        if (beforeStates + afterStates >= 500) {
+          count_++;
+          final String name = "cptest" + (count_ < 10 ? "0" : "") + count_;
+          final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
+          final AutomatonProxy before =
+            AutomatonTools.renameAutomaton(aut, "before", factory);
+          automata.add(before);
+          final AutomatonProxy after =
+            AutomatonTools.renameAutomaton(lastAut, "after", factory);
+          automata.add(after);
+          MarshallingTools.saveProductDES(automata, name + ".wdes");
+        }
       }
       return !steps.isEmpty();
     } finally {
@@ -401,5 +421,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     mCertainConflictsSimplifier;
   private final ChainTRSimplifier mPostChain;
   private final ChainTRSimplifier mCompleteChain;
+
+  private int count_ = 0;
 
 }

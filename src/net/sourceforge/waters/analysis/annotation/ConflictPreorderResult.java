@@ -36,7 +36,7 @@ public class ConflictPreorderResult
    */
   ConflictPreorderResult()
   {
-    mFirstAutomatonStates = mSecondAutomatonStates = mMaxMCTriples = -1;
+    mFirstAutomatonStates = mSecondAutomatonStates = -1;
     mTotalLCPairs = 0;
     mLevelSizes = new TIntArrayList();
   }
@@ -51,6 +51,7 @@ public class ConflictPreorderResult
       mergeAdd(mFirstAutomatonStates, rel1.getNumberOfStates());
     mSecondAutomatonStates =
       mergeAdd(mSecondAutomatonStates, rel2.getNumberOfStates());
+    updateNumberOfAutomata(2);
   }
 
   void addLCPairs(final int value)
@@ -60,7 +61,8 @@ public class ConflictPreorderResult
 
   void addMCTriples(final int value)
   {
-    mMaxMCTriples = Math.max(mMaxMCTriples, value);
+    updateNumberOfStates(value);
+    updateNumberOfNodes(value);
   }
 
   void addLevel(final int level, final int size)
@@ -85,7 +87,6 @@ public class ConflictPreorderResult
     mSecondAutomatonStates =
       mergeAdd(mSecondAutomatonStates, result.mSecondAutomatonStates);
     mTotalLCPairs = mergeAdd(mTotalLCPairs, result.mTotalLCPairs);
-    mMaxMCTriples = Math.max(mMaxMCTriples, result.mMaxMCTriples);
     final int maxLevel =
       Math.max(mLevelSizes.size(), result.mLevelSizes.size());
     for (int l = 0; l < maxLevel; l++) {
@@ -115,9 +116,6 @@ public class ConflictPreorderResult
     if (mTotalLCPairs >= 0) {
       writer.println("Total number of LC-Pairs: " + mTotalLCPairs);
     }
-    if (mMaxMCTriples >= 0) {
-      writer.println("Peak number of MC-Triples: " + mMaxMCTriples);
-    }
     if (mLevelSizes.size() > 0) {
       writer.println("Maximum LC-level: " + (mLevelSizes.size() - 1));
       for (int l = 0; l < mLevelSizes.size(); l++) {
@@ -133,7 +131,6 @@ public class ConflictPreorderResult
     writer.print(",FirstStates");
     writer.print(",SecondStates");
     writer.print(",TotLC");
-    writer.print(",MaxMC");
     writer.print(",MaxLevel");
     writer.print(",Levels");
   }
@@ -153,10 +150,6 @@ public class ConflictPreorderResult
     writer.print(',');
     if (mTotalLCPairs >= 0) {
       writer.print(mTotalLCPairs);
-    }
-    writer.print(',');
-    if (mMaxMCTriples >= 0) {
-      writer.print(mMaxMCTriples);
     }
     writer.print(',');
     if (mLevelSizes.size() > 0) {
@@ -183,7 +176,6 @@ public class ConflictPreorderResult
   private int mFirstAutomatonStates;
   private int mSecondAutomatonStates;
   private int mTotalLCPairs;
-  private int mMaxMCTriples;
   private final TIntArrayList mLevelSizes;
 
 }

@@ -47,126 +47,150 @@ public class DefaultAnalysisResult
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.AnalysisResult
+  @Override
   public boolean isFinished()
   {
     return mFinished;
   }
 
+  @Override
   public boolean isSatisfied()
   {
     return mSatisfied;
   }
 
+  @Override
   public AnalysisException getException()
   {
     return mException;
   }
 
+  @Override
   public long getRunTime()
   {
     return mRunTime;
   }
 
+  @Override
   public long getPeakMemoryUsage()
   {
     return mPeakMemoryUsage;
   }
 
+  @Override
   public int getTotalNumberOfAutomata()
   {
     return mTotalNumberOfAutomata;
   }
 
+  @Override
   public double getTotalNumberOfStates()
   {
     return mTotalNumberOfStates;
   }
 
+  @Override
   public double getPeakNumberOfStates()
   {
     return mPeakNumberOfStates;
   }
 
+  @Override
   public int getPeakNumberOfNodes()
   {
     return mPeakNumberOfNodes;
   }
 
+  @Override
   public double getTotalNumberOfTransitions()
   {
     return mTotalNumberOfTransitions;
   }
 
+  @Override
   public double getPeakNumberOfTransitions()
   {
     return mPeakNumberOfTransitions;
   }
 
 
+  @Override
   public void setSatisfied(final boolean sat)
   {
     mFinished = true;
     mSatisfied = sat;
   }
 
+  @Override
   public void setException(final AnalysisException exception)
   {
     mFinished = true;
     mException = exception;
   }
 
+  @Override
   public void setRuntime(final long time)
   {
     mRunTime = time;
   }
 
-  public void updatePeakMemoryUsage(final long usage)
-  {
-    if (usage > mPeakMemoryUsage) {
-      mPeakMemoryUsage = usage;
-    }
-  }
-
+  @Override
   public void setNumberOfStates(final double numstates)
   {
     setTotalNumberOfStates(numstates);
     setPeakNumberOfStates(numstates);
   }
 
+  @Override
   public void setNumberOfAutomata(final int numaut)
   {
     mTotalNumberOfAutomata = numaut;
   }
 
+  @Override
   public void setTotalNumberOfStates(final double numstates)
   {
     mTotalNumberOfStates = numstates;
   }
 
+  @Override
   public void setPeakNumberOfStates(final double numstates)
   {
     mPeakNumberOfStates = numstates;
   }
 
+  @Override
   public void setNumberOfTransitions(final double numtrans)
   {
     setTotalNumberOfTransitions(numtrans);
     setPeakNumberOfTransitions(numtrans);
   }
 
+  @Override
   public void setTotalNumberOfTransitions(final double numtrans)
   {
     mTotalNumberOfTransitions = numtrans;
   }
 
+  @Override
   public void setPeakNumberOfTransitions(final double numtrans)
   {
     mPeakNumberOfTransitions = numtrans;
   }
 
+  @Override
   public void setPeakNumberOfNodes(final int numnodes)
   {
     mPeakNumberOfNodes = numnodes;
+  }
+
+
+  @Override
+  public void updatePeakMemoryUsage(final long usage)
+  {
+    if (usage > mPeakMemoryUsage) {
+      mPeakMemoryUsage = usage;
+    }
   }
 
 
@@ -189,6 +213,7 @@ public class DefaultAnalysisResult
    *          to indicate that the two records merged are not of exactly the
    *          same type.
    */
+  @Override
   public void merge(final AnalysisResult other)
   {
     if (other.getClass() == getClass()) {
@@ -245,6 +270,7 @@ public class DefaultAnalysisResult
 
   }
 
+  @Override
   public void print(final PrintStream stream)
   {
     final PrintWriter writer = new PrintWriter(stream);
@@ -252,6 +278,7 @@ public class DefaultAnalysisResult
     writer.flush();
   }
 
+  @Override
   public void print(final PrintWriter writer)
   {
     if (mException != null) {
@@ -292,6 +319,7 @@ public class DefaultAnalysisResult
     }
   }
 
+  @Override
   public void printCSVHorizontal(final PrintWriter writer)
   {
     if (mException != null) {
@@ -333,6 +361,7 @@ public class DefaultAnalysisResult
     }
   }
 
+  @Override
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     writer.print("Result,RunTime");
@@ -343,6 +372,31 @@ public class DefaultAnalysisResult
     writer.print(",PeakStates");
     writer.print(",PeakTrans");
     writer.print(",PeakNodes");
+  }
+
+
+  //#########################################################################
+  //# Specific Access
+  public void updateNumberOfAutomata(final int numaut)
+  {
+    mTotalNumberOfAutomata = mergeAdd(mTotalNumberOfAutomata, numaut);
+  }
+
+  public void updateNumberOfStates(final double numstates)
+  {
+    mTotalNumberOfStates = mergeAdd(mTotalNumberOfStates, numstates);
+    mPeakNumberOfStates = Math.max(mPeakNumberOfStates, numstates);
+  }
+
+  public void updateNumberOfTransitions(final double numtrans)
+  {
+    mTotalNumberOfTransitions = mergeAdd(mTotalNumberOfTransitions, numtrans);
+    mPeakNumberOfTransitions = Math.max(mPeakNumberOfTransitions, numtrans);
+  }
+
+  public void updateNumberOfNodes(final int numnodes)
+  {
+    mPeakNumberOfNodes = Math.max(mPeakNumberOfNodes, numnodes);
   }
 
 

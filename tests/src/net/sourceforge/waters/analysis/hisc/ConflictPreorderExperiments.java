@@ -107,10 +107,23 @@ public class ConflictPreorderExperiments
     testDirectPhiloSubsys12();
     testDirectPhiloSubsys123();
     testDirectPhiloSubsys1234();
+    testDirectAnn1();
+    testDirectAnn2();
+    testDirectAnn3();
+    testDirectAnn4();
+    testDirectAnn5();
+    testDirectCP1();
+    testDirectCP2();
+    testDirectCP3();
+    testDirectCP4();
+    testDirectCP5();
+    testDirectCP6();
+    testDirectCP7();
+    testDirectCP8();
+    testDirectCP9();
+    testDirectCP10();
+    testDirectSimon();
 
-    testHISCCP_verriegel4ft();
-    testHISCCP_verriegel4ftbad();
-    testHISCCP_verriegel4ht();
     testHISCCP_SimpleManufHISCCP1();
     testHISCCP_SimpleManufHISCCP1bad();
     testHISCCP_aip3el12();
@@ -118,36 +131,6 @@ public class ConflictPreorderExperiments
     testHISCCP_aip3el3();
     testHISCCP_aip3el4();
     testHISCCP_rhone_subsystem1_ld();
-    testHISCCP_rhone_subsystem1_ld_failsic5();
-  }
-
-
-  // Central Locking
-  private void testHISCCP_verriegel4ft()
-    throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("hisccp", "central_locking", "verriegel4ft.wmod");
-    runHISCCP(des, false, true);
-    runHISCCP(des, true, false);
-  }
-
-  private void testHISCCP_verriegel4ftbad()
-    throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("hisccp", "central_locking", "verriegel4ft_bad.wmod");
-    runHISCCP(des, false, false);
-    runHISCCP(des, true, true);
-  }
-
-  private void testHISCCP_verriegel4ht()
-    throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("hisccp", "central_locking", "verriegel4ht.wmod");
-    runHISCCP(des, false, true);
-    runHISCCP(des, true, false);
   }
 
 
@@ -231,15 +214,6 @@ public class ConflictPreorderExperiments
     runHISCCP(des, true, false);
   }
 
-  private void testHISCCP_rhone_subsystem1_ld_failsic5()
-    throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "hisc", "rhone_subsystem1_ld_failsic5.wmod");
-    runHISCCP(des, false, false);
-    runHISCCP(des, true, false);
-  }
-
 
   // Philosophers
   private void testDirectPhiloSubsys12()
@@ -265,6 +239,151 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "conflict_preorder", "philo_subsys1234.wmod");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP1()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest01.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP2()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest02.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP3()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest03.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP4()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest04.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP5()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest05.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP6()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest06.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP7()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest07.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP8()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest08.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP9()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest09.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectCP10()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "cptest10.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+
+  private void testDirectAnn1()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "anntest01.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectAnn2()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "anntest02.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectAnn3()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "anntest03.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectAnn4()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "anntest04.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectAnn5()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "anntest05.wdes");
+    runDirect(des, false, true);
+    runDirect(des, true, true);
+  }
+
+  private void testDirectSimon()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "conflict_preorder", "simon.wmod");
     runDirect(des, false, true);
     runDirect(des, true, true);
   }
@@ -327,6 +446,7 @@ public class ConflictPreorderExperiments
     throws AnalysisException
   {
     final String name = des.getName();
+    printAndLog("DIRECT " + name + " ...");
     final Collection<AutomatonProxy> automata = des.getAutomata();
     assert automata.size() == 2 :
       "Model '" + name + "' does not have exactly 2 automata!";
@@ -339,10 +459,9 @@ public class ConflictPreorderExperiments
       aut2 = iter.next();
       aut1 = iter.next();
     }
-    printAndLog(aut1.getName() + "<" + aut2.getName() + " ...");
     final Collection<EventProxy> events = des.getEvents();
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    final EventProxy tau = getEvent(des, TAU);
+    final EventProxy tau = getTauEvent(des);
     final EventEncoding enc = new EventEncoding(events, translator, tau);
     final int config = TRConflictPreorderChecker.getPreferredInputConfiguration();
     final ListBufferTransitionRelation rel1 =
@@ -364,6 +483,16 @@ public class ConflictPreorderExperiments
       final ConflictPreorderResult stats = checker.getAnalysisResult();
       printStats(name, stats);
     }
+  }
+
+  private EventProxy getTauEvent(final ProductDESProxy des)
+  {
+    for (final EventProxy event : des.getEvents()) {
+      if (!event.isObservable() && event.getName().startsWith(TAU)) {
+        return event;
+      }
+    }
+    return null;
   }
 
   private void printStats(final String name, final ConflictPreorderResult stats)

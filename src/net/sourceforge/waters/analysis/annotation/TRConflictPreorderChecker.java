@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
@@ -105,7 +106,7 @@ public class TRConflictPreorderChecker
    *      TRConflictPreorderChecker()
    */
   public boolean isLessConflicting()
-    throws AbortException
+    throws AnalysisException
   {
     try {
       setUp();
@@ -127,6 +128,12 @@ public class TRConflictPreorderChecker
       final LCPair init = createPair(init1, init2);
       final boolean result = isLessConflicting(init);
       return setBooleanResult(result);
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      System.gc();
+      final OverflowException exception = new OverflowException(error);
+      setExceptionResult(exception);
+      throw exception;
     } finally {
       tearDown();
     }
@@ -159,6 +166,13 @@ public class TRConflictPreorderChecker
    */
   private void tearDown()
   {
+    mSetCache = null;
+    mTupleCache = null;
+    mStates = null;
+    mFirstLC = null;
+    mSecondBlocking = null;
+    mSuccessors = null;
+    mPredeccessors = null;
     mIsAborting = false;
     addStatistics();
   }
@@ -594,13 +608,13 @@ public class TRConflictPreorderChecker
   //# Data Members
   private final ListBufferTransitionRelation mFirstRelation;
   private final ListBufferTransitionRelation mSecondRelation;
-  private final Map<TIntHashSet,TIntHashSet> mSetCache;
-  private final TObjectIntHashMap<LCPair> mTupleCache;
-  private final List<LCPair> mStates;
-  private final List<TIntArrayList> mSuccessors;
-  private final List<TIntHashSet[]> mPredeccessors;
-  private final TIntHashSet mFirstLC;
-  private final TIntHashSet mSecondBlocking;
+  private Map<TIntHashSet,TIntHashSet> mSetCache;
+  private TObjectIntHashMap<LCPair> mTupleCache;
+  private List<LCPair> mStates;
+  private List<TIntArrayList> mSuccessors;
+  private List<TIntHashSet[]> mPredeccessors;
+  private TIntHashSet mFirstLC;
+  private TIntHashSet mSecondBlocking;
   private final int mMarking;
   private int mExpanded;
 

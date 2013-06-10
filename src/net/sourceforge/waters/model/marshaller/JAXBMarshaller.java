@@ -14,10 +14,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URL;
 import java.net.URI;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
+
 import javax.swing.filechooser.FileFilter;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -125,12 +126,13 @@ public abstract class JAXBMarshaller
   //# and net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
   /**
    * Load a document from a file.
-   * @param  uri      A URI specifiying the location of the document
+   * @param  uri      A URI specifying the location of the document
    *                  to be retrieved.
    * @return The loaded document.
    * @throws WatersUnmarshalException to indicate that reading the XML file
    *                  has failed for some reason.
    */
+  @Override
   public D unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
   {
@@ -157,6 +159,7 @@ public abstract class JAXBMarshaller
    * @throws IOException to indicate that the output file could not be
    *                  opened.
    */
+  @Override
   public void marshal(final D docproxy, final File filename)
     throws WatersMarshalException, IOException
   {
@@ -177,12 +180,14 @@ public abstract class JAXBMarshaller
     }
   }
 
+  @Override
   public Collection<String> getSupportedExtensions()
   {
     final String ext = getDefaultExtension();
     return Collections.singletonList(ext);
   }
 
+  @Override
   public FileFilter getDefaultFileFilter()
   {
     final String ext = getDefaultExtension();
@@ -190,17 +195,20 @@ public abstract class JAXBMarshaller
     return StandardExtensionFileFilter.getFilter(description, ext);
   }
 
+  @Override
   public Collection<FileFilter> getSupportedFileFilters()
   {
     final FileFilter filter = getDefaultFileFilter();
     return Collections.singletonList(filter);
   }
 
+  @Override
   public DocumentManager getDocumentManager()
   {
     return mImporter.getDocumentManager();
   }
 
+  @Override
   public void setDocumentManager(final DocumentManager manager)
   {
     mImporter.setDocumentManager(manager);
