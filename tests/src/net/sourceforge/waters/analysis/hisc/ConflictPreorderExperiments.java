@@ -13,8 +13,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
 
@@ -53,7 +55,8 @@ public class ConflictPreorderExperiments
 
   //#########################################################################
   //# Constructor
-  public ConflictPreorderExperiments(final String statsFilename)
+  public ConflictPreorderExperiments(final String statsFilename,
+                                     final String latexName)
     throws FileNotFoundException
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -62,6 +65,7 @@ public class ConflictPreorderExperiments
     final File statsFile = new File(dir, statsFilename);
     mOut = new FileOutputStream(statsFile);
     mPrintWriter = null;
+    mLaTeXName = latexName;
   }
 
 
@@ -95,35 +99,45 @@ public class ConflictPreorderExperiments
 
 
   //#########################################################################
-  //# Configuration
-
-
-  //#########################################################################
   //# Tests
+  @SuppressWarnings("unchecked")
   private void runAllTests() throws Exception
   {
+    mCurrentGroup = null;
+    mMaxLCLevel = 0;
     testHISCCP_aip3syn_as1();
 
+    final List<ConflictPreorderRecord> philo =
+      new ArrayList<ConflictPreorderRecord>(3);
+    mCurrentGroup = philo;
     testDirectPhiloSubsys12();
     testDirectPhiloSubsys123();
     testDirectPhiloSubsys1234();
+
+    final List<ConflictPreorderRecord> direct =
+      new ArrayList<ConflictPreorderRecord>(16);
+    mCurrentGroup = direct;
     testDirectAnn1();
     testDirectAnn2();
     testDirectAnn3();
     testDirectAnn4();
     testDirectAnn5();
-    testDirectCP1();
+    //testDirectCP1();
     testDirectCP2();
     testDirectCP3();
     testDirectCP4();
     testDirectCP5();
-    testDirectCP6();
-    testDirectCP7();
+    //testDirectCP6();
+    //testDirectCP7();
     testDirectCP8();
     testDirectCP9();
-    testDirectCP10();
+    //testDirectCP10();
     testDirectSimon();
+    Collections.sort(direct);
 
+    final List<ConflictPreorderRecord> hisccp =
+      new ArrayList<ConflictPreorderRecord>(7);
+    mCurrentGroup = hisccp;
     testHISCCP_SimpleManufHISCCP1();
     testHISCCP_SimpleManufHISCCP1bad();
     testHISCCP_aip3el12();
@@ -131,6 +145,11 @@ public class ConflictPreorderExperiments
     testHISCCP_aip3el3();
     testHISCCP_aip3el4();
     testHISCCP_rhone_subsystem1_ld();
+
+    final FileOutputStream latexStream = new FileOutputStream(mLaTeXName);
+    final PrintWriter writer = new PrintWriter(latexStream);
+    printLaTeX(writer, philo, hisccp, direct);
+    writer.close();
   }
 
 
@@ -140,8 +159,8 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("hisccp", "simple_manuf_multi_hisccp", "subsystem.wmod");
-    runHISCCP(des, false, true);
-    runHISCCP(des, true, false);
+    runHISCCP("smm", des, false, true);
+    runHISCCP("", des, true, false);
   }
 
   private void testHISCCP_SimpleManufHISCCP1bad()
@@ -150,8 +169,8 @@ public class ConflictPreorderExperiments
     final ProductDESProxy des =
       getCompiledDES("hisccp", "simple_manuf_multi_hisccp",
                      "subsystem_bad.wmod");
-    runHISCCP(des, false, false);
-    runHISCCP(des, true, false);
+    runHISCCP("smm\\_bad", des, false, false);
+    runHISCCP("", des, true, false);
   }
 
 
@@ -161,8 +180,8 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("despot", "song_aip", "aip3_syn", "as1.wmod");
-    runHISCCP(des, false, false);
-    runHISCCP(des, true, false);
+    runHISCCP("aip3as1", des, false, false);
+    runHISCCP("", des, true, false);
   }
 
 
@@ -172,8 +191,8 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("hisccp", "aip3_hisccp", "el12.wmod");
-    runHISCCP(des, false, true);
-    runHISCCP(des, true, false);
+    runHISCCP("aip3el12", des, false, true);
+    runHISCCP("", des, true, false);
   }
 
   private void testHISCCP_aip3el12b()
@@ -181,8 +200,8 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("hisccp", "aip3_hisccp", "el12b.wmod");
-    runHISCCP(des, false, false);
-    runHISCCP(des, true, false);
+    runHISCCP("aip3el12b", des, false, false);
+    runHISCCP("", des, true, false);
   }
 
   private void testHISCCP_aip3el3()
@@ -190,8 +209,8 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("hisccp", "aip3_hisccp", "el3.wmod");
-    runHISCCP(des, false, true);
-    runHISCCP(des, true, true);
+    runHISCCP("aip3el3", des, false, true);
+    runHISCCP("", des, true, true);
   }
 
   private void testHISCCP_aip3el4()
@@ -199,8 +218,8 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("hisccp", "aip3_hisccp", "el4.wmod");
-    runHISCCP(des, false, true);
-    runHISCCP(des, true, true);
+    runHISCCP("aip3el4", des, false, true);
+    runHISCCP("", des, true, true);
   }
 
 
@@ -210,8 +229,8 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "hisc", "rhone_subsystem1_ld.wmod");
-    runHISCCP(des, false, false);
-    runHISCCP(des, true, false);
+    runHISCCP("aip1sub1", des, false, false);
+    runHISCCP("", des, true, false);
   }
 
 
@@ -221,8 +240,8 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "conflict_preorder", "philo_subsys12.wmod");
-    runDirect(des, false, true);
-    runDirect(des, true, true);
+    runDirect("$\\subsys1 \\confle \\abssys1$", des, false, true);
+    runDirect("$\\abssys1 \\confle \\subsys1$", des, true, true);
   }
 
   private void testDirectPhiloSubsys123()
@@ -230,8 +249,8 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "conflict_preorder", "philo_subsys123.wmod");
-    runDirect(des, false, true);
-    runDirect(des, true, true);
+    runDirect("$\\subsys{1,2} \\confle \\abssys{1,2}$", des, false, true);
+    runDirect("$\\abssys{1,2} \\confle \\subsys{1,2}$", des, true, true);
   }
 
   private void testDirectPhiloSubsys1234()
@@ -239,10 +258,11 @@ public class ConflictPreorderExperiments
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "conflict_preorder", "philo_subsys1234.wmod");
-    runDirect(des, false, true);
-    runDirect(des, true, true);
+    runDirect("$\\subsys{1,2,3} \\confle \\abssys{1,2,3}$", des, false, true);
+    runDirect("$\\abssys{1,2,3} \\confle \\subsys{1,2,3}$", des, true, true);
   }
 
+  @SuppressWarnings("unused")
   private void testDirectCP1()
     throws Exception
   {
@@ -288,6 +308,7 @@ public class ConflictPreorderExperiments
     runDirect(des, true, true);
   }
 
+  @SuppressWarnings("unused")
   private void testDirectCP6()
     throws Exception
   {
@@ -297,6 +318,7 @@ public class ConflictPreorderExperiments
     runDirect(des, true, true);
   }
 
+  @SuppressWarnings("unused")
   private void testDirectCP7()
     throws Exception
   {
@@ -324,6 +346,7 @@ public class ConflictPreorderExperiments
     runDirect(des, true, true);
   }
 
+  @SuppressWarnings("unused")
   private void testDirectCP10()
     throws Exception
   {
@@ -393,11 +416,12 @@ public class ConflictPreorderExperiments
   //# Main Method
   public static void main(final String[] args)
   {
-    if (args.length == 1) {
+    if (args.length == 1 || args.length == 2) {
       try {
         final String filename = args[0];
+        final String latexName = args.length == 2 ? args[1] : null;
         final ConflictPreorderExperiments experiment =
-          new ConflictPreorderExperiments(filename);
+          new ConflictPreorderExperiments(filename, latexName);
         experiment.setUp();
         experiment.runAllTests();
         experiment.tearDown();
@@ -409,14 +433,15 @@ public class ConflictPreorderExperiments
       System.err.println
         ("USAGE: " +
          ProxyTools.getShortClassName(ConflictPreorderExperiments.class) +
-         " <outputFilename>");
+         " <outputFilename> <latexName>");
     }
   }
 
 
   //#########################################################################
   //# Invocation
-  private void runHISCCP(final ProductDESProxy des,
+  private void runHISCCP(final String label,
+                         final ProductDESProxy des,
                          final boolean reverse,
                          final boolean expect)
     throws Exception
@@ -436,11 +461,20 @@ public class ConflictPreorderExperiments
       final HISCCPVerificationResult stats =
         (HISCCPVerificationResult) mHISCCPChecker.getAnalysisResult();
       final ConflictPreorderResult cpStats = stats.getConflictPreorderResult();
-      printStats(name, cpStats);
+      printStats(name, label, reverse, cpStats);
     }
   }
 
   private void runDirect(final ProductDESProxy des,
+                         final boolean reverse,
+                         final boolean expect)
+    throws AnalysisException
+  {
+    runDirect(null, des, reverse, expect);
+  }
+
+  private void runDirect(final String label,
+                         final ProductDESProxy des,
                          final boolean reverse,
                          final boolean expect)
     throws AnalysisException
@@ -481,7 +515,7 @@ public class ConflictPreorderExperiments
       mPrintWriter.println(name + "," + exception.getMessage());
     } finally {
       final ConflictPreorderResult stats = checker.getAnalysisResult();
-      printStats(name, stats);
+      printStats(name, label, reverse, stats);
     }
   }
 
@@ -495,7 +529,10 @@ public class ConflictPreorderExperiments
     return null;
   }
 
-  private void printStats(final String name, final ConflictPreorderResult stats)
+  private void printStats(final String name,
+                          final String label,
+                          final boolean reverse,
+                          final ConflictPreorderResult stats)
   {
     if (!mHasBeenPrinted) {
       mHasBeenPrinted = true;
@@ -507,6 +544,54 @@ public class ConflictPreorderExperiments
     mPrintWriter.print(',');
     stats.printCSVHorizontal(mPrintWriter);
     mPrintWriter.println();
+
+    if (mCurrentGroup != null) {
+      final ConflictPreorderRecord record =
+        new ConflictPreorderRecord(label, reverse, stats);
+      mCurrentGroup.add(record);
+      final int level = stats.getMaxLCLevel();
+      if (level > mMaxLCLevel) {
+        mMaxLCLevel = level;
+      }
+    }
+  }
+
+  private void printLaTeX(final PrintWriter writer,
+                          final List<ConflictPreorderRecord>... groups)
+  {
+    writer.print("\\begin{tabular}{|>{\\hskip4.6em}rr<{) }|r|r|r|r|r|");
+    for (int l = 0; l <= mMaxLCLevel; l++) {
+      writer.print("r|");
+    }
+    writer.println("r|c|}");
+    writer.println("\\hline");
+    writer.println("\\multicolumn{2}{|c|}{\\bf Instance} &");
+    writer.println("  \\multicolumn{2}{c|}{\\bf States} &");
+    writer.println("  \\multicolumn{1}{c|}{\\bf Pairs} &");
+    writer.println("  \\multicolumn{1}{c|}{\\bf Triples} &");
+    writer.print("  \\multicolumn{");
+    writer.print(mMaxLCLevel + 1);
+    writer.println("}{c|}{\\bf \\LC-Pairs} &");
+    writer.println("  \\bf Time & \\bf Res. \\\\");
+    writer.println("\\multicolumn{2}{|c|}{$A \\confle B$} &");
+    writer.println("  \\scriptsize$|Q_A|$ & \\scriptsize$|Q_B|$ &");
+    writer.println("  \\scriptsize$|\\Pairs|$ &");
+    writer.println("  \\multicolumn{1}{c|}{\\scriptsize$|\\mc|$} &");
+    for (int l = 0; l <= mMaxLCLevel; l++) {
+      writer.print("  \\multicolumn{1}{c|}{\\scriptsize $|\\LC^");
+      writer.print(l);
+      writer.println("|$} &");
+    }
+    writer.println("  \\multicolumn{1}{c|}{[s]} & $\\confle$ \\\\");
+    writer.println("\\hline");
+    for (final List<ConflictPreorderRecord> group : groups) {
+      writer.println("\\hline");
+      int lineno = 0;
+      for (final ConflictPreorderRecord record : group) {
+        record.printLaTeX(writer, lineno++);
+      }
+    }
+    writer.println("\\end{tabular}");
   }
 
 
@@ -534,10 +619,129 @@ public class ConflictPreorderExperiments
 
 
   //#########################################################################
+  //# Inner Class
+  private class ConflictPreorderRecord
+    implements Comparable<ConflictPreorderRecord>
+  {
+
+    //#######################################################################
+    //# Constructor
+    private ConflictPreorderRecord(final String label,
+                                   final boolean reverse,
+                                   final ConflictPreorderResult stats)
+    {
+      mLabel = label;
+      mReversed = reverse;
+      mStats = stats;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparable<ConflictPreorderRecord>
+    @Override
+    public int compareTo(final ConflictPreorderRecord record)
+    {
+      final int size1 =
+        mStats.getFirstAutomatonStates() + mStats.getSecondAutomatonStates();
+      final int size2 =
+        record.mStats.getFirstAutomatonStates() +
+        record.mStats.getSecondAutomatonStates();
+      if (size1 != size2) {
+        if (size1 < size2) {
+          return -1;
+        } else {
+          return 1;
+        }
+      }
+      if (mReversed != record.mReversed) {
+        if (!mReversed) {
+          return -1;
+        } else {
+          return 1;
+        }
+      }
+      return 0;
+    }
+
+    //#######################################################################
+    //# Printing
+    private void printLaTeX(final PrintWriter writer, final int lineno)
+    {
+      if (mLabel != null) {
+        if (mLabel.startsWith("$")) {
+          writer.print("\\multicolumn{2}{|c|}{");
+        } else {
+          writer.print("\\multicolumn{2}{|r<{ }|}{\\sf ");
+        }
+        writer.print(mLabel);
+        writer.print("}");
+      } else {
+        final int groupno = (lineno >> 1) + 1;
+        if (groupno < 10) {
+          writer.print(' ');
+        }
+        if (!mReversed) {
+          writer.print(groupno);
+          writer.print(". & a");
+        } else {
+          writer.print("   & b");
+        }
+      }
+      writer.println(" &");
+      writer.print("  ");
+      writer.print(mStats.getFirstAutomatonStates());
+      writer.print(" & ");
+      writer.print(mStats.getSecondAutomatonStates());
+      writer.print(" & ");
+      writer.print(mStats.getTotalLCPairs());
+      writer.print(" & ");
+      writer.print(mStats.getPeakMCTriples());
+      writer.println(" &");
+      writer.print("  ");
+      int prev = 0;
+      for (int l = 0; l <= mMaxLCLevel; l++) {
+        final int delta;
+        if (l <= mStats.getMaxLCLevel()) {
+          final int lc = mStats.getTotalLCPairs(l);
+          delta = lc - prev;
+          prev = lc;
+        } else {
+          delta = 0;
+        }
+        writer.print(delta);
+        writer.print(" & ");
+      }
+      final Formatter formatter = new Formatter(writer);
+      final float seconds = 0.001f * mStats.getRunTime();
+      formatter.format("%.1f", seconds);
+      writer.print(" & ");
+      if (mStats.isSatisfied()) {
+        writer.print("\\ltrue");
+      } else {
+        writer.print("\\lfalse");
+      }
+      writer.println(" \\\\");
+      if (mReversed) {
+        writer.println("\\hline");
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final String mLabel;
+    private final boolean mReversed;
+    private final ConflictPreorderResult mStats;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private HISCCPInterfaceConsistencyChecker mHISCCPChecker;
+  private List<ConflictPreorderRecord> mCurrentGroup;
+  private int mMaxLCLevel;
+
   private final FileOutputStream mOut;
   private PrintWriter mPrintWriter;
+  private final String mLaTeXName;
   private boolean mHasBeenPrinted;
 
 

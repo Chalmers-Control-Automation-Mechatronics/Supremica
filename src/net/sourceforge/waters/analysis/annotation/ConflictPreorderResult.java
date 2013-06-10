@@ -43,6 +43,44 @@ public class ConflictPreorderResult
 
 
   //#########################################################################
+  //# Simple Access
+  public int getFirstAutomatonStates()
+  {
+    return mFirstAutomatonStates;
+  }
+
+  public int getSecondAutomatonStates()
+  {
+    return mSecondAutomatonStates;
+  }
+
+  public int getMaxLCLevel()
+  {
+    return mLevelSizes.size() - 1;
+  }
+
+  public int getTotalLCPairs()
+  {
+    return mTotalLCPairs;
+  }
+
+  public int getTotalLCPairs(final int level)
+  {
+    return mLevelSizes.get(level);
+  }
+
+  public int getTotalMCTriples()
+  {
+    return (int) getTotalNumberOfStates();
+  }
+
+  public int getPeakMCTriples()
+  {
+    return (int) getPeakNumberOfStates();
+  }
+
+
+  //#########################################################################
   //# Recording Statistics
   void addPair(final ListBufferTransitionRelation rel1,
                final ListBufferTransitionRelation rel2)
