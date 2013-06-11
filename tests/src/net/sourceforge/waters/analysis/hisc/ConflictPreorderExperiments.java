@@ -710,9 +710,10 @@ public class ConflictPreorderExperiments
         writer.print(delta);
         writer.print(" & ");
       }
+      @SuppressWarnings("resource")
       final Formatter formatter = new Formatter(writer);
       final float seconds = 0.001f * mStats.getRunTime();
-      formatter.format("%.1f", seconds);
+      formatter.format("%.2f", seconds);
       writer.print(" & ");
       if (mStats.isSatisfied()) {
         writer.print("\\ltrue");
