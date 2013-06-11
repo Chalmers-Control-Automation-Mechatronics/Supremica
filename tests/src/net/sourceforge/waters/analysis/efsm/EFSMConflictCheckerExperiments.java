@@ -14,19 +14,15 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.Formatter;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.IntConstantProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersException;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
@@ -38,7 +34,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  */
 
 public class EFSMConflictCheckerExperiments
-  extends AbstractAnalysisTest
+  extends EFSMConflictCheckerTest
 {
 
   //#########################################################################
@@ -61,119 +57,35 @@ public class EFSMConflictCheckerExperiments
     mOut = new FileOutputStream(statsFile);
     mPrintWriter = null;
     mCompositionSelectionHeuristic = compositionSelectionHeuristic;
-    mModuleProxyFactory = ModuleElementFactory.getInstance();
-    mConflictChecker = new EFSMConflictChecker(mModuleProxyFactory);
   }
 
 
   //#########################################################################
-  //# Overrides for junit.framework.TestCase
-  @Override
-  protected void setUp() throws Exception
+  //# Test Suite
+  private void runAllTests() throws Exception
   {
-    super.setUp();
-    mPrintWriter = new PrintWriter(mOut, true);
-    // final int internalStateLimit = 5000;
-    // mConflictChecker.setInternalStateLimit(internalStateLimit);
-    final int internalTransitionLimit = 1000000;
-    mConflictChecker.setInternalTransitionLimit(internalTransitionLimit);
-    // final int finalStateLimit = 2000000;
-    // mConflictChecker.setMonolithicStateLimit(finalStateLimit);
-    if (mCompositionSelectionHeuristic != null) {
-      mConflictChecker.setCompositionSelectionHeuristic(mCompositionSelectionHeuristic);
-    }
-    mPrintWriter.println("InternalTransitionLimit," +
-                         internalTransitionLimit);
-    mPrintWriter.println("CompositionSelectionHeuristic," +
-                         mCompositionSelectionHeuristic);
-    mHasBeenPrinted = false;
-  }
-
-  @Override
-  protected void tearDown() throws Exception
-  {
-    mConflictChecker = null;
-    mPrintWriter.close();
-    mOut.close();
-    System.out.println("All experiments complete");
-    super.tearDown();
+    testPrimeSieve6();
+    testPrimeSieve7();
+    testPrimeSieve8();
+    //checkPhilosophers("dining_philosophers", 1000, false);
+    checkTransferLine("transferline_efsm", 1000, 10, true);
   }
 
 
   //#########################################################################
-  //# Simple Access
-  EFSMConflictChecker getConflictChecker()
+  //# Tests
+  private void testPrimeSieve7()
+    throws IOException, WatersException
   {
-    return mConflictChecker;
+    final ModuleProxy module = loadModule("efa", "prime_sieve7");
+    checkConflict(module, true);
   }
 
-
-  //#########################################################################
-  //# Configuration
-
-
-  //#########################################################################
-  //# Invocation
-  void runModel(final String group,
-                final String name)
-  throws Exception
+  private void testPrimeSieve8()
+    throws IOException, WatersException
   {
-    runModel(group, null, name, null);
-  }
-
-  void runModel(final String group,
-                final String subdir,
-                final String name)
-  throws Exception
-  {
-    runModel(group, subdir, name, null);
-  }
-
-  void runModel(final String group,
-                final String subdir,
-                final String name,
-                final List<ParameterBindingProxy> bindings)
-  throws Exception
-  {
-    printAndLog("Running " + name + " with " +
-                mCompositionSelectionHeuristic + " ...");
-    final String inputprop = System.getProperty("waters.test.inputdir");
-    final File inputRoot = new File(inputprop);
-    final File rootdir = new File(inputRoot, "waters");
-    File dir = new File(rootdir, group);
-    if (subdir != null) {
-      dir = new File(dir, subdir);
-    }
-    final File filename = new File(dir, name);
-    final ModuleProxy module = getModule(filename);
-    mConflictChecker.setModel(module);
-    mConflictChecker.setBindings(bindings);
-    try {
-      mConflictChecker.run();
-    } catch (final AnalysisException exception) {
-      mPrintWriter.println(name + "," + exception.getMessage());
-    } finally {
-      final EFSMConflictCheckerAnalysisResult stats =
-        mConflictChecker.getAnalysisResult();
-      if (!mHasBeenPrinted) {
-        mHasBeenPrinted = true;
-        mPrintWriter.print("Model,");
-        stats.printCSVHorizontalHeadings(mPrintWriter);
-        mPrintWriter.println();
-      }
-      mPrintWriter.print(name);
-      mPrintWriter.print(',');
-      stats.printCSVHorizontal(mPrintWriter);
-      mPrintWriter.println();
-    }
-  }
-
-
-  public ModuleProxy getModule(final File file)
-    throws WatersUnmarshalException, IOException
-  {
-    final DocumentManager manager = getDocumentManager();
-    return (ModuleProxy) manager.load(file);
+    final ModuleProxy module = loadModule("efa", "prime_sieve8");
+    checkConflict(module, true);
   }
 
 
@@ -195,45 +107,85 @@ public class EFSMConflictCheckerExperiments
       }
     } else {
       System.err.println
-        ("Usage: CompositionalSynthesizerExperiments " +
+        ("USAGE: " +
+         ProxyTools.getShortClassName(EFSMConflictCheckerExperiments.class) +
          "<outputFilename>");
     }
   }
 
 
   //#########################################################################
-  //# Invocation
-  void runAllTests() throws Exception
+  //# Overrides for junit.framework.TestCase
+  @Override
+  protected void setUp() throws Exception
   {
-    efsmConflictChecker_sieve6();
+    super.setUp();
+    mPrintWriter = new PrintWriter(mOut, true);
+    mPrintWriter.println("InternalTransitionLimit," +
+                         mInternalTransitionLimit);
+    mPrintWriter.println("CompositionSelectionHeuristic," +
+                         mCompositionSelectionHeuristic);
+    mHasBeenPrinted = false;
+  }
+
+  @Override
+  protected void tearDown() throws Exception
+  {
+    mPrintWriter.close();
+    mOut.close();
+    System.out.println("All experiments complete");
+    super.tearDown();
   }
 
 
   //#########################################################################
-  //# Models
-  // Central locking
-  private void efsmConflictChecker_sieve6() throws Exception
+  //# Overrides for net.sourceforge.waters.analysis.efsm.EFSMConflictCheckerTest
+  @Override
+  boolean checkConflict(final ModuleProxy module,
+                        final List<ParameterBindingProxy> bindings,
+                        final boolean expected)
+    throws EvalException, AnalysisException
   {
-    runModel("efa", "prime_sieve6.wmod");
+    final String name = module.getName();
+    printAndLog("Running " + name + " with " +
+                mCompositionSelectionHeuristic + " ...");
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final EFSMConflictChecker conflictChecker =
+      new EFSMConflictChecker(module, factory);
+    configure(conflictChecker);
+    conflictChecker.setBindings(bindings);
+    try {
+      return conflictChecker.run();
+    } catch (final AnalysisException exception) {
+      mPrintWriter.println(name + "," + exception.getMessage());
+      return false;
+    } finally {
+      final EFSMConflictCheckerAnalysisResult stats =
+        conflictChecker.getAnalysisResult();
+      if (!mHasBeenPrinted) {
+        mHasBeenPrinted = true;
+        mPrintWriter.print("Model,");
+        stats.printCSVHorizontalHeadings(mPrintWriter);
+        mPrintWriter.println();
+      }
+      mPrintWriter.print(name);
+      mPrintWriter.print(',');
+      stats.printCSVHorizontal(mPrintWriter);
+      mPrintWriter.println();
+    }
   }
 
-
-  @SuppressWarnings("unused")
-  private void synthesisTransferline(final int n) throws Exception
+  @Override
+  void configure(final EFSMConflictChecker checker)
   {
-    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
-    final IntConstantProxy expr = factory.createIntConstantProxy(n);
-    final ParameterBindingProxy binding =
-      factory.createParameterBindingProxy("N", expr);
-    final List<ParameterBindingProxy> bindings =
-      Collections.singletonList(binding);
-    final long start = System.currentTimeMillis();
-    runModel("handwritten", null, "transferline_uncont.wmod", bindings);
-    final long stop = System.currentTimeMillis();
-    @SuppressWarnings("resource")
-    final Formatter formatter = new Formatter(System.out);
-    final float difftime = 0.001f * (stop - start);
-    formatter.format("%.3f s\n", difftime);
+    // final int internalStateLimit = 5000;
+    // mConflictChecker.setInternalStateLimit(internalStateLimit);
+    checker.setInternalTransitionLimit(mInternalTransitionLimit);
+    // final int finalStateLimit = 2000000;
+    // mConflictChecker.setMonolithicStateLimit(finalStateLimit);
+    if (mCompositionSelectionHeuristic != null) {
+      checker.setCompositionSelectionHeuristic(mCompositionSelectionHeuristic);
+    }
   }
 
 
@@ -248,11 +200,10 @@ public class EFSMConflictCheckerExperiments
 
   //#########################################################################
   //# Data Members
-  private final ModuleProxyFactory mModuleProxyFactory;
-  private EFSMConflictChecker mConflictChecker;
   private final FileOutputStream mOut;
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
 
+  private final int mInternalTransitionLimit = 1000000;
   private final CompositionSelectionHeuristic mCompositionSelectionHeuristic;
 }

@@ -4,7 +4,7 @@
     <ConstantAliasList>
         <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
             <ConstantAliasExpression>
-                <IntConstant Value="500"/>
+                <IntConstant Value="5"/>
             </ConstantAliasExpression>
         </ConstantAlias>
     </ConstantAliasList>

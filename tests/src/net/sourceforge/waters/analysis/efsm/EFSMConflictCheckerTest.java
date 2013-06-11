@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.efsm;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Test;
@@ -163,6 +164,12 @@ public class EFSMConflictCheckerTest
     checkConflict(module, true);
   }
 
+  public void testPhilosophers5()
+    throws IOException, WatersException
+  {
+    checkPhilosophers("dining_philosophers", 5, false);
+  }
+
   public void testTransferLine12()
     throws IOException, WatersException
   {
@@ -281,9 +288,24 @@ public class EFSMConflictCheckerTest
 
   //#########################################################################
   //# Parametrised Tests
-  private void checkTransferLine(final String name,
-                                 final int n, final int m,
-                                 final boolean expect)
+  void checkPhilosophers(final String name,
+                         final int n,
+                         final boolean expect)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy bindingN =
+      factory.createParameterBindingProxy("N", constN);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(bindingN);
+    final ModuleProxy module = loadModule("efa", name);
+    checkConflict(module, bindings, expect);
+  }
+
+  void checkTransferLine(final String name,
+                         final int n, final int m,
+                         final boolean expect)
     throws IOException, WatersException
   {
     final ModuleProxyFactory factory = getModuleProxyFactory();
@@ -311,16 +333,16 @@ public class EFSMConflictCheckerTest
 
   //#########################################################################
   //# Utilities
-  private boolean checkConflict(final ModuleProxy module,
-                                final boolean expected)
+  boolean checkConflict(final ModuleProxy module,
+                        final boolean expected)
     throws EvalException, AnalysisException
   {
     return checkConflict(module, null, expected);
   }
 
-  private boolean checkConflict(final ModuleProxy module,
-                                final List<ParameterBindingProxy> bindings,
-                                final boolean expected)
+  boolean checkConflict(final ModuleProxy module,
+                        final List<ParameterBindingProxy> bindings,
+                        final boolean expected)
     throws EvalException, AnalysisException
   {
     final ModuleProxyFactory factory = getModuleProxyFactory();
