@@ -248,6 +248,14 @@ public class EFSMConflictCheckerTest
     checkConflict(module, true);
   }
 
+  public void testCaseStudy()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("efa",  "caseStudy-original");
+    checkConflict(module, false);
+  }
+
   public void testPsl()
     throws IOException, WatersException
   {
@@ -270,14 +278,6 @@ public class EFSMConflictCheckerTest
     checkConflict(module, false);
   }
 
-
-  public void testCaseStudy()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("efa",  "caseStudy-original");
-    checkConflict(module, false);
-  }
 
   //#########################################################################
   //# Parametrised Tests

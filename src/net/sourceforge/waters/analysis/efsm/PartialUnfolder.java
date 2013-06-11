@@ -85,9 +85,10 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
   @Override
   public void tearDown()
   {
+    super.tearDown();
+    mSelfloops = null;
     mValueToClass = null;
     mClassToValue = null;
-    super.tearDown();
   }
 
   EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
@@ -149,7 +150,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       mPropagatorCalls = 0;
 
       final EFSMEventEncoding selfloops = mUnfoldedVariable.getSelfloops();
-      if (selfloops.size() > 0) {
+      if (selfloops.size() > 1) {
         // There are proper selfloop updates. These updates must be considered
         // as selfloops on every state of the unfolded EFSM. Create event IDs
         // for all selfloops and remember them in the list mSelfloops.
