@@ -55,7 +55,7 @@ public class BDDMonolithicEdges
 //        plantUncontrollableEdgesBackwardBDD = manager.getZeroBDD();
 //        specUncontrollableEdgesBackwardBDD = manager.getZeroBDD();
 
-        System.err.println("Start generating BDDs for forward transitions...");
+        //System.err.println("Start generating BDDs for forward transitions...");
 
         for (BDDExtendedAutomaton currAutomaton : bddExAutomata) {
 //            System.out.println(currAutomaton.getExAutomaton().getName());
@@ -83,9 +83,9 @@ public class BDDMonolithicEdges
         specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
         plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(bddExAutomata.uncontrollableEventsBDD);
 
-        System.err.println("Synchronizing actions...");
+        //System.err.println("Synchronizing actions...");
         BDD actionsBDD = synchronizedActions(bddExAutomata.forwardTransWhereVisUpdated, bddExAutomata.forwardTransAndNextValsForV);
-        System.err.println("Done.");
+        //System.err.println("Done.");
 
 
         edgesForwardBDD = edgesForwardBDD.and(actionsBDD);
@@ -153,11 +153,11 @@ public class BDDMonolithicEdges
         edgesBackwardWithEventsBDD = edgesBackwardBDD.id();
 
         edgesForwardBDD = edgesForwardBDD.exist(bddExAutomata.getEventVarSet());
-        System.err.println("BDD represeting forward edges without events is created.");
-        System.err.println("The number of nodes in the forward edge BDD: " + edgesForwardBDD.nodeCount());
+        //System.err.println("BDD represeting forward edges without events is created.");
+        //System.err.println("The number of nodes in the forward edge BDD: " + edgesForwardBDD.nodeCount());
         edgesBackwardBDD = edgesBackwardBDD.exist(bddExAutomata.getEventVarSet());
-        System.err.println("BDD represeting backward edges without events is created.");
-        System.err.println("The number of nodes in the backward edge BDD: " + edgesBackwardBDD.nodeCount());
+        //System.err.println("BDD represeting backward edges without events is created.");
+        //System.err.println("The number of nodes in the backward edge BDD: " + edgesBackwardBDD.nodeCount());
     }
 
     private BDD synchronizedActions(BDD[][] inTransWhereVisUpdated, BDD[][] inTransAndNextValsForV) {

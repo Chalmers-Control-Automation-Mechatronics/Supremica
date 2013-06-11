@@ -319,7 +319,14 @@ public abstract class BDDAbstractManager {
                 } else {
                     throw new IllegalArgumentException("Divisor is not constant");
                 }
+            }else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getTimesOperator())) {
+                final SupremicaBDDBitVector v2 = expr2BDDBitVec(bexpr.getRight(), false).getResult().copy();
+                if (v2.isConst()) {
+                    return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(), false).getResult().mulfixed(v2.val()), getZeroBDD());
                 } else {
+                    throw new IllegalArgumentException("Factor is not constant!");
+                }
+            } else {
                 throw new IllegalArgumentException(bexpr + ":" + bexpr.getOperator() + " is not known!");
             }
             //I have added the other operators to SupremicaBDDBitVector... they should be verified though.

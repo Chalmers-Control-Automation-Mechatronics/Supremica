@@ -16,22 +16,16 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  *
- * @author Sajed
- *
- * The class builds a set of EFAs (one location plus several self-loops, aka
- * flower structure).
- * The structure was firstly introduced in CASE11 authored by
- * Z. Fei, S. Miremadi and K. ?kesson.
+ * @author Sajed, Zhennan
  */
 
 public class FlowerEFABuilder {
 
     private int nbrOfJobs;
     private int nbrOfResources;
-
     private int[] resourceCapacities;
     private int[] nbrOfTransitionsForJob;
-    public static int[] nbrOfStagesForJob;
+    public  int[] nbrOfStagesForJob;
     private int[][][] demandAtStage;
     private int[][] maxInstancesAtStage;
 
@@ -39,21 +33,29 @@ public class FlowerEFABuilder {
     private Map<Integer, Set<Pair>> jobToTransitions;
     private Map<Integer, Set<Integer>> jobToInitialStages;
     private Map<Integer, Set<Integer>> jobToLastStages;
-
     public static String STAGE_PREFIX = "s";
     public static String RESOURCE_PREFIX = "r";
     public static String LOAD_EVENT_PREFIX = "load";
     public static String feasibleEquation = "";
-
     private ExtendedAutomata exAutomata;
     private final ModuleSubject module;
-
-    public FlowerEFABuilder (final File rasFile, final ModuleSubject module)
-    {
+    
+    /*public static List<TIntIntHashMap> jobStageToUsedResource;
+    
+    public static TIntObjectHashMap<String> resourceIndexToBlockEquation;
+    
+    public static HashMap<String, Integer> eventToResourceBlocked  = new HashMap<String, Integer>();
+    
+    public static TIntObjectHashMap<Set<String>> resourceToBlockedStageVars;*/
+    
+    public static HashMap<String, String> eventIndexToSourceStageVar 
+            = new HashMap<String, String>();
+    
+    public FlowerEFABuilder(final File rasFile, final ModuleSubject module) {
         this.module = module;
 
         BufferedReader br = null;
-        
+
         try {
             br = new BufferedReader(new FileReader(rasFile));
             nbrOfJobs = Integer.parseInt(br.readLine());
@@ -68,7 +70,8 @@ public class FlowerEFABuilder {
 
             resourceToUsedInStages = new HashMap<Integer, Set<Pair>>();
             resourceCapacities = new int[nbrOfResources];
-
+            
+            //jobStageToUsedResource = new ArrayList<TIntIntHashMap>(nbrOfJobs);
             StringTokenizer st = new StringTokenizer(br.readLine());
 
             int i = 0;
@@ -77,8 +80,9 @@ public class FlowerEFABuilder {
                 resourceCapacities[i++] = Integer.parseInt(st.nextToken());
             }
 
-            for (i = 0; i < nbrOfJobs; i++) {
+            for (i = 0; i < nbrOfJobs; i++) {           
                 nbrOfStagesForJob[i] = Integer.parseInt(br.readLine());
+                //TIntIntHashMap stageToResourceMap = new TIntIntHashMap(nbrOfStagesForJob[i]);
                 maxInstancesAtStage[i] = new int[nbrOfStagesForJob[i]];
 
                 demandAtStage[i] = new int[nbrOfStagesForJob[i]][];
@@ -105,6 +109,12 @@ public class FlowerEFABuilder {
 
                         demandAtStage[i][j][k] = nbrOfNeededResources;
                         resourceToUsedInStages.get(k).add(new Pair(i, j));
+                        
+                        // a stage could request two types of resources...
+                        // this is not used in the currecnt monolithic RAS implementation 
+                        /*if(demandAtStage[i][j][k] > 0) {
+                            stageToResourceMap.put(j, k);
+                        }*/
                         k++;
                     }
                 }
@@ -123,149 +133,189 @@ public class FlowerEFABuilder {
                 jobToTransitions.put(i, trans);
                 jobToInitialStages.put(i, initialStages);
                 jobToLastStages.put(i, lastStages);
-
+                //jobStageToUsedResource.add(stageToResourceMap);
             }
-            
+
             //Compute the equations the represents the feasible states in the model
             feasibleEquation = "";
-        for(i = 0; i < nbrOfResources; i++)
-        {
-            String resourceGuard = "";
-            for(final Pair jobStage:resourceToUsedInStages.get(i))
-            {
-                final String plus = resourceGuard.isEmpty() ? "(" : " + ";
-                if(demandAtStage[jobStage.p1][jobStage.p2][i] > 0 &&
-                        !jobToLastStages.get(jobStage.p1).contains(jobStage.p2))
-                {
-                    final String coefficient =
-                            demandAtStage[jobStage.p1][jobStage.p2][i] > 1 ?
-                                demandAtStage[jobStage.p1][jobStage.p2][i]+"*" :
-                                "";
-                    resourceGuard = resourceGuard + plus +
-                                    coefficient + STAGE_PREFIX +
-                                    jobStage.p1 + jobStage.p2;
+            //resourceIndexToBlockEquation = new TIntObjectHashMap<String>(nbrOfResources);
+            //resourceToBlockedStageVars = new TIntObjectHashMap<Set<String>>(nbrOfResources);
+
+            for (i = 0; i < nbrOfResources; i++) {
+                
+                //Set<String> blockedStageVars = new HashSet();
+                
+                String resourceGuard = "";
+                //String blockEquation = "";
+                for (final Pair jobStage : resourceToUsedInStages.get(i)) {
+                    if (demandAtStage[jobStage.p1][jobStage.p2][i] > 0
+                            && !jobToLastStages.get(jobStage.p1).contains(jobStage.p2)) {
+
+                        String stage = "";
+                        for (int k = 1; k <=  demandAtStage[jobStage.p1][jobStage.p2][i]; 
+                                                                                    k++){
+                            stage = stage + " + " + STAGE_PREFIX + jobStage.p1 + jobStage.p2;
+                        }
+                        
+                        resourceGuard = resourceGuard + stage;
+
+                        //blockEquation = blockEquation + stage;
+                        
+                        //blockedStageVars.add(STAGE_PREFIX + jobStage.p1 + jobStage.p2);
+                    }
                 }
-            }
 
-            if(!resourceGuard.isEmpty())
-            {
-                resourceGuard = resourceGuard + " + " + RESOURCE_PREFIX + i +
-                                ") == " + resourceCapacities[i];
-                final String and = feasibleEquation.isEmpty() ? "" : " & ";
-                feasibleEquation = feasibleEquation + and + resourceGuard;
-            }
+                if (!resourceGuard.isEmpty()) {
+                    resourceGuard = "(" + RESOURCE_PREFIX + i + resourceGuard 
+                            + ") == " + resourceCapacities[i];
+                    final String and = feasibleEquation.isEmpty() ? "" : " & ";
+                    feasibleEquation = feasibleEquation + and + resourceGuard;
+                }
 
-        }
-        } catch(IOException e) {
+                /*if (!blockEquation.isEmpty()) {
+                    blockEquation = blockEquation + " == " + resourceCapacities[i];
+                    resourceIndexToBlockEquation.put(i, blockEquation);
+                }*/
+                
+                //resourceToBlockedStageVars.put(i, blockedStageVars);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            try{
-                if(br != null) 
+            try {
+                if (br != null) {
                     br.close();
-            } catch(IOException e) {
+                }
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        System.err.println(feasibleEquation);
+        
+        //############################################
+        // Print out the feasiable equation
+        // System.err.println(feasibleEquation);
+        
+        /*resourceIndexToBlockEquation.forEachEntry(new TIntObjectProcedure<String>() {
+
+            public boolean execute(int i, String t) {
+                System.err.println("R"+i+" :"+t);
+                return true;
+            }
+        });
+        for (final TIntIntHashMap m: jobStageToUsedResource) {
+            m.forEachEntry(new TIntIntProcedure() {
+
+                public boolean execute(int stage, int resource) {
+                    System.err.println("S"+jobStageToUsedResource.indexOf(m)+stage
+                            +": R" + resource);
+                    return true;
+                }
+            });
+        }
+        
+        resourceToBlockedStageVars.forEachEntry(new TIntObjectProcedure<Set<String>>() {
+
+            public boolean execute(int re, Set<String> stageVars) {
+                System.err.print("R"+re+" : ");
+                for(String v: stageVars)
+                    System.err.print(v + " ");
+                System.err.println();
+                return true;
+            }
+        });*/
     }
 
-    public void buildEFA()
-    {
+    public void buildEFA() {
         exAutomata = new ExtendedAutomata(module);
         final ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
         module.getEventDeclListModifiable().add(
-                        factory.createEventDeclProxy(
-                                    factory.createSimpleIdentifierProxy(
-                                        EventDeclProxy.DEFAULT_MARKING_NAME),
-                                        EventKind.PROPOSITION));
+                factory.createEventDeclProxy(
+                factory.createSimpleIdentifierProxy(
+                EventDeclProxy.DEFAULT_MARKING_NAME),
+                EventKind.PROPOSITION));
 
         int i;
-        for(i = 0; i < nbrOfResources; i++)
-        {
-            exAutomata.addIntegerVariable(RESOURCE_PREFIX+i,
-                                          0,
-                                          resourceCapacities[i],
-                                          resourceCapacities[i],
-                                          resourceCapacities[i]);
+        for (i = 0; i < nbrOfResources; i++) {
+            exAutomata.addIntegerVariable(RESOURCE_PREFIX + i,
+                    0,
+                    resourceCapacities[i],
+                    resourceCapacities[i],
+                    resourceCapacities[i]);
         }
-        
-        for(i = 0; i < nbrOfJobs; i++)
-        {
+
+        for (i = 0; i < nbrOfJobs; i++) {
+            
+            //TIntIntHashMap stageToUsedResource = jobStageToUsedResource.get(i);
+            
             @SuppressWarnings("deprecation")
-            final
-            ExtendedAutomaton efa = new ExtendedAutomaton("Job"+i,
-                                                          exAutomata,
-                                                          true);
-            efa.addState("J"+i, false, true, false);
+            final ExtendedAutomaton efa = new ExtendedAutomaton("Job" + i,
+                    exAutomata,
+                    true);
+            efa.addState("J" + i, false, true, false);
 
-            exAutomata.addEvent(LOAD_EVENT_PREFIX+i);
+            exAutomata.addEvent(LOAD_EVENT_PREFIX + i);
 
-            for(final Integer init : jobToInitialStages.get(i))
-            {
-                final String targetStageVar = STAGE_PREFIX+i+init;
+            for (final Integer init : jobToInitialStages.get(i)) {
+                final String targetStageVar = STAGE_PREFIX + i + init;
 
                 String guard = "";
-                String action = targetStageVar+"+=1";;
+                String action = targetStageVar + "+=1";;
 
-                for(int r = 0; r < nbrOfResources; r++)
-                {
+                for (int r = 0; r < nbrOfResources; r++) {
                     final int targetDemand = demandAtStage[i][init][r];
-                    if(targetDemand > 0)
-                    {
-                        final String resourceVar = RESOURCE_PREFIX+r;
+                    if (targetDemand > 0) {
+                        final String resourceVar = RESOURCE_PREFIX + r;
                         final String and = guard.isEmpty() ? "" : " & ";
-                        guard = guard + and + resourceVar + ">=" +
-                                        targetDemand;
+                        guard = guard + and + resourceVar + ">="
+                                + targetDemand;
 
-                        action = action + ";" + resourceVar+ "-=" +
-                                                targetDemand + ";";
+                        action = action + ";" + resourceVar + "-="
+                                + targetDemand + ";";
                     }
 
                 }
 
-                efa.addTransition("J"+i,
-                                  "J"+i,
-                                  LOAD_EVENT_PREFIX+i+";",
-                                  guard,
-                                  action);
+                efa.addTransition("J" + i,
+                        "J" + i,
+                        LOAD_EVENT_PREFIX + i + ";",
+                        guard,
+                        action);
             }
 
-            for(final Pair tran:jobToTransitions.get(i))
-            {
+            for (final Pair tran : jobToTransitions.get(i)) {
                 String guard = "";
                 String action = "";
 
-                final String sourceStageVar = STAGE_PREFIX+i+tran.p1;
-                final String targetStageVar = STAGE_PREFIX+i+tran.p2;
+                final String sourceStageVar = STAGE_PREFIX + i + tran.p1;
+                final String targetStageVar = STAGE_PREFIX + i + tran.p2;
 
+                //int targerResource = stageToUsedResource.get(tran.p2); 
+                
                 action = sourceStageVar + "-=1";
-                if(!jobToLastStages.get(i).contains(tran.p2))
+                if (!jobToLastStages.get(i).contains(tran.p2)) {
                     action = action + ";" + targetStageVar + "+=1";
+                }
 
                 guard = sourceStageVar + ">0";
 
-                for(int r = 0; r < nbrOfResources; r++)
-                {
+                for (int r = 0; r < nbrOfResources; r++) {
                     final int sourceDemand = demandAtStage[i][tran.p1][r];
-                    if(sourceDemand > 0)
-                    {
-                        final String resourceVar = RESOURCE_PREFIX+r;
+                    if (sourceDemand > 0) {
+                        final String resourceVar = RESOURCE_PREFIX + r;
 
-                        action = action + ";" + resourceVar+ "+=" +
-                                          sourceDemand + ";";
+                        action = action + ";" + resourceVar + "+="
+                                + sourceDemand + ";";
                     }
 
                     final int targetDemand = demandAtStage[i][tran.p2][r];
-                    if(targetDemand > 0)
-                    {
-                        final String resourceVar = RESOURCE_PREFIX+r;
-                        guard = guard + " & " + resourceVar + ">=" +
-                                        targetDemand;
+                    if (targetDemand > 0) {
+                        final String resourceVar = RESOURCE_PREFIX + r;
+                        guard = guard + " & " + resourceVar + ">="
+                                + targetDemand;
 
-                        if(!jobToLastStages.get(i).contains(tran.p2))
-                        {
-                            action = action + ";" + resourceVar+"-=" +
-                                              targetDemand + ";";
+                        if (!jobToLastStages.get(i).contains(tran.p2)) {
+                            action = action + ";" + resourceVar + "-="
+                                    + targetDemand + ";";
                         }
                     }
 
@@ -273,36 +323,40 @@ public class FlowerEFABuilder {
 
 
                 exAutomata.addEvent(sourceStageVar + targetStageVar);
-                efa.addTransition("J"+i,
-                                  "J"+i,
-                                  (sourceStageVar + targetStageVar)+";",
-                                  guard,
-                                  action);
+                efa.addTransition("J" + i,
+                        "J" + i,
+                        (sourceStageVar + targetStageVar) + ";",
+                        guard,
+                        action);
+                
+                eventIndexToSourceStageVar.put(sourceStageVar+targetStageVar, sourceStageVar);
+                //eventToResourceBlocked.put(sourceStageVar+targetStageVar, targerResource);
             }
 
             exAutomata.addAutomaton(efa);
 
-            for(int j = 0; j < nbrOfStagesForJob[i]-1; j++)
-            {
-                exAutomata.addIntegerVariable(STAGE_PREFIX+i+j,
-                                              0,
-                                              maxInstancesAtStage[i][j],
-                                              0,
-                                              0);
+            for (int j = 0; j < nbrOfStagesForJob[i] - 1; j++) {
+                exAutomata.addIntegerVariable(STAGE_PREFIX + i + j,
+                        0,
+                        maxInstancesAtStage[i][j],
+                        0,
+                        0);
             }
         }
-        
+
+        /*for(Map.Entry<String, Integer> entry: eventToResourceBlocked.entrySet()) {
+            System.err.println(entry.getKey() + " R" + entry.getValue());
+        }*/
     }
 
-    class Pair
-    {
+    class Pair {
+
         private final int p1;
         private final int p2;
-        Pair(final int p1, final int p2)
-        {
+
+        Pair(final int p1, final int p2) {
             this.p1 = p1;
             this.p2 = p2;
         }
-
     }
 }

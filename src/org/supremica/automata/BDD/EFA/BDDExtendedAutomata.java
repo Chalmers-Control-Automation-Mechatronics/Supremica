@@ -70,9 +70,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     private BDDVarSet sourceStagesVarSet = null;
     private BDDVarSet sourceResourceVarSet = null;
     private BDDVarSet destResourceVarSet = null;
-    TIntObjectHashMap<List<VariableComponentProxy>> jobID2StageVars;
-    BDDVarSet[][] jobStageVarSet;
-    HashMap<VariableComponentProxy, BDDVarSet> stageVar2BDDVarSetMap;
+    HashMap<VariableComponentProxy, BDDVarSet> stageVar2BDDTempVarSetMap;
     public BDD loadEventsBDD = null;
     
     //Related to all variables including regular variables and clocks
@@ -226,16 +224,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             optVarName = options.getOptVaribale();
         }
         
-        if (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MINIMALITY) {
-            stageVar2BDDVarSetMap = new HashMap<VariableComponentProxy, BDDVarSet>();
-            jobID2StageVars = new TIntObjectHashMap<List<VariableComponentProxy>>(orgExAutomata.size());
+        stageVar2BDDTempVarSetMap = new HashMap<VariableComponentProxy, BDDVarSet>();
 
-            jobStageVarSet = new BDDVarSet[orgExAutomata.size()][];
-            for (int i = 0; i < orgExAutomata.size(); i++) {
-                jobStageVarSet[i] = new BDDVarSet[FlowerEFABuilder.nbrOfStagesForJob[i] - 1];
-            }
-        }
-        
         initialize();
     }
 
@@ -383,7 +373,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             if (obj instanceof ExtendedAutomaton) {
                 final String automatonName = ((ExtendedAutomaton) obj).getName();
 
-                System.err.println(automatonName);
+                //System.err.println(automatonName);
                 final int autIndex = theIndexMap.getExAutomatonIndex(automatonName);
                 final int nbrOfStates = ((ExtendedAutomaton) obj).nbrOfNodes();
                 final BDDDomain tempLocationDomain = manager.createDomain(nbrOfStates);
@@ -397,11 +387,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                     bddVar2AutVarName.put(sourceVars[i], automatonName);
                 }
 
-                System.err.println("sourceLocation variables: " + sourceLocationDomain.set().toString());
+                //System.err.println("sourceLocation variables: " + sourceLocationDomain.set().toString());
                 final BDDDomain destLocationDomain = manager.createDomain(nbrOfStates);
                 numberOfUsedBDDVariables += destLocationDomain.varNum();
 
-                System.err.println("destLocation variables: " + destLocationDomain.set().toString());
+                //System.err.println("destLocation variables: " + destLocationDomain.set().toString());
 
                 sourceLocationVarSet.unionWith(sourceLocationDomain.set());
                 destLocationVarSet.unionWith(destLocationDomain.set());
@@ -449,9 +439,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             }
         }
 
-        for (final EventDeclProxy event : unionAlphabet) {
+        /*for (final EventDeclProxy event : unionAlphabet) {
             System.err.println(event.getName() + " index: " + theIndexMap.getEventIndex(event));
-        }
+        }*/
 
 
         initValuesBDD = manager.getOneBDD();
@@ -516,37 +506,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             parAlgoWorker = getParAlgoWorker();
         }
         
-        if (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MINIMALITY) {
-            List<VariableComponentProxy> stageVarList = orgExAutomata.getStageVars();
-            int svIndex = 0;
-            int accJobSize = 0;
-            for (int jIndex = 0; jIndex < orgExAutomata.size(); jIndex++) {
-
-                int jStageSize = jobStageVarSet[jIndex].length;
-
-                while (svIndex - accJobSize < jStageSize) {
-
-                    VariableComponentProxy var = stageVarList.get(svIndex);
-
-                    List<VariableComponentProxy> s = null;
-
-                    if (!jobID2StageVars.containsKey(jIndex)) {
-                        s = new ArrayList<VariableComponentProxy>();
-                    } else {
-                        s = jobID2StageVars.get(jIndex);
-                    }
-
-                    s.add(var);
-                    jobID2StageVars.put(jIndex, s);
-
-                    jobStageVarSet[jIndex][svIndex - accJobSize] = stageVar2BDDVarSetMap.get(var);
-
-                    svIndex++;
-                }
-
-                accJobSize += jStageSize;
-            }
-        }      
         computeMarkedValues();
 
 //                try
@@ -662,15 +621,15 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         final String varName = var.getName();
         final int varIndex = theIndexMap.getVariableIndex(var);
 
-        System.err.println("variable name: " + varName);
+        //System.err.println("variable name: " + varName);
 //        int domain = orgExAutomata.getDomain();
         final int domain = orgExAutomata.getVarDomain(varName);
 
         if (orgExAutomata.getClocks().contains(var)) {
             tempClockDomains1[varIndex] = manager.createDomain(orgExAutomata.getLargestClockDomain() * 2);
-            System.err.println("tempClock1 variables: " + tempClockDomains1[varIndex].set().toString());
+            //System.err.println("tempClock1 variables: " + tempClockDomains1[varIndex].set().toString());
             tempClockDomains2[varIndex] = manager.createDomain(orgExAutomata.getLargestClockDomain() * 2);
-            System.err.println("tempClock2 variables: " + tempClockDomains2[varIndex].set().toString());
+            //System.err.println("tempClock2 variables: " + tempClockDomains2[varIndex].set().toString());
         }
 
         final BDDDomain tempDomain = manager.createDomain(domain);
@@ -681,16 +640,16 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        int[] reversedTempVarOrdering = manager.partialReverseVarOrdering(tempDomain.vars());
 //        reversedTempVarOrderings.put(varIndex, new TIntArrayList(reversedTempVarOrdering));
         tempVarDomains[varIndex] = tempDomain;
-        System.err.println("tempVar variables: " + tempDomain.set().toString());
+        //System.err.println("tempVar variables: " + tempDomain.set().toString());
         
-        tempVariablesVarSet.unionWith(tempDomain.set());
+        tempVariablesVarSet = tempVariablesVarSet.union(tempDomain.set());
 
         final BDDDomain sourceDomain = manager.createDomain(domain);
         //manager.getFactory().buildCube(1, sourceDomain.vars()).printDot();
         variableToMinSourceBDDVar.put(varName, sourceDomain.vars()[0]);
 //        int[] reversedSourceVarOrdering = manager.partialReverseVarOrdering(sourceDomain.vars());
 //        reversedSourceVarOrderings.put(varIndex, new TIntArrayList(reversedSourceVarOrdering));
-        System.err.println("sourceVar variables: " + sourceDomain.set().toString());
+        //System.err.println("sourceVar variables: " + sourceDomain.set().toString());
         
         numberOfUsedBDDVariables += sourceDomain.varNum();
 
@@ -721,14 +680,14 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         if (orgExAutomata.getStageVars().contains(var)) {
             sourceStagesVarSet.unionWith(sourceDomain.set());
-            stageVar2BDDVarSetMap.put(var, sourceDomain.set());
+            stageVar2BDDTempVarSetMap.put(var, tempDomain.set());
         } else {
             sourceResourceVarSet.unionWith(sourceDomain.set());
             destResourceVarSet.unionWith(destDomain.set());
         }
 
         numberOfUsedBDDVariables += destDomain.varNum();
-        System.err.println("destVar variables: " + destDomain.set().toString());
+        //System.err.println("destVar variables: " + destDomain.set().toString());
         BDDBitVecTargetVarsMap.put(theIndexMap.getVariableIndex(var),
                 manager.createSupremicaBDDBitVector(BDDBitVectoryType,
                 orgExAutomata.getMinValueofVar(varName) < 0,
@@ -1335,14 +1294,15 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        System.err.println("compute reachable states --- begin");
 //        computeReachableStates();
 //        System.err.println("compute reachable states --- end");
-        final BDD unsafeStates = manager.uComputeUnsafeStates();
+        final BDD unsafeStates = manager.computeUnsafeStates();
 
 //        unsafeStates.printDot();
 
         //       final IDD idd = generateIDD(unsafeStates, unsafeStates);
         // printDOT(idd);
         nbrOfUnsafeStates = (long) unsafeStates.satCount(sourceStagesVarSet);
-        System.err.println("Number of unsafe states: " + nbrOfUnsafeStates);
+        //System.err.println();
+        //System.err.println("Complete! Number of minimal unsafe states: " + nbrOfUnsafeStates);
 
         return unsafeStates;
     }
