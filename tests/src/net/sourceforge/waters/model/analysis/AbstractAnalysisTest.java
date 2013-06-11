@@ -87,8 +87,10 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
       final String name = names[i];
       dir = new File(dir, name);
     }
-    final String extname =
-      names[numDirs] + mModuleMarshaller.getDefaultExtension();
+    String extname = names[numDirs];
+    if (extname.indexOf('.') < 0) {
+      extname += mModuleMarshaller.getDefaultExtension();
+    }
     final File filename = new File(dir, extname);
     return loadModule(filename);
   }
@@ -326,6 +328,21 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     final String modname = basename + modext;
     final File modfilename = new File(dir, modname);
     mDocumentManager.saveAs(module, modfilename);
+  }
+
+  protected void saveModule(final ModuleProxy module, final String basename)
+    throws WatersMarshalException, IOException, ParseException
+  {
+    assertNotNull(module);
+    final String ext = mModuleMarshaller.getDefaultExtension();
+    final String filename = basename + ext;
+    assertTrue("File name '" + filename + "' contains colon, " +
+               "which does not work on all platforms!",
+               filename.indexOf(':') < 0);
+    final File dir = getOutputDirectory();
+    final File fullname = new File(dir, filename);
+    ensureParentDirectoryExists(fullname);
+    mDocumentManager.saveAs(module, fullname);
   }
 
   protected boolean isProductDESDeterministic()
