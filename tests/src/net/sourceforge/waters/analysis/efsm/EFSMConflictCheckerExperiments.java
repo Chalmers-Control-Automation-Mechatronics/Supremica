@@ -64,16 +64,49 @@ public class EFSMConflictCheckerExperiments
   //# Test Suite
   private void runAllTests() throws Exception
   {
+    testPrimeSieve4();
+    testPrimeSieve4b();
     testPrimeSieve6();
     testPrimeSieve7();
     testPrimeSieve8();
-    //checkPhilosophers("dining_philosophers", 1000, false);
+    testPslBig();
+    testPsl();
+    testPslWithResetTrans();
+    checkPhilosophers("dining_philosophers", 1000, false);
+    checkPhilosophers("dining_philosophers", 2000, false);
+    checkPhilosophers("dining_philosophers", 4000, false);
+    checkTransferLine("transferline_efsm", 500, 10, true);
     checkTransferLine("transferline_efsm", 1000, 10, true);
+    checkTransferLine("transferline_efsm", 2000, 10, true);
   }
 
 
   //#########################################################################
   //# Tests
+
+  private void testPrimeSieve4()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("efa", "prime_sieve4");
+    checkConflict(module, true);
+  }
+
+
+  private void testPrimeSieve4b()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("efa", "prime_sieve4b");
+    checkConflict(module, true);
+  }
+
+
+  private void testPrimeSieve6()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("efa", "prime_sieve6");
+    checkConflict(module, true);
+  }
+
   private void testPrimeSieve7()
     throws IOException, WatersException
   {
@@ -86,6 +119,42 @@ public class EFSMConflictCheckerExperiments
   {
     final ModuleProxy module = loadModule("efa", "prime_sieve8");
     checkConflict(module, true);
+  }
+
+  @Override
+  public void testPsl()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "psl");
+    checkConflict(module, false);
+  }
+
+
+  @Override
+  public void testPslBig()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "pslBig");
+    checkConflict(module, false);
+  }
+
+
+  @Override
+  public void testPslBigWithManyRestartTrans()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslBigWithManyRestartTrans");
+    checkConflict(module, false);
+  }
+
+  @Override
+  public void testPslWithResetTrans()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslWithResetTrans");
+    checkConflict(module, false);
   }
 
 

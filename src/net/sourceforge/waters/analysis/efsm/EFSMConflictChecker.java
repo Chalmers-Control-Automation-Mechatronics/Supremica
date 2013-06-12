@@ -171,6 +171,9 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       final EstimatedMinStatesVariableSelectionHeuristic minES =
         new EstimatedMinStatesVariableSelectionHeuristic(factory, mCompilerOperatorTable);
       defaultVariableSelectionHeuristicList.add(minES);
+      final VariableOccurenceStatesVariableSelectionHeuristic maxOc =
+        new VariableOccurenceStatesVariableSelectionHeuristic(factory, mCompilerOperatorTable);
+      defaultVariableSelectionHeuristicList.add(maxOc);
       mChainVariableSelectionHeuristic=
         new ChainVariableSelectionHeuristic
         (factory, mCompilerOperatorTable, defaultVariableSelectionHeuristicList);

@@ -59,6 +59,8 @@ public class EFSMConflictCheckerTest
 
   //#########################################################################
   //# Successful Test Cases using EFA
+
+  /*
   public void testEFSMCompiler1()
     throws IOException, WatersException
   {
@@ -270,7 +272,7 @@ public class EFSMConflictCheckerTest
       loadModule("efa",  "caseStudy-original");
     checkConflict(module, false);
   }
-
+*/
   public void testPsl()
     throws IOException, WatersException
   {
@@ -290,6 +292,14 @@ public class EFSMConflictCheckerTest
   {
     final ModuleProxy module =
       loadModule("tests", "psl", "pslBigWithManyRestartTrans");
+    checkConflict(module, false);
+  }
+
+  public void testPslWithResetTrans()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslWithResetTrans");
     checkConflict(module, false);
   }
 
