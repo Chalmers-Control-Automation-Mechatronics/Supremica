@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.efsm;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -94,9 +95,26 @@ class EFSMEventEncoding
 
 
   //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringBuffer buffer = new StringBuffer();
+    final int e = 0;
+    for (final ConstraintList update : mUpdateList) {
+      buffer.append(e);
+      buffer.append(" : ");
+      buffer.append(update);
+      buffer.append("\n");
+    }
+    return buffer.toString();
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final TObjectIntHashMap<ConstraintList> mEventMap;
-  private final ArrayList<ConstraintList> mUpdateList;
+  private final List<ConstraintList> mUpdateList;
 
   private static final int DEFAULT_SIZE = 16;
 }

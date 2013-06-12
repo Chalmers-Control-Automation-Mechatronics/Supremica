@@ -164,6 +164,14 @@ public class EFSMConflictCheckerTest
     checkConflict(module, true);
   }
 
+  public void testEFSMConflict3()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "conflict03");
+    checkConflict(module, false);
+  }
+
+
   public void testPhilosophers5()
     throws IOException, WatersException
   {

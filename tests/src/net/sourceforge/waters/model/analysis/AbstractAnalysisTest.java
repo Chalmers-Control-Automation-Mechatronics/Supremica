@@ -78,35 +78,29 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   //#########################################################################
   //# Compiling
-  protected ModuleProxy loadModule(final String... names)
+  protected ModuleProxy loadModule(final String... path)
     throws IOException, WatersException
   {
     File dir = getWatersInputRoot();
-    final int numDirs = names.length - 1;
+    final int numDirs = path.length - 1;
     for (int i = 0; i < numDirs; i++) {
-      final String name = names[i];
+      final String name = path[i];
       dir = new File(dir, name);
     }
-    String extname = names[numDirs];
+    String extname = path[numDirs];
     if (extname.indexOf('.') < 0) {
       extname += mModuleMarshaller.getDefaultExtension();
     }
     final File filename = new File(dir, extname);
-    return loadModule(filename);
-  }
-
-  protected ModuleProxy loadModule(final File filename)
-    throws IOException, WatersException
-  {
     final URI uri = filename.toURI();
     return mModuleMarshaller.unmarshal(uri);
   }
 
 
-  protected ProductDESProxy getCompiledDES(final String... names)
+  protected ProductDESProxy getCompiledDES(final String... path)
     throws Exception
   {
-    return getCompiledDESRaw(null, names);
+    return getCompiledDESRaw(null, path);
   }
 
   protected ProductDESProxy getCompiledDES
