@@ -61,6 +61,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.swing.AbstractListModel;
@@ -164,8 +165,8 @@ public class AutomatonExplorer
 
     public void initialize()
     {
-        final Image image = IconLoader.ICON_APPLICATION.getImage();
-        setIconImage(image);
+        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        setIconImages(images);
         stateViewer.initialize();
     }
 

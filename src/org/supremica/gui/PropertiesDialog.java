@@ -7,55 +7,6 @@
 //# $Id: 7817fa751ec6cc3623edb25997e9ff3d4899fff2 $
 //###########################################################################
 
-/*
- * Supremica Software License Agreement
- *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
- *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
- *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
- *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Knarrhogsgatan 10
- * SE-431 60 MOLNDAL
- * SWEDEN
- *
- * to discuss license terms. No cost evaluation licenses are
- * available.
- *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
- *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
- *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
- *
- * Supremica is owned and represented by KA.
- */
-
 package org.supremica.gui;
 
 import java.awt.BorderLayout;
@@ -187,6 +138,7 @@ public class PropertiesDialog
         setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
         addWindowListener(new WindowAdapter()
         {
+            @Override
             public void windowClosing(final WindowEvent e)
             {
                 doCancel();
@@ -225,6 +177,7 @@ public class PropertiesDialog
         owner.repaint();
     }
 
+    @Override
     public void setVisible(final boolean toVisible)
     {
         if (toVisible)
@@ -262,6 +215,7 @@ public class PropertiesDialog
         return true;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private void fillPropertyPanel(final PropertyType type,
                                    final JPanel panel)
     {
@@ -278,7 +232,7 @@ public class PropertiesDialog
           } else if (property instanceof DoubleProperty) {
             chooser = new DoubleChooser((DoubleProperty) property);
           } else if (property instanceof ObjectProperty) {
-            chooser = new StringChooser((ObjectProperty) property);
+            chooser = new ObjectPropertyChooser((ObjectProperty) property);
           } else if (property instanceof ColorProperty) {
             chooser = new ColorChooser((ColorProperty) property);
           } else {
@@ -330,21 +284,24 @@ public class PropertiesDialog
 
         BooleanChooser(final BooleanProperty property)
         {
-            super(property.getComment(), ((BooleanProperty) property).get());
+            super(property.getComment(), property.get());
             this.property = property;
         }
 
+        @Override
         public void setInConfig()
         {
             if (!property.isImmutable())
                 property.set(isSelected());
         }
 
+        @Override
         public void getFromConfig()
         {
             setSelected(property.get());
         }
 
+        @Override
         public String getLabel() { return getText(); }
     }
 
@@ -403,6 +360,7 @@ public class PropertiesDialog
                 text.addPropertyChangeListener(new PropertyChangeListener()
                 {
                     // If the text changes value, update the slider
+                    @Override
                     public void propertyChange(final PropertyChangeEvent e)
                     {
                         // Is the value being changed?
@@ -419,6 +377,7 @@ public class PropertiesDialog
                 slider.addChangeListener(new ChangeListener()
                 {
                     // If the slider changes state, update the text
+                    @Override
                     public void stateChanged(final ChangeEvent e)
                     {
                         slider.setValue((int) (Math.round((double) (slider.getValue()) / property.getTick()) * property.getTick()));
@@ -439,6 +398,7 @@ public class PropertiesDialog
             this.add(text);
         }
 
+        @Override
         public void setInConfig()
         {
             if (!property.isImmutable())
@@ -465,11 +425,13 @@ public class PropertiesDialog
             }
         }
 
+        @Override
         public void getFromConfig()
         {
             text.setText(""+property.get());
         }
 
+        @Override
         public String getLabel() {  return label.getText(); }
     }
 
@@ -510,6 +472,7 @@ public class PropertiesDialog
             this.add(text);
         }
 
+        @Override
         public void setInConfig()
         {
             if (!property.isImmutable())
@@ -529,82 +492,90 @@ public class PropertiesDialog
             }
         }
 
+        @Override
         public void getFromConfig()
         {
             text.setText(""+property.get());
         }
 
+        @Override
         public String getLabel() {  return label.getText(); }
     }
 
     /**
-     * Chooser for StringProperties. If the StringProperty has a set of legal values,
-     * this becomes a JComboBox with those as choices, otherwise this becomes an
-     * editable JTextField.
+     * Chooser for {@link ObjectProperty} items. If the property has a set of
+     * legal values, this becomes a {@link JComboBox} with those as choices,
+     * otherwise this becomes an editable JTextField.
      */
-    private class StringChooser
-        extends JPanel
-        implements Chooser
+    private class ObjectPropertyChooser<T> extends JPanel implements Chooser
     {
-        private static final long serialVersionUID = 1L;
 
-        private final ObjectProperty property;
-
-        private JTextField text = null;
-        private JComboBox<Object> selector = null;
-        private JLabel label = null;
-
-        StringChooser(final ObjectProperty property)
-        {
-            super();
-            this.property = property;
-            this.label = new JLabel(property.getComment());
-            this.add(label);
-
-            if (property.legalValues() == null)
-            {
-                text = new JTextField();
-                text.setColumns(Math.max(property.get().toString().length()+1,5));
-                this.add(text);
-            }
-            else
-            {
-                selector = new JComboBox<Object>(property.legalValues());
-                if (property.get() != null)
-                {
-                    selector.setSelectedItem(property.get());
-                }
-                this.add(selector);
-            }
+      //#####################################################################
+      //# Constructor
+      private ObjectPropertyChooser(final ObjectProperty<T> property)
+      {
+        mProperty = property;
+        mLabel = new JLabel(property.getComment());
+        add(mLabel);
+        if (property.getLegalValues() == null) {
+          mTextField = new JTextField();
+          mTextField.setColumns(Math.max(property.get().toString().length() + 1, 5));
+          this.add(mTextField);
+        } else {
+          mComboBox = new JComboBox<T>(property.getLegalValues());
+          if (property.get() != null) {
+            mComboBox.setSelectedItem(property.get());
+          }
+          this.add(mComboBox);
         }
+      }
 
-        public void setInConfig()
-        {
-            if (!property.isImmutable())
-            {
-                if (selector != null)
-                {
-                    if (selector.getSelectedItem() != null)
-                    {
-                        property.set(selector.getSelectedItem());
-                    }
-                }
-                else if (text != null)
-                {
-                    property.set(text.getText());
-                }
+      //#####################################################################
+      //# Interface org.supremica.gui.PropertiesDialog.Chooser
+      @Override
+      public void setInConfig()
+      {
+        if (!mProperty.isImmutable()) {
+          if (mComboBox != null) {
+            final Object selected = mComboBox.getSelectedItem();
+            if (selected != null &&
+                mProperty.getObjectClass().isAssignableFrom(selected.getClass())) {
+              @SuppressWarnings("unchecked")
+              final T value = (T) selected;
+              mProperty.setValue(value);
             }
+          } else if (mTextField != null) {
+            mProperty.set(mTextField.getText());
+          }
         }
+      }
 
-        public void getFromConfig()
-        {
-            if (text != null)
-                text.setText(property.getAsString());
-            else
-                selector.setSelectedItem(property.get());
+      @Override
+      public void getFromConfig()
+      {
+        if (mTextField != null) {
+          mTextField.setText(mProperty.getAsString());
+        } else {
+          mComboBox.setSelectedItem(mProperty.get());
         }
+      }
 
-        public String getLabel() {  return label.getText(); }
+      @Override
+      public String getLabel()
+      {
+        return mLabel.getText();
+      }
+
+      //#####################################################################
+      //# Data Members
+      private final ObjectProperty<T> mProperty;
+      private JTextField mTextField = null;
+      private JComboBox<T> mComboBox = null;
+      private JLabel mLabel = null;
+
+      //#####################################################################
+      //# Class Constants
+      private static final long serialVersionUID = 1L;
     }
 
 
@@ -640,6 +611,7 @@ public class PropertiesDialog
 
       //#####################################################################
       //# Interface org.supremica.properties.PropertiesDialog.Chooser
+      @Override
       public void setInConfig()
       {
         if (!mProperty.isImmutable()) {
@@ -648,12 +620,14 @@ public class PropertiesDialog
         }
       }
 
+      @Override
       public void getFromConfig()
       {
         final Color color = mProperty.get();
         setColor(color);
       }
 
+      @Override
       public String getLabel()
       {
         return mLabel.getText();
@@ -661,6 +635,7 @@ public class PropertiesDialog
 
       //#####################################################################
       //# Interface java.awt.event.ActionListener
+      @Override
       public void actionPerformed(final ActionEvent event)
       {
         final String title = "Choose " + mProperty.getComment();
@@ -761,6 +736,7 @@ class PropertiesControllerPanel
             this.dialog = dialog;
         }
 
+        @Override
         public void actionPerformed(final ActionEvent e)
         {
             dialog.setVisible(false);
@@ -857,6 +833,7 @@ class PropertiesControllerPanel
             return false; // did not find anything new on this tab
         }
 
+        @Override
         public void actionPerformed(final ActionEvent e)
         {
           // System.out.println("SearchAction.actionPerformed called, we are " + (searching ? "" : "not ") + "searching");
@@ -902,6 +879,7 @@ class PropertiesControllerPanel
             this.dialog = dialog;
         }
 
+        @Override
         public void actionPerformed(final ActionEvent e)
         {
             dialog.doApply();

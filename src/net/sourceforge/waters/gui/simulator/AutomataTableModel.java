@@ -168,7 +168,7 @@ class AutomataTableModel
         if (container.getSourceInfoMap().get(aut).getSourceObject().getClass() == VariableComponentSubject.class)
           row.add(IconLoader.ICON_VARIABLE);
         else
-          row.add(ModuleContext.getComponentKindIcon(aut.getKind(), false));
+          row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
         row.add(aut.getName());
         row.add(getSimulation().getAutomatonActivityIcon(aut));
         final StateProxy state = getSimulation().getCurrentState(aut);

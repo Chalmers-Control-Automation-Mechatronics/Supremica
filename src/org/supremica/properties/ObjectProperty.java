@@ -2,282 +2,229 @@
 //###########################################################################
 //# PROJECT: Supremica
 //# PACKAGE: org.supremica.properties
-//# CLASS:   StringProperty
+//# CLASS:   ObjectProperty
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-/*
- * Supremica Software License Agreement
- *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
- *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
- *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
- *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Knarrhogsgatan 10
- * SE-431 60 MOLNDAL
- * SWEDEN
- *
- * to discuss license terms. No cost evaluation licenses are
- * available.
- *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
- *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
- *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
- *
- * Supremica is owned and represented by KA.
- */
 package org.supremica.properties;
 
-public class ObjectProperty
-    extends Property
+public class ObjectProperty<T> extends Property
 {
-    private final String defaultValue;
-    private Object mValue;
-    private final Object[] legalValues;
 
-    public ObjectProperty(final PropertyType type, final String key, final Object value, final String comment)
-    {
-        this(type, key, value, comment, null);
+  //#########################################################################
+  //# Constructors
+  public ObjectProperty(final PropertyType type, final String key,
+                        final T value, final String comment)
+  {
+    this(type, key, value, comment, null);
+  }
+
+  public ObjectProperty(final PropertyType type, final String key,
+                        final T value, final String comment,
+                        final T[] legalValues)
+  {
+    this(type, key, value, comment, legalValues, false);
+  }
+
+  public ObjectProperty(final PropertyType type, final String key,
+                        final T value, final String comment,
+                        final T[] legalValues, final boolean immutable)
+  {
+    super(type, key, comment, immutable);
+    mDefaultValue = mValue = value;
+    mLegalValues = legalValues;
+  }
+
+
+  //#########################################################################
+  //# Overrides for org.supremica.properties.Property
+  @Override
+  public String getAsString()
+  {
+    return get().toString();
+  }
+
+  @Override
+  public void set(final String value)
+  {
+    final Object oldvalue = mValue;
+    setValue(parseObject(value));
+    firePropertyChanged(oldvalue.toString());
+  }
+
+  @Override
+  public String valueToEscapedString()
+  {
+    return ObjectProperty.convert(getAsString(), false);
+  }
+
+  @Override
+  public boolean currentValueDifferentFromDefaultValue()
+  {
+    return !mDefaultValue.equals(mValue);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public T get()
+  {
+    return mValue;
+  }
+
+  public void setValue(final T value)
+  {
+    if (mValue != value) {
+      checkValid(value);
+      checkMutable();
+      final String oldvalue = getAsString();
+      mValue = value;
+      firePropertyChanged(oldvalue);
     }
+  }
 
-    public ObjectProperty(final PropertyType type, final String key, final Object value, final String comment, final Object[] legalValues)
-    {
-        this(type, key, value, comment, legalValues, false);
+  public boolean isValid(final T value)
+  {
+    if (value == null) {
+      throw new IllegalArgumentException
+        ("null property values are not allowed!");
     }
-
-    public ObjectProperty(final PropertyType type, final String key, final Object value, final String comment, final Object[] legalValues, final boolean immutable)
-    {
-        super(type, key, comment, immutable);
-        this.defaultValue = value.toString();
-        mValue = value.toString();
-        this.legalValues = legalValues;
+    if (mLegalValues == null) {
+      return true;
     }
-
-    public Object get()
-    {
-        if (mValue instanceof String)
-            return parseObject((String) mValue);
-        else
-            return mValue;
+    for (int i = 0; i < mLegalValues.length; i++) {
+      if (value.equals(mLegalValues[i])) {
+        return true;
+      }
     }
+    return false;
+  }
 
-    public String getAsString()
-    {
-        return get().toString();
+  public void checkValid(final T value)
+  {
+    if (!isValid(value)) {
+      throw new IllegalArgumentException
+        ("Assigning illegal value to property " + getFullKey() + ": " +
+         value + "!");
     }
+  }
 
-    public void set(final String value)
-    {
-        final Object oldvalue = mValue;
-        set(parseObject(value));
-        firePropertyChanged(oldvalue.toString());
+  public T[] getLegalValues()
+  {
+    return mLegalValues;
+  }
+
+  public Class<?> getObjectClass()
+  {
+    return mDefaultValue.getClass();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Parses a String.
+   */
+  private T parseObject(final String value)
+  {
+    if (mLegalValues != null) {
+      for (final T object : mLegalValues) {
+        if (object.toString().equals(value)) {
+          return object;
+        }
+      }
+      return null;
+    } else {
+      @SuppressWarnings("unchecked")
+      final T object = (T) value;
+      return object;
     }
+  }
 
-    public void set(final Object value)
-    {
-      if (mValue != value) {
-        checkValid(value);
-        checkMutable();
-        final String oldvalue = getAsString();
-        mValue = value;
-        firePropertyChanged(oldvalue);
+
+  // ALL OF THIS IS COMING FROM THE JAVA SDK CODE (Properties.java)
+  private static String convert(final String theString,
+                                final boolean escapeSpace)
+  {
+    final int len = theString.length();
+    final StringBuffer outBuffer = new StringBuffer(len * 2);
+
+    for (int x = 0; x < len; x++) {
+      final char aChar = theString.charAt(x);
+
+      switch (aChar) {
+
+      case ' ':
+        if ((x == 0) || escapeSpace) {
+          outBuffer.append('\\');
+        }
+
+        outBuffer.append(' ');
+        break;
+
+      case '\\':
+        outBuffer.append('\\');
+        outBuffer.append('\\');
+        break;
+
+      case '\t':
+        outBuffer.append('\\');
+        outBuffer.append('t');
+        break;
+
+      case '\n':
+        outBuffer.append('\\');
+        outBuffer.append('n');
+        break;
+
+      case '\r':
+        outBuffer.append('\\');
+        outBuffer.append('r');
+        break;
+
+      case '\f':
+        outBuffer.append('\\');
+        outBuffer.append('f');
+        break;
+
+      default:
+        if ((aChar < 0x0020) || (aChar > 0x007e)) {
+          outBuffer.append('\\');
+          outBuffer.append('u');
+          outBuffer.append(toHex((aChar >> 12) & 0xF));
+          outBuffer.append(toHex((aChar >> 8) & 0xF));
+          outBuffer.append(toHex((aChar >> 4) & 0xF));
+          outBuffer.append(toHex(aChar & 0xF));
+        } else {
+          if (specialSaveChars.indexOf(aChar) != -1) {
+            outBuffer.append('\\');
+          }
+
+          outBuffer.append(aChar);
+        }
       }
     }
 
-    /**
-     * Parses a String.
-     */
-    private Object parseObject(final String value)
-    {
-        if (legalValues != null)
-        {
-            for (final Object object: legalValues)
-            {
-                if (object.toString().equals(value))
-                {
-                    return object;
-                }
-            }
-            return null;
-        }
-        else
-        {
-            return value;
-        }
-    }
+    return outBuffer.toString();
+  }
 
-    public boolean isValid(final Object value)
-    {
-        if (value == null)
-        {
-            throw new IllegalArgumentException("null strings are not allowed.");
-        }
-        if (legalValues == null)
-        {
-            return true;
-        }
-        for (int i = 0; i < legalValues.length; i++)
-        {
-            if (value.equals(legalValues[i]))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+  private static char toHex(final int nibble)
+  {
+    return hexDigit[(nibble & 0xF)];
+  }
 
-    public void checkValid(final Object value)
-    {
-        if (!isValid(value)) {
-            throw new IllegalArgumentException
-                ("Assigning illegal value to property " + getFullKey() +
-                 ": " + value + "!");
-        }
-    }
+  /** A table of hex digits */
+  private static final char[] hexDigit = {'0', '1', '2', '3', '4', '5', '6',
+                                          '7', '8', '9', 'A', 'B', 'C', 'D',
+                                          'E', 'F'};
+  private static final String specialSaveChars = "=: \t\r\n\f#!";
 
-    public Object[] legalValues()
-    {
-        return legalValues;
-    }
 
-    /*
-    public String[] legalValuesAsStrings()
-    {
-        String[] legalValuesAsStrings = new String[legalValues.length];
-        for (int i = 0; i < legalValues.length; i++)
-        {
-            legalValuesAsStrings[i] = legalValues[i].toString();
-        }
-        return legalValuesAsStrings;
-    }
-     */
+  //#########################################################################
+  //# Data Members
+  private final T mDefaultValue;
+  private final T[] mLegalValues;
+  private T mValue;
 
-    public String valueToEscapedString()
-    {
-        return ObjectProperty.convert(getAsString(), false);
-    }
-
-    public boolean currentValueDifferentFromDefaultValue()
-    {
-        return !defaultValue.equals(mValue);
-    }
-
-    // --------------------------------------------------------------
-    // ALL OF THIS IS COMING FROM THE JAVA SDK CODE (Properties.java)
-    private static char toHex(final int nibble)
-    {
-        return hexDigit[(nibble & 0xF)];
-    }
-
-    /** A table of hex digits */
-    private static final char[] hexDigit = { '0', '1', '2', '3', '4', '5',
-    '6', '7', '8', '9', 'A', 'B',
-    'C', 'D', 'E', 'F' };
-    @SuppressWarnings("unused")
-	private static final String keyValueSeparators = "=: \t\r\n\f";
-    @SuppressWarnings("unused")
-	private static final String strictKeyValueSeparators = "=:";
-    private static final String specialSaveChars = "=: \t\r\n\f#!";
-    @SuppressWarnings("unused")
-	private static final String whiteSpaceChars = " \t\r\n\f";
-
-    private static String convert(final String theString, final boolean escapeSpace)
-    {
-        final int len = theString.length();
-        final StringBuffer outBuffer = new StringBuffer(len * 2);
-
-        for (int x = 0; x < len; x++)
-        {
-            final char aChar = theString.charAt(x);
-
-            switch (aChar)
-            {
-
-                case ' ' :
-                    if ((x == 0) || escapeSpace)
-                    {
-                        outBuffer.append('\\');
-                    }
-
-                    outBuffer.append(' ');
-                    break;
-
-                case '\\' :
-                    outBuffer.append('\\');
-                    outBuffer.append('\\');
-                    break;
-
-                case '\t' :
-                    outBuffer.append('\\');
-                    outBuffer.append('t');
-                    break;
-
-                case '\n' :
-                    outBuffer.append('\\');
-                    outBuffer.append('n');
-                    break;
-
-                case '\r' :
-                    outBuffer.append('\\');
-                    outBuffer.append('r');
-                    break;
-
-                case '\f' :
-                    outBuffer.append('\\');
-                    outBuffer.append('f');
-                    break;
-
-                default :
-                    if ((aChar < 0x0020) || (aChar > 0x007e))
-                    {
-                        outBuffer.append('\\');
-                        outBuffer.append('u');
-                        outBuffer.append(toHex((aChar >> 12) & 0xF));
-                        outBuffer.append(toHex((aChar >> 8) & 0xF));
-                        outBuffer.append(toHex((aChar >> 4) & 0xF));
-                        outBuffer.append(toHex(aChar & 0xF));
-                    }
-                    else
-                    {
-                        if (specialSaveChars.indexOf(aChar) != -1)
-                        {
-                            outBuffer.append('\\');
-                        }
-
-                        outBuffer.append(aChar);
-                    }
-            }
-        }
-
-        return outBuffer.toString();
-    }
 }

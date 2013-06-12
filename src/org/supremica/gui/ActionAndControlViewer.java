@@ -58,6 +58,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -113,8 +114,8 @@ public class ActionAndControlViewer
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-        final Image image = IconLoader.ICON_APPLICATION.getImage();
-		setIconImage(image);
+        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        setIconImages(images);
 		initMenubar();
 		contentPane.add(thePanel, BorderLayout.CENTER);
 	}

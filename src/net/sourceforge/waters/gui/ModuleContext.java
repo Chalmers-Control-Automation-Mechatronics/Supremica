@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.util.IconLoader;
@@ -508,23 +509,43 @@ public class ModuleContext
    * Gets an icon to represent a component of the given kind.
    * @param kind    The type ({@link ComponentKind#PLANT}, etc.) of the
    *                component to be displayed.
-   * @param window  <CODE>true</CODE> if a small icon to be used for a frame
-   *                should be returned;
-   *                <CODE>false</CODE> for a standard icon in the configured
-   *                resolution.
    */
-  public static Icon getComponentKindIcon(final ComponentKind kind,
-                                          final boolean window)
+  public static Icon getComponentKindIcon(final ComponentKind kind)
   {
     switch (kind) {
     case PLANT:
-      return window ? IconLoader.ICON_WINDOW_PLANT : IconLoader.ICON_PLANT;
+      return IconLoader.ICON_PLANT;
     case PROPERTY:
-      return window ? IconLoader.ICON_WINDOW_PROPERTY : IconLoader.ICON_PROPERTY;
+      return IconLoader.ICON_PROPERTY;
     case SPEC:
-      return window ? IconLoader.ICON_WINDOW_SPEC : IconLoader.ICON_SPEC;
+      return IconLoader.ICON_SPEC;
     case SUPERVISOR:
-      return window ? IconLoader.ICON_WINDOW_SUPERVISOR : IconLoader.ICON_SUPERVISOR;
+      return IconLoader.ICON_SUPERVISOR;
+    default:
+      throw new IllegalArgumentException("Unknown component kind: " + kind
+                                         + "!");
+    }
+  }
+
+  /**
+   * Gets an icon list to represent a component of the given kind.
+   * This icon list can be used to set frame icons using the
+   * {@link java.awt.Window#setIconImages(List) setIconImages()}
+   * method.
+   * @param kind    The type ({@link ComponentKind#PLANT}, etc.) of the
+   *                component to be displayed.
+   */
+  public static List<ImageIcon> getComponentKindIconList(final ComponentKind kind)
+  {
+    switch (kind) {
+    case PLANT:
+      return IconLoader.ICONLIST_PLANT;
+    case PROPERTY:
+      return IconLoader.ICONLIST_PROPERTY;
+    case SPEC:
+      return IconLoader.ICONLIST_SPEC;
+    case SUPERVISOR:
+      return IconLoader.ICONLIST_SUPERVISOR;
     default:
       throw new IllegalArgumentException("Unknown component kind: " + kind
                                          + "!");
@@ -548,7 +569,7 @@ public class ModuleContext
         return IconLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
       }
     case PROPOSITION:
-      return IconLoader.ICON_PROPOSITION;
+      return PropositionIcon.getDefaultMarkedIcon();
     default:
       throw new IllegalArgumentException("Unknown event kind: " + event + "!");
     }
@@ -1138,7 +1159,7 @@ public class ModuleContext
     public Icon visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       final ComponentKind kind = comp.getKind();
-      return getComponentKindIcon(kind, false);
+      return getComponentKindIcon(kind);
     }
 
     @Override

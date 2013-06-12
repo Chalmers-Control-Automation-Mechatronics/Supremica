@@ -60,6 +60,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -222,8 +223,8 @@ public class SimulatorExecuter
 
     public void initialize()
     {
-        final Image image = IconLoader.ICON_APPLICATION.getImage();
-        setIconImage(image);
+        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        setIconImages(images);
         stateViewer.initialize();
     }
 

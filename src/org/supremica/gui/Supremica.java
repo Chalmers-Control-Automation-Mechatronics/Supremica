@@ -65,6 +65,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.help.CSH;
 import javax.swing.JFrame;
@@ -364,8 +365,8 @@ public class Supremica
 
     public void initialize()
     {
-        final Image image = IconLoader.ICON_APPLICATION.getImage();
-        setIconImage(image);
+        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        setIconImages(images);
         setVisible(true);
         splitPaneVertical.setDividerLocation(0.7);
 

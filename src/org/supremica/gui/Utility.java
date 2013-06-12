@@ -10,6 +10,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -56,8 +57,8 @@ public class Utility
     {
         frame.setSize(width, height);    // from Component
         frame.setLocation(getPosForCenter(new Dimension(width, height)));    // from Component
-        final Image image = IconLoader.ICON_APPLICATION.getImage();
-        frame.setIconImage(image);    // from Frame
+        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        frame.setIconImages(images);
     }
 
     public static void setupFrame(final JFrame frame, final Dimension dimension)

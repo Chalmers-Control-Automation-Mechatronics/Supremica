@@ -4,11 +4,11 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+
+import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.Plantifier;
-import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
@@ -31,15 +31,11 @@ public class AnalyzerPlantifyAction
     public AnalyzerPlantifyAction(final List<IDEAction> actionList)
     {
         super(actionList);
-
         setEditorActiveRequired(false);
         setAnalyzerActiveRequired(true);
-
         putValue(Action.NAME, "Plantify");
         putValue(Action.SHORT_DESCRIPTION, "Turns specifications and supervisors into plants");
-        //putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
-        //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/plant16.gif")));
+        putValue(Action.SMALL_ICON, IconLoader.ICON_PLANT);
     }
 
     @Override

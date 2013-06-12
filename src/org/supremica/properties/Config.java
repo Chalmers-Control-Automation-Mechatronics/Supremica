@@ -104,12 +104,12 @@ public final class Config
     // GENERAL_COMM_XMLRPC
     public static final BooleanProperty XML_RPC_ACTIVE = new BooleanProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcActive", false, "XML-RPC Active");
     public static final IntegerProperty XML_RPC_PORT = new IntegerProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcPort", 9112, "XML-RPC Port", false, 0);
-    public static final ObjectProperty XML_RPC_FILTER = new ObjectProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcFilter", "127.0.0.1", "XML-RPC Filter");
+    public static final ObjectProperty<String> XML_RPC_FILTER = new ObjectProperty<String>(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcFilter", "127.0.0.1", "XML-RPC Filter");
     public static final BooleanProperty XML_RPC_DEBUG = new BooleanProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcDebug", false, "XML-RPC Debug");
 
     // GUI_DOT
     public static final BooleanProperty DOT_USE = new BooleanProperty(PropertyType.GUI_DOT, "dotUse", true, "Use Dot");
-    public static final ObjectProperty DOT_EXECUTE_COMMAND = new ObjectProperty(PropertyType.GUI_DOT, "dotExecuteCommand", "dot", "Dot command");
+    public static final ObjectProperty<String> DOT_EXECUTE_COMMAND = new ObjectProperty<String>(PropertyType.GUI_DOT, "dotExecuteCommand", "dot", "Dot command");
     public static final IntegerProperty DOT_MAX_NBR_OF_STATES = new IntegerProperty(PropertyType.GUI_DOT, "dotMaxNbrOfStatesWithoutWarning", 100, "Max number of states without warning", false, 0);
     public static final BooleanProperty DOT_LEFT_TO_RIGHT = new BooleanProperty(PropertyType.GUI_DOT, "dotLeftToRight", false, "Layout from left to right, otherwise from top to bottom");
     public static final BooleanProperty DOT_WITH_STATE_LABELS = new BooleanProperty(PropertyType.GUI_DOT, "dotWithStateLabels", true, "Draw state names");
@@ -132,9 +132,9 @@ public final class Config
      */
     private static enum LOOKANDFEEL_LEGALVALUES {System, Metal, Motif, Windows, Mac, GTK};
     //private static final Object[] LOOKANDFEEL_LEGALVALUES2 = UIManager.getInstalledLookAndFeels(); // Won't work
-    public static final ObjectProperty GENERAL_LOOKANDFEEL  = new ObjectProperty(PropertyType.GENERAL, "generalLookAndFeel", LOOKANDFEEL_LEGALVALUES.System, "Look and feel (requires restart)", LOOKANDFEEL_LEGALVALUES.values());
-    public static final ObjectProperty GENERAL_STATE_SEPARATOR  = new ObjectProperty(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
-    public static final ObjectProperty GENERAL_STATELABEL_SEPARATOR  = new ObjectProperty(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
+    public static final ObjectProperty<LOOKANDFEEL_LEGALVALUES> GENERAL_LOOKANDFEEL  = new ObjectProperty<LOOKANDFEEL_LEGALVALUES>(PropertyType.GENERAL, "generalLookAndFeel", LOOKANDFEEL_LEGALVALUES.System, "Look and feel (requires restart)", LOOKANDFEEL_LEGALVALUES.values());
+    public static final ObjectProperty<String> GENERAL_STATE_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
+    public static final ObjectProperty<String> GENERAL_STATELABEL_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
     public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");
     public static final BooleanProperty GENERAL_STUDENT_VERSION = new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion", false, "Student version (requires restart)");
     public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms (requires restart)");
@@ -157,8 +157,8 @@ public final class Config
 			  false, "Verbose mode");
 
     // GENERAL_FILE
-    public static final ObjectProperty FILE_OPEN_PATH = new ObjectProperty(PropertyType.GENERAL_FILE, "fileOpenPath", LocalSystem.getHomeDirectory(), "Default file open path");
-    public static final ObjectProperty FILE_SAVE_PATH = new ObjectProperty(PropertyType.GENERAL_FILE, "fileSavePath", LocalSystem.getHomeDirectory(), "Default file save path");
+    public static final ObjectProperty<String> FILE_OPEN_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileOpenPath", LocalSystem.getHomeDirectory(), "Default file open path");
+    public static final ObjectProperty<String> FILE_SAVE_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileSavePath", LocalSystem.getHomeDirectory(), "Default file save path");
     public static final BooleanProperty FILE_ALLOW_OPEN = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowOpen", true, "Allow user to open file");
     public static final BooleanProperty FILE_ALLOW_SAVE = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowSave", true, "Allow user to save file");
     public static final BooleanProperty FILE_ALLOW_IMPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowImport", true, "Allow user to import file");
@@ -168,7 +168,7 @@ public final class Config
     // GENERAL_SOFTPLC
     public static final BooleanProperty INCLUDE_SOFTPLC = new BooleanProperty(PropertyType.GENERAL_SOFTPLC, "includeSoftPLC", false, "Include soft PLC");
     public static final IntegerProperty SOFTPLC_CYCLE_TIME = new IntegerProperty(PropertyType.GENERAL_SOFTPLC, "softplcCycleTime", 40, "SoftPLC Cycle time (ms)", false, 1);
-    public static final ObjectProperty SOFTPLC_INTERFACES = new ObjectProperty(PropertyType.GENERAL_SOFTPLC, "softplcInterfaces", "org.supremica.softplc.Simulator.BTSim", "Default interface");
+    public static final ObjectProperty<String> SOFTPLC_INTERFACES = new ObjectProperty<String>(PropertyType.GENERAL_SOFTPLC, "softplcInterfaces", "org.supremica.softplc.Simulator.BTSim", "Default interface");
 
     // GUI
     public static final BooleanProperty INCLUDE_EXTERNALTOOLS = new BooleanProperty(PropertyType.GUI, "includeExternalTools", true, "Include external tools");
@@ -190,15 +190,15 @@ public final class Config
               "Include RAS support");
 
     // GUI_EDITOR
-    public static final ObjectProperty GUI_EDITOR_ICONSET =
-      new ObjectProperty(PropertyType.GUI_EDITOR, "iconSet", "waters",
-                         "Icon set (requires restart)",
-                         new Object[] {"waters", "16x16", "20x20", "24x24"});
+    public static final ObjectProperty<String> GUI_EDITOR_ICONSET =
+      new ObjectProperty<String>(PropertyType.GUI_EDITOR, "iconSet", "supremica",
+                                 "Icon set (requires restart)",
+                                 new String[] {"supremica", "16x16", "20x20", "24x24"});
     public static final ColorProperty GUI_EDITOR_BACKGROUND_COLOR =
       new ColorProperty(PropertyType.GUI_EDITOR, "backgroundColor",
                         Color.WHITE, "Automaton background colour");
-    public static final ObjectProperty GUI_EDITOR_LAYOUT_MODE =
-      new ObjectProperty(PropertyType.GUI_EDITOR, "layoutMode",
+    public static final ObjectProperty<LAYOUT_MODE_LEGALVALUES> GUI_EDITOR_LAYOUT_MODE =
+      new ObjectProperty<LAYOUT_MODE_LEGALVALUES>(PropertyType.GUI_EDITOR, "layoutMode",
                          LAYOUT_MODE_LEGALVALUES.Default, "Layout mode",
                          LAYOUT_MODE_LEGALVALUES.values());
     public static final BooleanProperty GUI_EDITOR_DEFAULT_EMPTY_MODULE =
@@ -228,8 +228,8 @@ public final class Config
                           10000, "Maximum layout time", false, 0);
 
     // GUI_ANALYZER
-    public static final ObjectProperty GUI_ANALYZER_USED_FACTORY =
-      new ObjectProperty(PropertyType.GUI_ANALYZER, "guiAnalyzerUsedFactory",
+    public static final ObjectProperty<ModelVerifierFactoryLoader> GUI_ANALYZER_USED_FACTORY =
+      new ObjectProperty<ModelVerifierFactoryLoader>(PropertyType.GUI_ANALYZER, "guiAnalyzerUsedFactory",
                          ModelVerifierFactoryLoader.Monolithic,
                          "Model verifier factory used by Editor's Verify menu",
                          ModelVerifierFactoryLoader.values());
@@ -273,11 +273,11 @@ public final class Config
     public static final IntegerProperty SYNC_INITIAL_HASHTABLE_SIZE = new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncInitialHashtableSize", (1 << 14) - 1, "Initial hashtable size", false, 1);
     public static final BooleanProperty SYNC_EXPAND_HASHTABLE = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncExpandHashtable", true, "Expand hashtable");
     public static final IntegerProperty SYNC_NBR_OF_EXECUTERS = new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchNbrOfExecuters", 1, "Number of synchronization threads", false, 1);
-    public static final ObjectProperty SYNC_AUTOMATON_NAME_SEPARATOR = new ObjectProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchAutomatonNameSeparator", "||", "Automata name separator");
+    public static final ObjectProperty<String> SYNC_AUTOMATON_NAME_SEPARATOR = new ObjectProperty<String>(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchAutomatonNameSeparator", "||", "Automata name separator");
 
     // ALGORITHMS_VERIFICATION
-    public static final ObjectProperty VERIFY_VERIFICATION_TYPE = new ObjectProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyVerificationType", VerificationType.CONTROLLABILITY, "Default verificaton type", VerificationType.values());
-    public static final ObjectProperty VERIFY_ALGORITHM_TYPE  = new ObjectProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyAlgorithmType", VerificationAlgorithm.MODULAR, "Default verificaton algorithm", VerificationAlgorithm.values());
+    public static final ObjectProperty<VerificationType> VERIFY_VERIFICATION_TYPE = new ObjectProperty<VerificationType>(PropertyType.ALGORITHMS_VERIFICATION, "verifyVerificationType", VerificationType.CONTROLLABILITY, "Default verificaton type", VerificationType.values());
+    public static final ObjectProperty<VerificationAlgorithm> VERIFY_ALGORITHM_TYPE  = new ObjectProperty<VerificationAlgorithm>(PropertyType.ALGORITHMS_VERIFICATION, "verifyAlgorithmType", VerificationAlgorithm.MODULAR, "Default verificaton algorithm", VerificationAlgorithm.values());
     public static final IntegerProperty VERIFY_EXCLUSION_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyExclusionStateLimit", 1000, "Exclusion state limit", false, 1);
     public static final IntegerProperty VERIFY_REACHABILITY_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyReachabilityStateLimit", 1000, "Reachability state limit", false, 1);
     public static final BooleanProperty VERIFY_ONE_EVENT_AT_A_TIME = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyOneEventAtATime", false, "Verify one event at a time");
@@ -286,8 +286,8 @@ public final class Config
     public static final BooleanProperty VERIFY_SHOW_BAD_TRACE = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "showBadTrace", false, "Show trace to bad state");
 
     // ALGORITHMS_SYNTHESIS
-    public static final ObjectProperty SYNTHESIS_SYNTHESIS_TYPE = new ObjectProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", SynthesisType.NONBLOCKINGCONTROLLABLE, "Default synthesis type", SynthesisType.values());
-    public static final ObjectProperty SYNTHESIS_ALGORITHM_TYPE  = new ObjectProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisAlgorithmType", SynthesisAlgorithm.MONOLITHIC, "Default synthesis algorithm", SynthesisAlgorithm.values());
+    public static final ObjectProperty<SynthesisType> SYNTHESIS_SYNTHESIS_TYPE = new ObjectProperty<SynthesisType>(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", SynthesisType.NONBLOCKINGCONTROLLABLE, "Default synthesis type", SynthesisType.values());
+    public static final ObjectProperty<SynthesisAlgorithm> SYNTHESIS_ALGORITHM_TYPE  = new ObjectProperty<SynthesisAlgorithm>(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisAlgorithmType", SynthesisAlgorithm.MONOLITHIC, "Default synthesis algorithm", SynthesisAlgorithm.values());
     public static final BooleanProperty SYNTHESIS_PURGE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisPurge", true, "Remove forbidden states after synthesis"); // MF changed to true here
     public static final BooleanProperty SYNTHESIS_OPTIMIZE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisOptimize", false, "Try to remove supervisors that are not necessary");
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissive", true, "Synthesize a maximally permissive supervisor");
@@ -305,46 +305,45 @@ public final class Config
 	public static final BooleanProperty SYNTHESIS_SUP_AS_PLANT = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSupsAsPlants", false, "Consider supervisors as plants");
 
     // ALGORITHMS_MINIMIZATION
-    public static final ObjectProperty MINIMIZATION_EQUIVALENCE_RELATION = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationEquivalenceRelation", EquivalenceRelation.LANGUAGEEQUIVALENCE, "Default equivalence relation", EquivalenceRelation.values());
+    public static final ObjectProperty<EquivalenceRelation> MINIMIZATION_EQUIVALENCE_RELATION = new ObjectProperty<EquivalenceRelation>(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationEquivalenceRelation", EquivalenceRelation.LANGUAGEEQUIVALENCE, "Default equivalence relation", EquivalenceRelation.values());
     public static final BooleanProperty MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationAlsoMinimizeTransitions", true, "Minimize the number of transitions");
     public static final BooleanProperty MINIMIZATION_KEEP_ORIGINAL = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationKeepOriginal", true, "Keep original");
     public static final BooleanProperty MINIMIZATION_IGNORE_MARKING = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationIgnoreMarking", false, "Ignore marking");
-    public static final ObjectProperty MINIMIZATION_STRATEGY = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationStrategy", MinimizationStrategy.FewestTransitionsFirst, "Minimization strategy", MinimizationStrategy.values());
-    public static final ObjectProperty MINIMIZATION_HEURISTIC = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationHeuristic", MinimizationHeuristic.MostLocal, "Minimization heuristics", MinimizationHeuristic.values());
-    public static final ObjectProperty MINIMIZATION_SILENT_EVENT_NAME = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentEventName", "tau", "Silent event name");
-    public static final ObjectProperty MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
-    public static final ObjectProperty MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new ObjectProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
+    public static final ObjectProperty<MinimizationStrategy> MINIMIZATION_STRATEGY = new ObjectProperty<MinimizationStrategy>(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationStrategy", MinimizationStrategy.FewestTransitionsFirst, "Minimization strategy", MinimizationStrategy.values());
+    public static final ObjectProperty<MinimizationHeuristic> MINIMIZATION_HEURISTIC = new ObjectProperty<MinimizationHeuristic>(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationHeuristic", MinimizationHeuristic.MostLocal, "Minimization heuristics", MinimizationHeuristic.values());
+    public static final ObjectProperty<String> MINIMIZATION_SILENT_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentEventName", "tau", "Silent event name");
+    public static final ObjectProperty<String> MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
+    public static final ObjectProperty<String> MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
     // MF: This one below is purely experimental, remove in production code
     public static final BooleanProperty MINIMIZATION_USE_TAUEVENT_MAP = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationUseTaueventMap", true, "Use TauEvent map");
 
     // ALGORITHMS_BDD2
     // New BDD implementation using JavaBDD library
-    public static final ObjectProperty BDD2_BDDLIBRARY = new ObjectProperty(PropertyType.ALGORITHMS_BDD2, "libraryName", BDDLibraryType.JAVA, "Binary Decision Diagram Library", BDDLibraryType.values());
+    public static final ObjectProperty<BDDLibraryType> BDD2_BDDLIBRARY = new ObjectProperty<BDDLibraryType>(PropertyType.ALGORITHMS_BDD2, "libraryName", BDDLibraryType.JAVA, "Binary Decision Diagram Library", BDDLibraryType.values());
     public static final IntegerProperty BDD2_INITIALNODETABLESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "initialNodeTableSize", 1000000, "Initial node table size");
     public static final IntegerProperty BDD2_CACHESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "cacheSize", 100000, "Operation cache size");
     public static final IntegerProperty BDD2_MAXINCREASENODES = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "maxIncreaseNodes", 2500000, "Set maximum number of nodes by which to increase node table after a garbage collection.");
     public static final DoubleProperty BDD2_INCREASEFACTOR = new DoubleProperty(PropertyType.ALGORITHMS_BDD2, "increaseFactor", 2.0, "Set factor by which to increase node table after a garbage collection.", false, 0.0);
     public static final DoubleProperty BDD2_CACHERATIO = new DoubleProperty(PropertyType.ALGORITHMS_BDD2, "cacheRatio", 10.0, "Sets the cache ratio for the operator caches (#tablenodes/#cachenodes)", false, 0.0);
-    public static final ObjectProperty BDD2_PARTITIONING = new ObjectProperty(PropertyType.ALGORITHMS_BDD2, "partitioning", BDDPartitioningType.MONOLITHIC, "BDD transition partitioning", BDDPartitioningType.values());
+    public static final ObjectProperty<BDDPartitioningType> BDD2_PARTITIONING = new ObjectProperty<BDDPartitioningType>(PropertyType.ALGORITHMS_BDD2, "partitioning", BDDPartitioningType.MONOLITHIC, "BDD transition partitioning", BDDPartitioningType.values());
 
     // ALGORITHMS_BDD
     // Most of these are ugly integers in BDD.Options... but they have String representations here.
-    public static final ObjectProperty BDD_ALGORITHM = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddAlgorithm", Options.REACH_ALGO_NAMES[Options.algo_family], "Algorithm", Options.REACH_ALGO_NAMES);
-    public static final ObjectProperty BDD_SHOW_GROW = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddShowGrowth", Options.SHOW_GROW_NAMES[Options.show_grow], "Show growth", Options.SHOW_GROW_NAMES);
-    public static final ObjectProperty BDD_COUNT_ALGO = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddCountAlgorithm", Options.COUNT_ALGO_NAMES[Options.count_algo], "Count algorithm", Options.COUNT_ALGO_NAMES);
-    public static final ObjectProperty BDD_LI_ALGO = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddLanguageInclusionAlgorithm", Options.INCLUSION_ALGORITHM_NAMES[Options.inclusion_algorithm], "Inclusion algorithm", Options.INCLUSION_ALGORITHM_NAMES);
-    public static final ObjectProperty BDD_ORDER_ALGO = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddAutomataOrderingAlgorithm", Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], "Automata ordering algorithm", Options.ORDERING_ALGORITHM_NAMES);
-    public static final ObjectProperty BDD_ORDERING_FORCE_COST = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddOrderingForceCost", Options.FORCE_TYPE_NAMES[Options.ordering_force_cost], "Ordering force cost", Options.FORCE_TYPE_NAMES);
-    public static final ObjectProperty BDD_AS_HEURISTIC = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddAutomataSelectionHeuristics", Options.AS_HEURISTIC_NAMES[Options.as_heuristics], "Automata selection heuristics", Options.AS_HEURISTIC_NAMES);
-    public static final ObjectProperty BDD_FRONTIER_TYPE = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddFrontierType", Options.FRONTIER_STRATEGY_NAMES[Options.frontier_strategy], "Frontier strategy", Options.FRONTIER_STRATEGY_NAMES);
-    public static final ObjectProperty BDD_H1 = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddH1", Options.ES_HEURISTIC_NAMES[Options.es_heuristics], "ES Heuristics", Options.ES_HEURISTIC_NAMES);
-    public static final ObjectProperty BDD_H2 = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddH2", Options.NDAS_HEURISTIC_NAMES[Options.ndas_heuristics], "NDAS Heuristics", Options.NDAS_HEURISTIC_NAMES);
-    public static final ObjectProperty BDD_DSSI_HEURISTIC = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddDelayedStarSelection", Options.DSSI_HEURISTIC_NAMES[Options.dssi_heuristics], "DSSI heuristics", Options.DSSI_HEURISTIC_NAMES);
-    public static final ObjectProperty BDD_ENCODING_ALGO = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddStateEncodingAlgorithm", Options.ENCODING_NAMES[Options.encoding_algorithm], "Encoding algorithm", Options.ENCODING_NAMES);
-    public static final ObjectProperty BDD_SUP_REACHABILITY = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddSupReachability", Options.SUP_REACHABILITY_NAMES[Options.sup_reachability_type], "Supervisor Reachability Type", Options.SUP_REACHABILITY_NAMES);
-    public static final ObjectProperty BDD_DISJ_OPTIMIZER_ALGO = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddDisjOptimizerAlgo", Options.DISJ_OPTIMIZER_NAMES[Options.disj_optimizer_algo], "Disjunctive optimizer algorithm", Options.DISJ_OPTIMIZER_NAMES);
-    public static final ObjectProperty BDD_TRANSITION_OPTIMIZER_ALGO = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddTransitionOptimizerAlgo", Options.TRANSITION_OPTIMIZER_NAMES[Options.transition_optimizer_algo], "Transition optimizer algorithm", Options.TRANSITION_OPTIMIZER_NAMES);
-    // This really is an IntegerProperty!!
+    public static final ObjectProperty<String> BDD_ALGORITHM = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddAlgorithm", Options.REACH_ALGO_NAMES[Options.algo_family], "Algorithm", Options.REACH_ALGO_NAMES);
+    public static final ObjectProperty<String> BDD_SHOW_GROW = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddShowGrowth", Options.SHOW_GROW_NAMES[Options.show_grow], "Show growth", Options.SHOW_GROW_NAMES);
+    public static final ObjectProperty<String> BDD_COUNT_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddCountAlgorithm", Options.COUNT_ALGO_NAMES[Options.count_algo], "Count algorithm", Options.COUNT_ALGO_NAMES);
+    public static final ObjectProperty<String> BDD_LI_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddLanguageInclusionAlgorithm", Options.INCLUSION_ALGORITHM_NAMES[Options.inclusion_algorithm], "Inclusion algorithm", Options.INCLUSION_ALGORITHM_NAMES);
+    public static final ObjectProperty<String> BDD_ORDER_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddAutomataOrderingAlgorithm", Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], "Automata ordering algorithm", Options.ORDERING_ALGORITHM_NAMES);
+    public static final ObjectProperty<String> BDD_ORDERING_FORCE_COST = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddOrderingForceCost", Options.FORCE_TYPE_NAMES[Options.ordering_force_cost], "Ordering force cost", Options.FORCE_TYPE_NAMES);
+    public static final ObjectProperty<String> BDD_AS_HEURISTIC = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddAutomataSelectionHeuristics", Options.AS_HEURISTIC_NAMES[Options.as_heuristics], "Automata selection heuristics", Options.AS_HEURISTIC_NAMES);
+    public static final ObjectProperty<String> BDD_FRONTIER_TYPE = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddFrontierType", Options.FRONTIER_STRATEGY_NAMES[Options.frontier_strategy], "Frontier strategy", Options.FRONTIER_STRATEGY_NAMES);
+    public static final ObjectProperty<String> BDD_H1 = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddH1", Options.ES_HEURISTIC_NAMES[Options.es_heuristics], "ES Heuristics", Options.ES_HEURISTIC_NAMES);
+    public static final ObjectProperty<String> BDD_H2 = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddH2", Options.NDAS_HEURISTIC_NAMES[Options.ndas_heuristics], "NDAS Heuristics", Options.NDAS_HEURISTIC_NAMES);
+    public static final ObjectProperty<String> BDD_DSSI_HEURISTIC = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddDelayedStarSelection", Options.DSSI_HEURISTIC_NAMES[Options.dssi_heuristics], "DSSI heuristics", Options.DSSI_HEURISTIC_NAMES);
+    public static final ObjectProperty<String> BDD_ENCODING_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddStateEncodingAlgorithm", Options.ENCODING_NAMES[Options.encoding_algorithm], "Encoding algorithm", Options.ENCODING_NAMES);
+    public static final ObjectProperty<String> BDD_SUP_REACHABILITY = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddSupReachability", Options.SUP_REACHABILITY_NAMES[Options.sup_reachability_type], "Supervisor Reachability Type", Options.SUP_REACHABILITY_NAMES);
+    public static final ObjectProperty<String> BDD_DISJ_OPTIMIZER_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddDisjOptimizerAlgo", Options.DISJ_OPTIMIZER_NAMES[Options.disj_optimizer_algo], "Disjunctive optimizer algorithm", Options.DISJ_OPTIMIZER_NAMES);
+    public static final ObjectProperty<String> BDD_TRANSITION_OPTIMIZER_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddTransitionOptimizerAlgo", Options.TRANSITION_OPTIMIZER_NAMES[Options.transition_optimizer_algo], "Transition optimizer algorithm", Options.TRANSITION_OPTIMIZER_NAMES);
     public static final IntegerProperty BDD_PARTITION_MAX = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", Options.max_partition_size, "Max Partition Size");
     public static final BooleanProperty BDD_SIZE_WATCH = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddSizeWatch", Options.size_watch, "Size watch");
     public static final BooleanProperty BDD_ALTER_PCG = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddAlterPCG", Options.user_alters_PCG, "Alter PCG");
@@ -356,7 +355,7 @@ public final class Config
     public static final BooleanProperty BDD_PROFILE_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddProfileOn", Options.profile_on, "Profiling");
     public static final BooleanProperty BDD_INTERLEAVED_VARIABLES = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddInterleavedVariables", Options.interleaved_variables, "Interleaved or seperated variable orders");
     public static final BooleanProperty BDD_LEVEL_GRAPHS = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddLevelGraphs", Options.show_level_graph, "Shows the fillness of the workset sent to H1");
-    public static final ObjectProperty BDD_LIB_PATH  = new ObjectProperty(PropertyType.ALGORITHMS_BDD, "bddLibPath", Options.extraLibPath, "Extra Library path");
+    public static final ObjectProperty<String> BDD_LIB_PATH  = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddLibPath", Options.extraLibPath, "Extra Library path");
     public static final BooleanProperty BDD_SYNTHESIS_EXTRACT_AUTOMATON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddSynthesisExtractAutomaton", false, "Build automaton after BDD synthesis");
 
     // ALGORITHMS_HMI

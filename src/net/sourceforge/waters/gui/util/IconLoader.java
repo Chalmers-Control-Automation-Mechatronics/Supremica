@@ -9,7 +9,12 @@
 
 package net.sourceforge.waters.gui.util;
 
+import java.awt.Image;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -25,15 +30,6 @@ public class IconLoader
   private static final ImageIcon getWatersIcon(final String name)
   {
     final String subdir = Config.GUI_EDITOR_ICONSET.getAsString();
-    return getWatersIcon(subdir, name);
-  }
-
-  private static final ImageIcon getWindowIcon(final String name)
-  {
-    String subdir = Config.GUI_EDITOR_ICONSET.getAsString();
-    if (Character.isDigit(subdir.charAt(0))) {
-      subdir = "16x16";
-    }
     return getWatersIcon(subdir, name);
   }
 
@@ -59,6 +55,45 @@ public class IconLoader
     final String resourcename = "/icons/" + name + ".gif";
     final URL resource = cls.getResource(resourcename);
     return new ImageIcon(resource);
+  }
+
+  private static List<ImageIcon> getIconList(final String name)
+  {
+    final String subdir = Config.GUI_EDITOR_ICONSET.getAsString();
+    if (Character.isDigit(subdir.charAt(0))) {
+      final List<ImageIcon> icons = new LinkedList<ImageIcon>();
+      for (final String choice : Config.GUI_EDITOR_ICONSET.getLegalValues()) {
+        if (Character.isDigit(choice.charAt(0))) {
+          final ImageIcon icon = getWatersIcon(choice, name);
+          icons.add(icon);
+        }
+      }
+      return icons;
+    } else {
+      final ImageIcon icon = getWatersIcon(subdir, name);
+      return Collections.singletonList(icon);
+    }
+  }
+
+  private static List<Image> getImageList(final String name)
+  {
+    final List<ImageIcon> icons = getIconList(name);
+    final int size = icons.size();
+    switch (size) {
+    case 0:
+      return Collections.emptyList();
+    case 1:
+      final ImageIcon icon0 = icons.get(0);
+      final Image image0 = icon0.getImage();
+      return Collections.singletonList(image0);
+    default:
+      final List<Image> images = new ArrayList<Image>(size);
+      for (final ImageIcon icon : icons) {
+        final Image image = icon.getImage();
+        images.add(image);
+      }
+      return images;
+    }
   }
 
 
@@ -91,7 +126,6 @@ public class IconLoader
   private static final String NAME_NO = "no";
   private static final String NAME_PLANT = "plant";
   private static final String NAME_PROPERTY = "property";
-  private static final String NAME_PROPOSITION = "waters/proposition";
   private static final String NAME_SIMULATOR_BACK = "simulator_back";
   private static final String NAME_SIMULATOR_REPLAY = "simulator_replay";
   private static final String NAME_SIMULATOR_RESET = "simulator_reset";
@@ -129,7 +163,6 @@ public class IconLoader
   //#########################################################################
   //# Class Constants
   // Editor
-  public static final ImageIcon ICON_APPLICATION = getWindowIcon(NAME_APPLICATION);
   public static final ImageIcon ICON_CONSTANT = getWatersIcon(NAME_CONSTANT);
   public static final ImageIcon ICON_CONSOLE_DEBUG = getWatersIcon(NAME_CONSOLE_DEBUG);
   public static final ImageIcon ICON_CONSOLE_ERROR = getWatersIcon(NAME_CONSOLE_ERROR);
@@ -157,8 +190,6 @@ public class IconLoader
   public static final ImageIcon ICON_NO = getWatersIcon(NAME_NO);
   public static final ImageIcon ICON_PLANT = getWatersIcon(NAME_PLANT);
   public static final ImageIcon ICON_PROPERTY = getWatersIcon(NAME_PROPERTY);
-  // TODO Replace this by computed icon:
-  public static final ImageIcon ICON_PROPOSITION = getSupremicaIcon(NAME_PROPOSITION);
   public static final ImageIcon ICON_SPEC = getWatersIcon(NAME_SPEC);
   public static final ImageIcon ICON_SUPERVISOR = getWatersIcon(NAME_SUPERVISOR);
   public static final ImageIcon ICON_TOOL_ABOUT = getWatersIcon(NAME_TOOL_ABOUT);
@@ -184,12 +215,6 @@ public class IconLoader
   public static final ImageIcon ICON_UNCONTROLLABLE_UNOBSERVABLE =
     getWatersIcon(NAME_UNCONTROLLABLE_UNOBSERVABLE);
   public static final ImageIcon ICON_VARIABLE = getWatersIcon(NAME_VARIABLE);
-  public static final ImageIcon ICON_WINDOW_PLANT = getWindowIcon(NAME_PLANT);
-  public static final ImageIcon ICON_WINDOW_PROPERTY =
-    getWindowIcon(NAME_PROPERTY);
-  public static final ImageIcon ICON_WINDOW_SPEC = getWindowIcon(NAME_SPEC);
-  public static final ImageIcon ICON_WINDOW_SUPERVISOR =
-    getWindowIcon(NAME_SUPERVISOR);
   public static final ImageIcon ICON_YES = getWatersIcon(NAME_YES);
 
   // Simulator
@@ -219,5 +244,15 @@ public class IconLoader
   public static final ImageIcon ICON_EVENTTREE_CAUSES_WARNING_PROPERTY = ICON_CONSOLE_WARNING;
 
   public static final Icon ICON_EVENTTREE_BLOCKING_AUTOMATON = ICON_CONSOLE_WARNING;
+
+  // Frame icon lists
+  public static final List<Image> ICONLIST_APPLICATION =
+    getImageList(NAME_APPLICATION);
+  public static final List<ImageIcon> ICONLIST_PLANT = getIconList(NAME_PLANT);
+  public static final List<ImageIcon> ICONLIST_PROPERTY =
+    getIconList(NAME_PROPERTY);
+  public static final List<ImageIcon> ICONLIST_SPEC = getIconList(NAME_SPEC);
+  public static final List<ImageIcon> ICONLIST_SUPERVISOR =
+    getIconList(NAME_SUPERVISOR);
 
 }

@@ -52,8 +52,8 @@ public class Animator
         super("Supremica Animator - " + detail);
 
         contentPane = (JPanel) getContentPane();
-        final Image image = IconLoader.ICON_APPLICATION.getImage();
-        setIconImage(image);
+        final java.util.List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        setIconImages(images);
         contentPane.setLayout(new GridBagLayout());
 
         final GridBagConstraints pos = new GridBagConstraints();

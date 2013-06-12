@@ -8,10 +8,13 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -20,6 +23,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -53,7 +57,8 @@ public class AutomatonInternalFrame
         storeReferenceFrame();
       }
     });
-    setFrameIcon(ModuleContext.getComponentKindIcon(aut.getKind(), true));
+    final ComponentKind kind = aut.getKind();
+    setFrameIcon(kind);
     container.getModule().addModelObserver(this);
   }
 
@@ -184,6 +189,33 @@ public class AutomatonInternalFrame
   public int getModelObserverPriority()
   {
     return ModelObserver.RENDERING_PRIORITY;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void setFrameIcon(final ComponentKind kind)
+  {
+    final List<ImageIcon> icons = ModuleContext.getComponentKindIconList(kind);
+    ImageIcon icon = null;
+    if (icons.size() > 1) {
+      try {
+        final BasicInternalFrameUI ui =
+          (javax.swing.plaf.basic.BasicInternalFrameUI) getUI();
+        final int titleBarHeight = ui.getNorthPane().getPreferredSize().height;
+        for (final ImageIcon candidate : icons) {
+          if (candidate.getIconHeight() <= titleBarHeight) {
+            icon = candidate;
+          }
+        }
+      } catch (final ClassCastException exception) {
+        // Just in case the UI is a different type ...
+      }
+    }
+    if (icon == null && !icons.isEmpty()) {
+      icon = icons.get(0);
+    }
+    setFrameIcon(icon);
   }
 
 
