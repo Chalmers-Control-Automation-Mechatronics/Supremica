@@ -19,8 +19,9 @@ import java.util.Arrays;
 /**
  * An open addressed hash set implementation for <CODE>int</CODE> values.
  *
- * This is a modified version of {@link gnu.trove.TIntHashSet} that supports
- * configurable equality of keys.
+ * This is a modified version of GNU Trove 2 class
+ * <CODE>gnu.trove.TIntHashSet</CODE> that supports configurable equality of
+ * keys.
  *
  * @author Eric D. Friedman, Robi Malik
  */
@@ -413,6 +414,7 @@ public class WatersIntHashSet
   {
     //######################################################################
     //# Interface gnu.trove.TIntProcedure
+    @Override
     public final boolean execute(final int value)
     {
       return contains(value);
@@ -433,6 +435,7 @@ public class WatersIntHashSet
 
     //######################################################################
     //# Interface gnu.trove.TIntProcedure
+    @Override
     public final boolean execute(final int value)
     {
       mResult += _hashingStrategy.computeHashCode(value);
@@ -459,6 +462,7 @@ public class WatersIntHashSet
 
     //######################################################################
     //# Interface gnu.trove.TIntProcedure
+    @Override
     public final boolean execute(final int value)
     {
       if (mFirst) {

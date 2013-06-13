@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
 //# CLASS:   AbstractEFSMAlgorithm
 //###########################################################################
@@ -16,9 +16,11 @@ import net.sourceforge.waters.model.base.ProxyTools;
 
 import org.apache.log4j.Logger;
 
+
 /**
- * @author saharm
+ * @author Sahar Mohajerani, Robi Malik
  */
+
 public abstract class AbstractEFSMAlgorithm
   implements Abortable
 {
@@ -64,13 +66,7 @@ public abstract class AbstractEFSMAlgorithm
   }
 
   /**
-   * Cleans up temporary data from the current {@link #run()}.
-   * The difference between this method and {@link #reset()} is that
-   * tearDown() deletes temporary data structures that are only needed
-   * during simplification, whereas {@link #reset()} cleans up results.
-   * The tearDown() method is called automatically by {@link #run()} in
-   * a <CODE>finally</CODE> block, while {@link #reset()} must be called
-   * by the user after retrieving all results.
+   * Cleans up temporary data.
    */
   protected void tearDown()
   {

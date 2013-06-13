@@ -18,8 +18,9 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 /**
  * An open addressed hashing implementation for int primitives.
  *
- * This is a modified version of {@link gnu.trove.TIntHash}
- * that supports configurable equality of keys.
+ * This is a modified version of GNU Trove 2 class
+ * <CODE>gnu.trove.TIntHash</CODE> that supports configurable equality of
+ * keys.
  *
  * @author Eric D. Friedman, Robi Malik
  */

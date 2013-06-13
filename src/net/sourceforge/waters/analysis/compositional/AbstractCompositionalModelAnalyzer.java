@@ -349,7 +349,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   /**
    * Returns whether special events are considered in abstraction.
-   * @see #setUsesSpecialEvents(boolean)
+   * @see #setUsingSpecialEvents(boolean)
    */
   public boolean isUsingSpecialEvents()
   {
