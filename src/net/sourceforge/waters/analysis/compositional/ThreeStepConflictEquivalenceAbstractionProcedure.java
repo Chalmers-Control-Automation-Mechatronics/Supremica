@@ -300,7 +300,6 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
         final StateEncoding outputStateEnc = new StateEncoding();
         final AutomatonProxy outputAut =
           rel.createAutomaton(factory, eventEnc, outputStateEnc);
-        lastAut = outputAut;
         final AbstractionStep postStep =
           createStep(lastAut, lastStateEnc, outputAut, outputStateEnc,
                      tau, partition, oeq, reduced);
