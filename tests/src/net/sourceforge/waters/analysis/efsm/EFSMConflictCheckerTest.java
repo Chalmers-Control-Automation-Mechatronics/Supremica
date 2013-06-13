@@ -263,6 +263,30 @@ public class EFSMConflictCheckerTest
     checkConflict(module, true);
   }
 
+  public void testDynamicPrimeSieve2()
+    throws IOException, WatersException
+  {
+    checkPrimeSieve("dynamic_prime_sieve", 2, 24, true);
+  }
+
+  public void testDynamicPrimeSieve3()
+    throws IOException, WatersException
+  {
+    checkPrimeSieve("dynamic_prime_sieve", 3, 48, true);
+  }
+
+  public void testDynamicPrimeSieve4()
+    throws IOException, WatersException
+  {
+    checkPrimeSieve("dynamic_prime_sieve", 4, 120, true);
+  }
+
+  public void testDynamicPrimeSieve5()
+    throws IOException, WatersException
+  {
+    checkPrimeSieve("dynamic_prime_sieve", 5, 168, true);
+  }
+
   public void testCaseStudy()
     throws IOException, WatersException
   {
@@ -316,6 +340,26 @@ public class EFSMConflictCheckerTest
       factory.createParameterBindingProxy("N", constN);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(bindingN);
+    final ModuleProxy module = loadModule("efa", name);
+    checkConflict(module, bindings, expect);
+  }
+
+  void checkPrimeSieve(final String name,
+                       final int s, final int n,
+                       final boolean expect)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final List<ParameterBindingProxy> bindings =
+      new ArrayList<ParameterBindingProxy>(2);
+    final IntConstantProxy constS = factory.createIntConstantProxy(s);
+    final ParameterBindingProxy bindingS =
+      factory.createParameterBindingProxy("S", constS);
+    bindings.add(bindingS);
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy bindingN =
+      factory.createParameterBindingProxy("N", constN);
+    bindings.add(bindingN);
     final ModuleProxy module = loadModule("efa", name);
     checkConflict(module, bindings, expect);
   }

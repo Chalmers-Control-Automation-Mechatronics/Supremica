@@ -2,11 +2,6 @@
 <Module Name="dynamic_prime_sieve" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Distributed prime number sieve, dymanic version.
 
-This is the basic version with two sieve processes for primes 2 and 3.
-It handles numbers up to 24.
-This is a blocking version, with broken sink.
-The number of reachable states is 743830515, and the diameter is 58.
-
 Source generates numbers from 2 to N and sends them to the first sieve process sieve[1].
 There are S sieve processes for the first S prime numbers.
 The first number received by a sieve is recorded and printed as a prime.

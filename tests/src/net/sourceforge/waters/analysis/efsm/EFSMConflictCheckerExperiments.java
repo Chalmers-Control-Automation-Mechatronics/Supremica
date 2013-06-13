@@ -97,6 +97,18 @@ public class EFSMConflictCheckerExperiments
     checkConflict(module, true);
   }
 
+  public void testDynamicPrimeSieve6()
+    throws IOException, WatersException
+  {
+    checkPrimeSieve("dynamic_prime_sieve", 6, 288, true);
+  }
+
+  public void testDynamicPrimeSieve7()
+    throws IOException, WatersException
+  {
+    checkPrimeSieve("dynamic_prime_sieve", 7, 360, true);
+  }
+
 
   //#########################################################################
   //# Main Method
