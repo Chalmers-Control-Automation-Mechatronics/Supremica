@@ -54,6 +54,11 @@ public class OccursChecker extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Invocation
+  /**
+   * Searches a constraint list for a variable.
+   * @return <CODE>true</CODE> if the given variable occurs in the given
+   *         constraint list, in its primed or unprimed form.
+   */
   public boolean occurs(final SimpleExpressionProxy varname,
                         final ConstraintList constraints)
   {
@@ -72,6 +77,11 @@ public class OccursChecker extends DefaultModuleProxyVisitor
     }
   }
 
+  /**
+   * Searches an expression for a variable.
+   * @return <CODE>true</CODE> if the given variable occurs in the given
+   *         expression, in its primed or unprimed form.
+   */
   public boolean occurs(final SimpleExpressionProxy varname,
                         final SimpleExpressionProxy expr)
   {
