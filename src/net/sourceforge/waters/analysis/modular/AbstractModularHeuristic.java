@@ -29,6 +29,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -64,6 +65,7 @@ abstract class AbstractModularHeuristic
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.modular.ModularHeuristic
+  @Override
   public String getName()
   {
     final String fullname = getClass().getName();
@@ -77,6 +79,7 @@ abstract class AbstractModularHeuristic
     }
   }
 
+  @Override
   public SafetyTraceProxy extendTrace(final ProductDESProxyFactory factory,
                                       final SafetyTraceProxy trace,
                                       final List<AutomatonProxy> automata)
@@ -105,6 +108,7 @@ abstract class AbstractModularHeuristic
                                             des, automata, oldSteps);
     }
     final int numSteps = oldSteps.size();
+    final KindTranslator translator = getKindTranslator();
     final List<TraceStepProxy> newSteps =
       new ArrayList<TraceStepProxy>(numSteps);
     int depth = 0;
@@ -115,6 +119,11 @@ abstract class AbstractModularHeuristic
       for (final AutomatonProxy aut : automata) {
         if (!oldAutomata.contains(aut)) {
           final TraceFinder finder = getTraceFinder(aut);
+          if (translator.getComponentKind(aut) == ComponentKind.SPEC &&
+              finder.getNumberOfAcceptedSteps() == depth - 1) {
+            // Don't try to find state for last step of spec.
+            continue;
+          }
           final StateProxy state = finder.getState(depth);
           if (state != null) {
             if (newMap == null) {
@@ -190,7 +199,7 @@ abstract class AbstractModularHeuristic
                                 final TraceProxy trace)
   {
     final TraceFinder finder = getTraceFinder(aut);
-    return finder.getNumberOfAcceptedSteps(trace);
+    return finder.computeNumberOfAcceptedSteps(trace);
   }
 
   private TraceFinder getTraceFinder(final AutomatonProxy aut)

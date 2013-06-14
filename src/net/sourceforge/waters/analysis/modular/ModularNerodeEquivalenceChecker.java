@@ -431,7 +431,7 @@ public class ModularNerodeEquivalenceChecker
                                 final TraceProxy trace)
   {
     final TraceFinder finder = getTraceFinder(aut);
-    return finder.getNumberOfAcceptedSteps(trace);
+    return finder.computeNumberOfAcceptedSteps(trace);
   }
 
   private TraceFinder getTraceFinder(final AutomatonProxy aut)

@@ -199,8 +199,20 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
       final EnabledEventsCompositionalConflictChecker enabledEventsAnalyzer = (EnabledEventsCompositionalConflictChecker)getAnalyzer();
 
+      final List<EventProxy> enabledEventsList = new ArrayList<EventProxy>(aut.getEvents().size());
+      enabledEventsList.addAll(enabledEventsAnalyzer.calculateAlwaysEnabledEvents(aut, candidate));
+
+      final List<EventProxy> otherEventsList = new ArrayList<EventProxy>(aut.getEvents().size());
+      otherEventsList.addAll(aut.getEvents());
+      otherEventsList.removeAll(enabledEventsList);
       final List<EventProxy> eventsList = new ArrayList<EventProxy>(aut.getEvents().size());
       //Creates an event encoding with always enabled events at start
+      eventsList.addAll(enabledEventsList);
+      eventsList.addAll(otherEventsList);
+      final int numEnabledEvents = enabledEventsList.size();
+
+      System.out.println(enabledEventsList);
+      /*
 
       int numEnabledEvents = 0;
       //for all the events
@@ -217,6 +229,13 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
               numEnabledEvents++;
             }
           }
+          else
+          {
+            //Harder check for AE
+            //call something in other EE Compositional Conflict Checker class
+
+
+          }
         }
       }
       for(final EventProxy events : aut.getEvents()) {
@@ -226,6 +245,10 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           eventsList.add(events);
         }
       }
+
+*/
+
+
 
       // Tell the simplifiers how many enabled events there are
       mEnabledEventsSilentContinuationSimplifier.

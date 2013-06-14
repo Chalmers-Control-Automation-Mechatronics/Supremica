@@ -536,6 +536,14 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void test_Nondet_MultiSepPlacesUncontrollable() throws Exception
+  {
+    final String group = "tests";
+    final String dir  = "nondeterministic";
+    final String name = "multiNondeterministicSepPlacesUncontrollable.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testProfisafeI3HostEFA() throws Exception
   {
     final String group = "tests";

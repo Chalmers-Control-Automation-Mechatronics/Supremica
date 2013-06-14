@@ -67,6 +67,7 @@ public class TraceFinder
       final boolean det =
         mInitialStates.size() <= 1 && mTransitionRelation.isDeterministic();
       mStateEncoding = det ? null : enc;
+      mNumberOfAcceptedSteps = -1;
       mPath = null;
     } catch (final OverflowException exception) {
       // Should not get overflow with 0 propositions ...
@@ -91,7 +92,7 @@ public class TraceFinder
   public boolean accepts(final TraceProxy trace)
   {
     final int len = trace.getEvents().size();
-    return getNumberOfAcceptedSteps(trace) == len;
+    return computeNumberOfAcceptedSteps(trace) == len;
   }
 
   /**
@@ -103,7 +104,7 @@ public class TraceFinder
    *         has no initial state, and 0 indicates that the first event of
    *         the trace is not eligible in any initial state.
    */
-  public int getNumberOfAcceptedSteps(final TraceProxy trace)
+  public int computeNumberOfAcceptedSteps(final TraceProxy trace)
   {
     if (mInitialStates.isEmpty()) {
       // No initial state ...
@@ -126,6 +127,7 @@ public class TraceFinder
         }
         depth++;
       }
+      mNumberOfAcceptedSteps = depth;
       return depth;
     } else {
       // Nondeterministic automaton ...
@@ -184,13 +186,24 @@ public class TraceFinder
       if (mInitialStates.size() > 1) {
         mPath[0] = mStateEncoding.getState(nextStateID);
       }
+      mNumberOfAcceptedSteps = depth;
       return depth;
     }
   }
 
   /**
+   * Gets the number of steps computed from the last call to
+   * {@link #computeNumberOfAcceptedSteps(TraceProxy)
+   * computeNumberOfAcceptedSteps()}.
+   */
+  public int getNumberOfAcceptedSteps()
+  {
+    return mNumberOfAcceptedSteps;
+  }
+
+  /**
    * Gets a trace state on the path found by a previous call to
-   * {@link #getNumberOfAcceptedSteps(TraceProxy) accepts()}
+   * {@link #computeNumberOfAcceptedSteps(TraceProxy) accepts()}
    * @param  depth   The index position of the state to be looked up,
    *                 where 0 indicates the initial state of the trace.
    * @return The state on the path, or <CODE>null</CODE> to indicate a
@@ -251,6 +264,7 @@ public class TraceFinder
   private final ListBufferTransitionRelation mTransitionRelation;
   private final List<SearchRecord> mInitialStates;
 
+  private int mNumberOfAcceptedSteps;
   private StateProxy[] mPath;
 
 }
