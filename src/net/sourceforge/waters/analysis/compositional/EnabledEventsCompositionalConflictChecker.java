@@ -213,13 +213,6 @@ public class EnabledEventsCompositionalConflictChecker extends
         }
       }
     }
-
-    //new method that calculates if a event is always enabled from A1.
-    //give aut and candidate
-    //returns all events that are always enabled from aut. including those you can tell from event info.
-
-
-
   }
 
   /**
@@ -232,9 +225,21 @@ public class EnabledEventsCompositionalConflictChecker extends
    */
   public List<EventProxy> calculateAlwaysEnabledEvents(final AutomatonProxy aut, final Candidate candidate) throws AnalysisException
   {
-    //Ways to optimise:
-    //Do after original check, as that has already calculated some always enabled events
-    //If an event is always enabled it should always be always enabled, so only check the other events
+
+    /*
+    //If an automaton doesn't have tau or certain conflict states, don't bother calculating always enabled.
+    boolean autContainsTau = false;
+    for(final EventProxy e : aut.getEvents())
+    {
+      final EnabledEventsEventInfo eInfo = getEventInfo(e);
+      if(eInfo.isLocal(candidate.getAutomata()))
+      {
+        autContainsTau = true;
+      }
+    }
+    boolean autHasBlockingStates = false;
+    */
+
 
     final ArrayList<EventProxy> alwaysEnabledEventsList = new ArrayList<EventProxy>();
   //getCurrentAut - ones in candidate + aut
@@ -246,8 +251,27 @@ public class EnabledEventsCompositionalConflictChecker extends
 
     //for each of the events in aut
     for (final EventProxy event : aut.getEvents()) {
-      final EventInfo info = getEventInfo(event);
+      //If it is not tau or proposition
+      final EnabledEventsEventInfo info = getEventInfo(event);
       if (info != null && !info.isLocal(candidate.getAutomata())) {
+
+        boolean isEventAlwaysEnabledAlready = false;
+        //If an event is always enabled for this automaton we do not need to test it again
+        if(info.isAlwaysEnabledCandidate(candidate)) {
+          isEventAlwaysEnabledAlready = true;
+          info.addAlwaysEnabledAutomaton(aut);
+          System.out.println("skipped");
+        }
+        //If the old rule finds this event is always enabled do not need to do hard test
+        if(!isEventAlwaysEnabledAlready && info.isSingleDisablingCandidate(candidate)) {
+          isEventAlwaysEnabledAlready = true;
+          info.addAlwaysEnabledAutomaton(aut);
+          System.out.println("skipped because of old test");
+        }
+        if(isEventAlwaysEnabledAlready) {
+          alwaysEnabledEventsList.add(event);
+        }
+        else{
         //Set new KindTranslator
         mChecker.setKindTranslator(new KindTranslator() {
           //This event is set to uncontrollable, the rest are controllable
@@ -272,6 +296,7 @@ public class EnabledEventsCompositionalConflictChecker extends
           if (mChecker.run()) {
             //If mChecker returns true then this event is always enabled in this aut
             alwaysEnabledEventsList.add(event);
+            info.addAlwaysEnabledAutomaton(aut);
           }
         } catch (final OverflowException ex) {
           //If it runs out of space, assume it is not always enabled
@@ -279,7 +304,7 @@ public class EnabledEventsCompositionalConflictChecker extends
             .println("Ran out of space while checking for Always Enabled Events");
         }
       }
-
+    }
 
     }
     System.out.println("Found " + alwaysEnabledEventsList.size() + " always enabled events in aut " + aut.getName());
@@ -294,6 +319,10 @@ public class EnabledEventsCompositionalConflictChecker extends
 
     mChecker = new ModularControllabilityChecker(getFactory(), new NativeControllabilityChecker(getFactory()));
     mChecker.setNodeLimit(1000);
+
+
+
+
   }
   @Override
   protected void tearDown()
@@ -511,16 +540,23 @@ public class EnabledEventsCompositionalConflictChecker extends
   {
     //List of automata the disable this event
     private final Set<AutomatonProxy> mDisablingAutomata;
+    //List of automata where this event is considered as being always enabled
+    private final Set<AutomatonProxy> mAlwaysEnabledAutomata;
 
     private EnabledEventsEventInfo(final EventProxy event)
     {
       super(event);
       mDisablingAutomata = new THashSet<AutomatonProxy>();
+      mAlwaysEnabledAutomata = new THashSet<AutomatonProxy>();
     }
 
     public Set<AutomatonProxy> getDisablingAutomata()
     {
       return mDisablingAutomata;
+    }
+    public Set<AutomatonProxy> getAlwaysEnabledAutomata()
+    {
+      return mAlwaysEnabledAutomata;
     }
 
     public List<AutomatonProxy> getDisablingAutomataList()
@@ -536,6 +572,12 @@ public class EnabledEventsCompositionalConflictChecker extends
     {
       //When given an automaton, it adds it to the list of automaton that this event disables.
       mDisablingAutomata.add(aut);
+    }
+
+    private void addAlwaysEnabledAutomaton(final AutomatonProxy aut)
+    {
+      //If an event is always enabled from an automaton, add it to the list
+      mAlwaysEnabledAutomata.add(aut);
     }
 
     @SuppressWarnings("unused")
@@ -558,6 +600,26 @@ public class EnabledEventsCompositionalConflictChecker extends
     }
 
     /**
+     * Returns true if this automaton considers this event as always enabled
+     * @param aut
+     * @return
+     */
+    boolean isAlwaysEnabledAutomaton(final AutomatonProxy aut)
+    {
+      return mAlwaysEnabledAutomata.contains(aut);
+    }
+    boolean isAlwaysEnabledCandidate(final Candidate candidate)
+    {
+      boolean containsAlwaysEnabledAutomaton = false;
+      for(final AutomatonProxy aut : candidate.getAutomata())
+      {
+        if(mAlwaysEnabledAutomata.contains(aut))
+          containsAlwaysEnabledAutomaton = true;
+      }
+      return containsAlwaysEnabledAutomaton;
+    }
+
+    /**
      *
      * returns true if the candidate is the only disabling candidate
      */
@@ -571,6 +633,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     {
       super.removeAutomata(victims);
       mDisablingAutomata.removeAll(victims);
+      mAlwaysEnabledAutomata.removeAll(victims);
     }
 
     @Override
@@ -580,6 +643,10 @@ public class EnabledEventsCompositionalConflictChecker extends
       boolean result = super.replaceAutomaton(oldAut, newAut);
       if (mDisablingAutomata.remove(oldAut)) {
         mDisablingAutomata.add(newAut);
+        result = true;
+      }
+      if (mAlwaysEnabledAutomata.remove(oldAut)) {
+        mAlwaysEnabledAutomata.add(newAut);
         result = true;
       }
       return result;
