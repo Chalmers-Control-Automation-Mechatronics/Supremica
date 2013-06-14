@@ -16,10 +16,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.bdd.BDDConflictChecker;
+import net.sourceforge.waters.analysis.bdd.BDDPackage;
+import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
+import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
+import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
+import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersException;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -61,17 +72,52 @@ public class EFSMConflictCheckerExperiments
 
 
   //#########################################################################
+  //# Main Method
+  public static void main(final String[] args)
+  {
+    if (args.length == 1) {
+      try {
+        final String filename = args[0];
+        final EFSMConflictCheckerExperiments experiment =
+          new EFSMConflictCheckerExperiments(filename);
+        experiment.setUp();
+        experiment.runAllTests();
+        experiment.tearDown();
+      } catch (final Throwable exception) {
+        System.err.println("FATAL ERROR");
+        exception.printStackTrace(System.err);
+      }
+    } else {
+      System.err.println
+        ("USAGE: " +
+         ProxyTools.getShortClassName(EFSMConflictCheckerExperiments.class) +
+         "<outputFilename>");
+    }
+  }
+
+
+  //#########################################################################
   //# Test Suite
   private void runAllTests() throws Exception
   {
+    runAllTests(new EFSMConflictCheckerWrapper());
+    //runAllTests(new CompositionalConflictCheckerWrapper());
+    //runAllTests(new BDDConflictCheckerWrapper());
+  }
+
+  private void runAllTests(final ConflictCheckerWrapper wrapper) throws Exception
+  {
+    mConflictCheckerWrapper = wrapper;
+    testPsl();
+    testPslBig();
+    //testPslWithResetTrans();
     testPrimeSieve4();
     testPrimeSieve4b();
     testPrimeSieve6();
     testPrimeSieve7();
     testPrimeSieve8();
-    testPslBig();
-    testPsl();
-    //testPslWithResetTrans();
+    checkPrimeSieve("dynamic_prime_sieve", 6, 288, true);
+    //checkPrimeSieve("dynamic_prime_sieve", 7, 360, true);
     checkPhilosophers("dining_philosophers", 1000, false);
     checkPhilosophers("dining_philosophers", 2000, false);
     checkPhilosophers("dining_philosophers", 4000, false);
@@ -95,43 +141,6 @@ public class EFSMConflictCheckerExperiments
   {
     final ModuleProxy module = loadModule("efa", "prime_sieve8");
     checkConflict(module, true);
-  }
-
-  public void testDynamicPrimeSieve6()
-    throws IOException, WatersException
-  {
-    checkPrimeSieve("dynamic_prime_sieve", 6, 288, true);
-  }
-
-  public void testDynamicPrimeSieve7()
-    throws IOException, WatersException
-  {
-    checkPrimeSieve("dynamic_prime_sieve", 7, 360, true);
-  }
-
-
-  //#########################################################################
-  //# Main Method
-  public static void main(final String[] args)
-  {
-    if (args.length == 1) {
-      try {
-        final String filename = args[0];
-        final EFSMConflictCheckerExperiments experiment =
-          new EFSMConflictCheckerExperiments(filename);
-        experiment.setUp();
-        experiment.runAllTests();
-        experiment.tearDown();
-      } catch (final Throwable exception) {
-        System.err.println("FATAL ERROR");
-        exception.printStackTrace(System.err);
-      }
-    } else {
-      System.err.println
-        ("USAGE: " +
-         ProxyTools.getShortClassName(EFSMConflictCheckerExperiments.class) +
-         "<outputFilename>");
-    }
   }
 
 
@@ -167,46 +176,7 @@ public class EFSMConflictCheckerExperiments
                         final boolean expected)
     throws EvalException, AnalysisException
   {
-    final String name = module.getName();
-    printAndLog("Running " + name + " with " +
-                mCompositionSelectionHeuristic + " ...");
-    final ModuleProxyFactory factory = getModuleProxyFactory();
-    final EFSMConflictChecker conflictChecker =
-      new EFSMConflictChecker(module, factory);
-    configure(conflictChecker);
-    conflictChecker.setBindings(bindings);
-    try {
-      return conflictChecker.run();
-    } catch (final AnalysisException exception) {
-      mPrintWriter.println(name + "," + exception.getMessage());
-      return false;
-    } finally {
-      final EFSMConflictCheckerAnalysisResult stats =
-        conflictChecker.getAnalysisResult();
-      if (!mHasBeenPrinted) {
-        mHasBeenPrinted = true;
-        mPrintWriter.print("Model,");
-        stats.printCSVHorizontalHeadings(mPrintWriter);
-        mPrintWriter.println();
-      }
-      mPrintWriter.print(name);
-      mPrintWriter.print(',');
-      stats.printCSVHorizontal(mPrintWriter);
-      mPrintWriter.println();
-    }
-  }
-
-  @Override
-  void configure(final EFSMConflictChecker checker)
-  {
-    // final int internalStateLimit = 5000;
-    // mConflictChecker.setInternalStateLimit(internalStateLimit);
-    checker.setInternalTransitionLimit(mInternalTransitionLimit);
-    // final int finalStateLimit = 2000000;
-    // mConflictChecker.setMonolithicStateLimit(finalStateLimit);
-    if (mCompositionSelectionHeuristic != null) {
-      checker.setCompositionSelectionHeuristic(mCompositionSelectionHeuristic);
-    }
+    return mConflictCheckerWrapper.run(module, bindings, expected);
   }
 
 
@@ -220,7 +190,174 @@ public class EFSMConflictCheckerExperiments
 
 
   //#########################################################################
+  //# Inner Class ConflictCheckerWrapper
+  private abstract class ConflictCheckerWrapper
+  {
+    private boolean run(final ModuleProxy module,
+                        final List<ParameterBindingProxy> bindings,
+                        final boolean expected)
+      throws EvalException, AnalysisException
+    {
+      final String moduleName = module.getName();
+      String className = ProxyTools.getShortClassName(this);
+      if (className.endsWith("Wrapper")) {
+        final int len = className.length();
+        className = className.substring(0, len - 7);
+      }
+      printAndLog("Running " + moduleName + " with " + className + " ...");
+      try {
+        final AnalysisResult stats = runConflictChecker(module, bindings);
+        if (!mHasBeenPrinted) {
+          mHasBeenPrinted = true;
+          mPrintWriter.print("Model,");
+          stats.printCSVHorizontalHeadings(mPrintWriter);
+          mPrintWriter.println();
+        }
+        mPrintWriter.print(moduleName);
+        mPrintWriter.print(',');
+        stats.printCSVHorizontal(mPrintWriter);
+        mPrintWriter.println();
+        return stats.isSatisfied();
+      } catch (final Throwable exception) {
+        mPrintWriter.println(moduleName + "," + exception.getMessage());
+        return false;
+      }
+    }
+
+    //#########################################################################
+    //# Abstract Methods
+    abstract AnalysisResult runConflictChecker
+      (ModuleProxy module, List<ParameterBindingProxy> bindings)
+      throws EvalException, AnalysisException;
+  }
+
+
+  //#########################################################################
+  //# Inner Class EFSMConflictCheckerWrapper
+  private class EFSMConflictCheckerWrapper extends ConflictCheckerWrapper
+  {
+
+    //#######################################################################
+    //# Overrides for ConflictCheckerWrapper
+    @Override
+    AnalysisResult runConflictChecker(final ModuleProxy module,
+                                      final List<ParameterBindingProxy> bindings)
+      throws EvalException, AnalysisException
+    {
+      final ModuleProxyFactory factory = getModuleProxyFactory();
+      final EFSMConflictChecker checker =
+        new EFSMConflictChecker(module, factory);
+      // Configuration of EFSMConflictChecker ...
+      checker.setInternalTransitionLimit(mInternalTransitionLimit);
+      if (mCompositionSelectionHeuristic != null) {
+        checker.setCompositionSelectionHeuristic(mCompositionSelectionHeuristic);
+      }
+      // Configuration end
+      checker.setBindings(bindings);
+      checker.run();
+      return checker.getAnalysisResult();
+    }
+
+  }
+
+
+
+  //#########################################################################
+  //# Inner Class CompositionalConflictCheckerWrapper
+  @SuppressWarnings("unused")
+  private class CompositionalConflictCheckerWrapper
+    extends ConflictCheckerWrapper
+  {
+
+    //#######################################################################
+    //# Constructor
+    private CompositionalConflictCheckerWrapper()
+    {
+      final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      mConflictChecker =  new CompositionalConflictChecker(factory);
+      // Configuration of CompositionalConflictChecker ...
+      mConflictChecker.setAbstractionProcedureFactory
+        (ConflictAbstractionProcedureFactory.NB);
+      mConflictChecker.setPreselectingMethod
+        (AbstractCompositionalModelAnalyzer.MustL);
+      mConflictChecker.setSelectingMethod
+        (AbstractCompositionalModelAnalyzer.MinS);
+      mConflictChecker.setInternalStateLimit(10000);
+      mConflictChecker.setMonolithicStateLimit(50000000);
+      mConflictChecker.setMonolithicTransitionLimit(0);
+      // Configuration end
+    }
+
+    //#######################################################################
+    //# Overrides for ConflictCheckerWrapper
+    @Override
+    AnalysisResult runConflictChecker(final ModuleProxy module,
+                                      final List<ParameterBindingProxy> bindings)
+      throws EvalException, AnalysisException
+    {
+      final DocumentManager manager = getDocumentManager();
+      final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      final ModuleCompiler compiler =
+        new ModuleCompiler(manager, factory, module);
+      final ProductDESProxy des = compiler.compile();
+      mConflictChecker.setModel(des);
+      mConflictChecker.run();
+      return mConflictChecker.getAnalysisResult();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final CompositionalConflictChecker mConflictChecker;
+  }
+
+
+  //#########################################################################
+  //# Inner Class BDDConflictCheckerWrapper
+  @SuppressWarnings("unused")
+  private class BDDConflictCheckerWrapper
+    extends ConflictCheckerWrapper
+  {
+
+    //#######################################################################
+    //# Constructor
+    private BDDConflictCheckerWrapper()
+    {
+      final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      mConflictChecker =  new BDDConflictChecker(factory);
+      // Configuration of CompositionalConflictChecker ...
+      mConflictChecker.setBDDPackage(BDDPackage.CUDD);
+      mConflictChecker.setTransitionPartitioningStrategy
+        (TransitionPartitioningStrategy.AUTOMATA);
+      mConflictChecker.setPartitioningSizeLimit(5000);
+      // Configuration end
+    }
+
+    //#######################################################################
+    //# Overrides for ConflictCheckerWrapper
+    @Override
+    AnalysisResult runConflictChecker(final ModuleProxy module,
+                                      final List<ParameterBindingProxy> bindings)
+      throws EvalException, AnalysisException
+    {
+      final DocumentManager manager = getDocumentManager();
+      final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      final ModuleCompiler compiler =
+        new ModuleCompiler(manager, factory, module);
+      final ProductDESProxy des = compiler.compile();
+      mConflictChecker.setModel(des);
+      mConflictChecker.run();
+      return mConflictChecker.getAnalysisResult();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final BDDConflictChecker mConflictChecker;
+  }
+
+
+  //#########################################################################
   //# Data Members
+  private ConflictCheckerWrapper mConflictCheckerWrapper;
   private final FileOutputStream mOut;
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
