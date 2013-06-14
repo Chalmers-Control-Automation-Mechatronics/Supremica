@@ -19,16 +19,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -208,8 +213,94 @@ public class EnabledEventsCompositionalConflictChecker extends
         }
       }
     }
+
+    //new method that calculates if a event is always enabled from A1.
+    //give aut and candidate
+    //returns all events that are always enabled from aut. including those you can tell from event info.
+
+
+
   }
 
+  /**
+   * Returns a list of all always enabled events in aut.
+   *
+   * @param aut is the automaton being simplified
+   * @param candidate is the candidate being simplified
+   * @return
+   * @throws AnalysisException
+   */
+  public List<EventProxy> calculateAlwaysEnabledEvents(final AutomatonProxy aut, final Candidate candidate) throws AnalysisException
+  {
+    //Ways to optimise:
+    //Do after original check, as that has already calculated some always enabled events
+    //If an event is always enabled it should always be always enabled, so only check the other events
+
+    final ArrayList<EventProxy> alwaysEnabledEventsList = new ArrayList<EventProxy>();
+  //getCurrentAut - ones in candidate + aut
+   final List<AutomatonProxy> modelList = new ArrayList<AutomatonProxy>();
+   modelList.addAll(getCurrentAutomata());
+   modelList.removeAll(candidate.getAutomata());
+   modelList.add(aut);
+    mChecker.setModel(createProductDESProxy(modelList));
+
+    //for each of the events in aut
+    for (final EventProxy event : aut.getEvents()) {
+      final EventInfo info = getEventInfo(event);
+      if (info != null && !info.isLocal(candidate.getAutomata())) {
+        //Set new KindTranslator
+        mChecker.setKindTranslator(new KindTranslator() {
+          //This event is set to uncontrollable, the rest are controllable
+          @Override
+          public EventKind getEventKind(final EventProxy e)
+          {
+            return e.equals(event) ? EventKind.UNCONTROLLABLE
+              : EventKind.CONTROLLABLE;
+          }
+
+          //Set aut as plant, the rest as spec
+          @Override
+          public ComponentKind getComponentKind(final AutomatonProxy a)
+          {
+            return a.equals(aut) ? ComponentKind.PLANT : ComponentKind.SPEC;
+          }
+        });
+
+
+
+        try {
+          if (mChecker.run()) {
+            //If mChecker returns true then this event is always enabled in this aut
+            alwaysEnabledEventsList.add(event);
+          }
+        } catch (final OverflowException ex) {
+          //If it runs out of space, assume it is not always enabled
+          System.err
+            .println("Ran out of space while checking for Always Enabled Events");
+        }
+      }
+
+
+    }
+    System.out.println("Found " + alwaysEnabledEventsList.size() + " always enabled events in aut " + aut.getName());
+    return alwaysEnabledEventsList;
+
+  }
+
+  @Override
+  protected void setUp() throws AnalysisException
+  {
+    super.setUp();
+
+    mChecker = new ModularControllabilityChecker(getFactory(), new NativeControllabilityChecker(getFactory()));
+    mChecker.setNodeLimit(1000);
+  }
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mChecker = null;
+  }
 
   @Override
   protected EventInfo createEventInfo(final EventProxy event)
@@ -223,6 +314,10 @@ public class EnabledEventsCompositionalConflictChecker extends
   {
     return (EnabledEventsEventInfo) super.getEventInfo(event);
   }
+
+  private ModularControllabilityChecker mChecker;
+
+
 
   /**
    * The preselecting method that considers every set of automata with at
