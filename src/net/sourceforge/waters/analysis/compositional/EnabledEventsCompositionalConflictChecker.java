@@ -225,23 +225,60 @@ public class EnabledEventsCompositionalConflictChecker extends
    */
   public List<EventProxy> calculateAlwaysEnabledEvents(final AutomatonProxy aut, final Candidate candidate) throws AnalysisException
   {
-
-    /*
     //If an automaton doesn't have tau or certain conflict states, don't bother calculating always enabled.
     boolean autContainsTau = false;
     for(final EventProxy e : aut.getEvents())
     {
       final EnabledEventsEventInfo eInfo = getEventInfo(e);
-      if(eInfo.isLocal(candidate.getAutomata()))
+      if(eInfo == null && e.getKind() != EventKind.PROPOSITION)
       {
         autContainsTau = true;
       }
     }
-    boolean autHasBlockingStates = false;
-    */
 
+    boolean autHasBlockingStates = false;
+    if(!autContainsTau)
+    {
+      //Creates transRelIterator to find dump states
+    final KindTranslator translator = getKindTranslator();
+    int markingID = -1;
+    final Collection<AutomatonProxy> collection =
+      Collections.singletonList(aut);
+    final EventEncoding encoding = new EventEncoding();
+    for (final EventProxy event : aut.getEvents()) {
+      final EventInfo info = getEventInfo(event);
+      if (info == null) {
+        final int code = encoding.addEvent(event, translator, (byte)0);
+        if (event == getUsedDefaultMarking()) {
+          markingID = code;
+        }
+        //super.addEventsToAutomata(aut);
+      } else if (info.isLocal(collection)) {
+        //tau info is always null so this is never reached
+        encoding.addSilentEvent(event);
+      } else {
+        encoding.addEvent(event, translator, (byte)0);
+      }
+    }
+    final ListBufferTransitionRelation transrel =
+      new ListBufferTransitionRelation(aut, encoding,
+                                       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final TransitionIterator normalTransIterator = transrel.createSuccessorsReadOnlyIterator();
+      for (int s = 0; s < transrel.getNumberOfStates(); s++) {
+        if (transrel.isReachable(s)) {
+          normalTransIterator.resetState(s);
+          if (!(normalTransIterator.advance() || markingID < 0 || transrel
+            .isMarked(s, markingID))) {
+            //Then s is not a dump state
+            autHasBlockingStates = true;
+          }
+        }
+      }
+    }
 
     final ArrayList<EventProxy> alwaysEnabledEventsList = new ArrayList<EventProxy>();
+    if(autHasBlockingStates || autContainsTau)
+    {
   //getCurrentAut - ones in candidate + aut
    final List<AutomatonProxy> modelList = new ArrayList<AutomatonProxy>();
    modelList.addAll(getCurrentAutomata());
@@ -260,13 +297,13 @@ public class EnabledEventsCompositionalConflictChecker extends
         if(info.isAlwaysEnabledCandidate(candidate)) {
           isEventAlwaysEnabledAlready = true;
           info.addAlwaysEnabledAutomaton(aut);
-          System.out.println("skipped");
+          //System.out.println("skipped");
         }
         //If the old rule finds this event is always enabled do not need to do hard test
         if(!isEventAlwaysEnabledAlready && info.isSingleDisablingCandidate(candidate)) {
           isEventAlwaysEnabledAlready = true;
           info.addAlwaysEnabledAutomaton(aut);
-          System.out.println("skipped because of old test");
+          //System.out.println("skipped because of old test");
         }
         if(isEventAlwaysEnabledAlready) {
           alwaysEnabledEventsList.add(event);
@@ -290,8 +327,6 @@ public class EnabledEventsCompositionalConflictChecker extends
           }
         });
 
-
-
         try {
           if (mChecker.run()) {
             //If mChecker returns true then this event is always enabled in this aut
@@ -300,14 +335,14 @@ public class EnabledEventsCompositionalConflictChecker extends
           }
         } catch (final OverflowException ex) {
           //If it runs out of space, assume it is not always enabled
-          System.err
-            .println("Ran out of space while checking for Always Enabled Events");
+          //System.err.println("Ran out of space while checking for Always Enabled Events");
         }
+      }
       }
     }
 
     }
-    System.out.println("Found " + alwaysEnabledEventsList.size() + " always enabled events in aut " + aut.getName());
+    //System.out.println("Found " + alwaysEnabledEventsList.size() + " always enabled events in aut " + aut.getName());
     return alwaysEnabledEventsList;
 
   }
