@@ -178,6 +178,8 @@ public class EFSMConflictCheckerTest
     checkPhilosophers("dining_philosophers", 5, false);
   }
 
+  /*--------------------------- Transfer Line ------------------------------*/
+
   public void testTransferLine12()
     throws IOException, WatersException
   {
@@ -213,6 +215,8 @@ public class EFSMConflictCheckerTest
   {
     checkTransferLine("transferline_efsm_block", 2, 2, false);
   }
+
+  /*--------------------------- Prime Sieve --------------------------------*/
 
   public void testPrimeSieve2a()
     throws IOException, WatersException
@@ -263,6 +267,8 @@ public class EFSMConflictCheckerTest
     checkConflict(module, true);
   }
 
+  /*--------------------------- Dynamic Sieve ------------------------------*/
+
   public void testDynamicPrimeSieve2()
     throws IOException, WatersException
   {
@@ -287,12 +293,7 @@ public class EFSMConflictCheckerTest
     checkPrimeSieve("dynamic_prime_sieve", 5, 168, true);
   }
 
-  public void testCaseStudy()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("efa", "caseStudy-original");
-    checkConflict(module, false);
-  }
+  /*----------------------------- PSL --------------------------------------*/
 
   public void testPsl()
     throws IOException, WatersException
@@ -301,10 +302,32 @@ public class EFSMConflictCheckerTest
     checkConflict(module, false);
   }
 
+
+  public void testPslNon()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "pslNon");
+    checkConflict(module, true);
+  }
+
   public void testPslBig()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "psl", "pslBig");
+    checkConflict(module, false);
+  }
+
+  public void testPslBigNonblocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "pslBigNonblocking");
+    checkConflict(module, true);
+  }
+
+  public void testPslBigBlocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "pslBigBlocking");
     checkConflict(module, false);
   }
 
@@ -316,15 +339,13 @@ public class EFSMConflictCheckerTest
     checkConflict(module, false);
   }
 
-  /*
-   * Please upload this file, then comment in again.
   public void testPslWithResetTrans()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "psl", "pslWithResetTrans");
     checkConflict(module, false);
   }
-   */
+
 
 
   //#########################################################################
