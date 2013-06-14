@@ -116,12 +116,14 @@ abstract class AbstractModularHeuristic
       final EventProxy event = oldStep.getEvent();
       final Map<AutomatonProxy,StateProxy> oldMap = oldStep.getStateMap();
       Map<AutomatonProxy,StateProxy> newMap = null;
+      boolean endOfTrace = false;
       for (final AutomatonProxy aut : automata) {
         if (!oldAutomata.contains(aut)) {
           final TraceFinder finder = getTraceFinder(aut);
           if (translator.getComponentKind(aut) == ComponentKind.SPEC &&
-              finder.getNumberOfAcceptedSteps() == depth - 1) {
-            // Don't try to find state for last step of spec.
+              depth > finder.getNumberOfAcceptedSteps()) {
+            // Found nonaccepting spec --- trace ends here.
+            endOfTrace = true;
             continue;
           }
           final StateProxy state = finder.getState(depth);
@@ -139,6 +141,9 @@ abstract class AbstractModularHeuristic
         final TraceStepProxy newStep =
           factory.createTraceStepProxy(event, newMap);
         newSteps.add(newStep);
+      }
+      if (endOfTrace) {
+        break;
       }
       depth++;
     }

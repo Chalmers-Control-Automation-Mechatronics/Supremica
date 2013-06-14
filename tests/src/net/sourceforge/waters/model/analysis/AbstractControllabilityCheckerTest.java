@@ -162,6 +162,14 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
+  public void testSjw41Counter() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "sjw41counter.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testVerriegel4Counter2() throws Exception
   {
     final String group = "tests";
@@ -536,11 +544,11 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
-  public void test_Nondet_MultiSepPlacesUncontrollable() throws Exception
+  public void test_Nondet_MultiSepPlacesConflicting() throws Exception
   {
     final String group = "tests";
     final String dir  = "nondeterministic";
-    final String name = "multiNondeterministicSepPlacesUncontrollable.wmod";
+    final String name = "multiNondeterministicSepPlacesConflicting.wmod";
     runModelVerifier(group, dir, name, false);
   }
 

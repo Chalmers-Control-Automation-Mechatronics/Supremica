@@ -44,7 +44,14 @@ do
   xs = c[S]
   c[S] = 0
   print xs
-loop</ns2:Comment>
+loop
+
+Here are the numbers of reachable states for some parameter values:
+
+S=2, N=24: 13704 reachable states
+S=3, N=48: 234890 reachable states
+S=4, N=120: 5680392 reachable states
+S=5, N=168: 67891570 reachable states</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
             <ConstantAliasExpression>
