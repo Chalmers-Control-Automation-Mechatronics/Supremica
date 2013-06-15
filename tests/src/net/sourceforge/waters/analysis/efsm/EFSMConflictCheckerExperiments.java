@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   CompositionalSynthesizerExperiments
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efsm
+//# CLASS:   EFSMConflictCheckerExperiments
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -24,6 +24,7 @@ import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecke
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -41,7 +42,7 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
  * a variety of configurations. The heuristics for choosing candidates can
  * be varied, as well as the abstraction rules applied and their order.
  *
- * @author Sahar Mohajerani
+ * @author Sahar Mohajerani, Robi Malik
  */
 
 public class EFSMConflictCheckerExperiments
@@ -181,6 +182,26 @@ public class EFSMConflictCheckerExperiments
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private ProductDESProxy compile(final ModuleProxy module,
+                                  final List<ParameterBindingProxy> bindings)
+    throws EvalException, OverflowException
+  {
+    try {
+      final DocumentManager manager = getDocumentManager();
+      final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      final ModuleCompiler compiler =
+        new ModuleCompiler(manager, factory, module);
+      final ProductDESProxy des = compiler.compile(bindings);
+      return des;
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      throw new OverflowException(error);
+    }
+  }
+
+
+  //#########################################################################
   //# Logging
   private void printAndLog(final String msg)
   {
@@ -295,11 +316,7 @@ public class EFSMConflictCheckerExperiments
                                       final List<ParameterBindingProxy> bindings)
       throws EvalException, AnalysisException
     {
-      final DocumentManager manager = getDocumentManager();
-      final ProductDESProxyFactory factory = getProductDESProxyFactory();
-      final ModuleCompiler compiler =
-        new ModuleCompiler(manager, factory, module);
-      final ProductDESProxy des = compiler.compile();
+      final ProductDESProxy des = compile(module, bindings);
       mConflictChecker.setModel(des);
       mConflictChecker.run();
       return mConflictChecker.getAnalysisResult();
@@ -339,11 +356,7 @@ public class EFSMConflictCheckerExperiments
                                       final List<ParameterBindingProxy> bindings)
       throws EvalException, AnalysisException
     {
-      final DocumentManager manager = getDocumentManager();
-      final ProductDESProxyFactory factory = getProductDESProxyFactory();
-      final ModuleCompiler compiler =
-        new ModuleCompiler(manager, factory, module);
-      final ProductDESProxy des = compiler.compile();
+      final ProductDESProxy des = compile(module, bindings);
       mConflictChecker.setModel(des);
       mConflictChecker.run();
       return mConflictChecker.getAnalysisResult();

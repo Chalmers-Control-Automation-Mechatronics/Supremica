@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
-//# CLASS:   EFSMCompilerTest
+//# CLASS:   EFSMConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -27,6 +27,11 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
+/**
+ * A test for the {@link EFSMConflictChecker}.
+ *
+ * @author Sahar Mohajerani, Robi Malik
+ */
 
 public class EFSMConflictCheckerTest
   extends AbstractAnalysisTest
@@ -58,7 +63,7 @@ public class EFSMConflictCheckerTest
 
 
   //#########################################################################
-  //# Successful Test Cases using EFA
+  //# Test Cases using EFA
   public void testEFSMCompiler1()
     throws IOException, WatersException
   {
@@ -302,13 +307,15 @@ public class EFSMConflictCheckerTest
     checkConflict(module, false);
   }
 
-
+  /*
+   * This file is not in the repository :-(
   public void testPslNon()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "psl", "pslNon");
     checkConflict(module, true);
   }
+   */
 
   public void testPslBig()
     throws IOException, WatersException
@@ -339,13 +346,15 @@ public class EFSMConflictCheckerTest
     checkConflict(module, false);
   }
 
+  /*
+   * This file is not in the repository :-(
   public void testPslWithResetTrans()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "psl", "pslWithResetTrans");
     checkConflict(module, false);
   }
-
+   */
 
 
   //#########################################################################
