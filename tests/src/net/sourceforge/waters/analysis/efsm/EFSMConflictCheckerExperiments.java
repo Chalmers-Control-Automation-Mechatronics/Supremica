@@ -125,6 +125,7 @@ public class EFSMConflictCheckerExperiments
     checkTransferLine("transferline_efsm", 500, 10, true);
     checkTransferLine("transferline_efsm", 1000, 10, true);
     checkTransferLine("transferline_efsm", 2000, 10, true);
+    checkProfisafe("profisafe_ihost_efsm", 5 ,true); // up to 255 ???
   }
 
 

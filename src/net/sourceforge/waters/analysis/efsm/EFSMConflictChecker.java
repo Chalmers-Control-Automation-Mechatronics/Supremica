@@ -13,6 +13,7 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -245,6 +246,8 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       final EFSMCompiler compiler =
         new EFSMCompiler(mDocumentManager, module);
       compiler.setConfiguredDefaultMarking(getConfiguredDefaultMarking());
+      final List<String> none = Collections.emptyList();
+      compiler.setEnabledPropertyNames(none);
       mCurrentEFSMSystem = compiler.compile(binding);
       final EFSMConflictCheckerAnalysisResult result = getAnalysisResult();
       result.setEFSMSystem(mCurrentEFSMSystem);

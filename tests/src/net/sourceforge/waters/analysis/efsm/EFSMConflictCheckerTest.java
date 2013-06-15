@@ -221,6 +221,15 @@ public class EFSMConflictCheckerTest
     checkTransferLine("transferline_efsm_block", 2, 2, false);
   }
 
+  /*---------------------------- PROFIsafe ---------------------------------*/
+
+  public void testProfisafeIHost4()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_ihost_efsm", 4 ,true);
+  }
+
+
   /*--------------------------- Prime Sieve --------------------------------*/
 
   public void testPrimeSieve2a()
@@ -391,6 +400,22 @@ public class EFSMConflictCheckerTest
       factory.createParameterBindingProxy("N", constN);
     bindings.add(bindingN);
     final ModuleProxy module = loadModule("efa", name);
+    checkConflict(module, bindings, expect);
+  }
+
+  void checkProfisafe(final String name,
+                      final int maxseqno,
+                      final boolean expect)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final IntConstantProxy constMAXSEQNO =
+      factory.createIntConstantProxy(maxseqno);
+    final ParameterBindingProxy bindingMAXSEQNO =
+      factory.createParameterBindingProxy("MAXSEQNO", constMAXSEQNO);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(bindingMAXSEQNO);
+    final ModuleProxy module = loadModule("tests", "profisafe", name);
     checkConflict(module, bindings, expect);
   }
 
