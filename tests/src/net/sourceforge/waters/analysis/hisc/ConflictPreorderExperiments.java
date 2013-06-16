@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.annotation.ConflictPreorderResult;
@@ -100,11 +101,12 @@ public class ConflictPreorderExperiments
 
   //#########################################################################
   //# Tests
-  @SuppressWarnings("unchecked")
   private void runAllTests() throws Exception
   {
     mCurrentGroup = null;
     mMaxLCLevel = 0;
+    final List<List<ConflictPreorderRecord>> groups =
+      new LinkedList<List<ConflictPreorderRecord>>();
     testHISCCP_aip3syn_as1();
 
     final List<ConflictPreorderRecord> philo =
@@ -113,6 +115,7 @@ public class ConflictPreorderExperiments
     testDirectPhiloSubsys12();
     testDirectPhiloSubsys123();
     testDirectPhiloSubsys1234();
+    groups.add(philo);
 
     final List<ConflictPreorderRecord> direct =
       new ArrayList<ConflictPreorderRecord>(16);
@@ -134,6 +137,7 @@ public class ConflictPreorderExperiments
     //testDirectCP10();
     testDirectSimon();
     Collections.sort(direct);
+    groups.add(direct);
 
     final List<ConflictPreorderRecord> hisccp =
       new ArrayList<ConflictPreorderRecord>(7);
@@ -145,10 +149,11 @@ public class ConflictPreorderExperiments
     testHISCCP_aip3el3();
     testHISCCP_aip3el4();
     testHISCCP_rhone_subsystem1_ld();
+    groups.add(hisccp);
 
     final FileOutputStream latexStream = new FileOutputStream(mLaTeXName);
     final PrintWriter writer = new PrintWriter(latexStream);
-    printLaTeX(writer, philo, hisccp, direct);
+    printLaTeX(writer, groups);
     writer.close();
   }
 
@@ -557,7 +562,7 @@ public class ConflictPreorderExperiments
   }
 
   private void printLaTeX(final PrintWriter writer,
-                          final List<ConflictPreorderRecord>... groups)
+                          final List<List<ConflictPreorderRecord>> groups)
   {
     writer.print("\\begin{tabular}{|>{\\hskip4.6em}rr<{) }|r|r|r|r|r|");
     for (int l = 0; l <= mMaxLCLevel; l++) {
