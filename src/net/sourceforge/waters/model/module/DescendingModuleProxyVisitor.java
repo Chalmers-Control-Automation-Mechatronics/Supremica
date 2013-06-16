@@ -186,6 +186,16 @@ public class DescendingModuleProxyVisitor
   }
 
   @Override
+  public Object visitFunctionCallExpressionProxy(final FunctionCallExpressionProxy proxy)
+    throws VisitorException
+  {
+    visitSimpleExpressionProxy(proxy);
+    final List<SimpleExpressionProxy> arguments = proxy.getArguments();
+    visitCollection(arguments);
+    return null;
+  }
+
+  @Override
   public Object visitGraphProxy(final GraphProxy proxy)
     throws VisitorException
   {

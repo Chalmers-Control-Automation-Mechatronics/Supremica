@@ -803,6 +803,7 @@
     <xs:element ref="M:IntConstant"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
+    <xs:element ref="M:FunctionCallExpression"/>
     <xs:element ref="M:EnumSetExpression"/>
   </xs:choice>
 </xs:group>
@@ -825,12 +826,13 @@
 
 <xs:group name="ArithmeticExpression">
   <xs:choice>
-    <xs:element ref="M:BinaryExpression"/>
     <xs:element ref="M:IntConstant"/>
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:IndexedIdentifier"/>
     <xs:element ref="M:QualifiedIdentifier"/>
     <xs:element ref="M:UnaryExpression"/>
+    <xs:element ref="M:BinaryExpression"/>
+    <xs:element ref="M:FunctionCallExpression"/>
   </xs:choice>
 </xs:group>
 
@@ -841,6 +843,7 @@
     <xs:element ref="M:IntConstant"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
+    <xs:element ref="M:FunctionCallExpression"/>
     <xs:element ref="M:EnumSetExpression"/>
   </xs:choice>
 </xs:group>
@@ -934,6 +937,24 @@
           </xs:group>
         </xs:sequence>
         <xs:attribute name="Operator" type="M:BinaryOperator" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="FunctionCallExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticExpression"
+                    minOccurs="1" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Arguments"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+        <xs:attribute name="FunctionName" type="xs:string" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

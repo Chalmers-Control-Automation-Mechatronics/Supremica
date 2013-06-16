@@ -21,7 +21,7 @@ class Token {
 
   //#########################################################################
   //# Constructors
-  Token(final int type, final String text, final int pos)
+  Token(final Type type, final String text, final int pos)
   {
     mType = type;
     mText = text;
@@ -35,11 +35,12 @@ class Token {
    * Gets the type of this token.
    * The token type identifies this token as a integer constant,
    * operator, parentheses, etc.
-   * @return One of {@link #END}, {@link #OPENBR}, {@link #OPENSQ},
-   *         {@link #CLOSEBR}, {@link #CLOSESQ}, {@link #COMMA},
-   *         {@link #OPERATOR}, {@link #NUMBER}, {@link #SYMBOL}.
+   * @return One of {@link Type#END}, {@link Type#OPENBR},
+   *         {@link Type#OPENSQ}, {@link Type#CLOSEBR}, {@link Type#CLOSESQ},
+   *         {@link Type#COMMA}, {@link Type#OPERATOR}, {@link Type#NUMBER},
+   *         {@link Type#SYMBOL}, {@link Type#FUNCTION}.
    */
-  int getType()
+  Type getType()
   {
     return mType;
   }
@@ -67,6 +68,7 @@ class Token {
 
   //#########################################################################
   //# Overrides for base class java.lang.Object
+  @Override
   public String toString()
   {
     return
@@ -85,8 +87,13 @@ class Token {
   {
     return null;
   }
-  
+
   BinaryOperator getBinaryOperator()
+  {
+    return null;
+  }
+
+  BuiltInFunction getBuiltInFunction()
   {
     return null;
   }
@@ -103,21 +110,24 @@ class Token {
 
 
   //#########################################################################
-  //# Token Type Constants
-  static final int END = 0;
-  static final int OPENBR = 1;
-  static final int OPENSQ = 2;
-  static final int CLOSEBR = 3;
-  static final int CLOSESQ = 4;
-  static final int COMMA = 5;
-  static final int OPERATOR = 6;
-  static final int NUMBER = 7;
-  static final int SYMBOL = 8;
+  //# Inner Enumeration Type
+  static enum Type {
+    END,
+    OPENBR,
+    OPENSQ,
+    CLOSEBR,
+    CLOSESQ,
+    COMMA,
+    OPERATOR,
+    NUMBER,
+    SYMBOL,
+    FUNCTION
+  }
 
 
   //#########################################################################
   //# Data Members
-  private final int mType;
+  private final Type mType;
   private final String mText;
   private final int mPosition;
 

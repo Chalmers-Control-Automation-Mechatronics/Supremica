@@ -15,8 +15,9 @@ import java.util.List;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -44,7 +45,7 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
   {
   }
 
-    
+
   //#########################################################################
   //# Invocation
   SimpleExpressionProxy replace(final SimpleExpressionProxy template,
@@ -71,10 +72,11 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
   {
     return (SimpleExpressionProxy) template.acceptVisitor(this);
   }
-    
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public BinaryExpressionProxy visitBinaryExpressionProxy
     (final BinaryExpressionProxy binary)
     throws VisitorException
@@ -91,19 +93,45 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
+  public FunctionCallExpressionProxy visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy expr)
+    throws VisitorException
+  {
+    final List<SimpleExpressionProxy> args =
+      new ArrayList<SimpleExpressionProxy>(expr.getArguments());
+    final int numArgs = args.size();
+    boolean change = false;
+    for (int i = 0; i < numArgs; i++) {
+      final SimpleExpressionProxy oldArg = args.get(i);
+      final SimpleExpressionProxy newArg = replace(oldArg);
+      if (newArg != oldArg) {
+        args.set(i, newArg);
+        change = true;
+      }
+    }
+    if (change) {
+      final String name = expr.getFunctionName();
+      return mFactory.createFunctionCallExpressionProxy(name, args);
+    } else {
+      return expr;
+    }
+  }
+
+  @Override
   public IndexedIdentifierProxy visitIndexedIdentifierProxy
     (final IndexedIdentifierProxy ident)
     throws VisitorException
   {
     final List<SimpleExpressionProxy> indexes =
       new ArrayList<SimpleExpressionProxy>(ident.getIndexes());
-    final int numindexes = indexes.size();
+    final int numIndexes = indexes.size();
     boolean change = false;
-    for (int i = 0; i < numindexes; i++) {
-      final SimpleExpressionProxy oldindex = indexes.get(i);
-      final SimpleExpressionProxy newindex = replace(oldindex);
-      if (newindex != oldindex) {
-        indexes.set(i, newindex);
+    for (int i = 0; i < numIndexes; i++) {
+      final SimpleExpressionProxy oldIndex = indexes.get(i);
+      final SimpleExpressionProxy newIndex = replace(oldIndex);
+      if (newIndex != oldIndex) {
+        indexes.set(i, newIndex);
         change = true;
       }
     }
@@ -115,6 +143,7 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
     (final QualifiedIdentifierProxy qual)
     throws VisitorException
@@ -130,12 +159,14 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public SimpleExpressionProxy visitSimpleExpressionProxy
     (final SimpleExpressionProxy expr)
   {
     return expr;
   }
 
+  @Override
   public SimpleExpressionProxy visitSimpleIdentifierProxy
     (final SimpleIdentifierProxy ident)
   {
@@ -147,6 +178,7 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public UnaryExpressionProxy visitUnaryExpressionProxy
     (final UnaryExpressionProxy unary)
     throws VisitorException

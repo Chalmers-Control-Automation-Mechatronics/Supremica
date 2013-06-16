@@ -9,41 +9,37 @@
 
 package net.sourceforge.waters.model.module;
 
-import net.sourceforge.waters.model.expr.BinaryOperator;
+import java.util.List;
 
 
 /**
- * The base class for all binary expressions.
- * A binary expression has two arguments, <I>left</I> and <I>right</I>,
- * and an <I>operator</I> applied to them. Typical examples are:
+ * An expression representing a function call.
+ * Function calls are written with the function name, which is recognised by
+ * the parser by an initial backslash character, followed by the argument
+ * list in brackets, separated by commas. Typical examples are:
  * <UL>
- * <LI><CODE>1 + 1</CODE></LI>
- * <LI><CODE>17 == 0</CODE></LI>
- * <LI><CODE>1 .. 100</CODE></LI>
+ * <LI><CODE>\min(12, 5, 7)</CODE></LI>
+ * <LI><CODE>\ite(x==y, x+1, x)</CODE></LI>
  * </UL>
  *
  * @author Robi Malik
  */
 
-public interface BinaryExpressionProxy
+public interface FunctionCallExpressionProxy
   extends SimpleExpressionProxy
 {
 
   //#########################################################################
   //# Getters
   /**
-   * Gets the operator of this expression.
+   * Gets the name of the function.
    */
-  public BinaryOperator getOperator();
+  public String getFunctionName();
 
   /**
-   * Gets the left subterm of this expression.
+   * Gets the list of arguments passed to the function.
    */
-  public SimpleExpressionProxy getLeft();
-
-  /**
-   * Gets the right subterm of this expression.
-   */
-  public SimpleExpressionProxy getRight();
+  // @default none
+  public List<SimpleExpressionProxy> getArguments();
 
 }

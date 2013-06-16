@@ -12,9 +12,9 @@ package net.sourceforge.waters.model.compiler.efa;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +24,8 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.OccursChecker;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -367,6 +367,7 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Interface java.lang.Comparable
+    @Override
     public int compareTo(final EventRecord record)
     {
       return mTransitionRelation.compareTo(record.mTransitionRelation);
@@ -493,6 +494,7 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Overrides
+    @Override
     EFAVariableTransitionRelationPart createTransitionRelationPart()
       throws EvalException
     {
@@ -546,6 +548,7 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Overrides
+    @Override
     EFAVariableTransitionRelationPart createTransitionRelationPart()
       throws EvalException
     {
@@ -578,13 +581,15 @@ class EFATransitionRelationBuilder
             new SingleBindingContext(outervar, outervalue, mContext);
           final SimpleExpressionProxy innervalue =
             mSimpleExpressionCompiler.eval(expr, outercontext);
-          final BindingContext innercontext =
-            new SingleBindingContext(innervar, innervalue, outercontext);
-          if (evalOtherLiterals(innercontext)) {
-            if (forward) {
-              result.addTransition(outervalue, innervalue);
-            } else {
-              result.addTransition(innervalue, outervalue);
+          if (range.contains(innervalue)) {
+            final BindingContext innercontext =
+              new SingleBindingContext(innervar, innervalue, outercontext);
+            if (evalOtherLiterals(innercontext)) {
+              if (forward) {
+                result.addTransition(outervalue, innervalue);
+              } else {
+                result.addTransition(innervalue, outervalue);
+              }
             }
           }
         }
@@ -615,6 +620,7 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Overrides for Base Class java.lang.Object
+    @Override
     public boolean equals(final Object other)
     {
       if (other != null && getClass() == other.getClass()) {
@@ -625,6 +631,7 @@ class EFATransitionRelationBuilder
       }
     }
 
+    @Override
     public int hashCode()
     {
       return mRelation1.objectHashCode() + 5 * mRelation2.objectHashCode();

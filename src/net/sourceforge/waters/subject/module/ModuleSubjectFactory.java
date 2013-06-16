@@ -235,6 +235,24 @@ public class ModuleSubjectFactory
                               range);
   }
 
+  public FunctionCallExpressionSubject createFunctionCallExpressionProxy
+      (final String plainText,
+       final String functionName,
+       final Collection<? extends SimpleExpressionProxy> arguments)
+  {
+    return new FunctionCallExpressionSubject(plainText,
+                                             functionName,
+                                             arguments);
+  }
+
+  public FunctionCallExpressionSubject createFunctionCallExpressionProxy
+      (final String functionName,
+       final Collection<? extends SimpleExpressionProxy> arguments)
+  {
+    return new FunctionCallExpressionSubject(functionName,
+                                             arguments);
+  }
+
   public GraphSubject createGraphProxy
       (final boolean deterministic,
        final LabelBlockProxy blockedEvents,

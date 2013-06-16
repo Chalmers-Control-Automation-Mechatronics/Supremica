@@ -9,11 +9,12 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -500,7 +501,7 @@ public class EFACompiler
           mCurrentGuard = mTrueGuard;
         } else {
           if (mIsUsingEventAlphabet) {
-            mCollectedVariables = new HashSet<EFAVariable>();
+            mCollectedVariables = new THashSet<EFAVariable>();
           }
           visitGuardActionBlockProxy(ga);
         }
@@ -615,9 +616,9 @@ public class EFACompiler
       try {
         final int size = mEFAEventDeclMap.size();
         mCurrentComponent = comp;
-        mCollectedEvents = new HashSet<EFAEventDecl>(size);
+        mCollectedEvents = new THashSet<EFAEventDecl>(size);
         if (!mIsUsingEventAlphabet) {
-          mCollectedVariables = new HashSet<EFAVariable>();
+          mCollectedVariables = new THashSet<EFAVariable>();
         }
         final ComponentKind ckind = comp.getKind();
         final GraphProxy graph = comp.getGraph();
@@ -791,7 +792,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
-        mEFAAlphabet = new HashSet<EFAEvent>();
+        mEFAAlphabet = new THashSet<EFAEvent>();
         final Collection<NodeProxy> nodes = graph.getNodes();
         final int numnodes = nodes.size();
         mNodeList = new ArrayList<NodeProxy>(numnodes);

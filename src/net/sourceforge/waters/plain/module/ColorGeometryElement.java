@@ -110,4 +110,3 @@ public final class ColorGeometryElement
   private static final long serialVersionUID = -5667739637678377383L;
 
 }
-

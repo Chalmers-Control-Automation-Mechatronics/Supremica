@@ -9,17 +9,18 @@
 
 package net.sourceforge.waters.model.expr;
 
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
@@ -74,7 +75,7 @@ public class ExpressionComparator
   //#########################################################################
   //# Constructors
   public ExpressionComparator
-    (final Map<Class<? extends Proxy>,Integer> ifacevalues)
+    (final TObjectIntHashMap<Class<? extends Proxy>> ifacevalues)
   {
     this(ifacevalues, null);
   }
@@ -86,7 +87,7 @@ public class ExpressionComparator
   }
 
   public ExpressionComparator
-    (final Map<Class<? extends Proxy>,Integer> ifacevalues,
+    (final TObjectIntHashMap<Class<? extends Proxy>> ifacevalues,
      final OperatorTable optable)
   {
     mInterfaceValues = ifacevalues;
@@ -96,6 +97,7 @@ public class ExpressionComparator
 
   //##########################################################################
   //# Interface java.util.Comparator
+  @Override
   public int compare(final SimpleExpressionProxy expr1,
                      final SimpleExpressionProxy expr2)
   {
@@ -122,6 +124,7 @@ public class ExpressionComparator
 
   //##########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public Integer visitBinaryExpressionProxy(final BinaryExpressionProxy expr1)
   {
     final BinaryExpressionProxy expr2 = (BinaryExpressionProxy) mExpr2;
@@ -142,6 +145,7 @@ public class ExpressionComparator
     return compare(rhs1, rhs2);
   }
 
+  @Override
   public Integer visitEnumSetExpressionProxy
     (final EnumSetExpressionProxy enum1)
   {
@@ -165,6 +169,36 @@ public class ExpressionComparator
     return more1 - more2;
   }
 
+  @Override
+  public Integer visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy expr1)
+  {
+    final FunctionCallExpressionProxy expr2 =
+      (FunctionCallExpressionProxy) mExpr2;
+    final String name1 = expr1.getFunctionName();
+    final String name2 = expr2.getFunctionName();
+    int result = name1.compareTo(name2);
+    if (result != 0) {
+      return result;
+    }
+    final List<SimpleExpressionProxy> args1 = expr1.getArguments();
+    final List<SimpleExpressionProxy> args2 = expr2.getArguments();
+    final Iterator<SimpleExpressionProxy> iter1 = args1.iterator();
+    final Iterator<SimpleExpressionProxy> iter2 = args2.iterator();
+    while (iter1.hasNext() && iter2.hasNext()) {
+      final SimpleExpressionProxy arg1 = iter1.next();
+      final SimpleExpressionProxy arg2 = iter2.next();
+      result = compare(arg1, arg2);
+      if (result != 0) {
+        return result;
+      }
+   }
+    final int more1 = iter1.hasNext() ? 1 : 0;
+    final int more2 = iter2.hasNext() ? 1 : 0;
+    return more1 - more2;
+  }
+
+  @Override
   public Integer visitIndexedIdentifierProxy
     (final IndexedIdentifierProxy ident1)
   {
@@ -192,6 +226,7 @@ public class ExpressionComparator
     return more1 - more2;
   }
 
+  @Override
   public Integer visitIntConstantProxy(final IntConstantProxy intconst1)
   {
     final IntConstantProxy intconst2 = (IntConstantProxy) mExpr2;
@@ -206,6 +241,7 @@ public class ExpressionComparator
     }
   }
 
+  @Override
   public Integer visitQualifiedIdentifierProxy
     (final QualifiedIdentifierProxy ident1)
   {
@@ -221,6 +257,7 @@ public class ExpressionComparator
     return compare(comp1, comp2);
   }
 
+  @Override
   public Integer visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident1)
   {
     final SimpleIdentifierProxy ident2 = (SimpleIdentifierProxy) mExpr2;
@@ -229,6 +266,7 @@ public class ExpressionComparator
     return name1.compareTo(name2);
   }
 
+  @Override
   public Integer visitUnaryExpressionProxy(final UnaryExpressionProxy expr1)
   {
     final UnaryExpressionProxy expr2 = (UnaryExpressionProxy) mExpr2;
@@ -274,7 +312,7 @@ public class ExpressionComparator
 
   //#########################################################################
   //# Data Members
-  private final Map<Class<? extends Proxy>,Integer> mInterfaceValues;
+  private final TObjectIntHashMap<Class<? extends Proxy>> mInterfaceValues;
   private final OperatorTable mOperatorTable;
   private SimpleExpressionProxy mExpr2;
 
@@ -284,10 +322,10 @@ public class ExpressionComparator
   private static class SingletonHolder {
 
     private static final Comparator<SimpleExpressionProxy> INSTANCE;
-    private static final Map<Class<? extends Proxy>,Integer> DEFAULTMAP;
+    private static final TObjectIntHashMap<Class<? extends Proxy>> DEFAULTMAP;
 
     static {
-      DEFAULTMAP = new HashMap<Class<? extends Proxy>,Integer>(32);
+      DEFAULTMAP = new TObjectIntHashMap<Class<? extends Proxy>>(32);
       DEFAULTMAP.put(IntConstantProxy.class, 0);
       DEFAULTMAP.put(SimpleIdentifierProxy.class, 1);
       DEFAULTMAP.put(IndexedIdentifierProxy.class, 2);
@@ -295,6 +333,7 @@ public class ExpressionComparator
       DEFAULTMAP.put(EnumSetExpressionProxy.class, 4);
       DEFAULTMAP.put(UnaryExpressionProxy.class, 5);
       DEFAULTMAP.put(BinaryExpressionProxy.class, 6);
+      DEFAULTMAP.put(FunctionCallExpressionProxy.class, 6);
       INSTANCE = new ExpressionComparator(DEFAULTMAP, null);
     }
 

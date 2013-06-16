@@ -16,6 +16,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -121,6 +122,20 @@ public class OccursChecker extends DefaultModuleProxyVisitor
     final SimpleExpressionProxy lhs = expr.getLeft();
     final SimpleExpressionProxy rhs = expr.getRight();
     return occurs(lhs) || occurs(rhs);
+  }
+
+  @Override
+  public Boolean visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy expr)
+    throws VisitorException
+  {
+    final List<SimpleExpressionProxy> args = expr.getArguments();
+    for (final SimpleExpressionProxy arg : args) {
+      if (occurs(arg)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

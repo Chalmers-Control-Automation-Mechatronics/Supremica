@@ -14,7 +14,7 @@ package net.sourceforge.waters.model.expr;
  * <P>An operator table.</P>
  *
  * <P>This is the interface needed for the identification of operators
- * given their name.</P>
+ * and built-in functions given their name.</P>
  *
  * @author Robi Malik
  */
@@ -23,15 +23,19 @@ public interface OperatorTable {
 
   //#########################################################################
   //# Access Methods
-  public UnaryOperator getUnaryOperator(final String name);
+  public UnaryOperator getUnaryOperator(String name);
 
-  public BinaryOperator getBinaryOperator(final String name);
+  public BinaryOperator getBinaryOperator(String name);
 
-  public boolean contains(final String name);
+  public BuiltInFunction getBuiltInFunction(String name);
 
-  public boolean isOperatorCharacter(final char ch);
+  public boolean containsOperator(String name);
 
-  public int getOperatorValue(final Operator op);
+  public boolean isOperatorCharacter(char ch);
+
+  public int getOperatorValue(Operator op);
+
+  public char getFunctionKeyCharacter();
 
 
   //#########################################################################

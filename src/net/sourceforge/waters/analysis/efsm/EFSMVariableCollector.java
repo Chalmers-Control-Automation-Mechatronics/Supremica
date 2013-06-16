@@ -15,8 +15,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
@@ -30,7 +29,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  */
 
 class EFSMVariableCollector
-  extends DefaultModuleProxyVisitor
+  extends DescendingModuleProxyVisitor
 {
 
 
@@ -170,17 +169,6 @@ class EFSMVariableCollector
   }
 
   @Override
-  public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
-    throws VisitorException
-  {
-    final SimpleExpressionProxy lhs = expr.getLeft();
-    collect(lhs);
-    final SimpleExpressionProxy rhs = expr.getRight();
-    collect(rhs);
-    return null;
-  }
-
-  @Override
   public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
   {
     return null;
@@ -199,7 +187,7 @@ class EFSMVariableCollector
         }
       }
     } else {
-      collect(subterm);
+      subterm.acceptVisitor(this);
     }
     return null;
   }

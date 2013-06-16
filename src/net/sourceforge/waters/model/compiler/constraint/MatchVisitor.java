@@ -14,8 +14,9 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -83,6 +84,7 @@ class MatchVisitor extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public Boolean visitBinaryExpressionProxy
     (final BinaryExpressionProxy template)
     throws VisitorException
@@ -105,6 +107,34 @@ class MatchVisitor extends DefaultModuleProxyVisitor
     return match(tright, eright);
   }
 
+  @Override
+  public Boolean visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy template)
+    throws VisitorException
+  {
+    if (!(mCurrentExpression instanceof FunctionCallExpressionProxy)) {
+      return false;
+    }
+    final FunctionCallExpressionProxy expr =
+      (FunctionCallExpressionProxy) mCurrentExpression;
+    final List<SimpleExpressionProxy> tArgs = template.getArguments();
+    final List<SimpleExpressionProxy> eArgs = expr.getArguments();
+    if (tArgs.size() != eArgs.size()) {
+      return false;
+    }
+    final Iterator<SimpleExpressionProxy> tIter = tArgs.iterator();
+    final Iterator<SimpleExpressionProxy> eIter = eArgs.iterator();
+    while (tIter.hasNext()) {
+      final SimpleExpressionProxy tArg = tIter.next();
+      final SimpleExpressionProxy eArg = eIter.next();
+      if (!match(tArg, eArg)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public Boolean visitIndexedIdentifierProxy
     (final IndexedIdentifierProxy template)
     throws VisitorException
@@ -114,23 +144,24 @@ class MatchVisitor extends DefaultModuleProxyVisitor
     }
     final IndexedIdentifierProxy expr =
       (IndexedIdentifierProxy) mCurrentExpression;
-    final List<SimpleExpressionProxy> tindexes = template.getIndexes();
-    final List<SimpleExpressionProxy> eindexes = expr.getIndexes();
-    if (tindexes.size() != eindexes.size()) {
+    final List<SimpleExpressionProxy> tIndexes = template.getIndexes();
+    final List<SimpleExpressionProxy> eIndexes = expr.getIndexes();
+    if (tIndexes.size() != eIndexes.size()) {
       return false;
     }
-    final Iterator<SimpleExpressionProxy> titer = tindexes.iterator();
-    final Iterator<SimpleExpressionProxy> eiter = eindexes.iterator();
-    while (titer.hasNext()) {
-      final SimpleExpressionProxy tindex = titer.next();
-      final SimpleExpressionProxy eindex = eiter.next();
-      if (!match(tindex, eindex)) {
+    final Iterator<SimpleExpressionProxy> tIter = tIndexes.iterator();
+    final Iterator<SimpleExpressionProxy> eIter = eIndexes.iterator();
+    while (tIter.hasNext()) {
+      final SimpleExpressionProxy tIndex = tIter.next();
+      final SimpleExpressionProxy eIndex = eIter.next();
+      if (!match(tIndex, eIndex)) {
         return false;
       }
     }
     return true;
   }
 
+  @Override
   public Boolean visitQualifiedIdentifierProxy
     (final QualifiedIdentifierProxy template)
     throws VisitorException
@@ -150,6 +181,7 @@ class MatchVisitor extends DefaultModuleProxyVisitor
     return match(tcomp, ecomp);
   }
 
+  @Override
   public Boolean visitSimpleExpressionProxy
     (final SimpleExpressionProxy template)
   {
@@ -158,6 +190,7 @@ class MatchVisitor extends DefaultModuleProxyVisitor
     return eq.equals(template, mCurrentExpression);
   }
 
+  @Override
   public Boolean visitSimpleIdentifierProxy
     (final SimpleIdentifierProxy template)
     throws VisitorException
@@ -174,6 +207,7 @@ class MatchVisitor extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public Boolean visitUnaryExpressionProxy
     (final UnaryExpressionProxy template)
     throws VisitorException

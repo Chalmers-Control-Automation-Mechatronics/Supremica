@@ -314,6 +314,62 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_compare_1()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 10);
+    addVariable("x", range);
+    final String[] constraints = {"x<x"};
+    final String[] expected = null;
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_ite_1()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 31);
+    addVariable("x", range);
+    addVariable("y", range);
+    final String[] constraints = {"x > 5", "y == \\ite(x<3, x+1, 0)"};
+    final String[] expected = {"6 <= x", "y == 0"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_ite_2()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 31);
+    addVariable("x", range);
+    addVariable("y", range);
+    final String[] constraints = {"x > 5", "y == \\ite(x<3, x+1, x-1)"};
+    final String[] expected = {"6 <= x", "y == x-1"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_ite_3()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 31);
+    addVariable("x", range);
+    addVariable("y", range);
+    addVariable("z", range);
+    final String[] constraints = {"x == 1", "z == \\ite(x<y, x+1, y+x)"};
+    final String[] expected = {"x == 1", "z == \\ite(1<y, 2, y+1)"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_ite_4()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 31);
+    addVariable("x", range);
+    addVariable("y", range);
+    addVariable("z", range);
+    final String[] constraints = {"x == y", "z == \\ite(x<y, 1, 0)"};
+    final String[] expected = {"x == y", "z == 0"};
+    testPropagate(constraints, expected);
+  }
+
   public void testPropagate_balllift_1()
     throws EvalException, ParseException
   {

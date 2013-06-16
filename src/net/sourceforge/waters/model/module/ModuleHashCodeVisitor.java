@@ -258,6 +258,20 @@ public class ModuleHashCodeVisitor
     return result;
   }
 
+  public Integer visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy proxy)
+    throws VisitorException
+  {
+    int result = visitSimpleExpressionProxy(proxy);
+    final String functionName = proxy.getFunctionName();
+    result *= 5;
+    result += computeOptionalHashCode(functionName);
+    final List<SimpleExpressionProxy> arguments = proxy.getArguments();
+    result *= 5;
+    result += computeListHashCode(arguments);
+    return result;
+  }
+
   public Integer visitGraphProxy
     (final GraphProxy proxy)
     throws VisitorException
