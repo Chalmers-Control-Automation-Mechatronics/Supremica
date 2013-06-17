@@ -150,8 +150,7 @@ public class SplitComputerTest extends TestCase
     addBooleanVariable("statusbit");
     addBooleanVariable("statusbit'");
     final String[] constraints = {"statusbit'==\\ite(numcycles>1, statusbit, 0)"};
-    // TODO Can probably do better by taking \ite into account ...
-    final String[] expected = {"!statusbit", "statusbit"};
+    final String[] expected = {"numcycles>1", "!(numcycles>1)"};
     testPropose(constraints, expected);
   }
 

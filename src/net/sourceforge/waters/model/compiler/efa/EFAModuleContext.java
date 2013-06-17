@@ -30,8 +30,8 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 /**
  * The binding context used by the EFA compiler.
  *
- * In addition to bindings of enumeration atom, the EFA context includes a
- * symbol table with all variables maintained by the EFA compiler
+ * In addition to bindings of enumeration atoms, the EFA module context
+ * includes a symbol table with all variables maintained by the EFA compiler
  * and their range. These are the variables that occur in guards and
  * represent the current state of EFA components such as variables ({@link
  * net.sourceforge.waters.model.module.VariableComponentProxy

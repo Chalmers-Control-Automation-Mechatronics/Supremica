@@ -32,11 +32,13 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.BuiltInFunction;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -44,6 +46,7 @@ import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
@@ -61,6 +64,8 @@ public class SplitComputer
     mOperatorTable = optable;
     mDisjunctionCollectVisitor = new DisjunctionCollectVisitor();
     mCollectVisitor = new CollectVisitor();
+    mOneVariableFinder = new OneVariableFinder();
+    mEquality = ModuleEqualityVisitor.getInstance(false);
     mExpressionComparator = new ExpressionComparator(optable);
     mCandidateComparator = new CandidateComparator();
     mCombinations = new THashSet<VariableCombination>();
@@ -201,17 +206,8 @@ public class SplitComputer
   {
     final UnaryOperator nextop = mOperatorTable.getNextOperator();
     for (final SimpleExpressionProxy varname : comb.getVariables()) {
-      final VariableSplitCandidate vcand;
-      final ProxyAccessor<SimpleExpressionProxy> accessor =
-        mCandidateMap.createAccessor(varname);
-      final AbstractSplitCandidate cand = mCandidateMap.get(accessor);
-      if (cand == null) {
-        final CompiledRange range = mContext.getVariableRange(varname);
-        vcand = new VariableSplitCandidate(varname, range);
-        mCandidateMap.put(accessor, vcand);
-      } else {
-        vcand = (VariableSplitCandidate) cand;
-      }
+      final VariableSplitCandidate vcand =
+        createVariableSplitCandidate(varname);
       vcand.addOccurrence();
       if (varname instanceof IdentifierProxy) {
         final UnaryExpressionProxy nextvarname =
@@ -226,6 +222,24 @@ public class SplitComputer
           vcand.setOccursWithNext();
         }
       }
+    }
+  }
+
+
+  private VariableSplitCandidate createVariableSplitCandidate
+    (final SimpleExpressionProxy varname)
+  {
+    final ProxyAccessor<SimpleExpressionProxy> accessor =
+      mCandidateMap.createAccessor(varname);
+    final AbstractSplitCandidate cand = mCandidateMap.get(accessor);
+    if (cand == null) {
+      final CompiledRange range = mContext.getVariableRange(varname);
+      final VariableSplitCandidate vcand =
+        new VariableSplitCandidate(varname, range);
+      mCandidateMap.put(accessor, vcand);
+      return vcand;
+    } else {
+      return (VariableSplitCandidate) cand;
     }
   }
 
@@ -457,8 +471,15 @@ public class SplitComputer
       (final FunctionCallExpressionProxy expr)
       throws VisitorException
     {
+      final String name = expr.getFunctionName();
+      final BuiltInFunction function = mOperatorTable.getBuiltInFunction(name);
+      final List<SimpleExpressionProxy> args = expr.getArguments();
+      if (function == mOperatorTable.getIteFunction()) {
+        final SimpleExpressionProxy cond = args.get(0);
+        recordIteSplit(cond);
+      }
       boolean result = false;
-      for (final SimpleExpressionProxy arg : expr.getArguments()) {
+      for (final SimpleExpressionProxy arg : args) {
         result |= process(arg);
       }
       return result;
@@ -578,12 +599,131 @@ public class SplitComputer
       return mInIndex;
     }
 
+    private void recordIteSplit(final SimpleExpressionProxy cond)
+    {
+      final SimpleExpressionProxy varname =
+        mOneVariableFinder.findUniqueVariable(cond);
+      if (varname != null) {
+        final VariableSplitCandidate vcand =
+          createVariableSplitCandidate(varname);
+        vcand.addIteSplit(cond);
+      }
+    }
+
     //#######################################################################
     //# Data Members
     private ProxyAccessorSet<SimpleExpressionProxy> mCollection;
     private boolean mInIndex;
     private boolean mInQualification;
 
+  }
+
+
+  //#########################################################################
+  //# Inner Class OneVariableFinder
+  /**
+   * A visitor that collects the variables in an expression.
+   * Splitting is performed by assigning to each variable all possible values
+   * from is range.
+   */
+  private class OneVariableFinder
+    extends DescendingModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private SimpleExpressionProxy findUniqueVariable
+      (final SimpleExpressionProxy expr)
+    {
+      try {
+        if (scan(expr)) {
+          return mVariable;
+        } else {
+          return null;
+        }
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      } finally {
+        mVariable = null;
+      }
+    }
+
+    private Boolean scan(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      return (Boolean) expr.acceptVisitor(this);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Boolean visitBinaryExpressionProxy
+      (final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy lhs = expr.getLeft();
+      final SimpleExpressionProxy rhs = expr.getRight();
+      return scan(lhs) || scan(rhs);
+    }
+
+    @Override
+    public Boolean visitFunctionCallExpressionProxy
+      (final FunctionCallExpressionProxy expr)
+      throws VisitorException
+    {
+      final List<SimpleExpressionProxy> args = expr.getArguments();
+      for (final SimpleExpressionProxy arg : args) {
+        if (scan(arg)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public Boolean visitSimpleExpressionProxy
+      (final SimpleExpressionProxy expr)
+    {
+      return false;
+    }
+
+    @Override
+    public Boolean visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
+      throws VisitorException
+    {
+      if (mContext.getVariableRange(ident) == null) {
+        return true;
+      } else if (mVariable == null) {
+        mVariable = ident;
+        return true;
+      } else {
+        return mEquality.equals(mVariable, ident);
+      }
+    }
+
+    @Override
+    public Boolean visitUnaryExpressionProxy
+      (final UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy subterm = expr.getSubTerm();
+      if (expr.getOperator() != mOperatorTable.getNextOperator()) {
+        return scan(subterm);
+      } else if (!(subterm instanceof SimpleIdentifierProxy)) {
+        return false;
+      } else if (mContext.getVariableRange(subterm) == null) {
+        return true;
+      } else if (mVariable == null) {
+        mVariable = expr;
+        return true;
+      } else {
+        return mEquality.equals(mVariable, expr);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private SimpleExpressionProxy mVariable;
   }
 
 
@@ -683,6 +823,8 @@ public class SplitComputer
   private final CompilerOperatorTable mOperatorTable;
   private final DisjunctionCollectVisitor mDisjunctionCollectVisitor;
   private final CollectVisitor mCollectVisitor;
+  private final OneVariableFinder mOneVariableFinder;
+  private final ModuleEqualityVisitor mEquality;
   private final Comparator<SimpleExpressionProxy> mExpressionComparator;
   private final Comparator<AbstractSplitCandidate> mCandidateComparator;
   private final Set<VariableCombination> mCombinations;
