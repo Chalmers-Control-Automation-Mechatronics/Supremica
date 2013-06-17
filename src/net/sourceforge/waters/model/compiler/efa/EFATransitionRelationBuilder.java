@@ -9,11 +9,12 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -241,8 +242,8 @@ class EFATransitionRelationBuilder
   private VariableRecord collectRecord(final EFAEventDecl edecl,
                                        final SimpleExpressionProxy literal)
   {
-    final Collection<EFAVariable> unprimedSet = new HashSet<EFAVariable>(1);
-    final Collection<EFAVariable> primedSet = new HashSet<EFAVariable>(1);
+    final Collection<EFAVariable> unprimedSet = new THashSet<EFAVariable>(1);
+    final Collection<EFAVariable> primedSet = new THashSet<EFAVariable>(1);
     mCollector.collectAllVariables(literal, unprimedSet, primedSet);
     // Note: 'primed' is the unprimed version of the primed variable!
     assert unprimedSet.size() <= 1;
@@ -345,7 +346,7 @@ class EFATransitionRelationBuilder
                         final Collection<Proxy> locations)
     {
       mTransitionRelation = rel;
-      mSourceLocations = new HashSet<Proxy>(locations);
+      mSourceLocations = new THashSet<Proxy>(locations);
     }
 
     //#######################################################################

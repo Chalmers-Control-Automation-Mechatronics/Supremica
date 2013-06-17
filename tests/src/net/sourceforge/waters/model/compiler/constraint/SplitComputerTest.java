@@ -142,6 +142,31 @@ public class SplitComputerTest extends TestCase
     testPropose(constraints, expected);
   }
 
+  public void testPropose_ite_1()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 4);
+    addVariable("numcycles", range);
+    addBooleanVariable("statusbit");
+    addBooleanVariable("statusbit'");
+    final String[] constraints = {"statusbit'==\\ite(numcycles>1, statusbit, 0)"};
+    // TODO Can probably do better by taking \ite into account ...
+    final String[] expected = {"!statusbit", "statusbit"};
+    testPropose(constraints, expected);
+  }
+
+  public void testPropose_funcall_1()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 3);
+    addVariable("x", range);
+    addBooleanVariable("b");
+    addBooleanVariable("b'");
+    final String[] constraints = {"b'==\\max(x, b)"};
+    final String[] expected = {"x==0", "x==1", "x==2", "x==3"};
+    testPropose(constraints, expected);
+  }
+
   public void testPropose_balllift_1()
     throws EvalException, ParseException
   {

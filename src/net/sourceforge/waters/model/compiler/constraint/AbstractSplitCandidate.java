@@ -18,6 +18,7 @@ abstract class AbstractSplitCandidate
 
   //#########################################################################
   //# Overrides for Base Class java.lang.Object
+  @Override
   public String toString()
   {
     final StringBuffer buffer = new StringBuffer();
@@ -44,6 +45,18 @@ abstract class AbstractSplitCandidate
   abstract int getKindValue();
 
   abstract SimpleExpressionProxy getSplitExpression();
+
+
+  //#########################################################################
+  //# Advanced Access
+  int getPredictedSplitSize()
+  {
+    int size = getSplitSize();
+    if (getOccursWithNext()) {
+      size *= size;
+    }
+    return size;
+  }
 
 
   //#########################################################################

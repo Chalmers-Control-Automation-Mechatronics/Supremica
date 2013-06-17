@@ -9,11 +9,12 @@
 
 package net.sourceforge.waters.model.compiler.constraint;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,8 +35,9 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -61,7 +63,7 @@ public class SplitComputer
     mCollectVisitor = new CollectVisitor();
     mExpressionComparator = new ExpressionComparator(optable);
     mCandidateComparator = new CandidateComparator();
-    mCombinations = new HashSet<VariableCombination>();
+    mCombinations = new THashSet<VariableCombination>();
     mCandidateMap =
       new ProxyAccessorHashMap<SimpleExpressionProxy,AbstractSplitCandidate>
         (eq);
@@ -259,6 +261,7 @@ public class SplitComputer
 
     //#######################################################################
     //# Interface java.util.Comparator
+    @Override
     public int compare(final AbstractSplitCandidate cand1,
                        final AbstractSplitCandidate cand2)
     {
@@ -267,8 +270,8 @@ public class SplitComputer
       if (numocc1 != numocc2) {
         return numocc2 - numocc1;
       }
-      final int size1 = cand1.getSplitSize();
-      final int size2 = cand2.getSplitSize();
+      final int size1 = cand1.getPredictedSplitSize();
+      final int size2 = cand2.getPredictedSplitSize();
       if (size1 != size2) {
         return size1 - size2;
       }
@@ -366,6 +369,7 @@ public class SplitComputer
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
       throws VisitorException
     {
@@ -381,6 +385,7 @@ public class SplitComputer
       }
     }
 
+    @Override
     public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
       throws VisitorException
     {
@@ -436,6 +441,7 @@ public class SplitComputer
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
       throws VisitorException
     {
@@ -446,6 +452,19 @@ public class SplitComputer
       return lhsresult | rhsresult;
     }
 
+    @Override
+    public Boolean visitFunctionCallExpressionProxy
+      (final FunctionCallExpressionProxy expr)
+      throws VisitorException
+    {
+      boolean result = false;
+      for (final SimpleExpressionProxy arg : expr.getArguments()) {
+        result |= process(arg);
+      }
+      return result;
+    }
+
+    @Override
     public Boolean visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
@@ -462,6 +481,7 @@ public class SplitComputer
       }
     }
 
+    @Override
     public Boolean visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
@@ -486,6 +506,7 @@ public class SplitComputer
       }
     }
 
+    @Override
     public Boolean visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -513,11 +534,13 @@ public class SplitComputer
       }
     }
 
+    @Override
     public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
     {
       return false;
     }
 
+    @Override
     public Boolean visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
       throws VisitorException
     {
@@ -623,11 +646,13 @@ public class SplitComputer
 
     //#######################################################################
     //# Overrides for Baseclass java.lang.Object
+    @Override
     public String toString()
     {
       return mContents.values().toString();
     }
 
+    @Override
     public boolean equals(final Object other)
     {
       if (other != null && other.getClass() == getClass()) {
@@ -639,6 +664,7 @@ public class SplitComputer
       }
     }
 
+    @Override
     public int hashCode()
     {
       return mContents.hashCodeByAccessorEquality();
