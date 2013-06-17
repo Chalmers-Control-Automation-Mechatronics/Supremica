@@ -229,6 +229,12 @@ public class EFSMConflictCheckerTest
     checkProfisafe("profisafe_ihost_efsm", 4 ,true);
   }
 
+  public void testProfisafeISlave4()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_islave_efsm", 4 ,true);
+  }
+
 
   /*--------------------------- Prime Sieve --------------------------------*/
 

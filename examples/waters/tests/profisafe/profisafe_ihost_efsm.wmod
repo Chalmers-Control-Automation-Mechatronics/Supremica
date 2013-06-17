@@ -1997,20 +1997,9 @@ Robi Malik and Reinhard Mühlfeld, Testing the PROFIsafe Protocol Using Automati
                     </IndexedIdentifier>
                     <Graph>
                         <NodeList>
-                            <SimpleNode Initial="true" Name="sometimes">
+                            <SimpleNode Initial="true" Name="never">
                                 <PointGeometry>
-                                    <Point X="192" Y="144"/>
-                                </PointGeometry>
-                                <InitialArrowGeometry>
-                                    <Point X="-5" Y="-5"/>
-                                </InitialArrowGeometry>
-                                <LabelGeometry Anchor="NW">
-                                    <Point X="-60" Y="7"/>
-                                </LabelGeometry>
-                            </SimpleNode>
-                            <SimpleNode Name="never">
-                                <PointGeometry>
-                                    <Point X="272" Y="144"/>
+                                    <Point X="64" Y="48"/>
                                 </PointGeometry>
                                 <LabelGeometry Anchor="NW">
                                     <Point X="-39" Y="8"/>
@@ -2026,11 +2015,11 @@ Robi Malik and Reinhard Mühlfeld, Testing the PROFIsafe Protocol Using Automati
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point X="316" Y="144"/>
+                                    <Point X="108" Y="48"/>
                                 </SplineGeometry>
                                 <GuardActionBlock>
                                     <Guards>
-                                        <BinaryExpression Operator="==">
+                                        <BinaryExpression Operator="!=">
                                             <SimpleIdentifier Name="out_cons_num"/>
                                             <SimpleIdentifier Name="seq"/>
                                         </BinaryExpression>
@@ -2786,8 +2775,7 @@ Robi Malik and Reinhard Mühlfeld, Testing the PROFIsafe Protocol Using Automati
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="|" Text="out_cons_num==1 &amp; in_cons_num!=0 |
-in_cons_num==0 &amp;  in_CRC==ok">
+                                <BinaryExpression Operator="|" Text="out_cons_num==1 &amp; in_cons_num!=0 | in_cons_num==0 &amp;  in_CRC==ok">
                                     <BinaryExpression Operator="&amp;">
                                         <BinaryExpression Operator="==">
                                             <SimpleIdentifier Name="out_cons_num"/>
@@ -3266,8 +3254,8 @@ in_cons_num==0 &amp;  in_CRC==ok">
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G7">
-                        <NodeRef Name="rcvd1"/>
                         <NodeRef Name="virgin1"/>
+                        <NodeRef Name="rcvd1"/>
                         <BoxGeometry>
                             <Box Height="96" Width="352" X="80" Y="160"/>
                         </BoxGeometry>

@@ -12,8 +12,8 @@ package net.sourceforge.waters.model.analysis;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -26,7 +26,6 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
@@ -192,9 +191,20 @@ public abstract class AbstractLanguageInclusionCheckerTest
   public void testProfisafeI4SlaveEFA__neversend()
     throws Exception
   {
+    checkProfisafe__neversend("profisafe_islave_efa.wmod");
+  }
+
+  public void testProfisafeI4SlaveEFSM__neversend()
+    throws Exception
+  {
+    checkProfisafe__neversend("profisafe_islave_efsm.wmod");
+  }
+
+  private void checkProfisafe__neversend(final String name)
+    throws Exception
+  {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_islave_efa.wmod";
     final int maxseqno = 4;
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
     final List<ParameterBindingProxy> bindings =
@@ -217,6 +227,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
       }
     }
   }
+
 
   public void testProfisafeI4SlaveEFA__slave_sets_fv_after_slave_crc_fault_2()
     throws Exception
@@ -492,6 +503,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
     }
   }
 
+  @Override
   protected void configure(final ModuleCompiler compiler)
   {
     final Collection<String> empty = Collections.emptyList();
@@ -506,6 +518,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
     throws Exception
