@@ -1571,6 +1571,13 @@
                     <IntConstant Value="0"/>
                 </BinaryExpression>
             </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="slave_running"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
         </VariableComponent>
         <VariableComponent Deterministic="false" Name="in_cons_num">
             <VariableRange>
