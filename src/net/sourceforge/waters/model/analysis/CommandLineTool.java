@@ -9,13 +9,13 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.lang.reflect.Method;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
@@ -202,11 +202,14 @@ public class CommandLineTool
           ("SIC property check requires a conflict checker, " +
            "but none was configured.");
       }
-      final Watchdog watchdog = new Watchdog(wrapper, timeout);
       final Collection<String> empty = Collections.emptyList();
       final Iterator<String> argIter = argList.iterator();
       factory.parse(argIter);
       factory.configure(checker);
+      if (timeout > 0) {
+        final Watchdog watchdog = new Watchdog(wrapper, timeout);
+        watchdog.start();
+      }
 
       boolean first = true;
       for (final String name : argList) {
@@ -233,7 +236,7 @@ public class CommandLineTool
         factory.postConfigure(checker);
         boolean additions = false;
         try {
-          watchdog.launch();
+          wrapper.run();
           final VerificationResult result = wrapper.getAnalysisResult();
           final long stop = System.currentTimeMillis();
           final boolean satisfied = result.isSatisfied();
@@ -242,7 +245,7 @@ public class CommandLineTool
           final int numnodes = result.getPeakNumberOfNodes();
           if (numstates < 0 && numnodes < 0) {
             formatter.format("%b (%.3f s)\n", satisfied, difftime);
-          } else if (numnodes < 0 || (int) numnodes == (int) numstates) {
+          } else if (numnodes < 0 || numnodes == (int) numstates) {
             formatter.format("%b (%.0f states, %.3f s)\n",
                              satisfied, numstates, difftime);
           } else if (numstates < 0) {
@@ -345,56 +348,6 @@ public class CommandLineTool
     System.err.println
       ("USAGE: java CommandLineTool <factory>  [options] <checker> <file> ...");
     System.exit(1);
-  }
-
-
-  //#########################################################################
-  //# Inner Class Watchdog
-  private static class Watchdog implements Runnable {
-
-    //#######################################################################
-    //# Constructor
-    private Watchdog(final ModelVerifier checker, final int timeout)
-    {
-      mChecker = checker;
-      mTimeoutMillis = timeout >= 0 ? 1000L * timeout : -1;
-    }
-
-    //#######################################################################
-    //# Invocation
-    private boolean launch()
-    throws AnalysisException
-    {
-      if (mTimeoutMillis >= 0) {
-        final Thread thread = new Thread(this);
-        try {
-          thread.start();
-          return mChecker.run();
-        } finally {
-          thread.interrupt();
-        }
-      } else {
-        return mChecker.run();
-      }
-    }
-
-    //#######################################################################
-    //# Interface java.lang.Runnable
-    public void run()
-    {
-      try {
-        Thread.sleep(mTimeoutMillis);
-        mChecker.requestAbort();
-      } catch (final InterruptedException exception) {
-        // No problem ...
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final ModelVerifier mChecker;
-    private final long mTimeoutMillis;
-
   }
 
 

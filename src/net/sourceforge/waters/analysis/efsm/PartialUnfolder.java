@@ -16,7 +16,6 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Formatter;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -38,6 +37,8 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -105,8 +106,11 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
                                 final List<int[]> partition)
     throws EvalException, AnalysisException
   {
-    System.err.println("Unfolding: " + efsmRel.getName() + " \\ " + var.getName() + " ...");
-    System.err.println(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Unfolding: " + efsmRel.getName() + " \\ " + var.getName() + " ...");
+      logger.debug(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
+    }
     final long start = System.currentTimeMillis();
     final EFSMSimplifierStatistics statistics = getStatistics();
     statistics.recordStart(efsmRel);
@@ -147,7 +151,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       mConstraintPropagator =
         new ConstraintPropagator(mFactory, mOperatorTable,
                                  mUnfoldingVariableContext);
-      mPropagatorCalls = 0;
 
       final EFSMEventEncoding selfloops = mUnfoldedVariable.getSelfloops();
       if (selfloops.size() > 1) {
@@ -282,17 +285,20 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
     } finally {
       final long stop = System.currentTimeMillis();
       final long difftime = stop - start;
-      @SuppressWarnings("resource")
-      final Formatter formatter = new Formatter(System.err);
       if (result != null) {
         final ListBufferTransitionRelation unfoldedRel =
           result.getTransitionRelation();
-        formatter.format("%d states, %d propagator calls, %.3f seconds\n",
-                         unfoldedRel.getNumberOfStates(), mPropagatorCalls,
-                         0.001f * difftime);
+        if (logger.isDebugEnabled()) {
+          final String msg = String.format
+            ("%d states, %d propagator calls, %.3f seconds\n",
+             unfoldedRel.getNumberOfStates(),
+             mConstraintPropagator.getNumberOfInvocations(),
+             0.001f * difftime);
+          logger.debug(msg);
+        }
         statistics.recordFinish(result, true);
       } else {
-        System.err.println("fail");
+        logger.debug("OVERFLOW while unfolding.");
         statistics.recordOverflow();
       }
       recordRunTime(difftime);
@@ -319,7 +325,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       mConstraintPropagator.init(update);
       mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
       mConstraintPropagator.propagate();
-      mPropagatorCalls++;
       if (!mConstraintPropagator.isUnsatisfiable()) {
         final ConstraintList unfoldedUpdate =
           mConstraintPropagator.getAllConstraints();
@@ -346,7 +351,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       mUnfoldingVariableContext.setPrimedValue(null);
       mConstraintPropagator.init(update);
       mConstraintPropagator.propagate();
-      mPropagatorCalls++;
       if (mConstraintPropagator.isUnsatisfiable()) {
         mKnownAfterValueCache.put(key, UNSATISFIED_UNFOLDING);
         return UNSATISFIED_UNFOLDING;
@@ -362,7 +366,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
           mUnfoldingVariableContext.setPrimedValue(afterExpr);
           mConstraintPropagator.init(update);
           mConstraintPropagator.propagate();
-          mPropagatorCalls++;
         }
       }
       if (afterValue < 0) {
@@ -544,7 +547,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
           mUnfoldingVariableContext.setPrimedValue(null);
           mConstraintPropagator.init(update);
           mConstraintPropagator.propagate();
-          mPropagatorCalls++;
           assert !mConstraintPropagator.isUnsatisfiable();
           final VariableContext context = mConstraintPropagator.getContext();
           final SimpleExpressionProxy afterExpr =
@@ -559,7 +561,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
               mUnfoldingVariableContext.setPrimedValue(afterExpr);
               mConstraintPropagator.init(update);
               mConstraintPropagator.propagate();
-              mPropagatorCalls++;
               mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
               final ConstraintList unfoldedUpdate =
                 mConstraintPropagator.getAllConstraints();
@@ -638,8 +639,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
   private EFSMEventEncoding mUnfoldedEventEncoding;
   private ConstraintPropagator mConstraintPropagator;
   private EFSMVariableCollector mEFSMVariableCollector;
-
-  private int mPropagatorCalls;
 
   private static final int UNSATISFIED_UNFOLDING = -1;
   private static final int UNKNOWN_AFTER_VALUE = -2;

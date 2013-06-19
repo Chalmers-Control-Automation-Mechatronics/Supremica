@@ -14,6 +14,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Formatter;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.bdd.BDDConflictChecker;
@@ -27,6 +30,7 @@ import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -101,31 +105,86 @@ public class EFSMConflictCheckerExperiments
   //# Test Suite
   private void runAllTests() throws Exception
   {
+    runAllTests(new CompositionalConflictCheckerWrapper());
     runAllTests(new EFSMConflictCheckerWrapper());
-    //runAllTests(new CompositionalConflictCheckerWrapper());
     //runAllTests(new BDDConflictCheckerWrapper());
   }
 
   private void runAllTests(final ConflictCheckerWrapper wrapper) throws Exception
   {
     mConflictCheckerWrapper = wrapper;
-    testPsl();
-    testPslBig();
-    //testPslWithResetTrans();
-    testPrimeSieve4();
-    testPrimeSieve4b();
-    testPrimeSieve6();
-    testPrimeSieve7();
-    testPrimeSieve8();
-    checkPrimeSieve("dynamic_prime_sieve", 6, 288, true);
-    //checkPrimeSieve("dynamic_prime_sieve", 7, 360, true);
-    checkPhilosophers("dining_philosophers", 1000, false);
-    checkPhilosophers("dining_philosophers", 2000, false);
-    checkPhilosophers("dining_philosophers", 4000, false);
-    checkTransferLine("transferline_efsm", 500, 10, true);
-    checkTransferLine("transferline_efsm", 1000, 10, true);
-    checkTransferLine("transferline_efsm", 2000, 10, true);
-    checkProfisafe("profisafe_ihost_efsm", 5 ,true); // up to 255 ???
+    try {
+      testPsl();
+      testPslBig();
+      testPslBigWithManyRestartTrans();
+    } catch (final OverflowException exception) {
+      // next please ...
+    }
+    try {
+      testPslBigBlocking();
+    } catch (final OverflowException exception) {
+      // next please ...
+    }
+    try {
+      testPslBigNonblocking();
+    } catch (final OverflowException exception) {
+      // next please ...
+    }
+    for (int m = 1; m <= 10; m++) {
+      try {
+        for (int n = 200; n <= 2000; n+= 200) {
+          checkTransferLine("transferline_efsm", n, m, true);
+        }
+      } catch (final OverflowException exception) {
+        // next please ...
+      }
+      try {
+        for (int n = 200; n <= 2000; n+= 200) {
+          checkTransferLine("transferline_efsm_block", n, m, false);
+        }
+      } catch (final OverflowException exception) {
+        // next please ...
+      }
+    }
+    try {
+      for (int n = 1000; n <= 4000; n+= 1000) {
+        checkPhilosophers("dining_philosophers", n, false);
+      }
+    } catch (final OverflowException exception) {
+      // next please ...
+    }
+    try {
+      testPrimeSieve4();
+      testPrimeSieve4b();
+      testPrimeSieve6();
+      testPrimeSieve7();
+      testPrimeSieve8();
+    } catch (final OverflowException exception) {
+      // next please ...
+    }
+    try {
+      final int[] primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
+      for (int s = 4; s < primes.length; s++) {
+        final int maxval = primes[s] * primes[s] - 1;
+        checkPrimeSieve("dynamic_prime_sieve", s, maxval, true);
+      }
+    } catch (final OverflowException exception) {
+      // next please ...
+    }
+    try {
+      for (int maxseqno = 20; maxseqno <= 240; maxseqno+= 20) {
+        checkProfisafe("profisafe_islave_efsm", maxseqno, true);
+      }
+    } catch (final OverflowException exception) {
+      // next please ...
+    }
+    try {
+      for (int maxseqno = 20; maxseqno <= 240; maxseqno+= 20) {
+        checkProfisafe("profisafe_ihost_efsm", maxseqno, true);
+      }
+    } catch (final OverflowException exception) {
+      // next please ...
+    }
   }
 
 
@@ -193,6 +252,8 @@ public class EFSMConflictCheckerExperiments
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
       final ModuleCompiler compiler =
         new ModuleCompiler(manager, factory, module);
+      final List<String> none = Collections.emptyList();
+      compiler.setEnabledPropertyNames(none);
       final ProductDESProxy des = compiler.compile(bindings);
       return des;
     } catch (final OutOfMemoryError error) {
@@ -204,9 +265,36 @@ public class EFSMConflictCheckerExperiments
 
   //#########################################################################
   //# Logging
+  private void printAndLog(final String moduleName,
+                           final List<ParameterBindingProxy> bindings,
+                           final String methodName)
+  {
+    final StringBuffer buffer = new StringBuffer("Running ");
+    buffer.append(moduleName);
+    if (bindings != null) {
+      buffer.append('<');
+      final Iterator<ParameterBindingProxy> iter = bindings.iterator();
+      while (iter.hasNext()) {
+        final ParameterBindingProxy binding = iter.next();
+        buffer.append(binding.getName());
+        buffer.append('=');
+        buffer.append(binding.getExpression());
+        if (iter.hasNext()) {
+          buffer.append(',');
+        } else {
+          buffer.append('>');
+        }
+      }
+    }
+    buffer.append(" with ");
+    buffer.append(methodName);
+    buffer.append(" ... ");
+    printAndLog(buffer.toString());
+  }
+
   private void printAndLog(final String msg)
   {
-    System.out.println(msg);
+    System.out.print(msg);
     getLogger().info(msg);
   }
 
@@ -215,6 +303,8 @@ public class EFSMConflictCheckerExperiments
   //# Inner Class ConflictCheckerWrapper
   private abstract class ConflictCheckerWrapper
   {
+    //#######################################################################
+    //# Inner Class ConflictCheckerWrapper
     private boolean run(final ModuleProxy module,
                         final List<ParameterBindingProxy> bindings,
                         final boolean expected)
@@ -226,9 +316,15 @@ public class EFSMConflictCheckerExperiments
         final int len = className.length();
         className = className.substring(0, len - 7);
       }
-      printAndLog("Running " + moduleName + " with " + className + " ...");
+      printAndLog(moduleName, bindings, className);
       try {
+        final long start = System.currentTimeMillis();
         final AnalysisResult stats = runConflictChecker(module, bindings);
+        final long stop = System.currentTimeMillis();
+        @SuppressWarnings("resource")
+        final Formatter formatter = new Formatter(System.out);
+        final float seconds = 0.001f * (stop - start);
+        formatter.format("%.3fs\n", seconds);
         if (!mHasBeenPrinted) {
           mHasBeenPrinted = true;
           mPrintWriter.print("Model,");
@@ -241,8 +337,17 @@ public class EFSMConflictCheckerExperiments
         mPrintWriter.println();
         return stats.isSatisfied();
       } catch (final Throwable exception) {
+        System.out.println(ProxyTools.getShortClassName(exception));
         mPrintWriter.println(moduleName + "," + exception.getMessage());
-        return false;
+        if (exception instanceof AnalysisException) {
+          throw (AnalysisException) exception;
+        } else if (exception instanceof EvalException) {
+          throw (EvalException) exception;
+        } else if (exception instanceof RuntimeException) {
+          throw (RuntimeException) exception;
+        } else {
+          throw new WatersRuntimeException(exception);
+        }
       }
     }
 
@@ -283,10 +388,8 @@ public class EFSMConflictCheckerExperiments
   }
 
 
-
   //#########################################################################
   //# Inner Class CompositionalConflictCheckerWrapper
-  @SuppressWarnings("unused")
   private class CompositionalConflictCheckerWrapper
     extends ConflictCheckerWrapper
   {

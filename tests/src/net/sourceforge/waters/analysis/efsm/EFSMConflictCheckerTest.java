@@ -322,16 +322,6 @@ public class EFSMConflictCheckerTest
     checkConflict(module, false);
   }
 
-  /*
-   * This file is not in the repository :-(
-  public void testPslNon()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "psl", "pslNon");
-    checkConflict(module, true);
-  }
-   */
-
   public void testPslBig()
     throws IOException, WatersException
   {

@@ -36,6 +36,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * <P>An abstraction procedure based on a transition relation simplifier
@@ -201,8 +203,11 @@ class EFSMTRSimplifier
     throws AnalysisException
   {
     try {
-      System.err.println("Simplifying: " + efsmTR.getName() + " ...");
-      System.err.println(efsmTR.getTransitionRelation().getNumberOfStates() + " states");
+      final Logger logger = getLogger();
+      if (logger.isDebugEnabled()) {
+        logger.debug("Simplifying: " + efsmTR.getName() + " ...");
+        logger.debug(efsmTR.getTransitionRelation().getNumberOfStates() + " states");
+      }
       final long start = System.currentTimeMillis();
       ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
       final int numStates = rel.getNumberOfStates();
@@ -336,6 +341,15 @@ class EFSMTRSimplifier
     } finally {
       mSimplifier.reset();
     }
+  }
+
+
+  //#########################################################################
+  //# Logging
+  public Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
   }
 
 

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa
 //# CLASS:   EFSMConflictChecker
 //###########################################################################
@@ -42,28 +42,19 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 public class EFSMConflictChecker extends AbstractModuleConflictChecker
 {
 
-  /**
-   * @param factory
-   */
+  //#########################################################################
+  //# Constructors
   public EFSMConflictChecker(final ModuleProxyFactory factory)
   {
     super(factory);
   }
 
-  /**
-   * @param model
-   * @param factory
-   */
-  public EFSMConflictChecker(final ModuleProxy model, final ModuleProxyFactory factory)
+  public EFSMConflictChecker(final ModuleProxy model,
+                             final ModuleProxyFactory factory)
   {
     super(model, factory);
   }
 
-  /**
-   * @param model
-   * @param marking
-   * @param factory
-   */
   public EFSMConflictChecker(final ModuleProxy model, final IdentifierProxy marking,
                              final ModuleProxyFactory factory)
   {
@@ -594,7 +585,5 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   private String mSystemName;
   private int mNextSubsystemNumber;
   private EFSMSystem mCurrentEFSMSystem;
-
-
 
 }

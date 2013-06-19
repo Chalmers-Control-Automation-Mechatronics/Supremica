@@ -37,6 +37,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * @author Robi Malik, Sahar Mohajerani
@@ -67,8 +69,11 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
                                       final EFSMSystem system)
     throws EvalException, AnalysisException
   {
-    System.err.println("Computing partition for " + var.getName() + " (" +
-                       var.getRange().size() + " states) ...");
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      System.err.println("Computing partition for " + var.getName() + " (" +
+                         var.getRange().size() + " states) ...");
+    }
     final EFSMSimplifierStatistics statistics = getStatistics();
     statistics.recordStart(var);
     final long start = System.currentTimeMillis();
@@ -254,10 +259,12 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
       recordRunTime(difftime);
       if (partition == null) {
         statistics.recordFinish(var, null);
-        System.err.println("NULL result partition");
+        logger.debug("NULL result partition");
       } else {
         statistics.recordFinish(var, partition);
-        System.err.println("Result partition size " + partition.size());
+        if (logger.isDebugEnabled()) {
+          logger.debug("Result partition size " + partition.size());
+        }
       }
       tearDown();
     }
