@@ -71,8 +71,8 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
-      System.err.println("Computing partition for " + var.getName() + " (" +
-                         var.getRange().size() + " states) ...");
+      logger.debug("Computing partition for " + var.getName() + " (" +
+                   var.getRange().size() + " states) ...");
     }
     final EFSMSimplifierStatistics statistics = getStatistics();
     statistics.recordStart(var);

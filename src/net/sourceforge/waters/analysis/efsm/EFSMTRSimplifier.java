@@ -14,7 +14,6 @@ import gnu.trove.set.hash.THashSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Formatter;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
@@ -323,19 +322,21 @@ class EFSMTRSimplifier
         }
         final EFSMTransitionRelation newEFSMTR =
           new EFSMTransitionRelation(newRel, newEventEncoding, newVariables);
-        final long stop = System.currentTimeMillis();
-        final float difftime = 0.001f * (stop - start);
-        @SuppressWarnings("resource")
-        final Formatter formatter = new Formatter(System.err);
-        formatter.format("%d states, %.3f seconds\n",
-                         newRel.getNumberOfStates(), difftime);
+        if (logger.isDebugEnabled()) {
+          final long stop = System.currentTimeMillis();
+          final float difftime = 0.001f * (stop - start);
+          final String msg = String.format("%d states, %.3f seconds\n",
+                                     newRel.getNumberOfStates(), difftime);
+          logger.debug(msg);
+        }
         return newEFSMTR;
       } else {
-        final long stop = System.currentTimeMillis();
-        final float difftime = 0.001f * (stop - start);
-        @SuppressWarnings("resource")
-        final Formatter formatter = new Formatter(System.err);
-        formatter.format("No change, %.3f seconds\n", difftime);
+        if (logger.isDebugEnabled()) {
+          final long stop = System.currentTimeMillis();
+          final float difftime = 0.001f * (stop - start);
+          final String msg = String.format("No change, %.3f seconds\n", difftime);
+          logger.debug(msg);
+        }
         return null;
       }
     } finally {

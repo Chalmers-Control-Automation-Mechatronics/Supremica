@@ -105,8 +105,8 @@ public class EFSMConflictCheckerExperiments
   //# Test Suite
   private void runAllTests() throws Exception
   {
-    runAllTests(new CompositionalConflictCheckerWrapper());
     runAllTests(new EFSMConflictCheckerWrapper());
+    runAllTests(new CompositionalConflictCheckerWrapper());
     //runAllTests(new BDDConflictCheckerWrapper());
   }
 
