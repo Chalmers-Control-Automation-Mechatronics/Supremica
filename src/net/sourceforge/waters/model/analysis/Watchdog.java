@@ -53,7 +53,7 @@ public class Watchdog extends Thread {
   public Watchdog(final int seconds)
   {
     mAbortables = new LinkedList<Abortable>();
-    mTimeoutMillis = seconds >= 0 ? 1000L * seconds : -1;
+    mTimeoutMillis = 1000L * seconds;
     mStartTime = 0;
     setDaemon(true);
   }
@@ -118,7 +118,7 @@ public class Watchdog extends Thread {
     try {
       while (true) {
         while (mStartTime < 0) {
-          wait();
+          wait(mTimeoutMillis);
         }
         if (mStartTime == 0) {
           mStartTime = System.currentTimeMillis();

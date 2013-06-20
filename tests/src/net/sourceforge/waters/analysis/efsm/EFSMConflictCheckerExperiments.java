@@ -106,13 +106,14 @@ public class EFSMConflictCheckerExperiments
   //# Test Suite
   private void runAllTests() throws Exception
   {
-    runAllTests(new EFSMConflictCheckerWrapper());
     runAllTests(new CompositionalConflictCheckerWrapper());
     runAllTests(new BDDConflictCheckerWrapper());
+    runAllTests(new EFSMConflictCheckerWrapper());
   }
 
   private void runAllTests(final ConflictCheckerWrapper wrapper) throws Exception
   {
+    mHasBeenPrinted = false;
     mConflictCheckerWrapper = wrapper;
     try {
       testPsl();
@@ -238,7 +239,6 @@ public class EFSMConflictCheckerExperiments
                          mInternalTransitionLimit);
     mPrintWriter.println("CompositionSelectionHeuristic," +
                          mCompositionSelectionHeuristic);
-    mHasBeenPrinted = false;
     mWatchdog.start();
   }
 
@@ -456,6 +456,14 @@ public class EFSMConflictCheckerExperiments
     }
 
     //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public void finalize()
+    {
+      mWatchdog.removeAbortable(mConflictChecker);
+    }
+
+    //#######################################################################
     //# Data Members
     private final CompositionalConflictChecker mConflictChecker;
   }
@@ -479,6 +487,7 @@ public class EFSMConflictCheckerExperiments
       mConflictChecker.setTransitionPartitioningStrategy
         (TransitionPartitioningStrategy.AUTOMATA);
       mConflictChecker.setPartitioningSizeLimit(5000);
+      mConflictChecker.setNodeLimit(40000000);
       // Configuration end
     }
 
@@ -493,6 +502,14 @@ public class EFSMConflictCheckerExperiments
       mConflictChecker.setModel(des);
       mConflictChecker.run();
       return mConflictChecker.getAnalysisResult();
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public void finalize()
+    {
+      mWatchdog.removeAbortable(mConflictChecker);
     }
 
     //#######################################################################
