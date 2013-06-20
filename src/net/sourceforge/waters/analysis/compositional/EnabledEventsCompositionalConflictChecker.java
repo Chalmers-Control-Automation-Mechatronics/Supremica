@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
@@ -32,6 +34,8 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -284,7 +288,17 @@ public class EnabledEventsCompositionalConflictChecker extends
    modelList.addAll(getCurrentAutomata());
    modelList.removeAll(candidate.getAutomata());
    modelList.add(aut);
-    mChecker.setModel(createProductDESProxy(modelList));
+
+   final List<AutomatonProxy> newModelList = new ArrayList<AutomatonProxy>();
+   //Change automata to automata that find more enabled events
+   //Add self loops of every event to dump states
+   //add in observation equivalent redundant transitions.
+   for(final AutomatonProxy oldAutomata : modelList)
+   {
+     newModelList.add(createAutomatonForAlwaysEnabledEvents(oldAutomata));
+   }
+
+    mChecker.setModel(createProductDESProxy(newModelList));
 
     //for each of the events in aut
     for (final EventProxy event : aut.getEvents()) {
@@ -347,6 +361,102 @@ public class EnabledEventsCompositionalConflictChecker extends
 
   }
 
+  /*
+   * Change automata to automata that find more enabled events
+   *Add self loops of every event to dump states
+   *add in observation equivalent redundant transitions.
+   */
+  private AutomatonProxy createAutomatonForAlwaysEnabledEvents(final AutomatonProxy aut)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final Collection<EventProxy> oldevents = aut.getEvents();
+    final int numevents = oldevents.size();
+    final Collection<EventProxy> newevents = new ArrayList<EventProxy>(numevents);
+    //Removes Propositions from the events
+    for (final EventProxy oldevent : oldevents) {
+      if (oldevent.getKind() != EventKind.PROPOSITION) {
+        newevents.add(oldevent);
+      }
+    }
+    final Collection<StateProxy> states = aut.getStates();
+    final int numstates = states.size();
+
+    final Collection<EventProxy> tauEvents = new ArrayList<EventProxy>(numevents);
+    for(final EventProxy event : newevents) {
+      final EnabledEventsEventInfo info = getEventInfo(event);
+      final Collection<AutomatonProxy> collection = Collections.singletonList(aut);
+      if (info == null || info.isLocal(collection)) {
+        tauEvents.add(event);
+      }
+    }
+
+    final Collection<TransitionProxy> oldtransitions = aut.getTransitions();
+    final int numtrans = oldtransitions.size();
+    final Collection<TransitionProxy> newtransitions =
+        new ArrayList<TransitionProxy>(numstates + numtrans);
+    //Add self loops of every event to dump states
+    for(final StateProxy state : states) {
+      boolean dumpState = true;
+     for(final TransitionProxy trans : oldtransitions) {
+      if(trans.getSource().equals(state) && !trans.getTarget().equals(state)) {
+        dumpState = false;
+        break;
+      }
+      if(dumpState) {
+        for(final EventProxy event : newevents) {
+          final TransitionProxy newTrans =
+            factory.createTransitionProxy(state, event, state);
+        newtransitions.add(newTrans);
+        }
+      }
+     }
+    }
+
+  //Map of tau target states to source states
+    final Map<StateProxy,Collection<StateProxy>> tauStatemap =
+      new HashMap<StateProxy, Collection<StateProxy>>(numstates);
+    for(final TransitionProxy tauTrans : oldtransitions) {
+      for(final EventProxy tauEvent : tauEvents) {
+        if(tauTrans.getEvent().equals(tauEvent)) {
+          Collection<StateProxy> sourceStates = tauStatemap.get(tauTrans);
+          if(sourceStates == null) {
+            sourceStates = new ArrayList<StateProxy>(numstates);
+          }
+          sourceStates.add(tauTrans.getSource());
+          tauStatemap.put(tauTrans.getTarget(), sourceStates);
+        }
+      }
+    }
+    //Add in observation equivalent redundant transitions.
+    for (final TransitionProxy trans : oldtransitions) {
+      AddOERedundantTransitions(trans, newtransitions, tauStatemap);
+    }
+
+    final String autname = aut.getName();
+    final ComponentKind kind = aut.getKind();
+    return factory.createAutomatonProxy(autname, kind, newevents, states, newtransitions);
+  }
+
+  /**
+   *
+   * Adds observationally equivalent transitions to newtransitions based on the tauStateMap
+   *
+   */
+  private void AddOERedundantTransitions(final TransitionProxy trans, final Collection<TransitionProxy> newtransitions, final Map<StateProxy,Collection<StateProxy>> tauStatemap) {
+
+    if(tauStatemap.get(trans.getSource()) != null){
+      for(final StateProxy newSourceState : tauStatemap.get(trans.getSource())) {
+        final TransitionProxy newTrans =
+          getFactory().createTransitionProxy(newSourceState, trans.getEvent(), trans.getTarget());
+        if(!newtransitions.contains(newTrans)) {
+        newtransitions.add(newTrans);
+        //If a new transition was added, new redundant transitions may be possible
+        //AddOERedundantTransitions(newTrans, newtransitions, tauStatemap);
+      }
+      }
+    }
+  }
+
   @Override
   protected void setUp() throws AnalysisException
   {
@@ -354,10 +464,6 @@ public class EnabledEventsCompositionalConflictChecker extends
 
     mChecker = new ModularControllabilityChecker(getFactory(), new NativeControllabilityChecker(getFactory()));
     mChecker.setNodeLimit(1000);
-
-
-
-
   }
   @Override
   protected void tearDown()
