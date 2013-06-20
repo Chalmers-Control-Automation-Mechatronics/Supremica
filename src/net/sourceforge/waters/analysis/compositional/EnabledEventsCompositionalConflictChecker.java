@@ -295,7 +295,7 @@ public class EnabledEventsCompositionalConflictChecker extends
    //add in observation equivalent redundant transitions.
    for(final AutomatonProxy oldAutomata : modelList)
    {
-     newModelList.add(createAutomatonForAlwaysEnabledEvents(oldAutomata));
+    newModelList.add(createAutomatonForAlwaysEnabledEvents(oldAutomata));
    }
 
     mChecker.setModel(createProductDESProxy(newModelList));
@@ -394,6 +394,9 @@ public class EnabledEventsCompositionalConflictChecker extends
     final int numtrans = oldtransitions.size();
     final Collection<TransitionProxy> newtransitions =
         new ArrayList<TransitionProxy>(numstates + numtrans);
+
+    newtransitions.addAll(oldtransitions);
+
     //Add self loops of every event to dump states
     for(final StateProxy state : states) {
       boolean dumpState = true;
@@ -402,13 +405,17 @@ public class EnabledEventsCompositionalConflictChecker extends
         dumpState = false;
         break;
       }
-      if(dumpState) {
-        for(final EventProxy event : newevents) {
-          final TransitionProxy newTrans =
-            factory.createTransitionProxy(state, event, state);
-        newtransitions.add(newTrans);
-        }
-      }
+     }
+     if(dumpState) {
+       for(final EventProxy event : newevents) {
+         //Don't need to add tau self loops
+         if(!tauEvents.contains(event)) {
+         final TransitionProxy newTrans =
+           factory.createTransitionProxy(state, event, state);
+         if(!newtransitions.contains(newTrans))
+           newtransitions.add(newTrans);
+         }
+       }
      }
     }
 
