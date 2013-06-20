@@ -1,3 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efsm
+//# CLASS:   EFSMSynchronizer
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.analysis.efsm;
 
 import gnu.trove.set.hash.THashSet;
@@ -8,21 +18,24 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
-public class EFSMSynchronization extends AbstractEFSMAlgorithm
+
+public class EFSMSynchronizer extends AbstractEFSMAlgorithm
 {
+
   //#########################################################################
   //# Constructors
-  public EFSMSynchronization(final ModuleProxyFactory factory)
+  public EFSMSynchronizer(final ModuleProxyFactory factory)
   {
-    super(true);
+    createStatistics(true);
     mFactory = factory;
   }
+
 
   //#########################################################################
   //# Configuration
@@ -31,11 +44,12 @@ public class EFSMSynchronization extends AbstractEFSMAlgorithm
     mSourceInfoEnabled = enabled;
   }
 
+
   //#########################################################################
   //# Invocation
   public EFSMTransitionRelation synchronize(final EFSMTransitionRelation efsmTR1,
                                             final EFSMTransitionRelation efsmTR2)
-  throws OverflowException
+    throws AnalysisException
   {
     final long start = System.currentTimeMillis();
     final EFSMSimplifierStatistics statistics = getStatistics();
@@ -81,6 +95,7 @@ public class EFSMSynchronization extends AbstractEFSMAlgorithm
           stateMap1[s1] = -1;
         }
       }
+      checkAbort();
       int currentState2 = 0;
       final int[] stateMap2 = new int[rel2.getNumberOfStates()];
       for (int s2=0; s2<rel2.getNumberOfStates(); s2++ ){
@@ -91,6 +106,7 @@ public class EFSMSynchronization extends AbstractEFSMAlgorithm
           stateMap2[s2] = -1;
         }
       }
+      checkAbort();
       int prop = 0;
       final int prop1 = rel1.getNumberOfPropositions();
       final int prop2 = rel2.getNumberOfPropositions();
@@ -136,6 +152,7 @@ public class EFSMSynchronization extends AbstractEFSMAlgorithm
                 final String name = name1 + ":" +name2;
                 final SimpleNodeProxy node = mFactory.createSimpleNodeProxy(name);
                 nodeList.add(node);
+                checkAbort();
               }
               iter1.resetState(s1);
               while (iter1.advance()) {
@@ -143,6 +160,7 @@ public class EFSMSynchronization extends AbstractEFSMAlgorithm
                 final int target1 = stateMap1[iter1.getCurrentTargetState()];
                 final int target = reachableStates2 * target1 + code2;
                 synchRel.addTransition(code, event, target);
+                checkAbort();
               }
               iter2.resetState(s2);
               while (iter2.advance()) {
@@ -150,6 +168,7 @@ public class EFSMSynchronization extends AbstractEFSMAlgorithm
                 final int target2 = stateMap2[iter2.getCurrentTargetState()];
                 final int target = reachableStates2 * code1 + target2;
                 synchRel.addTransition(code, event, target);
+                checkAbort();
               }
               code++;
             }
@@ -178,8 +197,10 @@ public class EFSMSynchronization extends AbstractEFSMAlgorithm
     }
   }
 
+
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private boolean mSourceInfoEnabled;
+
 }

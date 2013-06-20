@@ -53,6 +53,7 @@ public abstract class NativeModelAnalyzer
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
@@ -61,7 +62,11 @@ public abstract class NativeModelAnalyzer
 
   //#########################################################################
   //# Native Methods
+  @Override
   public native void requestAbort();
+
+  @Override
+  public native void resetAbort();
 
   public static native long getPeakMemoryUsage();
 

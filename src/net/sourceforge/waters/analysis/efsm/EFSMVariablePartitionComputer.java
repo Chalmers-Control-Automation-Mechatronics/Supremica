@@ -23,6 +23,7 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -52,14 +53,30 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
   public EFSMVariablePartitionComputer(final ModuleProxyFactory factory,
                                        final CompilerOperatorTable op)
   {
-    super(false);
+    createStatistics(false);
     mFactory = factory;
     mCompilerOperatorTable = op;
     mEFSMVariableFinder = new EFSMVariableFinder(op);
     mBisimulator = new ObservationEquivalenceTRSimplifier();
     mBisimulator.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+  }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    mBisimulator.requestAbort();
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    mBisimulator.resetAbort();
   }
 
 
@@ -138,6 +155,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
               }
               list.add(update);
             }
+            checkAbort();
           }
           final TIntObjectIterator<List<ConstraintList>> hIter =
             mergedUpdates.iterator();
@@ -157,6 +175,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
             }
           }
           createMergedUpdate(mergedEventEncoding, mergibleSelfloops);
+          checkAbort();
         }
         final int mergedSize = mergedEventEncoding.size();
         mRelevantUpdates =  new ArrayList<ConstraintList>(mergedSize);
@@ -196,6 +215,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
           }
           if (beforeValue >= 0) {
             rel.addTransition(beforeValue, event, beforeValue);
+            checkAbort();
           } else {
             for (beforeValue = 0; beforeValue < mRangeValues.size(); beforeValue++) {
               beforeExpr = mRangeValues.get(beforeValue);
@@ -205,6 +225,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
               if (!mConstraintPropagator.isUnsatisfiable()) {
                 rel.addTransition(beforeValue, event, beforeValue);
               }
+              checkAbort();
             }
           }
         } else {
@@ -227,6 +248,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
               }
               if (afterValue >= 0) {
                 rel.addTransition(beforeValue, event, afterValue);
+                checkAbort();
               } else {
                 for (afterValue = 0; afterValue < rangeSize; afterValue++) {
                   afterExpr = mRangeValues.get(afterValue);
@@ -236,6 +258,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
                   if (!mConstraintPropagator.isUnsatisfiable()) {
                     rel.addTransition(beforeValue, event, afterValue);
                   }
+                  checkAbort();
                 }
               }
             }
@@ -271,12 +294,14 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
   }
 
   private boolean checkEventEncoding(final EFSMEventEncoding encoding)
+    throws AnalysisAbortException
   {
     for (int e = EventEncoding.NONTAU; e < encoding.size(); e++) {
       final ConstraintList update = encoding.getUpdate(e);
       if (!checkUpdate(update)) {
         return false;
       }
+      checkAbort();
     }
     return true;
   }

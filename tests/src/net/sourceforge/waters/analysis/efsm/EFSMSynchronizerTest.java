@@ -53,7 +53,7 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mModuleMarshaller);
-    mEFSMSynchronization = new EFSMSynchronization(mFactory);
+    mEFSMSynchronization = new EFSMSynchronizer(mFactory);
     mImporter = new EFSMSystemImporter(mFactory, optable);
     mEFSMSynchronization.setSourceInfoEnabled(true);
   }
@@ -304,5 +304,5 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
   private final String AFTER = "after";
   private final String RESULT = "result";
 
-  private  EFSMSynchronization mEFSMSynchronization;
+  private  EFSMSynchronizer mEFSMSynchronization;
 }

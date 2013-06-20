@@ -16,7 +16,7 @@ import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -88,13 +88,19 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
     return mIsAborting;
   }
 
+  @Override
+  public void resetAbort()
+  {
+    mIsAborting = false;
+  }
+
 
   //#######################################################################
   //# Rule Application
   @Override
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
-  throws AbortException
+  throws AnalysisAbortException
   {
     mAutToAbstract = autToAbstract;
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
@@ -181,15 +187,15 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
   //# Auxiliary Methods
   /**
    * Checks whether this simplifier has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AbortException}.
+   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
    * This method should be called periodically by any transition relation
    * simplifier that supports being aborted by user request.
    */
   private void checkAbort()
-    throws AbortException
+    throws AnalysisAbortException
   {
     if (mIsAborting) {
-      final AbortException exception = new AbortException();
+      final AnalysisAbortException exception = new AnalysisAbortException();
       throw exception;
     }
   }

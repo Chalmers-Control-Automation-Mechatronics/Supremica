@@ -12,19 +12,19 @@ package net.sourceforge.waters.model.analysis;
 
 /**
  * An exception indicating that an analysis algorithm has been aborted
- * in response to a user request.
+ * in response to a user request or timeout.
  *
  * @author Robi Malik
  */
 
-public class AbortException extends AnalysisException {
+public class AnalysisAbortException extends AnalysisException {
 
   //#########################################################################
   //# Constructors
   /**
    * Constructs a new overflow exception with a default message.
    */
-  public AbortException()
+  public AnalysisAbortException()
   {
     this("Analysis aborted!");
   }
@@ -32,7 +32,7 @@ public class AbortException extends AnalysisException {
   /**
    * Constructs a new overflow exception with a given message.
    */
-  public AbortException(final String msg)
+  public AnalysisAbortException(final String msg)
   {
     super(msg);
   }

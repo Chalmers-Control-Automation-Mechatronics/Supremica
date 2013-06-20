@@ -24,7 +24,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  * this interface is kept separate to facilitate its implementation by
  * subroutines that are not model analysers.</P>
  *
- * @see AbortException
+ * @see AnalysisAbortException
  * @author Robi Malik
  */
 
@@ -39,7 +39,8 @@ public interface Abortable
    * request abort at a later time. It may take some time for the model
    * analyser to check this flag and react, or the request may not be
    * obeyed at all. If a model analyser aborts, it will throw an
-   * {@link AbortException} from its {@link ModelAnalyzer#run() run()} method.
+   * {@link AnalysisAbortException} from its {@link ModelAnalyzer#run() run()}
+   * method.
    */
   public void requestAbort();
 
@@ -47,5 +48,14 @@ public interface Abortable
    * Returns whether the model analyser has been requested to abort.
    */
   public boolean isAborting();
+
+  /**
+   * Resets a previous abort request. This method removes any pending
+   * abort request, so {@link #isAborting()} will return <CODE>false</CODE>
+   * again. This method should not be called while a the controlled object
+   * is still executing, as it is undefined whether or not an abort will
+   * be cancelled safely in such a case.
+   */
+  public void resetAbort();
 
 }

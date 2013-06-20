@@ -31,7 +31,7 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-public class ModuleCompiler
+public class ModuleCompiler extends AbortableCompiler
 {
 
   //##########################################################################
@@ -54,6 +54,39 @@ public class ModuleCompiler
   }
 
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mInstanceCompiler != null) {
+      mInstanceCompiler.requestAbort();
+    }
+    if (mEFACompiler != null) {
+      mEFACompiler.requestAbort();
+    }
+    if (mGraphCompiler != null) {
+      mGraphCompiler.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mInstanceCompiler != null) {
+      mInstanceCompiler.resetAbort();
+    }
+    if (mEFACompiler != null) {
+      mEFACompiler.resetAbort();
+    }
+    if (mGraphCompiler != null) {
+      mGraphCompiler.resetAbort();
+    }
+  }
+
+
   //##########################################################################
   //# Invocation
   public ProductDESProxy compile()
@@ -65,31 +98,39 @@ public class ModuleCompiler
   public ProductDESProxy compile(final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    initSourceInfo();
-    final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
-    ModuleInstanceCompiler pass1 = new ModuleInstanceCompiler
-      (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
-    pass1.setOptimizationEnabled(mIsOptimizationEnabled);
-    pass1.setEnabledPropertyNames(mEnabledPropertyNames);
-    pass1.setEnabledPropositionNames(mEnabledPropositionNames);
-    pass1.setHISCCompileMode(mHISCCompileMode);
-    ModuleProxy intermediate = pass1.compile(bindings);
-    final boolean efa = pass1.getHasEFAElements();
-    pass1 = null;
-    if (efa && mIsExpandingEFATransitions) {
+    try {
+      setUp();
+      initSourceInfo();
+      final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
+      mInstanceCompiler = new ModuleInstanceCompiler
+        (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
+      mInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
+      mInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
+      mInstanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
+      mInstanceCompiler.setHISCCompileMode(mHISCCompileMode);
+      checkAbort();
+      ModuleProxy intermediate = mInstanceCompiler.compile(bindings);
+      final boolean efa = mInstanceCompiler.getHasEFAElements();
+      mInstanceCompiler = null;
+      if (efa && mIsExpandingEFATransitions) {
+        shiftSourceInfo();
+        mEFACompiler =
+          new EFACompiler(modfactory, mSourceInfoBuilder, intermediate);
+        checkAbort();
+        intermediate = mEFACompiler.compile();
+        mEFACompiler = null;
+      }
       shiftSourceInfo();
-      EFACompiler pass2 =
-        new EFACompiler(modfactory, mSourceInfoBuilder, intermediate);
-      intermediate = pass2.compile();
-      pass2 = null;
+      mGraphCompiler =
+        new ModuleGraphCompiler(mFactory, mSourceInfoBuilder, intermediate);
+      mGraphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
+      checkAbort();
+      final ProductDESProxy des = mGraphCompiler.compile();
+      setLocation(des);
+      return des;
+    } finally {
+      tearDown();
     }
-    shiftSourceInfo();
-    final ModuleGraphCompiler pass3 =
-      new ModuleGraphCompiler(mFactory, mSourceInfoBuilder, intermediate);
-    pass3.setOptimizationEnabled(mIsOptimizationEnabled);
-    final ProductDESProxy des = pass3.compile();
-    setLocation(des);
-    return des;
   }
 
   public Map<Object,SourceInfo> getSourceInfoMap()
@@ -185,6 +226,17 @@ public class ModuleCompiler
 
   //#########################################################################
   //# Auxiliary Methods
+  private void setUp()
+  {
+  }
+
+  private void tearDown()
+  {
+    mInstanceCompiler = null;
+    mEFACompiler = null;
+    mGraphCompiler = null;
+  }
+
   private void setLocation(final ProductDESProxy des)
   {
     final URI moduleLocation = mInputModule.getLocation();
@@ -224,6 +276,9 @@ public class ModuleCompiler
   private final ModuleProxy mInputModule;
 
   private SourceInfoBuilder mSourceInfoBuilder;
+  private ModuleInstanceCompiler mInstanceCompiler;
+  private EFACompiler mEFACompiler;
+  private ModuleGraphCompiler mGraphCompiler;
 
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsExpandingEFATransitions = true;

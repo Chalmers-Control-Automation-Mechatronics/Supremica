@@ -74,9 +74,17 @@ abstract public class AbstractSICConflictChecker
     mChecker.requestAbort();
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    mChecker.resetAbort();
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return mChecker.supportsNondeterminism();

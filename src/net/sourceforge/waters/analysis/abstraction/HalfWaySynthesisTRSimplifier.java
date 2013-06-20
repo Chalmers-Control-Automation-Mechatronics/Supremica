@@ -18,7 +18,7 @@ import java.util.BitSet;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -231,7 +231,7 @@ public class HalfWaySynthesisTRSimplifier
   //# Auxiliary Methods
   private void findCoreachableStates(final BitSet coreachable,
                                      final BitSet badStates)
-    throws AbortException
+    throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
@@ -263,7 +263,7 @@ public class HalfWaySynthesisTRSimplifier
   }
 
   private boolean findMoreBadStates(final BitSet badStates)
-    throws AbortException
+    throws AnalysisAbortException
   {
     boolean hasAdded = false;
     final BitSet oldBadStates = (BitSet) badStates.clone();

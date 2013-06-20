@@ -179,6 +179,15 @@ public class ChainTRSimplifier
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.resetAbort();
+    }
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.

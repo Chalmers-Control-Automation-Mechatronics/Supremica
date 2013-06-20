@@ -28,6 +28,7 @@ import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedur
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.Watchdog;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -107,7 +108,7 @@ public class EFSMConflictCheckerExperiments
   {
     runAllTests(new EFSMConflictCheckerWrapper());
     runAllTests(new CompositionalConflictCheckerWrapper());
-    //runAllTests(new BDDConflictCheckerWrapper());
+    runAllTests(new BDDConflictCheckerWrapper());
   }
 
   private void runAllTests(final ConflictCheckerWrapper wrapper) throws Exception
@@ -117,32 +118,42 @@ public class EFSMConflictCheckerExperiments
       testPsl();
       testPslBig();
       testPslBigWithManyRestartTrans();
-    } catch (final OverflowException exception) {
+    } catch (final AnalysisException exception) {
+      // next please ...
+    } catch (final EvalException exception) {
       // next please ...
     }
     try {
       testPslBigBlocking();
-    } catch (final OverflowException exception) {
+    } catch (final AnalysisException exception) {
+      // next please ...
+    } catch (final EvalException exception) {
       // next please ...
     }
     try {
       testPslBigNonblocking();
-    } catch (final OverflowException exception) {
+    } catch (final AnalysisException exception) {
+      // next please ...
+    } catch (final EvalException exception) {
       // next please ...
     }
-    for (int m = 1; m <= 10; m++) {
+    for (int m = 2; m <= 10; m += 2) {
       try {
         for (int n = 200; n <= 2000; n+= 200) {
           checkTransferLine("transferline_efsm", n, m, true);
         }
-      } catch (final OverflowException exception) {
+      } catch (final AnalysisException exception) {
+        // next please ...
+      } catch (final EvalException exception) {
         // next please ...
       }
       try {
         for (int n = 200; n <= 2000; n+= 200) {
           checkTransferLine("transferline_efsm_block", n, m, false);
         }
-      } catch (final OverflowException exception) {
+      } catch (final AnalysisException exception) {
+        // next please ...
+      } catch (final EvalException exception) {
         // next please ...
       }
     }
@@ -150,7 +161,9 @@ public class EFSMConflictCheckerExperiments
       for (int n = 1000; n <= 4000; n+= 1000) {
         checkPhilosophers("dining_philosophers", n, false);
       }
-    } catch (final OverflowException exception) {
+    } catch (final AnalysisException exception) {
+      // next please ...
+    } catch (final EvalException exception) {
       // next please ...
     }
     try {
@@ -159,30 +172,38 @@ public class EFSMConflictCheckerExperiments
       testPrimeSieve6();
       testPrimeSieve7();
       testPrimeSieve8();
-    } catch (final OverflowException exception) {
+    } catch (final AnalysisException exception) {
+      // next please ...
+    } catch (final EvalException exception) {
       // next please ...
     }
     try {
       final int[] primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
-      for (int s = 4; s < primes.length; s++) {
+      for (int s = 3; s < primes.length; s++) {
         final int maxval = primes[s] * primes[s] - 1;
         checkPrimeSieve("dynamic_prime_sieve", s, maxval, true);
       }
-    } catch (final OverflowException exception) {
+    } catch (final AnalysisException exception) {
+      // next please ...
+    } catch (final EvalException exception) {
       // next please ...
     }
     try {
-      for (int maxseqno = 20; maxseqno <= 240; maxseqno+= 20) {
+      for (int maxseqno = 31; maxseqno <= 255; maxseqno += 32) {
         checkProfisafe("profisafe_islave_efsm", maxseqno, true);
       }
-    } catch (final OverflowException exception) {
+    } catch (final AnalysisException exception) {
+      // next please ...
+    } catch (final EvalException exception) {
       // next please ...
     }
     try {
-      for (int maxseqno = 20; maxseqno <= 240; maxseqno+= 20) {
+      for (int maxseqno = 31; maxseqno <= 255; maxseqno += 32) {
         checkProfisafe("profisafe_ihost_efsm", maxseqno, true);
       }
-    } catch (final OverflowException exception) {
+    } catch (final AnalysisException exception) {
+      // next please ...
+    } catch (final EvalException exception) {
       // next please ...
     }
   }
@@ -211,12 +232,14 @@ public class EFSMConflictCheckerExperiments
   protected void setUp() throws Exception
   {
     super.setUp();
+    mWatchdog = new Watchdog(mTimeout);
     mPrintWriter = new PrintWriter(mOut, true);
     mPrintWriter.println("InternalTransitionLimit," +
                          mInternalTransitionLimit);
     mPrintWriter.println("CompositionSelectionHeuristic," +
                          mCompositionSelectionHeuristic);
     mHasBeenPrinted = false;
+    mWatchdog.start();
   }
 
   @Override
@@ -254,7 +277,9 @@ public class EFSMConflictCheckerExperiments
         new ModuleCompiler(manager, factory, module);
       final List<String> none = Collections.emptyList();
       compiler.setEnabledPropertyNames(none);
+      mWatchdog.addAbortable(compiler);
       final ProductDESProxy des = compiler.compile(bindings);
+      mWatchdog.removeAbortable(compiler);
       return des;
     } catch (final OutOfMemoryError error) {
       System.gc();
@@ -318,6 +343,7 @@ public class EFSMConflictCheckerExperiments
       }
       printAndLog(moduleName, bindings, className);
       try {
+        mWatchdog.reset();
         final long start = System.currentTimeMillis();
         final AnalysisResult stats = runConflictChecker(module, bindings);
         final long stop = System.currentTimeMillis();
@@ -381,7 +407,9 @@ public class EFSMConflictCheckerExperiments
       }
       // Configuration end
       checker.setBindings(bindings);
+      mWatchdog.addAbortable(checker);
       checker.run();
+      mWatchdog.removeAbortable(checker);
       return checker.getAnalysisResult();
     }
 
@@ -400,6 +428,7 @@ public class EFSMConflictCheckerExperiments
     {
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
       mConflictChecker =  new CompositionalConflictChecker(factory);
+      mWatchdog.addAbortable(mConflictChecker);
       // Configuration of CompositionalConflictChecker ...
       mConflictChecker.setAbstractionProcedureFactory
         (ConflictAbstractionProcedureFactory.NB);
@@ -434,7 +463,6 @@ public class EFSMConflictCheckerExperiments
 
   //#########################################################################
   //# Inner Class BDDConflictCheckerWrapper
-  @SuppressWarnings("unused")
   private class BDDConflictCheckerWrapper
     extends ConflictCheckerWrapper
   {
@@ -445,6 +473,7 @@ public class EFSMConflictCheckerExperiments
     {
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
       mConflictChecker =  new BDDConflictChecker(factory);
+      mWatchdog.addAbortable(mConflictChecker);
       // Configuration of CompositionalConflictChecker ...
       mConflictChecker.setBDDPackage(BDDPackage.CUDD);
       mConflictChecker.setTransitionPartitioningStrategy
@@ -475,10 +504,12 @@ public class EFSMConflictCheckerExperiments
   //#########################################################################
   //# Data Members
   private ConflictCheckerWrapper mConflictCheckerWrapper;
+  private Watchdog mWatchdog;
   private final FileOutputStream mOut;
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
 
+  private final int mTimeout = 1200;  // 20 minutes
   private final int mInternalTransitionLimit = 1000000;
   private final CompositionSelectionHeuristic mCompositionSelectionHeuristic;
 }

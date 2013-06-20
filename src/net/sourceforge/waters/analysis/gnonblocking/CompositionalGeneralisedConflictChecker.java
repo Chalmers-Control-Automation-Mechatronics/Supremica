@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -155,6 +155,7 @@ public class CompositionalGeneralisedConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
@@ -245,9 +246,21 @@ public class CompositionalGeneralisedConflictChecker
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mAbstractionRules != null) {
+      for (final AbstractionRule rule : mAbstractionRules) {
+        rule.resetAbort();
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run() throws AnalysisException
   {
     setUp();
@@ -585,6 +598,7 @@ public class CompositionalGeneralisedConflictChecker
    * Initialises required variables to default values if the user has not
    * configured them.
    */
+  @Override
   protected void setUp() throws AnalysisException
   {
     super.setUp();
@@ -1242,6 +1256,7 @@ public class CompositionalGeneralisedConflictChecker
      * no candidates is eligible the automaton being paired is removed and
      * another pairing is attempted.
      */
+    @Override
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
       Collection<AutomatonProxy> automata = model.getAutomata();
@@ -1308,6 +1323,7 @@ public class CompositionalGeneralisedConflictChecker
      */
     protected class AutomataComparator implements Comparator<AutomatonProxy>
     {
+      @Override
       public int compare(final AutomatonProxy aut1, final AutomatonProxy aut2)
       {
         final int aut1Count = getHeuristicFigure(aut1);
@@ -1338,11 +1354,13 @@ public class CompositionalGeneralisedConflictChecker
 
   private class HeuristicMinT extends PreselectingPairingHeuristic
   {
+    @Override
     protected int getHeuristicFigure(final AutomatonProxy aut)
     {
       return aut.getTransitions().size();
     }
 
+    @Override
     protected AutomatonProxy getHeuristicProperty(
                                                   final Collection<AutomatonProxy> automata)
     {
@@ -1381,11 +1399,13 @@ public class CompositionalGeneralisedConflictChecker
    */
   private class HeuristicMaxS extends PreselectingPairingHeuristic
   {
+    @Override
     protected int getHeuristicFigure(final AutomatonProxy aut)
     {
       return -aut.getStates().size();
     }
 
+    @Override
     protected AutomatonProxy getHeuristicProperty(
                                                   final Collection<AutomatonProxy> automata)
     {
@@ -1396,6 +1416,7 @@ public class CompositionalGeneralisedConflictChecker
 
   private class HeuristicMustL extends PreselectingHeuristic
   {
+    @Override
     protected List<Candidate> evaluate(final ProductDESProxy model)
     {
       final List<Candidate> candidates =
@@ -1546,6 +1567,7 @@ public class CompositionalGeneralisedConflictChecker
 
   private abstract class MinSelectingHeuristic extends SelectingHeuristic
   {
+    @Override
     protected boolean getMaxOrMin(final double currentMaxMin,
                                   final double newValue)
     {
@@ -1559,6 +1581,7 @@ public class CompositionalGeneralisedConflictChecker
 
   private abstract class MaxSelectingHeuristic extends SelectingHeuristic
   {
+    @Override
     protected boolean getMaxOrMin(final double currentMaxMin,
                                   final double newValue)
     {
@@ -1576,6 +1599,7 @@ public class CompositionalGeneralisedConflictChecker
    */
   private class HeuristicMaxLt extends MaxSelectingHeuristic
   {
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       return (double) candidate.getLocalEventCount()
@@ -1591,6 +1615,7 @@ public class CompositionalGeneralisedConflictChecker
    */
   private class HeuristicMaxL extends MaxSelectingHeuristic
   {
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       return countCandidatesLocalEvents(candidate);
@@ -1605,6 +1630,7 @@ public class CompositionalGeneralisedConflictChecker
    */
   private class HeuristicMaxLa extends MaxSelectingHeuristic
   {
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       // TODO: do we want maxLa calculated as a proportion like I have already
@@ -1677,6 +1703,7 @@ public class CompositionalGeneralisedConflictChecker
   private class HeuristicMaxLOnTransitions extends TransitionHeuristic
   {
 
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       countTransitions(candidate);
@@ -1694,6 +1721,7 @@ public class CompositionalGeneralisedConflictChecker
   private class HeuristicMaxCt extends MaxSelectingHeuristic
   {
 
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       final int candidatesTotalEvents = candidate.getNumberOfEvents();
@@ -1711,6 +1739,7 @@ public class CompositionalGeneralisedConflictChecker
   private class HeuristicMaxC extends MaxSelectingHeuristic
   {
 
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       final double candidatesTotalEvents =
@@ -1729,6 +1758,7 @@ public class CompositionalGeneralisedConflictChecker
   private class HeuristicMaxCOnTransitions extends TransitionHeuristic
   {
 
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       countTransitions(candidate);
@@ -1744,6 +1774,7 @@ public class CompositionalGeneralisedConflictChecker
      * Predicts number of states for synchronous product with respect to the
      * number of local events.
      */
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       double product = 1;
@@ -1752,7 +1783,7 @@ public class CompositionalGeneralisedConflictChecker
       }
       final int totalEvents = candidate.getNumberOfEvents();
       final int nonLocalEvents = totalEvents - candidate.getLocalEventCount();
-      return product * (double) nonLocalEvents / (double) totalEvents;
+      return product * nonLocalEvents / totalEvents;
     }
   }
 
@@ -1763,6 +1794,7 @@ public class CompositionalGeneralisedConflictChecker
      * Predicts number of states for synchronous product with respect to the
      * number of events shared within the automata of the candidate.
      */
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       double product = 1;
@@ -1771,7 +1803,7 @@ public class CompositionalGeneralisedConflictChecker
       }
       final int totalEvents = candidate.getNumberOfEvents();
       final int commonEvents = candidate.getCommonEventCount();
-      return product * (double) commonEvents / (double) totalEvents;
+      return product * commonEvents / totalEvents;
     }
   }
 
@@ -1830,12 +1862,14 @@ public class CompositionalGeneralisedConflictChecker
     }
 
     // not used
+    @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
       return 0;
     }
 
     // not used
+    @Override
     protected boolean getMaxOrMin(final double currentMaxMin,
                                   final double newValue)
     {
@@ -1987,6 +2021,7 @@ public class CompositionalGeneralisedConflictChecker
 
     // #######################################################################
     // # Trace Computation
+    @Override
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final AutomatonProxy composed = getResultAutomaton();
@@ -2055,6 +2090,7 @@ public class CompositionalGeneralisedConflictChecker
 
     // #######################################################################
     // # Trace Computation
+    @Override
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final List<TraceStepProxy> convertedSteps =
@@ -2245,6 +2281,7 @@ public class CompositionalGeneralisedConflictChecker
     /**
      * This performs a forward search over trace steps to convert a given trace.
      */
+    @Override
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       createTransitionRelation();
@@ -2679,6 +2716,7 @@ public class CompositionalGeneralisedConflictChecker
      *         the start of the trace. (The first item being the very first
      *         state of the trace).
      */
+    @Override
     protected List<SearchRecord> completeStartOfTrace(
                                                       final TIntArrayList initialStateIDs,
                                                       final int resultAutInitialStateClass)
@@ -2728,18 +2766,21 @@ public class CompositionalGeneralisedConflictChecker
       }
     }
 
+    @Override
     protected TIntHashSet getSuccessorsOrPredecessors(final int source,
                                                       final int event)
     {
       return getTransitionRelation().getSuccessors(source, event);
     }
 
+    @Override
     protected boolean isTargetState(final int stateFound,
                                     final int resultAutTarget)
     {
       return mClassMap[stateFound] == resultAutTarget;
     }
 
+    @Override
     protected boolean isTraceEndState(final int stateFound)
     {
       final OldTransitionRelation rel = getTransitionRelation();
@@ -2833,6 +2874,7 @@ public class CompositionalGeneralisedConflictChecker
     /**
      * Dummy method. Not needed for non-alpha determinisation.
      */
+    @Override
     protected List<SearchRecord> completeStartOfTrace(
                                                       final TIntArrayList initialStateIDs,
                                                       final int resultAutInitialStateClass)
@@ -2840,18 +2882,21 @@ public class CompositionalGeneralisedConflictChecker
       return null;
     }
 
+    @Override
     protected TIntHashSet getSuccessorsOrPredecessors(final int source,
                                                       final int event)
     {
       return getTransitionRelation().getPredecessors(source, event);
     }
 
+    @Override
     protected boolean isTargetState(final int stateFound,
                                     final int resultAutTarget)
     {
       return mClassMap[stateFound] == resultAutTarget;
     }
 
+    @Override
     protected boolean isTraceEndState(final int stateFound)
     {
       final OldTransitionRelation rel = getTransitionRelation();
@@ -3042,6 +3087,7 @@ public class CompositionalGeneralisedConflictChecker
 
     }
 
+    @Override
     ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
     {
       final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
@@ -3124,6 +3170,7 @@ public class CompositionalGeneralisedConflictChecker
      *         the start of the trace. (The first item being the very first
      *         state of the trace).
      */
+    @Override
     protected List<SearchRecord> completeStartOfTrace(
                                                       final TIntArrayList initialStateIDs,
                                                       final int resultTraceInitialState)
@@ -3177,6 +3224,7 @@ public class CompositionalGeneralisedConflictChecker
      * @return A list of SearchRecord's that represent each extra step added of
      *         the trace. (The last item being the end state of the trace).
      */
+    @Override
     protected List<SearchRecord> completeEndOfTrace(final int originalSource)
     {
       if (!getOriginalAutomaton().getEvents()
@@ -3213,18 +3261,21 @@ public class CompositionalGeneralisedConflictChecker
       }
     }
 
+    @Override
     protected TIntHashSet getSuccessorsOrPredecessors(final int source,
                                                       final int event)
     {
       return getTransitionRelation().getSuccessors(source, event);
     }
 
+    @Override
     protected boolean isTargetState(final int stateFound,
                                     final int resultAutTarget)
     {
       return stateFound == resultAutTarget;
     }
 
+    @Override
     protected boolean isTraceEndState(final int stateFound)
     {
       final OldTransitionRelation rel = getTransitionRelation();

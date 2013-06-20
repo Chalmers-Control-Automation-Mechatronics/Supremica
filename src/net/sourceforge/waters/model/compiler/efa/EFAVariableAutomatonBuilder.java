@@ -19,6 +19,8 @@ import java.util.TreeMap;
 
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.compiler.AbortableCompiler;
+import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
@@ -50,7 +52,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * @author Robi Malik
  */
 
-class EFAVariableAutomatonBuilder
+class EFAVariableAutomatonBuilder extends AbortableCompiler
 {
 
   //#########################################################################
@@ -78,22 +80,22 @@ class EFAVariableAutomatonBuilder
       mBlockedEvents = new LinkedList<IdentifierProxy>();
       constructVariableRange();
       for (final EFAEvent event : var.getEFAEvents()) {
-	constructEventTransitions(event);
+        constructEventTransitions(event);
       }
       constructEdges();
       final VariableComponentProxy comp =
         (VariableComponentProxy) mVariable.getComponent();
       final boolean deterministic = comp.isDeterministic();
       final LabelBlockProxy blocked =
-	mFactory.createLabelBlockProxy(mBlockedEvents, null);
+        mFactory.createLabelBlockProxy(mBlockedEvents, null);
       final GraphProxy graph =
-	mFactory.createGraphProxy(deterministic, blocked,
+        mFactory.createGraphProxy(deterministic, blocked,
                                   mNodeList, mEdgeList);
       final ModuleProxyCloner cloner = mFactory.getCloner();
       final IdentifierProxy ident = comp.getIdentifier();
       final IdentifierProxy iclone = (IdentifierProxy) cloner.getClone(ident);
       return mFactory.createSimpleComponentProxy
-	(iclone, ComponentKind.PLANT, graph);
+        (iclone, ComponentKind.PLANT, graph);
     } finally {
       mVariable = null;
       mBlockedEvents = null;
@@ -132,6 +134,7 @@ class EFAVariableAutomatonBuilder
       (eq, rangesize);
     mEdgeMap = new TreeMap<EFAVariableEdge,EFAVariableEdge>();
     for (final SimpleExpressionProxy value : range.getValues()) {
+      checkAbort();
       final String name = value.toString();
       final BindingContext context =
         new SingleBindingContext(varname, value, mRootContext);
@@ -175,6 +178,7 @@ class EFAVariableAutomatonBuilder
     if (part != null) {
       boolean hastrans = false;
       for (final EFAVariableTransition trans : part.getTransitions()) {
+        checkAbort();
         final SimpleExpressionProxy source = trans.getSource();
         final SimpleExpressionProxy target = trans.getTarget();
         createTransition(source, target, event);
@@ -188,10 +192,12 @@ class EFAVariableAutomatonBuilder
   }
 
   private void constructEdges()
+    throws EvalAbortException
   {
     final int numedges = mEdgeMap.size();
     mEdgeList = new ArrayList<EdgeProxy>(numedges);
     for (final EFAVariableEdge vedge : mEdgeMap.keySet()) {
+      checkAbort();
       final EdgeProxy edge = vedge.createEdgeProxy();
       mEdgeList.add(edge);
     }
@@ -206,8 +212,8 @@ class EFAVariableAutomatonBuilder
   }
 
   private void createTransition(final SimpleExpressionProxy source,
-				final SimpleExpressionProxy target,
-				final EFAEvent event)
+                                final SimpleExpressionProxy target,
+                                final EFAEvent event)
   {
     EFAVariableEdge edge = new EFAVariableEdge(source, target);
     final EFAVariableEdge found = mEdgeMap.get(edge);
@@ -239,6 +245,7 @@ class EFAVariableAutomatonBuilder
 
     //#######################################################################
     //# Hashing and Comparing
+    @Override
     public int compareTo(final EFAVariableEdge edge)
     {
       final CompiledRange range = mVariable.getRange();
@@ -252,6 +259,7 @@ class EFAVariableAutomatonBuilder
       return target1 - target2;
     }
 
+    @Override
     public boolean equals(final Object other)
     {
       if (other.getClass() == getClass()) {
@@ -264,6 +272,7 @@ class EFAVariableAutomatonBuilder
       }
     }
 
+    @Override
     public int hashCode()
     {
       return

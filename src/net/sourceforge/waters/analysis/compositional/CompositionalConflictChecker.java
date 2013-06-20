@@ -427,6 +427,15 @@ public class CompositionalConflictChecker
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mCurrentCompositionalSafetyVerifier != null) {
+      mCurrentCompositionalSafetyVerifier.resetAbort();
+    }
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser

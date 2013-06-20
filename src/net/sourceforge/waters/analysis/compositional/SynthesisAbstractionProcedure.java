@@ -193,6 +193,12 @@ public class SynthesisAbstractionProcedure
     return mChain.isAborting();
   }
 
+  @Override
+  public void resetAbort()
+  {
+    mChain.resetAbort();
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.compositional.

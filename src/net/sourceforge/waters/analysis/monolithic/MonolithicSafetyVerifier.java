@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Arrays;
 
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -506,7 +506,7 @@ public class MonolithicSafetyVerifier
    *         property is satisfied and there is no counterexample.
    */
   private SafetyTraceProxy computeCounterExample()
-    throws AbortException
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();

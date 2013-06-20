@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFACompiler
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efsm
+//# CLASS:   EFSMSystemBuilder
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -20,6 +20,8 @@ import java.util.List;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
@@ -65,7 +67,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class EFSMSystemBuilder
+public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
 {
 
   //#########################################################################
@@ -89,11 +91,14 @@ public class EFSMSystemBuilder
     mResultEFSMSystem = new EFSMSystem(moduleName, mVariableContext, size);
   }
 
+
   //#########################################################################
   //# Invocation
-  public EFSMSystem compile() throws EvalException
+  public EFSMSystem compile()
+    throws EvalException, AnalysisException
   {
     try {
+      setUp();
       // Pass 1 ...
       final Pass1Visitor pass1 = new Pass1Visitor();
       mInputModule.acceptVisitor(pass1);
@@ -109,9 +114,13 @@ public class EFSMSystemBuilder
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
         throw (EvalException) cause;
+      } else if (cause instanceof AnalysisException) {
+        throw (AnalysisException) cause;
       } else {
         throw exception.getRuntimeException();
       }
+    } finally {
+      tearDown();
     }
   }
 
@@ -142,9 +151,11 @@ public class EFSMSystemBuilder
   //#########################################################################
   //# Auxiliary Methods
   private void createMarkingTR()
+    throws AnalysisAbortException
   {
     if (!mMarkedVariables.isEmpty()) {
       try {
+        checkAbort();
         final EFSMEventEncoding eventEncoding = new EFSMEventEncoding(2);
         final ConstraintList markingUpdate =
           new ConstraintList(mVariableMarkingPredicates);
@@ -218,6 +229,7 @@ public class EFSMSystemBuilder
     public Object visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
+      checkAbortInVisitor();
       final SimpleComponentProxy comp = mGlobalEventsMap.getByProxy(ident);
       if (comp == null) {
         mGlobalEventsMap.putByProxy(ident, mCurrentComponent);
@@ -309,6 +321,7 @@ public class EFSMSystemBuilder
       throws VisitorException
     {
       try {
+        checkAbortInVisitor();
         final SimpleExpressionProxy type = var.getType();
         type.acceptVisitor(this);
         final SimpleExpressionProxy value =
@@ -427,14 +440,16 @@ public class EFSMSystemBuilder
             final TransitionIterator iter =
               rel.createAllTransitionsReadOnlyIterator();
             while (iter.advance()) {
+              checkAbortInVisitor();
               final int currentEvent = iter.getCurrentEvent();
               if (!usedEvents[currentEvent]) {
                 newNumEvents ++;
                 usedEvents[currentEvent] = true;
               }
             }
-            final EFSMEventEncoding newEncoding = new EFSMEventEncoding(newNumEvents);
-            for (int i=0; i < oldNumEvents; i++) {
+            final EFSMEventEncoding newEncoding =
+              new EFSMEventEncoding(newNumEvents);
+            for (int i = 0; i < oldNumEvents; i++) {
               if (usedEvents[i]) {
                 final ConstraintList update = mEventEncoding.getUpdate(i);
                 newEncoding.createEventId(update);
@@ -454,7 +469,7 @@ public class EFSMSystemBuilder
         efsmTransitionRelation.register();
         mResultEFSMSystem.addTransitionRelation(efsmTransitionRelation);
         return efsmTransitionRelation;
-      } catch (final OverflowException exception) {
+      } catch (final AnalysisException exception) {
         throw wrap(exception);
       }
     }
@@ -506,6 +521,7 @@ public class EFSMSystemBuilder
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
+      checkAbortInVisitor();
       final GuardActionBlockProxy update = edge.getGuardActionBlock();
       if (update == null) {
         mSimplifiedGuardActionBlockMap.putByProxy(update, mTrueGuard);
@@ -555,7 +571,7 @@ public class EFSMSystemBuilder
 
     private ListBufferTransitionRelation createTransitionRelation
       (final SimpleComponentProxy comp)
-      throws OverflowException
+      throws AnalysisException
     {
       final GraphProxy graph = comp.getGraph();
       final String name = comp.getName();
@@ -584,6 +600,7 @@ public class EFSMSystemBuilder
       }
       final Collection<EdgeProxy> edges = graph.getEdges();
       for (final EdgeProxy edge : edges) {
+        checkAbort();
         final GuardActionBlockProxy update = edge.getGuardActionBlock();
         final ConstraintList simplifiedList =
           mSimplifiedGuardActionBlockMap.getByProxy(update);
@@ -611,7 +628,8 @@ public class EFSMSystemBuilder
     private final EFAGuardCompiler mGuardCompiler;
     private final ConstraintPropagator mConstraintPropagator;
     private EFSMEventEncoding mEventEncoding;
-    private ProxyAccessorMap<GuardActionBlockProxy,ConstraintList> mSimplifiedGuardActionBlockMap;
+    private ProxyAccessorMap<GuardActionBlockProxy,ConstraintList>
+      mSimplifiedGuardActionBlockMap;
     private TObjectIntHashMap<SimpleNodeProxy> mStateMap;
     private List<SimpleNodeProxy> mNodeList;
     private boolean mUsesMarking;
@@ -633,6 +651,5 @@ public class EFSMSystemBuilder
   private final List<EFSMVariable> mMarkedVariables;
   private final List<SimpleExpressionProxy> mVariableMarkingPredicates;
   private final EFSMSystem mResultEFSMSystem;
-
 
 }

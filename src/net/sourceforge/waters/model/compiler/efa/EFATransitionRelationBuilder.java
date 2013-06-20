@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
@@ -46,7 +47,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-class EFATransitionRelationBuilder
+class EFATransitionRelationBuilder extends AbortableCompiler
 {
 
   //#########################################################################
@@ -98,6 +99,7 @@ class EFATransitionRelationBuilder
         new LinkedList<EFAVariableTransitionRelation>();
       for (final Map.Entry<EFAVariableTransitionRelation,EventRecord> entry :
              mEventRecords.entrySet()) {
+        checkAbort();
         final EFAVariableTransitionRelation rel2 = entry.getKey();
         final EventRecord record2 = entry.getValue();
         final Collection<Proxy> locations2 = record2.getSourceLocations();
@@ -163,6 +165,7 @@ class EFATransitionRelationBuilder
         result = new EFAVariableTransitionRelation(numRecords);
         result.provideFormula(constraints);
         for (final VariableRecord record : mVariableRecords.values()) {
+          checkAbort();
           final EFAVariableTransitionRelationPart part =
             record.createTransitionRelationPart();
           if (part != null) {
@@ -176,6 +179,7 @@ class EFATransitionRelationBuilder
         }
         for (final EFAVariable var : edecl.getVariables()) {
           if (!mVariableRecords.containsKey(var)) {
+            checkAbort();
             final EFAVariable primedvar = getPrimedVariable(var);
             final VariableRecord record =
               new ModifyingVariableRecord(var, primedvar);

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -341,7 +341,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
    *         depth, <CODE>false</CODE> otherwise.
    */
   private boolean exploreBackwards(final int stateid, final BitSet coreachable,
-                                   int maxdepth) throws AbortException
+                                   int maxdepth) throws AnalysisAbortException
   {
     if (maxdepth-- > 0) {
       checkAbort();

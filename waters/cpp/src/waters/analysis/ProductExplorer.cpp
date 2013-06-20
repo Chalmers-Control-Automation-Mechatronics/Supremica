@@ -696,7 +696,7 @@ void ProductExplorer::
 doAbort()
   const
 {
-  throw jni::PreJavaException(jni::CLASS_AbortException);
+  throw jni::PreJavaException(jni::CLASS_AnalysisAbortException);
 }
 
 
@@ -890,6 +890,21 @@ Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_requestAbort
     waters::ProductExplorer* explorer =
       (waters::ProductExplorer*) env->GetDirectBufferAddress(bbuffer);
     explorer->requestAbort();
+  }
+}
+
+
+JNIEXPORT void JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_resetAbort
+  (JNIEnv *env, jobject jchecker)
+{
+  jni::ClassCache cache(env);
+  jni::NativeModelAnalyzerGlue gchecker(jchecker, &cache);
+  jobject bbuffer = gchecker.getNativeModelAnalyzer();
+  if (bbuffer != 0) {
+    waters::ProductExplorer* explorer =
+      (waters::ProductExplorer*) env->GetDirectBufferAddress(bbuffer);
+    explorer->resetAbort();
   }
 }
 

@@ -272,6 +272,15 @@ public abstract class AbstractCompositionalModelVerifier
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mCurrentMonolithicVerifier != null) {
+      mCurrentMonolithicVerifier.resetAbort();
+    }
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier

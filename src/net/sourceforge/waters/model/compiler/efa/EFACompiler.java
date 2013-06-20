@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
@@ -108,7 +109,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * @author Robi Malik
  */
 
-public class EFACompiler
+public class EFACompiler extends AbortableCompiler
 {
 
   //#########################################################################
@@ -124,6 +125,33 @@ public class EFACompiler
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mInputModule = module;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mTransitionRelationBuilder != null) {
+      mTransitionRelationBuilder.requestAbort();
+    }
+    if (mVariableAutomatonBuilder != null) {
+      mVariableAutomatonBuilder.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mTransitionRelationBuilder != null) {
+      mTransitionRelationBuilder.resetAbort();
+    }
+    if (mVariableAutomatonBuilder != null) {
+      mVariableAutomatonBuilder.resetAbort();
+    }
   }
 
 
@@ -295,6 +323,7 @@ public class EFACompiler
                                    final Collection<Proxy> locations)
     throws EvalException
   {
+    checkAbort();
     if (parent.isUnsatisfiable()) {
       createEvent(edecl, parent, locations);
       return;
@@ -437,6 +466,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
+        checkAbortInVisitor();
         final String name = node.getName();
         final SimpleIdentifierProxy ident =
           mFactory.createSimpleIdentifierProxy(name);
@@ -521,6 +551,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
+        checkAbortInVisitor();
         final IdentifierProxy ident = decl.getIdentifier();
         final EFAEventDecl edecl = new EFAEventDecl(decl);
         insertEventDecl(ident, edecl);
@@ -549,6 +580,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
+        checkAbortInVisitor();
         mCurrentGuard = mGuardCompiler.getCompiledGuard(ga);
         for (final SimpleExpressionProxy guard :
                mCurrentGuard.getConstraints()) {
@@ -566,6 +598,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
+        checkAbortInVisitor();
         final EFAEventDecl edecl = findEventDecl(ident);
         if (!edecl.isBlocked()) {
           mCollectedEvents.add(edecl);
@@ -686,6 +719,7 @@ public class EFACompiler
                               final SimpleComponentProxy catchAll)
       throws EvalException
     {
+      checkAbort();
       if (iter.hasNext()) {
         final EFAAutomatonTransition trans = iter.next();
         final ConstraintList guard = trans.getGuard();
@@ -753,6 +787,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
+        checkAbortInVisitor();
         final IdentifierProxy ident = decl.getIdentifier();
         final EFAEventDecl edecl = findEventDecl(ident);
         final EventKind kind = edecl.getKind();
@@ -814,6 +849,7 @@ public class EFACompiler
           mEFAEventMap.get(mCurrentComponent);
         if (events != null) {
           for (final EFAEvent event : events) {
+            checkAbortInVisitor();
             if (!mEFAAlphabet.contains(event) && !event.isBlocked()) {
               final IdentifierProxy ident = event.createIdentifier(mFactory);
               mLabelList.add(ident);
@@ -864,7 +900,9 @@ public class EFACompiler
 
     @Override
     public Object visitIdentifierProxy(final IdentifierProxy ident)
+      throws VisitorException
     {
+      checkAbortInVisitor();
       Collection<EFAEvent> events = mEFAEventMap.get(ident);
       if (events == null) {
         final EFAEventDecl edecl = getEventDecl(ident);
@@ -954,6 +992,7 @@ public class EFACompiler
     public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
       throws VisitorException
     {
+      checkAbortInVisitor();
       final String name = node.getName();
       final PlainEventListProxy props0 = node.getPropositions();
       final PlainEventListProxy props1 =
@@ -975,6 +1014,7 @@ public class EFACompiler
       throws VisitorException
     {
       try {
+        checkAbortInVisitor();
         final IdentifierProxy ident = comp.getIdentifier();
         final EFAVariable var = mRootContext.getVariable(ident);
         final SimpleComponentProxy result =

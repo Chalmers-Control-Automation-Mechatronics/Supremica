@@ -42,7 +42,7 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersLongHashingStrategy;
 import net.sourceforge.waters.analysis.tr.WatersLongIntHashMap;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -453,7 +453,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void setUpVerifier()
-    throws AbortException, OverflowException
+    throws AnalysisAbortException, OverflowException
   {
     final int numStates = mOriginalStates.length;
     mVerifierStatePairs = new TLongArrayList(numStates);
@@ -465,7 +465,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void rebuildVerifier()
-    throws AbortException, OverflowException
+    throws AnalysisAbortException, OverflowException
   {
     mVerifierStatePairs.clear();
     mVerifierStateMap.clear();
@@ -480,7 +480,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   private void buildVerifier()
-    throws AbortException, OverflowException
+    throws AnalysisAbortException, OverflowException
   {
     final int numStates = mOriginalStates.length;
     for (int s = 0; s < numStates; s++) {
@@ -779,7 +779,7 @@ public class OPSearchAutomatonSimplifier
   //#########################################################################
   //# OP-Search Algorithm
   private void doOPSearchStep()
-    throws AbortException, OverflowException
+    throws AnalysisAbortException, OverflowException
   {
     final OPSearchAutomatonResult result = getAnalysisResult();
     result.recordIteration();

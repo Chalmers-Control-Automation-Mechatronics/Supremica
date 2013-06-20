@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -456,7 +456,7 @@ public class MonolithicControlLoopChecker
   }
 
   private LoopTraceProxy computeCounterExample()
-    throws AbortException
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();

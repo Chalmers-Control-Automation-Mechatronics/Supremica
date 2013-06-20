@@ -26,7 +26,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
@@ -300,7 +300,7 @@ public abstract class WatersAnalyzeAction
         super.run();
         try {
           mVerifier.run();
-        } catch (final AbortException exception) {
+        } catch (final AnalysisAbortException exception) {
           // Do nothing: Aborted
           return;
         } catch (final AnalysisException exception) {

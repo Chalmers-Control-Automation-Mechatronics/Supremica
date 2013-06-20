@@ -25,6 +25,7 @@ import java.util.Queue;
 import net.sourceforge.waters.analysis.tr.BFSSeachSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -138,6 +139,51 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mEFSMSynchronizer != null) {
+      mEFSMSynchronizer.requestAbort();
+    }
+    if (mVariablePartitionComputer != null) {
+      mVariablePartitionComputer.requestAbort();
+    }
+    if (mPartialUnfolder != null) {
+      mPartialUnfolder.requestAbort();
+    }
+    if (mSimplifier != null) {
+      mSimplifier.requestAbort();
+    }
+    if (mNonblockingChecker != null) {
+      mNonblockingChecker.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mEFSMSynchronizer != null) {
+      mEFSMSynchronizer.resetAbort();
+    }
+    if (mVariablePartitionComputer != null) {
+      mVariablePartitionComputer.resetAbort();
+    }
+    if (mPartialUnfolder != null) {
+      mPartialUnfolder.resetAbort();
+    }
+    if (mSimplifier != null) {
+      mSimplifier.resetAbort();
+    }
+    if (mNonblockingChecker != null) {
+      mNonblockingChecker.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
   //# Invocation
   @Override
   public void setUp()
@@ -180,8 +226,8 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       mEFSMTRSimplifierFactory = EFSMTRSimplifierFactory.NB;
     }
     final EFSMConflictCheckerAnalysisResult result = getAnalysisResult();
-    mEFSMSynchronization = new EFSMSynchronization(factory);
-    result.addSynchronousProductStatistics(mEFSMSynchronization.getStatistics());
+    mEFSMSynchronizer = new EFSMSynchronizer(factory);
+    result.addSynchronousProductStatistics(mEFSMSynchronizer.getStatistics());
     mVariablePartitionComputer =
       new EFSMVariablePartitionComputer(factory, mCompilerOperatorTable);
     result.addPartitioningStatistics(mVariablePartitionComputer.getStatistics());
@@ -205,7 +251,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     mSimplifier = null;
     mVariablePartitionComputer = null;
     mPartialUnfolder = null;
-    mEFSMSynchronization = null;
+    mEFSMSynchronizer = null;
     mNonblockingChecker = null;
     mEFSMVariableCollector = null;
     mCurrentEFSMSystem = null;
@@ -344,7 +390,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         final EFSMTransitionRelation TR1 = selectedTR.get(0);
         final EFSMTransitionRelation TR2 = selectedTR.get(1);
         final EFSMTransitionRelation synchTR =
-          mEFSMSynchronization.synchronize(TR1, TR2);
+          mEFSMSynchronizer.synchronize(TR1, TR2);
         result.addEFSMTransitionRelation(synchTR);
         EFSMTransitionRelation synchSimplified = simplify(synchTR);
         final boolean splitting;
@@ -556,11 +602,12 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   //# Debugging
   @SuppressWarnings("unused")
   private void checkBlocking(final EFSMTransitionRelation efsmTR)
+    throws AnalysisAbortException
   {
     if (efsmTR != null) {
       final boolean nonblocking = mNonblockingChecker.run(efsmTR);
       if (!nonblocking) {
-        System.err.println("BLOCKING!!!");
+        getLogger().debug("BLOCKING!!!");
       }
     }
   }
@@ -578,7 +625,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   private EFSMVariablePartitionComputer mVariablePartitionComputer;
   private PartialUnfolder mPartialUnfolder;
   private CompositionSelectionHeuristic mCompositionSelectionHeuristic;
-  private EFSMSynchronization mEFSMSynchronization;
+  private EFSMSynchronizer mEFSMSynchronizer;
   private EFSMTRNonblockingChecker mNonblockingChecker;
   private EFSMVariableCollector mEFSMVariableCollector;
   private Queue<EFSMSystem> mEFSMSystemQueue;

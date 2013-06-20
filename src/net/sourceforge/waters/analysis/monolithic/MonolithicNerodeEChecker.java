@@ -18,7 +18,7 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.sd.NerodeDiagnostics;
 import net.sourceforge.waters.analysis.sd.NerodeEquVerificationResult;
 import net.sourceforge.waters.analysis.sd.NerodeKindTranslator;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -731,7 +731,7 @@ public class MonolithicNerodeEChecker
    *         property is satisfied and there is no counterexample.
    */
   private SafetyTraceProxy computeCounterExample()
-    throws AbortException
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
@@ -794,7 +794,7 @@ public class MonolithicNerodeEChecker
 // Computation for the second counterexample...
  //  This is to be used by the Modular checker
   private SafetyTraceProxy computeCounterExample2()
-      throws AbortException
+      throws AnalysisAbortException
     {
       final ProductDESProxyFactory factory = getFactory();
       final ProductDESProxy des = getModel();

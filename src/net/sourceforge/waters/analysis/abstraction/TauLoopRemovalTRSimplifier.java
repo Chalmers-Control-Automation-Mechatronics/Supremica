@@ -21,7 +21,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -149,7 +149,7 @@ public class TauLoopRemovalTRSimplifier
   //#########################################################################
   //# Auxiliary Methods
   private void tarjan(final int state)
-  throws AbortException
+  throws AnalysisAbortException
   {
     checkAbort();
     final ListBufferTransitionRelation rel = getTransitionRelation();

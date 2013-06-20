@@ -413,6 +413,12 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     return mCompleteChain.isAborting();
   }
 
+  @Override
+  public void resetAbort()
+  {
+    mCompleteChain.resetAbort();
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods

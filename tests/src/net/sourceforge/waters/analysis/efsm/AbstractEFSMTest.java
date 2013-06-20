@@ -15,6 +15,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -114,7 +115,7 @@ abstract class AbstractEFSMTest
 
   EFSMSystem createEFSMSystem(final ModuleProxy module,
                               final List<ParameterBindingProxy> bindings)
-    throws EvalException
+    throws EvalException, AnalysisException
   {
     final DocumentManager manager = getDocumentManager();
     final ModuleProxy before = createModule(module, BEFORE, true);

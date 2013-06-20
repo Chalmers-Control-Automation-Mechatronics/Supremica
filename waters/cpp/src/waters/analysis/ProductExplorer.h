@@ -126,6 +126,7 @@ public:
   //##########################################################################
   //# Aborting
   inline void requestAbort() {mIsAbortRequested = true;}
+  inline void resetAbort() {mIsAbortRequested = false;}
 
 protected:
   //##########################################################################

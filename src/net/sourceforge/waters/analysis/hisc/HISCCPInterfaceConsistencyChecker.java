@@ -314,6 +314,19 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    mConflictChecker.resetAbort();
+    if (mSimplifier != null) {
+      mSimplifier.resetAbort();
+    }
+    if (mConflictPreorderChecker != null) {
+      mConflictPreorderChecker.resetAbort();
+    }
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods

@@ -595,7 +595,21 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (mAbstractionProcedure != null) {
       mAbstractionProcedure.requestAbort();
     }
-    mSynchronousProductBuilder.requestAbort();
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mAbstractionProcedure != null) {
+      mAbstractionProcedure.resetAbort();
+    }
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.resetAbort();
+    }
   }
 
 

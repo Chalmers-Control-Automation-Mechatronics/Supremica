@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -44,11 +44,13 @@ public abstract class AbstractTRSimplifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  @Override
   public int getPreferredInputConfiguration()
   {
     return 0;
   }
 
+  @Override
   public void setPreferredOutputConfiguration(final int config)
   {
     mPreferredOutputConfiguration = config;
@@ -59,35 +61,42 @@ public abstract class AbstractTRSimplifier
     return mPreferredOutputConfiguration;
   }
 
+  @Override
   public ListBufferTransitionRelation getTransitionRelation()
   {
     return mTransitionRelation;
   }
 
+  @Override
   public void setTransitionRelation(final ListBufferTransitionRelation rel)
   {
     mTransitionRelation = rel;
   }
 
+  @Override
   public void setDefaultMarkingID(final int defaultID)
   {
     setPropositions(-1, defaultID);
   }
 
+  @Override
   public void setPropositions(final int preconditionID, final int defaultID)
   {
   }
 
+  @Override
   public void setAppliesPartitionAutomatically(final boolean apply)
   {
     mAppliesPartitionAutomatically = apply;
   }
 
+  @Override
   public boolean getAppliesPartitionAutomatically()
   {
     return mAppliesPartitionAutomatically;
   }
 
+  @Override
   public boolean run()
   throws AnalysisException
   {
@@ -117,32 +126,38 @@ public abstract class AbstractTRSimplifier
     }
   }
 
+  @Override
   public List<int[]> getResultPartition()
   {
     return mResultPartition;
   }
 
+  @Override
   public boolean isObservationEquivalentAbstraction()
   {
     return mResultPartition == null;
   }
 
+  @Override
   public boolean isReducedMarking(final int propID)
   {
     return false;
   }
 
+  @Override
   public TRSimplifierStatistics getStatistics()
   {
     return mStatistics;
   }
 
+  @Override
   public void collectStatistics(final List<TRSimplifierStatistics> list)
   {
     final TRSimplifierStatistics stats = getStatistics();
     list.add(stats);
   }
 
+  @Override
   public void reset()
   {
     mTransitionRelation = null;
@@ -152,14 +167,22 @@ public abstract class AbstractTRSimplifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
   public void requestAbort()
   {
     mIsAborting = true;
   }
 
+  @Override
   public boolean isAborting()
   {
     return mIsAborting;
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    mIsAborting = false;
   }
 
 
@@ -320,15 +343,15 @@ public abstract class AbstractTRSimplifier
 
   /**
    * Checks whether this simplifier has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AbortException}.
+   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
    * This method should be called periodically by any transition relation
    * simplifier that supports being aborted by user request.
    */
   protected void checkAbort()
-    throws AbortException
+    throws AnalysisAbortException
   {
     if (mIsAborting) {
-      final AbortException exception = new AbortException();
+      final AnalysisAbortException exception = new AnalysisAbortException();
       throw exception;
     }
   }

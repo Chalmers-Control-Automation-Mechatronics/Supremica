@@ -9,10 +9,11 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
-import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.VisitorException;
 
 import org.apache.log4j.Logger;
 
@@ -21,21 +22,26 @@ import org.apache.log4j.Logger;
  * @author Sahar Mohajerani, Robi Malik
  */
 
-public abstract class AbstractEFSMAlgorithm
+abstract class AbstractEFSMAlgorithm
   implements Abortable
 {
 
   //#########################################################################
   //# Constructor
-  public AbstractEFSMAlgorithm(final boolean trans)
+  AbstractEFSMAlgorithm()
   {
-    mStatistics = new EFSMSimplifierStatistics(this, trans);
   }
 
 
   //#########################################################################
-  //# Invocation
-  public EFSMSimplifierStatistics getStatistics()
+  //# Simple Access
+  EFSMSimplifierStatistics createStatistics(final boolean trans)
+  {
+    mStatistics = new EFSMSimplifierStatistics(this, trans);
+    return mStatistics;
+  }
+
+  EFSMSimplifierStatistics getStatistics()
   {
     return mStatistics;
   }
@@ -55,10 +61,16 @@ public abstract class AbstractEFSMAlgorithm
     return mIsAborting;
   }
 
+  @Override
+  public void resetAbort()
+  {
+    mIsAborting = false;
+  }
+
 
   //#########################################################################
   //# Algorithm Support
-  protected void setUp()
+  void setUp()
     throws AnalysisException
   {
     checkAbort();
@@ -68,7 +80,7 @@ public abstract class AbstractEFSMAlgorithm
   /**
    * Cleans up temporary data.
    */
-  protected void tearDown()
+  void tearDown()
   {
     updatePeakMemoryUsage();
   }
@@ -76,14 +88,14 @@ public abstract class AbstractEFSMAlgorithm
   /**
    * Adds the given runtime to the simplifier's statistics record.
    */
-  protected void recordRunTime(final long runtime)
+  void recordRunTime(final long runtime)
   {
     if (mStatistics != null) {
       mStatistics.recordRunTime(runtime);
     }
   }
 
-  protected void updatePeakMemoryUsage()
+  void updatePeakMemoryUsage()
   {
     if (mStatistics != null) {
       mStatistics.updatePeakMemoryUsage();
@@ -94,7 +106,7 @@ public abstract class AbstractEFSMAlgorithm
    * Prints a message to the current logger indicating that this simplifier
    * has just started.
    */
-  protected void logStart()
+  void logStart()
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
@@ -108,7 +120,7 @@ public abstract class AbstractEFSMAlgorithm
    * @param  success  Whether or not the simplifier has been able to
    *                  actually simplify the transition relation.
    */
-  protected void logFinish(final boolean success)
+  void logFinish(final boolean success)
   {
     if (success) {
       final Logger logger = getLogger();
@@ -120,23 +132,39 @@ public abstract class AbstractEFSMAlgorithm
 
   /**
    * Checks whether this simplifier has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AbortException}.
+   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
    * This method should be called periodically by any transition relation
    * simplifier that supports being aborted by user request.
    */
-  protected void checkAbort()
-    throws AbortException
+  void checkAbort()
+    throws AnalysisAbortException
   {
     if (mIsAborting) {
-      final AbortException exception = new AbortException();
+      final AnalysisAbortException exception = new AnalysisAbortException();
       throw exception;
+    }
+  }
+
+  /**
+   * Checks whether this simplifier has been requested to abort,
+   * and if so, performs the abort by throwing a {@link VisitorException}
+   * wrapped around an {@link AnalysisAbortException}. This method is used
+   * instead of {@link #checkAbort()} when inside a {@link
+   * net.sourceforge.waters.model.base.ProxyVisitor ProxyVisitor}.
+   */
+  void checkAbortInVisitor()
+    throws VisitorException
+  {
+    if (mIsAborting) {
+      final AnalysisAbortException exception = new AnalysisAbortException();
+      throw new VisitorException(exception);
     }
   }
 
 
   //#########################################################################
   //# Logging
-  protected Logger getLogger()
+  Logger getLogger()
   {
     final Class<?> clazz = getClass();
     return Logger.getLogger(clazz);
@@ -146,6 +174,6 @@ public abstract class AbstractEFSMAlgorithm
   //#########################################################################
   //# Data Members
   private boolean mIsAborting;
-  private final EFSMSimplifierStatistics mStatistics;
+  private EFSMSimplifierStatistics mStatistics;
 
 }

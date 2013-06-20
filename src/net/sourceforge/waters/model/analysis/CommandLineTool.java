@@ -37,6 +37,7 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -206,8 +207,8 @@ public class CommandLineTool
       final Iterator<String> argIter = argList.iterator();
       factory.parse(argIter);
       factory.configure(checker);
+      final Watchdog watchdog = new Watchdog(wrapper, timeout);
       if (timeout > 0) {
-        final Watchdog watchdog = new Watchdog(wrapper, timeout);
         watchdog.start();
       }
 
@@ -226,7 +227,9 @@ public class CommandLineTool
             compiler.setEnabledPropositionNames(empty);
           }
           factory.configure(compiler);
+          watchdog.addAbortable(compiler);
           des = compiler.compile(bindings);
+          watchdog.removeAbortable(compiler);
         }
         System.out.print(des.getName() + " ... ");
         System.out.flush();
@@ -277,7 +280,7 @@ public class CommandLineTool
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
           formatter.format("OVERFLOW (%.3f s)\n", difftime);
-        } catch (final AbortException abort) {
+        } catch (final AnalysisAbortException abort) {
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
           formatter.format("TIMEOUT (%.3f s)\n", difftime);
@@ -311,6 +314,14 @@ public class CommandLineTool
         first = false;
       }
 
+    } catch (final EvalException exception) {
+      System.err.print("FATAL ERROR (");
+      System.err.print(ProxyTools.getShortClassName(exception));
+      System.err.println(")");
+      final String msg = exception.getMessage();
+      if (msg != null) {
+        System.err.println(exception.getMessage());
+      }
     } catch (final WatersUnmarshalException exception) {
       System.err.print("FATAL ERROR (");
       System.err.print(ProxyTools.getShortClassName(exception));

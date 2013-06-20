@@ -130,6 +130,12 @@ abstract class TRAbstractionProcedure
     return mSimplifier.isAborting();
   }
 
+  @Override
+  public void resetAbort()
+  {
+    mSimplifier.resetAbort();
+  }
+
 
   //#########################################################################
   //# Simple Access

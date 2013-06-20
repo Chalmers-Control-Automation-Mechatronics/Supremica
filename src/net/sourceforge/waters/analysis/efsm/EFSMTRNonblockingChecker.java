@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
 //# CLASS:   EFSMTRNonblockingChecker
 //###########################################################################
@@ -14,14 +14,19 @@ import gnu.trove.stack.array.TIntArrayStack;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+
 
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-public class EFSMTRNonblockingChecker
+public class EFSMTRNonblockingChecker extends AbstractEFSMAlgorithm
 {
 
+  //#########################################################################
+  //# Invocation
   public boolean run(final EFSMTransitionRelation efsmTR)
+    throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
     if (rel.getNumberOfPropositions() == 0) {
@@ -45,6 +50,7 @@ public class EFSMTRNonblockingChecker
               coReachable[source] = true;
               stack.push(source);
             }
+            checkAbort();
           }
         }
       }

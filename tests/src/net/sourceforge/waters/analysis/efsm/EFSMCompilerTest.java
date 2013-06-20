@@ -19,6 +19,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -57,7 +58,7 @@ public class EFSMCompilerTest
   //#########################################################################
   //# Handcrafting Test Cases
   public void testCompile_empty_1()
-    throws EvalException
+    throws EvalException, AnalysisException
   {
     final String name = "empty";
     final ModuleProxy module = mModuleFactory.createModuleProxy
@@ -69,7 +70,7 @@ public class EFSMCompilerTest
   }
 
   public void testCompile_empty_2()
-    throws EvalException
+    throws EvalException, AnalysisException
   {
     final String modname = "almost_empty";
     final String instname = "instance";
@@ -442,7 +443,7 @@ public class EFSMCompilerTest
 
   private EFSMSystem compile(final ModuleProxy module,
                              final List<ParameterBindingProxy> bindings)
-    throws EvalException
+    throws EvalException, AnalysisException
   {
     final EFSMCompiler compiler =
       new EFSMCompiler(mDocumentManager, module);
@@ -451,7 +452,7 @@ public class EFSMCompilerTest
   }
 
   private EFSMSystem compile(final ModuleProxy module)
-    throws EvalException
+    throws EvalException, AnalysisException
   {
     return compile(module, null);
   }

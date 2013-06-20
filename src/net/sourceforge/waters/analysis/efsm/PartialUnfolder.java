@@ -21,7 +21,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -59,7 +59,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
   public PartialUnfolder(final ModuleProxyFactory factory,
                          final CompilerOperatorTable op)
   {
-    super(true);
+    createStatistics(true);
     mFactory = factory;
     mOperatorTable = op;
     mEFSMVariableFinder = new EFSMVariableFinder(op);
@@ -422,9 +422,8 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
     //#######################################################################
     //# Access
     private void expandState(final int source)
-      throws EvalException, AbortException
+      throws EvalException, AnalysisAbortException
     {
-      checkAbort();
       final long pair = mUnfoldedStateList.get(source);
       final int sourceState = (int) (pair & 0xffffffffL);
       final int beforeClass = (int) (pair >> 32);
@@ -446,7 +445,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
 
     private void expand(final int source, final int beforeClass,
                         final int event, final int targetState)
-      throws EvalException
+      throws EvalException, AnalysisAbortException
     {
 
       UpdateInfo info = mUpdateInfo[event];
@@ -514,7 +513,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
           }
         }
       }
-
+      checkAbort();
     }
 
     abstract void newTransition(int source, int event, long pair);

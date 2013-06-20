@@ -26,8 +26,8 @@ import net.sourceforge.waters.analysis.gnonblocking.FindBlockingStates;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AbortException;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -221,15 +221,15 @@ public class TRConflictPreorderChecker
 
   /**
    * Checks whether the model analyser has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AbortException}.
+   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
    * This method should be called periodically by any model analyser that
    * supports being aborted by user request.
    */
   private void checkAbort()
-    throws AbortException
+    throws AnalysisAbortException
   {
     if (mIsAborting) {
-      final AbortException exception = new AbortException();
+      final AnalysisAbortException exception = new AnalysisAbortException();
       setExceptionResult(exception);
       throw exception;
     }
@@ -248,6 +248,12 @@ public class TRConflictPreorderChecker
   public boolean isAborting()
   {
     return mIsAborting;
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    mIsAborting = false;
   }
 
 
@@ -331,7 +337,7 @@ public class TRConflictPreorderChecker
   }
 
   private void expandStates()
-    throws AbortException
+    throws AnalysisAbortException
   {
     for (; mExpanded < mStates.size(); mExpanded++) {
       checkAbort();
@@ -368,7 +374,7 @@ public class TRConflictPreorderChecker
   }
 
   private void calculateLCStates()
-    throws AbortException
+    throws AnalysisAbortException
   {
     boolean modified = true;
     int level = 0;
@@ -436,14 +442,14 @@ public class TRConflictPreorderChecker
 
   @SuppressWarnings("unused")
   private boolean isLessConflicting(final int s1, final int s2)
-    throws AbortException
+    throws AnalysisAbortException
   {
     return isLessConflicting(createPair(calculateTauReachable(s1, mFirstRelation),
                                         calculateTauReachable(s2, mSecondRelation)));
   }
 
   private boolean isLessConflicting(final LCPair tuple)
-    throws AbortException
+    throws AnalysisAbortException
   {
     final int initial = getState(tuple);
     // adds the certain conflict states to the calculation

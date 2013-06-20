@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
 //# CLASS:   EFSMCompiler
 //###########################################################################
@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
@@ -26,15 +27,18 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
+
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-public class EFSMCompiler
+
+class EFSMCompiler extends AbstractEFSMAlgorithm
 {
+
   //##########################################################################
   //# Constructors
-  public EFSMCompiler(final DocumentManager manager,
-                        final ModuleProxy module)
+  EFSMCompiler(final DocumentManager manager,
+               final ModuleProxy module)
   {
     mDocumentManager = manager;
     mInputModule = module;
@@ -43,47 +47,87 @@ public class EFSMCompiler
 
   //##########################################################################
   //# Simple Access
-  public ModuleProxy getInputModule()
+  ModuleProxy getInputModule()
   {
     return mInputModule;
   }
 
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mModuleInstanceCompiler != null) {
+      mModuleInstanceCompiler.requestAbort();
+    }
+    if (mEFSMSystemBuilder != null) {
+      mEFSMSystemBuilder.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mModuleInstanceCompiler != null) {
+      mModuleInstanceCompiler.resetAbort();
+    }
+    if (mEFSMSystemBuilder != null) {
+      mEFSMSystemBuilder.resetAbort();
+    }
+  }
+
+
   //##########################################################################
   //# Invocation
-  public EFSMSystem compile()
-    throws EvalException
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mModuleInstanceCompiler = null;
+    mEFSMSystemBuilder = null;
+  }
+
+  EFSMSystem compile()
+    throws EvalException, AnalysisException
   {
     return compile(null);
   }
 
-  public EFSMSystem compile(final List<ParameterBindingProxy> bindings)
-    throws EvalException
+  EFSMSystem compile(final List<ParameterBindingProxy> bindings)
+    throws EvalException, AnalysisException
   {
-    final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
-    final IdentifierProxy marking;
-    if (mMarking == null) {
-      marking =
-        modfactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
-    } else {
-      marking = mMarking;
+    try {
+      setUp();
+      final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
+      final IdentifierProxy marking;
+      if (mMarking == null) {
+        marking =
+          modfactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+      } else {
+        marking = mMarking;
+      }
+      final Collection<String> propositions =
+        Collections.singletonList(marking.toString());
+      initSourceInfo();
+      mModuleInstanceCompiler = new ModuleInstanceCompiler
+        (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
+      mModuleInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
+      mModuleInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
+      mModuleInstanceCompiler.setEnabledPropositionNames(propositions);
+      final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
+      mModuleInstanceCompiler = null;
+      shiftSourceInfo();
+      mEFSMSystemBuilder = new EFSMSystemBuilder
+        (modfactory, mSourceInfoBuilder, intermediate);
+      mEFSMSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
+      mEFSMSystemBuilder.setConfiguredDefaultMarking(marking);
+      return mEFSMSystemBuilder.compile();
+    } finally {
+      tearDown();
     }
-    final Collection<String> propositions =
-      Collections.singletonList(marking.toString());
-    initSourceInfo();
-    ModuleInstanceCompiler pass1 = new ModuleInstanceCompiler
-      (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
-    pass1.setOptimizationEnabled(mIsOptimizationEnabled);
-    pass1.setEnabledPropertyNames(mEnabledPropertyNames);
-    pass1.setEnabledPropositionNames(propositions);
-    final ModuleProxy intermediate = pass1.compile(bindings);
-    pass1 = null;
-    shiftSourceInfo();
-    final EFSMSystemBuilder pass2= new EFSMSystemBuilder
-      (modfactory, mSourceInfoBuilder, intermediate);
-    pass2.setOptimizationEnabled(mIsOptimizationEnabled);
-    pass2.setConfiguredDefaultMarking(marking);
-    return pass2.compile();
   }
 
   public Map<Object,SourceInfo> getSourceInfoMap()
@@ -182,6 +226,8 @@ public class EFSMCompiler
   private final DocumentManager mDocumentManager;
   private final ModuleProxy mInputModule;
 
+  private ModuleInstanceCompiler mModuleInstanceCompiler;
+  private EFSMSystemBuilder mEFSMSystemBuilder;
   private SourceInfoBuilder mSourceInfoBuilder;
 
   private boolean mIsOptimizationEnabled = true;

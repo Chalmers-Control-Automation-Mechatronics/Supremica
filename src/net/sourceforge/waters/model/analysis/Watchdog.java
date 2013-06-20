@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
@@ -19,7 +22,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  * other object implementing the {@link Abortable} interface. Once initialised
  * and started, it waits for the set timeout period before requesting its
  * controlled object to abort. It is possible to restart the timer by calling
- * the watchdog's {@link Thread#interrupt() interrupt()} method.</P>
+ * the watchdog's {@link #reset()} method.</P>
  *
  * <P>Sample code:<P>
  * <PRE> {@link ModelAnalyzer} analyzer;
@@ -29,10 +32,10 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  *   // configure analyzer for experiment i ...
  *   try {
  *     analyzer.{@link ModelAnalyzer#run() run}();
- *   } catch (final {@link AbortException} exception) {
+ *   } catch (final {@link AnalysisAbortException} exception) {
  *     // it has timed out ...
  *   }
- *   watchdog.{@link Thread#interrupt() interrupt}();  // so the timer is reset
+ *   watchdog.{@link #reset() reset}();  // so the timer is reset
  * }</PRE>
  *
  * @author Robi Malik
@@ -44,6 +47,19 @@ public class Watchdog extends Thread {
   //# Constructor
   /**
    * Creates a new watchdog.
+   * @param  seconds     The time in seconds before {@link
+   *                     Abortable#requestAbort() requestAbort()} is called.
+   */
+  public Watchdog(final int seconds)
+  {
+    mAbortables = new LinkedList<Abortable>();
+    mTimeoutMillis = seconds >= 0 ? 1000L * seconds : -1;
+    mStartTime = 0;
+    setDaemon(true);
+  }
+
+  /**
+   * Creates a new watchdog.
    * @param  abortable   The object to be controlled by timeout.
    *                     If the timeout is reached, the abortable's
    *                     {@link Abortable#requestAbort() requestAbort()}
@@ -53,36 +69,70 @@ public class Watchdog extends Thread {
    */
   public Watchdog(final Abortable abortable, final int seconds)
   {
-    mAbortable = abortable;
-    mTimeoutMillis = seconds >= 0 ? 1000L * seconds : -1;
-    setDaemon(true);
+    this(seconds);
+    mAbortables.add(abortable);
   }
 
 
   //#########################################################################
   //# Simple Access
   /**
-   * Resets the watchdog to control the given new {@link Abortable}.
+   * Resets the watchdog timer and cancels all abort requests.
    */
-  public void resetAbortable(final Abortable abortable)
+  public synchronized void reset()
   {
-    interrupt();
-    mAbortable = abortable;
+    for (final Abortable abortable : mAbortables) {
+      abortable.resetAbort();
+    }
+    mStartTime = System.currentTimeMillis();
+    notify();
+  }
+
+  /**
+   * Adds the given {@link Abortable} to the list of objects controlled
+   * by this watchdog.
+   */
+  public synchronized void addAbortable(final Abortable abortable)
+  {
+    mAbortables.add(abortable);
+    if (mStartTime < 0) {
+      abortable.requestAbort();
+    }
+  }
+
+  /**
+   * Removes the given {@link Abortable} from the list of objects controlled
+   * by this watchdog.
+   */
+  public synchronized void removeAbortable(final Abortable abortable)
+  {
+    mAbortables.remove(abortable);
   }
 
 
   //#########################################################################
   //# Interface java.lang.Runnable
   @Override
-  public void run()
+  public synchronized void run()
   {
-    while (true) {
-      try {
-        Thread.sleep(mTimeoutMillis);
-        mAbortable.requestAbort();
-      } catch (final InterruptedException exception) {
-        // Start over ...
+    try {
+      while (true) {
+        while (mStartTime < 0) {
+          wait();
+        }
+        if (mStartTime == 0) {
+          mStartTime = System.currentTimeMillis();
+        }
+        do {
+          wait(mTimeoutMillis);
+        } while (System.currentTimeMillis() < mStartTime + mTimeoutMillis);
+        mStartTime = -1;
+        for (final Abortable abortable : mAbortables) {
+          abortable.requestAbort();
+        }
       }
+    } catch (final InterruptedException exception) {
+      // Shouldn't get interrupted ...
     }
   }
 
@@ -90,6 +140,7 @@ public class Watchdog extends Thread {
   //#########################################################################
   //# Data Members
   private final long mTimeoutMillis;
-  private Abortable mAbortable;
+  private final Collection<Abortable> mAbortables;
+  private long mStartTime;
 
 }

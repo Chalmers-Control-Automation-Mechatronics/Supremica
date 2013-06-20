@@ -46,7 +46,7 @@ import org.apache.log4j.Logger;
  * @author Robi Malik
  */
 
-class EFSMTRSimplifier
+class EFSMTRSimplifier extends AbstractEFSMAlgorithm
 {
 
   //#########################################################################
@@ -196,6 +196,23 @@ class EFSMTRSimplifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    mSimplifier.requestAbort();
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    mSimplifier.resetAbort();
+  }
+
+
+  //#########################################################################
   //# Invocation
   public EFSMTransitionRelation run(final EFSMTransitionRelation efsmTR,
                                     final EFSMVariableContext context)
@@ -269,6 +286,7 @@ class EFSMTRSimplifier
             }
           }
         }
+        checkAbort();
         final ListBufferTransitionRelation newRel;
         if (newNumReachableStates == numStates && newNumEvents == numEvents) {
           newRel = rel;
@@ -309,6 +327,7 @@ class EFSMTRSimplifier
               newEvent = newEventEncoding.getEventId(update);
             }
             newRel.addTransition(newSource, newEvent, newTarget);
+            checkAbort();
           }
         }
         Collection<EFSMVariable> newVariables;
@@ -347,6 +366,7 @@ class EFSMTRSimplifier
 
   //#########################################################################
   //# Logging
+  @Override
   public Logger getLogger()
   {
     final Class<?> clazz = getClass();

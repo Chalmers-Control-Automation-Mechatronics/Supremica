@@ -25,7 +25,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.BlockedArrayList;
 import net.sourceforge.waters.analysis.monolithic.StateHashSet;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -999,7 +999,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     //assert false;
   }
 
-  private SafetyTraceProxy computePOCounterExample() throws AbortException
+  private SafetyTraceProxy computePOCounterExample() throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
