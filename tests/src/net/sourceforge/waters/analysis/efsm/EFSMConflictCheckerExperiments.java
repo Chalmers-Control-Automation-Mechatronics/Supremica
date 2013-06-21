@@ -106,9 +106,9 @@ public class EFSMConflictCheckerExperiments
   //# Test Suite
   private void runAllTests() throws Exception
   {
+    runAllTests(new EFSMConflictCheckerWrapper());
     runAllTests(new CompositionalConflictCheckerWrapper());
     runAllTests(new BDDConflictCheckerWrapper());
-    runAllTests(new EFSMConflictCheckerWrapper());
   }
 
   private void runAllTests(final ConflictCheckerWrapper wrapper) throws Exception
@@ -290,12 +290,10 @@ public class EFSMConflictCheckerExperiments
 
   //#########################################################################
   //# Logging
-  private void printAndLog(final String moduleName,
-                           final List<ParameterBindingProxy> bindings,
-                           final String methodName)
+  private String getFullModuleName(final String moduleName,
+                                   final List<ParameterBindingProxy> bindings)
   {
-    final StringBuffer buffer = new StringBuffer("Running ");
-    buffer.append(moduleName);
+    final StringBuffer buffer = new StringBuffer(moduleName);
     if (bindings != null) {
       buffer.append('<');
       final Iterator<ParameterBindingProxy> iter = bindings.iterator();
@@ -311,10 +309,7 @@ public class EFSMConflictCheckerExperiments
         }
       }
     }
-    buffer.append(" with ");
-    buffer.append(methodName);
-    buffer.append(" ... ");
-    printAndLog(buffer.toString());
+    return buffer.toString();
   }
 
   private void printAndLog(final String msg)
@@ -341,7 +336,8 @@ public class EFSMConflictCheckerExperiments
         final int len = className.length();
         className = className.substring(0, len - 7);
       }
-      printAndLog(moduleName, bindings, className);
+      final String fullModuleName = getFullModuleName(moduleName, bindings);
+      printAndLog("Running " + fullModuleName + " with " + className + " ...");
       try {
         mWatchdog.reset();
         final long start = System.currentTimeMillis();
@@ -357,7 +353,7 @@ public class EFSMConflictCheckerExperiments
           stats.printCSVHorizontalHeadings(mPrintWriter);
           mPrintWriter.println();
         }
-        mPrintWriter.print(moduleName);
+        mPrintWriter.print(fullModuleName);
         mPrintWriter.print(',');
         stats.printCSVHorizontal(mPrintWriter);
         mPrintWriter.println();
