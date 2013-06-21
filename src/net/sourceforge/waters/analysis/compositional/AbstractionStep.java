@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -124,6 +125,12 @@ abstract class AbstractionStep
     return mAnalyzer.getUsedPreconditionMarking();
   }
 
+  void checkAbort()
+    throws AnalysisAbortException
+  {
+    mAnalyzer.checkAbort();
+  }
+
 
   //#######################################################################
   //# Trace Computation
@@ -139,6 +146,7 @@ abstract class AbstractionStep
       (ProxyTools.getShortClassName(this) +
        " does not support trace expansion!");
   }
+
 
   //#######################################################################
   //# Debugging

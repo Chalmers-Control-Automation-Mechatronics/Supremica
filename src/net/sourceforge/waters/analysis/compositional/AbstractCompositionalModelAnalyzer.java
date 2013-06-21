@@ -1240,6 +1240,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       for (int i = 0; i < subsystemAutomata.size(); i++) {
         aut = subsystemAutomata.get(i);
         for (final EventProxy event : aut.getEvents()) {
+          checkAbort();
           if (translator.getEventKind(event) != EventKind.PROPOSITION &&
               subsystemEvents.add(event) && !remainingAutomata.isEmpty()) {
             final EventInfo info = mEventInfoMap.get(event);

@@ -206,7 +206,7 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
    * This method should be called periodically by any model analyser that
    * supports being aborted by user request.
    */
-  protected void checkAbort()
+  public void checkAbort()
     throws AnalysisAbortException
   {
     if (mIsAborting) {

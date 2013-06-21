@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;
@@ -21,6 +21,7 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -52,6 +53,7 @@ public class ProjectionTraceExpander extends TRTraceExpander
   @Override
   public List<TraceStepProxy> convertTraceSteps
     (final List<TraceStepProxy> traceSteps)
+    throws AnalysisAbortException
   {
     final TIntArrayList crucialEvents = getEventSteps(traceSteps);
     final SearchRecord endRecord = convertEventSteps(crucialEvents);
@@ -85,6 +87,7 @@ public class ProjectionTraceExpander extends TRTraceExpander
   }
 
   private SearchRecord convertEventSteps(final TIntArrayList eventSteps)
+    throws AnalysisAbortException
   {
     // 1. Collect initial states
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -106,6 +109,7 @@ public class ProjectionTraceExpander extends TRTraceExpander
     final TransitionIterator iter =
       rel.createSuccessorsReadOnlyIterator();
     while (true) {
+      checkAbort();
       final SearchRecord current = open.remove();
       final int state = current.getState();
       final int depth = current.getDepth();

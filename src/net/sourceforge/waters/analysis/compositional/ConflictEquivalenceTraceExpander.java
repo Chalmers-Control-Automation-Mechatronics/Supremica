@@ -21,6 +21,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -71,6 +72,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   @Override
   public List<TraceStepProxy> convertTraceSteps
     (final List<TraceStepProxy> traceSteps)
+    throws AnalysisAbortException
   {
     final List<SearchRecord> crucialSteps = getCrucialSteps(traceSteps);
     final List<SearchRecord> convertedSteps =
@@ -84,6 +86,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   //# Auxiliary Methods
   private List<SearchRecord> convertCrucialSteps
     (final List<SearchRecord> crucialSteps)
+    throws AnalysisAbortException
   {
     int len = crucialSteps.size();
     SearchRecord last = crucialSteps.get(len - 1);
@@ -112,6 +115,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   }
 
   private SearchRecord convertCrucialSteps(final SearchRecord[] crucialSteps)
+    throws AnalysisAbortException
   {
     final int tau = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -124,6 +128,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
     final SearchRecord dummy = new SearchRecord(-1);
     final int numStates = rel.getNumberOfStates();
     for (int state = 0; state < numStates; state++) {
+      checkAbort();
       if (rel.isInitial(state)) {
         final SearchRecord record;
         if (!firstEnd) {
@@ -142,6 +147,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
     }
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
     while (true) {
+      checkAbort();
       final SearchRecord current = open.remove();
       final int source = current.getState();
       final int depth = current.getDepth();

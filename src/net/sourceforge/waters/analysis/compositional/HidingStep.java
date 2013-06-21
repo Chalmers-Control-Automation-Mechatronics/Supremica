@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -91,6 +92,7 @@ class HidingStep extends AbstractionStep
   //# Trace Computation
   @Override
   List<TraceStepProxy> convertTraceSteps(final List<TraceStepProxy> steps)
+    throws AnalysisAbortException
   {
     Map<AutomatonProxy,StateProxy> previousMapOrig = null;
     final ListIterator<TraceStepProxy> iter = steps.listIterator();
@@ -111,6 +113,7 @@ class HidingStep extends AbstractionStep
     (final Map<AutomatonProxy,StateProxy> previousMapOrig,
      final Map<AutomatonProxy,StateProxy> nextMapResult,
      final EventProxy resultEvent)
+    throws AnalysisAbortException
   {
     final Map<AutomatonProxy,StateProxy> nextMapOrig =
       new HashMap<AutomatonProxy,StateProxy>(nextMapResult);
@@ -120,6 +123,7 @@ class HidingStep extends AbstractionStep
     final Collection<AutomatonProxy> originalAutomata =
       getOriginalAutomata();
     for (final AutomatonProxy aut : originalAutomata) {
+      checkAbort();
       final StateProxy nextStateOrig =
         getOriginalState(nextStateResult, aut);
       assert nextStateOrig != null;
@@ -137,6 +141,7 @@ class HidingStep extends AbstractionStep
 
   EventProxy findEvent(final Map<AutomatonProxy,StateProxy> sources,
                        final Map<AutomatonProxy,StateProxy> targets)
+    throws AnalysisAbortException
   {
     final Collection<EventProxy> possible =
       new LinkedList<EventProxy>(mLocalEvents);
@@ -152,6 +157,7 @@ class HidingStep extends AbstractionStep
       final Collection<EventProxy> retained =
         new THashSet<EventProxy>(size);
       for (final TransitionProxy trans : aut.getTransitions()) {
+        checkAbort();
         if (trans.getSource() == source && trans.getTarget() == target) {
           final EventProxy event = trans.getEvent();
           retained.add(event);
@@ -159,6 +165,7 @@ class HidingStep extends AbstractionStep
       }
       final Iterator<EventProxy> iter = possible.iterator();
       while (iter.hasNext()) {
+        checkAbort();
         final EventProxy event = iter.next();
         if (alphabet.contains(event)) {
           if (!retained.contains(event)) {
