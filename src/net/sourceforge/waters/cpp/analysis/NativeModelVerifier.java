@@ -43,15 +43,28 @@ public abstract class NativeModelVerifier
   {
     super(model, factory, translator);
     mExplorerMode = ExplorerMode.BEST_GUESS;
+    mCounterExampleEnabled = true;
   }
 
 
   //#########################################################################
-  //# Overrides net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
   @Override
   public VerificationResult createAnalysisResult()
   {
     return new DefaultVerificationResult();
+  }
+
+  @Override
+  public void setCounterExampleEnabled(final boolean enable)
+  {
+    mCounterExampleEnabled = enable;
+  }
+
+  @Override
+  public boolean isCounterExampleEnabled()
+  {
+    return mCounterExampleEnabled;
   }
 
 
@@ -70,6 +83,7 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -97,6 +111,7 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  @Override
   public boolean isSatisfied()
   {
     final VerificationResult result = getAnalysisResult();
@@ -107,6 +122,7 @@ public abstract class NativeModelVerifier
     }
   }
 
+  @Override
   public TraceProxy getCounterExample()
   {
     if (isSatisfied()) {
@@ -134,5 +150,6 @@ public abstract class NativeModelVerifier
   //#########################################################################
   //# Data Members
   private ExplorerMode mExplorerMode;
+  private boolean mCounterExampleEnabled;
 
 }

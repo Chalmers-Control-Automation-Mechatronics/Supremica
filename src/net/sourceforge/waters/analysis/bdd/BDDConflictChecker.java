@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.bdd;
 
 import java.util.List;
+
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -120,6 +121,7 @@ public class BDDConflictChecker
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -175,22 +177,26 @@ public class BDDConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
+  @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
   {
     mMarking = marking;
     mUsedMarking = null;
   }
 
+  @Override
   public EventProxy getConfiguredDefaultMarking()
   {
     return mMarking;
   }
 
+  @Override
   public void setConfiguredPreconditionMarking(final EventProxy marking)
   {
     mPreconditionMarking = marking;
   }
 
+  @Override
   public EventProxy getConfiguredPreconditionMarking()
   {
     return mPreconditionMarking;
@@ -333,15 +339,23 @@ public class BDDConflictChecker
                                                    final int index,
                                                    final ConflictKind kind)
   {
-    final List<TraceStepProxy> trace = computeTrace(bad, index);
-    return createCounterExample(trace, kind);
+    if (isCounterExampleEnabled()) {
+      final List<TraceStepProxy> trace = computeTrace(bad, index);
+      return createCounterExample(trace, kind);
+    } else {
+      return null;
+    }
   }
 
   private ConflictTraceProxy computeCounterExample(final BDD bad,
                                                    final ConflictKind kind)
   {
-    final List<TraceStepProxy> trace = computeTrace(bad);
-    return createCounterExample(trace, kind);
+    if (isCounterExampleEnabled()) {
+      final List<TraceStepProxy> trace = computeTrace(bad);
+      return createCounterExample(trace, kind);
+    } else {
+      return null;
+    }
   }
 
   private ConflictTraceProxy createCounterExample

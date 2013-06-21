@@ -45,11 +45,13 @@ public abstract class AbstractModelVerifier
                                final KindTranslator translator)
   {
     super(model, factory, translator);
+    mCounterExampleEnabled = true;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  @Override
   public boolean isSatisfied()
   {
     final VerificationResult result = getAnalysisResult();
@@ -60,6 +62,7 @@ public abstract class AbstractModelVerifier
     }
   }
 
+  @Override
   public TraceProxy getCounterExample()
   {
     if (isSatisfied()) {
@@ -74,6 +77,18 @@ public abstract class AbstractModelVerifier
   public VerificationResult getAnalysisResult()
   {
     return (VerificationResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public void setCounterExampleEnabled(final boolean enable)
+  {
+    mCounterExampleEnabled = enable;
+  }
+
+  @Override
+  public boolean isCounterExampleEnabled()
+  {
+    return mCounterExampleEnabled;
   }
 
 
@@ -110,5 +125,10 @@ public abstract class AbstractModelVerifier
     result.setCounterExample(counterexample);
     return setBooleanResult(false);
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private boolean mCounterExampleEnabled;
 
 }

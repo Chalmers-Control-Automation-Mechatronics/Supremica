@@ -249,9 +249,13 @@ public abstract class AbstractCompositionalModelVerifier
       } else {
         final AbstractionProcedure proc = getAbstractionProcedure();
         proc.resetStatistics();
-        TraceProxy trace = result.getCounterExample();
-        trace = expandTrace(trace);
-        return setFailedResult(trace);
+        if (mCounterExampleEnabled) {
+          TraceProxy trace = result.getCounterExample();
+          trace = expandTrace(trace);
+          return setFailedResult(trace);
+        } else {
+          return setFailedResult(null);
+        }
       }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -310,6 +314,18 @@ public abstract class AbstractCompositionalModelVerifier
   public CompositionalVerificationResult getAnalysisResult()
   {
     return (CompositionalVerificationResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public void setCounterExampleEnabled(final boolean enable)
+  {
+    mCounterExampleEnabled = enable;
+  }
+
+  @Override
+  public boolean isCounterExampleEnabled()
+  {
+    return mCounterExampleEnabled;
   }
 
   @Override
@@ -590,6 +606,7 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Data Members
+  private boolean mCounterExampleEnabled = true;
   private boolean mTraceCheckingEnabled = false;
 
   private ModelVerifier mMonolithicVerifier;
