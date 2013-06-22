@@ -308,7 +308,8 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
 
   //#########################################################################
   //# Auxiliary Methods
-  private int getUnfoldedEvent(final int event, final int beforeClass, final int afterValue)
+  private int getUnfoldedEvent(final int event, final int beforeClass,
+                               final int afterValue)
     throws EvalException
   {
     final long key = event |
@@ -328,7 +329,8 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       if (!mConstraintPropagator.isUnsatisfiable()) {
         final ConstraintList unfoldedUpdate =
           mConstraintPropagator.getAllConstraints();
-        final int newEvent = mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
+        final int newEvent =
+          mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
         mUnfoldedEventCache.put(key, newEvent);
         return newEvent;
       } else {
@@ -360,26 +362,33 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         mUnfoldedVariable.getPrimedVariableName();
       final SimpleExpressionProxy afterExpr =
         context.getBoundExpression(varNamePrimed);
-      int afterValue = -1;
-      if (afterExpr != null) {
-        final CompiledRange range = mUnfoldedVariable.getRange();
-        afterValue = range.indexOf(afterExpr);
-      }
-      if (afterValue < 0) {
+      final int afterValue = getValueIndex(afterExpr);
+      if (afterValue >= 0) {
+        mKnownAfterValueCache.put(key, afterValue);
+        final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
+        mConstraintPropagator.removeVariable(varName);
+        final ConstraintList unfoldedUpdate =
+          mConstraintPropagator.getAllConstraints();
+        final int newEvent = mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
+        final long eventKey = event |
+                              ((long) beforeClass << mSourceShift) |
+                              ((long) afterValue << mTargetShift);
+        mUnfoldedEventCache.put(eventKey, newEvent);
+        return afterValue;
+      } else {
         mKnownAfterValueCache.put(key, UNKNOWN_AFTER_VALUE);
         return UNKNOWN_AFTER_VALUE;
       }
-      mKnownAfterValueCache.put(key, afterValue);
-      final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
-      mConstraintPropagator.removeVariable(varName);
-      final ConstraintList unfoldedUpdate =
-        mConstraintPropagator.getAllConstraints();
-      final int newEvent = mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
-      final long eventKey = event |
-                            ((long) beforeClass << mSourceShift) |
-                            ((long) afterValue << mTargetShift);
-      mUnfoldedEventCache.put(eventKey, newEvent);
-      return afterValue;
+    }
+  }
+
+  private int getValueIndex(final SimpleExpressionProxy expr)
+  {
+    if (expr == null) {
+      return -1;
+    } else {
+      final CompiledRange range = mUnfoldedVariable.getRange();
+      return range.indexOf(expr);
     }
   }
 
@@ -550,23 +559,18 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
             mUnfoldedVariable.getPrimedVariableName();
           final SimpleExpressionProxy afterExpr =
             context.getBoundExpression(varNamePrimed);
-          mUnfoldedEventNumber = MISSING_CACHE_ENTRY;
-          mKnownAfterValue = UNKNOWN_AFTER_VALUE;
-          if (afterExpr != null) {
-            final CompiledRange range = mUnfoldedVariable.getRange();
-            final int afterValue = range.indexOf(afterExpr);
-            if (afterValue >= 0) {
-              mKnownAfterValue = afterValue;
-              mUnfoldingVariableContext.setPrimedValue(afterExpr);
-              mConstraintPropagator.init(update);
-              mConstraintPropagator.propagate();
-              final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
-              mConstraintPropagator.removeVariable(varName);
-              final ConstraintList unfoldedUpdate =
-                mConstraintPropagator.getAllConstraints();
-              mUnfoldedEventNumber =
-                mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
-            }
+          final int afterValue = getValueIndex(afterExpr);
+          if (afterValue >= 0) {
+            mKnownAfterValue = afterValue;
+            final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
+            mConstraintPropagator.removeVariable(varName);
+            final ConstraintList unfoldedUpdate =
+              mConstraintPropagator.getAllConstraints();
+            mUnfoldedEventNumber =
+              mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
+          } else {
+            mUnfoldedEventNumber = MISSING_CACHE_ENTRY;
+            mKnownAfterValue = UNKNOWN_AFTER_VALUE;
           }
         }
       } else {
@@ -639,6 +643,9 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
   private ConstraintPropagator mConstraintPropagator;
   private EFSMVariableCollector mEFSMVariableCollector;
 
+
+  //#########################################################################
+  //# Class Constants
   private static final int UNSATISFIED_UNFOLDING = -1;
   private static final int UNKNOWN_AFTER_VALUE = -2;
   private static final int UNCHANGED_AFTER_VALUE = -3;

@@ -302,20 +302,20 @@ public class ConstraintPropagator
   }
 
   /**
-   * Removes the given variable from the set the constraint propagator.
+   * Removes the given variable from the constraint propagator.
    * This method deletes any bindings associated with the variable in
    * its primed and unprimed form, and removes the variable from the
    * set of primed variables. This will remove all equations mentioning the
    * variable from the constraint propagator output.
-   * @param  varname  The name of the variable to be removed,
+   * @param  varName  The name of the variable to be removed,
    *                  without prime.
    */
-  public void removeVariable(final IdentifierProxy varname)
+  public void removeVariable(final IdentifierProxy varName)
   {
     final UnaryOperator prime = mOperatorTable.getNextOperator();
     final UnaryExpressionProxy unary =
-      mFactory.createUnaryExpressionProxy(prime, varname);
-    mContext.removeBinding(varname);
+      mFactory.createUnaryExpressionProxy(prime, varName);
+    mContext.removeBinding(varName);
     mContext.removeBinding(unary);
     mPrimedVariables.removeProxy(unary);
   }
@@ -469,6 +469,30 @@ public class ConstraintPropagator
     return mContext;
   }
 
+  /**
+   * Returns whether the given expression represents a literal value
+   * (integer constant or enumeration member) in the current context of
+   * this constraint propagator.
+   */
+  public boolean isAtomicValue(final SimpleExpressionProxy expr)
+  {
+    return mSimpleExpressionCompiler.isAtomicValue(expr, mContext);
+  }
+
+  /**
+   * Returns whether the given expression represents a variable name
+   * (primed or unprimed) in the current context of this constraint
+   * propagator.
+   */
+  public boolean isVariable(final SimpleExpressionProxy expr)
+  {
+    if (expr instanceof IdentifierProxy) {
+      final IdentifierProxy ident = (IdentifierProxy) expr;
+      return mContext.getVariableRange(ident) != null;
+    } else {
+      return false;
+    }
+  }
 
   /**
    * Returns the number of times the {@link #propagate()} method of this
@@ -575,21 +599,6 @@ public class ConstraintPropagator
       return mNegator.getResult(this);
     }
     return mFactory.createUnaryExpressionProxy(notop, expr);
-  }
-
-  boolean isAtomicValue(final SimpleExpressionProxy expr)
-  {
-    return mSimpleExpressionCompiler.isAtomicValue(expr, mContext);
-  }
-
-  boolean isVariable(final SimpleExpressionProxy expr)
-  {
-    if (expr instanceof IdentifierProxy) {
-      final IdentifierProxy ident = (IdentifierProxy) expr;
-      return mContext.getVariableRange(ident) != null;
-    } else {
-      return false;
-    }
   }
 
   CompiledRange estimateRange(final SimpleExpressionProxy expr)
