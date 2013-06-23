@@ -15,7 +15,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import net.sf.javabdd.BDDFactory;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 
 
 /**
@@ -40,6 +42,7 @@ class GreedyPartitioning<P extends PartitionBDD>
   //# Algorithm
   @Override
   void merge(final AutomatonBDD[] automatonBDDs)
+    throws AnalysisAbortException
   {
     final BDDFactory factory = getBDDFactory();
     final List<P> partitions = getFullPartition();
@@ -52,6 +55,7 @@ class GreedyPartitioning<P extends PartitionBDD>
         if (composition == null) {
           composition = part.clone();
         } else {
+          checkAbort();
           final PartitionBDD next =
             composition.compose(part, automatonBDDs, factory);
           composition.dispose();
@@ -65,6 +69,7 @@ class GreedyPartitioning<P extends PartitionBDD>
       final int count = partitions.size();
       final Collection<P> completed = new ArrayList<P>(count);
       while (!partitions.isEmpty()) {
+        checkAbort();
         final Iterator<P> iter = partitions.iterator();
         final P part = iter.next();
         iter.remove();

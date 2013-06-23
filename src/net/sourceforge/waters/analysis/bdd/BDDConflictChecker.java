@@ -13,14 +13,15 @@ import java.util.List;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
-import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -223,7 +224,7 @@ public class BDDConflictChecker
 
   @Override
   EventBDD[] createEventBDDs()
-    throws EventNotFoundException, NondeterministicDESException
+    throws AnalysisException
   {
     final EventBDD[] eventBDDs = super.createEventBDDs();
     final VerificationResult result = getAnalysisResult();
@@ -261,6 +262,7 @@ public class BDDConflictChecker
       final List<TransitionPartitionBDD> partitioning =
         getTransitionPartitioning().getFullPartition();
       for (final TransitionPartitionBDD part : partitioning) {
+        checkAbort();
         final BDD nondeadlockPart =
           part.getNonDeadlockBDD(automatonBDDs, factory);
         nondeadlock.orWith(nondeadlockPart);
@@ -282,6 +284,7 @@ public class BDDConflictChecker
 
   @Override
   boolean containsBadState(final BDD reached)
+    throws AnalysisAbortException, OverflowException
   {
     if (mDeadlockBDD != null) {
       final BDD bad = reached.and(mDeadlockBDD);
@@ -338,6 +341,7 @@ public class BDDConflictChecker
   private ConflictTraceProxy computeCounterExample(final BDD bad,
                                                    final int index,
                                                    final ConflictKind kind)
+    throws AnalysisAbortException, OverflowException
   {
     if (isCounterExampleEnabled()) {
       final List<TraceStepProxy> trace = computeTrace(bad, index);
@@ -349,6 +353,7 @@ public class BDDConflictChecker
 
   private ConflictTraceProxy computeCounterExample(final BDD bad,
                                                    final ConflictKind kind)
+    throws AnalysisAbortException, OverflowException
   {
     if (isCounterExampleEnabled()) {
       final List<TraceStepProxy> trace = computeTrace(bad);

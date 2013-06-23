@@ -140,38 +140,41 @@ public class EFSMConflictCheckerExperiments
     } catch (final EvalException exception) {
       // next please ...
     }
-    for (int m = 2; m <= 10; m += 2) {
+    if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+      for (int m = 2; m <= 10; m += 2) {
+        try {
+          for (int n = 200; n <= 2000; n+= 200) {
+            checkTransferLine("transferline_efsm", n, m, true);
+          }
+        } catch (final AnalysisException exception) {
+          // next please ...
+        } catch (final EvalException exception) {
+          // next please ...
+        }
+        try {
+          for (int n = 200; n <= 2000; n+= 200) {
+            checkTransferLine("transferline_efsm_block", n, m, false);
+          }
+        } catch (final AnalysisException exception) {
+          // next please ...
+        } catch (final EvalException exception) {
+          // next please ...
+        }
+      }
       try {
-        for (int n = 200; n <= 2000; n+= 200) {
-          checkTransferLine("transferline_efsm", n, m, true);
+        for (int n = 1000; n <= 4000; n+= 1000) {
+          checkPhilosophers("dining_philosophers", n, false);
         }
       } catch (final AnalysisException exception) {
         // next please ...
       } catch (final EvalException exception) {
         // next please ...
       }
-      try {
-        for (int n = 200; n <= 2000; n+= 200) {
-          checkTransferLine("transferline_efsm_block", n, m, false);
-        }
-      } catch (final AnalysisException exception) {
-        // next please ...
-      } catch (final EvalException exception) {
-        // next please ...
-      }
-    }
-    try {
-      for (int n = 1000; n <= 4000; n+= 1000) {
-        checkPhilosophers("dining_philosophers", n, false);
-      }
-    } catch (final AnalysisException exception) {
-      // next please ...
-    } catch (final EvalException exception) {
-      // next please ...
     }
     try {
       testPrimeSieve4();
       testPrimeSieve4b();
+      testPrimeSieve5();
       testPrimeSieve6();
       testPrimeSieve7();
       testPrimeSieve8();

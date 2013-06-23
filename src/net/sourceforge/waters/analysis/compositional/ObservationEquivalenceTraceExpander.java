@@ -24,6 +24,7 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -73,7 +74,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
   @Override
   public List<TraceStepProxy> convertTraceSteps
     (final List<TraceStepProxy> traceSteps)
-    throws AnalysisAbortException
+    throws AnalysisAbortException, OverflowException
   {
     final List<SearchRecord> crucialSteps = getCrucialSteps(traceSteps);
     final List<SearchRecord> convertedSteps =
@@ -87,7 +88,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
   //# Auxiliary Methods
   private List<SearchRecord> convertCrucialSteps
     (final List<SearchRecord> crucialSteps)
-    throws AnalysisAbortException
+    throws AnalysisAbortException, OverflowException
   {
     final List<SearchRecord> foundSteps = new LinkedList<SearchRecord>();
     int state = -1;
@@ -124,10 +125,9 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
    *         the first step after the source state, with its event and target
    *         state. The first step has a target state in the given target
    *         class. Events in the list can only be tau or the given event.
-   * @throws AnalysisAbortException
    */
   private SearchRecord convertCrucialStep(final int originalSource,
-                                          final SearchRecord crucialStep) throws AnalysisAbortException
+                                          final SearchRecord crucialStep) throws AnalysisAbortException, OverflowException
   {
     final int targetClass = crucialStep.getState();
     setupTarget(targetClass);
