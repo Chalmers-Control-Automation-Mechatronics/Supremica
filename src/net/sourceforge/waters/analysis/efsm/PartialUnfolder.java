@@ -34,9 +34,11 @@ import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 import org.apache.log4j.Logger;
 
@@ -172,9 +174,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       final ListBufferTransitionRelation rel = efsmRel.getTransitionRelation();
       rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       final int numInputStates = rel.getNumberOfStates();
-      mUnfoldedVariableNamePrimed =
-        mFactory.createUnaryExpressionProxy(mOperatorTable.getNextOperator(),
-                                            varName);
       final TIntArrayList initialValues = new TIntArrayList();
       final TIntArrayList initialStates = new TIntArrayList();
       int variableCounter = 0;
@@ -323,7 +322,8 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       mUnfoldingVariableContext.setPrimedValue(mRangeValues.get(afterValue));
       final ConstraintList update = mInputEventEncoding.getUpdate(event);
       mConstraintPropagator.init(update);
-      mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
+      final IdentifierProxy varname = mUnfoldedVariable.getVariableName();
+      mConstraintPropagator.removeVariable(varname);
       mConstraintPropagator.propagate();
       if (!mConstraintPropagator.isUnsatisfiable()) {
         final ConstraintList unfoldedUpdate =
@@ -356,24 +356,22 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         return UNSATISFIED_UNFOLDING;
       }
       final VariableContext context = mConstraintPropagator.getContext();
+      final UnaryExpressionProxy varNamePrimed =
+        mUnfoldedVariable.getPrimedVariableName();
       final SimpleExpressionProxy afterExpr =
-        context.getBoundExpression(mUnfoldedVariableNamePrimed);
+        context.getBoundExpression(varNamePrimed);
       int afterValue = -1;
       if (afterExpr != null) {
         final CompiledRange range = mUnfoldedVariable.getRange();
         afterValue = range.indexOf(afterExpr);
-        if (afterValue >= 0) {
-          mUnfoldingVariableContext.setPrimedValue(afterExpr);
-          mConstraintPropagator.init(update);
-          mConstraintPropagator.propagate();
-        }
       }
       if (afterValue < 0) {
         mKnownAfterValueCache.put(key, UNKNOWN_AFTER_VALUE);
         return UNKNOWN_AFTER_VALUE;
       }
       mKnownAfterValueCache.put(key, afterValue);
-      mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
+      final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
+      mConstraintPropagator.removeVariable(varName);
       final ConstraintList unfoldedUpdate =
         mConstraintPropagator.getAllConstraints();
       final int newEvent = mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
@@ -548,8 +546,10 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
           mConstraintPropagator.propagate();
           assert !mConstraintPropagator.isUnsatisfiable();
           final VariableContext context = mConstraintPropagator.getContext();
+          final UnaryExpressionProxy varNamePrimed =
+            mUnfoldedVariable.getPrimedVariableName();
           final SimpleExpressionProxy afterExpr =
-            context.getBoundExpression(mUnfoldedVariableNamePrimed);
+            context.getBoundExpression(varNamePrimed);
           mUnfoldedEventNumber = MISSING_CACHE_ENTRY;
           mKnownAfterValue = UNKNOWN_AFTER_VALUE;
           if (afterExpr != null) {
@@ -560,7 +560,8 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
               mUnfoldingVariableContext.setPrimedValue(afterExpr);
               mConstraintPropagator.init(update);
               mConstraintPropagator.propagate();
-              mConstraintPropagator.removePrimedVariable(mUnfoldedVariableNamePrimed);
+              final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
+              mConstraintPropagator.removeVariable(varName);
               final ConstraintList unfoldedUpdate =
                 mConstraintPropagator.getAllConstraints();
               mUnfoldedEventNumber =
@@ -628,7 +629,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
   private EFSMTransitionRelation mInputTransitionRelation;
   private EFSMEventEncoding mInputEventEncoding;
   private EFSMVariable mUnfoldedVariable;
-  private SimpleExpressionProxy mUnfoldedVariableNamePrimed;
   private List<? extends SimpleExpressionProxy> mRangeValues;
   private int mReducedRangeSize;
   private int[] mValueToClass;

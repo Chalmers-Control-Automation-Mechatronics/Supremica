@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 
@@ -47,7 +48,7 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
     mRange = range;
     final ModuleProxyCloner cloner = factory.getCloner();
     final IdentifierProxy ident = var.getIdentifier();
-    mVariableName = (SimpleExpressionProxy) cloner.getClone(ident);
+    mVariableName = (IdentifierProxy) cloner.getClone(ident);
     final SimpleExpressionProxy temp = (SimpleExpressionProxy) cloner.getClone(ident);
     final UnaryOperator next = op.getNextOperator();
     mPrimedVariableName = factory.createUnaryExpressionProxy(next, temp);
@@ -93,12 +94,12 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
     return mVariableName.toString();
   }
 
-  SimpleExpressionProxy getVariableName()
+  IdentifierProxy getVariableName()
   {
     return mVariableName;
   }
 
-  SimpleExpressionProxy getPrimedVariableName()
+  UnaryExpressionProxy getPrimedVariableName()
   {
     return mPrimedVariableName;
   }
@@ -200,8 +201,8 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
   //# Data Members
   private final ComponentProxy mComponent;
   private final CompiledRange mRange;
-  private final SimpleExpressionProxy mVariableName;
-  private final SimpleExpressionProxy mPrimedVariableName;
+  private final IdentifierProxy mVariableName;
+  private final UnaryExpressionProxy mPrimedVariableName;
   private final SimpleExpressionProxy mInitialStatePredicate;
 
   /**

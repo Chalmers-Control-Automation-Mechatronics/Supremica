@@ -44,6 +44,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * <P>A constraint propagator used to simplify expressions found in
@@ -300,27 +302,22 @@ public class ConstraintPropagator
   }
 
   /**
-   * Removes the given variable from the set of primed variables to be
-   * returned. This will prevent expressions x'==x' to appear in the
-   * constraint propagator output.
+   * Removes the given variable from the set the constraint propagator.
+   * This method deletes any bindings associated with the variable in
+   * its primed and unprimed form, and removes the variable from the
+   * set of primed variables. This will remove all equations mentioning the
+   * variable from the constraint propagator output.
    * @param  varname  The name of the variable to be removed,
-   *                  with or without prime.
-   * @return <CODE>true<CODE> if a variable was found and removed,
-   *         <CODE>false</CODE> otherwise.
+   *                  without prime.
    */
-  public boolean removePrimedVariable(final SimpleExpressionProxy varname)
+  public void removeVariable(final IdentifierProxy varname)
   {
-    if (varname instanceof UnaryExpressionProxy) {
-      final UnaryExpressionProxy unary = (UnaryExpressionProxy) varname;
-      return mPrimedVariables.removeProxy(unary);
-    } else if (varname instanceof IdentifierProxy) {
-      final UnaryOperator prime = mOperatorTable.getNextOperator();
-      final UnaryExpressionProxy unary =
-        mFactory.createUnaryExpressionProxy(prime, varname);
-      return mPrimedVariables.removeProxy(unary);
-    } else {
-      return false;
-    }
+    final UnaryOperator prime = mOperatorTable.getNextOperator();
+    final UnaryExpressionProxy unary =
+      mFactory.createUnaryExpressionProxy(prime, varname);
+    mContext.removeBinding(varname);
+    mContext.removeBinding(unary);
+    mPrimedVariables.removeProxy(unary);
   }
 
 
@@ -339,6 +336,12 @@ public class ConstraintPropagator
   public void propagate()
     throws EvalException
   {
+    /*
+    getLogger().debug("ConstraintPropagator IN: " +
+                      mUnprocessedConstraints + " " +
+                      getAllConstraints() + " " +
+                      mNumberOfInvocations);
+    */
     mNumberOfInvocations++;
     outer:
     while (!mIsUnsatisfiable) {
@@ -388,6 +391,9 @@ public class ConstraintPropagator
         break;
       }
     }
+    /*
+    getLogger().debug("ConstraintPropagator OUT: " + getAllConstraints());
+    */
   }
 
 
@@ -625,6 +631,15 @@ public class ConstraintPropagator
 
 
   //#########################################################################
+  //# Logging
+  public Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
+  }
+
+
+  //#########################################################################
   //# Inner Class ConstraintContext
   private class ConstraintContext implements VariableContext
   {
@@ -822,6 +837,11 @@ public class ConstraintPropagator
           }
         }
       } while (changed != null);
+    }
+
+    void removeBinding(final SimpleExpressionProxy varname)
+    {
+      mBindings.removeProxy(varname);
     }
 
     BinaryExpressionProxy recallBinding(final SimpleExpressionProxy varname)

@@ -43,9 +43,8 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
 /**
- * This class runs experiments using the {@link EFSMConflictChecker} with
- * a variety of configurations. The heuristics for choosing candidates can
- * be varied, as well as the abstraction rules applied and their order.
+ * This class runs experiments using the {@link EFSMConflictChecker} and
+ * other algorithms.
  *
  * @author Sahar Mohajerani, Robi Malik
  */
@@ -55,7 +54,7 @@ public class EFSMConflictCheckerExperiments
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
   public EFSMConflictCheckerExperiments(final String statsFilename)
     throws FileNotFoundException
   {
@@ -95,7 +94,7 @@ public class EFSMConflictCheckerExperiments
       }
     } else {
       System.err.println
-        ("USAGE: " +
+        ("USAGE: java " +
          ProxyTools.getShortClassName(EFSMConflictCheckerExperiments.class) +
          "<outputFilename>");
     }
@@ -106,13 +105,16 @@ public class EFSMConflictCheckerExperiments
   //# Test Suite
   private void runAllTests() throws Exception
   {
+    runAllTests(new EFSMConflictCheckerWrapper());
     runAllTests(new CompositionalConflictCheckerWrapper());
     runAllTests(new BDDConflictCheckerWrapper());
-    runAllTests(new EFSMConflictCheckerWrapper());
   }
 
-  private void runAllTests(final ConflictCheckerWrapper wrapper) throws Exception
+  private void runAllTests(final ConflictCheckerWrapper wrapper)
+    throws Exception
   {
+    mPrintWriter.println();
+    mPrintWriter.println(wrapper.getName());
     mHasBeenPrinted = false;
     mConflictCheckerWrapper = wrapper;
     try {
@@ -238,10 +240,11 @@ public class EFSMConflictCheckerExperiments
     super.setUp();
     mWatchdog = new Watchdog(mTimeout);
     mPrintWriter = new PrintWriter(mOut, true);
-    mPrintWriter.println("InternalTransitionLimit," +
-                         mInternalTransitionLimit);
+    mPrintWriter.println("Timeout," + mTimeout);
+    /*
     mPrintWriter.println("CompositionSelectionHeuristic," +
                          mCompositionSelectionHeuristic);
+    */
     mWatchdog.start();
   }
 
@@ -293,12 +296,10 @@ public class EFSMConflictCheckerExperiments
 
   //#########################################################################
   //# Logging
-  private void printAndLog(final String moduleName,
-                           final List<ParameterBindingProxy> bindings,
-                           final String methodName)
+  private String getFullModuleName(final String moduleName,
+                                   final List<ParameterBindingProxy> bindings)
   {
-    final StringBuffer buffer = new StringBuffer("Running ");
-    buffer.append(moduleName);
+    final StringBuffer buffer = new StringBuffer(moduleName);
     if (bindings != null) {
       buffer.append('<');
       final Iterator<ParameterBindingProxy> iter = bindings.iterator();
@@ -314,10 +315,7 @@ public class EFSMConflictCheckerExperiments
         }
       }
     }
-    buffer.append(" with ");
-    buffer.append(methodName);
-    buffer.append(" ... ");
-    printAndLog(buffer.toString());
+    return buffer.toString();
   }
 
   private void printAndLog(final String msg)
@@ -339,12 +337,9 @@ public class EFSMConflictCheckerExperiments
       throws EvalException, AnalysisException
     {
       final String moduleName = module.getName();
-      String className = ProxyTools.getShortClassName(this);
-      if (className.endsWith("Wrapper")) {
-        final int len = className.length();
-        className = className.substring(0, len - 7);
-      }
-      printAndLog(moduleName, bindings, className);
+      final String fullModuleName = getFullModuleName(moduleName, bindings);
+      final String className = getName();
+      printAndLog("Running " + fullModuleName + " with " + className + " ... ");
       try {
         mWatchdog.reset();
         final long start = System.currentTimeMillis();
@@ -360,14 +355,14 @@ public class EFSMConflictCheckerExperiments
           stats.printCSVHorizontalHeadings(mPrintWriter);
           mPrintWriter.println();
         }
-        mPrintWriter.print(moduleName);
+        mPrintWriter.print(fullModuleName);
         mPrintWriter.print(',');
         stats.printCSVHorizontal(mPrintWriter);
         mPrintWriter.println();
         return stats.isSatisfied();
       } catch (final Throwable exception) {
         System.out.println(ProxyTools.getShortClassName(exception));
-        mPrintWriter.println(moduleName + "," + exception.getMessage());
+        mPrintWriter.println(fullModuleName + "," + exception.getMessage());
         if (exception instanceof AnalysisException) {
           throw (AnalysisException) exception;
         } else if (exception instanceof EvalException) {
@@ -379,6 +374,18 @@ public class EFSMConflictCheckerExperiments
         }
       }
     }
+
+    private String getName()
+    {
+      final String className = ProxyTools.getShortClassName(this);
+      if (className.endsWith("Wrapper")) {
+        final int len = className.length();
+        return className.substring(0, len - 7);
+      } else {
+        return className;
+      }
+    }
+
 
     //#########################################################################
     //# Abstract Methods
@@ -491,7 +498,7 @@ public class EFSMConflictCheckerExperiments
       mConflictChecker.setTransitionPartitioningStrategy
         (TransitionPartitioningStrategy.AUTOMATA);
       mConflictChecker.setPartitioningSizeLimit(5000);
-      mConflictChecker.setNodeLimit(40000000);
+      mConflictChecker.setNodeLimit(25000000);
       mConflictChecker.setCounterExampleEnabled(false);
       // Configuration end
     }
@@ -534,4 +541,5 @@ public class EFSMConflictCheckerExperiments
   private final int mTimeout = 1200;  // 20 minutes
   private final int mInternalTransitionLimit = 1000000;
   private final CompositionSelectionHeuristic mCompositionSelectionHeuristic;
+
 }
