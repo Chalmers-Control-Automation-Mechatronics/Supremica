@@ -27,14 +27,13 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
-import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
-import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -187,6 +186,27 @@ public abstract class BDDModelVerifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mTransitionPartitioning != null) {
+      mTransitionPartitioning.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mTransitionPartitioning != null) {
+      mTransitionPartitioning.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   @Override
   public boolean supportsNondeterminism()
@@ -194,14 +214,19 @@ public abstract class BDDModelVerifier
     return true;
   }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelVerifier
   @Override
   public void setKindTranslator(final KindTranslator translator)
   {
     super.setKindTranslator(translator);
     clearAnalysisResult();
+  }
+
+  @Override
+  public void checkAbort()
+    throws AnalysisAbortException, OverflowException
+  {
+    final int numNodes = mBDDFactory.getNodeNum();
+    checkAbort(numNodes);
   }
 
 
@@ -273,8 +298,24 @@ public abstract class BDDModelVerifier
 
 
   //#########################################################################
+  //# Aborting
+  void checkAbort(final int numNodes)
+    throws AnalysisAbortException, OverflowException
+  {
+    super.checkAbort();
+    if (numNodes > mPeakNodes) {
+      mPeakNodes = numNodes;
+      if (numNodes > getNodeLimit()) {
+        throw new OverflowException(OverflowKind.NODE, getNodeLimit());
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Algorithm Implementation
   void createAutomatonBDDs()
+    throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxy model = getModel();
     final KindTranslator translator = getKindTranslator();
@@ -287,6 +328,7 @@ public abstract class BDDModelVerifier
     mAutomatonBDDbyVarIndex = null;
     int index = mNumAutomata;
     for (final AutomatonProxy aut : ordering) {
+      checkAbort();
       final ComponentKind kind = translator.getComponentKind(aut);
       index--;
       mAutomata[index] = aut;
@@ -307,7 +349,7 @@ public abstract class BDDModelVerifier
   }
 
   EventBDD[] createEventBDDs()
-    throws EventNotFoundException, NondeterministicDESException
+    throws AnalysisException
   {
     final ProductDESProxy model = getModel();
     final KindTranslator translator = getKindTranslator();
@@ -328,6 +370,7 @@ public abstract class BDDModelVerifier
       new HashMap<EventProxy,EventBDD>(numevents);
     int eventindex = 0;
     for (final EventProxy event : events) {
+      checkAbort();
       final EventBDD eventBDD;
       switch (translator.getEventKind(event)) {
       case UNCONTROLLABLE:
@@ -349,6 +392,7 @@ public abstract class BDDModelVerifier
     mLevels = new ArrayList<BDD>();
     mLevels.add(initial);
     for (final AutomatonBDD autBDD : mAutomatonBDDs) {
+      checkAbort();
       final BDD autinit = createInitialStateBDD(autBDD);
       if (autinit != null) {
         initial.andWith(autinit);
@@ -432,9 +476,11 @@ public abstract class BDDModelVerifier
   }
 
   BDD getMarkedStateBDD(final EventProxy prop)
+    throws AnalysisAbortException, OverflowException
   {
     final BDD result = mBDDFactory.one();
     for (final AutomatonBDD autbdd : mAutomatonBDDs) {
+      checkAbort();
       final BDD autmarking = autbdd.getMarkedStateBDD(prop, mBDDFactory);
       if (autmarking == null) {
         // skip
@@ -449,7 +495,7 @@ public abstract class BDDModelVerifier
   }
 
   BDD computeReachability()
-    throws OverflowException
+    throws AnalysisException
   {
     resetReorderIndex();
     final List<TransitionPartitionBDD> partitioning =
@@ -463,16 +509,11 @@ public abstract class BDDModelVerifier
     List<TransitionPartitionBDD> group =
       mTransitionPartitioning.startIteration();
     while (true) {
-      final int numnodes = mBDDFactory.getNodeNum();
+      final int numNodes = mBDDFactory.getNodeNum();
+      checkAbort(numNodes);
       if (logger.isDebugEnabled()) {
         logger.debug("Depth " + mLevels.size() + ", " +
-                     numnodes + " nodes ...");
-      }
-      if (numnodes > mPeakNodes) {
-        mPeakNodes = numnodes;
-        if (numnodes > getNodeLimit()) {
-          throw new OverflowException(OverflowKind.NODE, getNodeLimit());
-        }
+                     numNodes + " nodes ...");
       }
       if (containsBadState(current)) {
         recordStateCount(current);
@@ -484,6 +525,7 @@ public abstract class BDDModelVerifier
       }
       final BDD next = current.id();
       for (final TransitionPartitionBDD part : group) {
+        checkAbort();
         final BDD transpart = part.getBDD();
         final BDDVarSet cube = part.getCurrentStateCube();
         final BDD nextpart = current.relprod(transpart, cube);
@@ -504,7 +546,7 @@ public abstract class BDDModelVerifier
   }
 
   BDD computeCoreachability(final BDD endset, final BDD restriction)
-    throws OverflowException
+    throws AnalysisException
   {
     resetReorderIndex();
     final List<TransitionPartitionBDD> partitioning =
@@ -524,16 +566,11 @@ public abstract class BDDModelVerifier
     List<TransitionPartitionBDD> group =
       mTransitionPartitioning.startIteration();
     while (group != null) {
-      final int numnodes = mBDDFactory.getNodeNum();
+      final int numNodes = mBDDFactory.getNodeNum();
+      checkAbort(numNodes);
       if (logger.isDebugEnabled()) {
         logger.debug("Coreachability " + level + ", " +
-                     numnodes + " nodes ...");
-      }
-      if (numnodes > mPeakNodes) {
-        mPeakNodes = numnodes;
-        if (numnodes > getNodeLimit()) {
-          throw new OverflowException(OverflowKind.NODE, getNodeLimit());
-        }
+                     numNodes + " nodes ...");
       }
       if (isCoreachabilityExhausted(current)) {
         current.free();
@@ -541,6 +578,7 @@ public abstract class BDDModelVerifier
       }
       BDD prev = current.id();
       for (final TransitionPartitionBDD part : group) {
+        checkAbort();
         final BDDPairing renaming = part.getCurrentToNext();
         final BDD nextpart = current.replace(renaming);
         final BDD transpart = part.getBDD();
@@ -567,6 +605,7 @@ public abstract class BDDModelVerifier
   }
 
   boolean containsBadState(final BDD reached)
+    throws AnalysisAbortException, OverflowException
   {
     return false;
   }
@@ -577,10 +616,12 @@ public abstract class BDDModelVerifier
   }
 
   List<TraceStepProxy> computeTrace(final BDD target)
+    throws AnalysisAbortException, OverflowException
   {
     int lower = 0;
     int upper = mLevels.size() - 1;
     while (lower < upper) {
+      checkAbort();
       final int mid = lower + ((upper - lower) >> 1);
       final BDD level = mLevels.get(mid);
       final BDD intersection = level.and(target);
@@ -597,6 +638,7 @@ public abstract class BDDModelVerifier
   }
 
   List<TraceStepProxy> computeTrace(final BDD target, final int level)
+    throws AnalysisAbortException, OverflowException
   {
     final List<TransitionPartitionBDD> partitioning =
       mTransitionPartitioning.getFullPartition();
@@ -610,6 +652,7 @@ public abstract class BDDModelVerifier
     final List<TraceStepProxy> trace = new LinkedList<TraceStepProxy>();
     final ListIterator<BDD> liter = mLevels.listIterator(level);
     while (liter.hasPrevious()) {
+      checkAbort();
       TransitionPartitionBDD foundPart = null;
       BDD foundPrev = bddFactory.zero();
       BDD foundPreds = bddFactory.zero();
@@ -617,6 +660,7 @@ public abstract class BDDModelVerifier
       BDD prev = liter.previous();
       parts:
       for (final TransitionPartitionBDD part : partitioning) {
+        checkAbort();
         final BDDPairing renaming = part.getCurrentToNext();
         final BDD currentPrimed = current.id();
         currentPrimed.replaceWith(renaming);
@@ -635,6 +679,7 @@ public abstract class BDDModelVerifier
           foundPrimed = currentPrimed;
           if (!mTransitionPartitioning.isStrictBFS()) {
             while (liter.hasPrevious()) {
+              checkAbort();
               prev = liter.previous();
               intersection = preds.and(prev);
               if (intersection.isZero()) {
@@ -674,6 +719,7 @@ public abstract class BDDModelVerifier
                       BDD preds,
                       BDD targetPrimed,
                       final List<TraceStepProxy> trace)
+    throws AnalysisAbortException, OverflowException
   {
     final Map<EventProxy,TransitionPartitionBDD> map =
       part.getTransitionComponents();
@@ -682,6 +728,7 @@ public abstract class BDDModelVerifier
     Map.Entry<EventProxy,TransitionPartitionBDD> entry = iter.next();
     if (iter.hasNext()) {
       while (true) {
+        checkAbort();
         preds.free();
         targetPrimed.free();
         final TransitionPartitionBDD subpart = entry.getValue();
