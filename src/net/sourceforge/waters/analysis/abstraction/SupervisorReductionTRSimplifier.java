@@ -37,8 +37,9 @@ public class SupervisorReductionTRSimplifier extends
 
   //#########################################################################
   //# Constructors
-  public SupervisorReductionTRSimplifier()
+  public SupervisorReductionTRSimplifier() throws AnalysisException
   {
+
   }
 
   public SupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
@@ -72,9 +73,11 @@ public class SupervisorReductionTRSimplifier extends
   protected void setUp() throws AnalysisException
   {
     super.setUp();
+    // Get TR
     mTransitionRelation = getTransitionRelation();
-    mTransitionRelation.setName("Supervisor");
+    // Get number of states
     mBadStateIndex = mTransitionRelation.getNumberOfStates() - 1;
+    // Read event status
     mNumProperEvents = mTransitionRelation.getNumberOfProperEvents() - 1;
     for (int e = 1; e <= mNumProperEvents; e++) {
       if ((mTransitionRelation.getProperEventStatus(e) & EventEncoding.STATUS_CONTROLLABLE) == EventEncoding.STATUS_CONTROLLABLE) {
@@ -93,8 +96,7 @@ public class SupervisorReductionTRSimplifier extends
       return false;
     }
     mainProcedure(mEventList);
-    mergeTransitionRelation(mTransitionRelation);
-    simplifyAutomaton(mTransitionRelation);
+    mergeTR();
     return true;
   }
 
@@ -104,6 +106,15 @@ public class SupervisorReductionTRSimplifier extends
     return runSimplifier();
   }
 
+  //#########################################################################
+  // Configuration
+  public void setName(final String name){
+    mTransitionRelation.setName(name);
+  }
+
+  public TIntArrayList getDisabledEvents(){
+    return mDisabledEventList;
+  }
   //##########################################################################
   // Methods for Supervisor Reduction
 
@@ -427,7 +438,7 @@ public class SupervisorReductionTRSimplifier extends
     return pair;
   }
 
-  public void mergeTransitionRelation(final ListBufferTransitionRelation rel)
+  public void mergeTR()
   {
     final List<int[]> mergingStates = new ArrayList<int[]>();
     for (int i = 0; i < mBadStateIndex; i++) {
@@ -441,50 +452,8 @@ public class SupervisorReductionTRSimplifier extends
     states[0] = mBadStateIndex;
     mBadStateIndex = mergingStates.size();
     mergingStates.add(states);
-    rel.merge(mergingStates);
-    rel.removeProperSelfLoopEvents();
-  }
-
-  public void simplifyAutomaton(final ListBufferTransitionRelation rel)
-  {
-    removeBadStateTransitions(rel);
-    removeSelfloops(rel);
-  }
-
-  public void removeBadStateTransitions(final ListBufferTransitionRelation rel)
-  {
-    final TransitionIterator iter =
-      rel.createAllTransitionsModifyingIterator();
-    while (iter.advance()) {
-      final int to = iter.getCurrentTargetState();
-      if (to == mBadStateIndex) {
-        iter.remove();
-      }
-    }
-    rel.setReachable(mBadStateIndex, false);
-  }
-
-  public void removeSelfloops(final ListBufferTransitionRelation rel)
-  {
-    for (int e = 1; e < mFirstCEvent; e++) {
-      final TransitionIterator iter =
-        rel.createAllTransitionsReadOnlyIterator(e);
-      boolean isSelfloopOnly = true;
-      while (iter.advance()) {
-        if (iter.getCurrentSourceState() != iter.getCurrentTargetState()) {
-          isSelfloopOnly = false;
-          break;
-        }
-      }
-      if (isSelfloopOnly) {
-        rel.removeEvent(e);
-      }
-    }
-    rel.removeProperSelfLoopEvents();
-  }
-
-  public TIntArrayList getDisabledEvents(){
-    return mDisabledEventList;
+    mTransitionRelation.merge(mergingStates);
+    mTransitionRelation.removeProperSelfLoopEvents();
   }
 
   //#########################################################################
