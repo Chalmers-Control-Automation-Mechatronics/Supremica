@@ -3,7 +3,7 @@
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="tau:G"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau:F"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau:x"/>
         <EventDecl Kind="CONTROLLABLE" Name="tau::marking::accepting"/>
     </EventDeclList>
     <ComponentList>
@@ -21,36 +21,22 @@
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Deterministic="false" Name="y">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="2"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="y"/>
-                    <IntConstant Value="1"/>
-                </BinaryExpression>
-            </VariableInitial>
-        </VariableComponent>
-        <SimpleComponent Kind="PLANT" Name="F">
-            <Graph Deterministic="false">
+        <SimpleComponent Kind="PLANT" Name="selfloops:x">
+            <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
+                    <SimpleNode Initial="true" Name=":sl">
                         <PointGeometry>
                             <Point X="96" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-18" Y="10"/>
+                            <Point X="-26" Y="0"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="S0" Target="S0">
+                    <Edge Source=":sl" Target=":sl">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau:F"/>
+                            <SimpleIdentifier Name="tau:x"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="10" Y="-26"/>
                             </LabelGeometry>
@@ -75,6 +61,20 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
+        <VariableComponent Deterministic="false" Name="y">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="y"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="G">
             <Graph Deterministic="false">
                 <NodeList>

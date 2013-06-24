@@ -54,7 +54,12 @@ class EFSMEventEncoding
 
   //#########################################################################
   //# Simple Access
-  int size ()
+  /**
+   * Returns the number of updates in this event encoding.
+   * Note that this method always returns at least&nbsp;1 because the
+   * true update is contained in every encoding.
+   */
+  int size()
   {
     return mEventMap.size();
   }

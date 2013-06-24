@@ -79,8 +79,7 @@ abstract class VariableSelectionHeuristic
     if (cached != null) {
       return cached;
     } else {
-      final EFSMTransitionRelation unfolded =
-        mUnfolder.unfold(var.getTransitionRelation(), var, mSystem);
+      final EFSMTransitionRelation unfolded = mUnfolder.unfold(var, mSystem);
       mUnfoldingCache.put(var, unfolded);
       return unfolded;
     }

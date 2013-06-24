@@ -200,16 +200,19 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     if (mChainVariableSelectionHeuristic == null) {
       final List <VariableSelectionHeuristic> defaultVariableSelectionHeuristicList =
         new ArrayList<VariableSelectionHeuristic>();
-//      final MaxTrueVariableSelectionHeuristic maxT =
+//      final VariableSelectionHeuristic maxT =
 //        new MaxTrueVariableSelectionHeuristic(factory, mCompilerOperatorTable);
 //      defaultVariableSelectionHeuristicList.add(maxT);
-//      final MinStatesVariableSelectionHeuristic minS =
+//      final VariableSelectionHeuristic minS =
 //        new MinStatesVariableSelectionHeuristic(factory, mCompilerOperatorTable);
 //      defaultVariableSelectionHeuristicList.add(minS);
-      final VariableOccurrenceVariableSelectionHeuristic maxOc =
-        new VariableOccurrenceVariableSelectionHeuristic(factory, mCompilerOperatorTable);
+      final VariableSelectionHeuristic maxOc =
+        new MaxOccurrenceVariableSelectionHeuristic(factory, mCompilerOperatorTable);
       defaultVariableSelectionHeuristicList.add(maxOc);
-      final EstimatedMinStatesVariableSelectionHeuristic minES =
+      final VariableSelectionHeuristic maxSelfloop =
+        new MaxSelfloopVariableSelectionHeuristic(factory, mCompilerOperatorTable);
+      defaultVariableSelectionHeuristicList.add(maxSelfloop);
+      final VariableSelectionHeuristic minES =
         new EstimatedMinStatesVariableSelectionHeuristic(factory, mCompilerOperatorTable);
       defaultVariableSelectionHeuristicList.add(minES);
       mChainVariableSelectionHeuristic=
@@ -345,18 +348,11 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         mChainVariableSelectionHeuristic.selectVariable(mCurrentEFSMSystem);
       if (varSelected != null) {
         result.addCompositionAttempt();
-        final EFSMTransitionRelation varEFSMTransitionRelation =
-          varSelected.getTransitionRelation();
-        if (varEFSMTransitionRelation == null) {
-          removeVariable(varSelected);
-          continue;
-        }
         final List<int[]> partition =
           mVariablePartitionComputer.computePartition(varSelected,
                                                       mCurrentEFSMSystem);
         final EFSMTransitionRelation unfoldTR =
-          mPartialUnfolder.unfold(varEFSMTransitionRelation, varSelected,
-                                  mCurrentEFSMSystem, partition);
+          mPartialUnfolder.unfold(varSelected, mCurrentEFSMSystem, partition);
         result.addEFSMTransitionRelation(unfoldTR);
         EFSMTransitionRelation unfoldSimplified = null;
         if (efsmTransitionRelationList.size() > 1 ||
@@ -368,7 +364,11 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         }
         removeVariable(varSelected);
         unfoldSimplified.register();
-        varEFSMTransitionRelation.dispose();
+        final EFSMTransitionRelation varEFSMTransitionRelation =
+          varSelected.getTransitionRelation();
+        if (varEFSMTransitionRelation != null) {
+          varEFSMTransitionRelation.dispose();
+        }
         final ListIterator<EFSMTransitionRelation> unfoldIter =
           efsmTransitionRelationList.listIterator();
         while (unfoldIter.hasNext()) {

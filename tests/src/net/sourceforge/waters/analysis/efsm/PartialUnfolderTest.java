@@ -112,6 +112,8 @@ public class PartialUnfolderTest
     runPartialUnfolder(module);
   }
 
+  /*
+   * These cases are handled by the compiler. No partial unfolding needed.
   public void testUnfolding_3() throws Exception
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unfolding03");
@@ -123,6 +125,7 @@ public class PartialUnfolderTest
     final ModuleProxy module = loadModule("tests", "efsm", "unfolding04");
     runPartialUnfolder(module);
   }
+   */
 
   public void testUnfolding_5() throws Exception
   {
@@ -223,8 +226,6 @@ public class PartialUnfolderTest
     throws Exception
   {
     final EFSMSystem system = createEFSMSystem(module, bindings);
-    final EFSMTransitionRelation efsmTransitionRelation =
-      findTR(system, BEFORE);
     final EFSMVariable unfoldedVariable = system.getVariables().get(0);
     final List<int[]> partition;
     if (partitioned) {
@@ -233,8 +234,7 @@ public class PartialUnfolderTest
       partition = null;
     }
     final EFSMTransitionRelation resultTransitionRelation =
-      mPartialUnfolder.unfold(efsmTransitionRelation, unfoldedVariable,
-                              system, partition);
+      mPartialUnfolder.unfold(unfoldedVariable, system, partition);
     saveResult(resultTransitionRelation, system, module);
     SimpleComponentProxy after = findComponent(module, AFTER);
     after = renameForPartition(after, unfoldedVariable, partition);

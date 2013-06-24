@@ -16,6 +16,7 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -39,6 +40,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
 
@@ -94,23 +96,31 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
     mClassToValue = null;
   }
 
-  EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
-                                final EFSMVariable var,
+  EFSMTransitionRelation unfold(final EFSMVariable var,
                                 final EFSMSystem system)
     throws EvalException, AnalysisException
   {
-    return unfold(efsmRel, var, system, null);
+    return unfold(var, system, null);
   }
 
-  EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
-                                final EFSMVariable var,
+  EFSMTransitionRelation unfold(final EFSMVariable var,
                                 final EFSMSystem system,
                                 final List<int[]> partition)
     throws EvalException, AnalysisException
   {
+    EFSMTransitionRelation efsmRel = var.getTransitionRelation();
+    if (efsmRel == null) {
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(":dummy", ComponentKind.PLANT, 1, 0, 1,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      rel.setInitial(0, true);
+      final EFSMEventEncoding enc = new EFSMEventEncoding();
+      final List<EFSMVariable> list = Collections.singletonList(var);
+      efsmRel = new EFSMTransitionRelation(rel, enc, list);
+    }
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
-      logger.debug("Unfolding: " + efsmRel.getName() + " \\ " + var.getName() + " ...");
+      logger.debug("Unfolding: " + var.getName() + " ...");
       logger.debug(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
     }
     final long start = System.currentTimeMillis();
@@ -289,7 +299,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
           result.getTransitionRelation();
         if (logger.isDebugEnabled()) {
           final String msg = String.format
-            ("%d states, %d propagator calls, %.3f seconds\n",
+            ("%d states, %d propagator calls, %.3f seconds",
              unfoldedRel.getNumberOfStates(),
              mConstraintPropagator.getNumberOfInvocations(),
              0.001f * difftime);
