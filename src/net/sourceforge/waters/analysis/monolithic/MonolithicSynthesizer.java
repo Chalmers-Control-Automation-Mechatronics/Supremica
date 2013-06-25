@@ -339,7 +339,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             if (mSupervisorLocalizationEnabled) {
               // SUPERVISOR LOCALISATION ENABLED
               @SuppressWarnings("unused")
-              final boolean simplifyFurther = true;
+              boolean simplifyFurther = true;
               final List<AutomatonProxy> mAutomata =
                 new ArrayList<AutomatonProxy>();
               final TIntArrayList selectedEvents =
@@ -352,7 +352,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                                                    ListBufferTransitionRelation.CONFIG_SUCCESSORS);
                 mSupervisorSimplifier.setTransitionRelation(copy);
                 mSupervisorSimplifier.setEvent(selectedEvents.get(e));
-                mSupervisorSimplifier.run();
+                final boolean simplified = mSupervisorSimplifier.run();
+                if (!simplified) {
+                  simplifyFurther = false;
+                  break;
+                }
                 copy = mSupervisorSimplifier.getTransitionRelation();
                 copy
                   .setName("Supervisor:<"
@@ -360,9 +364,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                 mAutomata.add(copy.createAutomaton(getFactory(),
                                                    getEventEncoding()));
               }
-              des =
-                AutomatonTools.createProductDESProxy("SUPERVISOR", mAutomata,
-                                                     getFactory());
+              //
+                des =
+                  AutomatonTools.createProductDESProxy("SUPERVISOR",
+                                                       mAutomata,
+                                                       getFactory());
+              //}
             } else {
               // SUPERVISOR LOCALISATION DISABLED
               mNumGoodStates = mTransitionRelation.getNumberOfStates() - 1;
@@ -370,8 +377,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
               removeSelfloops(mTransitionRelation);
               aut =
                 mTransitionRelation.createAutomaton(getFactory(),
-                                                    getEventEncoding());
-              des = AutomatonTools.createProductDESProxy(aut, getFactory());
+                                                    getEventEncoding());//
+              des = AutomatonTools.createProductDESProxy(aut, getFactory());//
             }
           } else {
             // SUPERVISOR NOT CREATED
