@@ -13,6 +13,7 @@ import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -338,7 +340,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             // SUPERVISOR CREATED
             if (mSupervisorLocalizationEnabled) {
               // SUPERVISOR LOCALISATION ENABLED
-              @SuppressWarnings("unused")
               boolean simplifyFurther = true;
               final List<AutomatonProxy> mAutomata =
                 new ArrayList<AutomatonProxy>();
@@ -364,12 +365,35 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                 mAutomata.add(copy.createAutomaton(getFactory(),
                                                    getEventEncoding()));
               }
-              //
+              if (!simplifyFurther) {
+                aut =
+                  mTransitionRelation.createAutomaton(getFactory(),
+                                                      getEventEncoding());//
+                des = AutomatonTools.createProductDESProxy(aut, getFactory());//
+              } else {
+                final IsomorphismChecker checker =
+                  new IsomorphismChecker(getFactory(), false, false);
+                final THashSet<AutomatonProxy> removeSet =
+                  new THashSet<AutomatonProxy>();
+                for (int autom = 0; autom < mAutomata.size() - 1; autom++) {
+                  for (int auto = autom + 1; auto < mAutomata.size(); auto++) {
+                    if (checker.checkBisimulation(mAutomata.get(autom),
+                                                  mAutomata.get(auto))) {
+                      removeSet.add(mAutomata.get(auto));
+                    }
+                  }
+                }
+                for (int a = mAutomata.size() - 1; a >= 0; a--) {
+                  if (removeSet.contains(mAutomata.get(a))) {
+                    removeSet.remove(mAutomata.get(a));
+                    mAutomata.remove(a);
+                  }
+                }
                 des =
                   AutomatonTools.createProductDESProxy("SUPERVISOR",
                                                        mAutomata,
                                                        getFactory());
-              //}
+              }
             } else {
               // SUPERVISOR LOCALISATION DISABLED
               mNumGoodStates = mTransitionRelation.getNumberOfStates() - 1;
