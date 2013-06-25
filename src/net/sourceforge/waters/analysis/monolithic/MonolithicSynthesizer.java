@@ -977,6 +977,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     for (int i = 0; i < mEvents.length; i++) {
       events.add(mEvents[i]);
     }
+    events.addAll(mCurrentPropositions);
     return new EventEncoding(events, getKindTranslator());
   }
 
