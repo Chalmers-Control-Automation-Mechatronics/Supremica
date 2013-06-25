@@ -286,7 +286,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             for (int a = 0; a < mNumAutomata; a++) {
               final List<EventProxy> stateMarking =
                 getStateMarking(a, tuple[a]);
-              if (Collections.binarySearch(stateMarking, prop) < 0) {
+              if (!stateMarking.contains(prop)) {
                 continue props;
               }
             }
