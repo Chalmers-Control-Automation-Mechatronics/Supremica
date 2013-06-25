@@ -317,37 +317,71 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mSafeStates = null;
       mReachableStates = null;
 
-      // Write event status to TR
+      // Write event status into TR
       for (int e = mNumUncontrollableEvents + 1; e <= mNumProperEvents; e++) {
         mTransitionRelation
           .setProperEventStatus(e, EventEncoding.STATUS_CONTROLLABLE);
       }
 
-      // Supervisor Reduction
+      // SUPERVISOR REDUCTION
       if (getConstructsResult()) {
         AutomatonProxy aut = null;
         ProductDESProxy des = null;
         mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);
 
         if (mSupervisorReductionEnabled) {
+          // SUPERVISOR REDUCTION ENABLED
+          mSupervisorSimplifier.setEvent(-1);
           final boolean result = mSupervisorSimplifier.run();
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           if (result) {
-            mNumGoodStates = mTransitionRelation.getNumberOfStates() - 1;
-            removeBadStateTransitions(mTransitionRelation);
-            removeSelfloops(mTransitionRelation);
-
-            aut =
-              mTransitionRelation.createAutomaton(getFactory(),
-                                                  getEventEncoding());
-            des = AutomatonTools.createProductDESProxy(aut, getFactory());
+            // SUPERVISOR CREATED
+            if (mSupervisorLocalizationEnabled) {
+              // SUPERVISOR LOCALISATION ENABLED
+              @SuppressWarnings("unused")
+              final boolean simplifyFurther = true;
+              final List<AutomatonProxy> mAutomata =
+                new ArrayList<AutomatonProxy>();
+              final TIntArrayList selectedEvents =
+                mSupervisorSimplifier.setUpEventList();
+              ListBufferTransitionRelation copy;
+              for (int e = 0; e < selectedEvents.size(); e++) {
+                copy =
+                  new ListBufferTransitionRelation(
+                                                   mTransitionRelation,
+                                                   ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+                mSupervisorSimplifier.setTransitionRelation(copy);
+                mSupervisorSimplifier.setEvent(selectedEvents.get(e));
+                mSupervisorSimplifier.run();
+                copy = mSupervisorSimplifier.getTransitionRelation();
+                copy
+                  .setName("Supervisor:<"
+                           + mEvents[selectedEvents.get(e)].getName() + ">");
+                mAutomata.add(copy.createAutomaton(getFactory(),
+                                                   getEventEncoding()));
+              }
+              des =
+                AutomatonTools.createProductDESProxy("SUPERVISOR", mAutomata,
+                                                     getFactory());
+            } else {
+              // SUPERVISOR LOCALISATION DISABLED
+              mNumGoodStates = mTransitionRelation.getNumberOfStates() - 1;
+              removeBadStateTransitions(mTransitionRelation);
+              removeSelfloops(mTransitionRelation);
+              aut =
+                mTransitionRelation.createAutomaton(getFactory(),
+                                                    getEventEncoding());
+              des = AutomatonTools.createProductDESProxy(aut, getFactory());
+            }
           } else {
+            // SUPERVISOR NOT CREATED
             aut =
               createOneStateAutomaton(mSupervisorSimplifier
                 .getDisabledEvents());
             des = AutomatonTools.createProductDESProxy(aut, getFactory());
           }
         } else {
+          // SUPERVISOR REDUCTION DISABLED
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           removeBadStateTransitions(mTransitionRelation);
           mTransitionRelation.removeProperSelfLoopEvents();
@@ -804,8 +838,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mFinalStateExplorer =
       new FinalStateExplorer(eventAutomata, transitions, ndTuple3, 1,
                              mNumProperEvents);
-    mSupervisorSimplifier =
-      new SupervisorReductionTRSimplifier();
+    mSupervisorSimplifier = new SupervisorReductionTRSimplifier();
   }
 
   @Override
@@ -1499,8 +1532,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private int mNumGoodStates;
   private BitSet mGoodStates;
   private int[] mStateMap;
-  @SuppressWarnings("unused")
-  private List<AutomatonProxy> mAutomataList;
 
   //#########################################################################
   //# Class Constants
