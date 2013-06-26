@@ -186,14 +186,17 @@ public class ListBufferTransitionRelation
       }
       mEventStatus[e] = status;
     }
+    final EventEncoding.OrderingInfo orderingInfo = eventEnc.getOrderInfo();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+        new OutgoingTransitionListBuffer(numEvents, numStates,
+                                         mEventStatus, orderingInfo, numTrans);
       mSuccessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+        new IncomingTransitionListBuffer(numEvents, numStates,
+                                         mEventStatus, orderingInfo, numTrans);
       mPredecessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
     }
 
@@ -240,13 +243,16 @@ public class ListBufferTransitionRelation
     for (int e = 0; e < numEvents; e++) {
       mEventStatus[e] = eventEnc.getProperEventStatus(e);
     }
+    final EventEncoding.OrderingInfo orderingInfo = eventEnc.getOrderInfo();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus, 0);
+        new OutgoingTransitionListBuffer(numEvents, numStates,
+                                         mEventStatus, orderingInfo, 0);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, 0);
+        new IncomingTransitionListBuffer(numEvents, numStates,
+                                         mEventStatus, orderingInfo, 0);
     }
 
   }
@@ -289,16 +295,15 @@ public class ListBufferTransitionRelation
     mKind = kind;
     mStateBuffer = new IntStateBuffer(numStates, numPropositions);
     mEventStatus = new byte[numProperEvents];
-    mEventStatus[EventEncoding.TAU] = EventEncoding.STATUS_LOCAL;
+    mEventStatus[EventEncoding.TAU] = EventEncoding.STATUS_FULLY_LOCAL;
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer = new OutgoingTransitionListBuffer
-        (numProperEvents, numStates ,mEventStatus, 0);
+        (numProperEvents, numStates ,mEventStatus, null, 0);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer = new IncomingTransitionListBuffer
-        (numProperEvents, numStates, mEventStatus, 0);
+        (numProperEvents, numStates, mEventStatus, null, 0);
     }
-
   }
 
   /**
@@ -325,9 +330,10 @@ public class ListBufferTransitionRelation
     mEventStatus = Arrays.copyOf(rel.mEventStatus, numEvents);
     final int numStates = mStateBuffer.getNumberOfStates();
     try {
+      final EventEncoding.OrderingInfo orderingInfo = rel.getOrderingInfo();
       if ((config & CONFIG_SUCCESSORS) != 0) {
-        mSuccessorBuffer =
-          new OutgoingTransitionListBuffer(numEvents, numStates,mEventStatus, 0);
+        mSuccessorBuffer = new OutgoingTransitionListBuffer
+          (numEvents, numStates, mEventStatus, orderingInfo, 0);
         if (rel.mSuccessorBuffer != null) {
           mSuccessorBuffer.setUpTransitions(rel.mSuccessorBuffer);
         } else {
@@ -335,8 +341,8 @@ public class ListBufferTransitionRelation
         }
       }
       if ((config & CONFIG_PREDECESSORS) != 0) {
-        mPredecessorBuffer =
-          new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, 0);
+        mPredecessorBuffer = new IncomingTransitionListBuffer
+          (numEvents, numStates, mEventStatus, orderingInfo, 0);
         if (rel.mPredecessorBuffer != null) {
           mPredecessorBuffer.setUpTransitions(rel.mPredecessorBuffer);
         } else {
@@ -401,6 +407,23 @@ public class ListBufferTransitionRelation
     mKind = kind;
   }
 
+  /**
+   * Gets the ordering information associated with this transition relation.
+   * @return Ordering information, or <CODE>null</CODE> if the event
+   *         encoding is not ordered by event status.
+   */
+  public EventEncoding.OrderingInfo getOrderingInfo()
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.getOrderingInfo();
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.getOrderingInfo();
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+
   //#########################################################################
   //# Event Access
   public int getNumberOfProperEvents()
@@ -418,6 +441,7 @@ public class ListBufferTransitionRelation
   {
     return mStateBuffer.getNumberOfPropositions();
   }
+
 
   //#########################################################################
   //# State Access
@@ -736,6 +760,7 @@ public class ListBufferTransitionRelation
   {
     return mStateBuffer.mergeMarkings(markings1, markings2);
   }
+
 
   //#########################################################################
   //# Transition Access
@@ -1129,6 +1154,42 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Obtains a local-event closure over successors of this transition
+   * relation with a specific event type.
+   * @param limit
+   *          The maximum number of transitions that can be stored. If the
+   *          number of transitions already in the transition relation plus
+   *          the number of computed tau transitions exceeds the limit,
+   *          precomputation is aborted and transitions will be produced on
+   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
+   *          always to be computed on the fly.
+   * @param flags
+   *          List of event status flags, represented by a sequence of the
+   *          bits or bit combinations
+   *          {@link EventEncoding#STATUS_CONTROLLABLE},
+   *          {@link EventEncoding#STATUS_LOCAL},
+   *          {@link EventEncoding#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *          {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *          {@link EventEncoding#STATUS_UNUSED} or their complements.<BR>
+   *          The flags must appear in the correct ordering, which must
+   *          match the ordering of the {@link EventEncoding}. If a flag
+   *          is complemented, the closure is restricted to events without
+   *          that property, otherwise to events with the property.
+   * @return A {@link TauClosure} object, which can be used to obtain a
+   *         {@link TransitionIterator} over the tau-closure of the
+   *         successor transition relation.
+   */
+  public TauClosure createSuccessorsTauClosureByStatus(final int limit,
+                                                       final int... flags)
+  {
+    final EventEncoding.OrderingInfo info = getOrderingInfo();
+    assert info != null;
+    final int first = info.getFirstEventIndex(flags);
+    final int last = info.getLastEventIndex(flags);
+    return createSuccessorsTauClosure(first, last, limit);
+  }
+
+  /**
    * Obtains the tau-closure of the predecessors of this transition relation.
    * @param limit
    *          The maximum number of transitions that can be stored. If the
@@ -1179,6 +1240,43 @@ public class ListBufferTransitionRelation
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }
+  }
+
+
+  /**
+   * Obtains a local-event closure over predecessors of this transition
+   * relation with a specific event type.
+   * @param limit
+   *          The maximum number of transitions that can be stored. If the
+   *          number of transitions already in the transition relation plus
+   *          the number of computed tau transitions exceeds the limit,
+   *          precomputation is aborted and transitions will be produced on
+   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
+   *          always to be computed on the fly.
+   * @param flags
+   *          List of event status flags, represented by a sequence of the
+   *          bits or bit combinations
+   *          {@link EventEncoding#STATUS_CONTROLLABLE},
+   *          {@link EventEncoding#STATUS_LOCAL},
+   *          {@link EventEncoding#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *          {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *          {@link EventEncoding#STATUS_UNUSED} or their complements.<BR>
+   *          The flags must appear in the correct ordering, which must
+   *          match the ordering of the {@link EventEncoding}. If a flag
+   *          is complemented, the closure is restricted to events without
+   *          that property, otherwise to events with the property.
+   * @return A {@link TauClosure} object, which can be used to obtain a
+   *         {@link TransitionIterator} over the tau-closure of the
+   *         successor transition relation.
+   */
+  public TauClosure createPredecessorsTauClosureByStatus(final int limit,
+                                                         final int... flags)
+  {
+    final EventEncoding.OrderingInfo info = getOrderingInfo();
+    assert info != null;
+    final int first = info.getFirstEventIndex(flags);
+    final int last = info.getLastEventIndex(flags);
+    return createPredecessorsTauClosure(first, last, limit);
   }
 
   /**
@@ -1688,9 +1786,9 @@ public class ListBufferTransitionRelation
    *                {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
    *                {@link EventEncoding#STATUS_UNUSED}.
    */
-  public void setProperEventStatus(final int event, final byte status)
+  public void setProperEventStatus(final int event, final int status)
   {
-    mEventStatus[event] = status;
+    mEventStatus[event] = (byte) status;
   }
 
   /**
@@ -1798,6 +1896,7 @@ public class ListBufferTransitionRelation
     }
   }
 
+
   //#########################################################################
   //# Buffer Maintenance
   /**
@@ -1836,8 +1935,10 @@ public class ListBufferTransitionRelation
     try {
       if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
         if (mPredecessorBuffer != null) {
-          mSuccessorBuffer =
-            new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus);
+          final EventEncoding.OrderingInfo orderingInfo =
+            mPredecessorBuffer.getOrderingInfo();
+          mSuccessorBuffer = new OutgoingTransitionListBuffer
+            (numEvents, numStates, mEventStatus, orderingInfo);
           mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
         } else {
           throw createNoBufferException(CONFIG_PREDECESSORS);
@@ -1845,8 +1946,10 @@ public class ListBufferTransitionRelation
       }
       if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
         if (mSuccessorBuffer != null) {
-          mPredecessorBuffer =
-            new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus);
+          final EventEncoding.OrderingInfo orderingInfo =
+            mSuccessorBuffer.getOrderingInfo();
+          mPredecessorBuffer = new IncomingTransitionListBuffer
+            (numEvents, numStates, mEventStatus, orderingInfo);
           mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
         } else {
           throw createNoBufferException(CONFIG_SUCCESSORS);
@@ -1896,26 +1999,30 @@ public class ListBufferTransitionRelation
    *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
    * @throws OverflowException
    */
-  public void reset(final IntStateBuffer newStates, final int numTrans,
-                    final int config) throws OverflowException
+  public void reset(final IntStateBuffer newStates,
+                    final int numTrans,
+                    final int config)
+    throws OverflowException
   {
     checkConfig(config);
     final int numEvents = getNumberOfProperEvents();
     final int numStates = newStates.getNumberOfStates();
     mStateBuffer = newStates;
+    final EventEncoding.OrderingInfo orderingInfo = getOrderingInfo();
     if ((config & CONFIG_SUCCESSORS) != 0) {
-      mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+      mSuccessorBuffer = new OutgoingTransitionListBuffer
+        (numEvents, numStates, mEventStatus, orderingInfo, numTrans);
     } else {
       mSuccessorBuffer = null;
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
-      mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+      mPredecessorBuffer = new IncomingTransitionListBuffer
+        (numEvents, numStates, mEventStatus, orderingInfo, numTrans);
     } else {
       mPredecessorBuffer = null;
     }
   }
+
 
   //#########################################################################
   //# Automaton Simplification
@@ -2114,6 +2221,7 @@ public class ListBufferTransitionRelation
     }
   }
 
+
   //#########################################################################
   //# Automaton Output
   /**
@@ -2251,6 +2359,7 @@ public class ListBufferTransitionRelation
                                         transitions);
   }
 
+
   //#########################################################################
   //# Debugging
   @Override
@@ -2327,40 +2436,40 @@ public class ListBufferTransitionRelation
     MarshallingTools.saveModule(aut, filename);
   }
 
+
   //#########################################################################
   //# Errors
   private void checkConfig(final int config)
   {
     if ((config & CONFIG_ALL) == 0) {
-      throw new IllegalArgumentException(
-                                         ProxyTools.getShortClassName(this)
-                                           + " configuration error: "
-                                           + "no incoming or outgoing transition buffer specified!");
+      throw new IllegalArgumentException
+        (ProxyTools.getShortClassName(this) + " configuration error: " +
+         "no incoming or outgoing transition buffer specified!");
     }
   }
 
   private IllegalStateException createNoBufferException()
   {
-    return new IllegalStateException(
-                                     ProxyTools.getShortClassName(this)
-                                       + " configuration error: no transition buffer!");
+    return new IllegalStateException(ProxyTools.getShortClassName(this) +
+                                     " configuration error: no transition buffer!");
   }
 
   private IllegalStateException createNoBufferException(final int config)
   {
     switch (config) {
     case CONFIG_SUCCESSORS:
-      return new IllegalStateException(
-                                       ProxyTools.getShortClassName(this)
-                                         + " configuration error: successor buffer not initialised!");
+      return new IllegalStateException
+        (ProxyTools.getShortClassName(this) +
+         " configuration error: successor buffer not initialised!");
     case CONFIG_PREDECESSORS:
-      return new IllegalStateException(
-                                       ProxyTools.getShortClassName(this)
-                                         + " configuration error: predecessor buffer not initialised!");
+      return new IllegalStateException
+        (ProxyTools.getShortClassName(this) +
+         " configuration error: predecessor buffer not initialised!");
     default:
       return createNoBufferException();
     }
   }
+
 
   //#########################################################################
   //# Data Members

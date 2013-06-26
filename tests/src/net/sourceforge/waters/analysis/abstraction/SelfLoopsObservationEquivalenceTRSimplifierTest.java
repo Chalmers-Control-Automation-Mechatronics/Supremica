@@ -74,7 +74,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
       final byte status = encoding.getProperEventStatus(event);
       if (!EventEncoding.isControllableEvent(status)) {
         encoding.setProperEventStatus
-          (event, (byte) (status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP));
+          (event, status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
       }
     }
     return encoding;

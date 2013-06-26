@@ -106,7 +106,7 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
         if (info.isOnlyNonSelfLoopCandidate(candidate)) {
           final byte status = enc.getProperEventStatus(e);
           enc.setProperEventStatus
-            (e, (byte) (status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP));
+            (e, status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
         }
       }
     }

@@ -364,6 +364,12 @@ public class TauClosure
     }
 
     @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      throwNonTauException();
+    }
+
+    @Override
     public void resetState(final int from)
     {
       mFrom = from;
@@ -661,6 +667,13 @@ public class TauClosure
     }
 
     @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      mEventIterator.resetEventsByStatus(flags);
+      reset();
+    }
+
+    @Override
     public void resetState(final int from)
     {
       mFromState = from;
@@ -793,6 +806,13 @@ public class TauClosure
     }
 
     @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      mEventIterator.resetEventsByStatus(flags);
+      reset();
+    }
+
+    @Override
     public void resetState(final int from)
     {
       mFromState = from;
@@ -920,6 +940,13 @@ public class TauClosure
     public void resetEvents(final int first, final int last)
     {
       mEventIterator.resetEvents(first, last);
+      reset();
+    }
+
+    @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      mEventIterator.resetEventsByStatus(flags);
       reset();
     }
 

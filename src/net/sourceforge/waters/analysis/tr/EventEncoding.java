@@ -16,6 +16,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -228,9 +229,9 @@ public class EventEncoding
     mEventCodeMap = new TObjectIntHashMap<EventProxy>(numEvents);
     mProperEvents.add(tau);
     if (tau == null) {
-      mProperEventStatus.add((byte) (STATUS_LOCAL | STATUS_UNUSED));
+      mProperEventStatus.add((byte) (STATUS_FULLY_LOCAL | STATUS_UNUSED));
     } else {
-      mProperEventStatus.add(STATUS_LOCAL);
+      mProperEventStatus.add(STATUS_FULLY_LOCAL);
       mEventCodeMap.put(tau, TAU);
     }
     for (final EventProxy event : events) {
@@ -440,6 +441,19 @@ public class EventEncoding
     return list;
   }
 
+  /**
+   * Gets the current ordering information for this event encoding.
+   * If the event encoding has been ordered, the ordering information
+   * can be used to iterate over events more efficiently.
+   * @return Ordering information if available,
+   *         <CODE>null</CODE> otherwise.
+   * @see #sortProperEvents(byte...) sortProperEvents()
+   */
+  public OrderingInfo getOrderInfo()
+  {
+    return mOrderingInfo;
+  }
+
 
   //#########################################################################
   //# Alphabet extension
@@ -461,7 +475,7 @@ public class EventEncoding
    */
   public int addEvent(final EventProxy event,
                       final KindTranslator translator,
-                      byte status)
+                      int status)
   {
     final int code;
     switch (translator.getEventKind(event)) {
@@ -471,13 +485,13 @@ public class EventEncoding
       code = mProperEvents.size();
       mEventCodeMap.put(event, code);
       mProperEvents.add(event);
-      mProperEventStatus.add(status);
+      mProperEventStatus.add((byte) status);
       break;
     case PROPOSITION:
       code = mPropositions.size();
       mEventCodeMap.put(event, code);
       mPropositions.add(event);
-      mPropositionStatus.add(status);
+      mPropositionStatus.add((byte) status);
       break;
     default:
       throw new IllegalArgumentException
@@ -492,7 +506,7 @@ public class EventEncoding
    *                Must be in the range from 0 to
    *                {@link #getNumberOfProperEvents()}-1.
    * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
-   *         {@link #STATUS_LOCAL}, {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *         {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
    *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
    *         {@link #STATUS_UNUSED}.
    */
@@ -507,14 +521,13 @@ public class EventEncoding
    *                Must be in the range from 0 to
    *                {@link #getNumberOfProperEvents()}-1.
    * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
-   *                {@link #STATUS_LOCAL},
    *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
    *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
    *                {@link #STATUS_UNUSED}.
    */
-  public void setProperEventStatus(final int event, final byte status)
+  public void setProperEventStatus(final int event, final int status)
   {
-    mProperEventStatus.set(event, status);
+    mProperEventStatus.set(event, (byte) status);
   }
 
   /**
@@ -523,7 +536,7 @@ public class EventEncoding
    *                Must be in the range from 0 to
    *                {@link #getNumberOfPropositions()}-1.
    * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
-   *         {@link #STATUS_LOCAL}, {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *         {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
    *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
    *         {@link #STATUS_UNUSED}.
    */
@@ -538,14 +551,13 @@ public class EventEncoding
    *                Must be in the range from 0 to
    *                {@link #getNumberOfPropositions()}-1.
    * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
-   *                {@link #STATUS_LOCAL},
    *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
    *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
    *                {@link #STATUS_UNUSED}.
    */
-  public void setPropositionStatus(final int prop, final byte status)
+  public void setPropositionStatus(final int prop, final int status)
   {
-    mPropositionStatus.set(prop, status);
+    mPropositionStatus.set(prop, (byte) status);
   }
 
 
@@ -559,7 +571,7 @@ public class EventEncoding
    * a silent event followed by another set events to be hidden. all these
    * events will be encoded as {@link #TAU}, and can later all be decoded to
    * the first silent event that was added.</P>
-   * @param  event    A new silent event.
+   * @param  event  A new silent event.
    */
   public void addSilentEvent(final EventProxy event)
   {
@@ -569,6 +581,31 @@ public class EventEncoding
       mProperEventStatus.set(TAU, (byte) (status & ~STATUS_UNUSED));
     }
     mEventCodeMap.put(event, TAU);
+  }
+
+  /**
+   * Reorders the proper events in this encoding based on their status.
+   * @param  flags  List of flags to define the ordering, represented by
+   *                a sequence of the bits or bit combinations
+   *                {@link #STATUS_CONTROLLABLE}, {@link #STATUS_LOCAL},
+   *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link #STATUS_UNUSED} or their complements.<BR>
+   *                For example, to sort events by controllability first
+   *                and second by locality, two arguments STATUS_CONTROLLABLE
+   *                and&nbsp;STATUS_LOCAL are passed into the method.<BR>
+   *                This considers uncontrollable events as "smaller" than
+   *                controllable events. To consider controllable events as
+   *                "smaller", ~STATUS_CONTROLLABLE is used as the first
+   *                argument.
+   * @return Ordering information that can be used to iterate over events
+   *         of a certain type based on the new ordering.
+   */
+  public OrderingInfo sortProperEvents(final byte... flags)
+  {
+    final EventOrdering ordering = new EventOrdering(flags);
+    ordering.sortProperEvents();
+    return mOrderingInfo = new OrderingInfo(mProperEventStatus, flags);
   }
 
 
@@ -589,7 +626,7 @@ public class EventEncoding
    */
   public static boolean isLocalEvent(final byte status)
   {
-    return (status & STATUS_LOCAL) == STATUS_LOCAL;
+    return (status & STATUS_LOCAL) != 0;
   }
 
   /**
@@ -624,12 +661,225 @@ public class EventEncoding
 
 
   //#########################################################################
+  //# Inner Class OrderingInfo
+  /**
+   * Ordering information for an {@link EventEncoding}.
+   * The ordering information records the positions of the events
+   * with the specific status flags in an encoding sorted by event
+   * status. This can be used to iterate over events with specific
+   * type more efficiently.
+   * @see EventEncoding#sortProperEvents(byte...)
+   * @see TransitionIterator#resetEvents(int, int)
+   */
+  public static class OrderingInfo
+  {
+    //#######################################################################
+    //# Constructor
+    /**
+     * Creates new ordering information.
+     * @param  statusArrayList  Array list containing event status bytes,
+     *                          contains one entry for each event.
+     * @param  flags            Ordering flags used to establish the
+     *                          ordering, as passed to the {@link
+     *                          EventEncoding#sortProperEvents(byte...)
+     *                          sortProperEvents()} method.
+     */
+    public OrderingInfo(final TByteArrayList statusArrayList,
+                        final byte... flags)
+    {
+      mFlags = flags;
+      mIndexes = new int[(1 << flags.length) + 1];
+      final int numEvents = statusArrayList.size();
+      int lastIndex = -1;
+      for (int e = NONTAU; e < numEvents; e++) {
+        final byte status = statusArrayList.get(e);
+        final int offset = getOffset(status);
+        assert offset >= lastIndex : "Events not in required order!";
+        while (lastIndex < offset) {
+          mIndexes[++lastIndex] = e;
+        }
+      }
+      lastIndex++;
+      while (lastIndex < mIndexes.length) {
+        mIndexes[lastIndex++] = numEvents;
+      }
+    }
+
+    //#######################################################################
+    //# Access Methods
+    /**
+     * Gets the index of the first event with the given status flags
+     * in the ordering.
+     * @param  flags  List of event status flags, represented by
+     *                a sequence of the bits or bit combinations
+     *                {@link #STATUS_CONTROLLABLE}, {@link #STATUS_LOCAL},
+     *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+     *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+     *                {@link #STATUS_UNUSED} or their complements.<BR>
+     *                The flags must appear in the ordering that matches
+     *                the original call to the {@link
+     *                EventEncoding#sortProperEvents(byte...)
+     *                sortProperEvents()} method. If a flag is negated,
+     *                the method looks for the first event without what
+     *                property, otherwise for the first event with the
+     *                property.
+     */
+    public int getFirstEventIndex(final int... flags)
+    {
+      final int offset = getOffset(flags);
+      return mIndexes[offset];
+    }
+
+    /**
+     * Gets the index of the last event with the given status flags
+     * in the ordering.
+     * @param  flags  List of event status flags, represented by
+     *                a sequence of the bits or bit combinations
+     *                {@link #STATUS_CONTROLLABLE}, {@link #STATUS_LOCAL},
+     *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+     *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+     *                {@link #STATUS_UNUSED} or their complements.<BR>
+     *                The flags must appear in the ordering that matches
+     *                the original call to the {@link
+     *                EventEncoding#sortProperEvents(byte...)
+     *                sortProperEvents()} method. If a flag is negated,
+     *                the method looks for the last event without what
+     *                property, otherwise for the last event with the
+     *                property.
+     */
+    public int getLastEventIndex(final int... flags)
+    {
+      int offset = getOffset(flags);
+      offset += 1 << (mFlags.length - flags.length);
+      return mIndexes[offset] - 1;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private int getOffset(final int... flags)
+    {
+      int offset = 0;
+      int shift = mFlags.length - 1;
+      for (int i = 0; i < flags.length; i++, shift--) {
+        final int flag = flags[i];
+        if (flag == mFlags[i]) {
+          offset |= (1 << shift);
+        } else {
+          assert flag == ~mFlags[i] : "Unexpected event ordering flag!";
+        }
+      }
+      return offset;
+    }
+
+    private int getOffset(final byte status)
+    {
+      int offset = 0;
+      int shift = mFlags.length - 1;
+      for (final byte flag : mFlags) {
+        final boolean bit;
+        if ((flag & ~STATUS_ALL) == 0) {
+          bit = (status & flag) != 0;
+        } else {
+          bit = (status & ~flag) == 0;
+        }
+        if (bit) {
+          offset |= (1 << shift);
+        }
+        shift--;
+      }
+      return offset;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final byte[] mFlags;
+    private final int[] mIndexes;
+  }
+
+
+  //#########################################################################
+  //# Inner Class EventOrdering
+  private class EventOrdering implements Comparator<EventProxy>
+  {
+    //#######################################################################
+    //# Constructor
+    private EventOrdering(final byte... flags)
+    {
+      mMasks = new byte[flags.length];
+      mReverse = new boolean[flags.length];
+      for (int i = 0; i < flags.length; i++) {
+        final byte flag = flags[i];
+        if ((flag & ~STATUS_ALL) == 0) {
+          mMasks[i] = flag;
+        } else {
+          mMasks[i] = (byte) ~flag;
+          mReverse[i] = true;
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Invocation
+    private void sortProperEvents()
+    {
+      Collections.sort(mProperEvents, this);
+      final int numEvents = mProperEvents.size();
+      final TByteArrayList oldStatus = new TByteArrayList(mProperEventStatus);
+      for (int e = NONTAU; e < numEvents; e++) {
+        final EventProxy event = mProperEvents.get(e);
+        final int oldCode = mEventCodeMap.get(event);
+        mEventCodeMap.put(event, e);
+        final byte status = oldStatus.get(oldCode);
+        mProperEventStatus.set(e, status);
+      }
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparator<EventProxy>
+    @Override
+    public int compare(final EventProxy event1, final EventProxy event2)
+    {
+      if (event1 == event2) {
+        return 0;
+      }
+      final int e1 = mEventCodeMap.get(event1);
+      final int e2 = mEventCodeMap.get(event2);
+      if (e1 == TAU) {
+        return -1;
+      } else if (e2 == TAU) {
+        return 1;
+      }
+      final byte status1 = mProperEventStatus.get(e1);
+      final byte status2 = mProperEventStatus.get(e2);
+      if (status1 == status2) {
+        return 0;
+      }
+      for (int i = 0; i < mMasks.length; i++) {
+        final boolean bit1 = (status1 & mMasks[i]) != 0;
+        final boolean bit2 = (status2 & mMasks[i]) != 0;
+        final int result = Boolean.compare(bit1, bit2);
+        if (result != 0) {
+          return mReverse[i] ? -result : result;
+        }
+      }
+      return 0;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final byte[] mMasks;
+    private final boolean[] mReverse;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final List<EventProxy> mProperEvents;
   private final List<EventProxy> mPropositions;
   private final TObjectIntHashMap<EventProxy> mEventCodeMap;
   private final TByteArrayList mProperEventStatus;
   private final TByteArrayList mPropositionStatus;
+  private OrderingInfo mOrderingInfo;
 
 
   //#########################################################################
@@ -682,34 +932,53 @@ public class EventEncoding
    */
   public static final byte STATUS_CONTROLLABLE = 0x01;
   /**
+   * A status flags indicating a local event.
+   * A local event is assumed not to be used in any other automaton
+   * except the current one.
+   * Unlike {@link #STATUS_OUTSIDE_ALWAYS_ENABLED} and
+   * {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, this flag is purely informational.
+   */
+  public static final byte STATUS_LOCAL = 0x02;
+  /**
    * A status flag indicating an event that outside of the current automaton
    * only appears in selfloop transitions.
    */
-  public static final byte STATUS_OUTSIDE_ONLY_SELFLOOP = 0x02;
+  public static final byte STATUS_OUTSIDE_ONLY_SELFLOOP = 0x04;
   /**
    * A status flag indicating an event that outside of the current automaton
    * is always enabled. The only automaton ever disabling this event is the
-   * current automaton.
+   * current automaton. Selfloops by events with this status flag are
+   * automatically suppressed in a {@link ListBufferTransitionRelation}.
    */
-  public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x04;
-  /**
-   * Status flags indicating a local event.
-   * This is a combination of the bits {@link #STATUS_OUTSIDE_ALWAYS_ENABLED}
-   * and {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}.
-   * A local event is assumed not to be used in any other automaton
-   * except the current one.
-   */
-  public static final byte STATUS_LOCAL =
-    STATUS_OUTSIDE_ONLY_SELFLOOP | STATUS_OUTSIDE_ALWAYS_ENABLED;
+  public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x08;
   /**
    * A status flag indicating an event not in the alphabet of the current
    * transition relation. This event is assumed to be implicitly selflooped
    * in all states.
    */
-  public static final byte STATUS_UNUSED = 0x08;
+  public static final byte STATUS_UNUSED = 0x10;
+
+  /**
+   * Status flags indicating a local event.
+   * This is a combination of the bits {@link STATUS_LOCAL},
+   * {@link #STATUS_OUTSIDE_ALWAYS_ENABLED}, and
+   * {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}.
+   * Although {@link STATUS_LOCAL} usually implies the other two flags,
+   * it is separated from the other two for synthesis and other applications,
+   * where the automatic suppression of local selfloops is not desired.
+   */
+  public static final byte STATUS_FULLY_LOCAL =
+    STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP | STATUS_OUTSIDE_ALWAYS_ENABLED;
+
+  /**
+   * All status flags combined.
+   */
+  public static final byte STATUS_ALL =
+    STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP |
+    STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_UNUSED;
 
   private static final String[] STATUS_NAMES = {
-    "CONTROLLABLE", "OUTSIDE_ONLY_SELFLOOP",
+    "CONTROLLABLE", "LOCAL", "OUTSIDE_ONLY_SELFLOOP",
     "OUTSIDE_ALWAYS_ENABLED", "UNUSED"
   };
 
