@@ -360,8 +360,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                 }
                 copy = mSupervisorSimplifier.getTransitionRelation();
                 copy
-                  .setName("Supervisor:<"
-                           + mEvents[selectedEvents.get(e)].getName() + ">");
+                  .setName("Supervisor:"
+                           + mEvents[selectedEvents.get(e)].getName());
                 mAutomata.add(copy.createAutomaton(getFactory(),
                                                    getEventEncoding()));
               }

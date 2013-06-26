@@ -95,8 +95,9 @@ public class HalfWaySynthesisTRSimplifier
    * with <I>renamed</I> controllable events leading to blocking states
    * are not removed from the supervisor to facilitate composition with
    * distinguishers.
-   * @return Transition relation representing supervisor, or <CODE>null</CODE>
-   *         if no controllable events need to be disabled.
+   * @return Transition relation representing the supervisor,
+   *         or <CODE>null</CODE> if no controllable events need to be
+   *         disabled.
    * @see #setRenamedEvents(TIntHashSet) setRenamedEvents()
    */
   public ListBufferTransitionRelation getPseudoSupervisor()
@@ -197,7 +198,7 @@ public class HalfWaySynthesisTRSimplifier
       iter.resetState(dumpState);
       while (iter.advance()) {
         final int event = iter.getCurrentEvent();
-        if (!isRenamedControllable(event)) {
+        if (!isRetainedControllable(event)) {
           final int source = iter.getCurrentSourceState();
           mPseudoSupervisor.removeTransition(source, event, dumpState);
         }
@@ -316,7 +317,11 @@ public class HalfWaySynthesisTRSimplifier
     }
   }
 
-  private boolean isRenamedControllable(final int event)
+  /**
+   * Returns whether the given event should be retained on transitions
+   * to dump states in the pseudo supervisor.
+   */
+  private boolean isRetainedControllable(final int event)
   {
     return
       isControllable(event) &&
