@@ -50,7 +50,9 @@
 package org.supremica.automata.algorithms;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.compositional.CompositionalSynthesizer;
@@ -67,17 +69,29 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.supremica.log.*;
-import org.supremica.gui.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.minimization.*;
-import org.supremica.properties.Config;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.ModularSupervisor;
+import org.supremica.automata.Supervisor;
 import org.supremica.automata.BDD.BDDSynthesizer;
 import org.supremica.automata.IO.AutomataToWaters;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
+import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
+import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
+import org.supremica.automata.algorithms.minimization.MinimizationHelper;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.gui.ExecutionDialog;
+import org.supremica.gui.ExecutionDialogMode;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
 import org.supremica.util.ActionTimer;
-import org.supremica.util.BDD.OnlineBDDSupervisor;
 import org.supremica.util.BDD.BDDAutomata;
+import org.supremica.util.BDD.OnlineBDDSupervisor;
 
 /**
  * Does synthesis in automata-scale, modularily,
@@ -371,7 +385,7 @@ public class AutomataSynthesizer
            final boolean supervisorReduction =
              synthesizerOptions.getReduceSupervisors();
            synthesizer.setSupervisorReductionEnabled(supervisorReduction);
-           final boolean supervisorLocalization = 
+           final boolean supervisorLocalization =
              synthesizerOptions.getLocalizeSupervisors();
            synthesizer.setSupervisorLocalizationEnabled(supervisorLocalization);
            // set options & marking
@@ -434,6 +448,9 @@ public class AutomataSynthesizer
             new CompositionalSynthesizer(des, factory, translator,
                                          SynthesisAbstractionProcedureFactory.WSOE);
           synthesizer.setConfiguredDefaultMarking(marking);
+          final boolean supervisorReduction =
+            synthesizerOptions.getReduceSupervisors();
+          synthesizer.setSupervisorReductionEnabled(supervisorReduction);////
           synthesizer.setInternalStateLimit(5000);
            synthesizer.setPreselectingMethod
              (AbstractCompositionalModelAnalyzer.MustL);
@@ -678,6 +695,7 @@ public class AutomataSynthesizer
         // Initialize execution dialog
         java.awt.EventQueue.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
                 if (executionDialog != null)
@@ -966,6 +984,7 @@ public class AutomataSynthesizer
      *
      * @see  ExecutionDialog
      */
+    @Override
     public void requestStop()
     {
         stopRequested = true;
@@ -979,6 +998,7 @@ public class AutomataSynthesizer
         }
     }
 
+    @Override
     public boolean isStopped()
     {
         return stopRequested;

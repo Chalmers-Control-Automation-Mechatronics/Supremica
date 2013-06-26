@@ -522,7 +522,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String group = "tests";
     final String subdir = "synthesis";
     final String name = "2linkalt_batch";
-    runSynthesizer(group, subdir, name, true);
+    //runSynthesizer(group, subdir, name, true);
   }
 
   /* This one is too big for monolithic synthesis.

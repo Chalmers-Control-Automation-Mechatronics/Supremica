@@ -32,7 +32,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  */
 
 public class HalfWaySynthesisTRSimplifier
-  extends AbstractSynthesisTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
@@ -172,7 +172,8 @@ public class HalfWaySynthesisTRSimplifier
             continue;
           }
           final int event = iter.getCurrentEvent();
-          if (isControllable(event)) {
+          final byte status = rel.getProperEventStatus(event);
+          if (EventEncoding.isControllableEvent(status)) {
             needAbstraction = needSupervisor = true;
           }
         }
@@ -215,7 +216,8 @@ public class HalfWaySynthesisTRSimplifier
     iter.resetState(dumpState);
     while (iter.advance()) {
       final int event = iter.getCurrentEvent();
-      if (isControllable(event)) {
+      final byte status = rel.getProperEventStatus(event);
+      if (EventEncoding.isControllableEvent(status)) {
         iter.remove();
       }
     }
@@ -270,15 +272,16 @@ public class HalfWaySynthesisTRSimplifier
     final BitSet oldBadStates = (BitSet) badStates.clone();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    iterateLocalUncontrollable(iter);
+    iter.resetEventsByStatus(EventEncoding.STATUS_LOCAL,
+                             ~EventEncoding.STATUS_CONTROLLABLE);
     final TIntStack unvisited = new TIntArrayStack();
     for (int state = oldBadStates.nextSetBit(0); state >= 0;
          state = oldBadStates.nextSetBit(state+1)) {
       unvisited.push(state);
-      while (unvisited.size()>0) {
+      while (unvisited.size() > 0) {
         final int current = unvisited.pop();
         iter.resetState(current);
-        while(iter.advance()){
+        while (iter.advance()) {
           final int source = iter.getCurrentSourceState();
           if(rel.isReachable(source) && !badStates.get(source)){
             hasAdded = true;
@@ -303,8 +306,7 @@ public class HalfWaySynthesisTRSimplifier
       final int numEvents = rel.getNumberOfProperEvents();
       for (int event = 0; event < numEvents; event++) {
         final byte status = rel.getProperEventStatus(event);
-        rel.setProperEventStatus
-          (event, (byte) (status | EventEncoding.STATUS_UNUSED));
+        rel.setProperEventStatus(event, status | EventEncoding.STATUS_UNUSED);
       }
       rel.removeRedundantPropositions();
       mPseudoSupervisor =
@@ -323,8 +325,10 @@ public class HalfWaySynthesisTRSimplifier
    */
   private boolean isRetainedControllable(final int event)
   {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final byte status = rel.getProperEventStatus(event);
     return
-      isControllable(event) &&
+      EventEncoding.isControllableEvent(status) &&
       mRenamedEvents != null &&
       mRenamedEvents.contains(event);
   }

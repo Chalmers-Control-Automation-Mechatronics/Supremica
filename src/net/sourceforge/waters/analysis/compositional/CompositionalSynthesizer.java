@@ -537,9 +537,9 @@ public class CompositionalSynthesizer extends
       automaton = syncBuilder.getComputedAutomaton();
       break;
     }
-    final EventEncoding coding = createSynthesisEventEncoding(automaton);
+    final EventEncoding encoding = createSynthesisEventEncoding(automaton);
     final ListBufferTransitionRelation supervisor =
-      synthesise(automaton, coding);
+      synthesise(automaton, encoding);
     if (supervisor != null) {
       reportSupervisor("monolithic", supervisor);
       final CompositionalSynthesisResult result = getAnalysisResult();
@@ -549,7 +549,7 @@ public class CompositionalSynthesizer extends
         return false;
       } else {
         final AutomatonProxy renamedSup =
-          createRenamedSupervisor(supervisor, coding);
+          createRenamedSupervisor(supervisor, encoding);
         result.addSupervisor(renamedSup);
         return true;
       }
@@ -834,24 +834,24 @@ public class CompositionalSynthesizer extends
   private EventEncoding createSynthesisEventEncoding(final AutomatonProxy aut)
   {
     final KindTranslator translator = getKindTranslator();
-    final Collection<EventProxy> events = aut.getEvents();
-    final int numEvents = events.size();
-    final Collection<EventProxy> uncontrollable =
-      new ArrayList<EventProxy>(numEvents);
-    final Collection<EventProxy> controllable =
-      new ArrayList<EventProxy>(numEvents);
-    for (final EventProxy event : events) {
-      if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
-        uncontrollable.add(event);
-      } else {
-        controllable.add(event);
-      }
+    final Collection<EventProxy> props = getPropositions();
+    final Collection<EventProxy> filter;
+    if (props == null) {
+      filter = Collections.emptyList();
+    } else {
+      filter = props;
     }
-    final Collection<EventProxy> orderedEvents =
-      new ArrayList<EventProxy>(numEvents);
-    orderedEvents.addAll(uncontrollable);
-    orderedEvents.addAll(controllable);
-    return new EventEncoding(orderedEvents, translator);
+    final EventEncoding encoding = new EventEncoding
+      (aut, translator, filter, EventEncoding.FILTER_PROPOSITIONS);
+    for (int e = EventEncoding.NONTAU;
+         e < encoding.getNumberOfProperEvents();
+         e++) {
+      final byte status = encoding.getProperEventStatus(e);
+      encoding.setProperEventStatus(e, status | EventEncoding.STATUS_LOCAL);
+    }
+    encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
+                              EventEncoding.STATUS_CONTROLLABLE);
+    return encoding;
   }
 
   private ListBufferTransitionRelation synthesise(final AutomatonProxy automaton,
@@ -865,21 +865,6 @@ public class CompositionalSynthesizer extends
                                        ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final HalfWaySynthesisTRSimplifier synthesiser =
       new HalfWaySynthesisTRSimplifier(rel);
-    final KindTranslator translator = getKindTranslator();
-    final int numEvents = encoding.getNumberOfProperEvents();
-    int numUncontrollables = 1;
-    for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      final EventProxy proxy = encoding.getProperEvent(event);
-      final EventKind kind = translator.getEventKind(proxy);
-      if (EventKind.CONTROLLABLE == kind) {
-        break;
-      } else {
-        numUncontrollables++;
-      }
-    }
-    synthesiser.setLastLocalControllableEvent(numEvents);
-    synthesiser.setLastLocalUncontrollableEvent(numUncontrollables - 1);
-    synthesiser.setLastSharedUncontrollableEvent(numEvents);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultID = encoding.getEventCode(defaultMarking);
     synthesiser.setDefaultMarkingID(defaultID);
@@ -994,9 +979,8 @@ public class CompositionalSynthesizer extends
               }
             }
             final byte status = rel.getProperEventStatus(nextCode);
-            rel
-              .setProperEventStatus(nextCode,
-                                    (byte) (status | EventEncoding.STATUS_UNUSED));
+            rel.setProperEventStatus
+              (nextCode, status | EventEncoding.STATUS_UNUSED);
           }
         }
       }
