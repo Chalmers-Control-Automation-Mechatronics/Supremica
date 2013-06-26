@@ -13,6 +13,7 @@ import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -284,7 +286,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             for (int a = 0; a < mNumAutomata; a++) {
               final List<EventProxy> stateMarking =
                 getStateMarking(a, tuple[a]);
-              if (Collections.binarySearch(stateMarking, prop) < 0) {
+              if (!stateMarking.contains(prop)) {
                 continue props;
               }
             }
@@ -338,8 +340,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             // SUPERVISOR CREATED
             if (mSupervisorLocalizationEnabled) {
               // SUPERVISOR LOCALISATION ENABLED
-              @SuppressWarnings("unused")
-              final boolean simplifyFurther = true;
+              boolean simplifyFurther = true;
               final List<AutomatonProxy> mAutomata =
                 new ArrayList<AutomatonProxy>();
               final TIntArrayList selectedEvents =
@@ -352,7 +353,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                                                    ListBufferTransitionRelation.CONFIG_SUCCESSORS);
                 mSupervisorSimplifier.setTransitionRelation(copy);
                 mSupervisorSimplifier.setEvent(selectedEvents.get(e));
-                mSupervisorSimplifier.run();
+                final boolean simplified = mSupervisorSimplifier.run();
+                if (!simplified) {
+                  simplifyFurther = false;
+                  break;
+                }
                 copy = mSupervisorSimplifier.getTransitionRelation();
                 copy
                   .setName("Supervisor:<"
@@ -360,9 +365,35 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                 mAutomata.add(copy.createAutomaton(getFactory(),
                                                    getEventEncoding()));
               }
-              des =
-                AutomatonTools.createProductDESProxy("SUPERVISOR", mAutomata,
-                                                     getFactory());
+              if (!simplifyFurther) {
+                aut =
+                  mTransitionRelation.createAutomaton(getFactory(),
+                                                      getEventEncoding());//
+                des = AutomatonTools.createProductDESProxy(aut, getFactory());//
+              } else {
+                final IsomorphismChecker checker =
+                  new IsomorphismChecker(getFactory(), false, false);
+                final THashSet<AutomatonProxy> removeSet =
+                  new THashSet<AutomatonProxy>();
+                for (int autom = 0; autom < mAutomata.size() - 1; autom++) {
+                  for (int auto = autom + 1; auto < mAutomata.size(); auto++) {
+                    if (checker.checkBisimulation(mAutomata.get(autom),
+                                                  mAutomata.get(auto))) {
+                      removeSet.add(mAutomata.get(auto));
+                    }
+                  }
+                }
+                for (int a = mAutomata.size() - 1; a >= 0; a--) {
+                  if (removeSet.contains(mAutomata.get(a))) {
+                    removeSet.remove(mAutomata.get(a));
+                    mAutomata.remove(a);
+                  }
+                }
+                des =
+                  AutomatonTools.createProductDESProxy("SUPERVISOR",
+                                                       mAutomata,
+                                                       getFactory());
+              }
             } else {
               // SUPERVISOR LOCALISATION DISABLED
               mNumGoodStates = mTransitionRelation.getNumberOfStates() - 1;
@@ -370,8 +401,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
               removeSelfloops(mTransitionRelation);
               aut =
                 mTransitionRelation.createAutomaton(getFactory(),
-                                                    getEventEncoding());
-              des = AutomatonTools.createProductDESProxy(aut, getFactory());
+                                                    getEventEncoding());//
+              des = AutomatonTools.createProductDESProxy(aut, getFactory());//
             }
           } else {
             // SUPERVISOR NOT CREATED
@@ -946,6 +977,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     for (int i = 0; i < mEvents.length; i++) {
       events.add(mEvents[i]);
     }
+    events.addAll(mCurrentPropositions);
     return new EventEncoding(events, getKindTranslator());
   }
 

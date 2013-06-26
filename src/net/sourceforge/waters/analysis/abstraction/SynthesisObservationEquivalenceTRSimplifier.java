@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.set.hash.TLongHashSet;
 
 import java.io.PrintWriter;
@@ -59,7 +59,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  */
 
 public class SynthesisObservationEquivalenceTRSimplifier
-  extends AbstractSynthesisTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
@@ -172,7 +172,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
   {
     super.reset();
     mOriginalTransitionRelation = null;
-    mUncontrollableTauClosure = null;
+    mLocalUncontrollablePredecessorsTauClosure = null;
     mPredecessorIterator = null;
     mUncontrollableTauIterator = null;
     mUncontrollableEventIterator = null;
@@ -236,7 +236,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
       rel.setReachable(mOmegaState, false);
       final byte status = rel.getProperEventStatus(EventEncoding.TAU);
       rel.setProperEventStatus
-        (EventEncoding.TAU, (byte) (status | EventEncoding.STATUS_UNUSED));
+        (EventEncoding.TAU, status | EventEncoding.STATUS_UNUSED);
       mNumClasses--;
       mNumReachableStates--;
     }
@@ -271,7 +271,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (getResultPartition() != null) {
-      mUncontrollableTauClosure = null;
+      mLocalUncontrollablePredecessorsTauClosure = null;
       mUncontrollableTauIterator = null;
       mUncontrollableEventIterator = null;
       final ListBufferTransitionRelation copy =
@@ -329,7 +329,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
       omegaClass.setUpStateToClass();
       final byte status = rel.getProperEventStatus(EventEncoding.TAU);
       rel.setProperEventStatus
-        (EventEncoding.TAU, (byte) (status & ~EventEncoding.STATUS_UNUSED));
+        (EventEncoding.TAU, status & ~EventEncoding.STATUS_UNUSED);
       rel.setReachable(mOmegaState, true);
       mNumReachableStates++;
     } else {
@@ -350,17 +350,21 @@ public class SynthesisObservationEquivalenceTRSimplifier
   //# Algorithm
   private void setUpTauClosure() throws OverflowException
   {
-    if (mUncontrollableTauClosure == null) {
+    if (mLocalUncontrollablePredecessorsTauClosure == null) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final int limit = getTransitionLimit();
-      mUncontrollableTauClosure =
-        createLocalUncontrollablePredecessorsTauClosure(limit);
+      mLocalUncontrollablePredecessorsTauClosure =
+        rel.createPredecessorsTauClosureByStatus
+          (limit,
+           EventEncoding.STATUS_LOCAL,
+           ~EventEncoding.STATUS_CONTROLLABLE);
       mPredecessorIterator = rel.createPredecessorsReadOnlyIterator();
       mUncontrollableTauIterator =
         new OneEventCachingTransitionIterator
-          (mUncontrollableTauClosure.createIterator(), EventEncoding.TAU);
+          (mLocalUncontrollablePredecessorsTauClosure.createIterator(),
+           EventEncoding.TAU);
       mUncontrollableEventIterator =
-        mUncontrollableTauClosure.createFullEventClosureIterator(-1);
+        mLocalUncontrollablePredecessorsTauClosure.createFullEventClosureIterator(-1);
     }
   }
 
@@ -391,6 +395,22 @@ public class SynthesisObservationEquivalenceTRSimplifier
       setResultPartitionList(partition);
     } else {
       setResultPartitionList(null);
+    }
+  }
+
+  /**
+   * Returns whether an event with the given code is local in
+   * the encoding of this simplifier.
+   */
+  boolean isLocalEvent(final int event)
+  {
+    if (event == EventEncoding.TAU) {
+      // OMEGA is not local!
+      return false;
+    } else {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final byte status = rel.getProperEventStatus(event);
+      return EventEncoding.isLocalEvent(status);
     }
   }
 
@@ -585,11 +605,20 @@ public class SynthesisObservationEquivalenceTRSimplifier
       collect(mTempClass);
 
       // Event codes
-      final int lastLocal =  getLastLocalControllableEvent();
-      final int firstShared = lastLocal + 1;
-      final int lastSharedUncont = getLastSharedUncontrollableEvent();
-      final int firstSharedCont = lastSharedUncont + 1;
-      final int lastSharedCont = getLastSharedControllableEvent();
+      final EventEncoding.OrderingInfo info = rel.getOrderingInfo();
+      final int lastLocal =
+        info.getLastEventIndex(EventEncoding.STATUS_LOCAL);
+      final int firstShared =
+        info.getFirstEventIndex(~EventEncoding.STATUS_LOCAL);
+      final int lastSharedUncont =
+        info.getLastEventIndex(~EventEncoding.STATUS_LOCAL,
+                               ~EventEncoding.STATUS_CONTROLLABLE);
+      final int firstSharedCont =
+        info.getFirstEventIndex(~EventEncoding.STATUS_LOCAL,
+                                EventEncoding.STATUS_CONTROLLABLE);
+      final int lastSharedCont =
+        info.getLastEventIndex(~EventEncoding.STATUS_LOCAL,
+                               EventEncoding.STATUS_CONTROLLABLE);
 
       // Uncontrollable shared events
       for (int event = firstShared; event <= lastSharedUncont; event++) {
@@ -617,6 +646,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
         splitOnControllable(EventEncoding.TAU);
       }
       // Controllable local events
+      // TODO What if there are none?
       splitOnControllable(lastLocal);
 
       mTempClass.clear();
@@ -655,7 +685,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
     {
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
       final EquivalenceClass endClass = mStateToClass[endState];
-      final boolean local = isLocal(event);
+      final boolean local = isLocalEvent(event);
       // For SOE, search for local events starts on first part of path,
       // every other search starts on second part of path ...
       final SearchRecord initial =
@@ -682,7 +712,8 @@ public class SynthesisObservationEquivalenceTRSimplifier
             // state's class is or can be made the starting class ...
             final EquivalenceClass controllableStartClass =
               local && stateClass == endClass ? null : stateClass;
-            iterateLocalControllable(mPredecessorIterator);
+            mPredecessorIterator.resetEventsByStatus
+              (EventEncoding.STATUS_LOCAL, EventEncoding.STATUS_CONTROLLABLE);
             while (mPredecessorIterator.advance()) {
               final int source = mPredecessorIterator.getCurrentSourceState();
               final SearchRecord next =
@@ -691,7 +722,8 @@ public class SynthesisObservationEquivalenceTRSimplifier
             }
           }
           // Visit predecessors for all local uncontrollable transitions ...
-          iterateLocalUncontrollable(mPredecessorIterator);
+          mPredecessorIterator.resetEventsByStatus
+            (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
           while (mPredecessorIterator.advance()) {
             final int source = mPredecessorIterator.getCurrentSourceState();
             final SearchRecord next =
@@ -703,7 +735,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
           if (mWeak) {
             // For weak synthesis observation equivalence,
             // visit predecessors for all local transitions ...
-            iterateLocal(mPredecessorIterator);
+            mPredecessorIterator.resetEventsByStatus(EventEncoding.STATUS_LOCAL);
             while (mPredecessorIterator.advance()) {
               final int source = mPredecessorIterator.getCurrentSourceState();
               final EquivalenceClass sourceClass = mStateToClass[source];
@@ -1043,12 +1075,15 @@ public class SynthesisObservationEquivalenceTRSimplifier
       final ListBufferTransitionRelation rel = getTransitionRelation();
       mEventIterator = rel.createSuccessorsReadOnlyIterator();
       final int limit = getTransitionLimit();
-      mUncontrollableSuccessorsTauClosure =
-        createLocalUncontrollableSuccessorsTauClosure(limit);
+      mLocalUncontrollableSuccessorsTauClosure =
+        rel.createSuccessorsTauClosureByStatus
+          (limit,
+           EventEncoding.STATUS_LOCAL,
+           ~EventEncoding.STATUS_CONTROLLABLE);
       mTauClosureIterator =
-        mUncontrollableSuccessorsTauClosure.createIterator();
+        mLocalUncontrollableSuccessorsTauClosure.createIterator();
       mFullEventClosureIterator =
-        mUncontrollableSuccessorsTauClosure.createFullEventClosureIterator();
+        mLocalUncontrollableSuccessorsTauClosure.createFullEventClosureIterator();
       mClassReadIterator = mListBuffer.createReadOnlyIterator();
     }
 
@@ -1081,7 +1116,8 @@ public class SynthesisObservationEquivalenceTRSimplifier
         return result;
       }
       final EquivalenceClass stateClass = mStateToClass[state];
-      iterateSharedUncontrollable(mEventIterator);
+      mEventIterator.resetEventsByStatus(~EventEncoding.STATUS_LOCAL,
+                                         ~EventEncoding.STATUS_CONTROLLABLE);
       mTauClosureIterator.resetState(state);
       outer:
       while (mTauClosureIterator.advance()) {
@@ -1206,7 +1242,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
     //#######################################################################
     //# Data Members
     private final TransitionIterator mEventIterator;
-    private final TauClosure mUncontrollableSuccessorsTauClosure;
+    private final TauClosure mLocalUncontrollableSuccessorsTauClosure;
     private final TransitionIterator mTauClosureIterator;
     private final TransitionIterator mFullEventClosureIterator;
     private final IntListBuffer.ReadOnlyIterator mClassReadIterator;
@@ -1256,7 +1292,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
   private boolean mHasModifications;
 
   private int mOmegaState;
-  private TauClosure mUncontrollableTauClosure;
+  private TauClosure mLocalUncontrollablePredecessorsTauClosure;
   private TransitionIterator mPredecessorIterator;
   private TransitionIterator mUncontrollableTauIterator;
   private TransitionIterator mUncontrollableEventIterator;

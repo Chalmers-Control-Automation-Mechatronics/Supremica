@@ -45,6 +45,24 @@ public interface TransitionIterator
 
   /**
    * Restarts this iterator to iterate over transitions associated with
+   * events of the given type.
+   * @param  flags  List of event status flags, represented by
+   *                a sequence of the bits or bit combinations
+   *                {@link EventEncoding#STATUS_CONTROLLABLE},
+   *                {@link EventEncoding#STATUS_LOCAL},
+   *                {@link EventEncoding#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link EventEncoding#STATUS_UNUSED} or their complements.<BR>
+   *                The flags must appear in the correct ordering, which must
+   *                match the ordering of the {@link EventEncoding}. If a flag
+   *                is complemented, iteration is performed over events
+   *                without that property, otherwise over events with the
+   *                property.
+   */
+  public void resetEventsByStatus(int... flags);
+
+  /**
+   * Restarts this iterator to iterate over transitions associated with
    * the given from-state.
    */
   public void resetState(int from);

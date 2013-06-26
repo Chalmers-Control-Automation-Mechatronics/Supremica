@@ -83,7 +83,7 @@ class ObserverProjectionAbstractionProcedure
     final EventProxy vtau =
       factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
     final KindTranslator id = IdenticalKindTranslator.getInstance();
-    final int codeOfVTau = eventEnc.addEvent(vtau, id, (byte)0);
+    final int codeOfVTau = eventEnc.addEvent(vtau, id, 0);
     mOPSimplifier.setVisibleTau(codeOfVTau);
     return eventEnc;
   }

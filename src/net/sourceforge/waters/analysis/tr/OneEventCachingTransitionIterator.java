@@ -78,6 +78,14 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
   }
 
   @Override
+  public void resetEventsByStatus(final int... flags)
+  {
+    throw new UnsupportedOperationException
+      (ProxyTools.getShortClassName(this) +
+       " does not support multiple events!");
+  }
+
+  @Override
   public void resetState(final int from)
   {
     mInnerIterator.resetState(from);
