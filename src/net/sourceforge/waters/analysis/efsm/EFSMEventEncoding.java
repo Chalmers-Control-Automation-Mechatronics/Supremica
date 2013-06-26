@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 
@@ -98,6 +99,19 @@ class EFSMEventEncoding
     }
   }
 
+  void setSelfloops(final ListBufferTransitionRelation rel,
+                    final EFSMVariableFinder finder)
+  {
+    for (int e = EventEncoding.NONTAU; e < size(); e++) {
+      final ConstraintList update = getUpdate(e);
+      if (!finder.findPrime(update)) {
+        final byte status = rel.getProperEventStatus(e);
+        rel.setProperEventStatus
+          (e, (byte) (status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP));
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Debugging
@@ -105,9 +119,9 @@ class EFSMEventEncoding
   public String toString()
   {
     final StringBuffer buffer = new StringBuffer();
-    final int e = 0;
+    int e = 0;
     for (final ConstraintList update : mUpdateList) {
-      buffer.append(e);
+      buffer.append(e++);
       buffer.append(" : ");
       buffer.append(update);
       buffer.append("\n");

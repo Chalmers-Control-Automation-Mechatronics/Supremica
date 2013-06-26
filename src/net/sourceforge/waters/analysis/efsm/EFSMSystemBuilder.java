@@ -82,6 +82,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
     mTrueGuard = new ConstraintList();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
+    mEFSMVariableFinder = new EFSMVariableFinder(mOperatorTable);
     mInputModule = module;
     final String moduleName = module.getName();
     mVariableContext = new EFSMVariableContext(module, mOperatorTable);
@@ -536,6 +537,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
                                          numProps,
                                          mStateMap.size(),
                                          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      mEventEncoding.setSelfloops(rel, mEFSMVariableFinder);
       final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
       while (iter.hasNext()) {
         iter.advance();
@@ -714,12 +716,14 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
-  private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-  private final ModuleProxy mInputModule;
-  private IdentifierProxy mDefaultMarking;
-  private boolean mIsOptimizationEnabled;
+  private final EFSMVariableFinder mEFSMVariableFinder;
+  private final ConstraintList mTrueGuard;
 
+  private boolean mIsOptimizationEnabled;
+  private IdentifierProxy mDefaultMarking;
+
+  private final ModuleProxy mInputModule;
   private final EFSMVariableContext mVariableContext;
   private final List<EFSMVariable> mMarkedVariables;
   private final List<SimpleExpressionProxy> mVariableMarkingPredicates;

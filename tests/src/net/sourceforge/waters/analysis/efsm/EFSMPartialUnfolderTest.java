@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
-//# CLASS:   PartialUnfolderTest
+//# CLASS:   EFSMPartialUnfolderTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -36,22 +36,22 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
- * A test for the {@link PartialUnfolder}.
+ * A test for the {@link EFSMPartialUnfolder}.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class PartialUnfolderTest
+public class EFSMPartialUnfolderTest
   extends AbstractEFSMTest
 {
 
   //#########################################################################
   //# Overrides for base class junit.framework.TestCase
-  public PartialUnfolderTest()
+  public EFSMPartialUnfolderTest()
   {
   }
 
-  public PartialUnfolderTest(final String name)
+  public EFSMPartialUnfolderTest(final String name)
   {
     super(name);
   }
@@ -62,7 +62,7 @@ public class PartialUnfolderTest
     super.setUp();
     final ModuleProxyFactory factory = getModuleProxyFactory();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    mPartialUnfolder = new PartialUnfolder(factory, optable);
+    mPartialUnfolder = new EFSMPartialUnfolder(factory, optable);
     mPartialUnfolder.setSourceInfoEnabled(true);
     mVariablePartitionComputer =
       new EFSMVariablePartitionComputer(factory, optable);
@@ -112,14 +112,14 @@ public class PartialUnfolderTest
     runPartialUnfolder(module);
   }
 
-  /*
-   * These cases are handled by the compiler. No partial unfolding needed.
   public void testUnfolding_3() throws Exception
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unfolding03");
     runPartialUnfolder(module);
   }
 
+  /*
+   * This case is handled by the compiler. No partial unfolding needed.
   public void testUnfolding_4() throws Exception
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unfolding04");
@@ -331,7 +331,7 @@ public class PartialUnfolderTest
 
   //#########################################################################
   //# Data Members
-  private PartialUnfolder mPartialUnfolder;
+  private EFSMPartialUnfolder mPartialUnfolder;
   private EFSMVariablePartitionComputer mVariablePartitionComputer;
 
 }

@@ -9,11 +9,15 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 import org.apache.log4j.Logger;
 
@@ -44,6 +48,17 @@ abstract class AbstractEFSMAlgorithm
   EFSMSimplifierStatistics getStatistics()
   {
     return mStatistics;
+  }
+
+  /**
+   * Returns a collection of updates found to be selfloops.
+   * This method is called after running an EFSM simplifier.
+   * The default implementation returns an empty list, but subclasses
+   * may provide more useful information.
+   */
+  Collection<ConstraintList> getSelfloopedUpdates()
+  {
+    return Collections.emptyList();
   }
 
 

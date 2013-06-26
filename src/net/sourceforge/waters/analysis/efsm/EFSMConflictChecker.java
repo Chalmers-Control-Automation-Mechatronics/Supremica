@@ -234,7 +234,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     mVariablePartitionComputer =
       new EFSMVariablePartitionComputer(factory, mCompilerOperatorTable);
     result.addPartitioningStatistics(mVariablePartitionComputer.getStatistics());
-    mPartialUnfolder = new PartialUnfolder(factory, mCompilerOperatorTable);
+    mPartialUnfolder = new EFSMPartialUnfolder(factory, mCompilerOperatorTable);
     result.addUnfoldingStatistics(mPartialUnfolder.getStatistics());
     mSimplifier = mEFSMTRSimplifierFactory.createAbstractionProcedure(this);
     result.setSimplifierStatistics(mSimplifier);
@@ -354,6 +354,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         final EFSMTransitionRelation unfoldTR =
           mPartialUnfolder.unfold(varSelected, mCurrentEFSMSystem, partition);
         result.addEFSMTransitionRelation(unfoldTR);
+        recordSelfloops(mPartialUnfolder);
         EFSMTransitionRelation unfoldSimplified = null;
         if (efsmTransitionRelationList.size() > 1 ||
             mCurrentEFSMSystem.getVariables().size() > 1) {
@@ -433,10 +434,20 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     final EFSMVariableContext context = mCurrentEFSMSystem.getVariableContext();
     final EFSMTransitionRelation result =
       mSimplifier.run(currentEFSMTransitionRelation, context);
-    // If the simplifier has detected and removed selfloops,
-    // i.e., updates that appear as selfloop and all states and nowhere else,
-    // we must record them on the variables, so they can be considered later
-    // in partial unfolding.
+    recordSelfloops(mSimplifier);
+    return result;
+  }
+
+  /**
+   * Stores selfloop information. If a simplifier has detected and removed
+   * selfloops, i.e., updates that appear as selfloop and all states and
+   * nowhere else, they must be recorded on the variables, so they can be
+   * considered later in partial unfolding.
+   * @param simplifier A simplifier that has just completed execution
+   *                   and may contain selfloops.
+   */
+  private void recordSelfloops(final AbstractEFSMAlgorithm simplifier)
+  {
     for (final ConstraintList update : mSimplifier.getSelfloopedUpdates()) {
       final Collection<EFSMVariable> unprimed = new THashSet<EFSMVariable>();
       final Collection<EFSMVariable> primed = new THashSet<EFSMVariable>();
@@ -451,7 +462,6 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         }
       }
     }
-    return result;
   }
 
   private boolean isCurrentSubsystemTrivial()
@@ -623,7 +633,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   private DocumentManager mDocumentManager;
   private EFSMTRSimplifier mSimplifier;
   private EFSMVariablePartitionComputer mVariablePartitionComputer;
-  private PartialUnfolder mPartialUnfolder;
+  private EFSMPartialUnfolder mPartialUnfolder;
   private CompositionSelectionHeuristic mCompositionSelectionHeuristic;
   private EFSMSynchronizer mEFSMSynchronizer;
   private EFSMTRNonblockingChecker mNonblockingChecker;

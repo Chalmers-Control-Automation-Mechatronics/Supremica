@@ -32,7 +32,6 @@ class EFSMVariableFinder
   extends DefaultModuleProxyVisitor
 {
 
-
   //#########################################################################
   //# Constructor
   EFSMVariableFinder(final CompilerOperatorTable optable)
@@ -48,45 +47,107 @@ class EFSMVariableFinder
    * Determines if a given variable is in the given expression.
    * @param  expr     The expression to be searched.
    * @param  var      The variable to be searched for.
+   * @return <CODE>true</CODE> if the variable has been found in its
+   *         primed or unprimed form. More detailed results can be
+   *         queried using the {@link #containsVariable()} and
+   *         {@link #containsPrimedVariable()} methods.
    */
-  void findVariable(final SimpleExpressionProxy expr, final EFSMVariable var)
+  boolean findVariable(final SimpleExpressionProxy expr,
+                       final EFSMVariable var)
   {
     try {
-      mContainsPrimedVariable = false;
-      mContainsVariable = false;
       mCurrentVariable = var.getVariableName();
+      mContainsVariable = false;
+      mContainsPrimedVariable = false;
       find(expr);
+      return mContainsVariable || mContainsPrimedVariable;
     } finally {
       mCurrentVariable = null;
     }
   }
 
-  void findVariable(final ConstraintList update, final EFSMVariable var)
+  /**
+   * Determines if a given variable is in the given constraint list.
+   * @param  update   The constraint list to be searched.
+   * @param  var      The variable to be searched for.
+   * @return <CODE>true</CODE> if the variable has been found in its
+   *         primed or unprimed form. More detailed results can be
+   *         queried using the {@link #containsVariable()} and
+   *         {@link #containsPrimedVariable()} methods.
+   */
+  boolean findVariable(final ConstraintList update, final EFSMVariable var)
   {
     try {
-      mContainsPrimedVariable = false;
-      mContainsVariable = false;
       mCurrentVariable = var.getVariableName();
+      mContainsVariable = false;
+      mContainsPrimedVariable = false;
       for (final SimpleExpressionProxy expr : update.getConstraints()) {
         find(expr);
         if (mContainsPrimedVariable && mContainsVariable) {
-          break;
+          return true;
         }
       }
+      return mContainsVariable || mContainsPrimedVariable;
     } finally {
       mCurrentVariable = null;
     }
   }
 
+  /**
+   * Determines if a given expression contains a primed identifier.
+   * @param  expr     The expression to be searched.
+   */
+  boolean findPrime(final SimpleExpressionProxy expr)
+  {
+    try {
+      mCurrentVariable = null;
+      mContainsVariable = true;
+      mContainsPrimedVariable = false;
+      find(expr);
+      return mContainsPrimedVariable;
+    } finally {
+      mContainsVariable = false;
+    }
+  }
+
+  /**
+   * Determines if a given constraint list contains a primed identifier.
+   * @param  update   The constraint list to be searched.
+   */
+  boolean findPrime(final ConstraintList update)
+  {
+    try {
+      mCurrentVariable = null;
+      mContainsVariable = true;
+      mContainsPrimedVariable = false;
+      for (final SimpleExpressionProxy expr : update.getConstraints()) {
+        find(expr);
+        if (mContainsPrimedVariable) {
+          return true;
+        }
+      }
+      return false;
+    } finally {
+      mContainsVariable = false;
+    }
+  }
+
+  /**
+   * Returns whether the last search has found an unprimed variable.
+   */
   boolean containsVariable()
   {
     return mContainsVariable;
   }
 
+  /**
+   * Returns whether the last search has found a primed variable.
+   */
   boolean containsPrimedVariable()
   {
     return mContainsPrimedVariable;
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -105,7 +166,8 @@ class EFSMVariableFinder
   @Override
   public Object visitIdentifierProxy(final IdentifierProxy ident)
   {
-    if (mEqualityVisitor.equals(ident, mCurrentVariable)) {
+    if (mCurrentVariable != null &&
+        mEqualityVisitor.equals(ident, mCurrentVariable)) {
       mContainsVariable = true;
     }
     return null;
@@ -116,9 +178,12 @@ class EFSMVariableFinder
     throws VisitorException
   {
     final SimpleExpressionProxy lhs = expr.getLeft();
-    find(lhs);
+    lhs.acceptVisitor(this);
+    if (mContainsVariable && mContainsPrimedVariable) {
+      return null;
+    }
     final SimpleExpressionProxy rhs = expr.getRight();
-    find(rhs);
+    rhs.acceptVisitor(this);
     return null;
   }
 
@@ -134,11 +199,12 @@ class EFSMVariableFinder
   {
     final SimpleExpressionProxy subterm = expr.getSubTerm();
     if (expr.getOperator() == mNextOperator) {
-      if (mEqualityVisitor.equals(subterm, mCurrentVariable)) {
+      if (mCurrentVariable == null ||
+          mEqualityVisitor.equals(subterm, mCurrentVariable)) {
         mContainsPrimedVariable = true;
       }
     } else {
-      find(subterm);
+      subterm.acceptVisitor(this);
     }
     return null;
   }
@@ -152,4 +218,5 @@ class EFSMVariableFinder
   private SimpleExpressionProxy mCurrentVariable;
   private boolean mContainsVariable;
   private boolean mContainsPrimedVariable;
+
 }

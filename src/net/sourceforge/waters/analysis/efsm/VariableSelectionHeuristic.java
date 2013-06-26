@@ -19,7 +19,7 @@ abstract class VariableSelectionHeuristic
   {
     mFactory = factory;
     mOperatorTable = op;
-    mUnfolder = new PartialUnfolder(factory, op);
+    mUnfolder = new EFSMPartialUnfolder(factory, op);
   }
 
 
@@ -95,7 +95,7 @@ abstract class VariableSelectionHeuristic
 
   //#########################################################################
   //# Data Members
-  private final PartialUnfolder mUnfolder;
+  private final EFSMPartialUnfolder mUnfolder;
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private EFSMSystem mSystem;
