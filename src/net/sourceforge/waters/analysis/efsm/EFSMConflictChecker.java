@@ -440,7 +440,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
 
   /**
    * Stores selfloop information. If a simplifier has detected and removed
-   * selfloops, i.e., updates that appear as selfloop and all states and
+   * selfloops, i.e., updates that appear as selfloop on all states and
    * nowhere else, they must be recorded on the variables, so they can be
    * considered later in partial unfolding.
    * @param simplifier A simplifier that has just completed execution

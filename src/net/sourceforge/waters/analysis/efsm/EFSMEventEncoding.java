@@ -107,7 +107,7 @@ class EFSMEventEncoding
       if (!finder.findPrime(update)) {
         final byte status = rel.getProperEventStatus(e);
         rel.setProperEventStatus
-          (e, (byte) (status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP));
+          (e, status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
       }
     }
   }

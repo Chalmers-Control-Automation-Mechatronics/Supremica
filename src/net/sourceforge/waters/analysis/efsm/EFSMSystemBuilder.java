@@ -537,7 +537,9 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
                                          numProps,
                                          mStateMap.size(),
                                          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      mEventEncoding.setSelfloops(rel, mEFSMVariableFinder);
+      if (mIsOptimizationEnabled) {
+        mEventEncoding.setSelfloops(rel, mEFSMVariableFinder);
+      }
       final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
       while (iter.hasNext()) {
         iter.advance();
