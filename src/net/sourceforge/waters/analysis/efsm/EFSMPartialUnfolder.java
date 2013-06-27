@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
-//# CLASS:   PartialUnfolder
+//# CLASS:   EFSMPartialUnfolder
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,11 +12,15 @@ package net.sourceforge.waters.analysis.efsm;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -39,6 +43,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
 
@@ -53,19 +58,20 @@ import org.apache.log4j.Logger;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class PartialUnfolder extends AbstractEFSMAlgorithm
+public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
 {
 
   //#########################################################################
   //# Constructors
-  public PartialUnfolder(final ModuleProxyFactory factory,
-                         final CompilerOperatorTable op)
+  public EFSMPartialUnfolder(final ModuleProxyFactory factory,
+                             final CompilerOperatorTable op)
   {
     createStatistics(true);
     mFactory = factory;
     mOperatorTable = op;
     mEFSMVariableFinder = new EFSMVariableFinder(op);
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, op);
+    mUnsatisfiesUpdate = new UnfoldedUpdateInfo(null);
   }
 
 
@@ -78,39 +84,61 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
 
 
   //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.efsm.AbstractEFSMAlgorithm
+  @Override
+  List<ConstraintList> getSelfloopedUpdates()
+  {
+    return mUnfoldedSelfloops;
+  }
+
+
+  //#########################################################################
   //# Invocation
   @Override
   public void setUp() throws AnalysisException
   {
     super.setUp();
+    mUnfoldedUpdateCache = new TLongObjectHashMap<UnfoldedUpdateInfo>();
+    mKnownAfterValueCache =
+      new TLongIntHashMap(0, 0.5f, MISSING_CACHE_ENTRY, MISSING_CACHE_ENTRY);
   }
 
   @Override
   public void tearDown()
   {
     super.tearDown();
-    mSelfloops = null;
+    mUnfoldedUpdateCache = null;
+    mKnownAfterValueCache = null;
+    mInputSelfloops = null;
     mValueToClass = null;
     mClassToValue = null;
   }
 
-  EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
-                                final EFSMVariable var,
+  EFSMTransitionRelation unfold(final EFSMVariable var,
                                 final EFSMSystem system)
     throws EvalException, AnalysisException
   {
-    return unfold(efsmRel, var, system, null);
+    return unfold(var, system, null);
   }
 
-  EFSMTransitionRelation unfold(final EFSMTransitionRelation efsmRel,
-                                final EFSMVariable var,
+  EFSMTransitionRelation unfold(final EFSMVariable var,
                                 final EFSMSystem system,
                                 final List<int[]> partition)
     throws EvalException, AnalysisException
   {
+    EFSMTransitionRelation efsmRel = var.getTransitionRelation();
+    if (efsmRel == null) {
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(":dummy", ComponentKind.PLANT, 1, 0, 1,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      rel.setInitial(0, true);
+      final EFSMEventEncoding enc = new EFSMEventEncoding();
+      final List<EFSMVariable> list = Collections.singletonList(var);
+      efsmRel = new EFSMTransitionRelation(rel, enc, list);
+    }
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
-      logger.debug("Unfolding: " + efsmRel.getName() + " \\ " + var.getName() + " ...");
+      logger.debug("Unfolding: " + var.getName() + " ...");
       logger.debug(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
     }
     final long start = System.currentTimeMillis();
@@ -122,10 +150,6 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       setUp();
       final CompiledRange range = var.getRange();
       mRangeValues = range.getValues();
-      mUnfoldedEventCache =
-        new TLongIntHashMap(0, 0.5f, MISSING_CACHE_ENTRY, MISSING_CACHE_ENTRY);
-      mKnownAfterValueCache =
-        new TLongIntHashMap(0, 0.5f, MISSING_CACHE_ENTRY, MISSING_CACHE_ENTRY);
       mRootContext = system.getVariableContext();
       if (partition == null) {
         mReducedRangeSize = mRangeValues.size();
@@ -159,15 +183,15 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         // There are proper selfloop updates. These updates must be considered
         // as selfloops on every state of the unfolded EFSM. Create event IDs
         // for all selfloops and remember them in the list mSelfloops.
-        mSelfloops = new TIntArrayList();
+        mInputSelfloops = new TIntArrayList();
         mInputEventEncoding = new EFSMEventEncoding(mInputEventEncoding);
         for (int e = EventEncoding.NONTAU; e < selfloops.size(); e++) {
           final ConstraintList update = selfloops.getUpdate(e);
           final int ecode = mInputEventEncoding.createEventId(update);
-          mSelfloops.add(ecode);
+          mInputSelfloops.add(ecode);
         }
       }
-      mUpdateInfo = new UpdateInfo[mInputEventEncoding.size()];
+      mInputUpdateInfo = new InputUpdateInfo[mInputEventEncoding.size()];
 
       final SimpleExpressionProxy initStatePredicate =
         var.getInitialStatePredicate();
@@ -193,7 +217,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         }
       }
       mUnfoldedStateList = new TLongArrayList(numInputStates);
-      mUnfoldedStateMap = new TLongIntHashMap(numInputStates);
+      mUnfoldedStateMap = new TLongIntHashMap(numInputStates, 0.5f, -1, -1);
       for (int lowState = 0; lowState < initialStates.size(); lowState++) {
         for (int highValue = 0; highValue < initialValues.size(); highValue++) {
           final long initialPair =
@@ -205,8 +229,8 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         }
       }
       final int numInitialStates = mUnfoldedStateList.size();
-      mUnfoldedEventEncoding =
-        new EFSMEventEncoding(rel.getNumberOfProperEvents());
+      mUnfoldedUpdateMap =
+        new HashMap<ConstraintList,UnfoldedUpdateInfo>(rel.getNumberOfProperEvents());
       mSourceShift = AutomatonTools.log2(mInputEventEncoding.size());
       final int rangeBits = AutomatonTools.log2(mReducedRangeSize);
       final int encodingSize = mSourceShift + rangeBits +
@@ -220,13 +244,17 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       mTargetShift = mSourceShift + rangeBits;
       final StateExpander expander1 = new StateExpander() {
         @Override
-        void newTransition(final int source, final int event, final long pair)
+        void newTransition(final int source,
+                           final UnfoldedUpdateInfo info,
+                           final long targetPair)
         {
-          if (!mUnfoldedStateMap.contains(pair)) {
-            final int code = mUnfoldedStateList.size();
-            mUnfoldedStateList.add(pair);
-            mUnfoldedStateMap.put(pair, code);
+          int target = mUnfoldedStateMap.get(targetPair);
+          if (target < 0) {
+            target = mUnfoldedStateList.size();
+            mUnfoldedStateList.add(targetPair);
+            mUnfoldedStateMap.put(targetPair, target);
           }
+          info.checkSelfloop(source, target);
         }
       };
       int currentState = 0;
@@ -235,19 +263,26 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         currentState++;
       }
       final int numUnfoldedStates = mUnfoldedStateList.size();
-
-      final ListBufferTransitionRelation unfoldedRel =
+      mUnfoldedSelfloops = new ArrayList<ConstraintList>();
+      final int numUnfoldedUpdates = getNumberOfRelevantUpdates();
+      mUnfoldedEventEncoding = new EFSMEventEncoding(numUnfoldedUpdates);
+      mUnfoldedTransitionRelation =
         new ListBufferTransitionRelation(rel.getName(), rel.getKind(),
-                                         mUnfoldedEventEncoding.size(),
+                                         numUnfoldedUpdates,
                                          rel.getNumberOfPropositions(),
                                          numUnfoldedStates,
                                          rel.getConfiguration());
       final StateExpander expander2 = new StateExpander() {
         @Override
-        void newTransition(final int source, final int event, final long pair)
+        void newTransition(final int source,
+                           final UnfoldedUpdateInfo info,
+                           final long targetPair)
         {
-          final int target = mUnfoldedStateMap.get(pair);
-          unfoldedRel.addTransition(source, event, target);
+          if (info.isNeededInEventEncoding()) {
+            final int target = mUnfoldedStateMap.get(targetPair);
+            final int event = info.createUnfoldedEventNumber();
+            mUnfoldedTransitionRelation.addTransition(source, event, target);
+          }
         }
       };
 
@@ -259,12 +294,12 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       }
       for (int s = 0; s < numUnfoldedStates; s++) {
         if (s < numInitialStates) {
-          unfoldedRel.setInitial(s, true);
+          mUnfoldedTransitionRelation.setInitial(s, true);
         }
         final long pair = mUnfoldedStateList.get(s);
         final int efsmState = (int) (pair & 0xffffffffL);
         if (rel.isMarked(efsmState, 0)) {
-          unfoldedRel.setMarked(s, 0, true);
+          mUnfoldedTransitionRelation.setMarked(s, 0, true);
         }
         expander2.expandState(s);
         if (mSourceInfoEnabled && EFSMNodeList != null) {
@@ -277,7 +312,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       final Collection<EFSMVariable> variables =
         new THashSet<EFSMVariable>(efsmRel.getVariables().size());
       mEFSMVariableCollector.collectAllVariables(mUnfoldedEventEncoding, variables);
-      result = new EFSMTransitionRelation(unfoldedRel, mUnfoldedEventEncoding,
+      result = new EFSMTransitionRelation(mUnfoldedTransitionRelation, mUnfoldedEventEncoding,
                                           variables, nodeList);
       return result;
 
@@ -289,7 +324,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
           result.getTransitionRelation();
         if (logger.isDebugEnabled()) {
           final String msg = String.format
-            ("%d states, %d propagator calls, %.3f seconds\n",
+            ("%d states, %d propagator calls, %.3f seconds",
              unfoldedRel.getNumberOfStates(),
              mConstraintPropagator.getNumberOfInvocations(),
              0.001f * difftime);
@@ -308,15 +343,17 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
 
   //#########################################################################
   //# Auxiliary Methods
-  private int getUnfoldedEvent(final int event, final int beforeClass, final int afterValue)
+  private UnfoldedUpdateInfo getUnfoldedUpdateInfo(final int event,
+                                                   final int beforeClass,
+                                                   final int afterValue)
     throws EvalException
   {
     final long key = event |
                      ((long) beforeClass << mSourceShift) |
                      ((long) afterValue<< mTargetShift);
-    final int foundValue = mUnfoldedEventCache.get(key);
-    if (foundValue != MISSING_CACHE_ENTRY) {
-      return foundValue;
+    final UnfoldedUpdateInfo found = mUnfoldedUpdateCache.get(key);
+    if (found != null) {
+      return found;
     } else {
       mUnfoldingVariableContext.setCurrentValue(getValue(beforeClass));
       mUnfoldingVariableContext.setPrimedValue(mRangeValues.get(afterValue));
@@ -328,12 +365,12 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       if (!mConstraintPropagator.isUnsatisfiable()) {
         final ConstraintList unfoldedUpdate =
           mConstraintPropagator.getAllConstraints();
-        final int newEvent = mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
-        mUnfoldedEventCache.put(key, newEvent);
-        return newEvent;
+        final UnfoldedUpdateInfo info = createUnfoldedUpdateInfo(unfoldedUpdate);
+        mUnfoldedUpdateCache.put(key, info);
+        return info;
       } else {
-        mUnfoldedEventCache.put(key, UNSATISFIED_UNFOLDING);
-        return UNSATISFIED_UNFOLDING;
+        mUnfoldedUpdateCache.put(key, mUnsatisfiesUpdate);
+        return mUnsatisfiesUpdate;
       }
     }
   }
@@ -360,26 +397,60 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         mUnfoldedVariable.getPrimedVariableName();
       final SimpleExpressionProxy afterExpr =
         context.getBoundExpression(varNamePrimed);
-      int afterValue = -1;
-      if (afterExpr != null) {
-        final CompiledRange range = mUnfoldedVariable.getRange();
-        afterValue = range.indexOf(afterExpr);
-      }
-      if (afterValue < 0) {
+      final int afterValue = getValueIndex(afterExpr);
+      if (afterValue >= 0) {
+        mKnownAfterValueCache.put(key, afterValue);
+        final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
+        mConstraintPropagator.removeVariable(varName);
+        final ConstraintList unfoldedUpdate =
+          mConstraintPropagator.getAllConstraints();
+        final UnfoldedUpdateInfo info =
+          createUnfoldedUpdateInfo(unfoldedUpdate);
+        final long eventKey = event |
+                              ((long) beforeClass << mSourceShift) |
+                              ((long) afterValue << mTargetShift);
+        mUnfoldedUpdateCache.put(eventKey, info);
+        return afterValue;
+      } else {
         mKnownAfterValueCache.put(key, UNKNOWN_AFTER_VALUE);
         return UNKNOWN_AFTER_VALUE;
       }
-      mKnownAfterValueCache.put(key, afterValue);
-      final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
-      mConstraintPropagator.removeVariable(varName);
-      final ConstraintList unfoldedUpdate =
-        mConstraintPropagator.getAllConstraints();
-      final int newEvent = mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
-      final long eventKey = event |
-                            ((long) beforeClass << mSourceShift) |
-                            ((long) afterValue << mTargetShift);
-      mUnfoldedEventCache.put(eventKey, newEvent);
-      return afterValue;
+    }
+  }
+
+  private UnfoldedUpdateInfo createUnfoldedUpdateInfo(final ConstraintList update)
+  {
+    final UnfoldedUpdateInfo found = mUnfoldedUpdateMap.get(update);
+    if (found != null) {
+      return found;
+    } else {
+      final UnfoldedUpdateInfo info = new UnfoldedUpdateInfo(update);
+      mUnfoldedUpdateMap.put(update, info);
+      return info;
+    }
+  }
+
+  private int getNumberOfRelevantUpdates()
+  {
+    int result = 1;  // Don't forget tau!
+    for (final UnfoldedUpdateInfo info : mUnfoldedUpdateMap.values()) {
+      if (info.isNeededInEventEncoding()) {
+        result++;
+      } else if (info.isRelevantSelfloop()) {
+        final ConstraintList update = info.getUpdate();
+        mUnfoldedSelfloops.add(update);
+      }
+    }
+    return result;
+  }
+
+  private int getValueIndex(final SimpleExpressionProxy expr)
+  {
+    if (expr == null) {
+      return -1;
+    } else {
+      final CompiledRange range = mUnfoldedVariable.getRange();
+      return range.indexOf(expr);
     }
   }
 
@@ -433,9 +504,9 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         final int targetState = mIterator.getCurrentTargetState();
         expand(source, beforeClass, event, targetState);
       }
-      if (mSelfloops != null) {
-        for (int index = 0; index < mSelfloops.size(); index ++) {
-          final int selfloopEvent = mSelfloops.get(index);
+      if (mInputSelfloops != null) {
+        for (int index = 0; index < mInputSelfloops.size(); index ++) {
+          final int selfloopEvent = mInputSelfloops.get(index);
           expand(source, beforeClass, selfloopEvent, sourceState);
         }
       }
@@ -446,33 +517,33 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       throws EvalException, AnalysisAbortException
     {
 
-      UpdateInfo info = mUpdateInfo[event];
+      InputUpdateInfo info = mInputUpdateInfo[event];
       if (info == null) {
-        mUpdateInfo[event] = info = new UpdateInfo(event);
+        mInputUpdateInfo[event] = info = new InputUpdateInfo(event);
       }
       if (!info.containsUnfoldedVariable()) {
         // update does not contain x (unfolded var)
-        int unfoldedEvent = info.getUnfoldedEventNumber();
-        if (unfoldedEvent >= 0) {
+        UnfoldedUpdateInfo unfoldedInfo = info.getUnfoldedUpdateInfo();
+        if (unfoldedInfo != null) {
           // update does not contain x' or after-value is known
           final int afterValue = info.getKnownAfterValue();
           if (afterValue == UNCHANGED_AFTER_VALUE) {
             final long targetPair = targetState | ((long) beforeClass << 32);
-            newTransition(source, unfoldedEvent, targetPair);
+            newTransition(source, unfoldedInfo, targetPair);
           } else {
             final int afterClass = getClazz(afterValue);
             final long targetPair = targetState | ((long) afterClass << 32);
-            newTransition(source, unfoldedEvent, targetPair);
+            newTransition(source, unfoldedInfo, targetPair);
           }
         } else {
           // update does not contain x but x',
           // and different after-values are possible
           for (int afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
-            unfoldedEvent = getUnfoldedEvent(event, 0, afterValue);
-            if (unfoldedEvent >= 0) {
+            unfoldedInfo = getUnfoldedUpdateInfo(event, 0, afterValue);
+            if (unfoldedInfo != mUnsatisfiesUpdate) {
               final int afterClass = getClazz(afterValue);
               final long targetPair = targetState | ((long) afterClass << 32);
-              newTransition(source, unfoldedEvent, targetPair);
+              newTransition(source, unfoldedInfo, targetPair);
             }
           }
         }
@@ -480,10 +551,11 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         // update contains x
         if (!info.containsUnfoldedPrimedVariable()) {
           // update contains x but not x'
-          final int unfoldedEvent = getUnfoldedEvent(event, beforeClass, 0);
-          if (unfoldedEvent >= 0) {
+          final UnfoldedUpdateInfo unfoldedInfo =
+            getUnfoldedUpdateInfo(event, beforeClass, 0);
+          if (unfoldedInfo != mUnsatisfiesUpdate) {
             final long targetPair = targetState | ((long) beforeClass << 32);
-            newTransition(source, unfoldedEvent, targetPair);
+            newTransition(source, unfoldedInfo, targetPair);
           }
         } else {
           // update contains x and x'
@@ -492,21 +564,21 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
             // no transition
           } else if (afterValue == UNKNOWN_AFTER_VALUE) {
             for (afterValue = 0; afterValue < mRangeValues.size(); afterValue++) {
-              final int unfoldedEvent =
-                getUnfoldedEvent(event, beforeClass, afterValue);
-              if (unfoldedEvent >= 0) {
+              final UnfoldedUpdateInfo unfoldedInfo =
+                getUnfoldedUpdateInfo(event, beforeClass, afterValue);
+              if (unfoldedInfo != mUnsatisfiesUpdate) {
                 final int afterClass = getClazz(afterValue);
                 final long targetPair = targetState | ((long) afterClass << 32);
-                newTransition(source, unfoldedEvent, targetPair);
+                newTransition(source, unfoldedInfo, targetPair);
               }
             }
           } else {
-            final int unfoldedEvent =
-              getUnfoldedEvent(event, beforeClass, afterValue);
-            if (unfoldedEvent >= 0) {
+            final UnfoldedUpdateInfo unfoldedInfo =
+              getUnfoldedUpdateInfo(event, beforeClass, afterValue);
+            if (unfoldedInfo != mUnsatisfiesUpdate) {
               final int afterClass = getClazz(afterValue);
               final long targetPair = targetState | ((long) afterClass << 32);
-              newTransition(source, unfoldedEvent, targetPair);
+              newTransition(source, unfoldedInfo, targetPair);
             }
           }
         }
@@ -514,7 +586,9 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       checkAbort();
     }
 
-    abstract void newTransition(int source, int event, long pair);
+    abstract void newTransition(int source,
+                                UnfoldedUpdateInfo info,
+                                long targetPair);
 
 
     //#######################################################################
@@ -524,12 +598,12 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
 
 
   //#########################################################################
-  //# Inner Class UpdateInfo
-  private class UpdateInfo
+  //# Inner Class InputUpdateInfo
+  private class InputUpdateInfo
   {
     //#######################################################################
     //# Constructor
-    private UpdateInfo(final int event) throws EvalException
+    private InputUpdateInfo(final int event) throws EvalException
     {
       final ConstraintList update = mInputEventEncoding.getUpdate(event);
       mEFSMVariableFinder.findVariable(update, mUnfoldedVariable);
@@ -538,7 +612,7 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
         mEFSMVariableFinder.containsPrimedVariable();
       if (!mContainsUnfoldedVariable) {
         if (!mContainsUnfoldedPrimedVariable) {
-          mUnfoldedEventNumber = mUnfoldedEventEncoding.createEventId(update);
+          mUnfoldedUpdateInfo = createUnfoldedUpdateInfo(update);
           mKnownAfterValue = UNCHANGED_AFTER_VALUE;
         } else {
           mUnfoldingVariableContext.setPrimedValue(null);
@@ -550,27 +624,21 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
             mUnfoldedVariable.getPrimedVariableName();
           final SimpleExpressionProxy afterExpr =
             context.getBoundExpression(varNamePrimed);
-          mUnfoldedEventNumber = MISSING_CACHE_ENTRY;
-          mKnownAfterValue = UNKNOWN_AFTER_VALUE;
-          if (afterExpr != null) {
-            final CompiledRange range = mUnfoldedVariable.getRange();
-            final int afterValue = range.indexOf(afterExpr);
-            if (afterValue >= 0) {
-              mKnownAfterValue = afterValue;
-              mUnfoldingVariableContext.setPrimedValue(afterExpr);
-              mConstraintPropagator.init(update);
-              mConstraintPropagator.propagate();
-              final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
-              mConstraintPropagator.removeVariable(varName);
-              final ConstraintList unfoldedUpdate =
-                mConstraintPropagator.getAllConstraints();
-              mUnfoldedEventNumber =
-                mUnfoldedEventEncoding.createEventId(unfoldedUpdate);
-            }
+          final int afterValue = getValueIndex(afterExpr);
+          if (afterValue >= 0) {
+            mKnownAfterValue = afterValue;
+            final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
+            mConstraintPropagator.removeVariable(varName);
+            final ConstraintList unfoldedUpdate =
+              mConstraintPropagator.getAllConstraints();
+            mUnfoldedUpdateInfo = createUnfoldedUpdateInfo(unfoldedUpdate);
+          } else {
+            mUnfoldedUpdateInfo = null;
+            mKnownAfterValue = UNKNOWN_AFTER_VALUE;
           }
         }
       } else {
-        mUnfoldedEventNumber = MISSING_CACHE_ENTRY;
+        mUnfoldedUpdateInfo = null;
         if (!mContainsUnfoldedPrimedVariable) {
           mKnownAfterValue = UNCHANGED_AFTER_VALUE;
         } else {
@@ -591,9 +659,9 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
       return mContainsUnfoldedPrimedVariable;
     }
 
-    private int getUnfoldedEventNumber()
+    private UnfoldedUpdateInfo getUnfoldedUpdateInfo()
     {
-      return mUnfoldedEventNumber;
+      return mUnfoldedUpdateInfo;
     }
 
     private int getKnownAfterValue()
@@ -605,8 +673,81 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
     //# Data Members
     private final boolean mContainsUnfoldedVariable;
     private final boolean mContainsUnfoldedPrimedVariable;
+    private final UnfoldedUpdateInfo mUnfoldedUpdateInfo;
+    private final int mKnownAfterValue;
+  }
+
+
+  //#########################################################################
+  //# Inner Class UnfoldedUpdateInfo
+  private class UnfoldedUpdateInfo
+  {
+    //#######################################################################
+    //# Constructor
+    private UnfoldedUpdateInfo(final ConstraintList update)
+    {
+      mUpdate = update;
+      mIsPureGuard =
+        update == null ? true : !mEFSMVariableFinder.findPrime(update);
+      mUnfoldedEventNumber = MISSING_CACHE_ENTRY;
+      mNumberOfSelfloops = 0;
+      mLastSelfloop = -1;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private ConstraintList getUpdate()
+    {
+      return mUpdate;
+    }
+
+    private int createUnfoldedEventNumber()
+    {
+      if (mUnfoldedEventNumber == MISSING_CACHE_ENTRY) {
+        mUnfoldedEventNumber = mUnfoldedEventEncoding.createEventId(mUpdate);
+        if (mIsPureGuard) {
+          mUnfoldedTransitionRelation.setProperEventStatus
+           (mUnfoldedEventNumber, EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
+        }
+      }
+      return mUnfoldedEventNumber;
+    }
+
+    private void checkSelfloop(final int source, final int target)
+    {
+      if (source != target) {
+        mNumberOfSelfloops = mLastSelfloop = -1;
+      } else if (source != mLastSelfloop && mNumberOfSelfloops >= 0) {
+        mNumberOfSelfloops++;
+        mLastSelfloop = source;
+      }
+    }
+
+    private boolean isNeededInEventEncoding()
+    {
+      if (mIsPureGuard) {
+        return mNumberOfSelfloops < 0;
+      } else {
+        return mNumberOfSelfloops < mUnfoldedStateList.size();
+      }
+    }
+
+    private boolean isRelevantSelfloop()
+    {
+      if (mIsPureGuard) {
+        return false;
+      } else {
+        return mNumberOfSelfloops == mUnfoldedStateList.size();
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ConstraintList mUpdate;
+    private final boolean mIsPureGuard;
     private int mUnfoldedEventNumber;
-    private int mKnownAfterValue;
+    private int mNumberOfSelfloops;
+    private int mLastSelfloop;
   }
 
 
@@ -616,16 +757,14 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
   private final CompilerOperatorTable mOperatorTable;
   private final EFSMVariableFinder mEFSMVariableFinder;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-  private boolean mSourceInfoEnabled;
-  private TIntArrayList mSelfloops;
+  private final UnfoldedUpdateInfo mUnsatisfiesUpdate;
+  private ConstraintPropagator mConstraintPropagator;
+  private EFSMVariableCollector mEFSMVariableCollector;
 
-  private TLongIntHashMap mUnfoldedEventCache;
-  private TLongIntHashMap mKnownAfterValueCache;
-  private UpdateInfo[] mUpdateInfo;
-  private int mSourceShift;
-  private int mTargetShift;
+  private boolean mSourceInfoEnabled;
+  private TIntArrayList mInputSelfloops;
+
   private EFSMVariableContext mRootContext;
-  private UnfoldingVariableContext mUnfoldingVariableContext;
   private EFSMTransitionRelation mInputTransitionRelation;
   private EFSMEventEncoding mInputEventEncoding;
   private EFSMVariable mUnfoldedVariable;
@@ -633,11 +772,22 @@ public class PartialUnfolder extends AbstractEFSMAlgorithm
   private int mReducedRangeSize;
   private int[] mValueToClass;
   private int[] mClassToValue;
+  private int mSourceShift;
+  private int mTargetShift;
+  private InputUpdateInfo[] mInputUpdateInfo;
+  private UnfoldingVariableContext mUnfoldingVariableContext;
+  private Map<ConstraintList,UnfoldedUpdateInfo> mUnfoldedUpdateMap;
+  private TLongObjectHashMap<UnfoldedUpdateInfo> mUnfoldedUpdateCache;
+  private TLongIntHashMap mKnownAfterValueCache;
   private TLongArrayList mUnfoldedStateList;
   private TLongIntHashMap mUnfoldedStateMap;
   private EFSMEventEncoding mUnfoldedEventEncoding;
-  private ConstraintPropagator mConstraintPropagator;
-  private EFSMVariableCollector mEFSMVariableCollector;
+  private ListBufferTransitionRelation mUnfoldedTransitionRelation;
+  private List<ConstraintList> mUnfoldedSelfloops;
+
+
+  //#########################################################################
+  //# Class Constants
 
   private static final int UNSATISFIED_UNFOLDING = -1;
   private static final int UNKNOWN_AFTER_VALUE = -2;

@@ -177,10 +177,6 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
     return mSimplifier;
   }
 
-  List<ConstraintList> getSelfloopedUpdates()
-  {
-    return mSelfloopedUpdates;
-  }
 
   /**
    * Stores statistics in the given list. This method is used to
@@ -192,6 +188,15 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
   public void collectStatistics(final List<TRSimplifierStatistics> list)
   {
     mSimplifier.collectStatistics(list);
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.efsm.AbstractEFSMAlgorithm
+  @Override
+  List<ConstraintList> getSelfloopedUpdates()
+  {
+    return mSelfloopedUpdates;
   }
 
 

@@ -186,8 +186,8 @@ public class EFSMSimplifierStatistics
   //# Providing Statistics
   public void recordStart(final EFSMTransitionRelation efsmTR)
   {
-    final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
     mApplicationCount++;
+    final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
     if (mInputStates >= 0) {
       mInputStates += rel.getNumberOfStates();
       mInputTransitions += rel.getNumberOfTransitions();

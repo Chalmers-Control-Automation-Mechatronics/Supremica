@@ -2,36 +2,32 @@
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
-//# CLASS:   VariableOccurenceVariableSelectionHeuristic
+//# CLASS:   MaxSelfloopVariableSelectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.efsm;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.compiler.context.OccursChecker;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 /**
  * A variable selection heuristic used by the {@link EFSMConflictChecker}.
- * The Variable occurrence heuristics selects the local variable that
- * occurs in the largest number of updates in its EFSM.
+ * This heuristics selects the local variable that with the largest number
+ * of recorded selfloops.
  *
- * @author Sahar Mohajerani, Robi Malik
+ * @author Robi Malik
  */
 
-public class VariableOccurrenceVariableSelectionHeuristic
+public class MaxSelfloopVariableSelectionHeuristic
   extends VariableSelectionHeuristic
 {
 
   //#########################################################################
   //# Constructors
-  public VariableOccurrenceVariableSelectionHeuristic
+  public MaxSelfloopVariableSelectionHeuristic
     (final ModuleProxyFactory factory, final CompilerOperatorTable op)
   {
     super(factory, op);
@@ -44,18 +40,7 @@ public class VariableOccurrenceVariableSelectionHeuristic
   @Override
   public double getHeuristicValue(final EFSMVariable var)
   {
-    final OccursChecker checker = OccursChecker.getInstance();
-    final SimpleExpressionProxy varname = var.getVariableName();
-    final EFSMTransitionRelation efsmTR = var.getTransitionRelation();
-    final EFSMEventEncoding encoding = efsmTR.getEventEncoding();
-    int occurences = 0;
-    for (int e = EventEncoding.NONTAU; e < encoding.size(); e++) {
-      final ConstraintList update = encoding.getUpdate(e);
-      if (checker.occurs(varname, update)) {
-        occurences++;
-      }
-    }
-    return -occurences;
+    return -var.getSelfloops().size();
   }
 
 }

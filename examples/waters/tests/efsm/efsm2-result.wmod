@@ -2,7 +2,7 @@
 <Module Name="efsm2-result" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="tau:efsm2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau:x"/>
     </EventDeclList>
     <ComponentList>
         <VariableComponent Deterministic="false" Name="x">
@@ -19,28 +19,28 @@
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <SimpleComponent Kind="PLANT" Name="efsm2">
-            <Graph Deterministic="false">
+        <SimpleComponent Kind="PLANT" Name="selfloops:x">
+            <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
+                    <SimpleNode Initial="true" Name=":sl">
                         <PointGeometry>
                             <Point X="91" Y="99"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
+                            <Point X="-26" Y="3"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="S0" Target="S0">
+                    <Edge Source=":sl" Target=":sl">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau:efsm2"/>
+                            <SimpleIdentifier Name="tau:x"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="29" Y="-17"/>
+                                <Point X="4" Y="-23"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="61" Y="54"/>
+                            <Point X="146" Y="99"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -55,7 +55,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-27" Y="51"/>
+                                <Point X="6" Y="-4"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>

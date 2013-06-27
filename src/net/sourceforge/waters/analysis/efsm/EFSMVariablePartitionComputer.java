@@ -118,9 +118,11 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
       mRelevantUpdates = new ArrayList<ConstraintList>();
       mMergibleUpdates = new THashSet<ConstraintList>();
       final EFSMTransitionRelation efsmTR = var.getTransitionRelation();
-      final EFSMEventEncoding encoding = efsmTR.getEventEncoding();
-      if (!checkEventEncoding(encoding)) {
-        return null;
+      if (efsmTR != null) {
+        final EFSMEventEncoding encoding = efsmTR.getEventEncoding();
+        if (!checkEventEncoding(encoding)) {
+          return null;
+        }
       }
       final EFSMEventEncoding selfloops = var.getSelfloops();
       if (!checkEventEncoding(selfloops)) {
@@ -138,31 +140,35 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
         }
         final TIntObjectHashMap<List<ConstraintList>> mergedUpdates =
           new TIntObjectHashMap<List<ConstraintList>>();
-        final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
-        final TransitionIterator iter = rel.createAnyReadOnlyIterator();
-        for (int fromState = 0; fromState < rel.getNumberOfStates(); fromState++) {
-          iter.resetState(fromState);
-          mergedUpdates.clear();
-          while (iter.advance()) {
-            final int event = iter.getCurrentEvent();
-            final ConstraintList update = encoding.getUpdate(event);
-            if (mMergibleUpdates.contains(update)) {
-              final int toState = iter.getCurrentToState();
-              List<ConstraintList> list = mergedUpdates.get(toState);
-              if (list == null) {
-                list = new ArrayList<ConstraintList>();
-                mergedUpdates.put(toState, list);
+        if (efsmTR != null) {
+          final EFSMEventEncoding encoding = efsmTR.getEventEncoding();
+          final ListBufferTransitionRelation rel =
+            efsmTR.getTransitionRelation();
+          final TransitionIterator iter = rel.createAnyReadOnlyIterator();
+          for (int fromState = 0; fromState < rel.getNumberOfStates(); fromState++) {
+            iter.resetState(fromState);
+            mergedUpdates.clear();
+            while (iter.advance()) {
+              final int event = iter.getCurrentEvent();
+              final ConstraintList update = encoding.getUpdate(event);
+              if (mMergibleUpdates.contains(update)) {
+                final int toState = iter.getCurrentToState();
+                List<ConstraintList> list = mergedUpdates.get(toState);
+                if (list == null) {
+                  list = new ArrayList<ConstraintList>();
+                  mergedUpdates.put(toState, list);
+                }
+                list.add(update);
               }
-              list.add(update);
+              checkAbort();
             }
-            checkAbort();
-          }
-          final TIntObjectIterator<List<ConstraintList>> hIter =
-            mergedUpdates.iterator();
-          while (hIter.hasNext()) {
-            hIter.advance();
-            final List<ConstraintList> updates = hIter.value();
-            createMergedUpdate(mergedEventEncoding, updates);
+            final TIntObjectIterator<List<ConstraintList>> hIter =
+              mergedUpdates.iterator();
+            while (hIter.hasNext()) {
+              hIter.advance();
+              final List<ConstraintList> updates = hIter.value();
+              createMergedUpdate(mergedEventEncoding, updates);
+            }
           }
         }
         if (selfloops.size() > 0) {

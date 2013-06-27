@@ -141,7 +141,7 @@
                             <Point X="96" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="-20" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -149,6 +149,9 @@
                     <Edge Source="S0" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="13" Y="-16"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
@@ -166,13 +169,16 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="13" Y="-13"/>
+                                <Point X="14" Y="-2"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Source="S0" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="10" Y="-31"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="138" Y="200"/>
@@ -193,7 +199,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="13" Y="-9"/>
+                                <Point X="10" Y="-17"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>

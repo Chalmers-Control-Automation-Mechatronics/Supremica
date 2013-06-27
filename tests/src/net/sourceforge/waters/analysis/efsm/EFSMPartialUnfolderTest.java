@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efsm
-//# CLASS:   PartialUnfolderTest
+//# CLASS:   EFSMPartialUnfolderTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -36,22 +36,22 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
- * A test for the {@link PartialUnfolder}.
+ * A test for the {@link EFSMPartialUnfolder}.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class PartialUnfolderTest
+public class EFSMPartialUnfolderTest
   extends AbstractEFSMTest
 {
 
   //#########################################################################
   //# Overrides for base class junit.framework.TestCase
-  public PartialUnfolderTest()
+  public EFSMPartialUnfolderTest()
   {
   }
 
-  public PartialUnfolderTest(final String name)
+  public EFSMPartialUnfolderTest(final String name)
   {
     super(name);
   }
@@ -62,7 +62,7 @@ public class PartialUnfolderTest
     super.setUp();
     final ModuleProxyFactory factory = getModuleProxyFactory();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    mPartialUnfolder = new PartialUnfolder(factory, optable);
+    mPartialUnfolder = new EFSMPartialUnfolder(factory, optable);
     mPartialUnfolder.setSourceInfoEnabled(true);
     mVariablePartitionComputer =
       new EFSMVariablePartitionComputer(factory, optable);
@@ -118,11 +118,14 @@ public class PartialUnfolderTest
     runPartialUnfolder(module);
   }
 
+  /*
+   * This case is handled by the compiler. No partial unfolding needed.
   public void testUnfolding_4() throws Exception
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unfolding04");
     runPartialUnfolder(module);
   }
+   */
 
   public void testUnfolding_5() throws Exception
   {
@@ -223,8 +226,6 @@ public class PartialUnfolderTest
     throws Exception
   {
     final EFSMSystem system = createEFSMSystem(module, bindings);
-    final EFSMTransitionRelation efsmTransitionRelation =
-      findTR(system, BEFORE);
     final EFSMVariable unfoldedVariable = system.getVariables().get(0);
     final List<int[]> partition;
     if (partitioned) {
@@ -233,8 +234,7 @@ public class PartialUnfolderTest
       partition = null;
     }
     final EFSMTransitionRelation resultTransitionRelation =
-      mPartialUnfolder.unfold(efsmTransitionRelation, unfoldedVariable,
-                              system, partition);
+      mPartialUnfolder.unfold(unfoldedVariable, system, partition);
     saveResult(resultTransitionRelation, system, module);
     SimpleComponentProxy after = findComponent(module, AFTER);
     after = renameForPartition(after, unfoldedVariable, partition);
@@ -331,7 +331,7 @@ public class PartialUnfolderTest
 
   //#########################################################################
   //# Data Members
-  private PartialUnfolder mPartialUnfolder;
+  private EFSMPartialUnfolder mPartialUnfolder;
   private EFSMVariablePartitionComputer mVariablePartitionComputer;
 
 }

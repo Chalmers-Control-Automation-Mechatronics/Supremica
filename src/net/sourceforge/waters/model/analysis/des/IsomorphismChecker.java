@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -187,15 +188,15 @@ public class IsomorphismChecker
         (ObservationEquivalenceTRSimplifier.TransitionRemoval.NONE);
       final boolean result = bisimulator.run();
       if (!result) {
-        if(mThrowingExceptions){
+        if (mThrowingExceptions) {
           throw new IsomorphismException
-          ("Bisimulator did not identify any states!");
+            ("Bisimulator did not identify any states!");
         } else{
           return false;
         }
       }
       final List<int[]> partition = bisimulator.getResultPartition();
-      if(!checkBisimulationPartition(partition, rel, stateEnc)){
+      if (!checkBisimulationPartition(partition, rel, stateEnc)) {
         return false;
       }
     }
@@ -323,13 +324,26 @@ public class IsomorphismChecker
                                              final boolean iso)
     throws IsomorphismException
   {
-    final Collection<EventProxy> events = aut1.getEvents();
+    final Collection<EventProxy> events1 = aut1.getEvents();
+    final Collection<EventProxy> events2 = aut2.getEvents();
+    final Collection<EventProxy> events;
+    if (!iso) {
+      events = createUnionAlphabet(events1, events2);
+    } else if (checkEventSetsEqual(events1, events2)) {
+      events = events1;
+    } else {
+      return null;
+    }
     final Collection<StateProxy> states1 = aut1.getStates();
     final Collection<StateProxy> states2 = aut2.getStates();
     final int numstates1 = states1.size();
     final int numstates2 = states2.size();
     if (iso && numstates1 != numstates2) {
-      throw new IsomorphismException("Different number of states!");
+      if (mThrowingExceptions) {
+        throw new IsomorphismException("Different number of states!");
+      } else {
+        return null;
+      }
     }
     final int numstates = numstates1 + numstates2;
     final Collection<StateProxy> states =
@@ -344,7 +358,11 @@ public class IsomorphismChecker
     final int numtrans2 =
       transitions2.size() + mSelfloops2.size() * states2.size();
     if (iso && numtrans1 != numtrans2) {
-      throw new IsomorphismException("Different number of transitions!");
+      if (mThrowingExceptions) {
+        throw new IsomorphismException("Different number of transitions!");
+      } else {
+        return null;
+      }
     }
     final Collection<TransitionProxy> transitions =
       new ArrayList<TransitionProxy>(numtrans1 + numtrans2);
@@ -402,9 +420,67 @@ public class IsomorphismChecker
       (name, ComponentKind.PLANT, events, states, transitions);
   }
 
+  private boolean checkEventSetsEqual(final Collection<EventProxy> events1,
+                                      final Collection<EventProxy> events2)
+    throws IsomorphismException
+  {
+    if (events1.size() == events2.size()) {
+      if (mMatchingNames) {
+        final int size = events1.size();
+        final Set<String> set = new THashSet<String>(size);
+        for (final EventProxy event : events1) {
+          set.add(event.getName());
+        }
+        for (final EventProxy event : events1) {
+          if (!set.contains(event.getName())) {
+            if (mThrowingExceptions) {
+              throw new IsomorphismException("Event '" + event.getName() +
+                                             "' not in both automata!");
+            } else {
+              return false;
+            }
+          }
+        }
+        return true;
+      } else {
+        final Set<EventProxy> set = new THashSet<EventProxy>(events1);
+        if (set.containsAll(events2)) {
+          return true;
+        } else if (mThrowingExceptions) {
+          for (final EventProxy event : events2) {
+            if (!set.contains(event)) {
+              throw new IsomorphismException("Event '" + event.getName() +
+                                             "' not in both automata!");
+            }
+          }
+        }
+      }
+    } else if (mThrowingExceptions) {
+      throw new IsomorphismException("Different number of events!");
+    }
+    return false;
+  }
+
+  private Collection<EventProxy> createUnionAlphabet
+    (final Collection<EventProxy> events1, final Collection<EventProxy> events2)
+  {
+    final int size = events1.size() + events2.size();
+    final Set<EventProxy> set = new THashSet<EventProxy>(size);
+    set.addAll(events1);
+    final List<EventProxy> list = new ArrayList<EventProxy>(size);
+    list.addAll(events1);
+    for (final EventProxy event2 : events2) {
+      if (set.add(event2)) {
+        final EventProxy event1 = getMappedEvent(event2);
+        list.add(event1);
+      }
+    }
+    return list;
+  }
+
   private void checkIsomorphismPartition(final List<int[]> partition,
-                                          final ListBufferTransitionRelation rel,
-                                          final StateEncoding enc)
+                                         final ListBufferTransitionRelation rel,
+                                         final StateEncoding enc)
     throws IsomorphismException
   {
     // TODO Not a proper isomorphism check. Must also match outgoing
@@ -454,17 +530,15 @@ public class IsomorphismChecker
         }
       }
       if (count[0] != count[1]) {
-        if(mThrowingExceptions){
-          throw new IsomorphismException
-          ("Automata contain non-bisimilar states!");
-        } else{
+        if (mThrowingExceptions) {
+          throw new IsomorphismException("Automata contain non-bisimilar states!");
+        } else {
           return false;
         }
       } else if (initCount[0] != initCount[1]) {
-        if(mThrowingExceptions){
-          throw new IsomorphismException
-          ("Initial states do not match!");
-        } else{
+        if (mThrowingExceptions) {
+          throw new IsomorphismException("Initial states do not match!");
+        } else {
           return false;
         }
       }

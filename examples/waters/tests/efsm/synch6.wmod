@@ -18,7 +18,7 @@
                             <Point X="112" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="10" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -29,7 +29,7 @@
                             <Point X="112" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="8" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -37,6 +37,9 @@
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-15"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
@@ -51,7 +54,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-55" Y="-23"/>
+                                <Point X="-64" Y="-2"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -66,7 +69,7 @@
                             <Point X="80" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="7" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -77,7 +80,7 @@
                             <Point X="80" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="13" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -97,7 +100,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-40" Y="3"/>
+                                <Point X="-43" Y="-5"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -106,12 +109,6 @@
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="after">
             <Graph Deterministic="false">
-                <LabelBlock>
-                    <SimpleIdentifier Name=":accepting"/>
-                    <LabelGeometry Anchor="NW">
-                        <Point X="272" Y="256"/>
-                    </LabelGeometry>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0:S0">
                         <PointGeometry>
@@ -129,9 +126,44 @@
                             <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Name="S1:S0">
+                        <PointGeometry>
+                            <Point X="272" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1:S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="272" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
                     <Edge Source="S0:S0" Target="S0:S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="x"/>
+                                    <SimpleIdentifier Name="y"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="20"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="S1:S0" Target="S1:S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau:after"/>
                         </LabelBlock>
