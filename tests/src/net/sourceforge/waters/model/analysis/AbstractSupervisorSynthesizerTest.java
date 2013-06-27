@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   AbstractSynthesizerTest
+//# CLASS:   AbstractSupervisorSynthesizerTest
 //###########################################################################
 //# $Id: 18f19951f0cf41f83ba1b7a947c558cf6453c57a $
 //###########################################################################
@@ -15,7 +15,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -25,7 +24,6 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -64,7 +62,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *
  * <P>This test class can be subclassed to test different synthesis
  * implementations. The synthesis implementation only needs to implement the
- * {@link ProductDESBuilder} interface to be tested. Monolithic and
+ * {@link SupervisorSynthesizer} interface to be tested. Monolithic and
  * compositional synthesis are both supported.</P>
  *
  * @author Robi Malik
@@ -157,306 +155,275 @@ public abstract class AbstractSupervisorSynthesizerTest
   //# Test Cases --- synthesis
   public void testAip0Sub1P0() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "aip0sub1p0";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "aip0sub1p0.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testAGVMF() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "agv_mf";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "agv_mf.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testBallProcess() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "ball_Process";
-    runSynthesizer(group, subdir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "ball_Process.wmod");
+    runSynthesizer(des, false);
   }
 
   public void testBigFactory() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "big_factory";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "big_factory.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testCatMouse() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "cat_mouse";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "cat_mouse.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testCell() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "cell";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "cell.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testCoffeeMachine() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "coffee_machine";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "coffee_machine.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testDebounce() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "debounce";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "debounce.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testDosingUnit() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "dosing_unit";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "dosing_unit.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testFalko() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "falko";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "falko.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testFTechnik() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "incremental_suite";
-    final String name = "ftechnik";
-    runSynthesizer(group, subdir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "incremental_suite", "ftechnik.wmod");
+    runSynthesizer(des, false);
+  }
+
+  public void testIMS() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "ims", "ims_uncont.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testIPC() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "IPC";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testManufacturingSystem() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "manufacturing_system";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "manufacturing_system.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testManWolf() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "man_wolf";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "man_wolf.wmod");
+    runSynthesizer(des, true);
   }
 
-  public void testNoPlant() throws Exception
+  public void testNoPlant1() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "no_plant";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "no_plant1.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testNoPlant2() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "no_plant2";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "no_plant2.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testNoPlant3() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "no_plant3";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "no_plant3.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testNoPlant4() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "no_plant4";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "no_plant4.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testParrow() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "parrow";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "parrow.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testPathFinder() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "path_finder";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "path_finder.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testPlantify() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "plantify";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "plantify.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testProductionSystem() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "production_system";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "production_system.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testProfessorPen() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "professor_pen";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "professor_pen.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testPV35() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "pv35";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "pv35.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testRobotAssemblyCell() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "robot_assembly_cell";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "robot_assembly_cell.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testSajed() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "sajed";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "sajed.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testSimpleManufacturingSystem() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "simple_manufacturing_system";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "simple_manufacturing_system.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testSmallFactory2() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "small_factory_2";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "small_factory_2.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testSoeCont() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "soe_cont";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "soe_cont.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testSupRed1() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "supred1";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "supred1.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testSupRed2() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "supred2";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "supred2.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testSupRed3() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "supred3";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "supred3.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testTankProcess() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "tank_process";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "tank_process.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testTbedMinsync() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "tbed_minsync";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "tbed_minsync.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testTeleNetwork() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "tele_network";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "tele_network.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testTrafficlights() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "trafficlights";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "trafficlights.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testTransferLine1() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "transferline_1";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "transferline_1.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testTransferLine2() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "transferline_2";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "transferline_2.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testTransferLine3() throws Exception
@@ -466,42 +433,30 @@ public abstract class AbstractSupervisorSynthesizerTest
 
   public void testTictactoe() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "tictactoe";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "tictactoe.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testThreeRobot() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "three_robot";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void test2LinkAlt() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "2linkalt";
-    runSynthesizer(group, subdir, name, true);
-  }
-
-  public void testIMS() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "ims";
-    final String name = "ims_uncont";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "three_robot.wmod");
+    runSynthesizer(des, true);
   }
 
   public void testZeroSup() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "test_zero_sup";
-    runSynthesizer(group, subdir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "test_zero_sup.wmod");
+    runSynthesizer(des, false);
+  }
+
+  public void test2LinkAlt() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "2linkalt.wmod");
+    runSynthesizer(des, true);
   }
 
 
@@ -510,28 +465,25 @@ public abstract class AbstractSupervisorSynthesizerTest
   /* Too slow (20min) for supervisor reduction
   public void testAip0Sub1P1() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "aip0sub1p1";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "aip0sub1p1.wmod");
+    runSynthesizer(des, true);
   }
   */
 
   public void test2LinkAltBatch() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "2linkalt_batch";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "2linkalt_batch.wmod");
+    runSynthesizer(des, true);
   }
 
   /* This one is too big for monolithic synthesis.
   public void testKoordWspSynth() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "koordwsp_synth";
-    runSynthesizer(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "koordwsp_synth.wmod");
+    runSynthesizer(des, true);
   }
   */
 
@@ -540,141 +492,17 @@ public abstract class AbstractSupervisorSynthesizerTest
   //# Parametrised tests
   private void checkTransferline(final int n) throws Exception
   {
-    final String group = "tests";
-    final String subdir = "synthesis";
-    final String name = "transferline_N";
-    final List<ParameterBindingProxy> bindings =
-      new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("N", n);
-    bindings.add(binding);
-    runSynthesizer(group, subdir, name, bindings, true);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    final ProductDESProxy des =
+      getCompiledDES(bindings, "tests", "synthesis", "transferline_N.wmod");
+    runSynthesizer(des, bindings, true);
   }
 
 
   //#########################################################################
-  //# Instantiating and Checking Modules
-  protected void runSynthesizer(final String group,
-                                final String name,
-                                final List<ParameterBindingProxy> bindings,
-                                final boolean expect)
-    throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runSynthesizer(groupdir, name, bindings, expect);
-  }
-
-  protected void runSynthesizer(final String group,
-                                final String subdir,
-                                final String name,
-                                final List<ParameterBindingProxy> bindings,
-                                final boolean expect)
-    throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runSynthesizer(groupdir, subdir, name, bindings, expect);
-  }
-
-  protected void runSynthesizer(final File groupdir,
-                                final String subdir,
-                                final String name,
-                                final List<ParameterBindingProxy> bindings,
-                                final boolean expect)
-    throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
-    runSynthesizer(dir, name, bindings, expect);
-  }
-
-  protected void runSynthesizer(final File dir,
-                                final String name,
-                                final List<ParameterBindingProxy> bindings,
-                                final boolean expect)
-    throws Exception
-  {
-    final String ext = getTestExtension();
-    final File filename = new File(dir, name + ext);
-    runSynthesizer(filename, bindings, expect);
-  }
-
-
-  //#########################################################################
-  //# Checking Instantiated Product DES problems
-  protected void runSynthesizer(final String group,
-                                final String name,
-                                final boolean expect)
-    throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runSynthesizer(groupdir, name, expect);
-  }
-
-  protected void runSynthesizer(final String group,
-                                final String subdir,
-                                final String name,
-                                final boolean expect)
-      throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runSynthesizer(groupdir, subdir, name, expect);
-  }
-
-  protected void runSynthesizer(final File groupdir,
-                                final String subdir,
-                                final String name,
-                                final boolean expect)
-      throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
-    runSynthesizer(dir, name, expect);
-  }
-
-  protected void runSynthesizer(final File dir,
-                                final String name,
-                                final boolean expect)
-    throws Exception
-  {
-    final String ext = getTestExtension();
-    final File filename = new File(dir, name + ext);
-    runSynthesizer(filename, expect);
-  }
-
-  protected void runSynthesizer(final File filename,
-                                final boolean expect)
-    throws Exception
-  {
-    runSynthesizer(filename, (List<ParameterBindingProxy>) null, expect);
-  }
-
-  protected void runSynthesizer(final File filename,
-                                final List<ParameterBindingProxy> bindings,
-                                final boolean expect)
-    throws Exception
-  {
-    mBindings = bindings;
-    final ProductDESProxy des = getCompiledDES(filename, bindings);
-    runSynthesizerWithBindings(des, expect);
-  }
-
-  protected void runSynthesizer(final ProductDESProxy des,
-                                final boolean expect)
-    throws Exception
-  {
-    runSynthesizer(des, null, expect);
-  }
-
-  protected void runSynthesizer(final ProductDESProxy des,
-                                final List<ParameterBindingProxy> bindings,
-                                final boolean expect)
-    throws Exception
-  {
-    mBindings = bindings;
-    runSynthesizerWithBindings(des, expect);
-  }
-
+  //# Simple Access
   protected SupervisorSynthesizer getSynthesizer()
   {
     return mSynthesizer;
@@ -707,32 +535,34 @@ public abstract class AbstractSupervisorSynthesizerTest
     mSynthesizer.setModel(des);
   }
 
-  /**
-   * Returns the extension used for all test files
-   */
-  protected String getTestExtension()
-  {
-    return ".wmod";
-  }
-
 
   //#########################################################################
   //# Testing Procedure
-  protected void runSynthesizerWithBindings(final ProductDESProxy des,
+  protected ProductDESResult runSynthesizer(final ProductDESProxy des,
                                             final boolean expect)
-      throws Exception
+    throws Exception
   {
+    return runSynthesizer(des, null, expect);
+  }
+
+  protected ProductDESResult runSynthesizer(final ProductDESProxy des,
+                                            final List<ParameterBindingProxy> bindings,
+                                            final boolean expect)
+    throws Exception
+  {
+    mBindings = bindings;
     getLogger().info("Checking " + des.getName() + " ...");
     configureSynthesizer(des);
     mSynthesizer.run();
     final ProductDESResult result = mSynthesizer.getAnalysisResult();
     checkResult(des, result, expect);
     getLogger().info("Done " + des.getName());
+    return result;
   }
 
-  private void checkResult(final ProductDESProxy des,
-                           final ProductDESResult result,
-                           final boolean expect)
+  protected void checkResult(final ProductDESProxy des,
+                             final ProductDESResult result,
+                             final boolean expect)
     throws Exception
   {
     if (result.isSatisfied()) {
