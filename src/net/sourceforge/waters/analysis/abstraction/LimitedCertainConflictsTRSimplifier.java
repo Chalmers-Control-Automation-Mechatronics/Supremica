@@ -83,7 +83,8 @@ public class LimitedCertainConflictsTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -108,6 +109,16 @@ public class LimitedCertainConflictsTRSimplifier
   {
     mStateInfo = null;
     super.reset();
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier
+  @Override
+  public boolean isDeadlockAware()
+  {
+    return true;
   }
 
 
@@ -373,7 +384,7 @@ public class LimitedCertainConflictsTRSimplifier
           rel.addTransition(bstate, event, bstate);
         }
       }
-      result |= rel.removeProperSelfLoopEvents();
+      result |= removeProperSelfLoopEvents();
       rel.removeOutgoingTransitions(bstate);
     } else {
       // More than one state of certain conflicts.
@@ -433,7 +444,7 @@ public class LimitedCertainConflictsTRSimplifier
           rel.addTransition(bstate, event, bstate);
         }
       }
-      rel.removeProperSelfLoopEvents();
+      removeProperSelfLoopEvents();
     }
     rel.removeOutgoingTransitions(bstate);
   }

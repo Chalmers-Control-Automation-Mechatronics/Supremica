@@ -1312,7 +1312,7 @@ public class ListBufferTransitionRelation
    */
   public boolean isDeadlockState(final int state, final int prop)
   {
-    if (isMarked(state, prop)) {
+    if (prop < 0 || isMarked(state, prop)) {
       return false;
     } else if (mSuccessorBuffer != null) {
       return !mSuccessorBuffer.hasTransitions(state);

@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -91,7 +91,6 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
   public List<TraceStepProxy> convertTraceSteps(final List<TraceStepProxy> traceSteps)
     throws AnalysisException
   {
-    ///////////////////////////////////////////
     final int config = mSimplifier.getPreferredInputConfiguration();
     final ListBufferTransitionRelation rel = getTransitionRelation();
 

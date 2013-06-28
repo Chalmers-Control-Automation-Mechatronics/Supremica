@@ -73,12 +73,29 @@ public abstract class AbstractTRSimplifier
     mTransitionRelation = rel;
   }
 
+  /**
+   * Sets the marking IDs used by this simplifier.
+   * This method also clears any precondition marking that may have been set.
+   * @param defaultID
+   *          ID of default marking proposition,
+   *          or <CODE>-1</CODE> if unused or not present.
+   */
   @Override
   public void setDefaultMarkingID(final int defaultID)
   {
     setPropositions(-1, defaultID);
   }
 
+  /**
+   * Sets the marking IDs used by this simplifier.
+   * The default implementation does nothing but subclasses may override it.
+   * @param preconditionID
+   *          ID of precondition marking proposition,
+   *          or <CODE>-1</CODE> if unused or not present.
+   * @param defaultID
+   *          ID of default marking proposition,
+   *          or <CODE>-1</CODE> if unused or not present.
+   */
   @Override
   public void setPropositions(final int preconditionID, final int defaultID)
   {

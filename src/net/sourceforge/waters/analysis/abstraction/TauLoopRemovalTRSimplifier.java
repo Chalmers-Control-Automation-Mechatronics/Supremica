@@ -42,8 +42,34 @@ public class TauLoopRemovalTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.
-  //# TransitionRelationSimplifier
+  //# Configuration
+  /**
+   * Sets whether this simplifier should consider deadlock states when
+   * removing selfloops.
+   * @see #isDeadlockAware()
+   */
+  public void setDeadlockAware(final boolean aware)
+  {
+    mDeadlockAware = aware;
+  }
+
+  /**
+   * Gets whether this simplifier considers deadlock states when
+   * removing selfloops. This setting affects how the simplifier checks for
+   * pure selfloop events in the end. If the simplifier is deadlock aware,
+   * then events not enabled in deadlock states can be considered as
+   * selfloop events and removed from the automaton if selflooped in all
+   * other states.
+   */
+  public boolean isDeadlockAware()
+  {
+    return mDeadlockAware;
+  }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public boolean isPartitioning()
   {
@@ -54,6 +80,12 @@ public class TauLoopRemovalTRSimplifier
   public boolean isObservationEquivalentAbstraction()
   {
     return true;
+  }
+
+  @Override
+  public void setPropositions(final int preconditionID, final int defaultID)
+  {
+    mDefaultMarkingID = defaultID;
   }
 
   @Override
@@ -142,7 +174,11 @@ public class TauLoopRemovalTRSimplifier
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
-    rel.removeProperSelfLoopEvents();
+    if (mDeadlockAware && mDefaultMarkingID >= 0) {
+      rel.removeProperSelfLoopEvents(mDefaultMarkingID);
+    } else {
+      rel.removeProperSelfLoopEvents();
+    }
   }
 
 
@@ -190,6 +226,9 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mDeadlockAware = false;
+  private int mDefaultMarkingID = -1;
+
   private int mIndex;
   private int[] mTarjan;
   private int[] mLowLink;

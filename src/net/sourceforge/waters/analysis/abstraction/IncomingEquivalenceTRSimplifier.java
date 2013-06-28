@@ -88,11 +88,22 @@ public class IncomingEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier
+  @Override
+  public boolean isDeadlockAware()
+  {
+    return true;
   }
 
 
@@ -230,7 +241,7 @@ public class IncomingEquivalenceTRSimplifier
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
-    rel.removeProperSelfLoopEvents();
+    removeProperSelfLoopEvents();
   }
 
 
