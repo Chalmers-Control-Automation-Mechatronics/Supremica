@@ -15,10 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
@@ -34,8 +32,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -237,6 +233,7 @@ public class EnabledEventsCompositionalConflictChecker extends
       if(eInfo == null && e.getKind() != EventKind.PROPOSITION)
       {
         autContainsTau = true;
+        break;
       }
     }
 
@@ -246,8 +243,6 @@ public class EnabledEventsCompositionalConflictChecker extends
       //Creates transRelIterator to find dump states
     final KindTranslator translator = getKindTranslator();
     int markingID = -1;
-    final Collection<AutomatonProxy> collection =
-      Collections.singletonList(aut);
     final EventEncoding encoding = new EventEncoding();
     for (final EventProxy event : aut.getEvents()) {
       final EventInfo info = getEventInfo(event);
@@ -256,10 +251,7 @@ public class EnabledEventsCompositionalConflictChecker extends
         if (event == getUsedDefaultMarking()) {
           markingID = code;
         }
-        //super.addEventsToAutomata(aut);
-      } else if (info.isLocal(collection)) {
-        //tau info is always null so this is never reached
-        encoding.addSilentEvent(event);
+        //only looks for dump states if aut has no tau so no silent events
       } else {
         encoding.addEvent(event, translator, (byte)0);
       }
@@ -275,6 +267,7 @@ public class EnabledEventsCompositionalConflictChecker extends
             .isMarked(s, markingID))) {
             //Then s is not a dump state
             autHasBlockingStates = true;
+            break;
           }
         }
       }
@@ -288,17 +281,6 @@ public class EnabledEventsCompositionalConflictChecker extends
    modelList.addAll(getCurrentAutomata());
    modelList.removeAll(candidate.getAutomata());
    modelList.add(aut);
-
-   final List<AutomatonProxy> newModelList = new ArrayList<AutomatonProxy>();
-   //Change automata to automata that find more enabled events
-   //Add self loops of every event to dump states
-   //add in observation equivalent redundant transitions.
-   for(final AutomatonProxy oldAutomata : modelList)
-   {
-    newModelList.add(createAutomatonForAlwaysEnabledEvents(oldAutomata));
-   }
-
-    mChecker.setModel(createProductDESProxy(newModelList));
 
     //for each of the events in aut
     for (final EventProxy event : aut.getEvents()) {
@@ -323,21 +305,66 @@ public class EnabledEventsCompositionalConflictChecker extends
           alwaysEnabledEventsList.add(event);
         }
         else{
+          final List<AutomatonProxy> newModelList = new ArrayList<AutomatonProxy>();
+          //Extend each of the specs to have helpful redundant transitions of this event
+          for(final AutomatonProxy specAut : modelList)
+          {
+            //We don't want to change the plant here
+            if(!specAut.equals(aut))
+            {
+              if(specAut.getEvents().contains(event))
+              {
+                newModelList.add(createAutomatonForAlwaysEnabledEvents(specAut, event));
+              }
+              else
+              {
+                //Add unchanged aut to list
+                newModelList.add(specAut);
+              }
+            } else {
+              newModelList.add(specAut);
+            }
+          }
+
+         mChecker.setModel(createProductDESProxy(newModelList));
         //Set new KindTranslator
         mChecker.setKindTranslator(new KindTranslator() {
           //This event is set to uncontrollable, the rest are controllable
-          @Override
-          public EventKind getEventKind(final EventProxy e)
-          {
-            return e.equals(event) ? EventKind.UNCONTROLLABLE
-              : EventKind.CONTROLLABLE;
-          }
+              @Override
+              public EventKind getEventKind(final EventProxy e)
+              {
+                if (e == event) {
+                  return EventKind.UNCONTROLLABLE;
+                } else {
+                  final KindTranslator parentTranslator = getKindTranslator();
+                  switch (parentTranslator.getEventKind(e)) {
+                  case UNCONTROLLABLE:
+                  case CONTROLLABLE:
+                    return EventKind.CONTROLLABLE;
+                  default:
+                    return EventKind.PROPOSITION;
+                  }
+                }
+              }
 
           //Set aut as plant, the rest as spec
           @Override
           public ComponentKind getComponentKind(final AutomatonProxy a)
           {
-            return a.equals(aut) ? ComponentKind.PLANT : ComponentKind.SPEC;
+            //aut is changed and not in model
+            //a.equals(aut) getName()
+            if (a == aut) {
+              return ComponentKind.PLANT;
+            } else {
+              final KindTranslator parentTranslator = getKindTranslator();
+              switch (parentTranslator.getComponentKind(a)) {
+              case PLANT:
+              case SPEC:
+                return ComponentKind.SPEC;
+              default:
+                return null;
+              }
+            }
           }
         });
 
@@ -366,102 +393,69 @@ public class EnabledEventsCompositionalConflictChecker extends
    *Add self loops of every event to dump states
    *add in observation equivalent redundant transitions.
    */
-  private AutomatonProxy createAutomatonForAlwaysEnabledEvents(final AutomatonProxy aut)
+  private AutomatonProxy createAutomatonForAlwaysEnabledEvents(final AutomatonProxy aut, final EventProxy AEEvent) throws OverflowException
   {
-    final ProductDESProxyFactory factory = getFactory();
-    final Collection<EventProxy> oldevents = aut.getEvents();
-    final int numevents = oldevents.size();
-    final Collection<EventProxy> newevents = new ArrayList<EventProxy>(numevents);
-    //Removes Propositions from the events
-    for (final EventProxy oldevent : oldevents) {
-      if (oldevent.getKind() != EventKind.PROPOSITION) {
-        newevents.add(oldevent);
-      }
-    }
-    final Collection<StateProxy> states = aut.getStates();
-    final int numstates = states.size();
-
-    final Collection<EventProxy> tauEvents = new ArrayList<EventProxy>(numevents);
-    for(final EventProxy event : newevents) {
-      final EnabledEventsEventInfo info = getEventInfo(event);
-      final Collection<AutomatonProxy> collection = Collections.singletonList(aut);
-      if (info == null || info.isLocal(collection)) {
-        tauEvents.add(event);
+    final KindTranslator translator = getKindTranslator();
+    int markingID = -1;
+    final Collection<AutomatonProxy> collection = Collections.singletonList(aut);
+    new EventEncoding(aut, translator);
+    final EventEncoding encoding = new EventEncoding();
+    for (final EventProxy event : aut.getEvents()) {
+      final EventInfo info = getEventInfo(event);
+      if (info == null) {
+        final int code = encoding.addEvent(event, translator, (byte)0);
+        if (event == getUsedDefaultMarking()) {
+          markingID = code;
+        }
+      } else if (info.isLocal(collection)) {
+        encoding.addSilentEvent(event);
+      } else {
+        encoding.addEvent(event, translator, (byte)0);
       }
     }
 
-    final Collection<TransitionProxy> oldtransitions = aut.getTransitions();
-    final int numtrans = oldtransitions.size();
-    final Collection<TransitionProxy> newtransitions =
-        new ArrayList<TransitionProxy>(numstates + numtrans);
+    final int AEEventCode = encoding.getEventCode(AEEvent);
+    boolean automatonChanged = false;
+    //transrel for finding dump states
+    final ListBufferTransitionRelation transrel =
+      new ListBufferTransitionRelation(aut, encoding,
+                                       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final ListBufferTransitionRelation transrelCopy =
+      new ListBufferTransitionRelation(transrel,
+                                       ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final TransitionIterator normalTransIterator = transrel.createSuccessorsReadOnlyIterator();
 
-    newtransitions.addAll(oldtransitions);
-
-    //Add self loops of every event to dump states
-    for(final StateProxy state : states) {
-      boolean dumpState = true;
-     for(final TransitionProxy trans : oldtransitions) {
-      if(trans.getSource().equals(state) && !trans.getTarget().equals(state)) {
-        dumpState = false;
-        break;
-      }
-     }
-     if(dumpState) {
-       for(final EventProxy event : newevents) {
-         //Don't need to add tau self loops
-         if(!tauEvents.contains(event)) {
-         final TransitionProxy newTrans =
-           factory.createTransitionProxy(state, event, state);
-         if(!newtransitions.contains(newTrans))
-           newtransitions.add(newTrans);
-         }
-       }
-     }
-    }
-
-  //Map of tau target states to source states
-    final Map<StateProxy,Collection<StateProxy>> tauStatemap =
-      new HashMap<StateProxy, Collection<StateProxy>>(numstates);
-    for(final TransitionProxy tauTrans : oldtransitions) {
-      for(final EventProxy tauEvent : tauEvents) {
-        if(tauTrans.getEvent().equals(tauEvent)) {
-          Collection<StateProxy> sourceStates = tauStatemap.get(tauTrans);
-          if(sourceStates == null) {
-            sourceStates = new ArrayList<StateProxy>(numstates);
-          }
-          sourceStates.add(tauTrans.getSource());
-          tauStatemap.put(tauTrans.getTarget(), sourceStates);
+    for (int s = 0; s < transrel.getNumberOfStates(); s++) {
+      if (transrel.isReachable(s)) {
+        normalTransIterator.resetState(s);
+        if (!(normalTransIterator.advance() || markingID < 0 || transrel
+          .isMarked(s, markingID))) {
+          //Then s is not a dump state
+          automatonChanged |= transrel.addTransition(s, AEEventCode, s);
+          //System.out.println("Transition added to dump state " + AEEvent.getName());
         }
       }
     }
-    //Add in observation equivalent redundant transitions.
-    for (final TransitionProxy trans : oldtransitions) {
-      AddOERedundantTransitions(trans, newtransitions, tauStatemap);
-    }
+    final TauClosure tauClosure = transrelCopy.createPredecessorsTauClosure(getTransitionLimit());
+    final TransitionIterator tauTransIterator = tauClosure.createIterator();
+    final TransitionIterator eventIterator = transrelCopy.createAllTransitionsReadOnlyIterator(AEEventCode);
 
-    final String autname = aut.getName();
-    final ComponentKind kind = aut.getKind();
-    return factory.createAutomatonProxy(autname, kind, newevents, states, newtransitions);
-  }
-
-  /**
-   *
-   * Adds observationally equivalent transitions to newtransitions based on the tauStateMap
-   *
-   */
-  private void AddOERedundantTransitions(final TransitionProxy trans, final Collection<TransitionProxy> newtransitions, final Map<StateProxy,Collection<StateProxy>> tauStatemap) {
-
-    if(tauStatemap.get(trans.getSource()) != null){
-      for(final StateProxy newSourceState : tauStatemap.get(trans.getSource())) {
-        final TransitionProxy newTrans =
-          getFactory().createTransitionProxy(newSourceState, trans.getEvent(), trans.getTarget());
-        if(!newtransitions.contains(newTrans)) {
-        newtransitions.add(newTrans);
-        //If a new transition was added, new redundant transitions may be possible
-        //AddOERedundantTransitions(newTrans, newtransitions, tauStatemap);
-      }
+    //Add OE redundant event
+    //If this state has an outgoing AEEvent transition
+    while(eventIterator.advance()) {
+      final int s = eventIterator.getCurrentSourceState();
+      tauTransIterator.resetState(s);
+      //then add this transition to source states of incoming tau chains
+      while(tauTransIterator.advance()){
+        automatonChanged |= transrel.addTransition(tauTransIterator.getCurrentSourceState(), AEEventCode, eventIterator.getCurrentTargetState());
+        //System.out.println("redundant event added " + AEEvent.getName());
       }
     }
+    //If the automaton was not changed, don't create a new one.
+    if(automatonChanged)
+    return transrel.createAutomaton(getFactory(), encoding);
+    else
+      return aut;
   }
 
   @Override
