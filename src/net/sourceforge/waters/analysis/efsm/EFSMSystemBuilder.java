@@ -82,6 +82,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
     mTrueGuard = new ConstraintList();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
+    mEFSMVariableFinder = new EFSMVariableFinder(mOperatorTable);
     mInputModule = module;
     final String moduleName = module.getName();
     mVariableContext = new EFSMVariableContext(module, mOperatorTable);
@@ -395,72 +396,19 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
         final GraphProxy graph = comp.getGraph();
         visitGraphProxy(graph);
         ListBufferTransitionRelation rel = createTransitionRelation(comp);
-        if (mIsOptimizationEnabled) {
-          rel.removeRedundantPropositions();
+        if (simplifyTransitionRelation(rel)) {
+          if (mEventEncoding.size() <= 1 && !mUsesMarking) {
+            return null;
+          }
+          rel = createTransitionRelation(comp);
         }
-        if (rel.isUsedProposition(0) && !mMarkedVariables.isEmpty()) {
+        if (mUsesMarking && !mMarkedVariables.isEmpty()) {
           // Throw an exception because markings in variables and
           // automata together are not yet supported.
           final EFSMVariable var = mMarkedVariables.get(0);
           final SharedEventException exception =
             new SharedEventException(mDefaultMarking, comp, var.getComponent());
-          throw new VisitorException(exception);
-        }
-        if (mIsOptimizationEnabled) {
-          final boolean hasUnreachableStates = rel.checkReachability();
-          if (hasUnreachableStates) {
-            final int newNumStates = rel.getNumberOfReachableStates();
-            final TObjectIntHashMap<SimpleNodeProxy> newStateMap =
-              new TObjectIntHashMap<SimpleNodeProxy>(newNumStates,
-                                                     0.5f, -1);
-            final List<SimpleNodeProxy> newNodeList;
-            if (mNodeList == null) {
-              newNodeList = null;
-            } else {
-              newNodeList = new ArrayList<SimpleNodeProxy>(newNumStates);
-            }
-            int newCode = 0;
-            for (final NodeProxy node : graph.getNodes()) {
-              if (node instanceof SimpleNodeProxy) {
-                final SimpleNodeProxy simple = (SimpleNodeProxy)node;
-                final int oldCode = mStateMap.get(simple);
-                if (rel.isReachable(oldCode)) {
-                  newStateMap.put(simple, newCode);
-                  newCode ++;
-                  if (newNodeList != null) {
-                    newNodeList.add(simple);
-                  }
-                }
-              }
-            }
-            final int oldNumEvents= mEventEncoding.size();
-            int newNumEvents = 1;
-            final boolean[] usedEvents = new boolean[oldNumEvents];
-            usedEvents[EventEncoding.TAU] = true;
-            final TransitionIterator iter =
-              rel.createAllTransitionsReadOnlyIterator();
-            while (iter.advance()) {
-              checkAbortInVisitor();
-              final int currentEvent = iter.getCurrentEvent();
-              if (!usedEvents[currentEvent]) {
-                newNumEvents ++;
-                usedEvents[currentEvent] = true;
-              }
-            }
-            final EFSMEventEncoding newEncoding =
-              new EFSMEventEncoding(newNumEvents);
-            for (int i = 0; i < oldNumEvents; i++) {
-              if (usedEvents[i]) {
-                final ConstraintList update = mEventEncoding.getUpdate(i);
-                newEncoding.createEventId(update);
-              }
-            }
-            mEventEncoding = newEncoding;
-            mStateMap = newStateMap;
-            mNodeList = newNodeList;
-            rel = createTransitionRelation(comp);
-            rel.removeRedundantPropositions();
-          }
+          throw wrap(exception);
         }
         final Collection<EFSMVariable> variables = new THashSet<EFSMVariable>();
         mEFSMVariableCollector.collectAllVariables(mEventEncoding, variables);
@@ -471,6 +419,10 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
         return efsmTransitionRelation;
       } catch (final AnalysisException exception) {
         throw wrap(exception);
+      } finally {
+        mEventEncoding = null;
+        mStateMap = null;
+        mNodeList = null;
       }
     }
 
@@ -585,6 +537,9 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
                                          numProps,
                                          mStateMap.size(),
                                          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      if (mIsOptimizationEnabled) {
+        mEventEncoding.setSelfloops(rel, mEFSMVariableFinder);
+      }
       final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
       while (iter.hasNext()) {
         iter.advance();
@@ -607,13 +562,13 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
         if (simplifiedList == null) {
           continue;
         }
+        final int event = mEventEncoding.getEventId(simplifiedList);
+        if (event < 0) {
+          continue;
+        }
         final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
         final int sourceState = mStateMap.get(source);
         if (sourceState < 0) {
-          continue;
-        }
-        final int event = mEventEncoding.getEventId(simplifiedList);
-        if (event < 0) {
           continue;
         }
         final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
@@ -623,16 +578,138 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
       return rel;
     }
 
+    private boolean simplifyTransitionRelation
+      (final ListBufferTransitionRelation rel)
+    {
+      if (mIsOptimizationEnabled) {
+        // 1. Check reachability
+        final boolean hasUnreachableStates = checkReachability(rel);
+        // 2. Check for unused events or selfloops
+        final boolean hasRemovableEvents = removeRedundantEvents(rel);
+        // 3. Check for redundant propositions
+        if (rel.removeRedundantPropositions()) {
+          mUsesMarking = rel.isUsedProposition(0);
+        }
+        return hasUnreachableStates || hasRemovableEvents;
+      } else {
+        return false;
+      }
+    }
+
+    private boolean checkReachability(final ListBufferTransitionRelation rel)
+    {
+      if (rel.checkReachability()) {
+        final int numStates = rel.getNumberOfStates();
+        final int[] newCodes = new int[numStates];
+        final List<SimpleNodeProxy> newNodeList;
+        if (mNodeList == null) {
+          newNodeList = null;
+        } else {
+          newNodeList = new ArrayList<SimpleNodeProxy>(numStates);
+        }
+        int newCode = 0;
+        for (int s = 0; s < numStates; s++) {
+          if (rel.isReachable(s)) {
+            newCodes[s] = newCode++;
+            if (newNodeList != null) {
+              final SimpleNodeProxy node = mNodeList.get(s);
+              newNodeList.add(node);
+            }
+          } else {
+            newCodes[s] = -1;
+          }
+        }
+        final TObjectIntHashMap<SimpleNodeProxy> newStateMap =
+          new TObjectIntHashMap<SimpleNodeProxy>(numStates, 0.5f, -1);
+        final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
+        while (iter.hasNext()) {
+          iter.advance();
+          final int s = iter.value();
+          newCode = newCodes[s];
+          if (newCode >= 0) {
+            final SimpleNodeProxy node = iter.key();
+            newStateMap.put(node, newCode);
+          }
+        }
+        mStateMap = newStateMap;
+        mNodeList = newNodeList;
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    private boolean removeRedundantEvents(final ListBufferTransitionRelation rel)
+    {
+      final int oldNumEvents = rel.getNumberOfProperEvents();
+      final boolean[] usedEvents = new boolean[oldNumEvents];
+      final int[] selfloops = new int[oldNumEvents];
+      final TransitionIterator iter =
+        rel.createAllTransitionsReadOnlyIterator();
+      while (iter.advance()) {
+        final int event = iter.getCurrentEvent();
+        if (event != EventEncoding.TAU) {
+          final int source = iter.getCurrentSourceState();
+          if (rel.isReachable(source)) {
+            usedEvents[event] = true;
+            if (selfloops[event] >= 0) {
+              final int target = iter.getCurrentTargetState();
+              if (source == target) {
+                selfloops[event]++;
+              } else {
+                selfloops[event] = -1;
+              }
+            }
+          }
+        }
+      }
+      final int numReachable = mStateMap.size();
+      int newNumEvents = 1;
+      boolean hasRemovableEvents = false;
+      for (int e = EventEncoding.NONTAU; e < oldNumEvents; e++) {
+        if (!usedEvents[e]) {
+          hasRemovableEvents = true;
+        } else if (selfloops[e] == numReachable) {
+          usedEvents[e] = false;
+          hasRemovableEvents = true;
+          final ConstraintList update = mEventEncoding.getUpdate(e);
+          final int numVars = mResultEFSMSystem.getVariables().size();
+          final List<EFSMVariable> vars =
+            new ArrayList<EFSMVariable>(numVars);
+          mEFSMVariableCollector.collectAllVariables(update, vars);
+          for (final EFSMVariable var : vars) {
+            var.addSelfloop(update);
+          }
+        } else {
+          newNumEvents++;
+        }
+      }
+      if (hasRemovableEvents) {
+        usedEvents[EventEncoding.TAU] = true;
+        final EFSMEventEncoding newEncoding =
+          new EFSMEventEncoding(newNumEvents);
+        for (int e = 0; e < oldNumEvents; e++) {
+          if (usedEvents[e]) {
+            final ConstraintList update = mEventEncoding.getUpdate(e);
+            newEncoding.createEventId(update);
+          }
+        }
+        mEventEncoding = newEncoding;
+      }
+      return hasRemovableEvents;
+    }
+
     //#######################################################################
     //# Data Members
-    private final EFAGuardCompiler mGuardCompiler;
-    private final ConstraintPropagator mConstraintPropagator;
     private EFSMEventEncoding mEventEncoding;
-    private ProxyAccessorMap<GuardActionBlockProxy,ConstraintList>
-      mSimplifiedGuardActionBlockMap;
     private TObjectIntHashMap<SimpleNodeProxy> mStateMap;
     private List<SimpleNodeProxy> mNodeList;
     private boolean mUsesMarking;
+    private ProxyAccessorMap<GuardActionBlockProxy,ConstraintList>
+      mSimplifiedGuardActionBlockMap;
+
+    private final EFAGuardCompiler mGuardCompiler;
+    private final ConstraintPropagator mConstraintPropagator;
     private final EFSMVariableCollector mEFSMVariableCollector;
   }
 
@@ -641,12 +718,14 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
-  private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-  private final ModuleProxy mInputModule;
-  private IdentifierProxy mDefaultMarking;
-  private boolean mIsOptimizationEnabled;
+  private final EFSMVariableFinder mEFSMVariableFinder;
+  private final ConstraintList mTrueGuard;
 
+  private boolean mIsOptimizationEnabled;
+  private IdentifierProxy mDefaultMarking;
+
+  private final ModuleProxy mInputModule;
   private final EFSMVariableContext mVariableContext;
   private final List<EFSMVariable> mMarkedVariables;
   private final List<SimpleExpressionProxy> mVariableMarkingPredicates;

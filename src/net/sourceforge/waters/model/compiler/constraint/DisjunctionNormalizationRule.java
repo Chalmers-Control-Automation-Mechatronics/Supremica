@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Constraint Propagator
 //# PACKAGE: net.sourceforge.waters.model.compiler.constraint
 //# CLASS:   DisjunctionNormalizationRule
 //###########################################################################
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
@@ -22,8 +23,8 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -54,7 +55,9 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * </PRE>
  *
  * <P>Both rules ensure that disjuncts are ordered according to expression
- * ordering and process nested negations. Duplicates are also removed.</P>
+ * ordering and process nested negations. Duplicates are removed.
+ * Furthermore, the law of excluded middle is applied, simplifying a
+ * disjunction containing complementary subformulas to true.</P>
  *
  * @author Robi Malik
  */
@@ -108,6 +111,7 @@ class DisjunctionNormalizationRule extends SimplificationRule
 
   //#########################################################################
   //# Invocation Interface
+  @Override
   boolean match(final SimpleExpressionProxy constraint,
                 final ConstraintPropagator propagator)
     throws EvalException
@@ -121,26 +125,30 @@ class DisjunctionNormalizationRule extends SimplificationRule
   }
 
 
+  @Override
   boolean isMakingReplacement()
   {
     return true;
   }
 
+  @Override
   void execute(final ConstraintPropagator propagator)
   {
-    final Comparator<SimpleExpressionProxy> comparator =
-      propagator.getListComparator();
-    Collections.sort(mList, comparator);
-    final ModuleProxyFactory factory = propagator.getFactory();
-    final CompilerOperatorTable optable = propagator.getOperatorTable();
-    final BinaryOperator op = optable.getOrOperator();
-    final Iterator<SimpleExpressionProxy> iter = mList.iterator();
-    SimpleExpressionProxy result = iter.next();
-    while (iter.hasNext()) {
-      final SimpleExpressionProxy rhs = iter.next();
-      result = factory.createBinaryExpressionProxy(op, result, rhs);
+    if (!mList.isEmpty()) {
+      final Comparator<SimpleExpressionProxy> comparator =
+        propagator.getListComparator();
+      Collections.sort(mList, comparator);
+      final ModuleProxyFactory factory = propagator.getFactory();
+      final CompilerOperatorTable optable = propagator.getOperatorTable();
+      final BinaryOperator op = optable.getOrOperator();
+      final Iterator<SimpleExpressionProxy> iter = mList.iterator();
+      SimpleExpressionProxy result = iter.next();
+      while (iter.hasNext()) {
+        final SimpleExpressionProxy rhs = iter.next();
+        result = factory.createBinaryExpressionProxy(op, result, rhs);
+      }
+      propagator.addConstraint(result);
     }
-    propagator.addConstraint(result);
   }
 
 
@@ -156,7 +164,9 @@ class DisjunctionNormalizationRule extends SimplificationRule
     {
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
-      mLiterals = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
+      mAllLiterals = new LinkedList<SimpleExpressionProxy>();
+      mPositiveLiterals = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
+      mNegativeLiterals = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
     }
 
     //#######################################################################
@@ -167,15 +177,18 @@ class DisjunctionNormalizationRule extends SimplificationRule
     {
       try {
         mPropagator = propagator;
+        mTrueDisjunction = false;
         mNegated = false;
         mHasModifications = false;
         mInRHS = false;
         mPrevious = null;
         expr.acceptVisitor(this);
-        if (mHasModifications) {
-          return new ArrayList<SimpleExpressionProxy>(mLiterals.values());
-        } else {
+        if (!mHasModifications) {
           return null;
+        } else if (mTrueDisjunction) {
+          return Collections.emptyList();
+        } else {
+          return new ArrayList<SimpleExpressionProxy>(mAllLiterals);
         }
       } catch (final VisitorException exception) {
         final Throwable cause = exception.getCause();
@@ -185,7 +198,9 @@ class DisjunctionNormalizationRule extends SimplificationRule
           throw exception.getRuntimeException();
         }
       } finally {
-        mLiterals.clear();
+        mAllLiterals.clear();
+        mPositiveLiterals.clear();
+        mNegativeLiterals.clear();
         mPrevious = null;
       }
     }
@@ -193,6 +208,7 @@ class DisjunctionNormalizationRule extends SimplificationRule
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
       throws VisitorException
     {
@@ -209,62 +225,94 @@ class DisjunctionNormalizationRule extends SimplificationRule
         mHasModifications |= mInRHS;
         final SimpleExpressionProxy lhs = expr.getLeft();
         lhs.acceptVisitor(this);
-        mInRHS = true;
-        final SimpleExpressionProxy rhs = expr.getRight();
-        rhs.acceptVisitor(this);
-        mInRHS = false;
+        if (!mTrueDisjunction) {
+          mInRHS = true;
+          final SimpleExpressionProxy rhs = expr.getRight();
+          rhs.acceptVisitor(this);
+          mInRHS = false;
+        }
         return null;
       } else {
         return visitSimpleExpressionProxy(expr);
       }
     }
 
+    @Override
     public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
       throws VisitorException
     {
       try {
         final SimpleExpressionProxy norm =
           mPropagator.getNormalisedLiteral(expr, mNegated);
-        if (mLiterals.addProxy(norm)) {
-          if (mPrevious != null) {
-            final Comparator<SimpleExpressionProxy> comparator =
-              mPropagator.getListComparator();
-            mHasModifications |= comparator.compare(mPrevious, norm) > 0;
-          }
-          mPrevious = norm;
-        } else {
-          mHasModifications = true;
-        }
+        addLiteral(norm);
         return null;
       } catch (final EvalException exception) {
         throw wrap(exception);
       }
     }
 
+    @Override
     public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
       throws VisitorException
     {
-      final CompilerOperatorTable optable = mPropagator.getOperatorTable();
-      if (expr.getOperator() == optable.getNotOperator()) {
+      final CompilerOperatorTable opTable = mPropagator.getOperatorTable();
+      final SimpleExpressionProxy negTerm = opTable.getNegatedSubterm(expr);
+      if (negTerm == null) {
+        return visitSimpleExpressionProxy(expr);
+      } else {
         final boolean negated = mNegated;
         mHasModifications |= negated;
         try {
           mNegated = !mNegated;
-          final SimpleExpressionProxy subterm = expr.getSubTerm();
-          return subterm.acceptVisitor(this);
+          return negTerm.acceptVisitor(this);
         } finally {
           mNegated = negated;
         }
-      } else {
-        return visitSimpleExpressionProxy(expr);
       }
     }
 
     //#######################################################################
+    //# Auxiliary Methods
+    private void addLiteral(final SimpleExpressionProxy expr)
+    {
+      final CompilerOperatorTable opTable = mPropagator.getOperatorTable();
+      final SimpleExpressionProxy negTerm = opTable.getNegatedSubterm(expr);
+      if (negTerm == null) {
+        if (mNegativeLiterals.containsProxy(expr)) {
+          mTrueDisjunction = mHasModifications = true;
+          mAllLiterals.clear();
+          return;
+        } else if (!mPositiveLiterals.addProxy(expr)) {
+          mHasModifications = true;
+          return;
+        }
+      } else {
+        if (mPositiveLiterals.containsProxy(negTerm)) {
+          mTrueDisjunction = mHasModifications = true;
+          mAllLiterals.clear();
+          return;
+        } else if (!mNegativeLiterals.addProxy(negTerm)) {
+          mHasModifications = true;
+          return;
+        }
+      }
+      mAllLiterals.add(expr);
+      if (mPrevious != null && !mHasModifications) {
+        final Comparator<SimpleExpressionProxy> comparator =
+          mPropagator.getListComparator();
+        mHasModifications = comparator.compare(mPrevious, expr) > 0;
+      }
+      mPrevious = expr;
+    }
+
+    //#######################################################################
     //# Data Members
-    private final ProxyAccessorSet<SimpleExpressionProxy> mLiterals;
+    private final List<SimpleExpressionProxy> mAllLiterals;
+    private final ProxyAccessorSet<SimpleExpressionProxy> mPositiveLiterals;
+    private final ProxyAccessorSet<SimpleExpressionProxy> mNegativeLiterals;
 
     private ConstraintPropagator mPropagator;
+    private boolean mTrueDisjunction;
     private boolean mHasModifications;
     private boolean mNegated;
     private boolean mInRHS;

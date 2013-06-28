@@ -22,247 +22,609 @@ This is the uncontrollable version without repair specification.</ns2:Comment>
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
+                        <PointGeometry>
+                            <Point X="72" Y="56"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="q1"/>
-                    <SimpleNode Name="q10"/>
-                    <SimpleNode Name="q11"/>
-                    <SimpleNode Name="q12"/>
-                    <SimpleNode Name="q13"/>
-                    <SimpleNode Name="q14"/>
-                    <SimpleNode Name="q15"/>
-                    <SimpleNode Name="q16"/>
-                    <SimpleNode Name="q17"/>
+                    <SimpleNode Name="q1">
+                        <PointGeometry>
+                            <Point X="77" Y="161"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q10">
+                        <PointGeometry>
+                            <Point X="131" Y="98"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q11">
+                        <PointGeometry>
+                            <Point X="203" Y="136"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q12">
+                        <PointGeometry>
+                            <Point X="399" Y="163"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q13">
+                        <PointGeometry>
+                            <Point X="317" Y="165"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q14">
+                        <PointGeometry>
+                            <Point X="373" Y="220"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q15">
+                        <PointGeometry>
+                            <Point X="301" Y="134"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q16">
+                        <PointGeometry>
+                            <Point X="256" Y="111"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q17">
+                        <PointGeometry>
+                            <Point X="296" Y="190"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Name="q2">
-                        <EventList>
-                            <SimpleIdentifier Name=":forbidden"/>
-                        </EventList>
+                        <PointGeometry>
+                            <Point X="391" Y="121"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="q3"/>
+                    <SimpleNode Name="q3">
+                        <PointGeometry>
+                            <Point X="58" Y="126"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Name="q4">
-                        <EventList>
-                            <SimpleIdentifier Name=":forbidden"/>
-                        </EventList>
+                        <PointGeometry>
+                            <Point X="328" Y="113"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="q5"/>
+                    <SimpleNode Name="q5">
+                        <PointGeometry>
+                            <Point X="154" Y="165"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Name="q6">
-                        <EventList>
-                            <SimpleIdentifier Name=":forbidden"/>
-                        </EventList>
+                        <PointGeometry>
+                            <Point X="373" Y="181"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="q7"/>
-                    <SimpleNode Name="q8"/>
-                    <SimpleNode Name="q9"/>
+                    <SimpleNode Name="q7">
+                        <PointGeometry>
+                            <Point X="82" Y="91"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q8">
+                        <PointGeometry>
+                            <Point X="158" Y="78"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q9">
+                        <PointGeometry>
+                            <Point X="147" Y="131"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
                     <Edge Source="q0" Target="q10">
                         <LabelBlock>
                             <SimpleIdentifier Name="start1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="97" Y="69"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q1" Target="q3">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="55" Y="149"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q1" Target="q7">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="72" Y="129"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q10" Target="q16">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="192" Y="98"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q10" Target="q3">
                         <LabelBlock>
                             <SimpleIdentifier Name="break1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="86" Y="111"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q11" Target="q10">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="166" Y="114"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q11" Target="q17">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="247" Y="173"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q11" Target="q5">
                         <LabelBlock>
                             <SimpleIdentifier Name="break1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="178" Y="159"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q11" Target="q9">
                         <LabelBlock>
                             <SimpleIdentifier Name="break2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="173" Y="137"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q12" Target="q13">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Source="q12" Target="q15">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="359" Y="146"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q13" Target="q16">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="286" Y="140"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q13" Target="q5">
                         <LabelBlock>
                             <SimpleIdentifier Name="start2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="235" Y="177"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q14" Target="q12">
                         <LabelBlock>
                             <SimpleIdentifier Name="break2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="400" Y="199"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q14" Target="q13">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="349" Y="201"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q14" Target="q17">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="336" Y="218"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q15" Target="q16">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="280" Y="117"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q15" Target="q2">
                         <LabelBlock>
                             <SimpleIdentifier Name="start1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="352" Y="123"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q16" Target="q4">
                         <LabelBlock>
                             <SimpleIdentifier Name="start1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="296" Y="100"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q16" Target="q8">
                         <LabelBlock>
                             <SimpleIdentifier Name="start2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="209" Y="82"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q17" Target="q15">
                         <LabelBlock>
                             <SimpleIdentifier Name="break2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="296" Y="166"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q17" Target="q16">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="273" Y="156"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q17" Target="q6">
                         <LabelBlock>
                             <SimpleIdentifier Name="start1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="337" Y="196"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q2" Target="q12">
                         <LabelBlock>
                             <SimpleIdentifier Name="break1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="409" Y="139"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q2" Target="q4">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="367" Y="107"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q3" Target="q0">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="50" Y="86"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q4" Target="q11">
                         <LabelBlock>
                             <SimpleIdentifier Name="start2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="269" Y="119"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q4" Target="q13">
                         <LabelBlock>
                             <SimpleIdentifier Name="break1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="329" Y="136"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q5" Target="q1">
                         <LabelBlock>
                             <SimpleIdentifier Name="break2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="110" Y="175"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q5" Target="q3">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="97" Y="152"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q5" Target="q8">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="160" Y="119"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q6" Target="q14">
                         <LabelBlock>
                             <SimpleIdentifier Name="break1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="381" Y="207"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q6" Target="q2">
                         <LabelBlock>
                             <SimpleIdentifier Name="break2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="390" Y="149"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q6" Target="q4">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="358" Y="145"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q7" Target="q0">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="68" Y="68"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q7" Target="q9">
                         <LabelBlock>
                             <SimpleIdentifier Name="start1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="107" Y="112"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q8" Target="q0">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="112" Y="53"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q8" Target="q11">
                         <LabelBlock>
                             <SimpleIdentifier Name="start1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="184" Y="100"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q8" Target="q7">
                         <LabelBlock>
                             <SimpleIdentifier Name="break2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="116" Y="73"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q9" Target="q1">
                         <LabelBlock>
                             <SimpleIdentifier Name="break1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="107" Y="153"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q9" Target="q10">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="134" Y="114"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="q9" Target="q15">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="223" Y="126"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

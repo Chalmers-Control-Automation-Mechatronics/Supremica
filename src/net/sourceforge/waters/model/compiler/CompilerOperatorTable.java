@@ -292,6 +292,26 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Checks whether the given expression is a not-expression.
+   * @param   expr    The expression to be checked.
+   * @return  If the given expression is a not-expression, its subterm is
+   *          returned, otherwise <CODE>null</CODE> is returned.
+   */
+  public SimpleExpressionProxy getNegatedSubterm(final SimpleExpressionProxy expr)
+  {
+    if (expr instanceof UnaryExpressionProxy) {
+      final UnaryExpressionProxy unary = (UnaryExpressionProxy) expr;
+      if (unary.getOperator() == mNotOperator) {
+        return unary.getSubTerm();
+      }
+    }
+    return null;
+  }
+
+
+  //#########################################################################
   //# Inner Class AbstractBinaryOperator
   /**
    * The abstract type of all binary operators whose parse result is

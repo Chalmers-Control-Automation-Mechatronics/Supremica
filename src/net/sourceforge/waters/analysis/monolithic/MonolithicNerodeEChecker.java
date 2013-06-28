@@ -8,11 +8,12 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.set.hash.THashSet;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.sd.NerodeDiagnostics;
@@ -25,13 +26,13 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.TraceStepProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -80,6 +81,7 @@ public class MonolithicNerodeEChecker
    *         net.sourceforge.waters.model.analysis.des.ModelVerifier#isSatisfied()
    *         isSatisfied()} method.
    */
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -399,6 +401,7 @@ public class MonolithicNerodeEChecker
   }
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -432,6 +435,7 @@ public class MonolithicNerodeEChecker
 
   //#########################################################################
   //# Algorithm
+  @Override
   protected void setUp()
     throws AnalysisException
   {
@@ -731,7 +735,7 @@ public class MonolithicNerodeEChecker
    *         property is satisfied and there is no counterexample.
    */
   private SafetyTraceProxy computeCounterExample()
-    throws AnalysisAbortException
+    throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
@@ -791,10 +795,13 @@ public class MonolithicNerodeEChecker
       (tracename, comment, null, des, null, steps);
     return trace;
   }
-// Computation for the second counterexample...
- //  This is to be used by the Modular checker
+
+  /**
+   * Computation for the second counterexample...
+   * This is to be used by the Modular checker.
+   */
   private SafetyTraceProxy computeCounterExample2()
-      throws AnalysisAbortException
+      throws AnalysisAbortException, OverflowException
     {
       final ProductDESProxyFactory factory = getFactory();
       final ProductDESProxy des = getModel();

@@ -19,7 +19,7 @@ abstract class VariableSelectionHeuristic
   {
     mFactory = factory;
     mOperatorTable = op;
-    mUnfolder = new PartialUnfolder(factory, op);
+    mUnfolder = new EFSMPartialUnfolder(factory, op);
   }
 
 
@@ -79,8 +79,7 @@ abstract class VariableSelectionHeuristic
     if (cached != null) {
       return cached;
     } else {
-      final EFSMTransitionRelation unfolded =
-        mUnfolder.unfold(var.getTransitionRelation(), var, mSystem);
+      final EFSMTransitionRelation unfolded = mUnfolder.unfold(var, mSystem);
       mUnfoldingCache.put(var, unfolded);
       return unfolded;
     }
@@ -96,7 +95,7 @@ abstract class VariableSelectionHeuristic
 
   //#########################################################################
   //# Data Members
-  private final PartialUnfolder mUnfolder;
+  private final EFSMPartialUnfolder mUnfolder;
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private EFSMSystem mSystem;

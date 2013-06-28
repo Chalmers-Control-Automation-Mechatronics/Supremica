@@ -22,7 +22,9 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -72,6 +74,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
   @Override
   public List<TraceStepProxy> convertTraceSteps
     (final List<TraceStepProxy> traceSteps)
+    throws AnalysisAbortException, OverflowException
   {
     final List<SearchRecord> crucialSteps = getCrucialSteps(traceSteps);
     final List<SearchRecord> convertedSteps =
@@ -85,6 +88,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
   //# Auxiliary Methods
   private List<SearchRecord> convertCrucialSteps
     (final List<SearchRecord> crucialSteps)
+    throws AnalysisAbortException, OverflowException
   {
     final List<SearchRecord> foundSteps = new LinkedList<SearchRecord>();
     int state = -1;
@@ -123,7 +127,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
    *         class. Events in the list can only be tau or the given event.
    */
   private SearchRecord convertCrucialStep(final int originalSource,
-                                          final SearchRecord crucialStep)
+                                          final SearchRecord crucialStep) throws AnalysisAbortException, OverflowException
   {
     final int targetClass = crucialStep.getState();
     setupTarget(targetClass);
@@ -157,6 +161,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
       final SearchRecord dummy = new SearchRecord(-1);
       final int numStates = rel.getNumberOfStates();
       for (int state = 0; state < numStates; state++) {
+        checkAbort();
         if (rel.isInitial(state)) {
           final SearchRecord record;
           if (crucialEvent == tau) {
@@ -174,6 +179,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
     }
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
     while (true) {
+      checkAbort();
       final SearchRecord current = open.remove();
       final int source = current.getState();
       final int depth = current.getDepth();

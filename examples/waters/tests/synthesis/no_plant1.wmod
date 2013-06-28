@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="no_plant" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="no_plant1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A synthesis test that involves an uncontrollable event not in any plant.
 This test assumes that uncontrollable events not explicitly in the plant are always enabled.</ns2:Comment>
     <EventDeclList>
@@ -17,13 +17,13 @@ This test assumes that uncontrollable events not explicitly in the plant are alw
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="48" X="64"/>
+                            <Point X="64" Y="48"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="0" X="-57"/>
+                            <Point X="-57" Y="0"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-21" X="-8"/>
+                            <Point X="-8" Y="-21"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -31,34 +31,34 @@ This test assumes that uncontrollable events not explicitly in the plant are alw
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="144" X="64"/>
+                            <Point X="64" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="2"/>
+                            <Point X="2" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
                         <PointGeometry>
-                            <Point Y="144" X="160"/>
+                            <Point X="160" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="9" X="-7"/>
+                            <Point X="-7" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S3">
                         <PointGeometry>
-                            <Point Y="48" X="160"/>
+                            <Point X="160" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-21" X="-7"/>
+                            <Point X="-7" Y="-21"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
                         <PointGeometry>
-                            <Point Y="144" X="256"/>
+                            <Point X="256" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-8"/>
+                            <Point X="-8" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S5">
@@ -66,70 +66,70 @@ This test assumes that uncontrollable events not explicitly in the plant are alw
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="240" X="64"/>
+                            <Point X="64" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="3" X="5"/>
+                            <Point X="5" Y="3"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="u"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-10" X="6"/>
+                                <Point X="6" Y="-10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S2" Source="S1">
+                    <Edge Source="S1" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-7"/>
+                                <Point X="-7" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S3" Source="S2">
+                    <Edge Source="S2" Target="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="7"/>
+                                <Point X="7" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S0" Source="S3">
+                    <Edge Source="S3" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="u"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-6"/>
+                                <Point X="-6" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S4" Source="S2">
+                    <Edge Source="S2" Target="S4">
                         <LabelBlock>
                             <SimpleIdentifier Name="u"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-10"/>
+                                <Point X="-10" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S1" Source="S1">
+                    <Edge Source="S1" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="u"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="3"/>
+                                <Point X="3" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="145" X="34"/>
+                            <Point X="34" Y="145"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S5" Source="S1">
+                    <Edge Source="S1" Target="S5">
                         <LabelBlock>
                             <SimpleIdentifier Name="d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-2" X="4"/>
+                                <Point X="4" Y="-2"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -142,7 +142,7 @@ This test assumes that uncontrollable events not explicitly in the plant are alw
                     <SimpleIdentifier Name="c"/>
                     <SimpleIdentifier Name="d"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="36" X="136"/>
+                        <Point X="136" Y="36"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
@@ -151,10 +151,10 @@ This test assumes that uncontrollable events not explicitly in the plant are alw
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="48" X="80"/>
+                            <Point X="80" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="9"/>
+                            <Point X="9" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>

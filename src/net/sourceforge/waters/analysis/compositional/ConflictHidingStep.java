@@ -19,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -60,6 +62,7 @@ class ConflictHidingStep extends HidingStep
     (final Map<AutomatonProxy,StateProxy> previousMapOrig,
      final Map<AutomatonProxy,StateProxy> nextMapResult,
      final EventProxy resultEvent)
+    throws AnalysisAbortException, OverflowException
   {
     final AutomatonProxy resultAutomaton = getResultAutomaton();
     final StateProxy nextStateResult = nextMapResult.get(resultAutomaton);
@@ -75,6 +78,7 @@ class ConflictHidingStep extends HidingStep
     (final Map<AutomatonProxy,StateProxy> previousMapOrig,
      final Map<AutomatonProxy,StateProxy> nextMapResult,
      final EventProxy resultEvent)
+    throws AnalysisAbortException, OverflowException
   {
     final List<AutomatonProxy> originalAutomata =
       getOriginalAutomata();
@@ -99,6 +103,7 @@ class ConflictHidingStep extends HidingStep
 
     final EventProxy marking = getUsedDefaultMarking();
     for (final AutomatonProxy aut : originalAutomata) {
+      checkAbort();
       final Collection<EventProxy> alphabet =
         new THashSet<EventProxy>(aut.getEvents());
       final Collection<StateProxy> states = aut.getStates();
@@ -142,6 +147,7 @@ class ConflictHidingStep extends HidingStep
       final Iterator<Map.Entry<EventProxy,DumpStateSearchData>> iter =
         searchMap.entrySet().iterator();
       while (iter.hasNext()) {
+        checkAbort();
         final Map.Entry<EventProxy,DumpStateSearchData> entry = iter.next();
         final EventProxy event = entry.getKey();
         final DumpStateSearchData data = entry.getValue();

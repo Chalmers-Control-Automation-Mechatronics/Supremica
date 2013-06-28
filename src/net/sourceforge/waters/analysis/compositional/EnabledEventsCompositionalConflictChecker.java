@@ -162,7 +162,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     for (final EventProxy event : aut.getEvents()) {
       final EventInfo info = getEventInfo(event);
       if (info == null) {
-        final int code = encoding.addEvent(event, translator, (byte)0);
+        final int code = encoding.addEvent(event, translator, 0);
         if (event == getUsedDefaultMarking()) {
           markingID = code;
         }
@@ -170,7 +170,7 @@ public class EnabledEventsCompositionalConflictChecker extends
       } else if (info.isLocal(collection)) {
         encoding.addSilentEvent(event);
       } else {
-        encoding.addEvent(event, translator, (byte)0);
+        encoding.addEvent(event, translator, 0);
       }
     }
 
@@ -247,13 +247,13 @@ public class EnabledEventsCompositionalConflictChecker extends
     for (final EventProxy event : aut.getEvents()) {
       final EventInfo info = getEventInfo(event);
       if (info == null) {
-        final int code = encoding.addEvent(event, translator, (byte)0);
+        final int code = encoding.addEvent(event, translator, 0);
         if (event == getUsedDefaultMarking()) {
           markingID = code;
         }
         //only looks for dump states if aut has no tau so no silent events
       } else {
-        encoding.addEvent(event, translator, (byte)0);
+        encoding.addEvent(event, translator, 0);
       }
     }
     final ListBufferTransitionRelation transrel =

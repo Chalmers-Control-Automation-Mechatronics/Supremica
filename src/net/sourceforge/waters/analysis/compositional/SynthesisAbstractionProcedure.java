@@ -11,12 +11,10 @@ package net.sourceforge.waters.analysis.compositional;
 
 import gnu.trove.set.hash.TIntHashSet;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.AbstractSynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
@@ -230,75 +228,31 @@ public class SynthesisAbstractionProcedure
     } else {
       filter = props;
     }
-    final Collection<EventProxy> autAlphabet = aut.getEvents();
-    final Collection<EventProxy> localUncontrollableEvents =
-      new ArrayList<EventProxy>(local.size());
-    final Collection<EventProxy> sharedUncontrollableEvents =
-      new ArrayList<EventProxy>(autAlphabet.size() - local.size());
-    final Collection<EventProxy> localControllableEvents =
-      new ArrayList<EventProxy>(local.size());
-    final Collection<EventProxy> sharedControllableEvents =
-      new ArrayList<EventProxy>(autAlphabet.size() - local.size());
-    final Collection<EventProxy> encodedEvents =
-      new ArrayList<EventProxy>(autAlphabet.size());
-    for (final EventProxy event : autAlphabet) {
-      switch (translator.getEventKind(event)) {
-      case CONTROLLABLE:
-        if (local.contains(event)) {
-          localControllableEvents.add(event);
-        } else {
-          sharedControllableEvents.add(event);
-        }
-        break;
-      case UNCONTROLLABLE:
-        if (local.contains(event)) {
-          localUncontrollableEvents.add(event);
-        } else {
-          sharedUncontrollableEvents.add(event);
-        }
-        break;
-      case PROPOSITION:
-        // Put propositions in last list---its size does not matter.
-        sharedControllableEvents.add(event);
-        break;
-      default:
-        throw new IllegalArgumentException
-          ("Unknown event kind " + translator.getEventKind(event) +
-           " found for event " + event.getName() + "!");
+    final EventEncoding encoding = new EventEncoding
+      (aut, translator, filter, EventEncoding.FILTER_PROPOSITIONS);
+    for (int e = EventEncoding.NONTAU;
+         e < encoding.getNumberOfProperEvents();
+         e++) {
+      final EventProxy event = encoding.getProperEvent(e);
+      if (local.contains(event)) {
+        final byte status = encoding.getProperEventStatus(e);
+        encoding.setProperEventStatus(e, status | EventEncoding.STATUS_LOCAL);
       }
     }
-    final int lastLocalUncontrollableEvent =
-      localUncontrollableEvents.size();
-    final int lastLocalControllableEvent =
-      lastLocalUncontrollableEvent + localControllableEvents.size();
-    final int lastSharedUncontrollableEvent =
-      lastLocalControllableEvent + sharedUncontrollableEvents.size();
-    encodedEvents.addAll(localUncontrollableEvents);
-    encodedEvents.addAll(localControllableEvents);
-    encodedEvents.addAll(sharedUncontrollableEvents);
-    encodedEvents.addAll(sharedControllableEvents);
-    final EventEncoding encoding =
-      new EventEncoding(encodedEvents, translator, filter,
-                        EventEncoding.FILTER_PROPOSITIONS);
+    encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
+                              EventEncoding.STATUS_CONTROLLABLE);
     final CompositionalSynthesizer synthesizer = getAnalyzer();
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultMarkingID = encoding.getEventCode(defaultMarking);
     mChain.setDefaultMarkingID(defaultMarkingID);
     for (int index = 0; index < mChain.size(); index++) {
       final TransitionRelationSimplifier step = mChain.getStep(index);
-      if (step instanceof AbstractSynthesisTRSimplifier) {
-        final AbstractSynthesisTRSimplifier simp =
-          (AbstractSynthesisTRSimplifier) step;
-        simp.setLastLocalControllableEvent(lastLocalControllableEvent);
-        simp.setLastLocalUncontrollableEvent(lastLocalUncontrollableEvent);
-        simp.setLastSharedUncontrollableEvent(lastSharedUncontrollableEvent);
-        if (simp instanceof HalfWaySynthesisTRSimplifier) {
-          final HalfWaySynthesisTRSimplifier halfWay =
-            (HalfWaySynthesisTRSimplifier) simp;
-          final TIntHashSet renamed =
-            synthesizer.getRenamedControllables(encoding);
-          halfWay.setRenamedEvents(renamed);
-        }
+      if (step instanceof HalfWaySynthesisTRSimplifier) {
+        final HalfWaySynthesisTRSimplifier halfWay =
+          (HalfWaySynthesisTRSimplifier) step;
+        final TIntHashSet renamed =
+          synthesizer.getRenamedControllables(encoding);
+        halfWay.setRenamedEvents(renamed);
       }
     }
     return encoding;

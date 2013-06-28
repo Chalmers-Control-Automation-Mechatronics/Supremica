@@ -27,8 +27,10 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -215,6 +217,7 @@ public abstract class TRTraceExpander
   List<TraceStepProxy> getSaturatedTraceSteps
     (final List<TraceStepProxy> steps,
      final Collection<AutomatonProxy> automata)
+    throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxyFactory factory = mModelVerifier.getFactory();
     final int numAutomata = automata.size();
@@ -242,6 +245,7 @@ public abstract class TRTraceExpander
       final Map<AutomatonProxy,StateProxy> convertedStepMap =
         new HashMap<AutomatonProxy,StateProxy>(numAutomata);
       for (final AutomatonProxy aut : automata) {
+        checkAbort();
         final StateProxy prev = previousStepMap.get(aut);
         final StateProxy state = findSuccessor(aut, event, prev, stepMap);
         convertedStepMap.put(aut, state);
@@ -335,6 +339,7 @@ public abstract class TRTraceExpander
 
   void mergeTraceSteps(final List<TraceStepProxy> traceSteps,
                        final List<SearchRecord> convertedSteps)
+    throws AnalysisAbortException, OverflowException
   {
     final int tau = EventEncoding.TAU;
     final ProductDESProxyFactory factory = mModelVerifier.getFactory();
@@ -356,6 +361,7 @@ public abstract class TRTraceExpander
       convertedIter.hasNext() ? convertedIter.next() : null;
     while (step != null || record != null) {
       if (step != null) {
+        checkAbort();
         final EventProxy event = step.getEvent();
         final int eventID = mEventEncoding.getEventCode(event);
         if (eventID == tau) {
@@ -495,6 +501,12 @@ public abstract class TRTraceExpander
         }
       }
     }
+  }
+
+  void checkAbort()
+    throws AnalysisAbortException, OverflowException
+  {
+    mModelVerifier.checkAbort();
   }
 
 

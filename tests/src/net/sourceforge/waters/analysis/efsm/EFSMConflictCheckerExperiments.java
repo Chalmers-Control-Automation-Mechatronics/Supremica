@@ -43,9 +43,8 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
 /**
- * This class runs experiments using the {@link EFSMConflictChecker} with
- * a variety of configurations. The heuristics for choosing candidates can
- * be varied, as well as the abstraction rules applied and their order.
+ * This class runs experiments using the {@link EFSMConflictChecker} and
+ * other algorithms.
  *
  * @author Sahar Mohajerani, Robi Malik
  */
@@ -55,7 +54,7 @@ public class EFSMConflictCheckerExperiments
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
   public EFSMConflictCheckerExperiments(final String statsFilename)
     throws FileNotFoundException
   {
@@ -95,7 +94,7 @@ public class EFSMConflictCheckerExperiments
       }
     } else {
       System.err.println
-        ("USAGE: " +
+        ("USAGE: java " +
          ProxyTools.getShortClassName(EFSMConflictCheckerExperiments.class) +
          "<outputFilename>");
     }
@@ -111,8 +110,12 @@ public class EFSMConflictCheckerExperiments
     runAllTests(new BDDConflictCheckerWrapper());
   }
 
-  private void runAllTests(final ConflictCheckerWrapper wrapper) throws Exception
+  private void runAllTests(final ConflictCheckerWrapper wrapper)
+    throws Exception
   {
+    mPrintWriter.println();
+    mPrintWriter.println(wrapper.getName());
+    mHasBeenPrinted = false;
     mConflictCheckerWrapper = wrapper;
     try {
       testPsl();
@@ -137,38 +140,41 @@ public class EFSMConflictCheckerExperiments
     } catch (final EvalException exception) {
       // next please ...
     }
-    for (int m = 2; m <= 10; m += 2) {
+    if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+      for (int m = 2; m <= 10; m += 2) {
+        try {
+          for (int n = 200; n <= 2000; n+= 200) {
+            checkTransferLine("transferline_efsm", n, m, true);
+          }
+        } catch (final AnalysisException exception) {
+          // next please ...
+        } catch (final EvalException exception) {
+          // next please ...
+        }
+        try {
+          for (int n = 200; n <= 2000; n+= 200) {
+            checkTransferLine("transferline_efsm_block", n, m, false);
+          }
+        } catch (final AnalysisException exception) {
+          // next please ...
+        } catch (final EvalException exception) {
+          // next please ...
+        }
+      }
       try {
-        for (int n = 200; n <= 2000; n+= 200) {
-          checkTransferLine("transferline_efsm", n, m, true);
+        for (int n = 1000; n <= 4000; n+= 1000) {
+          checkPhilosophers("dining_philosophers", n, false);
         }
       } catch (final AnalysisException exception) {
         // next please ...
       } catch (final EvalException exception) {
         // next please ...
       }
-      try {
-        for (int n = 200; n <= 2000; n+= 200) {
-          checkTransferLine("transferline_efsm_block", n, m, false);
-        }
-      } catch (final AnalysisException exception) {
-        // next please ...
-      } catch (final EvalException exception) {
-        // next please ...
-      }
-    }
-    try {
-      for (int n = 1000; n <= 4000; n+= 1000) {
-        checkPhilosophers("dining_philosophers", n, false);
-      }
-    } catch (final AnalysisException exception) {
-      // next please ...
-    } catch (final EvalException exception) {
-      // next please ...
     }
     try {
       testPrimeSieve4();
       testPrimeSieve4b();
+      testPrimeSieve5();
       testPrimeSieve6();
       testPrimeSieve7();
       testPrimeSieve8();
@@ -234,11 +240,11 @@ public class EFSMConflictCheckerExperiments
     super.setUp();
     mWatchdog = new Watchdog(mTimeout);
     mPrintWriter = new PrintWriter(mOut, true);
-    mPrintWriter.println("InternalTransitionLimit," +
-                         mInternalTransitionLimit);
+    mPrintWriter.println("Timeout," + mTimeout);
+    /*
     mPrintWriter.println("CompositionSelectionHeuristic," +
                          mCompositionSelectionHeuristic);
-    mHasBeenPrinted = false;
+    */
     mWatchdog.start();
   }
 
@@ -290,12 +296,10 @@ public class EFSMConflictCheckerExperiments
 
   //#########################################################################
   //# Logging
-  private void printAndLog(final String moduleName,
-                           final List<ParameterBindingProxy> bindings,
-                           final String methodName)
+  private String getFullModuleName(final String moduleName,
+                                   final List<ParameterBindingProxy> bindings)
   {
-    final StringBuffer buffer = new StringBuffer("Running ");
-    buffer.append(moduleName);
+    final StringBuffer buffer = new StringBuffer(moduleName);
     if (bindings != null) {
       buffer.append('<');
       final Iterator<ParameterBindingProxy> iter = bindings.iterator();
@@ -311,10 +315,7 @@ public class EFSMConflictCheckerExperiments
         }
       }
     }
-    buffer.append(" with ");
-    buffer.append(methodName);
-    buffer.append(" ... ");
-    printAndLog(buffer.toString());
+    return buffer.toString();
   }
 
   private void printAndLog(final String msg)
@@ -336,12 +337,9 @@ public class EFSMConflictCheckerExperiments
       throws EvalException, AnalysisException
     {
       final String moduleName = module.getName();
-      String className = ProxyTools.getShortClassName(this);
-      if (className.endsWith("Wrapper")) {
-        final int len = className.length();
-        className = className.substring(0, len - 7);
-      }
-      printAndLog(moduleName, bindings, className);
+      final String fullModuleName = getFullModuleName(moduleName, bindings);
+      final String className = getName();
+      printAndLog("Running " + fullModuleName + " with " + className + " ... ");
       try {
         mWatchdog.reset();
         final long start = System.currentTimeMillis();
@@ -357,14 +355,14 @@ public class EFSMConflictCheckerExperiments
           stats.printCSVHorizontalHeadings(mPrintWriter);
           mPrintWriter.println();
         }
-        mPrintWriter.print(moduleName);
+        mPrintWriter.print(fullModuleName);
         mPrintWriter.print(',');
         stats.printCSVHorizontal(mPrintWriter);
         mPrintWriter.println();
         return stats.isSatisfied();
       } catch (final Throwable exception) {
         System.out.println(ProxyTools.getShortClassName(exception));
-        mPrintWriter.println(moduleName + "," + exception.getMessage());
+        mPrintWriter.println(fullModuleName + "," + exception.getMessage());
         if (exception instanceof AnalysisException) {
           throw (AnalysisException) exception;
         } else if (exception instanceof EvalException) {
@@ -376,6 +374,18 @@ public class EFSMConflictCheckerExperiments
         }
       }
     }
+
+    private String getName()
+    {
+      final String className = ProxyTools.getShortClassName(this);
+      if (className.endsWith("Wrapper")) {
+        final int len = className.length();
+        return className.substring(0, len - 7);
+      } else {
+        return className;
+      }
+    }
+
 
     //#########################################################################
     //# Abstract Methods
@@ -439,6 +449,7 @@ public class EFSMConflictCheckerExperiments
       mConflictChecker.setInternalStateLimit(10000);
       mConflictChecker.setMonolithicStateLimit(50000000);
       mConflictChecker.setMonolithicTransitionLimit(0);
+      mConflictChecker.setCounterExampleEnabled(false);
       // Configuration end
     }
 
@@ -453,6 +464,14 @@ public class EFSMConflictCheckerExperiments
       mConflictChecker.setModel(des);
       mConflictChecker.run();
       return mConflictChecker.getAnalysisResult();
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public void finalize()
+    {
+      mWatchdog.removeAbortable(mConflictChecker);
     }
 
     //#######################################################################
@@ -479,6 +498,8 @@ public class EFSMConflictCheckerExperiments
       mConflictChecker.setTransitionPartitioningStrategy
         (TransitionPartitioningStrategy.AUTOMATA);
       mConflictChecker.setPartitioningSizeLimit(5000);
+      mConflictChecker.setNodeLimit(25000000);
+      mConflictChecker.setCounterExampleEnabled(false);
       // Configuration end
     }
 
@@ -493,6 +514,14 @@ public class EFSMConflictCheckerExperiments
       mConflictChecker.setModel(des);
       mConflictChecker.run();
       return mConflictChecker.getAnalysisResult();
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public void finalize()
+    {
+      mWatchdog.removeAbortable(mConflictChecker);
     }
 
     //#######################################################################
@@ -512,4 +541,5 @@ public class EFSMConflictCheckerExperiments
   private final int mTimeout = 1200;  // 20 minutes
   private final int mInternalTransitionLimit = 1000000;
   private final CompositionSelectionHeuristic mCompositionSelectionHeuristic;
+
 }

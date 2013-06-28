@@ -121,11 +121,13 @@ abstract class AbstractEFSMTest
     final ModuleProxy before = createModule(module, BEFORE, true);
     final EFSMCompiler compiler1 = new EFSMCompiler(manager, before);
     compiler1.setSourceInfoEnabled(true);
+    compiler1.setOptimizationEnabled(false);
     final EFSMSystem system = compiler1.compile(bindings);
     final ModuleProxy selfloops = createModule(module, SELFLOOPS, false);
     if (selfloops != null) {
       final EFSMVariable unfoldedVariable = system.getVariables().get(0);
       final EFSMCompiler compiler2 = new EFSMCompiler(manager, selfloops);
+      compiler2.setOptimizationEnabled(false);
       final EFSMSystem selfloopSystem = compiler2.compile(bindings);
       final EFSMTransitionRelation selfloopTR =
         findTR(selfloopSystem, SELFLOOPS);

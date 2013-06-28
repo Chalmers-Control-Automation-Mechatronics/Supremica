@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -251,6 +251,20 @@ public class IntStateBuffer
   }
 
   /**
+   * Sets a new pattern of used propositions.
+   * @param markings
+   *          Pattern containing all propositions to be considered as used.
+   *          This pattern can be obtained through the methods {@link
+   *          #getAllMarkings(int) getAllMarkings()}, {@link
+   *          #createMarkings(TIntArrayList) createMarkings()}, or
+   *          {@link #mergeMarkings(long,long) mergeMarkings()}.
+   */
+  public void setUsedPropositions(final long markings)
+  {
+    mUsedPropositions = (int) markings;
+  }
+
+  /**
    * Checks whether a state is marked.
    * This method reports a state as marked if the indicated proposition is
    * not marked as used (marked by default for proposition not in the
@@ -326,7 +340,7 @@ public class IntStateBuffer
    * Sets all markings for the given state simultaneously.
    * @param  state    ID of the state to be modified.
    * @param  markings A new marking pattern for the state. This pattern
-   *                  can be obtained through the method
+   *                  can be obtained through the methods
    *                  {@link #getAllMarkings(int) getAllMarkings()},
    *                  {@link #createMarkings(TIntArrayList) createMarkings()},
    *                  or {@link #mergeMarkings(long,long) mergeMarkings()}.
@@ -340,7 +354,7 @@ public class IntStateBuffer
    * Adds several markings to a given state simultaneously.
    * @param  state    ID of the state to be modified.
    * @param  markings A pattern of additional markings for the state. This
-   *                  pattern can be obtained through the method
+   *                  pattern can be obtained through the methods
    *                  {@link #getAllMarkings(int) getAllMarkings()},
    *                  {@link #createMarkings(TIntArrayList) createMarkings()},
    *                  or {@link #mergeMarkings(long,long) mergeMarkings()}.
@@ -362,7 +376,7 @@ public class IntStateBuffer
    * Removes several markings from a given state simultaneously.
    * @param  state    ID of the state to be modified.
    * @param  markings A pattern of markings to be removed from the state.
-   *                  This pattern can be obtained through the method
+   *                  This pattern can be obtained through the methods
    *                  {@link #getAllMarkings(int) getAllMarkings()},
    *                  {@link #createMarkings(TIntArrayList) createMarkings()},
    *                  or {@link #mergeMarkings(long,long) mergeMarkings()}.

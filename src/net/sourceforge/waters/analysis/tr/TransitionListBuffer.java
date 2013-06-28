@@ -82,19 +82,24 @@ public abstract class TransitionListBuffer
    * Creates a new transition list buffer.
    * The transition buffer is set up for a fixed number of states and events,
    * which defines an encoding and can no more be changed.
-   * @param  numEvents   The number of events that can be encoded in
-   *                     transitions.
-   * @param  numStates   The number of states that can be encoded in
-   *                     transitions.
+   * @param  numEvents    The number of events that can be encoded in
+   *                      transitions.
+   * @param  numStates    The number of states that can be encoded in
+   *                      transitions.
+   * @param  eventStatus  Status flags of events, based on constants defined
+   *                      in {@link EventEncoding}.
+   * @param  orderingInfo Ordering information to to describe event ordering,
+   *                      or <CODE>null</CODE>
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
   public TransitionListBuffer(final int numEvents,
                               final int numStates,
-                              final byte[] eventStatus)
+                              final byte[] eventStatus,
+                              final EventEncoding.OrderingInfo orderingInfo)
     throws OverflowException
   {
-    this(numEvents, numStates, eventStatus, MAX_BLOCK_SIZE);
+    this(numEvents, numStates, eventStatus, orderingInfo, MAX_BLOCK_SIZE);
   }
 
 
@@ -106,6 +111,10 @@ public abstract class TransitionListBuffer
    *                     transitions.
    * @param  numStates   The number of states that can be encoded in
    *                     transitions.
+   * @param  eventStatus  Status flags of events, based on constants defined
+   *                      in {@link EventEncoding}.
+   * @param  orderingInfo Ordering information to to describe event ordering,
+   *                      or <CODE>null</CODE>
    * @param  numTrans    Estimated number of transitions, used to determine
    *                     buffer size.
    * @throws OverflowException if the encoding for states and events does
@@ -114,9 +123,11 @@ public abstract class TransitionListBuffer
   public TransitionListBuffer(final int numEvents,
                               final int numStates,
                               final byte[] eventStatus,
+                              final EventEncoding.OrderingInfo orderingInfo,
                               final int numTrans)
     throws OverflowException
   {
+    mOrderingInfo = orderingInfo;
     final int estimate = 2 * (numTrans + numStates);
     if (estimate <= MIN_BLOCK_SIZE) {
       mBlockSize = MIN_BLOCK_SIZE;
@@ -183,6 +194,11 @@ public abstract class TransitionListBuffer
     return mStateTransitions.length;
   }
 
+  EventEncoding.OrderingInfo getOrderingInfo()
+  {
+    return mOrderingInfo;
+  }
+
 
   //#########################################################################
   //# Transition Access Methods
@@ -216,6 +232,15 @@ public abstract class TransitionListBuffer
   }
 
   /**
+   * Returns whether there are any transitions originating from the given
+   * state in this buffer.
+   */
+  public boolean hasTransitions(final int state)
+  {
+    return mStateTransitions[state] != NULL;
+  }
+
+/**
    * <P>Adds a transition to this buffer.</P>
    * <P>The new transition is appended after any other transitions with the
    * same from-state and event.</P>
@@ -681,14 +706,9 @@ public abstract class TransitionListBuffer
    */
   public boolean isGloballyDisabled(final int event)
   {
-    final TransitionIterator iter = createReadOnlyIterator();
-    for (int state = 0; state < getNumberOfStates(); state++) {
-      iter.reset(state, event);
-      if (iter.advance()) {
-        return false;
-      }
-    }
-    return true;
+    final TransitionIterator iter =
+      createAllTransitionsReadOnlyIterator(event);
+    return !iter.advance();
   }
 
   /**
@@ -1516,6 +1536,14 @@ public abstract class TransitionListBuffer
     }
 
     @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      final int first = mOrderingInfo.getFirstEventIndex(flags);
+      final int last = mOrderingInfo.getLastEventIndex(flags);
+      resetEvents(first, last);
+    }
+
+    @Override
     public void resetState(final int state)
     {
       mFromState = state;
@@ -1738,6 +1766,14 @@ public abstract class TransitionListBuffer
     }
 
     @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      final int first = mOrderingInfo.getFirstEventIndex(flags);
+      final int last = mOrderingInfo.getLastEventIndex(flags);
+      resetEvents(first, last);
+    }
+
+    @Override
     public void resetState(final int from)
     {
       throw new UnsupportedOperationException
@@ -1875,6 +1911,7 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Data Members
+  private EventEncoding.OrderingInfo mOrderingInfo;
   private final int mBlockShift;
   private final int mBlockMask;
   private final int mBlockSize;

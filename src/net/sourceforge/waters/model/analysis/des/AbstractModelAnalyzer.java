@@ -17,6 +17,7 @@ import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -206,8 +207,8 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
    * This method should be called periodically by any model analyser that
    * supports being aborted by user request.
    */
-  protected void checkAbort()
-    throws AnalysisAbortException
+  public void checkAbort()
+    throws AnalysisAbortException, OverflowException
   {
     if (mIsAborting) {
       final AnalysisAbortException exception = new AnalysisAbortException();

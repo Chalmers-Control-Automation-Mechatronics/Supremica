@@ -113,6 +113,22 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_a_or_not_a()
+    throws EvalException, ParseException
+  {
+    final String[] constraints = {"a | !a"};
+    final String[] expected = {};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_not_a_or_b_or_a()
+    throws EvalException, ParseException
+  {
+    final String[] constraints = {"!a | b | a"};
+    final String[] expected = {};
+    testPropagate(constraints, expected);
+  }
+
   public void testPropagate_a_and_aprime()
     throws EvalException, ParseException
   {

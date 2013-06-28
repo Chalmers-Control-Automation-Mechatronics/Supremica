@@ -215,12 +215,13 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
 
 
   private void runSynchronizer(final ModuleProxy module,
-                                  final List<ParameterBindingProxy> bindings)
+                               final List<ParameterBindingProxy> bindings)
     throws Exception
   {
     final ModuleProxy before = createModule(module, BEFORE1,BEFORE2);
     final EFSMCompiler compiler = new EFSMCompiler(mDocumentManager, before);
     compiler.setSourceInfoEnabled(true);
+    compiler.setOptimizationEnabled(false);
     final EFSMSystem system = compiler.compile(bindings);
     final List<EFSMTransitionRelation> efsmTransitionRelationList =
       system.getTransitionRelations();

@@ -341,7 +341,8 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
    *         depth, <CODE>false</CODE> otherwise.
    */
   private boolean exploreBackwards(final int stateid, final BitSet coreachable,
-                                   int maxdepth) throws AnalysisAbortException
+                                   int maxdepth)
+    throws AnalysisAbortException, OverflowException
   {
     if (maxdepth-- > 0) {
       checkAbort();

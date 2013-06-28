@@ -117,22 +117,37 @@
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="after">
             <Graph Deterministic="false">
-                <LabelBlock>
-                    <SimpleIdentifier Name=":accepting"/>
-                    <LabelGeometry Anchor="NW">
-                        <Point X="300" Y="283"/>
-                    </LabelGeometry>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0:S0">
                         <PointGeometry>
-                            <Point X="224" Y="272"/>
+                            <Point X="96" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="-47" Y="-3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1:S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="96" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-46" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
+                <EdgeList>
+                    <Edge Source="S1:S0" Target="S0:S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau:after"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
             </Graph>
         </SimpleComponent>
         <VariableComponent Name="y">
