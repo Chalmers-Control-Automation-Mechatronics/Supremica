@@ -108,9 +108,30 @@ public class NonAlphaDeterminisationTRSimplifier
     return mBisimulator.getTransitionLimit();
   }
 
+  /**
+   * Sets whether this simplifier should consider deadlock states when
+   * removing selfloops.
+   * @see AbstractMarkingTRSimplifier#isDeadlockAware()
+   */
+  public void setDeadlockAware(final boolean aware)
+  {
+    mDeadlockAware = aware;
+  }
+
+  /**
+   * Gets whether this simplifier considers deadlock states when
+   * removing selfloops.
+   */
+  @Override
+  public boolean isDeadlockAware()
+  {
+    return mDeadlockAware;
+  }
+
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -129,7 +150,7 @@ public class NonAlphaDeterminisationTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected void setUp()
-  throws AnalysisException
+    throws AnalysisException
   {
     super.setUp();
     if (getPreconditionMarkingID() < 0) {
@@ -141,7 +162,7 @@ public class NonAlphaDeterminisationTRSimplifier
 
   @Override
   protected boolean runSimplifier()
-  throws AnalysisException
+    throws AnalysisException
   {
     if (!hasNonPreconditionMarkedStates()) {
       return false;
@@ -157,6 +178,10 @@ public class NonAlphaDeterminisationTRSimplifier
     setResultPartitionList(partition);
     applyResultPartitionAutomatically();
     rel.reverse();
+    if (modified && getAppliesPartitionAutomatically() &&
+        mDeadlockAware && getDefaultMarkingID() >= 0) {
+      removeProperSelfLoopEvents();
+    }
     return modified;
   }
 
@@ -169,7 +194,7 @@ public class NonAlphaDeterminisationTRSimplifier
 
   @Override
   public void applyResultPartition()
-  throws AnalysisException
+    throws AnalysisException
   {
     mBisimulator.applyResultPartition();
   }
@@ -247,6 +272,8 @@ public class NonAlphaDeterminisationTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mDeadlockAware = false;
+
   private final ObservationEquivalenceTRSimplifier mBisimulator;
   private TransitionIterator mTauIterator;
 

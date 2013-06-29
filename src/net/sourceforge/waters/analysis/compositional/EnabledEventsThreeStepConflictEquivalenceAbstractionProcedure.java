@@ -211,7 +211,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       eventsList.addAll(otherEventsList);
       final int numEnabledEvents = enabledEventsList.size();
 
-      //System.out.println(enabledEventsList);
+      //System.out.println(numEnabledEvents + " " + enabledEventsList);
       /*
 
       int numEnabledEvents = 0;

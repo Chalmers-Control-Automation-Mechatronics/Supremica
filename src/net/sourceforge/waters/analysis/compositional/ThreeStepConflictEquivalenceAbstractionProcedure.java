@@ -62,6 +62,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     final ChainTRSimplifier postChain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
+    loopRemover.setDeadlockAware(true);
     preChain.add(loopRemover);
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
@@ -69,10 +70,12 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
+    silentInRemover.setDeadlockAware(true);
     preChain.add(silentInRemover);
     final int limit = analyzer.getInternalTransitionLimit();
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
+    silentOutRemover.setDeadlockAware(true);
     preChain.add(silentOutRemover);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
@@ -99,6 +102,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
+    bisimulator.setDeadlockAware(true);
     postChain.add(bisimulator);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
@@ -118,6 +122,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     final ChainTRSimplifier postChain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
+    loopRemover.setDeadlockAware(true);
     preChain.add(loopRemover);
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
@@ -129,9 +134,11 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
+    silentInRemover.setDeadlockAware(true);
     preChain.add(silentInRemover);
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
+    silentOutRemover.setDeadlockAware(true);
     preChain.add(silentOutRemover);
     final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
@@ -143,12 +150,14 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
+    bisimulator.setDeadlockAware(true);
     postChain.add(bisimulator);
     final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
       new NonAlphaDeterminisationTRSimplifier();
     nonAlphaDeterminiser.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
     nonAlphaDeterminiser.setTransitionLimit(limit);
+    nonAlphaDeterminiser.setDeadlockAware(true);
     postChain.add(nonAlphaDeterminiser);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();

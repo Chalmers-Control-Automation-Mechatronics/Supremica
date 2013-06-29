@@ -74,6 +74,26 @@ public class SilentIncomingTRSimplifier
   //#########################################################################
   //# Configuration
   /**
+   * Sets whether this simplifier should consider deadlock states when
+   * removing selfloops.
+   * @see AbstractMarkingTRSimplifier#isDeadlockAware()
+   */
+  public void setDeadlockAware(final boolean aware)
+  {
+    mDeadlockAware = aware;
+  }
+
+  /**
+   * Gets whether this simplifier considers deadlock states when
+   * removing selfloops.
+   */
+  @Override
+  public boolean isDeadlockAware()
+  {
+    return mDeadlockAware;
+  }
+
+  /**
    * Sets whether abstraction is applied to all states or only to states
    * that become unreachable. When this option is set to <CODE>true</CODE>
    * (the default), then the <I>Silent Incoming Rule</I> is only applied
@@ -208,13 +228,13 @@ public class SilentIncomingTRSimplifier
 
   @Override
   protected void applyResultPartition()
-  throws AnalysisException
+    throws AnalysisException
   {
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.checkReachability();
     rel.removeTauSelfLoops();
-    rel.removeProperSelfLoopEvents();
+    removeProperSelfLoopEvents();
   }
 
 
@@ -236,6 +256,7 @@ public class SilentIncomingTRSimplifier
   //#########################################################################
   //# Data Members
   private boolean mRestrictsToUnreachableStates = true;
+  private boolean mDeadlockAware = false;
 
   private TransitionIterator mTauTestIterator;
 

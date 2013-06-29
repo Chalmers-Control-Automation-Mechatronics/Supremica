@@ -337,6 +337,16 @@ public abstract class TRTraceExpander
     }
   }
 
+  int getDefaultMarkingID()
+  {
+    final EventProxy defaultMarking = mModelVerifier.getUsedDefaultMarking();
+    if (defaultMarking == null) {
+      return -1;
+    } else {
+      return mEventEncoding.getEventCode(defaultMarking);
+    }
+  }
+
   void mergeTraceSteps(final List<TraceStepProxy> traceSteps,
                        final List<SearchRecord> convertedSteps)
     throws AnalysisAbortException, OverflowException
@@ -379,6 +389,16 @@ public abstract class TRTraceExpander
           stepIter.set(newStep);
           step = stepIter.hasNext() ? stepIter.next() : null;
           continue;
+        } else if (record == null) {
+          // We have got a shared event, but the abstracted automaton
+          // does not accept it. This means we have entered certain conflicts
+          // in the original automaton, and the trace ends here.
+          stepIter.remove();
+          while (stepIter.hasNext()) {
+            stepIter.next();
+            stepIter.remove();
+          }
+          return;
         }
       }
       if (record != null) {
