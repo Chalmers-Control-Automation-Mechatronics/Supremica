@@ -178,18 +178,20 @@ public class SupervisorReductionTRSimplifier extends
   private boolean mainProcedure(final TIntArrayList ctrlEvents)
   {
     boolean merged = false;
-    for (int i = 0; i < mBadStateIndex - 1; i++) {
-      if (i > getMinimum(i)) {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
+    for (int i = 0; i < numStates - 1; i++) {
+      if (!rel.isReachable(i) || i == mBadStateIndex || i > getMinimum(i)) {
         continue;
       }
-      for (int j = i + 1; j < mBadStateIndex; j++) {
-        if (j > getMinimum(j)) {
+      for (int j = i + 1; j < numStates; j++) {
+        if (!rel.isReachable(j) || j == mBadStateIndex || j > getMinimum(j)) {
           continue;
         }
         TLongHashSet mergedPairs = new TLongHashSet();
         mShadowClasses = new IntListBuffer();
-        mShadowStateToClass = new int[mBadStateIndex];
-        for (int s = 0; s < mBadStateIndex; s++) {
+        mShadowStateToClass = new int[numStates];
+        for (int s = 0; s < numStates; s++) {
           mShadowStateToClass[s] = IntListBuffer.NULL;
         }
 
@@ -326,12 +328,18 @@ public class SupervisorReductionTRSimplifier extends
 
   private void setUpClasses()
   {
-    mStateToClass = new int[mBadStateIndex];
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
+    mStateToClass = new int[numStates];
     mClasses = new IntListBuffer();
-    for (int s = 0; s < mBadStateIndex; s++) {
-      final int list = mClasses.createList();
-      mClasses.add(list, s);
-      mStateToClass[s] = list;
+    for (int s = 0; s < numStates; s++) {
+      if (s != mBadStateIndex) {
+        final int list = mClasses.createList();
+        mClasses.add(list, s);
+        mStateToClass[s] = list;
+      } else {
+        mStateToClass[s] = IntListBuffer.NULL;
+      }
     }
   }
 
