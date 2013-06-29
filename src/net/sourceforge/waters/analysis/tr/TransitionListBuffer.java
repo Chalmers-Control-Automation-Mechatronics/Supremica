@@ -232,6 +232,15 @@ public abstract class TransitionListBuffer
   }
 
   /**
+   * Returns whether there are any transitions originating from the given
+   * state in this buffer.
+   */
+  public boolean hasTransitions(final int state)
+  {
+    return mStateTransitions[state] != NULL;
+  }
+
+/**
    * <P>Adds a transition to this buffer.</P>
    * <P>The new transition is appended after any other transitions with the
    * same from-state and event.</P>
@@ -697,14 +706,9 @@ public abstract class TransitionListBuffer
    */
   public boolean isGloballyDisabled(final int event)
   {
-    final TransitionIterator iter = createReadOnlyIterator();
-    for (int state = 0; state < getNumberOfStates(); state++) {
-      iter.reset(state, event);
-      if (iter.advance()) {
-        return false;
-      }
-    }
-    return true;
+    final TransitionIterator iter =
+      createAllTransitionsReadOnlyIterator(event);
+    return !iter.advance();
   }
 
   /**

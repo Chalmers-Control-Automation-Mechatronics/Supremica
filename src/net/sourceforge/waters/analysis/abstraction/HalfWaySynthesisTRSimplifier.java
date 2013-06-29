@@ -31,8 +31,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class HalfWaySynthesisTRSimplifier
-  extends AbstractMarkingTRSimplifier
+public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
@@ -45,7 +44,6 @@ public class HalfWaySynthesisTRSimplifier
   {
     super(rel);
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
@@ -61,18 +59,17 @@ public class HalfWaySynthesisTRSimplifier
     return false;
   }
 
-
   //#########################################################################
   //# Configuration
   /**
-   * Sets the set of renamed event indexes.
-   * Renamed controllable events are treated specially for the benefit
-   * of compositional synthesis. Renamed controllable transitions to a
-   * dump state are not removed in the synthesised supervisor to facilitate
-   * composition with distinguishers; these transitions are only removed in
-   * the abstraction.
-   * @param renamedEventIndexes Set of proper events indexes to be considered
-   *                            as renamed.
+   * Sets the set of renamed event indexes. Renamed controllable events are
+   * treated specially for the benefit of compositional synthesis. Renamed
+   * controllable transitions to a dump state are not removed in the
+   * synthesised supervisor to facilitate composition with distinguishers;
+   * these transitions are only removed in the abstraction.
+   *
+   * @param renamedEventIndexes
+   *          Set of proper events indexes to be considered as renamed.
    */
   public void setRenamedEvents(final TIntHashSet renamedEventIndexes)
   {
@@ -81,6 +78,7 @@ public class HalfWaySynthesisTRSimplifier
 
   /**
    * Gets the set of renamed event indexes.
+   *
    * @see #setRenamedEvents(TIntHashSet) setRenamedEvents()
    */
   public TIntHashSet getRenamedEvents()
@@ -89,15 +87,15 @@ public class HalfWaySynthesisTRSimplifier
   }
 
   /**
-   * Gets the supervisor computed by the last run of this simplifier.
-   * The supervisor returned may contain transitions to a dump state,
-   * and therefore is referred to as a pseudo-supervisor. Transitions
-   * with <I>renamed</I> controllable events leading to blocking states
-   * are not removed from the supervisor to facilitate composition with
+   * Gets the supervisor computed by the last run of this simplifier. The
+   * supervisor returned may contain transitions to a dump state, and
+   * therefore is referred to as a pseudo-supervisor. Transitions with
+   * <I>renamed</I> controllable events leading to blocking states are not
+   * removed from the supervisor to facilitate composition with
    * distinguishers.
-   * @return Transition relation representing the supervisor,
-   *         or <CODE>null</CODE> if no controllable events need to be
-   *         disabled.
+   *
+   * @return Transition relation representing the supervisor, or
+   *         <CODE>null</CODE> if no controllable events need to be disabled.
    * @see #setRenamedEvents(TIntHashSet) setRenamedEvents()
    */
   public ListBufferTransitionRelation getPseudoSupervisor()
@@ -105,27 +103,27 @@ public class HalfWaySynthesisTRSimplifier
     return mPseudoSupervisor;
   }
 
-
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
-  public void reset(){
+  public void reset()
+  {
     super.reset();
     mPseudoSupervisor = null;
   }
 
   @Override
-  protected void setUp() throws AnalysisException{
+  protected void setUp() throws AnalysisException
+  {
     super.setUp();
     mPseudoSupervisor = null;
   }
 
   @Override
-  protected boolean runSimplifier()
-  throws AnalysisException
+  protected boolean runSimplifier() throws AnalysisException
   {
     final int defaultID = getDefaultMarkingID();
-    if (defaultID < 0){
+    if (defaultID < 0) {
       return false;
     }
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -156,8 +154,8 @@ public class HalfWaySynthesisTRSimplifier
     boolean needAbstraction = false;
     boolean needSupervisor = false;
     final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
-    for (int state = badStates.nextSetBit(0); state >= 0;
-         state = badStates.nextSetBit(state+1)) {
+    for (int state = badStates.nextSetBit(0); state >= 0; state =
+      badStates.nextSetBit(state + 1)) {
       if (rel.isInitial(state)) {
         // some initial state is bad --- supervisor cannot exist.
         setAllStatesUnreachable();
@@ -193,8 +191,10 @@ public class HalfWaySynthesisTRSimplifier
     //  transitions that lead to a bad state to the dump state.
     //  Other transitions leading to a bad state are deleted.
     if (needSupervisor) {
-      mPseudoSupervisor = new ListBufferTransitionRelation
-        (rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      mPseudoSupervisor =
+        new ListBufferTransitionRelation(
+                                         rel,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       mPseudoSupervisor.removeOutgoingTransitions(dumpState);
       iter.resetState(dumpState);
       while (iter.advance()) {
@@ -229,7 +229,6 @@ public class HalfWaySynthesisTRSimplifier
     return true;
   }
 
-
   //#########################################################################
   //# Auxiliary Methods
   private void findCoreachableStates(final BitSet coreachable,
@@ -244,8 +243,7 @@ public class HalfWaySynthesisTRSimplifier
     // Creates a hash set of all states which can reach a marked state.
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (rel.isMarked(sourceID, defaultID) && rel.isReachable(sourceID)
-        && !badStates.get(sourceID)
-          && ! coreachable.get(sourceID)) {
+          && !badStates.get(sourceID) && !coreachable.get(sourceID)) {
         checkAbort();
         coreachable.set(sourceID);
         unvisited.push(sourceID);
@@ -255,7 +253,7 @@ public class HalfWaySynthesisTRSimplifier
           while (iter.advance()) {
             final int predID = iter.getCurrentSourceState();
             if (rel.isReachable(predID) && !badStates.get(predID)
-              && !coreachable.get(predID)) {
+                && !coreachable.get(predID)) {
               coreachable.set(predID);
               unvisited.push(predID);
             }
@@ -275,15 +273,15 @@ public class HalfWaySynthesisTRSimplifier
     iter.resetEventsByStatus(EventEncoding.STATUS_LOCAL,
                              ~EventEncoding.STATUS_CONTROLLABLE);
     final TIntStack unvisited = new TIntArrayStack();
-    for (int state = oldBadStates.nextSetBit(0); state >= 0;
-         state = oldBadStates.nextSetBit(state+1)) {
+    for (int state = oldBadStates.nextSetBit(0); state >= 0; state =
+      oldBadStates.nextSetBit(state + 1)) {
       unvisited.push(state);
       while (unvisited.size() > 0) {
         final int current = unvisited.pop();
         iter.resetState(current);
         while (iter.advance()) {
           final int source = iter.getCurrentSourceState();
-          if(rel.isReachable(source) && !badStates.get(source)){
+          if (rel.isReachable(source) && !badStates.get(source)) {
             hasAdded = true;
             badStates.set(source);
             unvisited.push(source);
@@ -310,29 +308,33 @@ public class HalfWaySynthesisTRSimplifier
       }
       rel.removeRedundantPropositions();
       mPseudoSupervisor =
-        new ListBufferTransitionRelation(name, ComponentKind.SUPERVISOR,
-                                         1, 0, 0,
-                                         ListBufferTransitionRelation.
-                                         CONFIG_SUCCESSORS);
+        new ListBufferTransitionRelation(
+                                         name,
+                                         ComponentKind.SUPERVISOR,
+                                         1,
+                                         0,
+                                         0,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     } catch (final OverflowException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
 
   /**
-   * Returns whether the given event should be retained on transitions
-   * to dump states in the pseudo supervisor.
+   * Returns whether the given event should be retained on transitions to dump
+   * states in the pseudo supervisor.
    */
   private boolean isRetainedControllable(final int event)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final byte status = rel.getProperEventStatus(event);
-    return
-      EventEncoding.isControllableEvent(status) &&
-      mRenamedEvents != null &&
-      mRenamedEvents.contains(event);
+    if (mRenamedEvents == null) {
+      return EventEncoding.isControllableEvent(status);
+    } else {
+      return EventEncoding.isControllableEvent(status)
+             & mRenamedEvents.contains(event);
+    }
   }
-
 
   //#########################################################################
   //# Data Members
@@ -341,4 +343,3 @@ public class HalfWaySynthesisTRSimplifier
   private ListBufferTransitionRelation mPseudoSupervisor;
 
 }
-

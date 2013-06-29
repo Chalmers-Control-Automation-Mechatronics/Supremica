@@ -18,6 +18,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
@@ -28,6 +29,7 @@ import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -128,6 +130,10 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
     chain.add(markingRemover);
+    final TransitionRemovalTRSimplifier transitionRemover =
+      new TransitionRemovalTRSimplifier();
+    transitionRemover.setTransitionLimit(limit);
+    chain.add(transitionRemover);
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
@@ -139,13 +145,17 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
       new IncomingEquivalenceTRSimplifier();
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     chain.add(incomingEquivalenceSimplifier);
+    final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
+      new LimitedCertainConflictsTRSimplifier();
+    chain.add(certainConflictsRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
+    bisimulator.setUsingSpecialEvents(true);
     bisimulator.setTransitionRemovalMode
-    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER);
     bisimulator.setMarkingMode
-    (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
+      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
     chain.add(bisimulator);
     final MarkingSaturationTRSimplifier saturator =

@@ -450,7 +450,7 @@ public class AutomataSynthesizer
           synthesizer.setConfiguredDefaultMarking(marking);
           final boolean supervisorReduction =
             synthesizerOptions.getReduceSupervisors();
-          synthesizer.setSupervisorReductionEnabled(supervisorReduction);////
+          synthesizer.setSupervisorReductionEnabled(supervisorReduction);
           synthesizer.setInternalStateLimit(5000);
            synthesizer.setPreselectingMethod
              (AbstractCompositionalModelAnalyzer.MustL);

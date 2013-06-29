@@ -541,6 +541,7 @@ public class ListBufferTransitionRelation
     }
   }
 
+
   //#########################################################################
   //# Markings Access
   /**
@@ -563,6 +564,20 @@ public class ListBufferTransitionRelation
   public long getUsedPropositions()
   {
     return mStateBuffer.getUsedPropositions();
+  }
+
+  /**
+   * Sets a new pattern of used propositions.
+   * @param markings
+   *          Pattern containing all propositions to be considered as used.
+   *          This pattern can be obtained through the methods {@link
+   *          #getAllMarkings(int) getAllMarkings()}, {@link
+   *          #createMarkings(TIntArrayList) createMarkings()}, or
+   *          {@link #mergeMarkings(long,long) mergeMarkings()}.
+   */
+  public void setUsedPropositions(final long markings)
+  {
+    mStateBuffer.setUsedPropositions(markings);
   }
 
   /**
@@ -624,7 +639,7 @@ public class ListBufferTransitionRelation
    *          ID of the state to be modified.
    * @param markings
    *          A new marking pattern for the state. This pattern can be
-   *          obtained through the method {@link #getAllMarkings(int)
+   *          obtained through the methods {@link #getAllMarkings(int)
    *          getAllMarkings()}, {@link #createMarkings(TIntArrayList)
    *          createMarkings()}, or {@link #mergeMarkings(long,long)
    *          mergeMarkings()}.
@@ -641,7 +656,7 @@ public class ListBufferTransitionRelation
    *          ID of the state to be modified.
    * @param markings
    *          A pattern of additional markings for the state. This pattern can
-   *          be obtained through the method {@link #getAllMarkings(int)
+   *          be obtained through the methods {@link #getAllMarkings(int)
    *          getAllMarkings()}, {@link #createMarkings(TIntArrayList)
    *          createMarkings()}, or {@link #mergeMarkings(long,long)
    *          mergeMarkings()}.
@@ -661,7 +676,7 @@ public class ListBufferTransitionRelation
    *          ID of the state to be modified.
    * @param markings
    *          A pattern of markings to be removed from the state. This pattern
-   *          can be obtained through the method {@link #getAllMarkings(int)
+   *          can be obtained through the methods {@link #getAllMarkings(int)
    *          getAllMarkings()}, {@link #createMarkings(TIntArrayList)
    *          createMarkings()}, or {@link #mergeMarkings(long,long)
    *          mergeMarkings()}.
@@ -726,7 +741,7 @@ public class ListBufferTransitionRelation
    *          Code of proposition to be added to pattern.
    * @return A number identifying a marking consisting of all propositions
    *         contained in the given markings, plus the the additional marking.
-   * @see #mergeMarkings(long, long)
+   * @see #mergeMarkings(long, long) mergeMarkings()
    * @see #setAllMarkings(int,long) setAllMarkings()
    */
   public long addMarking(final long markings, final int prop)
@@ -1280,6 +1295,33 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Returns whether the given state is a deadlock state.
+   * A deadlock state is a state that is not marked and has no outgoing
+   * transitions. This method uses the successor transition buffer to
+   * check for outgoing transitions and can only be called if the transition
+   * relation is configured for successors.
+   * @param state
+   *          The state to be checked.
+   * @param prop
+   *          The proposition to determine whether a state is marked.
+   *          If the transition relation does not use this proposition,
+   *          then there are no deadlock states; otherwise states marked
+   *          with this proposition cannot be deadlock states.
+   * @return <CODE>true</CODE> if the state is not marked and has no
+   *         outgoing transitions.
+   */
+  public boolean isDeadlockState(final int state, final int prop)
+  {
+    if (isMarked(state, prop)) {
+      return false;
+    } else if (mSuccessorBuffer != null) {
+      return !mSuccessorBuffer.hasTransitions(state);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
    * Checks whether this transition relation represents a deterministic
    * automaton. A transition relation is deterministic if it has at most
    * one initial state, and if there exists at most one successor state
@@ -1328,6 +1370,7 @@ public class ListBufferTransitionRelation
     }
     return true;
   }
+
 
   //#########################################################################
   //# Transition Modifications
@@ -1813,13 +1856,12 @@ public class ListBufferTransitionRelation
   /**
    * Determines whether the given event is selflooped in this transition
    * relation.
-   *
    * @param event
    *          The ID of the event to be tested.
    * @return <CODE>true</CODE> if the given event is selflooped in every
    *         state, and appears on no other transitions.
    */
-  public boolean isPureSelfloopEvent(final int event)
+  public boolean isProperSelfloopEvent(final int event)
   {
     final TransitionIterator iter;
     if (mSuccessorBuffer != null) {
@@ -1845,6 +1887,50 @@ public class ListBufferTransitionRelation
       }
     }
     return true;
+  }
+
+  /**
+   * Determines whether the given event is selflooped in all non-deadlock
+   * states of this transition relation. A deadlock state is a state that is
+   * not marked and has no outgoing transitions. This method uses the
+   * successor transition buffer to check for outgoing transitions and can
+   * only be called if the transition relation is configured for successors.
+   * @param event
+   *          The ID of the event to be tested.
+   * @param prop
+   *          The proposition to determine whether a state is marked.
+   *          If the transition relation does not use this proposition,
+   *          then there are no deadlock states; otherwise states marked
+   *          with this proposition cannot be deadlock states.
+   * @return <CODE>true</CODE> if the given event appears on at least one
+   *         transition and is selflooped in every non-deadlock state,
+   *         and appears on no other transitions.
+   */
+  public boolean isProperSelfloopEvent(final int event, final int prop)
+  {
+    if (mSuccessorBuffer != null) {
+      final TransitionIterator iter = mSuccessorBuffer.createReadOnlyIterator();
+      final int numStates = getNumberOfStates();
+      boolean hasTransition = false;
+      for (int state = 0; state < numStates; state++) {
+        if (isReachable(state) && !isDeadlockState(state, prop)) {
+          iter.reset(state, event);
+          if (iter.advance()) {
+            do {
+              if (iter.getCurrentToState() != state) {
+                return false;
+              }
+            } while (iter.advance());
+            hasTransition = true;
+          } else {
+            return false;
+          }
+        }
+      }
+      return hasTransition;
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
   }
 
   /**
@@ -2072,10 +2158,85 @@ public class ListBufferTransitionRelation
     boolean modified = false;
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0 &&
-          isPureSelfloopEvent(e)) {
+          isProperSelfloopEvent(e)) {
         removeEvent(e);
         modified = true;
       }
+    }
+    return modified;
+  }
+
+  /**
+   * <P>Attempts to simplify the automaton by removing redundant selfloop
+   * events while considering deadlock states.</P>
+   * <P>This method searches for any non-tau events that appear on at least
+   * one transition and appear only as selfloops and are selflooped in all
+   * non-deadlock states of the transition relation. These events are marked
+   * as unused and removed from the transition relation.</P>
+   * <P>A deadlock state is a state that is not marked and has no outgoing
+   * transitions.</P>
+   * @param prop
+   *          The proposition to determine whether a state is marked.
+   *          If the transition relation does not use this proposition,
+   *          then there are no deadlock states; otherwise states marked
+   *          with this proposition cannot be deadlock states.
+   * @return <CODE>true</CODE> if at least one event was removed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removeProperSelfLoopEvents(final int prop)
+  {
+    if (!isUsedProposition(prop)) {
+      return removeProperSelfLoopEvents();
+    }
+    final int numEvents = getNumberOfProperEvents();
+    boolean modified = false;
+    if (mSuccessorBuffer != null) {
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0 &&
+            isProperSelfloopEvent(e, prop)) {
+          removeEvent(e);
+          modified = true;
+        }
+      }
+    } else if (mPredecessorBuffer != null) {
+      final int numStates = getNumberOfStates();
+      final BitSet nonDeadlockStates = new BitSet(numStates);
+      final TransitionIterator iterAll =
+        mPredecessorBuffer.createAllTransitionsReadOnlyIterator();
+      while (iterAll.advance()) {
+        final int s = iterAll.getCurrentSourceState();
+        nonDeadlockStates.set(s);
+      }
+      final TransitionIterator iter =
+        mPredecessorBuffer.createReadOnlyIterator();
+      events:
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0) {
+          boolean hasTransition = false;
+          for (int s = 0; s < numStates; s++) {
+            if (isReachable(s) &&
+                (nonDeadlockStates.get(s) || isMarked(s, prop))) {
+              iter.reset(s, e);
+              if (iter.advance()) {
+                do {
+                  if (iter.getCurrentToState() != s) {
+                    continue events;
+                  }
+                } while (iter.advance());
+                hasTransition = true;
+              } else {
+                continue events;
+              }
+            }
+          }
+          if (hasTransition) {
+            removeEvent(e);
+            modified = true;
+          }
+        }
+      }
+    } else {
+      throw createNoBufferException();
     }
     return modified;
   }

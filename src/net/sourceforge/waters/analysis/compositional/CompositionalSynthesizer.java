@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -435,7 +436,7 @@ public class CompositionalSynthesizer extends
           return;
         } else {
           final AutomatonProxy newSupervisor =
-            createRenamedSupervisor(supervisor, eventEnc);
+          createRenamedSupervisor(reduceSupervisor(supervisor), eventEnc);
           result.addSupervisor(newSupervisor);
         }
       }
@@ -549,7 +550,7 @@ public class CompositionalSynthesizer extends
         return false;
       } else {
         final AutomatonProxy renamedSup =
-          createRenamedSupervisor(supervisor, encoding);
+        createRenamedSupervisor(reduceSupervisor(supervisor), encoding);
         result.addSupervisor(renamedSup);
         return true;
       }
@@ -841,11 +842,10 @@ public class CompositionalSynthesizer extends
     } else {
       filter = props;
     }
-    final EventEncoding encoding = new EventEncoding
-      (aut, translator, filter, EventEncoding.FILTER_PROPOSITIONS);
-    for (int e = EventEncoding.NONTAU;
-         e < encoding.getNumberOfProperEvents();
-         e++) {
+    final EventEncoding encoding =
+      new EventEncoding(aut, translator, filter,
+                        EventEncoding.FILTER_PROPOSITIONS);
+    for (int e = EventEncoding.NONTAU; e < encoding.getNumberOfProperEvents(); e++) {
       final byte status = encoding.getProperEventStatus(e);
       encoding.setProperEventStatus(e, status | EventEncoding.STATUS_LOCAL);
     }
@@ -868,10 +868,30 @@ public class CompositionalSynthesizer extends
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultID = encoding.getEventCode(defaultMarking);
     synthesiser.setDefaultMarkingID(defaultID);
-    final TIntHashSet renamed = getRenamedControllables(encoding);
+    TIntHashSet renamed = getRenamedControllables(encoding);
+    if (getSupervisorReductionEnabled()){
+      renamed = null;
+    }
     synthesiser.setRenamedEvents(renamed);
     synthesiser.run();
     return synthesiser.getPseudoSupervisor();
+  }
+
+  private void r(){
+
+  }
+
+  private ListBufferTransitionRelation reduceSupervisor(final ListBufferTransitionRelation rel) throws AnalysisException
+  {
+    if (!getSupervisorReductionEnabled()){
+      return rel;
+    }
+    final SupervisorReductionTRSimplifier simplifier = new SupervisorReductionTRSimplifier();
+    simplifier.setTransitionRelation(rel);
+    simplifier.setEvent(-1);
+    simplifier.setBadStateIndex();
+    simplifier.run();
+    return simplifier.getTransitionRelation();
   }
 
   private AutomatonProxy createRenamedSupervisor(final ListBufferTransitionRelation rel,
@@ -979,8 +999,8 @@ public class CompositionalSynthesizer extends
               }
             }
             final byte status = rel.getProperEventStatus(nextCode);
-            rel.setProperEventStatus
-              (nextCode, status | EventEncoding.STATUS_UNUSED);
+            rel.setProperEventStatus(nextCode, status
+                                               | EventEncoding.STATUS_UNUSED);
           }
         }
       }
