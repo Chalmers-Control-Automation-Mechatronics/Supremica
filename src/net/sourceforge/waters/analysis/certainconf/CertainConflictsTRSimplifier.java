@@ -84,12 +84,30 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     mStateSetBuffer = null;
     mTransitionBuffer = null;
   }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
 
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier
+  @Override
+  public boolean isDeadlockAware()
+  {
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
@@ -127,7 +145,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       if (dumpstate > -1) rel.removeOutgoingTransitions(dumpstate);
       rel.checkReachability();
-      rel.removeProperSelfLoopEvents();
+      removeProperSelfLoopEvents();
       return true;
     }
 
@@ -262,7 +280,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
         if (dumpstate > -1) rel.removeOutgoingTransitions(dumpstate);
         rel.checkReachability();
-        rel.removeProperSelfLoopEvents();
+        removeProperSelfLoopEvents();
       }
     }
 

@@ -33,7 +33,7 @@ import java.util.Set;
  * @author Robi Malik
  */
 
-public class BFSSeachSpace<E>
+public class BFSSearchSpace<E>
   extends AbstractQueue<E>
 {
 
@@ -42,7 +42,7 @@ public class BFSSeachSpace<E>
   /**
    * Creates a new search space.
    */
-  public BFSSeachSpace()
+  public BFSSearchSpace()
   {
     mQueue = new ArrayDeque<E>();
     mVisited = new THashSet<E>();
@@ -52,7 +52,7 @@ public class BFSSeachSpace<E>
    * Creates a new search space.
    * @param  size    The initial size of the visited hash set.
    */
-  public BFSSeachSpace(final int size)
+  public BFSSearchSpace(final int size)
   {
     mQueue = new ArrayDeque<E>();
     mVisited = new THashSet<E>(size);

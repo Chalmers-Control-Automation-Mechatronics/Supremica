@@ -700,76 +700,77 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected void runCompositionalMinimisation()
     throws AnalysisException
   {
-    simplify();
-    boolean cancheck = true;
-    OverflowException lastOverflow = null;
     final CompositionalAnalysisResult result = getAnalysisResult();
-    Collection<Candidate> candidates;
-    Candidate candidate = null;
-    outer:
-    do {
-      subsystem:
+    // If simplify() returns true, the global system has been trivially
+    // verified, and there is nothing left to do.
+    if (!simplify()) {
+      boolean cancheck = true;
+      OverflowException lastOverflow = null;
+      Collection<Candidate> candidates;
+      Candidate candidate = null;
+      outer:
       do {
-        if (isSubsystemTrivial(mCurrentAutomata)) {
-          if (result.isFinished()) {
-            break outer;
-          } else {
-            continue outer;
-          }
-        }
-        candidates = mPreselectingHeuristic.findCandidates();
-        candidate = selectCandidate(candidates);
-        while (candidate != null) {
-          try {
-            mMayBeSplit = false;
-            applyCandidate(candidate);
-            simplify();
-            cancheck = true;
-            continue subsystem;
-          } catch (final OutOfMemoryError error) {
-            getLogger().debug("<out of memory>");
-            // caught - go on ...
-          } catch (final OverflowException overflow) {
-            // caught - go on ...
-          }
-          recordUnsuccessfulComposition();
-          final List<AutomatonProxy> automata = candidate.getAutomata();
-          mOverflowCandidates.add(automata);
-          candidates.remove(candidate);
+        subsystem:
+        do {
+          candidates = mPreselectingHeuristic.findCandidates();
           candidate = selectCandidate(candidates);
-        }
-      } while (candidate != null);
-      try {
-        if (cancheck) {
-          doMonolithicAnalysis(mCurrentAutomata);
-          lastOverflow = null;
-        }
-      } catch (final OutOfMemoryError error) {
-        getLogger().debug("<out of memory>");
-        lastOverflow = new OverflowException(error);
-        cancheck = false;
-      } catch (final OverflowException overflow) {
-        lastOverflow = overflow;
-        cancheck = false;
-      }
-      if (lastOverflow != null) {
-        if (mCurrentInternalStateLimit < mUpperInternalStateLimit) {
-          mCurrentInternalStateLimit =
-            Math.min(2 * mCurrentInternalStateLimit, mUpperInternalStateLimit);
-          mOverflowCandidates.clear();
-          final Logger logger = getLogger();
-          if (logger.isDebugEnabled()) {
-            final String msg =
-              "State limit increased to " + mCurrentInternalStateLimit + ".";
-            logger.debug(msg);
+          while (candidate != null) {
+            try {
+              mMayBeSplit = false;
+              applyCandidate(candidate);
+              if (simplify()) {
+                if (result.isFinished()) {
+                  break outer;
+                } else {
+                  continue outer;
+                }
+              }
+              cancheck = true;
+              continue subsystem;
+            } catch (final OutOfMemoryError error) {
+              getLogger().debug("<out of memory>");
+              // caught - go on ...
+            } catch (final OverflowException overflow) {
+              // caught - go on ...
+            }
+            recordUnsuccessfulComposition();
+            final List<AutomatonProxy> automata = candidate.getAutomata();
+            mOverflowCandidates.add(automata);
+            candidates.remove(candidate);
+            candidate = selectCandidate(candidates);
           }
-        } else {
-          throw lastOverflow;
+        } while (candidate != null);
+        try {
+          if (cancheck) {
+            doMonolithicAnalysis(mCurrentAutomata);
+            lastOverflow = null;
+          }
+        } catch (final OutOfMemoryError error) {
+          getLogger().debug("<out of memory>");
+          lastOverflow = new OverflowException(error);
+          cancheck = false;
+        } catch (final OverflowException overflow) {
+          lastOverflow = overflow;
+          cancheck = false;
         }
-      }
-    } while (lastOverflow != null ||
-             !result.isFinished() && popEventDisjointSubsystem());
-
+        if (lastOverflow != null) {
+          if (mCurrentInternalStateLimit < mUpperInternalStateLimit) {
+            mCurrentInternalStateLimit =
+              Math.min(2 * mCurrentInternalStateLimit, mUpperInternalStateLimit);
+            mOverflowCandidates.clear();
+            final Logger logger = getLogger();
+            if (logger.isDebugEnabled()) {
+              final String msg =
+                "State limit increased to " + mCurrentInternalStateLimit + ".";
+              logger.debug(msg);
+            }
+          } else {
+            throw lastOverflow;
+          }
+        }
+      } while (lastOverflow != null ||
+               !result.isFinished() && popEventDisjointSubsystem());
+    }
     if (!result.isFinished()) {
       final List<AutomatonProxy> empty = Collections.emptyList();
       doMonolithicAnalysis(empty);
@@ -833,7 +834,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   /**
    * Creates an abstraction step representing a synchronous product operation.
    * This hook is called after two or more automata have been composed to
-   * prepare an abstraction step, which may later be files by a call to
+   * prepare an abstraction step, which may later be filed by a call to
    * {@link #recordAbstractionStep(AbstractionStep) recordAbstractionStep()}.
    * @param  automata     The automata that have been composed.
    * @param  sync         The synchronous product automaton that was created.
@@ -1374,20 +1375,33 @@ public abstract class AbstractCompositionalModelAnalyzer
    *                        been changed prior to the call, so the test for
    *                        event-disjoint subsystems is performed even if
    *                        no further simplification is possible.
+   * @return <CODE>true</CODE> if the subsystem has been found to be
+   *         trivially blocking or nonblocking. If <CODE>true</CODE>
+   *         is returned and the result for the global property is known,
+   *         the verification result is updated to contain the correct result
+   *         and a counterexample for the abstracted model if appropriate.
+   * @see #isSubsystemTrivial(Collection) isSubsystemTrivial()
    * @see #simplifyDirtyAutomata()
    * @see #removeRedundantEvents()
    * @see #findEventDisjointSubsystems()
    */
-  private void simplify()
+  private boolean simplify()
     throws AnalysisException
   {
+    if (isSubsystemTrivial(mCurrentAutomata)) {
+      return true;
+    }
     final boolean change1 = simplifyDirtyAutomata();
     final boolean change2 = removeRedundantEvents();
     boolean change = change1 || change2;
     while (change) {
+      if (isSubsystemTrivial(mCurrentAutomata)) {
+        return true;
+      }
       change = simplifyDirtyAutomata() && removeRedundantEvents();
     }
     findEventDisjointSubsystems();
+    return false;
   }
 
   /**
@@ -1552,7 +1566,7 @@ public abstract class AbstractCompositionalModelAnalyzer
        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final boolean change1 = rel.checkReachability();
     final boolean change2 = rel.removeTauSelfLoops();
-    final boolean change3 = rel.removeProperSelfLoopEvents();
+    final boolean change3 = removeProperSelfLoopEvents(eventEnc, rel);
     final boolean change4 = rel.removeRedundantPropositions();
     final EventProxy trueTau = change2 ? null : tau;
     mMayBeSplit |= change3;
@@ -1604,6 +1618,27 @@ public abstract class AbstractCompositionalModelAnalyzer
         mSynchronousProductBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
       mSynchronousProductBuilder.clearMask();
+    }
+  }
+
+  /**
+   * Removes events that are only selfloops from a transition relation,
+   * possibly taking into account deadlock states.
+   */
+  private boolean removeProperSelfLoopEvents(final EventEncoding enc,
+                                             final ListBufferTransitionRelation rel)
+  {
+    final EventProxy defaultMarking = getUsedDefaultMarking();
+    if (defaultMarking == null) {
+      return rel.removeProperSelfLoopEvents();
+    } else if (getConfiguredPreconditionMarking() != null) {
+      return rel.removeProperSelfLoopEvents();
+    }
+    final int defaultMarkingID = enc.getEventCode(defaultMarking);
+    if (defaultMarkingID < 0) {
+      return rel.removeProperSelfLoopEvents();
+    } else {
+      return rel.removeProperSelfLoopEvents(defaultMarkingID);
     }
   }
 

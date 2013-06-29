@@ -46,7 +46,31 @@ public class OnlySilentOutgoingTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Configuration
+  /**
+   * Sets whether this simplifier should consider deadlock states when
+   * removing selfloops.
+   * @see AbstractMarkingTRSimplifier#isDeadlockAware()
+   */
+  public void setDeadlockAware(final boolean aware)
+  {
+    mDeadlockAware = aware;
+  }
+
+  /**
+   * Gets whether this simplifier considers deadlock states when
+   * removing selfloops.
+   */
+  @Override
+  public boolean isDeadlockAware()
+  {
+    return mDeadlockAware;
+  }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -121,8 +145,12 @@ public class OnlySilentOutgoingTRSimplifier
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
-    rel.removeProperSelfLoopEvents();
+    removeProperSelfLoopEvents();
   }
 
-}
 
+  //#########################################################################
+  //# Data Members
+  private boolean mDeadlockAware = false;
+
+}

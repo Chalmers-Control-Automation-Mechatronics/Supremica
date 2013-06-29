@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import net.sourceforge.waters.analysis.tr.BFSSeachSpace;
+import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -509,14 +509,14 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     if (trListSize == 0) {
       return system;
     }
-    final BFSSeachSpace<EFSMTransitionRelation> trSearchSpace =
-      new BFSSeachSpace<EFSMTransitionRelation>(trListSize);
+    final BFSSearchSpace<EFSMTransitionRelation> trSearchSpace =
+      new BFSSearchSpace<EFSMTransitionRelation>(trListSize);
     final EFSMTransitionRelation firstTR = trList.get(0);
     trSearchSpace.add(firstTR);
     final List<EFSMVariable> varList = system.getVariables();
     final int varListSize = varList.size();
-    final BFSSeachSpace<EFSMVariable> varSearchSpace =
-      new BFSSeachSpace<EFSMVariable>(varListSize);
+    final BFSSearchSpace<EFSMVariable> varSearchSpace =
+      new BFSSearchSpace<EFSMVariable>(varListSize);
     while (!trSearchSpace.isEmpty() || !varSearchSpace.isEmpty()) {
       if (trSearchSpace.isEmpty()) {
         final EFSMVariable var = varSearchSpace.remove();

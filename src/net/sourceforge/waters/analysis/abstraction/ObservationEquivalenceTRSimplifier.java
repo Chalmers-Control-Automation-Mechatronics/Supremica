@@ -169,6 +169,29 @@ public class ObservationEquivalenceTRSimplifier
   }
 
   /**
+   * Sets whether this simplifier should consider deadlock states when
+   * removing selfloops.
+   * @see #isDeadlockAware()
+   */
+  public void setDeadlockAware(final boolean aware)
+  {
+    mDeadlockAware = aware;
+  }
+
+  /**
+   * Gets whether this simplifier considers deadlock states when
+   * removing selfloops. This setting affects how the simplifier checks for
+   * pure selfloop events in the end. If the simplifier is deadlock aware,
+   * then events not enabled in deadlock states can be considered as
+   * selfloop events and removed from the automaton if selflooped in all
+   * other states.
+   */
+  public boolean isDeadlockAware()
+  {
+    return mDeadlockAware;
+  }
+
+  /**
    * Sets whether special events are to be considered in abstraction.
    * If enabled, events marked as selfloop-only in all other automata
    * will be treated specially. For such events, it is possible to assume
@@ -273,6 +296,7 @@ public class ObservationEquivalenceTRSimplifier
       mask |= (1L << defaultID);
     }
     setPropositionMask(mask);
+    mDefaultMarkingID = defaultID;
   }
 
   @Override
@@ -670,7 +694,7 @@ public class ObservationEquivalenceTRSimplifier
   }
 
   private void applyObservationEquivalencePartition()
-  throws AnalysisException
+    throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (getResultPartition() != null) {
@@ -678,17 +702,17 @@ public class ObservationEquivalenceTRSimplifier
       super.applyResultPartition();
       removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
       rel.removeTauSelfLoops();
-      rel.removeProperSelfLoopEvents();
+      removeProperSelfLoopEvents();
     } else {
       removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
       if (mHasModifications) {
-        rel.removeProperSelfLoopEvents();
+        removeProperSelfLoopEvents();
       }
     }
   }
 
   private void applyWeakObservationEquivalencePartition()
-  throws AnalysisException
+    throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final List<int[]> partition = getResultPartition();
@@ -703,17 +727,17 @@ public class ObservationEquivalenceTRSimplifier
       partitioner.applyPartition();
       removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
       rel.removeTauSelfLoops();
-      rel.removeProperSelfLoopEvents();
+      removeProperSelfLoopEvents();
     } else {
       removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
       if (mHasModifications) {
-        rel.removeProperSelfLoopEvents();
+        removeProperSelfLoopEvents();
       }
     }
   }
 
   private void removeRedundantTransitions(final TransitionRemovalTime time)
-  throws AnalysisException
+    throws AnalysisException
   {
     final TransitionRemoval mode = mEquivalence.getTransitionRemovalMode(this);
     final boolean doTau = mode.getDoTau(time);
@@ -766,6 +790,16 @@ public class ObservationEquivalenceTRSimplifier
           }
         }
       }
+    }
+  }
+
+  protected boolean removeProperSelfLoopEvents()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (mDeadlockAware && mDefaultMarkingID >= 0) {
+      return rel.removeProperSelfLoopEvents(mDefaultMarkingID);
+    } else {
+      return rel.removeProperSelfLoopEvents();
     }
   }
 
@@ -2205,6 +2239,8 @@ public class ObservationEquivalenceTRSimplifier
   private TransitionRemoval mTransitionRemovalMode = TransitionRemoval.NONTAU;
   private MarkingMode mMarkingMode = MarkingMode.UNCHANGED;
   private long mPropositionMask = ~0;
+  private int mDefaultMarkingID = -1;
+  private boolean mDeadlockAware = false;
   private boolean mUsingSpecialEvents = true;
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mInitialInfoSize = -1;

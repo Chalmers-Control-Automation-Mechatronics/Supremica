@@ -56,9 +56,6 @@ public class EnabledEventsSilentContinuationTRSimplifier
   }
 
 
-
-
-
   //#########################################################################
   //# Configuration
   /**
@@ -86,17 +83,15 @@ public class EnabledEventsSilentContinuationTRSimplifier
   /**
    * Sets the number of always enabled events. Always enabled events are events
    * that are not disabled by any other current automaton.
-   * @param numEnabledEvents
    */
   public void setNumberOfEnabledEvents(final int numEnabledEvents)
   {
-
     mNumberOfEnabledEvents = numEnabledEvents;
   }
+
   public int getNumberOfEnabledEvents()
   {
     return mNumberOfEnabledEvents;
-
   }
 
 
@@ -224,8 +219,6 @@ public class EnabledEventsSilentContinuationTRSimplifier
     rel.removeTauSelfLoops();
     rel.removeProperSelfLoopEvents();
   }
-
-
 
 
   //#########################################################################
