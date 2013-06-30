@@ -220,6 +220,12 @@ public class EFSMCompilerTest
                  SharedEventException.class, ":accepting");
   }
 
+  public void testEFSMCompiler21()
+    throws IOException, WatersException
+  {
+    compile("tests", "efsm", "efsm21");
+  }
+
 
   //#########################################################################
   //# Customisation

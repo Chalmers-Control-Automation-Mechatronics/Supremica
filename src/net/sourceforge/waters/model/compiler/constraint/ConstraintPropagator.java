@@ -320,6 +320,47 @@ public class ConstraintPropagator
     mPrimedVariables.removeProxy(unary);
   }
 
+  /**
+   * Removes unchanged primed variables from this constraint propagator.
+   * This method checks for primed variables with bindings that are equal
+   * to the current values of the variables, and removes them. This
+   * suppresses equations of the form x'==x in the output.
+   */
+  public void removeUnchangedVariables()
+  {
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final int numPrimed = mPrimedVariables.size();
+    final ProxyAccessorSet<UnaryExpressionProxy> primedVars =
+      new ProxyAccessorHashSet<UnaryExpressionProxy>(eq, numPrimed);
+    mPrimedVariableCollector.collectPrimedVariables
+      (mNormalizedConstraints, primedVars);
+    mContext.collectPrimedVariables(primedVars);
+    final List<UnaryExpressionProxy> victims =
+      new LinkedList<UnaryExpressionProxy>();
+    for (final UnaryExpressionProxy primed : mPrimedVariables) {
+      if (!primedVars.containsProxy(primed)) {
+        final SimpleExpressionProxy varName = primed.getSubTerm();
+        final SimpleExpressionProxy primedBinding =
+          mContext.getBoundExpression(primed);
+        if (primedBinding == null) {
+          continue;
+        } else if (eq.equals(primedBinding, varName)) {
+          victims.add(primed);
+          continue;
+        }
+        final SimpleExpressionProxy varBinding =
+          mContext.getBoundExpression(varName);
+        if (eq.equals(primedBinding, varBinding)) {
+          victims.add(primed);
+        }
+      }
+    }
+    for (final UnaryExpressionProxy victim : victims) {
+      mContext.removeBinding(victim);
+      mPrimedVariables.removeProxy(victim);
+    }
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -747,6 +788,17 @@ public class ConstraintPropagator
     CompiledRange getOriginalRange(final SimpleExpressionProxy varname)
     {
       return mRootContext.getVariableRange(varname);
+    }
+
+    void collectPrimedVariables
+      (final ProxyAccessorSet<UnaryExpressionProxy> collection)
+    {
+      for (final AbstractBinding binding : mBindings.values()) {
+        final SimpleExpressionProxy expr = binding.getBoundExpression();
+        if (expr != null) {
+          mPrimedVariableCollector.collectPrimedVariables(expr, collection);
+        }
+      }
     }
 
     //#######################################################################

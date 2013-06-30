@@ -363,6 +363,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
       mConstraintPropagator.removeVariable(varname);
       mConstraintPropagator.propagate();
       if (!mConstraintPropagator.isUnsatisfiable()) {
+        mConstraintPropagator.removeUnchangedVariables();
         final ConstraintList unfoldedUpdate =
           mConstraintPropagator.getAllConstraints();
         final UnfoldedUpdateInfo info = createUnfoldedUpdateInfo(unfoldedUpdate);
@@ -402,6 +403,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
         mKnownAfterValueCache.put(key, afterValue);
         final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
         mConstraintPropagator.removeVariable(varName);
+        mConstraintPropagator.removeUnchangedVariables();
         final ConstraintList unfoldedUpdate =
           mConstraintPropagator.getAllConstraints();
         final UnfoldedUpdateInfo info =
@@ -629,6 +631,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
             mKnownAfterValue = afterValue;
             final IdentifierProxy varName = mUnfoldedVariable.getVariableName();
             mConstraintPropagator.removeVariable(varName);
+            mConstraintPropagator.removeUnchangedVariables();
             final ConstraintList unfoldedUpdate =
               mConstraintPropagator.getAllConstraints();
             mUnfoldedUpdateInfo = createUnfoldedUpdateInfo(unfoldedUpdate);

@@ -493,6 +493,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
         mConstraintPropagator.init(list);
         mConstraintPropagator.propagate();
         if (!mConstraintPropagator.isUnsatisfiable()) {
+          mConstraintPropagator.removeUnchangedVariables();
           final ConstraintList allConstraints =
             mConstraintPropagator.getAllConstraints();
           mSimplifiedGuardActionBlockMap.putByProxy(update, allConstraints);

@@ -126,6 +126,7 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier tauLoopRemover =
       new TauLoopRemovalTRSimplifier();
+    tauLoopRemover.setDumpStateAware(true);
     chain.add(tauLoopRemover);
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
@@ -137,9 +138,11 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
+    silentInRemover.setDumpStateAware(true);
     chain.add(silentInRemover);
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
+    silentOutRemover.setDumpStateAware(true);
     chain.add(silentOutRemover);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
@@ -152,6 +155,7 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
     bisimulator.setUsingSpecialEvents(true);
+    bisimulator.setDumpStateAware(true);
     bisimulator.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER);
     bisimulator.setMarkingMode

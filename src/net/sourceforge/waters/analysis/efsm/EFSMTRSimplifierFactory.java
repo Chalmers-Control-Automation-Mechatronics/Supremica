@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   ConflictAbstractionProcedureFactory
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efsm
+//# CLASS:   EFSMTRSimplifierFactory
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -10,21 +10,16 @@
 package net.sourceforge.waters.analysis.efsm;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
-import net.sourceforge.waters.analysis.compositional.AbstractionProcedure;
-import net.sourceforge.waters.analysis.compositional.AbstractionProcedureFactory;
-import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 
 
 /**
  * A collection of abstraction methods to be used for compositional
  * nonblocking verification. The members of this enumeration are passed to the
- * {@link CompositionalConflictChecker} using its
- * {@link AbstractCompositionalModelAnalyzer#setAbstractionProcedureFactory(AbstractionProcedureFactory)
- * setAbstractionProcedureFactory()} method.
+ * {@link EFSMConflictChecker} using its
+ * {@link EFSMConflictChecker#setSimplifierFactory(EFSMTRSimplifierFactory)
+ * setSimplifierFactory()} method.
  *
- * @see AbstractionProcedure
- * @author Robi Malik
+ * @author Sahar Mohajerani, Robi Malik
  */
 
 public enum EFSMTRSimplifierFactory
