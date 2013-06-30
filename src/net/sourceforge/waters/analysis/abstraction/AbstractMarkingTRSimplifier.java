@@ -117,7 +117,7 @@ public abstract class AbstractMarkingTRSimplifier
    * awareness only preservers conflict equivalence and should not be
    * used in general.
    */
-  public boolean isDeadlockAware()
+  public boolean isDumpStateAware()
   {
     return false;
   }
@@ -152,12 +152,12 @@ public abstract class AbstractMarkingTRSimplifier
    * simplifier is configured to be deadlock aware.
    * @return <CODE>true</CODE> if at least one event was removed,
    *         <CODE>false</CODE> otherwise.
-   * @see #isDeadlockAware()
+   * @see #isDumpStateAware()
    */
   protected boolean removeProperSelfLoopEvents()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (isDeadlockAware() && mDefaultMarkingID >= 0) {
+    if (isDumpStateAware() && mDefaultMarkingID >= 0) {
       return rel.removeProperSelfLoopEvents(mDefaultMarkingID);
     } else {
       return rel.removeProperSelfLoopEvents();

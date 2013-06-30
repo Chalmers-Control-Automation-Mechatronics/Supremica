@@ -171,11 +171,11 @@ public class ObservationEquivalenceTRSimplifier
   /**
    * Sets whether this simplifier should consider deadlock states when
    * removing selfloops.
-   * @see #isDeadlockAware()
+   * @see #isDumpStateAware()
    */
-  public void setDeadlockAware(final boolean aware)
+  public void setDumpStateAware(final boolean aware)
   {
-    mDeadlockAware = aware;
+    mDumpStateAware = aware;
   }
 
   /**
@@ -186,9 +186,9 @@ public class ObservationEquivalenceTRSimplifier
    * selfloop events and removed from the automaton if selflooped in all
    * other states.
    */
-  public boolean isDeadlockAware()
+  public boolean isDumpStateAware()
   {
-    return mDeadlockAware;
+    return mDumpStateAware;
   }
 
   /**
@@ -796,7 +796,7 @@ public class ObservationEquivalenceTRSimplifier
   protected boolean removeProperSelfLoopEvents()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (mDeadlockAware && mDefaultMarkingID >= 0) {
+    if (mDumpStateAware && mDefaultMarkingID >= 0) {
       return rel.removeProperSelfLoopEvents(mDefaultMarkingID);
     } else {
       return rel.removeProperSelfLoopEvents();
@@ -2240,7 +2240,7 @@ public class ObservationEquivalenceTRSimplifier
   private MarkingMode mMarkingMode = MarkingMode.UNCHANGED;
   private long mPropositionMask = ~0;
   private int mDefaultMarkingID = -1;
-  private boolean mDeadlockAware = false;
+  private boolean mDumpStateAware = false;
   private boolean mUsingSpecialEvents = true;
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mInitialInfoSize = -1;

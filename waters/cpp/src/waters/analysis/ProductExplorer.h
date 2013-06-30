@@ -111,6 +111,8 @@ public:
   inline void setStateLimit(uint32_t limit) {mStateLimit = limit;}
   inline uint32_t getTransitionLimit() const {return mTransitionLimit;}
   inline void setTransitionLimit(uint32_t limit) {mTransitionLimit = limit;}
+  inline bool isDumpStateAware() const {return mDumpStateAware;}
+  inline void setDumpStateAware(bool aware) {mDumpStateAware = aware;}
   inline bool isInitialUncontrollable() const {return mIsInitialUncontrollable;}
   inline void setInitialUncontrollable(bool initUncont)
     {mIsInitialUncontrollable = initUncont;}
@@ -197,6 +199,7 @@ private:
   jni::EventGlue mMarking;
   uint32_t mStateLimit;
   uint32_t mTransitionLimit;
+  bool mDumpStateAware;
   bool mIsInitialUncontrollable;
   ExplorerMode mMode;
   bool mIsAbortRequested;

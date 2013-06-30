@@ -111,11 +111,11 @@ public class NonAlphaDeterminisationTRSimplifier
   /**
    * Sets whether this simplifier should consider deadlock states when
    * removing selfloops.
-   * @see AbstractMarkingTRSimplifier#isDeadlockAware()
+   * @see AbstractMarkingTRSimplifier#isDumpStateAware()
    */
-  public void setDeadlockAware(final boolean aware)
+  public void setDumpStateAware(final boolean aware)
   {
-    mDeadlockAware = aware;
+    mDumpStateAware = aware;
   }
 
   /**
@@ -123,9 +123,9 @@ public class NonAlphaDeterminisationTRSimplifier
    * removing selfloops.
    */
   @Override
-  public boolean isDeadlockAware()
+  public boolean isDumpStateAware()
   {
-    return mDeadlockAware;
+    return mDumpStateAware;
   }
 
 
@@ -179,7 +179,7 @@ public class NonAlphaDeterminisationTRSimplifier
     applyResultPartitionAutomatically();
     rel.reverse();
     if (modified && getAppliesPartitionAutomatically() &&
-        mDeadlockAware && getDefaultMarkingID() >= 0) {
+        mDumpStateAware && getDefaultMarkingID() >= 0) {
       removeProperSelfLoopEvents();
     }
     return modified;
@@ -272,7 +272,7 @@ public class NonAlphaDeterminisationTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private boolean mDeadlockAware = false;
+  private boolean mDumpStateAware = false;
 
   private final ObservationEquivalenceTRSimplifier mBisimulator;
   private TransitionIterator mTauIterator;

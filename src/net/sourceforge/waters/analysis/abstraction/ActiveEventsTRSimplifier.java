@@ -91,7 +91,7 @@ public class ActiveEventsTRSimplifier
   //# Overrides for
   //# net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier
   @Override
-  public boolean isDeadlockAware()
+  public boolean isDumpStateAware()
   {
     return true;
   }

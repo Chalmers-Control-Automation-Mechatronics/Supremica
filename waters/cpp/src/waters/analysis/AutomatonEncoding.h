@@ -107,6 +107,9 @@ public:
   jni::JavaString getName() const;
   jni::JavaString getStateName(uint32_t code) const;
   const jni::StateGlue& getJavaState(uint32_t code) const;
+  inline int getNumberOfDumpStates() const
+    {return mDumpStates == 0 ? 0 : mDumpStates[0];}
+  inline int getDumpState(int i) const {return mDumpStates[i + 1];}
 
   //##########################################################################
   //# Comparing and Hashing
@@ -126,6 +129,7 @@ public:
   Int32PtrHashTable<const jni::StateGlue*,uint32_t>* createStateMap();
   void deleteStateMap
     (Int32PtrHashTable<const jni::StateGlue*,uint32_t>* statemap);
+  uint32_t setupDumpStates(const bool* dumpStatus);
 
   //##########################################################################
   //# Hash Methods (for states!!!)
@@ -169,6 +173,8 @@ private:
   uint32_t mFirstMarkedState;
   uint32_t mFirstPreMarkedState;
   uint32_t mEndPreMarkedStates;
+  // Number of dump states followed by state numbers, or NULL.
+  uint32_t* mDumpStates;
 
   //##########################################################################
   //# Class Constants

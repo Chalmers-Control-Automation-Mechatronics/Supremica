@@ -343,7 +343,11 @@ public class CompositionalConflictChecker
       final ConflictChecker current;
       if (configured == null) {
         final ProductDESProxyFactory factory = getFactory();
-        current = new NativeConflictChecker(factory);
+        final NativeConflictChecker nativeChecker =
+          new NativeConflictChecker(factory);
+        final boolean aware = getConfiguredPreconditionMarking() == null;
+        nativeChecker.setDumpStateAware(aware);
+        current = nativeChecker;
       } else {
         current = configured;
       }

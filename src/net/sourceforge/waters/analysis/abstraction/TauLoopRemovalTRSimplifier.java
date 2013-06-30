@@ -46,11 +46,11 @@ public class TauLoopRemovalTRSimplifier
   /**
    * Sets whether this simplifier should consider deadlock states when
    * removing selfloops.
-   * @see #isDeadlockAware()
+   * @see #isDumpStateAware()
    */
-  public void setDeadlockAware(final boolean aware)
+  public void setDumpStateAware(final boolean aware)
   {
-    mDeadlockAware = aware;
+    mDumpStateAware = aware;
   }
 
   /**
@@ -61,9 +61,9 @@ public class TauLoopRemovalTRSimplifier
    * selfloop events and removed from the automaton if selflooped in all
    * other states.
    */
-  public boolean isDeadlockAware()
+  public boolean isDumpStateAware()
   {
-    return mDeadlockAware;
+    return mDumpStateAware;
   }
 
 
@@ -174,7 +174,7 @@ public class TauLoopRemovalTRSimplifier
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
-    if (mDeadlockAware && mDefaultMarkingID >= 0) {
+    if (mDumpStateAware && mDefaultMarkingID >= 0) {
       rel.removeProperSelfLoopEvents(mDefaultMarkingID);
     } else {
       rel.removeProperSelfLoopEvents();
@@ -226,7 +226,7 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private boolean mDeadlockAware = false;
+  private boolean mDumpStateAware = false;
   private int mDefaultMarkingID = -1;
 
   private int mIndex;

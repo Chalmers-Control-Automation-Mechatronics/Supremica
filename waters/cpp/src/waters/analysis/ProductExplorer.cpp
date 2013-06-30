@@ -843,6 +843,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       gchecker.getConfiguredPreconditionMarkingGlue(&cache);
     waters::ProductExplorer* checker =
       finalizer.createProductExplorer(translator, premarking, marking, cache);
+    bool aware = gchecker.isDumpStateAware();
+    checker->setDumpStateAware(aware);
     bool result = checker->runNonblockingCheck();
     jni::VerificationResultGlue vresult =
       gchecker.createAnalysisResultGlue(&cache);

@@ -268,4 +268,5 @@ glue class NativeConflictChecker extends NativeModelVerifier {
   glue EventProxy getUsedDefaultMarking();
   glue EventProxy getConfiguredPreconditionMarking();
   glue KindTranslator getKindTranslator();
+  boolean isDumpStateAware();
 }

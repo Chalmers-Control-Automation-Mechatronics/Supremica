@@ -98,6 +98,9 @@ private:
   BroadEventRecord** mReversedEventRecords;
   int mMaxNondeterministicUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
+  // List of pairs (automaton number, state number), terminated by UINT32_MAX;
+  // or NULL.
+  uint32_t* mDumpStates;
   uint32_t mTraceLimit;
 };
 

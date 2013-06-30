@@ -877,10 +877,6 @@ public class CompositionalSynthesizer extends
     return synthesiser.getPseudoSupervisor();
   }
 
-  private void r(){
-
-  }
-
   private ListBufferTransitionRelation reduceSupervisor(final ListBufferTransitionRelation rel) throws AnalysisException
   {
     if (!getSupervisorReductionEnabled()){

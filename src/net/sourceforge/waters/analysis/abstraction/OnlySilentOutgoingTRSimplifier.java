@@ -50,11 +50,11 @@ public class OnlySilentOutgoingTRSimplifier
   /**
    * Sets whether this simplifier should consider deadlock states when
    * removing selfloops.
-   * @see AbstractMarkingTRSimplifier#isDeadlockAware()
+   * @see AbstractMarkingTRSimplifier#isDumpStateAware()
    */
-  public void setDeadlockAware(final boolean aware)
+  public void setDumpStateAware(final boolean aware)
   {
-    mDeadlockAware = aware;
+    mDumpStateAware = aware;
   }
 
   /**
@@ -62,9 +62,9 @@ public class OnlySilentOutgoingTRSimplifier
    * removing selfloops.
    */
   @Override
-  public boolean isDeadlockAware()
+  public boolean isDumpStateAware()
   {
-    return mDeadlockAware;
+    return mDumpStateAware;
   }
 
 
@@ -151,6 +151,6 @@ public class OnlySilentOutgoingTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private boolean mDeadlockAware = false;
+  private boolean mDumpStateAware = false;
 
 }

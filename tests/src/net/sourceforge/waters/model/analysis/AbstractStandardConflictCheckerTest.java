@@ -225,6 +225,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testAmpleStutterTest() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "ample_stutter_test.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testCertainConf1() throws Exception
   {
     final String group = "tests";

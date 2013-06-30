@@ -8,7 +8,6 @@
         <EventDecl Kind="CONTROLLABLE" Name="beta4"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="blocking"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="plant1">
@@ -94,6 +93,9 @@
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
                             <Point X="176" Y="96"/>
                         </PointGeometry>
@@ -122,6 +124,9 @@
                     <Edge Source="S0" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="blocking"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="4"/>
+                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>
@@ -132,7 +137,7 @@
                 <LabelBlock>
                     <SimpleIdentifier Name="blocking"/>
                     <LabelGeometry Anchor="NW">
-                        <Point X="720" Y="352"/>
+                        <Point X="47" Y="82"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
