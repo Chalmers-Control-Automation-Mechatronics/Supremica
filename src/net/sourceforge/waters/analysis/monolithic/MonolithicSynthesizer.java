@@ -13,6 +13,7 @@ import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -345,10 +347,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             final TIntArrayList disabEvents = new TIntArrayList(0);
             mSupervisorSimplifier
               .setUpEventList(enabDisabEvents, disabEvents);
-            final List<AutomatonProxy> localAut =
+            final List<AutomatonProxy> autList =
               new ArrayList<AutomatonProxy>();
+            boolean simplified = true;
             if (enabDisabEvents.size() == 0) {
-              localAut.add(mTransitionRelation
+              autList.add(mTransitionRelation
                 .createAutomaton(getFactory(), getEventEncoding()));
             } else {
               for (int e = 0; e < enabDisabEvents.size(); e++) {
@@ -363,15 +366,44 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                                                       .get(e)].getName());//set name
                 mSupervisorSimplifier.setBadStateIndex(mSupervisorSimplifier
                   .getBadStateIndex());//set bad state
-                mSupervisorSimplifier.run();
+                simplified = simplified & mSupervisorSimplifier.run();
+                if (!simplified) {
+                  removeBadStateTransitions(mTransitionRelation,
+                                            mSupervisorSimplifier
+                                              .getBadStateIndex());
+                  removeSelfloops(mTransitionRelation);
+                  autList.add(mTransitionRelation
+                    .createAutomaton(getFactory(), getEventEncoding()));
+                  break;
+                }
                 copy = mSupervisorSimplifier.getTransitionRelation();
-                localAut.add(copy.createAutomaton(getFactory(),
-                                                  getEventEncoding()));
+                autList.add(copy.createAutomaton(getFactory(),
+                                                 getEventEncoding()));
+              }
+            }
+            if (simplified) {
+              final IsomorphismChecker checker =
+                new IsomorphismChecker(getFactory(), false, false);
+              final THashSet<AutomatonProxy> removeSet =
+                new THashSet<AutomatonProxy>();
+              for (int autom = 0; autom < autList.size() - 1; autom++) {
+                for (int auto = autom + 1; auto < autList.size(); auto++) {
+                  if (checker.checkBisimulation(autList.get(autom),
+                                                autList.get(auto))) {
+                    removeSet.add(autList.get(auto));
+                  }
+                }
+              }
+              for (int a = autList.size() - 1; a >= 0; a--) {
+                if (removeSet.contains(autList.get(a))) {
+                  removeSet.remove(autList.get(a));
+                  autList.remove(a);
+                }
               }
             }
             des =
-              AutomatonTools.createProductDESProxy("Super_Localization",
-                                                   localAut, getFactory());
+              AutomatonTools.createProductDESProxy("Sup!!Local", autList,
+                                                   getFactory());
           }
         } else {
           // Supervisor Reduction Not Enabled
