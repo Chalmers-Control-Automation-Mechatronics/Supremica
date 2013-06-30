@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -56,28 +57,27 @@ import org.apache.log4j.Logger;
  * An implementation of the compositional synthesis algorithm.
  *
  * <I>References:</I><BR>
- * Sahar Mohajerani, Robi Malik, Simon Ware, Martin Fabian.
- * On the Use of Observation Equivalence in Synthesis Abstraction.
- * Proc. 3rd IFAC Workshop on Dependable Control of Discrete Systems,
- * DCDS&nbsp;2011, Saarbr&uuml;cken, Germany, 2011.<BR>
- * Sahar Mohajerani, Robi Malik, Martin Fabian.
- * Nondeterminism Avoidance in Compositional Synthesis of Discrete Event
- * Systems, Proc. 7th International Conference on Automation Science and
- * Engineering, CASE&nbsp;2011, Trieste, Italy.
+ * Sahar Mohajerani, Robi Malik, Simon Ware, Martin Fabian. On the Use of
+ * Observation Equivalence in Synthesis Abstraction. Proc. 3rd IFAC Workshop
+ * on Dependable Control of Discrete Systems, DCDS&nbsp;2011,
+ * Saarbr&uuml;cken, Germany, 2011.<BR>
+ * Sahar Mohajerani, Robi Malik, Martin Fabian. Nondeterminism Avoidance in
+ * Compositional Synthesis of Discrete Event Systems, Proc. 7th International
+ * Conference on Automation Science and Engineering, CASE&nbsp;2011, Trieste,
+ * Italy.
  *
  * @author Sahar Mohajerani, Robi Malik
  */
 
-
-public class CompositionalSynthesizer
-  extends AbstractCompositionalModelAnalyzer
-  implements SupervisorSynthesizer
+public class CompositionalSynthesizer extends
+  AbstractCompositionalModelAnalyzer implements SupervisorSynthesizer
 {
 
   //#########################################################################
   //# Constructors
   /**
    * Creates a compositional synthesiser without a model.
+   *
    * @param factory
    *          Factory used for trace construction.
    */
@@ -88,20 +88,21 @@ public class CompositionalSynthesizer
 
   /**
    * Creates a compositional synthesiser without a model.
+   *
    * @param factory
    *          Factory used for trace construction.
    * @param abstractionFactory
    *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalSynthesizer
-    (final ProductDESProxyFactory factory,
-     final SynthesisAbstractionProcedureFactory abstractionFactory)
+  public CompositionalSynthesizer(final ProductDESProxyFactory factory,
+                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(factory, IdenticalKindTranslator.getInstance(), abstractionFactory);
   }
 
   /**
    * Creates a compositional synthesiser without a model.
+   *
    * @param factory
    *          Factory used for trace construction.
    * @param translator
@@ -109,16 +110,16 @@ public class CompositionalSynthesizer
    * @param abstractionFactory
    *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalSynthesizer
-    (final ProductDESProxyFactory factory,
-     final KindTranslator translator,
-     final SynthesisAbstractionProcedureFactory abstractionFactory)
+  public CompositionalSynthesizer(final ProductDESProxyFactory factory,
+                                  final KindTranslator translator,
+                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(null, factory, translator, abstractionFactory);
   }
 
   /**
    * Creates a compositional synthesiser without a model.
+   *
    * @param factory
    *          Factory used for trace construction.
    * @param translator
@@ -129,23 +130,23 @@ public class CompositionalSynthesizer
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
    * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate
-   *          selection methods.
+   *          Enumeration factory that determines possible candidate selection
+   *          methods.
    */
-  public CompositionalSynthesizer
-    (final ProductDESProxyFactory factory,
-     final KindTranslator translator,
-     final SynthesisAbstractionProcedureFactory abstractionFactory,
-     final PreselectingMethodFactory preselectingMethodFactory,
-     final SelectingMethodFactory selectingMethodFactory)
+  public CompositionalSynthesizer(final ProductDESProxyFactory factory,
+                                  final KindTranslator translator,
+                                  final SynthesisAbstractionProcedureFactory abstractionFactory,
+                                  final PreselectingMethodFactory preselectingMethodFactory,
+                                  final SelectingMethodFactory selectingMethodFactory)
   {
     this(null, factory, translator, abstractionFactory,
          preselectingMethodFactory, selectingMethodFactory);
   }
 
   /**
-   * Creates a compositional synthesiser to compute a supervisor for the
-   * given model.
+   * Creates a compositional synthesiser to compute a supervisor for the given
+   * model.
+   *
    * @param model
    *          The model to be checked by this model verifier.
    * @param factory
@@ -155,19 +156,19 @@ public class CompositionalSynthesizer
    * @param abstractionFactory
    *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalSynthesizer
-    (final ProductDESProxy model,
-     final ProductDESProxyFactory factory,
-     final KindTranslator translator,
-     final SynthesisAbstractionProcedureFactory abstractionFactory)
+  public CompositionalSynthesizer(final ProductDESProxy model,
+                                  final ProductDESProxyFactory factory,
+                                  final KindTranslator translator,
+                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(model, factory, translator, abstractionFactory,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
   /**
-   * Creates a compositional synthesiser to compute a supervisor for the
-   * given model.
+   * Creates a compositional synthesiser to compute a supervisor for the given
+   * model.
+   *
    * @param model
    *          The model to be checked by this model verifier.
    * @param factory
@@ -180,22 +181,20 @@ public class CompositionalSynthesizer
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
    * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate
-   *          selection methods.
+   *          Enumeration factory that determines possible candidate selection
+   *          methods.
    */
-  public CompositionalSynthesizer
-    (final ProductDESProxy model,
-     final ProductDESProxyFactory factory,
-     final KindTranslator translator,
-     final SynthesisAbstractionProcedureFactory abstractionFactory,
-     final PreselectingMethodFactory preselectingMethodFactory,
-     final SelectingMethodFactory selectingMethodFactory)
+  public CompositionalSynthesizer(final ProductDESProxy model,
+                                  final ProductDESProxyFactory factory,
+                                  final KindTranslator translator,
+                                  final SynthesisAbstractionProcedureFactory abstractionFactory,
+                                  final PreselectingMethodFactory preselectingMethodFactory,
+                                  final SelectingMethodFactory selectingMethodFactory)
   {
     super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory, selectingMethodFactory);
     setPruningDeadlocks(true);
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
@@ -230,7 +229,6 @@ public class CompositionalSynthesizer
     return result.getComputedProductDES();
   }
 
-
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProductDESBuilder
   @Override
@@ -239,6 +237,17 @@ public class CompositionalSynthesizer
     return getComputedProxy();
   }
 
+  //#########################################################################
+  //# Configuration
+  public void setSupervisorReductionEnabled(final boolean enable)
+  {
+    mSupervisorReductionEnabled = enable;
+  }
+
+  public boolean getSupervisorReductionEnabled()
+  {
+    return mSupervisorReductionEnabled;
+  }
 
   //#########################################################################
   //# Invocation
@@ -269,16 +278,14 @@ public class CompositionalSynthesizer
     }
   }
 
-
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   @Override
-  protected void setUp()
-    throws AnalysisException
+  protected void setUp() throws AnalysisException
   {
     final EventProxy defaultMarking = createDefaultMarking();
     setPropositionsForMarkings(defaultMarking, null);
-    mDistinguisherInfoList = new LinkedList<DistinguisherInfo> ();
+    mDistinguisherInfoList = new LinkedList<DistinguisherInfo>();
     mRenamedEvents = new THashSet<EventProxy>();
     super.setUp();
   }
@@ -303,7 +310,6 @@ public class CompositionalSynthesizer
     return (CompositionalSynthesisResult) super.getAnalysisResult();
   }
 
-
   //#########################################################################
   //# Hooks
   @Override
@@ -324,9 +330,11 @@ public class CompositionalSynthesizer
       new EventEncoding(uncontrollables, translator);
     final StateEncoding stateEnc = new StateEncoding(spec);
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(spec, eventEnc, stateEnc,
-                                       ListBufferTransitionRelation.
-                                       CONFIG_SUCCESSORS);
+      new ListBufferTransitionRelation(
+                                       spec,
+                                       eventEnc,
+                                       stateEnc,
+                                       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final int numStates = rel.getNumberOfStates();
     final Collection<StateProxy> states =
       new ArrayList<StateProxy>(numStates + 1);
@@ -362,7 +370,7 @@ public class CompositionalSynthesizer
         new ArrayList<EventProxy>(numEvents + 1);
       newEvents.addAll(events);
       newEvents.add(defaultMarking);
-      final Collection <StateProxy> newStates =
+      final Collection<StateProxy> newStates =
         new ArrayList<StateProxy>(numStates + 1);
       final HashMap<StateProxy,StateProxy> mapStates =
         new HashMap<StateProxy,StateProxy>(numStates + 1);
@@ -372,8 +380,9 @@ public class CompositionalSynthesizer
           new ArrayList<EventProxy>(propositions.size() + 1);
         newPropostions.addAll(propositions);
         newPropostions.add(defaultMarking);
-        final StateProxy newState = factory.createStateProxy
-          (state.getName(), state.isInitial(), newPropostions);
+        final StateProxy newState =
+          factory.createStateProxy(state.getName(), state.isInitial(),
+                                   newPropostions);
         newStates.add(newState);
         mapStates.put(state, newState);
       }
@@ -383,15 +392,17 @@ public class CompositionalSynthesizer
         final StateProxy sourceState = trans.getSource();
         final StateProxy targetState = trans.getTarget();
         final EventProxy event = trans.getEvent();
-        final TransitionProxy newTransition = factory.createTransitionProxy
-          (mapStates.get(sourceState), event, mapStates.get(targetState));
+        final TransitionProxy newTransition =
+          factory.createTransitionProxy(mapStates.get(sourceState), event,
+                                        mapStates.get(targetState));
         newTransitions.add(newTransition);
       }
       return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                          newEvents, newStates, newTransitions);
+                                          newEvents, newStates,
+                                          newTransitions);
     } else {
-      return factory.createAutomatonProxy(name, ComponentKind.PLANT,
-                                          events, states, transitions);
+      return factory.createAutomatonProxy(name, ComponentKind.PLANT, events,
+                                          states, transitions);
     }
   }
 
@@ -404,9 +415,8 @@ public class CompositionalSynthesizer
   @Override
   protected boolean isPermissibleCandidate(final List<AutomatonProxy> automata)
   {
-    return
-      super.isPermissibleCandidate(automata) &&
-      automata.size() < getCurrentAutomata().size();
+    return super.isPermissibleCandidate(automata)
+           && automata.size() < getCurrentAutomata().size();
   }
 
   @Override
@@ -416,7 +426,8 @@ public class CompositionalSynthesizer
     final CompositionalSynthesisResult result = getAnalysisResult();
     final ProductDESProxyFactory factory = getFactory();
     if (step instanceof SynthesisAbstractionStep) {
-      final SynthesisAbstractionStep synStep = (SynthesisAbstractionStep) step;
+      final SynthesisAbstractionStep synStep =
+        (SynthesisAbstractionStep) step;
       final EventEncoding eventEnc = synStep.getEventEncoding();
       final ListBufferTransitionRelation supervisor = synStep.getSupervisor();
       if (supervisor != null) {
@@ -425,7 +436,7 @@ public class CompositionalSynthesizer
           return;
         } else {
           final AutomatonProxy newSupervisor =
-            createRenamedSupervisor(supervisor, eventEnc);
+          createRenamedSupervisor(reduceSupervisor(supervisor), eventEnc);
           result.addSupervisor(newSupervisor);
         }
       }
@@ -492,8 +503,7 @@ public class CompositionalSynthesizer
   }
 
   @Override
-  protected boolean doMonolithicAnalysis
-    (final List<AutomatonProxy> automata)
+  protected boolean doMonolithicAnalysis(final List<AutomatonProxy> automata)
     throws AnalysisException
   {
     AutomatonProxy automaton = null;
@@ -510,8 +520,8 @@ public class CompositionalSynthesizer
         for (final AutomatonProxy aut : automata) {
           estimate *= aut.getStates().size();
         }
-        logger.debug("Monolithically composing " + automata.size() +
-                     " automata, estimated " + estimate + " states.");
+        logger.debug("Monolithically composing " + automata.size()
+                     + " automata, estimated " + estimate + " states.");
       }
       final MonolithicSynchronousProductBuilder syncBuilder =
         getSynchronousProductBuilder();
@@ -540,7 +550,7 @@ public class CompositionalSynthesizer
         return false;
       } else {
         final AutomatonProxy renamedSup =
-          createRenamedSupervisor(supervisor, encoding);
+        createRenamedSupervisor(reduceSupervisor(supervisor), encoding);
         result.addSupervisor(renamedSup);
         return true;
       }
@@ -549,15 +559,13 @@ public class CompositionalSynthesizer
     }
   }
 
-
   //#########################################################################
   //# Renaming
-  SynthesisAbstractionStep createDeterministicAutomaton
-    (final AutomatonProxy originalAutomaton,
-     final ListBufferTransitionRelation original,
-     final ListBufferTransitionRelation simplified,
-     final List<int[]> partition,
-     final EventEncoding eventEnc)
+  SynthesisAbstractionStep createDeterministicAutomaton(final AutomatonProxy originalAutomaton,
+                                                        final ListBufferTransitionRelation original,
+                                                        final ListBufferTransitionRelation simplified,
+                                                        final List<int[]> partition,
+                                                        final EventEncoding eventEnc)
   {
     final ProductDESProxyFactory factory = getFactory();
     final int numOfStates = original.getNumberOfStates();
@@ -574,13 +582,12 @@ public class CompositionalSynthesizer
     }
 
     // Find event replacements
-    final Map<EventProxy, List<EventProxy>> renaming =
-      new HashMap<EventProxy, List<EventProxy>>(numOfEvents);
+    final Map<EventProxy,List<EventProxy>> renaming =
+      new HashMap<EventProxy,List<EventProxy>>(numOfEvents);
     final TransitionIterator iter =
       original.createSuccessorsReadOnlyIterator();
     for (int event = 0; event < numOfEvents; event++) {
-      if ((original.getProperEventStatus(event) &
-           EventEncoding.STATUS_UNUSED) == 0) {
+      if ((original.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
         int maxCount = 0;
         for (final int[] clazz : partition) {
           final TIntHashSet successors = new TIntHashSet();
@@ -603,9 +610,8 @@ public class CompositionalSynthesizer
           final EventProxy eventProxy = eventEnc.getProperEvent(event);
           for (int i = 0; i < maxCount; i++) {
             final EventProxy newEvent =
-              factory.createEventProxy("{" + eventProxy.getName() +
-                                       ":" + i + "}",
-                                       eventProxy.getKind(),
+              factory.createEventProxy("{" + eventProxy.getName() + ":" + i
+                                         + "}", eventProxy.getKind(),
                                        eventProxy.isObservable());
             replacement.add(newEvent);
           }
@@ -640,8 +646,7 @@ public class CompositionalSynthesizer
     final TransitionIterator simplifiedIter =
       simplified.createAllTransitionsReadOnlyIterator();
     for (int event = 0; event < numOfEvents; event++) {
-      if ((original.getProperEventStatus(event) &
-           EventEncoding.STATUS_UNUSED) == 0) {
+      if ((original.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
         final EventProxy eventProxy = eventEnc.getProperEvent(event);
         final List<EventProxy> replacement = renaming.get(eventProxy);
         if (replacement == null) {
@@ -657,8 +662,7 @@ public class CompositionalSynthesizer
               distinguisherTransitions.add(trans);
             }
           }
-          if ((simplified.getProperEventStatus(event) &
-               EventEncoding.STATUS_UNUSED) == 0) {
+          if ((simplified.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
             simplifiedIter.resetEvent(event);
             while (simplifiedIter.advance()) {
               final int s = simplifiedIter.getCurrentSourceState();
@@ -673,8 +677,7 @@ public class CompositionalSynthesizer
             }
           }
         } else {
-          for(int sourceClass = 0; sourceClass < partition.size();
-              sourceClass++){
+          for (int sourceClass = 0; sourceClass < partition.size(); sourceClass++) {
             final int[] clazz = partition.get(sourceClass);
             final TIntObjectHashMap<EventProxy> successors =
               new TIntObjectHashMap<EventProxy>(replacement.size());
@@ -724,27 +727,25 @@ public class CompositionalSynthesizer
                                    simplifiedEvents, simplifiedStates,
                                    simplifiedTransitions);
     final AutomatonProxy distinguisherAutomaton =
-      factory.createAutomatonProxy(distinguisherName, ComponentKind.SUPERVISOR,
+      factory.createAutomatonProxy(distinguisherName,
+                                   ComponentKind.SUPERVISOR,
                                    distinguisherEvents, distinguisherStates,
                                    distinguisherTransitions);
 
     // Create distinguisher info
-    for (final Map.Entry<EventProxy, List<EventProxy>> entry :
-         renaming.entrySet()){
+    for (final Map.Entry<EventProxy,List<EventProxy>> entry : renaming
+      .entrySet()) {
       final EventProxy event = entry.getKey();
       final List<EventProxy> replacement = entry.getValue();
-      final DistinguisherInfo info = new DistinguisherInfo
-        (event, replacement, distinguisherAutomaton);
+      final DistinguisherInfo info =
+        new DistinguisherInfo(event, replacement, distinguisherAutomaton);
       mDistinguisherInfoList.add(info);
       mRenamedEvents.addAll(replacement);
     }
     reportAbstractionResult(simplifiedAutomaton, distinguisherAutomaton);
 
-    return new SynthesisAbstractionStep(this,
-                                        simplifiedAutomaton,
-                                        originalAutomaton,
-                                        renaming,
-                                        eventEnc);
+    return new SynthesisAbstractionStep(this, simplifiedAutomaton,
+                                        originalAutomaton, renaming, eventEnc);
   }
 
   TIntHashSet getRenamedControllables(final EventEncoding encoding)
@@ -754,18 +755,17 @@ public class CompositionalSynthesizer
     final TIntHashSet result = new TIntHashSet(numEvents);
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final EventProxy event = encoding.getProperEvent(e);
-      if (translator.getEventKind(event) == EventKind.CONTROLLABLE &&
-        mRenamedEvents.contains(event)) {
+      if (translator.getEventKind(event) == EventKind.CONTROLLABLE
+          && mRenamedEvents.contains(event)) {
         result.add(e);
       }
     }
     return result;
   }
 
-  private Collection<EventProxy> createAlphabet
-    (final ListBufferTransitionRelation rel,
-     final EventEncoding eventEnc,
-     final Map<EventProxy,List<EventProxy>> eventMap)
+  private Collection<EventProxy> createAlphabet(final ListBufferTransitionRelation rel,
+                                                final EventEncoding eventEnc,
+                                                final Map<EventProxy,List<EventProxy>> eventMap)
   {
     final int numOfEvents = eventEnc.getNumberOfProperEvents();
     final Collection<EventProxy> events =
@@ -773,7 +773,7 @@ public class CompositionalSynthesizer
     for (int event = 0; event < numOfEvents; event++) {
       if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
         final EventProxy eventProxy = eventEnc.getProperEvent(event);
-        if (eventMap.get(eventProxy) != null){
+        if (eventMap.get(eventProxy) != null) {
           events.addAll(eventMap.get(eventProxy));
         } else {
           events.add(eventProxy);
@@ -842,11 +842,10 @@ public class CompositionalSynthesizer
     } else {
       filter = props;
     }
-    final EventEncoding encoding = new EventEncoding
-      (aut, translator, filter, EventEncoding.FILTER_PROPOSITIONS);
-    for (int e = EventEncoding.NONTAU;
-         e < encoding.getNumberOfProperEvents();
-         e++) {
+    final EventEncoding encoding =
+      new EventEncoding(aut, translator, filter,
+                        EventEncoding.FILTER_PROPOSITIONS);
+    for (int e = EventEncoding.NONTAU; e < encoding.getNumberOfProperEvents(); e++) {
       final byte status = encoding.getProperEventStatus(e);
       encoding.setProperEventStatus(e, status | EventEncoding.STATUS_LOCAL);
     }
@@ -855,25 +854,48 @@ public class CompositionalSynthesizer
     return encoding;
   }
 
-  private ListBufferTransitionRelation synthesise
-    (final AutomatonProxy automaton, final EventEncoding encoding)
+  private ListBufferTransitionRelation synthesise(final AutomatonProxy automaton,
+                                                  final EventEncoding encoding)
     throws AnalysisException
   {
-    final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
-      (automaton, encoding, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation(
+                                       automaton,
+                                       encoding,
+                                       ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final HalfWaySynthesisTRSimplifier synthesiser =
       new HalfWaySynthesisTRSimplifier(rel);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultID = encoding.getEventCode(defaultMarking);
     synthesiser.setDefaultMarkingID(defaultID);
-    final TIntHashSet renamed = getRenamedControllables(encoding);
+    TIntHashSet renamed = getRenamedControllables(encoding);
+    if (getSupervisorReductionEnabled()){
+      renamed = null;
+    }
     synthesiser.setRenamedEvents(renamed);
     synthesiser.run();
     return synthesiser.getPseudoSupervisor();
   }
 
-  private AutomatonProxy createRenamedSupervisor
-    (final ListBufferTransitionRelation rel, final EventEncoding encoding)
+  private void r(){
+
+  }
+
+  private ListBufferTransitionRelation reduceSupervisor(final ListBufferTransitionRelation rel) throws AnalysisException
+  {
+    if (!getSupervisorReductionEnabled()){
+      return rel;
+    }
+    final SupervisorReductionTRSimplifier simplifier = new SupervisorReductionTRSimplifier();
+    simplifier.setTransitionRelation(rel);
+    simplifier.setEvent(-1);
+    simplifier.setBadStateIndex();
+    simplifier.run();
+    return simplifier.getTransitionRelation();
+  }
+
+  private AutomatonProxy createRenamedSupervisor(final ListBufferTransitionRelation rel,
+                                                 final EventEncoding encoding)
     throws AnalysisException
   {
     final ListIterator<DistinguisherInfo> listIter =
@@ -881,10 +903,9 @@ public class CompositionalSynthesizer
     return createRenamedSupervisor(rel, encoding, listIter);
   }
 
-  private AutomatonProxy createRenamedSupervisor
-    (final ListBufferTransitionRelation rel,
-     final EventEncoding encoding,
-     final ListIterator<DistinguisherInfo> listIter)
+  private AutomatonProxy createRenamedSupervisor(final ListBufferTransitionRelation rel,
+                                                 final EventEncoding encoding,
+                                                 final ListIterator<DistinguisherInfo> listIter)
     throws AnalysisException
   {
 
@@ -914,38 +935,37 @@ public class CompositionalSynthesizer
           break;
         }
       }
-      if (!found){
+      if (!found) {
         continue;
       }
       renamings.add(info);
       if (!foundNondeterminism) {
-        outer :
-          for (int state = 0; state < numOfStates; state++) {
-            int foundSuccessor = -1;
-            for (final EventProxy event : replacement) {
-              final int code = encoding.getEventCode(event);
-              final int successor;
-              if (code < 0) {
-                // not in alphabet - selflooped in all states
-                successor = state;
+        outer: for (int state = 0; state < numOfStates; state++) {
+          int foundSuccessor = -1;
+          for (final EventProxy event : replacement) {
+            final int code = encoding.getEventCode(event);
+            final int successor;
+            if (code < 0) {
+              // not in alphabet - selflooped in all states
+              successor = state;
+            } else {
+              transitionIter.reset(state, code);
+              if (transitionIter.advance()) {
+                successor = transitionIter.getCurrentTargetState();
               } else {
-                transitionIter.reset(state, code);
-                if (transitionIter.advance()) {
-                  successor = transitionIter.getCurrentTargetState();
-                } else {
-                  successor = -1;
-                }
-              }
-              if (successor < 0 || successor == foundSuccessor) {
-                //nothing
-              } else if (foundSuccessor < 0) {
-                foundSuccessor = successor;
-              } else {
-                foundNondeterminism = true;
-                break outer;
+                successor = -1;
               }
             }
+            if (successor < 0 || successor == foundSuccessor) {
+              //nothing
+            } else if (foundSuccessor < 0) {
+              foundSuccessor = successor;
+            } else {
+              foundNondeterminism = true;
+              break outer;
+            }
           }
+        }
       }
     }
 
@@ -955,22 +975,22 @@ public class CompositionalSynthesizer
       final TransitionIterator modifyingIter =
         rel.createSuccessorsModifyingIterator();
       final int size = encoding.getNumberOfEvents();
-      final List <EventProxy> events = new ArrayList <EventProxy> (size);
+      final List<EventProxy> events = new ArrayList<EventProxy>(size);
       events.add(null);
       events.addAll(encoding.getEvents());
-      for (final DistinguisherInfo info:renamings) {
+      for (final DistinguisherInfo info : renamings) {
         final EventProxy original = info.getOriginalEvent();
         final List<EventProxy> replacement = info.getReplacement();
         final Iterator<EventProxy> iter = replacement.iterator();
         final EventProxy firstReplacement = iter.next();
         final int firstCode = encoding.getEventCode(firstReplacement);
         if (!events.contains(original))
-        events.set(firstCode, original);
+          events.set(firstCode, original);
         while (iter.hasNext()) {
           final EventProxy nextReplacement = iter.next();
           final int nextCode = encoding.getEventCode(nextReplacement);
           if (nextCode >= 0) {
-            for (int sourceState = 0; sourceState<numOfStates; sourceState++) {
+            for (int sourceState = 0; sourceState < numOfStates; sourceState++) {
               modifyingIter.reset(sourceState, nextCode);
               if (modifyingIter.advance()) {
                 final int target = modifyingIter.getCurrentTargetState();
@@ -979,8 +999,8 @@ public class CompositionalSynthesizer
               }
             }
             final byte status = rel.getProperEventStatus(nextCode);
-            rel.setProperEventStatus
-              (nextCode, status | EventEncoding.STATUS_UNUSED);
+            rel.setProperEventStatus(nextCode, status
+                                               | EventEncoding.STATUS_UNUSED);
           }
         }
       }
@@ -990,10 +1010,10 @@ public class CompositionalSynthesizer
       final ProductDESProxyFactory factory = getFactory();
       final AutomatonProxy oldSupervisor =
         rel.createAutomaton(factory, encoding);
-      final List<AutomatonProxy> automata = new ArrayList <AutomatonProxy>(2);
+      final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
       automata.add(oldSupervisor);
       automata.add(distinguisher);
-      final ProductDESProxy model = createProductDESProxy (automata);
+      final ProductDESProxy model = createProductDESProxy(automata);
       final MonolithicSynchronousProductBuilder builder =
         getSynchronousProductBuilder();
       builder.setNodeLimit(getMonolithicStateLimit());
@@ -1001,7 +1021,7 @@ public class CompositionalSynthesizer
       builder.setConstructsResult(true);
       builder.setPropositions(getPropositions());
       builder.setModel(model);
-      for (final DistinguisherInfo info:renamings) {
+      for (final DistinguisherInfo info : renamings) {
         final EventProxy original = info.getOriginalEvent();
         final List<EventProxy> replacement = info.getReplacement();
         builder.addMask(replacement, original);
@@ -1017,9 +1037,10 @@ public class CompositionalSynthesizer
       final EventEncoding newEncoding =
         new EventEncoding(newSupervisor, translator);
       final ListBufferTransitionRelation newRel =
-        new ListBufferTransitionRelation(newSupervisor, newEncoding,
-                                         ListBufferTransitionRelation.
-                                         CONFIG_SUCCESSORS);
+        new ListBufferTransitionRelation(
+                                         newSupervisor,
+                                         newEncoding,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       return createRenamedSupervisor(newRel, newEncoding, listIter);
     }
   }
@@ -1033,7 +1054,7 @@ public class CompositionalSynthesizer
     final boolean usesMarking = rel.isUsedProposition(defaultMarkingID);
     final int numOfStates = rel.getNumberOfStates();
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    for (int sourceState = 0; sourceState<numOfStates; sourceState++) {
+    for (int sourceState = 0; sourceState < numOfStates; sourceState++) {
       iter.resetState(sourceState);
       if (iter.advance()) {
         //nothing
@@ -1048,8 +1069,7 @@ public class CompositionalSynthesizer
     return rel.createAutomaton(factory, coding);
   }
 
-  private String getUniqueSupervisorName
-    (final ListBufferTransitionRelation rel)
+  private String getUniqueSupervisorName(final ListBufferTransitionRelation rel)
   {
     final CompositionalSynthesisResult result = getAnalysisResult();
     final Collection<AutomatonProxy> supervisors =
@@ -1075,36 +1095,35 @@ public class CompositionalSynthesizer
     return supname;
   }
 
-
   //#########################################################################
   //# Debugging
   void reportAbstractionResult(final AutomatonProxy aut,
-                                       final AutomatonProxy dist)
+                               final AutomatonProxy dist)
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
       /*
-      final boolean nonblocking = AnalysisTools.isNonBlocking(aut);
-      final String msg1 = "Simplified automaton is " +
-        (nonblocking ? "nonblocking." : "BLOCKING.");
-      logger.debug(msg1);
-      */
+       * final boolean nonblocking = AnalysisTools.isNonBlocking(aut); final
+       * String msg1 = "Simplified automaton is " + (nonblocking ?
+       * "nonblocking." : "BLOCKING."); logger.debug(msg1);
+       */
       if (dist != null) {
-        final String msg2 = "Creating distinguisher '" + dist.getName() +
-          "' with " + dist.getStates().size() + " states.";
+        final String msg2 =
+          "Creating distinguisher '" + dist.getName() + "' with "
+            + dist.getStates().size() + " states.";
         logger.debug(msg2);
       }
     }
   }
 
   void reportSupervisor(final String kind,
-                                final ListBufferTransitionRelation sup)
+                        final ListBufferTransitionRelation sup)
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled() && sup != null) {
-      final String msg = "Got " + kind + " supervisor '" +
-        sup.getName() + "' with " +
-        sup.getNumberOfReachableStates() + " states.";
+      final String msg =
+        "Got " + kind + " supervisor '" + sup.getName() + "' with "
+          + sup.getNumberOfReachableStates() + " states.";
       logger.debug(msg);
     }
   }
@@ -1113,9 +1132,9 @@ public class CompositionalSynthesizer
   //#########################################################################
   //# Inner Class SynthesisEventInfo
   /**
-   * An event information record for compositional synthesis.
-   * In compositional synthesis, there are no tau events, yet all events
-   * are subject to selfloop removal.
+   * An event information record for compositional synthesis. In compositional
+   * synthesis, there are no tau events, yet all events are subject to
+   * selfloop removal.
    */
   private final class SynthesisEventInfo extends EventInfo
   {
@@ -1163,7 +1182,7 @@ public class CompositionalSynthesizer
 
     //#######################################################################
     //# Simple Access
-    EventProxy getOriginalEvent ()
+    EventProxy getOriginalEvent()
     {
       return mOriginalEvent;
     }
@@ -1186,14 +1205,13 @@ public class CompositionalSynthesizer
 
   }
 
-
   //#########################################################################
   //# Data Members
   private String mOutputName;
   private boolean mConstructsResult = true;
+  private boolean mSupervisorReductionEnabled = false;
 
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
 
 }
-
