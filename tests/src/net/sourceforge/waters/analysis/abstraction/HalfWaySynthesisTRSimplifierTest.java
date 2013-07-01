@@ -100,7 +100,7 @@ public class HalfWaySynthesisTRSimplifierTest
       getTransitionRelationSimplifier();
     simplifier.setDefaultMarkingID(mDefaultMarkingID);
     if (mRenamedEvents != null) {
-      simplifier.setRenamedEvents(mRenamedEvents);
+      simplifier.setRetainedDumpStateEvents(mRenamedEvents);
     }
   }
 

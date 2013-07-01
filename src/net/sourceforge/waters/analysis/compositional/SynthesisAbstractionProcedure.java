@@ -247,7 +247,7 @@ public class SynthesisAbstractionProcedure extends
         if (!compSynth.getSupervisorReductionEnabled()) {
           renamed = synthesizer.getRenamedControllables(encoding);
         }
-        halfWay.setRenamedEvents(renamed);
+        halfWay.setRetainedDumpStateEvents(renamed);
       }
     }
     return encoding;
