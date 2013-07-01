@@ -196,19 +196,6 @@
                         <SplineGeometry>
                             <Point X="175" Y="232"/>
                         </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="==">
-                                    <UnaryExpression Operator="'">
-                                        <SimpleIdentifier Name="x"/>
-                                    </UnaryExpression>
-                                    <SimpleIdentifier Name="x"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="19"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
                     </Edge>
                     <Edge Source="S0:S1" Target="S0:S0">
                         <LabelBlock>
@@ -247,19 +234,6 @@
                         <SplineGeometry>
                             <Point X="318" Y="232"/>
                         </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="==">
-                                    <UnaryExpression Operator="'">
-                                        <SimpleIdentifier Name="x"/>
-                                    </UnaryExpression>
-                                    <SimpleIdentifier Name="x"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
                     </Edge>
                     <Edge Source="S1:S1" Target="S1:S0">
                         <LabelBlock>
