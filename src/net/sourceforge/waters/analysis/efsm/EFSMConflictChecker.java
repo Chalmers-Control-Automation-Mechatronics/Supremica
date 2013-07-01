@@ -27,6 +27,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -319,6 +320,11 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       }
       splitCurrentSubsystem();
       return runCompositionalMinimization();
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
     } finally {
       tearDown();
     }
