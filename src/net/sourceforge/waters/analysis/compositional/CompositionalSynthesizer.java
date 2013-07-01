@@ -436,7 +436,7 @@ public class CompositionalSynthesizer extends
           return;
         } else {
           final AutomatonProxy newSupervisor =
-          createRenamedSupervisor(reduceSupervisor(supervisor), eventEnc);
+            createSupervisor(eventEnc, supervisor);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
           result.addSupervisor(newSupervisor);
         }
       }
@@ -502,6 +502,15 @@ public class CompositionalSynthesizer extends
     }
   }
 
+  private AutomatonProxy createSupervisor(final EventEncoding eventEnc,
+                                          final ListBufferTransitionRelation supervisor)
+    throws AnalysisException
+  {
+    final ListBufferTransitionRelation sup =
+      reduceSupervisor(eventEnc, supervisor);
+    return createRenamedSupervisor(sup, eventEnc);
+  }
+
   @Override
   protected boolean doMonolithicAnalysis(final List<AutomatonProxy> automata)
     throws AnalysisException
@@ -550,7 +559,7 @@ public class CompositionalSynthesizer extends
         return false;
       } else {
         final AutomatonProxy renamedSup =
-        createRenamedSupervisor(reduceSupervisor(supervisor), encoding);
+          createSupervisor(encoding, supervisor);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         result.addSupervisor(renamedSup);
         return true;
       }
@@ -869,23 +878,28 @@ public class CompositionalSynthesizer extends
     final int defaultID = encoding.getEventCode(defaultMarking);
     synthesiser.setDefaultMarkingID(defaultID);
     TIntHashSet renamed = getRenamedControllables(encoding);
-    if (getSupervisorReductionEnabled()){
+    if (getSupervisorReductionEnabled()) {
       renamed = null;
     }
-    synthesiser.setRenamedEvents(renamed);
+    synthesiser.setRetainedDumpStateEvents(renamed);
     synthesiser.run();
     return synthesiser.getPseudoSupervisor();
   }
 
-  private ListBufferTransitionRelation reduceSupervisor(final ListBufferTransitionRelation rel) throws AnalysisException
+  private ListBufferTransitionRelation reduceSupervisor(final EventEncoding eventEnc,
+                                                        final ListBufferTransitionRelation rel)
+    throws AnalysisException
   {
-    if (!getSupervisorReductionEnabled()){
+    if (!getSupervisorReductionEnabled()) {
       return rel;
     }
-    final SupervisorReductionTRSimplifier simplifier = new SupervisorReductionTRSimplifier();
-    simplifier.setTransitionRelation(rel);
-    simplifier.setEvent(-1);
-    simplifier.setBadStateIndex();
+    final SupervisorReductionTRSimplifier simplifier =
+      new SupervisorReductionTRSimplifier();
+    simplifier.setTransitionRelation(rel);//set TR
+    simplifier.setEvent(-1);//set event
+    simplifier.setOutputName("HalfwaySup");//set name
+    simplifier.setBadStateIndex();//set bad state
+    simplifier.setRetainedDumpStateEvents(getRenamedControllables(eventEnc));//set retained transitions
     simplifier.run();
     return simplifier.getTransitionRelation();
   }

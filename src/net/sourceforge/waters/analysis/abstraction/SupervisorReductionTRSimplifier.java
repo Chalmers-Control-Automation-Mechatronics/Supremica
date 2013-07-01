@@ -103,14 +103,12 @@ public class SupervisorReductionTRSimplifier extends
       if (enabDisabEvents.size() == 0) {
         return createOneStateTR(disabEvents);
       } else {
-        mainProcedure(enabDisabEvents);
-        return mergeTR(false, true);
+        return mainProcedure(enabDisabEvents);
       }
     } else {
       final TIntArrayList singletonList = new TIntArrayList();
       singletonList.add(mCurrEvent);
-      mainProcedure(singletonList);
-      return mergeTR(true, false);
+      return mainProcedure(singletonList);
     }
   }
 
@@ -148,6 +146,16 @@ public class SupervisorReductionTRSimplifier extends
     mCurrEvent = e;
   }
 
+  public int getBadStateIndex()
+  {
+    return mBadStateIndex;
+  }
+
+  public void setBadStateIndex(final int s)
+  {
+    mBadStateIndex = s;
+  }
+
   public void setBadStateIndex()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -166,14 +174,14 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
-  public void setBadStateIndex(final int s)
+  public void setRetainedDumpStateEvents(final TIntHashSet set)
   {
-    mBadStateIndex = s;
+    mRetainedDumpStateEvents = set;
   }
 
-  public int getBadStateIndex()
+  public TIntHashSet getRetainedDumpStateEvents()
   {
-    return mBadStateIndex;
+    return mRetainedDumpStateEvents;
   }
 
   //##########################################################################
@@ -209,6 +217,7 @@ public class SupervisorReductionTRSimplifier extends
         mShadowStateToClass = null;
       }
     }
+    mergeTR();
     return merged;
   }
 
@@ -398,6 +407,68 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
+  /**
+   * Merges mTransitionRelation
+   *
+   * @param removeBadTrans
+   *          Remove transitions to the bad state
+   * @param addBadState
+   *          Add a bad state
+   * @return true if transition relation is changed
+   */
+  private boolean mergeTR()
+  {
+    if (mRetainedDumpStateEvents != null) {
+      retainTransitions();
+    }
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
+    boolean trChanged = false;
+    final List<int[]> mergingStates = new ArrayList<int[]>();
+    for (int i = 0; i < numStates; i++) {
+      if (i == mBadStateIndex) {
+        continue;
+      }
+      final int listID = mStateToClass[i];
+      if (mClasses.getFirst(listID) == i) {
+        final int[] states = mClasses.toArray(listID);
+        mergingStates.add(states);
+      } else {
+        trChanged = true;
+      }
+    }
+    if (mRetainedDumpStateEvents == null) {
+      final int[] badState = new int[1];
+      badState[0] = mBadStateIndex;
+      mBadStateIndex = mergingStates.size();
+      mergingStates.add(badState);
+    }
+    rel.merge(mergingStates);
+    final boolean selfLoofRemoved = rel.removeProperSelfLoopEvents();
+    return trChanged | selfLoofRemoved;
+  }
+
+  private boolean retainTransitions()
+  {
+    if (mRetainedDumpStateEvents == null) {
+      return false;
+    }
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    boolean trChanged = false;
+    final TransitionIterator iter =
+      rel.createAllTransitionsModifyingIterator();
+    while (iter.advance()) {
+      final int to = iter.getCurrentTargetState();
+      final int e = iter.getCurrentEvent();
+      if (!mRetainedDumpStateEvents.contains(e) & to == mBadStateIndex) {
+        iter.remove();
+        trChanged = true;
+      }
+    }
+    rel.setReachable(mBadStateIndex, false);
+    return trChanged;
+  }
+
   private int getSuccessorState(final int source, final int event)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -507,70 +578,6 @@ public class SupervisorReductionTRSimplifier extends
   }
 
   /**
-   * Merges mTransitionRelation
-   *
-   * @param removeBadTrans
-   *          Remove transitions to the bad state
-   * @param addBadState
-   *          Add a bad state
-   * @return true if transition relation is changed
-   */
-  private boolean mergeTR(final boolean removeBadTrans,
-                          final boolean addBadState)
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    boolean trChanged = false;
-    if (removeBadTrans) {
-      removeBadStateTransitions();
-    }
-    final List<int[]> mergingStates = new ArrayList<int[]>();
-    for (int i = 0; i < numStates; i++) {
-      if (i == mBadStateIndex) {
-        continue;
-      }
-      final int listID = mStateToClass[i];
-      if (mClasses.getFirst(listID) == i) {
-        final int[] states = mClasses.toArray(listID);
-        mergingStates.add(states);
-      } else {
-        trChanged = true;
-      }
-    }
-    if (addBadState) {
-      final int[] badState = new int[1];
-      badState[0] = mBadStateIndex;
-      mBadStateIndex = mergingStates.size();
-      mergingStates.add(badState);
-    }
-    rel.merge(mergingStates);
-    final boolean selfLoofRemoved = rel.removeProperSelfLoopEvents();
-    return trChanged | selfLoofRemoved;
-  }
-
-  /**
-   * Removes transitions to the bad state
-   *
-   * @return true if at least one transition is removed
-   */
-  private boolean removeBadStateTransitions()
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    boolean trChanged = false;
-    final TransitionIterator iter =
-      rel.createAllTransitionsModifyingIterator();
-    while (iter.advance()) {
-      final int to = iter.getCurrentTargetState();
-      if (to == mBadStateIndex) {
-        iter.remove();
-        trChanged = true;
-      }
-    }
-    rel.setReachable(mBadStateIndex, false);
-    return trChanged;
-  }
-
-  /**
    * Makes transition relation have only one state
    *
    * @return true if transition relation is changed
@@ -591,7 +598,18 @@ public class SupervisorReductionTRSimplifier extends
     for (int s = 1; s < rel.getNumberOfStates(); s++) {
       rel.setReachable(s, false);
     }
-    rel.removeOutgoingTransitions(0);
+    final TransitionIterator iter = rel.createSuccessorsModifyingIterator();
+    iter.resetState(0);
+    if (mRetainedDumpStateEvents != null) {
+      while (iter.advance()) {
+        final int e = iter.getCurrentEvent();
+        if (!mRetainedDumpStateEvents.contains(e)) {
+          iter.remove();
+        }
+      }
+    } else {
+      rel.removeOutgoingTransitions(0);
+    }
     rel.setReachable(0, true);
     rel.setInitial(0, true);
     return true;
@@ -612,7 +630,7 @@ public class SupervisorReductionTRSimplifier extends
   private int mBadStateIndex;
   private int mCurrEvent;
   private String mOuptutName;
-
+  private TIntHashSet mRetainedDumpStateEvents;
   private int[] mStateToClass;
   private IntListBuffer mClasses;
   private int[] mShadowStateToClass;

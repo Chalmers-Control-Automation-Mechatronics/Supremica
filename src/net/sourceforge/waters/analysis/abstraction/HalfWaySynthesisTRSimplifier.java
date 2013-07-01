@@ -71,7 +71,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
    * @param renamedEventIndexes
    *          Set of proper events indexes to be considered as renamed.
    */
-  public void setRenamedEvents(final TIntHashSet renamedEventIndexes)
+  public void setRetainedDumpStateEvents(final TIntHashSet renamedEventIndexes)
   {
     mRenamedEvents = renamedEventIndexes;
   }
@@ -79,9 +79,9 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
   /**
    * Gets the set of renamed event indexes.
    *
-   * @see #setRenamedEvents(TIntHashSet) setRenamedEvents()
+   * @see #setRetainedDumpStateEvents(TIntHashSet) setRenamedEvents()
    */
-  public TIntHashSet getRenamedEvents()
+  public TIntHashSet getRetainedDumpStateEvents()
   {
     return mRenamedEvents;
   }
@@ -96,7 +96,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
    *
    * @return Transition relation representing the supervisor, or
    *         <CODE>null</CODE> if no controllable events need to be disabled.
-   * @see #setRenamedEvents(TIntHashSet) setRenamedEvents()
+   * @see #setRetainedDumpStateEvents(TIntHashSet) setRenamedEvents()
    */
   public ListBufferTransitionRelation getPseudoSupervisor()
   {

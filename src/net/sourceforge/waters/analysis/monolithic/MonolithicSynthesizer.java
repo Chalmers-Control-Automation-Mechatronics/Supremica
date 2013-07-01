@@ -14,6 +14,7 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -333,6 +334,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           mSupervisorSimplifier.setEvent(-1);//set event
           mSupervisorSimplifier.setOutputName("Supervisor!!");//set name
           mSupervisorSimplifier.setBadStateIndex(mNumGoodStates);//set bad state
+          mSupervisorSimplifier.setRetainedDumpStateEvents(null);//set retained transitions
           mSupervisorSimplifier.run();
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           if (!mSupervisorLocalizationEnabled) {
@@ -366,6 +368,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                                                       .get(e)].getName());//set name
                 mSupervisorSimplifier.setBadStateIndex(mSupervisorSimplifier
                   .getBadStateIndex());//set bad state
+                mSupervisorSimplifier
+                  .setRetainedDumpStateEvents(new TIntHashSet());//set retained transitions
                 simplified = simplified & mSupervisorSimplifier.run();
                 if (!simplified) {
                   removeBadStateTransitions(mTransitionRelation,
