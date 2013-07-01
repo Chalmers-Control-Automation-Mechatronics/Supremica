@@ -151,15 +151,19 @@ public class SupervisorReductionTRSimplifier extends
   public void setBadStateIndex()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    int numBadState = 0;
     for (int s = 0; s < rel.getNumberOfStates(); s++) {
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       iter.resetState(s);
       if (!iter.advance() & rel.isReachable(s) & rel.getAllMarkings(s) == 0) {
         mBadStateIndex = s;
-        return;
+        numBadState++;
       }
     }
-    mBadStateIndex = -1;
+    assert (numBadState <= 1);
+    if (numBadState == 0) {
+      mBadStateIndex = -1;
+    }
   }
 
   public void setBadStateIndex(final int s)
@@ -371,7 +375,6 @@ public class SupervisorReductionTRSimplifier extends
         }
         enabledStates[currentEvent].add(pre);
       }
-
     }
     for (int i = 0; i < mNumProperEvents; i++) {
       for (int j = i + 1; j <= mNumProperEvents; j++) {
@@ -516,12 +519,16 @@ public class SupervisorReductionTRSimplifier extends
                           final boolean addBadState)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
     boolean trChanged = false;
     if (removeBadTrans) {
       removeBadStateTransitions();
     }
     final List<int[]> mergingStates = new ArrayList<int[]>();
-    for (int i = 0; i < mBadStateIndex; i++) {
+    for (int i = 0; i < numStates; i++) {
+      if (i == mBadStateIndex) {
+        continue;
+      }
       final int listID = mStateToClass[i];
       if (mClasses.getFirst(listID) == i) {
         final int[] states = mClasses.toArray(listID);
@@ -573,7 +580,7 @@ public class SupervisorReductionTRSimplifier extends
     throws OverflowException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    for (int e = 0; e < rel.getNumberOfProperEvents(); e++) {
+    for (int e = 1; e < rel.getNumberOfProperEvents(); e++) {
       if (!disabEvents.contains(e)) {
         final byte status = rel.getProperEventStatus(e);
         rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
