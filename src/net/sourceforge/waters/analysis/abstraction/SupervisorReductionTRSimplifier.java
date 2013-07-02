@@ -24,6 +24,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
@@ -407,15 +408,6 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
-  /**
-   * Merges mTransitionRelation
-   *
-   * @param removeBadTrans
-   *          Remove transitions to the bad state
-   * @param addBadState
-   *          Add a bad state
-   * @return true if transition relation is changed
-   */
   private boolean mergeTR()
   {
     if (mRetainedDumpStateEvents != null) {
@@ -437,7 +429,9 @@ public class SupervisorReductionTRSimplifier extends
         trChanged = true;
       }
     }
-    if (mRetainedDumpStateEvents == null) {
+    if (mBadStateIndex >= 0
+        && ((mRetainedDumpStateEvents == null) || !mRetainedDumpStateEvents
+          .isEmpty())) {
       final int[] badState = new int[1];
       badState[0] = mBadStateIndex;
       mBadStateIndex = mergingStates.size();
@@ -457,15 +451,20 @@ public class SupervisorReductionTRSimplifier extends
     boolean trChanged = false;
     final TransitionIterator iter =
       rel.createAllTransitionsModifyingIterator();
+    boolean badStateReachable = false;
     while (iter.advance()) {
       final int to = iter.getCurrentTargetState();
-      final int e = iter.getCurrentEvent();
-      if (!mRetainedDumpStateEvents.contains(e) & to == mBadStateIndex) {
-        iter.remove();
-        trChanged = true;
+      if (to == mBadStateIndex) {
+        final int e = iter.getCurrentEvent();
+        if (!mRetainedDumpStateEvents.contains(e)) {
+          iter.remove();
+          trChanged = true;
+        } else {
+          badStateReachable = true;
+        }
       }
     }
-    rel.setReachable(mBadStateIndex, false);
+    rel.setReachable(mBadStateIndex, badStateReachable);
     return trChanged;
   }
 
@@ -577,42 +576,57 @@ public class SupervisorReductionTRSimplifier extends
     return pair;
   }
 
-  /**
-   * Makes transition relation have only one state
-   *
-   * @return true if transition relation is changed
-   * @throws OverflowException
-   */
   private boolean createOneStateTR(final TIntArrayList disabEvents)
     throws OverflowException
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final ListBufferTransitionRelation oldRel = getTransitionRelation();
+    // get events that are in both disabEvents and mRetainedDumpStateEvents
+    TIntArrayList intersectEvents = new TIntArrayList();
+    if (mRetainedDumpStateEvents != null) {
+      for (int e = 0; e < disabEvents.size(); e++) {
+        if (mRetainedDumpStateEvents.contains(disabEvents.get(e))) {
+          intersectEvents.add(disabEvents.get(e));
+        }
+      }
+    } else {
+      intersectEvents = disabEvents;
+    }
+    // create a one-state automaton if the intersecting event set is empty
+    // otherwise create a two-state automaton
+    final int numStates = intersectEvents.size() == 0 ? 1 : 2;
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation(
+                                       "OneStateSup",
+                                       ComponentKind.SUPERVISOR,
+                                       mNumProperEvents + 1,
+                                       oldRel.getNumberOfPropositions(),
+                                       numStates,
+                                       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    rel.setInitial(0, true);
+    // set all events in disabEvents USED
     for (int e = 1; e < rel.getNumberOfProperEvents(); e++) {
       if (!disabEvents.contains(e)) {
         final byte status = rel.getProperEventStatus(e);
         rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
       }
     }
-    final long markings = rel.createMarkings();
-    rel.setUsedPropositions(markings);
-    for (int s = 1; s < rel.getNumberOfStates(); s++) {
-      rel.setReachable(s, false);
-    }
-    final TransitionIterator iter = rel.createSuccessorsModifyingIterator();
-    iter.resetState(0);
-    if (mRetainedDumpStateEvents != null) {
-      while (iter.advance()) {
-        final int e = iter.getCurrentEvent();
-        if (!mRetainedDumpStateEvents.contains(e)) {
-          iter.remove();
-        }
+
+    if (numStates == 2) {
+      // add transitions from state 0 to dump state (if creating a 2-state aut)
+      for (int e = 0; e < intersectEvents.size(); e++) {
+        rel.addTransition(0, intersectEvents.get(e), 1);
       }
-    } else {
-      rel.removeOutgoingTransitions(0);
+      // set initial state markings
+      final int numProp = rel.getNumberOfPropositions();
+      for (int p = 0; p < numProp; p++) {
+        rel.setMarked(0, p, true);
+      }
+    } else if (numStates == 1) {
+      // set initial state markings
+      final long markings = rel.createMarkings();
+      rel.setUsedPropositions(markings);
     }
-    rel.setReachable(0, true);
-    rel.setInitial(0, true);
-    return true;
+    return false;
   }
 
   //#########################################################################

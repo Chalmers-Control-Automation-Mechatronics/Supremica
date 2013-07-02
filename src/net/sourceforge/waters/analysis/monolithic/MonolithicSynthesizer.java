@@ -353,6 +353,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
               new ArrayList<AutomatonProxy>();
             boolean simplified = true;
             if (enabDisabEvents.size() == 0) {
+              removeBadStateTransitions(mTransitionRelation,
+                                        mSupervisorSimplifier
+                                          .getBadStateIndex());
+              removeSelfloops(mTransitionRelation);
               autList.add(mTransitionRelation
                 .createAutomaton(getFactory(), getEventEncoding()));
             } else {
