@@ -203,13 +203,13 @@ public class MonolithicSynchronousProductBuilder
   @Override
   public Collection<EventProxy> getPropositions()
   {
-    return mUsedPropositions;
+    return mConfiguredPropositions;
   }
 
   @Override
   public void setPropositions(final Collection<EventProxy> props)
   {
-    mUsedPropositions = props;
+    mConfiguredPropositions = props;
   }
 
   @Override
@@ -313,10 +313,10 @@ public class MonolithicSynchronousProductBuilder
 
     TObjectIntHashMap<EventProxy> eventToIndex =
       new TObjectIntHashMap<EventProxy>(mNumInputEvents, 0.5f, -1);
-    if (mUsedPropositions == null) {
+    if (mConfiguredPropositions == null) {
       mCurrentPropositions = new ArrayList<EventProxy>();
     } else {
-      mCurrentPropositions = mUsedPropositions;
+      mCurrentPropositions = new ArrayList<EventProxy>(mConfiguredPropositions);
     }
     final Collection<EventProxy> forbidden = new THashSet<EventProxy>();
     if (mMaskingPairs != null) {
@@ -332,7 +332,7 @@ public class MonolithicSynchronousProductBuilder
     final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : events) {
       if (translator.getEventKind(event) == EventKind.PROPOSITION) {
-        if (mUsedPropositions == null) {
+        if (mConfiguredPropositions == null) {
           mCurrentPropositions.add(event);
         }
       } else if (forbidden.contains(event)) {
@@ -346,8 +346,8 @@ public class MonolithicSynchronousProductBuilder
     final boolean pruning;
     if (!mPruningDeadlocks) {
       pruning = false;
-    } else if (mUsedPropositions != null) {
-      pruning = mUsedPropositions.containsAll(mCurrentPropositions);
+    } else if (mConfiguredPropositions != null) {
+      pruning = mConfiguredPropositions.containsAll(mCurrentPropositions);
     } else {
       pruning = !mCurrentPropositions.isEmpty();
     }
@@ -1096,7 +1096,7 @@ public class MonolithicSynchronousProductBuilder
 
   //#########################################################################
   //# Data Members
-  private Collection<EventProxy> mUsedPropositions;
+  private Collection<EventProxy> mConfiguredPropositions;
   private StateCallback mStateCallback;
   private Collection<MaskingPair> mMaskingPairs;
   private boolean mRemovingSelfloops;
