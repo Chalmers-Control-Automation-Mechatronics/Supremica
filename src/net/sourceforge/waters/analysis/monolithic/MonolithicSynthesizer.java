@@ -36,6 +36,7 @@ import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -115,6 +116,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   public boolean getSupervisorLocalizationEnabled()
   {
     return mSupervisorLocalizationEnabled;
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mSupervisorSimplifier != null) {
+      mSupervisorSimplifier.requestAbort();
+    }
   }
 
   //#########################################################################
@@ -1137,13 +1149,15 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mmDecodedTuple = new int[mNumAutomata];
     }
 
-    public boolean explore(final int[] encodedTuple) throws OverflowException
+    public boolean explore(final int[] encodedTuple)
+      throws OverflowException, AnalysisAbortException
     {
+      checkAbort();
+      decode(encodedTuple, mmDecodedTuple);
       events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
-            decode(encodedTuple, mmDecodedTuple);
             final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
             if (succ == null) {
               continue events;
@@ -1241,13 +1255,15 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
 
     @Override
-    public boolean explore(final int[] encodedTuple) throws OverflowException
+    public boolean explore(final int[] encodedTuple)
+      throws OverflowException, AnalysisAbortException
     {
+      checkAbort();
+      decode(encodedTuple, mmDecodedTuple);
       events: for (int e = 1; e <= mNumUncontrollableEvents; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
-            decode(encodedTuple, mmDecodedTuple);
             final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
             if (succ == null) {
               if (a >= mNumPlants) {

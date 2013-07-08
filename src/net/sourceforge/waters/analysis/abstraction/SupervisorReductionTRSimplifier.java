@@ -22,6 +22,7 @@ import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -48,6 +49,14 @@ public class SupervisorReductionTRSimplifier extends
   {
     super(rel);
     mBadStateIndex = -1;
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
   }
 
   //#########################################################################
@@ -157,11 +166,12 @@ public class SupervisorReductionTRSimplifier extends
     mBadStateIndex = s;
   }
 
-  public void setBadStateIndex()
+  public void setBadStateIndex() throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     int numBadState = 0;
     for (int s = 0; s < rel.getNumberOfStates(); s++) {
+      checkAbort();
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       iter.resetState(s);
       if (!iter.advance() & rel.isReachable(s) & rel.getAllMarkings(s) == 0) {
@@ -189,6 +199,7 @@ public class SupervisorReductionTRSimplifier extends
   // Methods for Supervisor Reduction
 
   private boolean mainProcedure(final TIntArrayList ctrlEvents)
+    throws AnalysisAbortException
   {
     boolean merged = false;
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -201,6 +212,7 @@ public class SupervisorReductionTRSimplifier extends
         if (!rel.isReachable(j) || j == mBadStateIndex || j > getMinimum(j)) {
           continue;
         }
+        checkAbort();
         TLongHashSet mergedPairs = new TLongHashSet();
         mShadowClasses = new IntListBuffer();
         mShadowStateToClass = new int[numStates];
@@ -226,7 +238,9 @@ public class SupervisorReductionTRSimplifier extends
                                    final int y0,
                                    final TLongHashSet mergedPairs,
                                    final TIntArrayList ctrlEvents)
+    throws AnalysisAbortException
   {
+    checkAbort();
     if (mStateToClass[x] == mStateToClass[y]) {
       return true;
     }
@@ -262,6 +276,7 @@ public class SupervisorReductionTRSimplifier extends
       boolean enabled = false;
       boolean disabled = false;
       for (final int xx : listX) {
+
         final int succ = getSuccessorState(xx, e);
         if (succ != -1) {
           if (xSet.add(xx)) {
@@ -340,13 +355,14 @@ public class SupervisorReductionTRSimplifier extends
     return true;
   }
 
-  private void setUpClasses()
+  private void setUpClasses() throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     mStateToClass = new int[numStates];
     mClasses = new IntListBuffer();
     for (int s = 0; s < numStates; s++) {
+      checkAbort();
       if (s != mBadStateIndex) {
         final int list = mClasses.createList();
         mClasses.add(list, s);
@@ -359,6 +375,7 @@ public class SupervisorReductionTRSimplifier extends
 
   public void setUpEventList(final TIntArrayList enabDisabEvents,
                              final TIntArrayList disabEvents)
+    throws AnalysisAbortException
   {
     enabDisabEvents.clear();
     disabEvents.clear();
@@ -371,6 +388,7 @@ public class SupervisorReductionTRSimplifier extends
       rel.createAllTransitionsReadOnlyIterator();
     iterator.resetEvents(mFirstCEvent, mNumProperEvents);
     while (iterator.advance()) {
+      checkAbort();
       final int currentEvent = iterator.getCurrentEvent();
       final int succ = iterator.getCurrentTargetState();
       final int pre = iterator.getCurrentSourceState();
@@ -388,6 +406,7 @@ public class SupervisorReductionTRSimplifier extends
     }
     for (int i = 0; i < mNumProperEvents; i++) {
       for (int j = i + 1; j <= mNumProperEvents; j++) {
+        checkAbort();
         if (disabledStates[i] != null && enabledStates[i] != null
             && disabledStates[i].equals(disabledStates[j])
             && enabledStates[i].equals(enabledStates[j])) {
@@ -398,6 +417,7 @@ public class SupervisorReductionTRSimplifier extends
       }
     }
     for (int e = mFirstCEvent; e <= mNumProperEvents; e++) {
+      checkAbort();
       if (disabledStates[e] != null) {
         if (enabledStates[e] != null) {
           enabDisabEvents.add(e);
@@ -408,7 +428,7 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
-  private boolean mergeTR()
+  private boolean mergeTR() throws AnalysisAbortException
   {
     if (mRetainedDumpStateEvents != null) {
       retainTransitions();
@@ -418,6 +438,7 @@ public class SupervisorReductionTRSimplifier extends
     boolean trChanged = false;
     final List<int[]> mergingStates = new ArrayList<int[]>();
     for (int i = 0; i < numStates; i++) {
+      checkAbort();
       if (i == mBadStateIndex) {
         continue;
       }
@@ -442,7 +463,7 @@ public class SupervisorReductionTRSimplifier extends
     return trChanged | selfLoofRemoved;
   }
 
-  private boolean retainTransitions()
+  private boolean retainTransitions() throws AnalysisAbortException
   {
     if (mRetainedDumpStateEvents == null) {
       return false;
@@ -453,6 +474,7 @@ public class SupervisorReductionTRSimplifier extends
       rel.createAllTransitionsModifyingIterator();
     boolean badStateReachable = false;
     while (iter.advance()) {
+      checkAbort();
       final int to = iter.getCurrentTargetState();
       if (to == mBadStateIndex) {
         final int e = iter.getCurrentEvent();
@@ -480,10 +502,11 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
-  private void merge(final TLongHashSet mergedPairs)
+  private void merge(final TLongHashSet mergedPairs) throws AnalysisAbortException
   {
     final TLongIterator itr = mergedPairs.iterator();
     while (itr.hasNext()) {
+      checkAbort();
       final long pair = itr.next();
       final int hi = getState(0, pair);
       final int lo = getState(1, pair);
@@ -509,7 +532,7 @@ public class SupervisorReductionTRSimplifier extends
     return list1;
   }
 
-  private void copyIfShadowNull(final int state)
+  private void copyIfShadowNull(final int state) throws AnalysisAbortException
   {
     if (mShadowStateToClass[state] == IntListBuffer.NULL) {
       final int newlist = mShadowClasses.copy(mStateToClass[state], mClasses);
@@ -525,6 +548,7 @@ public class SupervisorReductionTRSimplifier extends
 
   private void updateStateToClass(final int list, final int[] stateToClass,
                                   final IntListBuffer classes)
+    throws AnalysisAbortException
   {
     final ReadOnlyIterator iter = classes.createReadOnlyIterator(list);
     iter.reset(list);
@@ -577,7 +601,7 @@ public class SupervisorReductionTRSimplifier extends
   }
 
   private boolean createOneStateTR(final TIntArrayList disabEvents)
-    throws OverflowException
+    throws OverflowException, AnalysisAbortException
   {
     final ListBufferTransitionRelation oldRel = getTransitionRelation();
     // get events that are in both disabEvents and mRetainedDumpStateEvents
@@ -612,7 +636,7 @@ public class SupervisorReductionTRSimplifier extends
     }
 
     if (numStates == 2) {
-      // add transitions from state 0 to dump state (if creating a 2-state aut)
+      // add transitions from state 0 to dump state
       for (int e = 0; e < intersectEvents.size(); e++) {
         rel.addTransition(0, intersectEvents.get(e), 1);
       }

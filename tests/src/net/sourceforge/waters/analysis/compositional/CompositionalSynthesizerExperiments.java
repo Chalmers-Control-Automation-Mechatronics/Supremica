@@ -19,6 +19,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.Watchdog;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.IntConstantProxy;
@@ -29,14 +30,13 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 /**
  * This class runs experiments using the {@link CompositionalSynthesizer} with
- * a variety of configurations. The heuristics for choosing candidates can
- * be varied, as well as the abstraction rules applied and their order.
+ * a variety of configurations. The heuristics for choosing candidates can be
+ * varied, as well as the abstraction rules applied and their order.
  *
  * @author Sahar Mohajerani
  */
 
-public class CompositionalSynthesizerExperiments
-  extends AbstractAnalysisTest
+public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
 {
 
   //#########################################################################
@@ -47,10 +47,9 @@ public class CompositionalSynthesizerExperiments
     this(statsFilename, null, null);
   }
 
-  public CompositionalSynthesizerExperiments
-    (final String statsFilename,
-     final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
-     final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
+  public CompositionalSynthesizerExperiments(final String statsFilename,
+                                             final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
+                                             final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
     throws FileNotFoundException
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -64,7 +63,6 @@ public class CompositionalSynthesizerExperiments
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSynthesizer = new CompositionalSynthesizer(factory);
   }
-
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
@@ -81,12 +79,14 @@ public class CompositionalSynthesizerExperiments
     mSynthesizer.setMonolithicStateLimit(finalStateLimit);
     mSynthesizer.setPreselectingMethod(mPreselecting);
     mSynthesizer.setSelectingMethod(mSelecting);
-    mPrintWriter.println("InternalStateLimit," + internalStateLimit +
-                         ",InternalTransitionLimit," +
-                         internalTransitionLimit +
-                         ",FinalStateLimit," + finalStateLimit);
-    mPrintWriter.println("PreselHeuristic," + mPreselecting +
-                         ",SelecHeuristic," + mSelecting);
+    mSynthesizer.setSupervisorReductionEnabled(mSupervisorReductionEnabled);
+    mPrintWriter.println("InternalStateLimit," + internalStateLimit
+                         + ",InternalTransitionLimit,"
+                         + internalTransitionLimit + ",FinalStateLimit,"
+                         + finalStateLimit);
+    mPrintWriter.println("PreselHeuristic," + mPreselecting
+                         + ",SelecHeuristic," + mSelecting);
+    mPrintWriter.println("SupervisorReduction," + mSupervisorReductionEnabled);
     mHasBeenPrinted = false;
   }
 
@@ -100,14 +100,12 @@ public class CompositionalSynthesizerExperiments
     super.tearDown();
   }
 
-
   //#########################################################################
   //# Simple Access
   CompositionalSynthesizer getSynthesizer()
   {
     return mSynthesizer;
   }
-
 
   //#########################################################################
   //# Configuration
@@ -129,25 +127,24 @@ public class CompositionalSynthesizerExperiments
     mSelecting = factory.getEnumValue(name);
   }
 
+  void setSupervisorReductionEnabled(final boolean enabled)
+  {
+    mSupervisorReductionEnabled = enabled;
+  }
 
   //#########################################################################
   //# Invocation
-  void runModel(final String group,
-                final String subdir,
-                final String name)
-  throws Exception
+  void runModel(final String group, final String subdir, final String name)
+    throws Exception
   {
     runModel(group, subdir, name, null);
   }
 
-  void runModel(final String group,
-                final String subdir,
-                final String name,
-                final List<ParameterBindingProxy> bindings)
-  throws Exception
+  void runModel(final String group, final String subdir, final String name,
+                final List<ParameterBindingProxy> bindings) throws Exception
   {
-    printAndLog("Running " + name + " with " +
-                mPreselecting + "/" + mSelecting + " ...");
+    printAndLog("Running " + name + " with " + mPreselecting + "/"
+                + mSelecting + " ...");
     final String inputprop = System.getProperty("waters.test.inputdir");
     final File inputRoot = new File(inputprop);
     final File rootdir = new File(inputRoot, "waters");
@@ -158,15 +155,19 @@ public class CompositionalSynthesizerExperiments
     final File filename = new File(dir, name);
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mSynthesizer.setModel(des);
-    mSynthesizer.setAbstractionProcedureFactory
-      (SynthesisAbstractionProcedureFactory.SOE_ONLY);
+    /*
+    mSynthesizer
+      .setAbstractionProcedureFactory(SynthesisAbstractionProcedureFactory.SOE_ONLY);
+    */
     try {
+      final Watchdog watchdog = new Watchdog(mSynthesizer, 10);//                     doesn't work... ...
+      watchdog.start();
       mSynthesizer.run();
     } catch (final AnalysisException exception) {
       mPrintWriter.println(name + "," + exception.getMessage());
     } finally {
       final CompositionalSynthesisResult stats =
-        (CompositionalSynthesisResult) mSynthesizer.getAnalysisResult();
+        mSynthesizer.getAnalysisResult();
       if (!mHasBeenPrinted) {
         mHasBeenPrinted = true;
         mPrintWriter.print("Model,");
@@ -180,20 +181,23 @@ public class CompositionalSynthesizerExperiments
     }
   }
 
-
   //#########################################################################
   //# Main Method
   public static void main(final String[] args)
   {
-    if (args.length == 3) {
+    if (args.length == 4) {
       try {
         final String filename = args[0];
         final String preselectingHeuristic = args[1];
         final String selectingHeuristic = args[2];
+        final int enabled = Integer.parseInt(args[3]);
+        final boolean supervisorReductionEnabled =
+          (enabled == 0) ? false : true;
         final CompositionalSynthesizerExperiments experiment =
           new CompositionalSynthesizerExperiments(filename);
         experiment.setPreselectingHeuristic(preselectingHeuristic);
         experiment.setSelectingHeuristic(selectingHeuristic);
+        experiment.setSupervisorReductionEnabled(supervisorReductionEnabled);
         experiment.setUp();
         experiment.runAllTests();
         experiment.tearDown();
@@ -202,64 +206,63 @@ public class CompositionalSynthesizerExperiments
         exception.printStackTrace(System.err);
       }
     } else {
-      System.err.println
-        ("Usage: CompositionalSynthesizerExperiments " +
-         "<outputFilename> <preselectingHeuristic> <selectingHeuristic>");
+      System.err
+        .println("Usage: CompositionalSynthesizerExperiments "
+                 + "<outputFilename> <preselectingHeuristic> <selectingHeuristic>");
     }
   }
-
 
   //#########################################################################
   //# Invocation
   void runAllTests() throws Exception
   {
-    /*
-    synthesisTransferline(100);
-    synthesisTransferline(200);
-    synthesisTransferline(300);
-    */
-//    synthesiseTbedNoderailB();
-//    synthesiseCentralLockingKoordwspBlock();
-    synthesisAGV();
-    synthesisAGVB();
-    synthesissAip0Alps();
-    synthesissRhoneSubPatch0();
-//    synthesissAip0Aip();
-    synthesisFenCaiWon09B();
-//    synthesisFenCaiWon09Synth();
-    synthesissFms2003();
-    synthesiseFischertechnik();
-    synthesiseIPC();
-    synthesiseCentralLockingKoordwspBlock();
-//    synthesisAip0tough();
-//    synthesiseTbedCtct();
-    synthesiseTbedNoderailUncont();
-    synthesiseTbedNoderailB();
-//    synthesiseCentralLockingVerriegel3b();
-//    synthesiseVerrigel4B();
-//    synthesiseFlexibleManufacturingSystem();
-//  synthesisLargestCoherent();
-  }
+    synthesisAGV();// 1
+    synthesisAGVB();// 2
+    synthesissAip0Alps();// 3
+    synthesisFenCaiWon09B();// 4
+    synthesisFenCaiWon09Synth();// 5
+    synthesissFms2003();// 6
+    synthesiseTbedNoderailB();// 7
+    synthesiseTbedNoderailUncont();// 8
+    synthesiseCentralLockingVerriegel3b();// 9
+    synthesiseVerrigel4B();// 10
+    synthesis6linka();// 11
+    synthesis6linki();// 12
+    synthesis6linkp();// 13
+    synthesis6linkre();// 14
 
+    //synthesisTransferline(100);
+    //synthesisTransferline(200);
+    //synthesisTransferline(300);
+    //synthesiseCentralLockingKoordwspBlock();
+    //synthesissRhoneSubPatch0();
+    //synthesissAip0Aip();
+    //synthesiseFischertechnik();
+    //synthesiseIPC();
+    //synthesiseCentralLockingKoordwspBlock();
+    //synthesisAip0tough();
+    //synthesiseTbedCtct();
+    //synthesiseFlexibleManufacturingSystem();
+    //synthesisLargestCoherent();
+  }
 
   //#########################################################################
   //# Models
   // Central locking
+  @SuppressWarnings("unused")
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
     runModel("valid", "central_locking", "koordwsp_block.wmod");
   }
 
-  @SuppressWarnings("unused")
   private void synthesiseCentralLockingVerriegel3b() throws Exception
   {
     runModel("valid", "central_locking", "verriegel3b.wmod");
   }
 
-  @SuppressWarnings("unused")
   private void synthesiseVerrigel4B() throws Exception
   {
-    runModel("valid", "central_locking", "verriegel4b.wmod");
+    runModel("tests", "incremental_suite", "verriegel4b.wmod");
   }
 
   // AIP
@@ -272,12 +275,6 @@ public class CompositionalSynthesizerExperiments
   private void synthesiseAip0Aip() throws Exception
   {
     runModel("tests", "incremental_suite", "aip0aip.wmod");
-  }
-
-  @SuppressWarnings("unused")
-  private void synthesisFenCaiWon09Synth() throws Exception
-  {
-    runModel("tests", "fencaiwon09", "FenCaiWon09_synth.wmod");
   }
 
   // Train testbed
@@ -308,12 +305,13 @@ public class CompositionalSynthesizerExperiments
     runModel("tests", "incremental_suite", "agv.wmod");
   }
 
-  //
+  @SuppressWarnings("unused")
   private void synthesiseIPC() throws Exception
   {
     runModel("tests", "synthesis", "IPC.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesissRhoneSubPatch0() throws Exception
   {
     runModel("tests", "hisc", "rhone_subsystem1_patch0.wmod");
@@ -321,10 +319,11 @@ public class CompositionalSynthesizerExperiments
 
   private void synthesissFms2003() throws Exception
   {
-    runModel("tests", "fms2003", "fms2003_synth1.wmod");
+    runModel("tests", "fms2003", "fms2003.wmod");
   }
 
   //flexible production cell
+  @SuppressWarnings("unused")
   private void synthesiseFischertechnik() throws Exception
   {
     runModel("tests", "incremental_suite", "ftechnik.wmod");
@@ -339,6 +338,31 @@ public class CompositionalSynthesizerExperiments
   private void synthesisFenCaiWon09B() throws Exception
   {
     runModel("tests", "fencaiwon09", "FenCaiWon09b.wmod");
+  }
+
+  private void synthesisFenCaiWon09Synth() throws Exception
+  {
+    runModel("tests", "fencaiwon09", "FenCaiWon09_synth.wmod");
+  }
+
+  private void synthesis6linka() throws Exception
+  {
+    runModel("tests", "6link", "6linka.wmod");
+  }
+
+  private void synthesis6linki() throws Exception
+  {
+    runModel("tests", "6link", "6linki.wmod");
+  }
+
+  private void synthesis6linkp() throws Exception
+  {
+    runModel("tests", "6link", "6linkp.wmod");
+  }
+
+  private void synthesis6linkre() throws Exception
+  {
+    runModel("tests", "6link", "6linkre.wmod");
   }
 
   @SuppressWarnings("unused")
@@ -359,7 +383,6 @@ public class CompositionalSynthesizerExperiments
     formatter.format("%.3f s\n", difftime);
   }
 
-
   //#########################################################################
   //# Logging
   private void printAndLog(final String msg)
@@ -368,15 +391,14 @@ public class CompositionalSynthesizerExperiments
     getLogger().info(msg);
   }
 
-
   //#########################################################################
   //# Data Members
   private CompositionalSynthesizer mSynthesizer;
   private final FileOutputStream mOut;
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
+  private boolean mSupervisorReductionEnabled;
 
-  private AbstractCompositionalModelAnalyzer.PreselectingMethod
-    mPreselecting;
+  private AbstractCompositionalModelAnalyzer.PreselectingMethod mPreselecting;
   private AbstractCompositionalModelAnalyzer.SelectingMethod mSelecting;
 }
