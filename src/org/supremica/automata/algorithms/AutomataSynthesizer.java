@@ -110,8 +110,8 @@ public class AutomataSynthesizer
     private ExecutionDialog executionDialog = null;
 
     // For the stopping
-    private boolean abortRequested = false;
-    private Abortable threadToAbort = null;
+    private boolean mAbortRequested = false;
+    private Abortable mThreadToAbort = null;
 
     private ActionTimer timer = new ActionTimer();
     // Statistics
@@ -157,11 +157,11 @@ public class AutomataSynthesizer
         {
             // MONOLITHIC synthesis, just whack the entire stuff into the monolithic algo
             final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-			threadToAbort = synthesizer;
+			mThreadToAbort = synthesizer;
 			final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
 					theAutomata, synthesizerOptions, synchronizationOptions,
 					executionDialog, helperStatistics, false);
-			if (abortRequested) return new Automata();
+			if (mAbortRequested) return new Automata();
 			result.addAutomaton(retval.automaton);
         }
 
@@ -170,7 +170,7 @@ public class AutomataSynthesizer
             // MODULAR (controllability) synthesis
             final Automata newSupervisors = doModular(theAutomata);
 
-            if (abortRequested || newSupervisors == null) return new Automata();
+            if (mAbortRequested || newSupervisors == null) return new Automata();
             logger.info(helperStatistics);
             result.addAutomata(newSupervisors);
         }
@@ -330,10 +330,10 @@ public class AutomataSynthesizer
 //
             // Applying monolithic synthesis on the abstract automaton.
             final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-            threadToAbort = synthesizer;
+            mThreadToAbort = synthesizer;
             final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
 
-            if (abortRequested)
+            if (mAbortRequested)
                 return new Automata();
             retval.automaton.setName("sup(Untitled)");
             result.addAutomaton(retval.automaton);
@@ -711,7 +711,7 @@ public class AutomataSynthesizer
         // Loop over specs/sups AND their corresponding plants (dealt with by the selector)
         for (Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
         {
-            if (abortRequested)
+            if (mAbortRequested)
             {
                 return new Automata();
             }
@@ -756,12 +756,12 @@ public class AutomataSynthesizer
 
             // Do monolithic synthesis on this subsystem
             final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-			threadToAbort = synthesizer;
+			mThreadToAbort = synthesizer;
 			MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
 					automata, synthesizerOptions, synchronizationOptions,
 					executionDialog, helperStatistics, false);
 
-            if (abortRequested)
+            if (mAbortRequested)
             {
                 return new Automata();
             }
@@ -793,7 +793,7 @@ public class AutomataSynthesizer
 								synthesizerOptions, synchronizationOptions,
 								executionDialog, helperStatistics, false);
 
-                        if (abortRequested)
+                        if (mAbortRequested)
                         {
                             return new Automata();
                         }
@@ -946,7 +946,7 @@ public class AutomataSynthesizer
             final AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions,
                 synchronizationOptions, null);
 
-            if (abortRequested)
+            if (mAbortRequested)
             {
                 return;
             }
@@ -954,7 +954,7 @@ public class AutomataSynthesizer
             // Will the supervisor affect the system at all?
             logger.verbose("Examining whether the supervisor candidate " +
                 currSupervisor + " is needed.");
-            threadToAbort = verifier;
+            mThreadToAbort = verifier;
             // if (AutomataVerifier.verifyModularInclusion(currAutomata, new Automata(currSupervisor)))
             if (verifier.verify())
             {
@@ -967,7 +967,7 @@ public class AutomataSynthesizer
                 // This one was important! Don't remove it and put it back!!
                 currAutomata.addAutomaton(currSupervisor); // Not for LanguageInclusion
             }
-            threadToAbort = null;
+            mThreadToAbort = null;
 
             if (executionDialog != null)
             {
@@ -989,26 +989,26 @@ public class AutomataSynthesizer
     @Override
     public void requestAbort()
     {
-        abortRequested = true;
+        mAbortRequested = true;
 
         logger.debug("AutomataSynthesizer requested to stop.");
 
         // Stop currently executing thread!
-        if (threadToAbort != null)
+        if (mThreadToAbort != null)
         {
-            threadToAbort.requestAbort();
+            mThreadToAbort.requestAbort();
         }
     }
 
     @Override
     public boolean isAborting()
     {
-        return abortRequested;
+        return mAbortRequested;
     }
 
     @Override
     public void resetAbort(){
-      abortRequested = false;
+      mAbortRequested = false;
     }
 
     /**

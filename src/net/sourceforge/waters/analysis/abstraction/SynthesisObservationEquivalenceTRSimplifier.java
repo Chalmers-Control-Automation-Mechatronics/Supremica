@@ -221,6 +221,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
         for (EquivalenceClass splitter = mSplitters.poll();
              splitter != null && mNumClasses < mNumReachableStates;
              splitter = mSplitters.poll()) {
+          checkAbort();
           splitter.splitOn();
         }
         if (prevNumClasses == mNumClasses ||
