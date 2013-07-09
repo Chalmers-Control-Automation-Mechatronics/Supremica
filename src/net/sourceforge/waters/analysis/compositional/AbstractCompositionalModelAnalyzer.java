@@ -712,6 +712,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       do {
         subsystem:
         do {
+          checkAbort();
           candidates = mPreselectingHeuristic.findCandidates();
           candidate = selectCandidate(candidates);
           while (candidate != null) {
