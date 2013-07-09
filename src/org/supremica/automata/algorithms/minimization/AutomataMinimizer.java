@@ -47,26 +47,41 @@
  * Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms.minimization;
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.gui.*;
-import org.supremica.util.ActionTimer;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import net.sourceforge.waters.model.analysis.Abortable;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.EventToAutomataMap;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
+import org.supremica.automata.algorithms.AutomataSynchronizer;
+import org.supremica.automata.algorithms.AutomataSynthesizer;
+import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.gui.ExecutionDialog;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import java.util.*;
+import org.supremica.util.ActionTimer;
 
 public class AutomataMinimizer
-    implements Stoppable
+    implements Abortable
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataMinimizer.class);
     // Stoppable stuff
     private ExecutionDialog executionDialog;
-    private Stoppable threadToStop = null;
-    private boolean stopRequested = false;
+    private Abortable threadToAbort = null;
+    private boolean abortRequested = false;
 
     /** The automata being minimized (may be a copy of the original). */
     private Automata theAutomata;
-    private  Automata setOfHalf ;
+    private final  Automata setOfHalf ;
     /** The supplied options. */
     private MinimizationOptions options;
 
@@ -103,7 +118,7 @@ public class AutomataMinimizer
     private final Automata selection = new Automata();
     private final Automata taskExtra = new Automata();
     public static boolean synthesiss = false;
-    
+
 
     /**
      * Basic constructor.
@@ -123,12 +138,12 @@ public class AutomataMinimizer
     {
         this.executionDialog = executionDialog;
     }
-    public Automata getCompositionalMinimization(final MinimizationOptions options, boolean synthesis)
+    public Automata getCompositionalMinimization(final MinimizationOptions options, final boolean synthesis)
     throws Exception
     {
 
         synthesiss = synthesis;
-        
+
         return getCompositionalMinimization(options);
 
     }
@@ -139,7 +154,7 @@ public class AutomataMinimizer
     public Automata getCompositionalMinimization(final MinimizationOptions options)
     throws Exception
     {
-        
+
         this.options = options;
 
         // Are the options valid?
@@ -259,7 +274,7 @@ public class AutomataMinimizer
             final MinimizationTask task = getNextMinimizationTask(true); // new implementation
             //MinimizationTask task = getNextMinimizationTask(heuristicList.getFirst() != MinimizationHeuristic.MostLocal); // decide based on heuristic
             Automata selection;
-            
+
             Alphabet hideThese;
             if (task != null)
             {
@@ -283,16 +298,16 @@ public class AutomataMinimizer
                 hideThese = selection.getUnionAlphabet();
                 hideThese.minus(options.getTargetAlphabet());
             }
-           
+
             taskSelectionTimer.stop();
-            if (stopRequested)
+            if (abortRequested)
             {
                 return null;
             }
             // Perform the minimization, unless of course this is the last step
             // and it should be skipped...
             Automaton min;
-            
+
             if (options.getSkipLast() && (theAutomata.size() == selection.size()))
             {
                 // Just synch and hide
@@ -306,7 +321,7 @@ public class AutomataMinimizer
                     theAutomata.addAutomata(setOfHalf);
                     return theAutomata;
                 }
-                 
+
                 min = AutomataSynchronizer.synchronizeAutomata(selection, false);
                 if (options.getMinimizationType()
                         == EquivalenceRelation.SYNTHESISABSTRACTION) {
@@ -325,17 +340,17 @@ public class AutomataMinimizer
                 }
                 totalStates += min.nbrOfStates();
                 totalTransitions += min.nbrOfTransitions();
-                
+
             }
 
             else
             {
-//               
-                
+//
+
                 // Compose and minimize!
                  if(AutomataSynthesizer.renameBack()){
-                     Automata selectClone=selection.clone();
-                     String name= "HalfWaySynthesisResult("+selection.getFirstAutomaton().getName()+")";
+                     final Automata selectClone=selection.clone();
+                     final String name= "HalfWaySynthesisResult("+selection.getFirstAutomaton().getName()+")";
                       Automaton aut=new Automaton(name );
 //                        logger.info(selection);
                         // Synch
@@ -349,10 +364,10 @@ public class AutomataMinimizer
                         aut.setType(AutomatonType.SUPERVISOR);
                         setOfHalf.addAutomaton(aut);
                }
-                 
+
                  min = monolithicMinimization(selection, hideThese);
             }
-            if (stopRequested)
+            if (abortRequested)
             {
                 return null;
             }
@@ -518,6 +533,7 @@ public class AutomataMinimizer
                 return false;
             }
         }
+        @Override
         public String toString()
         {
             return automata + ", " + eventsToHide;
@@ -561,7 +577,7 @@ public class AutomataMinimizer
                     {
                         continue;
                     }
-                    if (stopRequested)
+                    if (abortRequested)
                     {
                         return null;
                     }
@@ -870,7 +886,7 @@ public class AutomataMinimizer
                             taskAutomata.addAutomata(selection);
                         }
                     }
-                    if (stopRequested)
+                    if (abortRequested)
                     {
                         return null;
                     }
@@ -914,8 +930,8 @@ public class AutomataMinimizer
     private Automaton monolithicMinimization(final Automata automata, final Alphabet hideThese)
     throws Exception
     {
-        
-         
+
+
 //        logger.info("hide these in monolithic"+hideThese);
         //System.err.println("Minimizing " + automata + ", hiding: " + hideThese);
 
@@ -951,7 +967,7 @@ public class AutomataMinimizer
         return monolithicMinimization(aut, hideThese);
     }
 
-    
+
     private Automaton monolithicMinimization(Automaton aut, final Alphabet hideThese)
     throws Exception
     {
@@ -971,13 +987,13 @@ public class AutomataMinimizer
             // Minimize!
             final AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
             minimizer.useShortStateNames(useShortStateNames);
-            threadToStop = minimizer;
+            threadToAbort = minimizer;
             final Automaton newAut = minimizer.getMinimizedAutomaton(options, hideThese);
 //            logger.info("self loop after minimized automaton"+newAut.nbrOfSelfLoops());
 //            logger.info("states after minimized automaton"+newAut.nbrOfStates());
             aut = newAut;
-            threadToStop = null;
-            if (stopRequested)
+            threadToAbort = null;
+            if (abortRequested)
             {
                 return null;
             }
@@ -987,13 +1003,13 @@ public class AutomataMinimizer
         final Alphabet inadequate = aut.getInadequateEvents(true);
         if (inadequate.size() > 0)
         {
-             if (options.getMinimizationType() == 
+             if (options.getMinimizationType() ==
                 EquivalenceRelation.SYNTHESISABSTRACTION) {
                 aut.synthesisHide(hideThese, preserveControllability);
              } else {
                 aut.hide(hideThese, preserveControllability);
              }
-           
+
 
             // Adjust eventToAutomataMap
             for (final LabeledEvent event: inadequate)
@@ -1053,19 +1069,26 @@ public class AutomataMinimizer
      *
      * @see  ExecutionDialog
      */
-    public void requestStop()
+    @Override
+    public void requestAbort()
     {
-        stopRequested = true;
+        abortRequested = true;
         logger.debug("AutomataMinimizer requested to stop.");
         // Stop current minimization thread!
-        if (threadToStop != null)
+        if (threadToAbort != null)
         {
-            threadToStop.requestStop();
+            threadToAbort.requestAbort();
         }
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
-        return stopRequested;
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      abortRequested = false;
     }
 }

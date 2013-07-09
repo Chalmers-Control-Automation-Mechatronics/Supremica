@@ -49,9 +49,17 @@
  */
 package org.supremica.automata.algorithms.minimization;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -59,31 +67,44 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
+import org.supremica.automata.StateSet;
+import org.supremica.automata.StateSets;
+import org.supremica.automata.TauEvent;
 import org.supremica.automata.IO.AutomataToWaters;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
-import org.supremica.automata.algorithms.*;
+import org.supremica.automata.algorithms.AutomataSynthesizer;
+import org.supremica.automata.algorithms.AutomataVerifier;
+import org.supremica.automata.algorithms.AutomatonSynthesizer;
+import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.automata.algorithms.standard.Determinizer;
-import org.supremica.properties.Config;
-import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ActionMan;
+import org.supremica.gui.ExecutionDialog;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
 import org.supremica.util.SupremicaException;
-import org.supremica.automata.LabeledEvent;
 
 /**
  * This class can be used to reduce the size of an automaton while
  * preserving different equivalences.
  */
 public class AutomatonMinimizer
-    implements Stoppable
+    implements Abortable
 {
     int l=0;
     private static Logger logger = LoggerFactory.createLogger(AutomatonMinimizer.class);
 
     // Stoppable stuff
     private ExecutionDialog executionDialog = null;
-    private boolean stopRequested = false;
+    private boolean abortRequested = false;
 
     /** The automaton being minimized (may be a copy of the original). */
     private Automaton theAutomaton;
@@ -239,7 +260,7 @@ public class AutomatonMinimizer
             if (!BisimulationEquivalenceMinimizer.libraryLoaded())
             {
                 logger.error("Library BisimulationEquivalence not in library path.");
-                requestStop();
+                requestAbort();
                 return null;
             }
 
@@ -335,12 +356,12 @@ public class AutomatonMinimizer
                     // Partition
                     findCoarsestPartitioning(equivClasses, equivalenceRelation);
                 } catch (final Exception ex) {
-                    requestStop();
+                    requestAbort();
                     throw ex;
                 }
 
 
-            if (stopRequested)
+            if (abortRequested)
             {
                 return null;
             }
@@ -385,7 +406,7 @@ public class AutomatonMinimizer
             if (theAutomaton.nbrOfForbiddenStates() > 0)
             {
                 logger.warn("Supervision equivalence can not cope with previously forbidden states.");
-                requestStop();
+                requestAbort();
                 throw new IllegalArgumentException("Automaton contains forbidden states, which is currently not supported by supervision equivalence");
             }
 
@@ -490,7 +511,7 @@ public class AutomatonMinimizer
             //logger.info(totalOES);
             totalD += countD;
 
-            if (stopRequested)
+            if (abortRequested)
             {
                 return null;
             }
@@ -542,7 +563,7 @@ public class AutomatonMinimizer
             throw new Exception("Unknown equivalence relation(" + equivalenceRelation.toString() + ")");
         }
 
-        if (stopRequested)
+        if (abortRequested)
         {
             return null;
         }
@@ -575,12 +596,12 @@ public class AutomatonMinimizer
                 // Partition
                 findCoarsestPartitioning(equivClasses, equivalenceRelation);
             } catch (final Exception ex) {
-                requestStop();
+                requestAbort();
                 throw ex;
             }
 
 
-            if (stopRequested)
+            if (abortRequested)
             {
                 return null;
             }
@@ -601,7 +622,7 @@ public class AutomatonMinimizer
                 "respect to observation equivalence.");
         }
 
-        if (stopRequested)
+        if (abortRequested)
         {
             return null;
         }
@@ -912,7 +933,7 @@ public class AutomatonMinimizer
         equivClassIt = equivClasses.iterator();
         while (equivClassIt.hasNext())
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return null;
             }
@@ -1055,7 +1076,7 @@ public class AutomatonMinimizer
             for (int i=0; i<array.length; i++)
             {
                 //logger.info("array"+l+i+array[i]);
-                if (stopRequested)
+                if (abortRequested)
                 {
                     return;
                 }
@@ -1085,7 +1106,7 @@ public class AutomatonMinimizer
 //        logger.info(theAutomaton.getAlphabet());
         for (final Iterator<?> eventIt = theAutomaton.getAlphabet().iterator(); eventIt.hasNext(); )
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return false;
             }
@@ -1228,7 +1249,7 @@ public class AutomatonMinimizer
         final Iterator<State> stateIt = eqClass.iterator();
         while (stateIt.hasNext())
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 newEquivalenceClassHolder.clear();
                 return newEquivalenceClassHolder;
@@ -1285,7 +1306,7 @@ public class AutomatonMinimizer
         while (stateIt.hasNext())
         {
             boolean extraCheck=false;
-            if (stopRequested)
+            if (abortRequested)
             {
                 newEquivalenceClassHolder.clear();
                 return newEquivalenceClassHolder;
@@ -1365,7 +1386,7 @@ public class AutomatonMinimizer
 
         while (stateIt.hasNext())
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 newEquivalenceClassHolder.clear();
                 return newEquivalenceClassHolder;
@@ -1443,7 +1464,7 @@ public class AutomatonMinimizer
         // Do the merging
         loop: while (statesToExamine.size() != 0)
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return -1;
             }
@@ -1510,7 +1531,7 @@ public class AutomatonMinimizer
         // Do the merging
         loop: while (statesToExamine.size() != 0)
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return -1;
             }
@@ -1575,7 +1596,7 @@ public class AutomatonMinimizer
       loop: while (statesToExamine.size() != 0)
         {
 
-            if (stopRequested)
+            if (abortRequested)
             {
                 return ;
             }
@@ -1673,7 +1694,7 @@ public class AutomatonMinimizer
         // Do the merging
         while (statesToExamine.size() != 0)
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return -1;
             }
@@ -1716,7 +1737,7 @@ public class AutomatonMinimizer
         // Do the merging
         while (statesToExamine.size() != 0)
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return -1;
             }
@@ -1865,7 +1886,7 @@ public class AutomatonMinimizer
                         }
 
                         // Did anything happen
-                        if (stopRequested)
+                        if (abortRequested)
                             return -1;
                         if (count < 0)
                             logger.error("Error when running rule: " + rule + " count: " + count);
@@ -2113,7 +2134,7 @@ public class AutomatonMinimizer
         final StateSet statesToExamine = new StateSet(aut.getStateSet());
         loop: while (statesToExamine.size() != 0)
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return -1;
             }
@@ -2315,7 +2336,7 @@ public class AutomatonMinimizer
         // Remove all outgoing arcs from these states
         for (final Iterator<?> it = aut.stateIterator(); it.hasNext(); )
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return -1;
             }
@@ -2469,7 +2490,7 @@ public class AutomatonMinimizer
         // Count the states that get marked
         int count = 0;
 
-        if (aut == null || stopRequested)
+        if (aut == null || abortRequested)
         {
             return -1;
         }
@@ -2547,7 +2568,7 @@ public class AutomatonMinimizer
         // States that only have epsilon events as outgoing can be bypassed!
         loop: while (statesToExamine.size() != 0)
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return -1;
             }
@@ -3264,21 +3285,25 @@ public class AutomatonMinimizer
         this.executionDialog = executionDialog;
     }
 
-    /**
-     * Method that stops AutomatonMinimizer as soon as possible.
-     *
-     * @see  ExecutionDialog
-     */
-    public void requestStop()
-    {
-        stopRequested = true;
 
-        logger.debug("AutomatonMinimizer requested to stop.");
+    @Override
+    public void requestAbort()
+    {
+      abortRequested = true;
+
+      logger.debug("AutomatonMinimizer requested to stop.");
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
-        return stopRequested;
+      return abortRequested;
+    }
+
+    @Override
+    public void resetAbort()
+    {
+      abortRequested = false;
     }
 }
 
@@ -3308,16 +3333,19 @@ class StateInfoIncoming
         isInitial = backwardsClosure.hasInitialState();
     }
 
+    @Override
     public void setState(final State state)
     {
         this.state = state;
     }
 
+    @Override
     public State getState()
     {
         return state;
     }
 
+    @Override
     public boolean equivalentTo(final StateInfo info)
     {
         assert(info instanceof StateInfoIncoming);
@@ -3330,6 +3358,7 @@ class StateInfoIncoming
         return result;
     }
 
+    @Override
     public boolean equals(final Object object)
     {
         final StateInfoIncoming other = (StateInfoIncoming) object;
@@ -3337,6 +3366,7 @@ class StateInfoIncoming
         return state.equals(other.state);
     }
 
+    @Override
     public int hashCode()
     {
         int hash = incomingArcs.hashCode();
@@ -3345,6 +3375,7 @@ class StateInfoIncoming
         return hash;
     }
 
+    @Override
     public String toString()
     {
         String result = "";
@@ -3372,6 +3403,7 @@ class StateInfoIncoming
         /**
          * Compares the state indices first and then the events.
          */
+        @Override
         public int compareTo(final Arclet other)
         {
 
@@ -3390,6 +3422,7 @@ class StateInfoIncoming
             }
         }
 
+        @Override
         public boolean equals(final Object obj)
         {
             final Arclet other = (Arclet) obj;
@@ -3397,11 +3430,13 @@ class StateInfoIncoming
             return (state.equals(other.state) && event.equals(other.event));
         }
 
+        @Override
         public int hashCode()
         {
             return (17*state.hashCode())*event.hashCode();
         }
 
+        @Override
         public String toString()
         {
             return "<" + state.getName() + ", " + event.getLabel() + ">";
@@ -3432,6 +3467,7 @@ class StateInfoIncoming
             }
         }
 
+        @Override
         public String toString()
         {
             String result = "";
@@ -3470,6 +3506,7 @@ class StateInfoActiveEventsRule
         isMarked = state.isAccepting();
     }
 
+    @Override
     public boolean equivalentTo(final StateInfo info)
     {
         assert(info instanceof StateInfoIncoming);
@@ -3482,6 +3519,7 @@ class StateInfoActiveEventsRule
         return result;
     }
 
+    @Override
     public int hashCode()
     {
         // If the number hasn't been generated before, do it now!
@@ -3495,6 +3533,7 @@ class StateInfoActiveEventsRule
         return hash;
     }
 
+    @Override
     public String toString()
     {
         String result = super.toString();
@@ -3616,7 +3655,7 @@ class EquivalenceClassHolder
 
         // Now get the EquivalenceClass associated with the nextEquivClass
         // and add the state to it.
-        final EquivalenceClass theEquivalenceClass = (EquivalenceClass) get(nextClass);
+        final EquivalenceClass theEquivalenceClass = get(nextClass);
 
         theEquivalenceClass.add(state);
         //System.out.println("value"+theEquivalenceClass);
@@ -3637,7 +3676,7 @@ class EquivalenceClassHolder
 
         // Now get the EquivalenceClass associated with the nextEquivClass
         // and add the state to it.
-        final EquivalenceClass theEquivalenceClass = (EquivalenceClass) get(nextClass);
+        final EquivalenceClass theEquivalenceClass = get(nextClass);
 
         theEquivalenceClass.add(state);
         System.out.println("value"+theEquivalenceClass);
@@ -3660,6 +3699,7 @@ class EquivalenceClassHolder
         }
     }
 
+    @Override
     public String toString()
     {
         final StringBuffer sb = new StringBuffer();

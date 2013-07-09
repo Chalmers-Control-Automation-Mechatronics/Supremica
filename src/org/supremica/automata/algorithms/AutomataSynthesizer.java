@@ -58,6 +58,7 @@ import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelA
 import net.sourceforge.waters.analysis.compositional.CompositionalSynthesizer;
 import net.sourceforge.waters.analysis.compositional.SynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -98,7 +99,7 @@ import org.supremica.util.BDD.OnlineBDDSupervisor;
  * uses AutomatonSynthesizer for monolithic problems
  */
 public class AutomataSynthesizer
-    implements Stoppable
+    implements Abortable
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
     private Automata theAutomata;
@@ -109,8 +110,8 @@ public class AutomataSynthesizer
     private ExecutionDialog executionDialog = null;
 
     // For the stopping
-    private boolean stopRequested = false;
-    private Stoppable threadToStop = null;
+    private boolean abortRequested = false;
+    private Abortable threadToAbort = null;
 
     private ActionTimer timer = new ActionTimer();
     // Statistics
@@ -156,11 +157,11 @@ public class AutomataSynthesizer
         {
             // MONOLITHIC synthesis, just whack the entire stuff into the monolithic algo
             final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-			threadToStop = synthesizer;
+			threadToAbort = synthesizer;
 			final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
 					theAutomata, synthesizerOptions, synchronizationOptions,
 					executionDialog, helperStatistics, false);
-			if (stopRequested) return new Automata();
+			if (abortRequested) return new Automata();
 			result.addAutomaton(retval.automaton);
         }
 
@@ -169,7 +170,7 @@ public class AutomataSynthesizer
             // MODULAR (controllability) synthesis
             final Automata newSupervisors = doModular(theAutomata);
 
-            if (stopRequested || newSupervisors == null) return new Automata();
+            if (abortRequested || newSupervisors == null) return new Automata();
             logger.info(helperStatistics);
             result.addAutomata(newSupervisors);
         }
@@ -329,10 +330,10 @@ public class AutomataSynthesizer
 //
             // Applying monolithic synthesis on the abstract automaton.
             final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-            threadToStop = synthesizer;
+            threadToAbort = synthesizer;
             final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
 
-            if (stopRequested)
+            if (abortRequested)
                 return new Automata();
             retval.automaton.setName("sup(Untitled)");
             result.addAutomaton(retval.automaton);
@@ -709,7 +710,7 @@ public class AutomataSynthesizer
         // Loop over specs/sups AND their corresponding plants (dealt with by the selector)
         for (Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return new Automata();
             }
@@ -754,12 +755,12 @@ public class AutomataSynthesizer
 
             // Do monolithic synthesis on this subsystem
             final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-			threadToStop = synthesizer;
+			threadToAbort = synthesizer;
 			MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
 					automata, synthesizerOptions, synchronizationOptions,
 					executionDialog, helperStatistics, false);
 
-            if (stopRequested)
+            if (abortRequested)
             {
                 return new Automata();
             }
@@ -791,7 +792,7 @@ public class AutomataSynthesizer
 								synthesizerOptions, synchronizationOptions,
 								executionDialog, helperStatistics, false);
 
-                        if (stopRequested)
+                        if (abortRequested)
                         {
                             return new Automata();
                         }
@@ -944,7 +945,7 @@ public class AutomataSynthesizer
             final AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions,
                 synchronizationOptions, null);
 
-            if (stopRequested)
+            if (abortRequested)
             {
                 return;
             }
@@ -952,7 +953,7 @@ public class AutomataSynthesizer
             // Will the supervisor affect the system at all?
             logger.verbose("Examining whether the supervisor candidate " +
                 currSupervisor + " is needed.");
-            threadToStop = verifier;
+            threadToAbort = verifier;
             // if (AutomataVerifier.verifyModularInclusion(currAutomata, new Automata(currSupervisor)))
             if (verifier.verify())
             {
@@ -965,7 +966,7 @@ public class AutomataSynthesizer
                 // This one was important! Don't remove it and put it back!!
                 currAutomata.addAutomaton(currSupervisor); // Not for LanguageInclusion
             }
-            threadToStop = null;
+            threadToAbort = null;
 
             if (executionDialog != null)
             {
@@ -985,23 +986,28 @@ public class AutomataSynthesizer
      * @see  ExecutionDialog
      */
     @Override
-    public void requestStop()
+    public void requestAbort()
     {
-        stopRequested = true;
+        abortRequested = true;
 
         logger.debug("AutomataSynthesizer requested to stop.");
 
         // Stop currently executing thread!
-        if (threadToStop != null)
+        if (threadToAbort != null)
         {
-            threadToStop.requestStop();
+            threadToAbort.requestAbort();
         }
     }
 
     @Override
-    public boolean isStopped()
+    public boolean isAborting()
     {
-        return stopRequested;
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      abortRequested = false;
     }
 
     /**

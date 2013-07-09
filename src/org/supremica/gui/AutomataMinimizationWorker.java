@@ -49,18 +49,24 @@
  */
 package org.supremica.gui;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.EventQueue;
+import java.awt.Frame;
+import java.util.ArrayList;
+import java.util.Iterator;
 
+import javax.swing.JOptionPane;
+
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.base.ProxyTools;
 
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.automata.Automata;
-import org.supremica.automata.Project;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.Project;
+import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
+import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
 
 /**
@@ -71,7 +77,7 @@ import org.supremica.util.ActionTimer;
  */
 public class AutomataMinimizationWorker
     extends Thread
-    implements Stoppable
+    implements Abortable
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataMinimizationWorker.class);
 
@@ -82,8 +88,8 @@ public class AutomataMinimizationWorker
 
     // For the stopping
     private ExecutionDialog executionDialog;
-    private boolean stopRequested = false;
-    private final ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
+    private boolean abortRequested = false;
+    private final ArrayList<Abortable> threadsToAbort = new ArrayList<Abortable>();
 
     public AutomataMinimizationWorker(final Frame frame, final Automata theAutomata, final Project theProject, final MinimizationOptions options)
     {
@@ -95,6 +101,7 @@ public class AutomataMinimizationWorker
         this.start();
     }
 
+    @Override
     public void run()
     {
         // Initialize the ExecutionDialog
@@ -115,7 +122,7 @@ public class AutomataMinimizationWorker
         if (errorMessage != null)
         {
             JOptionPane.showMessageDialog(frame, errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
-            requestStop();
+            requestAbort();
             return;
         }
 
@@ -158,11 +165,11 @@ public class AutomataMinimizationWorker
                     {
                         minimizer.setExecutionDialog(executionDialog);
                     }
-                    threadsToStop.add(minimizer);
+                    threadsToAbort.add(minimizer);
                     final Automaton newAutomaton =
                         minimizer.getMinimizedAutomaton(options);
-                    threadsToStop.remove(minimizer);
-                    if (stopRequested)
+                    threadsToAbort.remove(minimizer);
+                    if (abortRequested)
                     {
                         break;
                     }
@@ -207,10 +214,10 @@ public class AutomataMinimizationWorker
                 }
 
                 final AutomataMinimizer minimizer = new AutomataMinimizer(task);
-                threadsToStop.add(minimizer);
+                threadsToAbort.add(minimizer);
                 minimizer.setExecutionDialog(executionDialog);
                 final Automata newAutomata = minimizer.getCompositionalMinimization(options);
-                threadsToStop.remove(minimizer);
+                threadsToAbort.remove(minimizer);
 
                 // Minimized!
                 if (newAutomata != null)
@@ -223,7 +230,7 @@ public class AutomataMinimizationWorker
                 logger.error("Exception in AutomatonMinimizer when compositionally minimizing " +
                     theAutomata + " " + ex);
                 logger.debug(ex.getStackTrace());
-                requestStop();
+                requestAbort();
             }
 
             if (!options.getKeepOriginal())
@@ -238,6 +245,7 @@ public class AutomataMinimizationWorker
         // Hide execution dialog
         EventQueue.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
                 if (executionDialog != null)
@@ -248,7 +256,7 @@ public class AutomataMinimizationWorker
         });
 
         // How did it go?
-        if (!stopRequested)
+        if (!abortRequested)
         {
             logger.info("Execution completed after " + timer.toString());
 
@@ -280,15 +288,16 @@ public class AutomataMinimizationWorker
      *
      *@see  ExecutionDialog
      */
-    public void requestStop()
+    @Override
+    public void requestAbort()
     {
-        stopRequested = true;
+        abortRequested = true;
 
-        for (final Iterator<Stoppable> exIt = threadsToStop.iterator(); exIt.hasNext(); )
+        for (final Iterator<Abortable> exIt = threadsToAbort.iterator(); exIt.hasNext(); )
         {
-            exIt.next().requestStop();
+            exIt.next().requestAbort();
         }
-        threadsToStop.clear();
+        threadsToAbort.clear();
 
         logger.debug("AutomataMinimizationWorker requested to stop.");
 
@@ -298,8 +307,14 @@ public class AutomataMinimizationWorker
         }
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
-        return stopRequested;
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      abortRequested = false;
     }
 }
