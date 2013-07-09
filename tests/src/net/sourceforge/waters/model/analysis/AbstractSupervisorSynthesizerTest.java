@@ -531,7 +531,6 @@ public abstract class AbstractSupervisorSynthesizerTest
    * superclass method first.
    * @param des
    *          The model to be analysed for the current test case.
-   * @throws EventNotFoundException
    */
   protected void configureSynthesizer(final ProductDESProxy des)
     throws EventNotFoundException

@@ -76,8 +76,6 @@ import javax.swing.JProgressBar;
 
 import net.sourceforge.waters.model.analysis.Abortable;
 
-import org.supremica.automata.algorithms.Stoppable;
-
 
 public final class ExecutionDialog
     extends JDialog
