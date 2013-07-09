@@ -382,7 +382,7 @@ public class AutomataSynthesizer
 
            final MonolithicSynthesizer synthesizer =
              new MonolithicSynthesizer(des, factory, translator);
-           threadToAbort = synthesizer;
+           mThreadToAbort = synthesizer;
            synthesizer.setConfiguredDefaultMarking(marking);
            final boolean supervisorReduction =
              synthesizerOptions.getReduceSupervisors();

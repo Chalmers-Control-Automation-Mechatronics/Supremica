@@ -62,6 +62,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSelecting = selectingHeuristic;
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSynthesizer = new CompositionalSynthesizer(factory);
+    watchdog = new Watchdog(mSynthesizer, 10);
   }
 
   //#########################################################################
@@ -160,8 +161,6 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
       .setAbstractionProcedureFactory(SynthesisAbstractionProcedureFactory.SOE_ONLY);
     */
     try {
-      final Watchdog watchdog = new Watchdog(mSynthesizer, 10);//                     doesn't work... ...
-      watchdog.start();
       mSynthesizer.run();
     } catch (final AnalysisException exception) {
       mPrintWriter.println(name + "," + exception.getMessage());
@@ -179,6 +178,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
       stats.printCSVHorizontal(mPrintWriter);
       mPrintWriter.println();
     }
+    watchdog.reset();
   }
 
   //#########################################################################
@@ -216,6 +216,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   //# Invocation
   void runAllTests() throws Exception
   {
+    watchdog.start();
     synthesisAGV();// 1
     synthesisAGVB();// 2
     synthesissAip0Alps();// 3
@@ -396,6 +397,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   private CompositionalSynthesizer mSynthesizer;
   private final FileOutputStream mOut;
   private PrintWriter mPrintWriter;
+  private final Watchdog watchdog;
   private boolean mHasBeenPrinted;
   private boolean mSupervisorReductionEnabled;
 
