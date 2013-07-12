@@ -62,7 +62,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSelecting = selectingHeuristic;
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSynthesizer = new CompositionalSynthesizer(factory);
-    watchdog = new Watchdog(mSynthesizer, 10);
+    watchdog = new Watchdog(mSynthesizer, 600);
   }
 
   //#########################################################################
@@ -161,6 +161,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
       .setAbstractionProcedureFactory(SynthesisAbstractionProcedureFactory.SOE_ONLY);
     */
     try {
+      watchdog.reset();
       mSynthesizer.run();
     } catch (final AnalysisException exception) {
       mPrintWriter.println(name + "," + exception.getMessage());
@@ -178,7 +179,6 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
       stats.printCSVHorizontal(mPrintWriter);
       mPrintWriter.println();
     }
-    watchdog.reset();
   }
 
   //#########################################################################
@@ -231,6 +231,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesis6linki();// 12
     synthesis6linkp();// 13
     synthesis6linkre();// 14
+
 
     //synthesisTransferline(100);
     //synthesisTransferline(200);

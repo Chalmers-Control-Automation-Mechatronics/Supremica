@@ -52,14 +52,6 @@ public class SupervisorReductionTRSimplifier extends
   }
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    super.requestAbort();
-  }
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
@@ -502,7 +494,8 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
-  private void merge(final TLongHashSet mergedPairs) throws AnalysisAbortException
+  private void merge(final TLongHashSet mergedPairs)
+    throws AnalysisAbortException
   {
     final TLongIterator itr = mergedPairs.iterator();
     while (itr.hasNext()) {
@@ -532,7 +525,8 @@ public class SupervisorReductionTRSimplifier extends
     return list1;
   }
 
-  private void copyIfShadowNull(final int state) throws AnalysisAbortException
+  private void copyIfShadowNull(final int state)
+    throws AnalysisAbortException
   {
     if (mShadowStateToClass[state] == IntListBuffer.NULL) {
       final int newlist = mShadowClasses.copy(mStateToClass[state], mClasses);

@@ -184,8 +184,8 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
     throws AnalysisException
   {
     mStartTime = System.currentTimeMillis();
-    mIsAborting = false;
     mAnalysisResult = createAnalysisResult();
+    checkAbort();
   }
 
   /**
@@ -197,7 +197,6 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
    */
   protected void tearDown()
   {
-    mIsAborting = false;
     addStatistics();
   }
 

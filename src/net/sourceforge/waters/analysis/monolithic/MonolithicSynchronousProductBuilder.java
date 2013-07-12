@@ -556,8 +556,9 @@ public class MonolithicSynchronousProductBuilder
   //#########################################################################
   //# Auxiliary Methods
   private void explore(final int[] sourceTuple)
-    throws OverflowException
+    throws AnalysisException
   {
+    checkAbort();
     final int source = mStates.get(sourceTuple);
     if (mCurrentSuccessors != null) {
       for (int e = 0; e < mNumEvents; e++) {

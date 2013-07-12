@@ -41,11 +41,23 @@ public class SelfRunningExperimentCompositionalSynthesis
              selectingMethod: selectingFactory.getEnumConstants()) {
           final String preName = preselectingMethod.toString();
           final String selName = selectingMethod.toString();
-          System.out.println("*** " + preName + "/" + selName + " ***");
-          final CompositionalSynthesizerExperiments experiment =
+          // without supervisor reduction:
+          System.out.println("*** " + preName + "/" + selName + "  without reduction" + " ***");
+          CompositionalSynthesizerExperiments experiment =
             new CompositionalSynthesizerExperiments
-              (preName + "_" +  selName + ".csv",
+              (preName + "_" +  selName + "NR.csv",
                preselectingMethod, selectingMethod);
+          experiment.setSupervisorReductionEnabled(false);
+          experiment.setUp();
+          experiment.runAllTests();
+          experiment.tearDown();
+          // with supervisor reduction:
+          System.out.println("*** " + preName + "/" + selName + "  with reduction" + " ***");
+          experiment =
+            new CompositionalSynthesizerExperiments
+              (preName + "_" +  selName + "R.csv",
+               preselectingMethod, selectingMethod);
+          experiment.setSupervisorReductionEnabled(true);
           experiment.setUp();
           experiment.runAllTests();
           experiment.tearDown();

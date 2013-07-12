@@ -238,6 +238,20 @@ public class CompositionalSynthesizer extends
   }
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mSupervisorSimplifier != null) {
+      mSupervisorSimplifier.requestAbort();
+    }
+    if (mHalfwaySimplifier != null) {
+      mHalfwaySimplifier.requestAbort();
+    }
+  }
+
+  //#########################################################################
   //# Configuration
   public void setSupervisorReductionEnabled(final boolean enable)
   {
@@ -287,6 +301,8 @@ public class CompositionalSynthesizer extends
     setPropositionsForMarkings(defaultMarking, null);
     mDistinguisherInfoList = new LinkedList<DistinguisherInfo>();
     mRenamedEvents = new THashSet<EventProxy>();
+    mSupervisorSimplifier = new SupervisorReductionTRSimplifier();
+    mHalfwaySimplifier = new HalfWaySynthesisTRSimplifier();
     super.setUp();
   }
 
@@ -296,6 +312,8 @@ public class CompositionalSynthesizer extends
     super.tearDown();
     mDistinguisherInfoList = null;
     mRenamedEvents = null;
+    mSupervisorSimplifier = null;
+    mHalfwaySimplifier = null;
   }
 
   @Override
@@ -436,7 +454,7 @@ public class CompositionalSynthesizer extends
           return;
         } else {
           final AutomatonProxy newSupervisor =
-            createSupervisor(eventEnc, supervisor);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            createSupervisor(eventEnc, supervisor);
           result.addSupervisor(newSupervisor);
         }
       }
@@ -559,7 +577,7 @@ public class CompositionalSynthesizer extends
         return false;
       } else {
         final AutomatonProxy renamedSup =
-          createSupervisor(encoding, supervisor);//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+          createSupervisor(encoding, supervisor);
         result.addSupervisor(renamedSup);
         return true;
       }
@@ -872,18 +890,17 @@ public class CompositionalSynthesizer extends
                                        automaton,
                                        encoding,
                                        ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    final HalfWaySynthesisTRSimplifier synthesiser =
-      new HalfWaySynthesisTRSimplifier(rel);
+    mHalfwaySimplifier.setTransitionRelation(rel);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultID = encoding.getEventCode(defaultMarking);
-    synthesiser.setDefaultMarkingID(defaultID);
+    mHalfwaySimplifier.setDefaultMarkingID(defaultID);
     TIntHashSet renamed = getRenamedControllables(encoding);
     if (getSupervisorReductionEnabled()) {
       renamed = null;
     }
-    synthesiser.setRetainedDumpStateEvents(renamed);
-    synthesiser.run();
-    return synthesiser.getPseudoSupervisor();
+    mHalfwaySimplifier.setRetainedDumpStateEvents(renamed);
+    mHalfwaySimplifier.run();
+    return mHalfwaySimplifier.getPseudoSupervisor();
   }
 
   private ListBufferTransitionRelation reduceSupervisor(final EventEncoding eventEnc,
@@ -893,15 +910,15 @@ public class CompositionalSynthesizer extends
     if (!getSupervisorReductionEnabled()) {
       return rel;
     }
-    final SupervisorReductionTRSimplifier simplifier =
-      new SupervisorReductionTRSimplifier();
-    simplifier.setTransitionRelation(rel);//set TR
-    simplifier.setEvent(-1);//set event
-    simplifier.setOutputName("HalfwaySup");//set name
-    simplifier.setBadStateIndex();//set bad state
-    simplifier.setRetainedDumpStateEvents(getRenamedControllables(eventEnc));//set retained transitions
-    simplifier.run();
-    return simplifier.getTransitionRelation();
+
+    mSupervisorSimplifier.setTransitionRelation(rel);//set TR
+    mSupervisorSimplifier.setEvent(-1);//set event
+    mSupervisorSimplifier.setOutputName("HalfwaySup");//set name
+    mSupervisorSimplifier.setBadStateIndex();//set bad state
+    mSupervisorSimplifier
+      .setRetainedDumpStateEvents(getRenamedControllables(eventEnc));//set retained transitions
+    mSupervisorSimplifier.run();
+    return mSupervisorSimplifier.getTransitionRelation();
   }
 
   private AutomatonProxy createRenamedSupervisor(final ListBufferTransitionRelation rel,
@@ -918,7 +935,7 @@ public class CompositionalSynthesizer extends
                                                  final ListIterator<DistinguisherInfo> listIter)
     throws AnalysisException
   {
-
+    checkAbort();
     if (!listIter.hasPrevious()) {
       return removeDumpStates(rel, encoding);
     }
@@ -1220,7 +1237,8 @@ public class CompositionalSynthesizer extends
   private String mOutputName;
   private boolean mConstructsResult = true;
   private boolean mSupervisorReductionEnabled = false;
-
+  private SupervisorReductionTRSimplifier mSupervisorSimplifier;
+  private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
 
