@@ -85,7 +85,6 @@ public class SupervisorReductionTRSimplifier extends
         break;
       }
     }
-    rel.setName(mOuptutName);
   }
 
   @Override
@@ -131,16 +130,6 @@ public class SupervisorReductionTRSimplifier extends
   {
     super.setTransitionRelation(rel);
     mBadStateIndex = -1;
-  }
-
-  public void setOutputName(final String name)
-  {
-    mOuptutName = name;
-  }
-
-  public String getOutputName()
-  {
-    return mOuptutName;
   }
 
   public void setEvent(final int e)
@@ -661,7 +650,6 @@ public class SupervisorReductionTRSimplifier extends
   private int mNumProperEvents;
   private int mBadStateIndex;
   private int mCurrEvent;
-  private String mOuptutName;
   private TIntHashSet mRetainedDumpStateEvents;
   private int[] mStateToClass;
   private IntListBuffer mClasses;

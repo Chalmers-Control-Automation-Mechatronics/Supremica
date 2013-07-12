@@ -344,7 +344,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           // Supervisor Reduction Enabled
           mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);//set TR
           mSupervisorSimplifier.setEvent(-1);//set event
-          mSupervisorSimplifier.setOutputName("Supervisor!!");//set name
           mSupervisorSimplifier.setBadStateIndex(mNumGoodStates);//set bad state
           mSupervisorSimplifier.setRetainedDumpStateEvents(null);//set retained transitions
           mSupervisorSimplifier.run();
@@ -374,14 +373,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             } else {
               for (int e = 0; e < enabDisabEvents.size(); e++) {
                 ListBufferTransitionRelation copy =
-                  new ListBufferTransitionRelation(
-                                                   mTransitionRelation,
+                  new ListBufferTransitionRelation(mTransitionRelation,
                                                    ListBufferTransitionRelation.CONFIG_SUCCESSORS);
                 mSupervisorSimplifier.setTransitionRelation(copy);//set TR
                 mSupervisorSimplifier.setEvent(enabDisabEvents.get(e));//set event
-                mSupervisorSimplifier.setOutputName("Supervisor:"
-                                                    + mEvents[enabDisabEvents
-                                                      .get(e)].getName());//set name
                 mSupervisorSimplifier.setBadStateIndex(mSupervisorSimplifier
                   .getBadStateIndex());//set bad state
                 mSupervisorSimplifier
@@ -397,6 +392,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                   break;
                 }
                 copy = mSupervisorSimplifier.getTransitionRelation();
+                copy.setName("Supervisor:" + // set name
+                             mEvents[enabDisabEvents.get(e)].getName());
                 autList.add(copy.createAutomaton(getFactory(),
                                                  getEventEncoding()));
               }
