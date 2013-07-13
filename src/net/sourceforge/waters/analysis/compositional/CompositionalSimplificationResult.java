@@ -102,7 +102,7 @@ public class CompositionalSimplificationResult
 
   /**
    * Completes the result by constructing and storing a product DES consisting
-   * of the synthesised supervisors.
+   * of the simplified automata.
    * @param  factory  Factory used to construct the product DES.
    * @param  name     Name to be given to the product DES.
    */

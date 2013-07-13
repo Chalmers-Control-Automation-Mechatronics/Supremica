@@ -719,18 +719,8 @@ public abstract class AbstractCompositionalModelAnalyzer
             try {
               mMayBeSplit = false;
               applyCandidate(candidate);
-              if (simplify()) {
-                if (result.isFinished()) {
-                  break outer;
-                } else {
-                  continue outer;
-                }
-              }
               cancheck = true;
               continue subsystem;
-            } catch (final OutOfMemoryError error) {
-              getLogger().debug("<out of memory>");
-              // caught - go on ...
             } catch (final OverflowException overflow) {
               // caught - go on ...
             }
@@ -739,6 +729,13 @@ public abstract class AbstractCompositionalModelAnalyzer
             mOverflowCandidates.add(automata);
             candidates.remove(candidate);
             candidate = selectCandidate(candidates);
+          }
+          if (simplify()) {
+            if (result.isFinished()) {
+              break outer;
+            } else {
+              continue outer;
+            }
           }
         } while (candidate != null);
         try {
@@ -863,7 +860,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * @see #removeRedundantEvents()
    */
   protected AbstractionStep removeEvents(final Set<EventProxy> removed)
-    throws OverflowException
+    throws AnalysisException
   {
     if (removed.isEmpty()) {
       return null;
@@ -903,7 +900,9 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   protected AutomatonProxy removeEvents(final AutomatonProxy aut,
                                         final Set<EventProxy> removed)
+    throws AnalysisException
   {
+    checkAbort();
     mHasRemovedProperTransition = false;
     final Collection<EventProxy> events = aut.getEvents();
     boolean found = false;
@@ -1452,54 +1451,62 @@ public abstract class AbstractCompositionalModelAnalyzer
     throws AnalysisException
   {
     final List<AbstractionStep> steps = new LinkedList<AbstractionStep>();
-    final HidingStep syncStep = composeSynchronousProduct(candidate);
-    final Collection<EventProxy> local = candidate.getLocalEvents();
-    final int numLocal = local.size();
-    // Local events not replaced by tau, for synthesis abstraction.
-    final Collection<EventProxy> notReallyHidden =
-      new ArrayList<EventProxy>(numLocal);
-    for (final EventProxy event : local) {
-      final EventInfo info = mEventInfoMap.get(event);
-      if (info.canBeLocal() && !info.canBeTau()) {
-        notReallyHidden.add(event);
-      }
-    }
     AutomatonProxy aut;
-    final EventProxy tau;
-    if (syncStep == null) {
-      aut = candidate.getAutomata().iterator().next();
-      tau = null;
-    } else {
-      steps.add(syncStep);
-      aut = syncStep.getResultAutomaton();
-      tau = syncStep.getTauEvent();
-      if (tau != null) {
-        notReallyHidden.add(tau);
-      }
-    }
-    recordStatistics(aut);
-    final boolean simplified =
-      mAbstractionProcedure.run(aut, notReallyHidden, steps, candidate);
-    if (simplified) {
-      final Collection<EventProxy> oldEvents = aut.getEvents();
-      final int end = steps.size();
-      final AbstractionStep last = steps.listIterator(end).previous();
-      aut = last.getResultAutomaton();
-      final KindTranslator translator = getKindTranslator();
-      final Collection<EventProxy> newEvents =
-        new THashSet<EventProxy>(aut.getEvents());
-      for (final EventProxy event : oldEvents) {
-        if (event != tau &&
-            translator.getEventKind(event) != EventKind.PROPOSITION &&
-            !local.contains(event) && !newEvents.contains(event)) {
-          mMayBeSplit = true;
-          break;
+    try {
+      final HidingStep syncStep = composeSynchronousProduct(candidate);
+      final Collection<EventProxy> local = candidate.getLocalEvents();
+      final int numLocal = local.size();
+      // Local events not replaced by tau, for synthesis abstraction.
+      final Collection<EventProxy> notReallyHidden =
+        new ArrayList<EventProxy>(numLocal);
+      for (final EventProxy event : local) {
+        final EventInfo info = mEventInfoMap.get(event);
+        if (info.canBeLocal() && !info.canBeTau()) {
+          notReallyHidden.add(event);
         }
       }
+      final EventProxy tau;
+      if (syncStep == null) {
+        aut = candidate.getAutomata().iterator().next();
+        tau = null;
+      } else {
+        steps.add(syncStep);
+        aut = syncStep.getResultAutomaton();
+        tau = syncStep.getTauEvent();
+        if (tau != null) {
+          notReallyHidden.add(tau);
+        }
+      }
+      recordStatistics(aut);
+      final boolean simplified =
+        mAbstractionProcedure.run(aut, notReallyHidden, steps, candidate);
+      if (simplified) {
+        final Collection<EventProxy> oldEvents = aut.getEvents();
+        final int end = steps.size();
+        final AbstractionStep last = steps.listIterator(end).previous();
+        aut = last.getResultAutomaton();
+        final KindTranslator translator = getKindTranslator();
+        final Collection<EventProxy> newEvents =
+          new THashSet<EventProxy>(aut.getEvents());
+        for (final EventProxy event : oldEvents) {
+          if (event != tau &&
+            translator.getEventKind(event) != EventKind.PROPOSITION &&
+            !local.contains(event) && !newEvents.contains(event)) {
+            mMayBeSplit = true;
+            break;
+          }
+        }
+      }
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      getLogger().debug("<out of memory>");
+      throw new OverflowException(error);
     }
     if (steps.isEmpty()) {
       return false;
     } else {
+      // Beware of out-of-memory during updateEventsToAutomata() or
+      // recordAbstractionStep() --- it is not recoverable ...
       updateEventsToAutomata(aut, candidate.getAutomata());
       for (final AbstractionStep step : steps) {
         // Must be done after updateEventsToAutomata() ...

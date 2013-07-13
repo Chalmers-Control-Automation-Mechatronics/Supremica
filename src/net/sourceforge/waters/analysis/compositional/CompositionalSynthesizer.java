@@ -286,6 +286,10 @@ public class CompositionalSynthesizer extends
       return result.isSatisfied();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
     } finally {
       tearDown();
     }
@@ -902,20 +906,27 @@ public class CompositionalSynthesizer extends
     return mHalfwaySimplifier.getPseudoSupervisor();
   }
 
-  private ListBufferTransitionRelation reduceSupervisor(final EventEncoding eventEnc,
-                                                        final ListBufferTransitionRelation rel)
+  private ListBufferTransitionRelation reduceSupervisor
+    (final EventEncoding eventEnc,
+     final ListBufferTransitionRelation rel)
     throws AnalysisException
   {
-    if (!getSupervisorReductionEnabled()) {
+    if (mSupervisorReductionEnabled) {
+      try {
+        mSupervisorSimplifier.setTransitionRelation(rel);//set TR
+        mSupervisorSimplifier.setEvent(-1);//set event
+        mSupervisorSimplifier.setBadStateIndex();//set bad state
+        mSupervisorSimplifier.setRetainedDumpStateEvents
+          (getRenamedControllables(eventEnc));//set retained transitions
+        mSupervisorSimplifier.run();
+        return mSupervisorSimplifier.getTransitionRelation();
+      } catch (final OverflowException overflow) {
+        // If supervisor reduction fails, just use an unreduced supervisor.
+        return rel;
+      }
+    } else {
       return rel;
     }
-    mSupervisorSimplifier.setTransitionRelation(rel);//set TR
-    mSupervisorSimplifier.setEvent(-1);//set event
-    mSupervisorSimplifier.setBadStateIndex();//set bad state
-    mSupervisorSimplifier
-      .setRetainedDumpStateEvents(getRenamedControllables(eventEnc));//set retained transitions
-    mSupervisorSimplifier.run();
-    return mSupervisorSimplifier.getTransitionRelation();
   }
 
   private AutomatonProxy createRenamedSupervisor(final ListBufferTransitionRelation rel,
@@ -944,6 +955,7 @@ public class CompositionalSynthesizer extends
     AutomatonProxy distinguisher = null;
     boolean foundNondeterminism = false;
     while (listIter.hasPrevious()) {
+      checkAbort();
       final DistinguisherInfo info = listIter.previous();
       if (distinguisher == null) {
         distinguisher = info.getDistinguisher();
@@ -964,7 +976,8 @@ public class CompositionalSynthesizer extends
       }
       renamings.add(info);
       if (!foundNondeterminism) {
-        outer: for (int state = 0; state < numOfStates; state++) {
+        outer:
+        for (int state = 0; state < numOfStates; state++) {
           int foundSuccessor = -1;
           for (final EventProxy event : replacement) {
             final int code = encoding.getEventCode(event);
@@ -1014,6 +1027,7 @@ public class CompositionalSynthesizer extends
           for (final EventProxy event : replacement) {
             final int e = encoding.getEventCode(event);
             if (e >= 0) {
+              checkAbort();
               rel.removeEvent(e);
             }
           }
@@ -1024,6 +1038,7 @@ public class CompositionalSynthesizer extends
             if (r < 0) {
               r = e;
             } else {
+              checkAbort();
               rel.replaceEvent(e, r);
               final byte status = rel.getProperEventStatus(e);
               rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);

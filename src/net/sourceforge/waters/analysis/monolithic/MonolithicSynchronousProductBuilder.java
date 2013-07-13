@@ -406,6 +406,7 @@ public class MonolithicSynchronousProductBuilder
 
     int a = 0;
     for (final AutomatonProxy aut : automata) {
+      checkAbort();
       final Collection<EventProxy> localEvents = aut.getEvents();
       final List<EventProxy> nonLocalProps =
         new ArrayList<EventProxy>(numProps);
@@ -709,6 +710,7 @@ public class MonolithicSynchronousProductBuilder
   }
 
   private AutomatonProxy createAutomaton()
+    throws AnalysisException
   {
     final int numSelfloopStates = mNumStates - (mDeadlockState >= 0 ? 1 : 0);
     final Set<EventProxy> skip;
@@ -744,6 +746,7 @@ public class MonolithicSynchronousProductBuilder
         new THashSet<EventProxy>(mCurrentPropositions);
       final Set<EventProxy> localProps = new THashSet<EventProxy>(numProps);
       for (int code = 0; code < mNumStates; code++) {
+        checkAbort();
         final int[] tuple = mStateTuples.get(code);
         localProps.addAll(mCurrentPropositions);
         for (int a = 0; a < mNumAutomata; a++) {
@@ -768,6 +771,7 @@ public class MonolithicSynchronousProductBuilder
 
     final List<StateProxy> states = new ArrayList<StateProxy>(mNumStates);
     for (int code = 0; code < mNumStates; code++) {
+      checkAbort();
       final boolean initial = code < mNumInitialStates;
       final int[] tuple = mStateTuples.get(code);
       final List<EventProxy> marking = new ArrayList<EventProxy>(numProps);
@@ -798,6 +802,7 @@ public class MonolithicSynchronousProductBuilder
       final int t = mTransitionBuffer.get(i++);
       final EventProxy event = mEvents[e];
       if (event != null) {
+        checkAbort();
         final StateProxy source = states.get(s);
         final StateProxy target = states.get(t);
         transitions.add(factory.createTransitionProxy(source, event, target));
