@@ -52,7 +52,7 @@ public interface Abortable
   /**
    * Resets a previous abort request. This method removes any pending
    * abort request, so {@link #isAborting()} will return <CODE>false</CODE>
-   * again. This method should not be called while a the controlled object
+   * again. This method should not be called while the controlled object
    * is still executing, as it is undefined whether or not an abort will
    * be cancelled safely in such a case.
    */

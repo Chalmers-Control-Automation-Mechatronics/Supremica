@@ -225,8 +225,16 @@ public abstract class BDDModelVerifier
   public void checkAbort()
     throws AnalysisAbortException, OverflowException
   {
-    final int numNodes = mBDDFactory.getNodeNum();
-    checkAbort(numNodes);
+    super.checkAbort();
+    if (mBDDFactory != null) {
+      final int numNodes = mBDDFactory.getNodeNum();
+      if (numNodes > mPeakNodes) {
+        mPeakNodes = numNodes;
+        if (numNodes > getNodeLimit()) {
+          throw new OverflowException(OverflowKind.NODE, getNodeLimit());
+        }
+      }
+    }
   }
 
 
@@ -294,21 +302,6 @@ public abstract class BDDModelVerifier
   //# Debug Output
   public void silentBDDHandler(final Object dummy1, final Object dummy2)
   {
-  }
-
-
-  //#########################################################################
-  //# Aborting
-  void checkAbort(final int numNodes)
-    throws AnalysisAbortException, OverflowException
-  {
-    super.checkAbort();
-    if (numNodes > mPeakNodes) {
-      mPeakNodes = numNodes;
-      if (numNodes > getNodeLimit()) {
-        throw new OverflowException(OverflowKind.NODE, getNodeLimit());
-      }
-    }
   }
 
 
@@ -509,9 +502,9 @@ public abstract class BDDModelVerifier
     List<TransitionPartitionBDD> group =
       mTransitionPartitioning.startIteration();
     while (true) {
-      final int numNodes = mBDDFactory.getNodeNum();
-      checkAbort(numNodes);
+      checkAbort();
       if (logger.isDebugEnabled()) {
+        final int numNodes = mBDDFactory.getNodeNum();
         logger.debug("Depth " + mLevels.size() + ", " +
                      numNodes + " nodes ...");
       }
@@ -566,9 +559,9 @@ public abstract class BDDModelVerifier
     List<TransitionPartitionBDD> group =
       mTransitionPartitioning.startIteration();
     while (group != null) {
-      final int numNodes = mBDDFactory.getNodeNum();
-      checkAbort(numNodes);
+      checkAbort();
       if (logger.isDebugEnabled()) {
+        final int numNodes = mBDDFactory.getNodeNum();
         logger.debug("Coreachability " + level + ", " +
                      numNodes + " nodes ...");
       }

@@ -20,8 +20,10 @@ import java.util.List;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
@@ -531,8 +533,13 @@ public abstract class AbstractSupervisorSynthesizerTest
    *          The model to be analysed for the current test case.
    */
   protected void configureSynthesizer(final ProductDESProxy des)
+    throws EventNotFoundException
   {
     mSynthesizer.setModel(des);
+    final EventProxy marking =
+      AbstractConflictChecker.getMarkingProposition(des);
+    final Collection<EventProxy> props = Collections.singletonList(marking);
+    mSynthesizer.setPropositions(props);
   }
 
 

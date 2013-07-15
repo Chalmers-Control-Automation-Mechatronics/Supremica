@@ -74,7 +74,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-import org.supremica.automata.algorithms.Stoppable;
+import net.sourceforge.waters.model.analysis.Abortable;
 
 
 public final class ExecutionDialog
@@ -82,38 +82,38 @@ public final class ExecutionDialog
     implements ActionListener, Runnable
 {
     private static final long serialVersionUID = 1L;
-    private List<Stoppable> threadsToStop;
+    private List<Abortable> threadsToStop;
     private JPanel contentPanel = null;
-    
+
     /** The header of the operation. */
     private JLabel operationHeader = null;
     /** The subheader of the operation */
     private JLabel operationSubheader = null;
-    
+
     private JPanel infoPanel = null;
     private JPanel progressPanel = null;
     private JLabel infoValue = null;
     private JProgressBar progressBar = null;
     private JPanel currCenterPanel = null;
     private JButton stopButton = null;
-    
+
     private int progressValue = -1;
     private int value = -1;
-    
+
     private ExecutionDialogMode currentMode = null;
     private ExecutionDialogMode newMode = null;
     @SuppressWarnings("unused")
-	private int nbrOfFoundStates = -1;
-    
-    private void Init(String title)
+	private final int nbrOfFoundStates = -1;
+
+    private void Init(final String title)
     {
         setTitle(title);
         setSize(new Dimension(250, 120));
         setResizable(false);
-        
+
         // Center the window
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension frameSize = getSize();
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final Dimension frameSize = getSize();
         if (frameSize.height > screenSize.height)
         {
             frameSize.height = screenSize.height;
@@ -123,72 +123,72 @@ public final class ExecutionDialog
             frameSize.width = screenSize.width;
         }
         setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-        
-        JPanel operationPanel = new JPanel(new GridLayout(2, 1));
+
+        final JPanel operationPanel = new JPanel(new GridLayout(2, 1));
         operationHeader = new JLabel();
         operationHeader.setHorizontalAlignment(JLabel.LEFT);
         operationPanel.add(operationHeader);
         operationSubheader = new JLabel();
         operationSubheader.setHorizontalAlignment(JLabel.CENTER);
         operationPanel.add(operationSubheader);
-        
+
         // We have two panels that we switch between, infoPanel and progressPanel
-        
+
         // The infoPanel
         infoPanel = new JPanel();
         infoValue = new JLabel();
         infoPanel.add(infoValue, BorderLayout.CENTER);
-        
+
         // The progressPanel
         progressPanel = new JPanel();
         progressBar = new JProgressBar();
         progressBar.setStringPainted(true);
         progressPanel.add(progressBar, BorderLayout.CENTER);
-        
+
         // And there is a button
-        JPanel buttonPanel = new JPanel();
+        final JPanel buttonPanel = new JPanel();
         stopButton = new JButton("Abort");
         stopButton.addActionListener(this);
         buttonPanel.add(stopButton);
-        
+
         // And all is shown in one panel, the contentPanel
         contentPanel = (JPanel) getContentPane();
         contentPanel.add(operationPanel, BorderLayout.NORTH);
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
+
         // Hit it!
         setMode(ExecutionDialogMode.UNINITIALIZED);
         setVisible(true);
     }
-    
+
     /**
      * Creates dialog box for canceling the Stoppable classes in the supplied List.
      * @see Stoppable
      */
-    public ExecutionDialog(Frame frame, String title, List<Stoppable> threadsToStop)
+    public ExecutionDialog(final Frame frame, final String title, final List<Abortable> threadsToStop)
     {
         super(frame);
-        
+
         setVisible(false);
-        
+
         this.threadsToStop = threadsToStop;
-        
+
         Init(title);
     }
-    
+
     // -- MF -- Special case when you've got only one thread to watch
-    public ExecutionDialog(Frame frame, String title, Stoppable threadToStop)
+    public ExecutionDialog(final Frame frame, final String title, final Abortable threadToStop)
     {
-        this(frame, title, new ArrayList<Stoppable>());
-        
+        this(frame, title, new ArrayList<Abortable>());
+
         addThreadToStop(threadToStop);
     }
-    
-    public void addThreadToStop(Stoppable threadToStop)
+
+    public void addThreadToStop(final Abortable threadToStop)
     {
         threadsToStop.add(threadToStop);
     }
-    
+
     /**
      * Sets the mode of the dialog.
      */
@@ -197,53 +197,53 @@ public final class ExecutionDialog
         newMode = mode;
         updateMode();
     }
-    
+
     /**
      * Changes the subheader to the supplied string.
      */
-    public void setSubheader(String string)
+    public void setSubheader(final String string)
     {
         operationSubheader.setText(string);
     }
-    
+
     /**
      * This must be called before changing mode to a progressMode.
      */
-    public void initProgressBar(int min, int max)
+    public void initProgressBar(final int min, final int max)
     {
         // progressMin = min;
         // progressMax = max;
         progressBar.setMinimum(min);
         progressBar.setMaximum(max);
-        
+
         this.progressValue = 0;
-        
+
         update();
     }
-    
+
     /**
      * Sets value of progress bar. The value is shown as % of completion
      * (with respect to the initialized min and max ).
      */
-    public void setProgress(int progressValue)
+    public void setProgress(final int progressValue)
     {
         this.progressValue = progressValue;
-        
+
         update();
     }
-    
-    public void setValue(int value)
+
+    public void setValue(final int value)
     {
         this.value = value;
-        
+
         update();
     }
-    
+
     private void update()
     {
         java.awt.EventQueue.invokeLater(this);
     }
-    
+
     private void updateMode()
     {
         // Should we replace the "value panel"
@@ -251,17 +251,18 @@ public final class ExecutionDialog
         {
             contentPanel.remove(currCenterPanel);
         }
-        
+
         update();
     }
-    
+
+    @Override
     public void run()
     {
         // Update labels
 		if (newMode != currentMode) {
 			currentMode = newMode;
             if (currentMode == ExecutionDialogMode.HIDE) {
-                dispose();                
+                dispose();
                 return;
             }
 			setVisible(true);
@@ -270,29 +271,29 @@ public final class ExecutionDialog
             {
                 contentPanel.remove(currCenterPanel);
             }
-            
+
             // Update the dialog with the current mode
             operationHeader.setText(currentMode.getId());
             operationSubheader.setText(currentMode.getText());
-            
+
             if (currentMode.showValue())
             {
                 contentPanel.add(infoPanel, BorderLayout.CENTER);
-                
+
                 currCenterPanel = infoPanel;
             }
             else if (currentMode.showProgress())
             {
                 contentPanel.add(progressPanel, BorderLayout.CENTER);
-                
+
                 currCenterPanel = progressPanel;
             }
         }
-        
+
         // Update labels
-        boolean showValues = currentMode.showValue();
-        boolean showProgress = currentMode.showProgress();
-        
+        final boolean showValues = currentMode.showValue();
+        final boolean showProgress = currentMode.showProgress();
+
         if (showValues)
         {
             // Don't show negative values in the dialog
@@ -308,35 +309,36 @@ public final class ExecutionDialog
         else if (showProgress)
         {
             progressBar.setValue(progressValue);
-            
+
             //progressBar.setString(String.valueOf(Math.round(progressBar.getPercentComplete()*1000)/10.0) + "%");
             progressBar.setString(String.valueOf(Math.round(progressBar.getPercentComplete() * 100)) + "%");
         }
     }
-    
+
     public void stopAllThreads()
     {
-        for (Iterator<Stoppable> exIt = threadsToStop.iterator(); exIt.hasNext(); )
+        for (final Iterator<Abortable> exIt = threadsToStop.iterator(); exIt.hasNext(); )
         {
-            Stoppable threadToStop = exIt.next();
-            if (!threadToStop.isStopped())
-                threadToStop.requestStop();
+            final Abortable threadToStop = exIt.next();
+            if (!threadToStop.isAborting())
+                threadToStop.requestAbort();
         }
     }
-    
-    public void actionPerformed(ActionEvent event)
+
+    @Override
+    public void actionPerformed(final ActionEvent event)
     {
-        Object source = event.getSource();
-        
+        final Object source = event.getSource();
+
         if (source == stopButton)
         {
             if (threadsToStop != null)
             {
                 stopAllThreads();
-                
+
                 threadsToStop = null;    // Helping the garbage collector...
             }
-            
+
             setMode(ExecutionDialogMode.HIDE);
         }
         else

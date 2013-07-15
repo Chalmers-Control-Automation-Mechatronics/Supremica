@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.map.hash.TObjectByteHashMap;
 import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -112,6 +112,7 @@ public class CompositionalSafetyVerifier
     return (SafetyTraceProxy) super.getCounterExample();
   }
 
+  @Override
   public SafetyDiagnostics getDiagnostics()
   {
     return mDiagnostics;
@@ -205,7 +206,7 @@ public class CompositionalSafetyVerifier
 
   @Override
   protected AbstractionStep removeEvents(final Set<EventProxy> removed)
-    throws OverflowException
+    throws AnalysisException
   {
     final AbstractionStep step = super.removeEvents(removed);
     if (step != null) {

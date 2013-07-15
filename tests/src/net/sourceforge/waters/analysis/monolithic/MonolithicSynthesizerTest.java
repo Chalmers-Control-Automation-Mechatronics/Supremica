@@ -10,15 +10,18 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -83,6 +86,10 @@ public class MonolithicSynthesizerTest
       builder.setOutputName(des.getName());
       builder.setOutputKind(ComponentKind.SUPERVISOR);
       builder.setRemovingSelfloops(true);
+      final EventProxy marking =
+        AbstractConflictChecker.getMarkingProposition(des);
+      final Collection<EventProxy> props = Collections.singletonList(marking);
+      builder.setPropositions(props);
       assertTrue(builder.run());
       final AutomatonProxy expectedSupervisor = builder.getComputedAutomaton();
       final IsomorphismChecker checker =

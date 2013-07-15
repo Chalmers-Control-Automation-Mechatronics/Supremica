@@ -36,6 +36,7 @@ import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -115,6 +116,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   public boolean getSupervisorLocalizationEnabled()
   {
     return mSupervisorLocalizationEnabled;
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mSupervisorSimplifier != null) {
+      mSupervisorSimplifier.requestAbort();
+    }
   }
 
   //#########################################################################
@@ -332,16 +344,15 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           // Supervisor Reduction Enabled
           mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);//set TR
           mSupervisorSimplifier.setEvent(-1);//set event
-          mSupervisorSimplifier.setOutputName("Supervisor!!");//set name
           mSupervisorSimplifier.setBadStateIndex(mNumGoodStates);//set bad state
           mSupervisorSimplifier.setRetainedDumpStateEvents(null);//set retained transitions
           mSupervisorSimplifier.run();
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           if (!mSupervisorLocalizationEnabled) {
             removeBadStateTransitions(mTransitionRelation,
-                                      mSupervisorSimplifier
-                                        .getBadStateIndex());
+                                      mSupervisorSimplifier.getBadStateIndex());
             removeSelfloops(mTransitionRelation);
+            mTransitionRelation.setName("supervisor");
             des = createDESProxy(mTransitionRelation);
           } else {
             // Supervisor Localization Enabled
@@ -353,19 +364,19 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
               new ArrayList<AutomatonProxy>();
             boolean simplified = true;
             if (enabDisabEvents.size() == 0) {
+              removeBadStateTransitions(mTransitionRelation,
+                                        mSupervisorSimplifier
+                                          .getBadStateIndex());
+              removeSelfloops(mTransitionRelation);
               autList.add(mTransitionRelation
                 .createAutomaton(getFactory(), getEventEncoding()));
             } else {
               for (int e = 0; e < enabDisabEvents.size(); e++) {
                 ListBufferTransitionRelation copy =
-                  new ListBufferTransitionRelation(
-                                                   mTransitionRelation,
+                  new ListBufferTransitionRelation(mTransitionRelation,
                                                    ListBufferTransitionRelation.CONFIG_SUCCESSORS);
                 mSupervisorSimplifier.setTransitionRelation(copy);//set TR
                 mSupervisorSimplifier.setEvent(enabDisabEvents.get(e));//set event
-                mSupervisorSimplifier.setOutputName("Supervisor:"
-                                                    + mEvents[enabDisabEvents
-                                                      .get(e)].getName());//set name
                 mSupervisorSimplifier.setBadStateIndex(mSupervisorSimplifier
                   .getBadStateIndex());//set bad state
                 mSupervisorSimplifier
@@ -381,6 +392,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                   break;
                 }
                 copy = mSupervisorSimplifier.getTransitionRelation();
+                copy.setName("Supervisor:" + // set name
+                             mEvents[enabDisabEvents.get(e)].getName());
                 autList.add(copy.createAutomaton(getFactory(),
                                                  getEventEncoding()));
               }
@@ -1133,13 +1146,15 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mmDecodedTuple = new int[mNumAutomata];
     }
 
-    public boolean explore(final int[] encodedTuple) throws OverflowException
+    public boolean explore(final int[] encodedTuple)
+      throws OverflowException, AnalysisAbortException
     {
+      checkAbort();
+      decode(encodedTuple, mmDecodedTuple);
       events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
-            decode(encodedTuple, mmDecodedTuple);
             final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
             if (succ == null) {
               continue events;
@@ -1237,13 +1252,15 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
 
     @Override
-    public boolean explore(final int[] encodedTuple) throws OverflowException
+    public boolean explore(final int[] encodedTuple)
+      throws OverflowException, AnalysisAbortException
     {
+      checkAbort();
+      decode(encodedTuple, mmDecodedTuple);
       events: for (int e = 1; e <= mNumUncontrollableEvents; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
-            decode(encodedTuple, mmDecodedTuple);
             final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
             if (succ == null) {
               if (a >= mNumPlants) {

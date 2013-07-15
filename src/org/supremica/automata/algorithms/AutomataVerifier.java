@@ -60,6 +60,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -105,7 +106,7 @@ import org.supremica.util.BDD.Options;
  * @see  AutomataSynchronizerExecuter
  */
 public class AutomataVerifier
-    implements Stoppable
+    implements Abortable
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataVerifier.class);
     private Automata theAutomata;
@@ -144,8 +145,8 @@ public class AutomataVerifier
 
     /** For stopping execution. */
     private ExecutionDialog executionDialog = null;
-    private boolean stopRequested = false;
-    private Stoppable threadToStop = null;
+    private boolean abortRequested = false;
+    private Abortable threadToAbort = null;
 
     /** For error message when Supremica can't be certain on the answer. */
     private boolean failure = false;
@@ -481,7 +482,7 @@ public class AutomataVerifier
 
                             if (verificationOptions.getOneEventAtATime())
                             {
-                                if (stopRequested)
+                                if (abortRequested)
                                 {
                                     return false;
                                 }
@@ -509,7 +510,7 @@ public class AutomataVerifier
 
                 if (!verificationOptions.getOneEventAtATime())
                 {
-                    if (stopRequested)
+                    if (abortRequested)
                     {
                         return false;
                     }
@@ -566,7 +567,7 @@ public class AutomataVerifier
         synchHelper.setRememberUncontrollable(true);
         synchHelper.initialize();
 
-        if (stopRequested)
+        if (abortRequested)
         {
             return false;
         }
@@ -612,7 +613,7 @@ public class AutomataVerifier
 			}
 		}
 
-        if (stopRequested)
+        if (abortRequested)
         {
             return false;
         }
@@ -744,7 +745,7 @@ public class AutomataVerifier
                 // states from potentiallyUncontrollableStates...
                 excludeUncontrollableStates(similarAutomata, selectedAutomata, automataIndices);
 
-                if (stopRequested)
+                if (abortRequested)
                 {
                     return false;
                 }
@@ -1016,7 +1017,7 @@ public class AutomataVerifier
                 // synchHelper.clear(); // This is done while analyzing the result se *** below
                 synchHelper.initialize();
 
-                if (stopRequested)
+                if (abortRequested)
                 {
                     return;
                 }
@@ -1043,7 +1044,7 @@ public class AutomataVerifier
 
                 synchronizationExecuters.get(0).join();
 
-                if (stopRequested)
+                if (abortRequested)
                 {
                     return;
                 }
@@ -1535,7 +1536,7 @@ public class AutomataVerifier
             currAutomaton = (Automaton) autIt.next();
             allIndividuallyNonblocking = allIndividuallyNonblocking && moduleIsNonblocking(currAutomaton);
 
-            if (stopRequested)
+            if (abortRequested)
             {
                 return false;
             }
@@ -1545,7 +1546,7 @@ public class AutomataVerifier
                 logger.error("The automaton " + currAutomaton + " is blocking!");
 
                 // logger.error("Aborting verification...");
-                requestStop();
+                requestAbort();
 
                 return false;
             }
@@ -1612,6 +1613,7 @@ public class AutomataVerifier
         // Initialize execution dialog
         java.awt.EventQueue.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
                 if (executionDialog != null)
@@ -1634,7 +1636,7 @@ public class AutomataVerifier
 
             // Minimizer
             final AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
-            threadToStop = minimizer;
+            threadToAbort = minimizer;
             if (executionDialog != null)
             {
                 minimizer.setExecutionDialog(executionDialog);
@@ -1646,23 +1648,23 @@ public class AutomataVerifier
             // Something went wrong?
             if (result == null)
             {
-                requestStop();
+                requestAbort();
                 throw new RuntimeException("Failure in compositional nonblocking verification");
             }
-            threadToStop = null;
+            threadToAbort = null;
 
             // JUNK
             message = minimizer.getStatisticsLineLaTeX();
         }
         catch (final Exception ex)
         {
-            requestStop();
+            requestAbort();
             logger.error("Error in AutomataVerifier when verifying nonblocking compositionally. " + ex);
             logger.error(ex.getStackTrace());
             throw ex;
         }
 
-        if (stopRequested)
+        if (abortRequested)
         {
             return false;
         }
@@ -1795,7 +1797,7 @@ public class AutomataVerifier
                     }
                 }
 
-                if (stopRequested)
+                if (abortRequested)
                 {
                     return false;
                 }
@@ -1890,11 +1892,12 @@ public class AutomataVerifier
      *
      * @see  ExecutionDialog
      */
-    public void requestStop()
+    @Override
+    public void requestAbort()
     {
         logger.debug("AutomataVerifier requested to stop.");
 
-        stopRequested = true;
+        abortRequested = true;
 
         // Stop everything!
         for (int i = 0; i < synchronizationExecuters.size(); i++)
@@ -1902,9 +1905,9 @@ public class AutomataVerifier
             synchronizationExecuters.get(i).requestStop();
         }
 
-        if (threadToStop != null)
+        if (threadToAbort != null)
         {
-            threadToStop.requestStop();
+            threadToAbort.requestAbort();
         }
 
         if (executionDialog != null)
@@ -1915,9 +1918,15 @@ public class AutomataVerifier
         executionDialog = null;
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
-        return stopRequested;
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      abortRequested = false;
     }
 
     /**

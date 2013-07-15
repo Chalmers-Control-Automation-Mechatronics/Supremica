@@ -2581,8 +2581,11 @@ public class ListBufferTransitionRelation
       }
     }
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-      final EventProxy event =
-        factory.createEventProxy("e" + e, EventKind.CONTROLLABLE);
+      final byte status = getProperEventStatus(e);
+      final EventKind kind = EventEncoding.isControllableEvent(status) ?
+        EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE;
+      final boolean local = EventEncoding.isLocalEvent(status);
+      final EventProxy event = factory.createEventProxy("e" + e, kind, local);
       events.add(event);
     }
     final KindTranslator translator = IdenticalKindTranslator.getInstance();

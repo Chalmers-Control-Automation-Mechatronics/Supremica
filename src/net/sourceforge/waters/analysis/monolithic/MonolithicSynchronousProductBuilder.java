@@ -203,13 +203,13 @@ public class MonolithicSynchronousProductBuilder
   @Override
   public Collection<EventProxy> getPropositions()
   {
-    return mUsedPropositions;
+    return mConfiguredPropositions;
   }
 
   @Override
   public void setPropositions(final Collection<EventProxy> props)
   {
-    mUsedPropositions = props;
+    mConfiguredPropositions = props;
   }
 
   @Override
@@ -313,10 +313,10 @@ public class MonolithicSynchronousProductBuilder
 
     TObjectIntHashMap<EventProxy> eventToIndex =
       new TObjectIntHashMap<EventProxy>(mNumInputEvents, 0.5f, -1);
-    if (mUsedPropositions == null) {
+    if (mConfiguredPropositions == null) {
       mCurrentPropositions = new ArrayList<EventProxy>();
     } else {
-      mCurrentPropositions = mUsedPropositions;
+      mCurrentPropositions = new ArrayList<EventProxy>(mConfiguredPropositions);
     }
     final Collection<EventProxy> forbidden = new THashSet<EventProxy>();
     if (mMaskingPairs != null) {
@@ -332,7 +332,7 @@ public class MonolithicSynchronousProductBuilder
     final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : events) {
       if (translator.getEventKind(event) == EventKind.PROPOSITION) {
-        if (mUsedPropositions == null) {
+        if (mConfiguredPropositions == null) {
           mCurrentPropositions.add(event);
         }
       } else if (forbidden.contains(event)) {
@@ -346,8 +346,8 @@ public class MonolithicSynchronousProductBuilder
     final boolean pruning;
     if (!mPruningDeadlocks) {
       pruning = false;
-    } else if (mUsedPropositions != null) {
-      pruning = mUsedPropositions.containsAll(mCurrentPropositions);
+    } else if (mConfiguredPropositions != null) {
+      pruning = mConfiguredPropositions.containsAll(mCurrentPropositions);
     } else {
       pruning = !mCurrentPropositions.isEmpty();
     }
@@ -406,6 +406,7 @@ public class MonolithicSynchronousProductBuilder
 
     int a = 0;
     for (final AutomatonProxy aut : automata) {
+      checkAbort();
       final Collection<EventProxy> localEvents = aut.getEvents();
       final List<EventProxy> nonLocalProps =
         new ArrayList<EventProxy>(numProps);
@@ -556,8 +557,9 @@ public class MonolithicSynchronousProductBuilder
   //#########################################################################
   //# Auxiliary Methods
   private void explore(final int[] sourceTuple)
-    throws OverflowException
+    throws AnalysisException
   {
+    checkAbort();
     final int source = mStates.get(sourceTuple);
     if (mCurrentSuccessors != null) {
       for (int e = 0; e < mNumEvents; e++) {
@@ -708,6 +710,7 @@ public class MonolithicSynchronousProductBuilder
   }
 
   private AutomatonProxy createAutomaton()
+    throws AnalysisException
   {
     final int numSelfloopStates = mNumStates - (mDeadlockState >= 0 ? 1 : 0);
     final Set<EventProxy> skip;
@@ -743,6 +746,7 @@ public class MonolithicSynchronousProductBuilder
         new THashSet<EventProxy>(mCurrentPropositions);
       final Set<EventProxy> localProps = new THashSet<EventProxy>(numProps);
       for (int code = 0; code < mNumStates; code++) {
+        checkAbort();
         final int[] tuple = mStateTuples.get(code);
         localProps.addAll(mCurrentPropositions);
         for (int a = 0; a < mNumAutomata; a++) {
@@ -767,6 +771,7 @@ public class MonolithicSynchronousProductBuilder
 
     final List<StateProxy> states = new ArrayList<StateProxy>(mNumStates);
     for (int code = 0; code < mNumStates; code++) {
+      checkAbort();
       final boolean initial = code < mNumInitialStates;
       final int[] tuple = mStateTuples.get(code);
       final List<EventProxy> marking = new ArrayList<EventProxy>(numProps);
@@ -797,6 +802,7 @@ public class MonolithicSynchronousProductBuilder
       final int t = mTransitionBuffer.get(i++);
       final EventProxy event = mEvents[e];
       if (event != null) {
+        checkAbort();
         final StateProxy source = states.get(s);
         final StateProxy target = states.get(t);
         transitions.add(factory.createTransitionProxy(source, event, target));
@@ -1096,7 +1102,7 @@ public class MonolithicSynchronousProductBuilder
 
   //#########################################################################
   //# Data Members
-  private Collection<EventProxy> mUsedPropositions;
+  private Collection<EventProxy> mConfiguredPropositions;
   private StateCallback mStateCallback;
   private Collection<MaskingPair> mMaskingPairs;
   private boolean mRemovingSelfloops;

@@ -270,6 +270,7 @@ public class ModifiedAstar
     /*                                 INIT METHODS                                         */
     /****************************************************************************************/
 
+    @Override
     public void startSearchThread()
     {
         astarThread = new Thread(this);
@@ -277,6 +278,7 @@ public class ModifiedAstar
         astarThread.start();
     }
 
+    @Override
     public void run()
     {
         try
@@ -453,14 +455,21 @@ public class ModifiedAstar
         }
     }
 
-    public void requestStop()
+	@Override
+    public void requestAbort()
     {
         requestStop(false);
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
         return !isRunning;
+    }
+
+    @Override
+    public void resetAbort(){
+      isRunning = true;
     }
 
     public void requestStop(final boolean disposescheduleDialog)
@@ -535,6 +544,7 @@ public class ModifiedAstar
      * Walks through the tree of possible paths in search for the optimal one,
      * starting from the initial node.
      */
+    @Override
     public void schedule()
 		throws Exception
     {
@@ -697,7 +707,7 @@ public class ModifiedAstar
 				// 				Iterator childIter = childColl.iterator();
                 while (childIter.hasNext())
                 {
-                    final Node nextNode = (Node)childIter.next();
+                    final Node nextNode = childIter.next();
 
                     // Calculate the estimate function of the expanded node and store it at the appropriate position
                     nextNode.setValueAt(ESTIMATE_INDEX, calcEstimatedCost(nextNode));
@@ -730,13 +740,13 @@ public class ModifiedAstar
     {
         // The nodes corresponding to the same logical state (but different paths from the initial state)
         // as the new node. They are stored as one double[]-variable in the closedTree.
-        final Node correspondingClosedNodes = closedTree.remove(new Integer((int)getKey(node)));
+        final Node correspondingClosedNodes = closedTree.remove(new Integer(getKey(node)));
 
         // If the node (or its logical state collegues) has not yet been put on the closedTree,
         // then it is simply added to CLOSED.
         if (correspondingClosedNodes == null)
         {
-            closedTree.put(new Integer((int)getKey(node)), node);
+            closedTree.put(new Integer(getKey(node)), node);
         }
         else
         {
@@ -773,7 +783,7 @@ public class ModifiedAstar
                 // it is thrown away;
                 if (newNodeIsAlwaysWorse)
                 {
-                    closedTree.put(new Integer((int)getKey(node)), correspondingClosedNodes);
+                    closedTree.put(new Integer(getKey(node)), correspondingClosedNodes);
                     return false;
                 }
                 // else if the examined node is neither worse nor better, its index is added to the tieIndices
@@ -804,7 +814,7 @@ public class ModifiedAstar
 
 			correspondingClosedNodes.setBasis(newClosedNodeBasis);
 
-            closedTree.put(new Integer((int)getKey(node)), correspondingClosedNodes);
+            closedTree.put(new Integer(getKey(node)), correspondingClosedNodes);
         }
 
         return true;
@@ -1026,6 +1036,7 @@ public class ModifiedAstar
      * while the parent becomes the next node in search of its parent. This
      * is done until an initial node is found, which completes the construction.
      */
+    @Override
     public void buildScheduleAutomaton()
 		throws Exception
     {
@@ -1668,11 +1679,13 @@ public class ModifiedAstar
 		Thread.sleep(ms);
 	}
 
-	public Automaton getSchedule()
+	@Override
+  public Automaton getSchedule()
 	{
             return scheduleAuto;
 	}
 
+    @Override
     public String getMessages(final int msgType)
     {
         switch (msgType)
@@ -1689,11 +1702,13 @@ public class ModifiedAstar
         }
     }
 
-	public Object[] getDebugMessages()
+	@Override
+  public Object[] getDebugMessages()
 	{
 		return debugMsgs.toArray();
 	}
 
+    @Override
     public void addToMessages(final String additionStr, final int messageType)
     {
         switch (messageType)

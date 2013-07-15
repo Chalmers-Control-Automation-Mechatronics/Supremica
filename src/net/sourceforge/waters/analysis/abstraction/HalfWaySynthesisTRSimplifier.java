@@ -156,6 +156,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
     final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
     for (int state = badStates.nextSetBit(0); state >= 0; state =
       badStates.nextSetBit(state + 1)) {
+      checkAbort();
       if (rel.isInitial(state)) {
         // some initial state is bad --- supervisor cannot exist.
         setAllStatesUnreachable();

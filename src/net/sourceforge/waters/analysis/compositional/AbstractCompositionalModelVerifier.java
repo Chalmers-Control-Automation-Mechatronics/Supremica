@@ -21,6 +21,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -259,6 +260,10 @@ public abstract class AbstractCompositionalModelVerifier
       }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
     } finally {
       tearDown();
     }

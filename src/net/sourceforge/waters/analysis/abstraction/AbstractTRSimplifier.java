@@ -133,6 +133,8 @@ public abstract class AbstractTRSimplifier
       getLogger().debug("<out of memory>");
       System.gc();
       throw new OverflowException(error);
+    } catch (final StackOverflowError error) {
+      throw new OverflowException(error);
     } finally {
       tearDown();
       final long stop = System.currentTimeMillis();

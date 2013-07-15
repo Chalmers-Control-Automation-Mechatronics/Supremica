@@ -171,6 +171,7 @@ public class ScheduleDialog
         /************* Event Handlers ****************/
         okButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 doit();
@@ -179,11 +180,12 @@ public class ScheduleDialog
 
         cancelButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 if (sched != null)
                 {
-                    sched.requestStop();
+                    sched.requestAbort();
                     reset();
                 }
                 else
@@ -196,6 +198,7 @@ public class ScheduleDialog
 
         optiMethodsBox.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 if (((String)optiMethodsBox.getSelectedItem()).contains("A*"))
@@ -230,6 +233,7 @@ public class ScheduleDialog
         buttonPanel.add(autoTestButton);
         autoTestButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 try
@@ -250,6 +254,7 @@ public class ScheduleDialog
         final File rootDir = new File(org.supremica.properties.Config.FILE_OPEN_PATH.getAsString());
         final File[] files = rootDir.listFiles(new FilenameFilter()
             {
+                @Override
                 public boolean accept(final File dir, final String name)
                 {
                     return name.endsWith(".xml");
@@ -411,7 +416,7 @@ public class ScheduleDialog
             sched.startSearchThread();
 
             // Wait for the Scheduler to become stopped...
-            while (!sched.isStopped())
+            while (!sched.isAborting())
             {
                 Thread.sleep(10);
             }
@@ -537,7 +542,7 @@ public class ScheduleDialog
 
     void readMemoryCapacity()
     {
-        memoryCapacity = (int) (new Integer(memoryCapacityField.getText()));
+        memoryCapacity = (new Integer(memoryCapacityField.getText()));
     }
 
     /**
@@ -708,6 +713,7 @@ class ApproxWeightsDialog
         openApproxWeightsDialog();
     }
 
+    @Override
     public void run()
     {
 //        try
@@ -766,6 +772,7 @@ class ApproxWeightsDialog
         // Close the dialog box if cancel is called
         cancelBtn.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent ev)
             {
                 parentDlg.done();
@@ -807,6 +814,7 @@ class ApproxWeightsDialog
      * Called at the click of the ok-button. If the x- and y-fields are non-empty and
      * non-negative, the weight-values are stored.
      */
+    @Override
     public void actionPerformed(final ActionEvent ev)
     {
         try
@@ -834,6 +842,7 @@ class ApproxWeightsDialog
     /**
      * If return is pressed in the x- or y-field, click the ok-button
      */
+    @Override
     public void keyPressed(final KeyEvent ev)
     {
         if (ev.getKeyCode() == KeyEvent.VK_ENTER)
@@ -843,6 +852,8 @@ class ApproxWeightsDialog
     }
 
     // Necessary methods to implement the KeyListener-interface
+    @Override
     public void keyReleased(final KeyEvent ev){}
+    @Override
     public void keyTyped(final KeyEvent ev){}
 }
