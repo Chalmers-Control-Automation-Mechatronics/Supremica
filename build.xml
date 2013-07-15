@@ -654,8 +654,10 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/SupremicaBDD.cmd" todir="${dist}"/>    
         <chmod file="${dist}/SupremicaBDD.cmd" perm="644"/>
 -->
-        <copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>      
+        <copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>
         <chmod file="${dist}/RelationExtraction.cmd" perm="644"/>
+        <copy file="${templates}/waters.bat" todir="${dist}"/>
+        <chmod file="${dist}/waters.bat" perm="644"/>
     </target>
 
     <target name="-startfiles_supremica"

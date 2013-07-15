@@ -1013,12 +1013,11 @@ public class CompositionalSynthesizer extends
       for (final DistinguisherInfo info : renamings) {
         final EventProxy original = info.getOriginalEvent();
         final List<EventProxy> replacement = info.getReplacement();
-        // If an event is not in the encoding, and there is no
+        // If one of the events is not in the encoding, and there is no
         // nondeterminism, these events will be all-selfloops.
         boolean selfloop= false;
         for (final EventProxy event : replacement) {
-          final int e = encoding.getEventCode(event);
-          if (e < 0) {
+          if (encoding.getEventCode(event) < 0) {
             selfloop = true;
             break;
           }
