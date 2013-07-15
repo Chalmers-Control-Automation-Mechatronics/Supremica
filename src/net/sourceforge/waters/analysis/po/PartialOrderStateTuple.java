@@ -33,8 +33,9 @@ public class PartialOrderStateTuple
     mMayNeedExpansion = false;
     mFullyExpand = false;
     mVisited = false;
-
-    //mMark = new TIntArrayList();
+    mIncomponent = false;
+    mComponentVisited = false;
+    mRootChanged = false;
   }
 
   /**
@@ -98,8 +99,66 @@ public class PartialOrderStateTuple
     return mVisited;
   }
 
+  public void setComponentVisited(final boolean visited){
+    mComponentVisited = visited;
+  }
+
+  public boolean getComponentVisited(){
+    return mComponentVisited;
+  }
+
+  public void setInComponent(final boolean value){
+    mIncomponent = value;
+  }
+
+  public boolean isInComponent(){
+    return mIncomponent;
+  }
+
+  public void setRootChanged(final boolean value){
+    mRootChanged = value;
+  }
+
+  public boolean getRootChanged(){
+    return mRootChanged;
+  }
+
+
+  public void setDepthFirstIndex(final int value){
+    mDepthFirstIndex = value;
+  }
+
+  public int getDepthFirstIndex(){
+    return mDepthFirstIndex;
+  }
+
+  public void setRootIndex(final int value){
+    mRootIndex = value;
+  }
+
+  public int getRootIndex(){
+    return mRootIndex;
+  }
+
+  public void setTotalSuccessors(final int value){
+    mTotalSuccessors = value;
+  }
+
+  public int getTotalSuccessors(){
+    return mTotalSuccessors;
+  }
+
+  public void setAmpleSuccessors(final int value){
+    mAmpleSuccessors = value;
+  }
+
+  public int getAmpleSuccessors(){
+    return mAmpleSuccessors;
+  }
+
   //#########################################################################
   //# Overrides for Baseclass java.lang.Object
+  @Override
   public int hashCode()
   {
     int result = 0;
@@ -110,6 +169,7 @@ public class PartialOrderStateTuple
     return result;
   }
 
+  @Override
   public boolean equals(final Object other)
   {
     if (other != null && getClass() == other.getClass()) {
@@ -125,25 +185,10 @@ public class PartialOrderStateTuple
     }
   }
 
+  @Override
   public String toString(){
     return Arrays.toString(mStateCodes);
   }
-
-
-  /*public int[] getAmple()
-  {
-    return mAmple;
-  }
-
-  public void setAmple(final int[] ample)
-  {
-    mAmple = ample;
-  }
-
-  public TIntArrayList getMark()
-  {
-    return mMark;
-  }*/
 
   //#########################################################################
   //# Data Members
@@ -152,7 +197,11 @@ public class PartialOrderStateTuple
   private boolean mFullyExpand;
   private boolean mVisited;
   private PartialOrderStateTuple mPred;
-
-  //private int[] mAmple;
-  //private TIntArrayList mMark;
+  private boolean mIncomponent;
+  private boolean mComponentVisited;
+  private boolean mRootChanged;
+  private int mDepthFirstIndex;
+  private int mRootIndex;
+  private int mTotalSuccessors;
+  private int mAmpleSuccessors;
 }
