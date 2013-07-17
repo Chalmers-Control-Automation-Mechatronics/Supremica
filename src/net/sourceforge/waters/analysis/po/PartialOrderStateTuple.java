@@ -193,15 +193,15 @@ public class PartialOrderStateTuple
   //#########################################################################
   //# Data Members
   private final int mStateCodes[];
-  private boolean mMayNeedExpansion;
-  private boolean mFullyExpand;
+  private boolean mMayNeedExpansion; //
+  private boolean mFullyExpand; //
   private boolean mVisited;
-  private PartialOrderStateTuple mPred;
+  private PartialOrderStateTuple mPred; //
   private boolean mIncomponent;
   private boolean mComponentVisited;
   private boolean mRootChanged;
-  private int mDepthFirstIndex;
+  private int mDepthFirstIndex; //
   private int mRootIndex;
-  private int mTotalSuccessors;
-  private int mAmpleSuccessors;
+  private int mTotalSuccessors; //
+  private int mAmpleSuccessors; //
 }

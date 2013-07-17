@@ -622,7 +622,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
               boolean fullyExpanded = false;
               final int componentRootIndex = mComponentStack.indexOf(prev);
               final int lastIndex = mComponentStack.size()-1;
-              if(lastIndex - componentRootIndex <= 1){
+              if(lastIndex == componentRootIndex){
                 mComponentStack.remove(lastIndex);
                 prev.setInComponent(true);
                 continue;
@@ -702,7 +702,6 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
         }
         final int[][] transitionMap = plant ? mPlantTransitionMap.get(j) :
           mSpecTransitionMap.get(si);
-        selfLoop &= transitionMap[mSystemState[j]][i] == mSystemState[j];
         if (transitionMap[mSystemState[j]][i] == -1){
           if (kind == EventKind.UNCONTROLLABLE && !plant){
             mErrorEvent = i;
@@ -714,6 +713,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
             continue events;
           }
         }
+        selfLoop &= transitionMap[mSystemState[j]][i] == mSystemState[j];
       }
       if (selfLoop){
         continue events;
