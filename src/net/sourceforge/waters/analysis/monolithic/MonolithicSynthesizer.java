@@ -350,9 +350,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           if (!mSupervisorLocalizationEnabled) {
             removeBadStateTransitions(mTransitionRelation,
-                                      mSupervisorSimplifier
-                                        .getBadStateIndex());
+                                      mSupervisorSimplifier.getBadStateIndex());
             removeSelfloops(mTransitionRelation);
+            mTransitionRelation.setName("supervisor");
             des = createDESProxy(mTransitionRelation);
           } else {
             // Supervisor Localization Enabled
