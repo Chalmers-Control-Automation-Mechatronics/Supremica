@@ -79,8 +79,16 @@ public class PartialOrderStateTuple
     mFullyExpand = expand;
   }
 
-  public boolean FullyExpand(){
+  public boolean getFullyExpand(){
     return mFullyExpand;
+  }
+
+  public void setFullyExpanded(final boolean expand){
+    mFullyExpanded = expand;
+  }
+
+  public boolean getFullyExpanded(){
+    return mFullyExpanded;
   }
 
   public void setPred(final PartialOrderStateTuple pred){
@@ -121,15 +129,6 @@ public class PartialOrderStateTuple
 
   public boolean getRootChanged(){
     return mRootChanged;
-  }
-
-
-  public void setDepthFirstIndex(final int value){
-    mDepthFirstIndex = value;
-  }
-
-  public int getDepthFirstIndex(){
-    return mDepthFirstIndex;
   }
 
   public void setRootIndex(final int value){
@@ -200,7 +199,7 @@ public class PartialOrderStateTuple
   private boolean mIncomponent;
   private boolean mComponentVisited;
   private boolean mRootChanged;
-  private int mDepthFirstIndex; //
+  private boolean mFullyExpanded;
   private int mRootIndex;
   private int mTotalSuccessors; //
   private int mAmpleSuccessors; //

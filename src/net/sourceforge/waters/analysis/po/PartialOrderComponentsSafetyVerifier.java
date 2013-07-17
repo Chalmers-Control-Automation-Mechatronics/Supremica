@@ -577,6 +577,8 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
 
   private boolean isControllableReduced(final int[] sState) throws AnalysisException{
     mDepthIndex = 0;
+    mComponentCount = 0;
+    mFullExpansions = 0;
     mStack = new ArrayList<PartialOrderStateTuplePairing>();
     mStateSet = new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
     mLocalSet = new TIntHashSet();
@@ -596,9 +598,8 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
       final PartialOrderStateTuple state = current.getState();
       final PartialOrderStateTuple prev = current.getPrev();
       if (current.getReq() == PartialOrderParingRequest.VISIT && !state.getComponentVisited()){
-        state.setDepthFirstIndex(mDepthIndex++);
         state.setComponentVisited(true);
-        state.setRootIndex(state.getDepthFirstIndex());
+        state.setRootIndex(mDepthIndex++);
         int[] events;
         if((events = ample3(state))==null)
           return false;
@@ -628,21 +629,22 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
                 continue;
               }
               for(int i = lastIndex; i >= componentRootIndex && !fullyExpanded; i--){
-                fullyExpanded |= mComponentStack.get(i).getAmpleSuccessors() ==
-                  mComponentStack.get(i).getTotalSuccessors();
+                fullyExpanded |= mComponentStack.get(i).getFullyExpanded();
               }
               if(fullyExpanded){
                 for(int i = lastIndex; i >= componentRootIndex; i--){
                   final PartialOrderStateTuple temp = mComponentStack.remove(i);
                   temp.setInComponent(true);
                 }
+                mComponentCount++;
               }
               else{
-                final PartialOrderStateTuple temp = mComponentStack.get(mComponentStack.size()-1);
                 int[] events;
-                if((events = enabled(temp))==null)
+                if((events = enabled(prev))==null)
                   return false;
-                expand(temp,events,false);
+                expand(prev,events,false);
+                prev.setFullyExpanded(true);
+                mFullExpansions++;
               }
             }
           }
@@ -702,7 +704,9 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
         }
         final int[][] transitionMap = plant ? mPlantTransitionMap.get(j) :
           mSpecTransitionMap.get(si);
-        if (transitionMap[mSystemState[j]][i] == -1){
+        final int sourceState = mSystemState[j];
+        final int targetState = transitionMap[sourceState][i];
+        if (targetState == -1){
           if (kind == EventKind.UNCONTROLLABLE && !plant){
             mErrorEvent = i;
             mErrorAutomaton = j;
@@ -713,7 +717,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
             continue events;
           }
         }
-        selfLoop &= transitionMap[mSystemState[j]][i] == mSystemState[j];
+        selfLoop &= targetState == sourceState;
       }
       if (selfLoop){
         continue events;
@@ -890,10 +894,10 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
           continue ample;
         }
       }
-      current.setAmpleSuccessors(ample.size());
+      current.setFullyExpanded(ample.size() == enabled.length);
       return ample.toArray();
     }
-    current.setAmpleSuccessors(enabled.length);
+    current.setFullyExpanded(true);
     return enabled;
   }
 
@@ -1203,5 +1207,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
   private int mLoopCount;
   @SuppressWarnings("unused")
   private int mNumIndependentPairings;
+  private int mComponentCount;
+  private int mFullExpansions;
 }
 
