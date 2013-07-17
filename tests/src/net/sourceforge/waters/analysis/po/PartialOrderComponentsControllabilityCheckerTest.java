@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class PartialOrderControllabilityCheckerTest
+public class PartialOrderComponentsControllabilityCheckerTest
   extends AbstractControllabilityCheckerTest
 {
 
@@ -25,7 +25,7 @@ public class PartialOrderControllabilityCheckerTest
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
     final TestSuite testSuite =
-      new TestSuite(PartialOrderControllabilityCheckerTest.class);
+      new TestSuite(PartialOrderComponentsControllabilityCheckerTest.class);
     return testSuite;
   }
 
@@ -42,6 +42,6 @@ public class PartialOrderControllabilityCheckerTest
   protected ControllabilityChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
-    return new PartialOrderControllabilityChecker(factory);
+    return new PartialOrderComponentsControllabilityChecker(factory);
   }
 }

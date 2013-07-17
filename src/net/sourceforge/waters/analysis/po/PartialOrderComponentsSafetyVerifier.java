@@ -584,7 +584,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
 
     mComponentStack = new ArrayList<PartialOrderStateTuple>();
     mInitialState = new PartialOrderStateTuple(mStateTupleSize);
-    mInitialState.setDepthFirstIndex(mDepthIndex);
+
     encode(sState, mInitialState);
 
     mStateSet.getOrAdd(mInitialState);
@@ -595,7 +595,8 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
       final PartialOrderStateTuplePairing current = mStack.remove(mStack.size() - 1);
       final PartialOrderStateTuple state = current.getState();
       final PartialOrderStateTuple prev = current.getPrev();
-      if (current.getReq() == PartialOrderParingRequest.VISIT && !state.getVisited()){
+      if (current.getReq() == PartialOrderParingRequest.VISIT && !state.getComponentVisited()){
+        state.setDepthFirstIndex(mDepthIndex++);
         state.setComponentVisited(true);
         state.setRootIndex(state.getDepthFirstIndex());
         int[] events;
@@ -605,35 +606,46 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
           state.setInComponent(true);
         }
         else{
-          expand(state,events);
           mStack.add(new PartialOrderStateTuplePairing(state, prev, PartialOrderParingRequest.CLOSE));
+          expand(state,events,true);
         }
       }
       else if (prev != null){
         if (!state.isInComponent()){
           prev.setRootIndex(Math.min(prev.getRootIndex(), state.getRootIndex()));
+          prev.setRootChanged(true);
         }
         final PartialOrderStateTuplePairing newTop = mStack.get(mStack.size()-1);
-        if (!(newTop.getPrev().equals(prev) && newTop.getReq() == PartialOrderParingRequest.VISIT)){
-           if(prev.getRootIndex() == prev.getDepthFirstIndex()){
-             boolean fullyExpanded = false;
-             for(int i = 0; i < mComponentStack.size() && !fullyExpanded; i++){
-               fullyExpanded |= mComponentStack.get(i).getAmpleSuccessors() ==
-                                 mComponentStack.get(i).getTotalSuccessors();
-             }
-             if(fullyExpanded){
-               while(!mComponentStack.get(mComponentStack.size()-1).equals(prev)){
-                 final PartialOrderStateTuple temp = mComponentStack.remove(mComponentStack.size()-1);
-                 temp.setInComponent(true);
-               }
-               final PartialOrderStateTuple temp = mComponentStack.remove(mComponentStack.size()-1);
-               temp.setInComponent(true);
-             }
-             else{
-               final PartialOrderStateTuple temp = mComponentStack.get(mComponentStack.size()-1);
-               expand(temp,enabled(temp));
-             }
-           }
+        if (newTop.getPrev() != null){
+          if (!(newTop.getPrev().equals(prev) && newTop.getReq() == PartialOrderParingRequest.VISIT)){
+            if(prev.getRootChanged()){
+              boolean fullyExpanded = false;
+              final int componentRootIndex = mComponentStack.indexOf(prev);
+              final int lastIndex = mComponentStack.size()-1;
+              if(lastIndex - componentRootIndex <= 1){
+                mComponentStack.remove(lastIndex);
+                prev.setInComponent(true);
+                continue;
+              }
+              for(int i = lastIndex; i >= componentRootIndex && !fullyExpanded; i--){
+                fullyExpanded |= mComponentStack.get(i).getAmpleSuccessors() ==
+                  mComponentStack.get(i).getTotalSuccessors();
+              }
+              if(fullyExpanded){
+                for(int i = lastIndex; i >= componentRootIndex; i--){
+                  final PartialOrderStateTuple temp = mComponentStack.remove(i);
+                  temp.setInComponent(true);
+                }
+              }
+              else{
+                final PartialOrderStateTuple temp = mComponentStack.get(mComponentStack.size()-1);
+                int[] events;
+                if((events = enabled(temp))==null)
+                  return false;
+                expand(temp,events,false);
+              }
+            }
+          }
         }
       }
     }
@@ -641,9 +653,11 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
   }
 
   private void expand(final PartialOrderStateTuple current,
-                       final int[] events) throws AnalysisException{
+                       final int[] events,final boolean newState) throws AnalysisException{
     int i;
-    mComponentStack.add(current);
+    if(newState){
+      mComponentStack.add(current);
+    }
     for (final int e : events){
       for (i = 0; i < mNumAutomata; i++){
         final boolean plant = i < mNumPlants;
@@ -658,9 +672,9 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
         }
       }
       encode(mSuccessor, mStateTuple);
-      mStateSet.getOrAdd(mStateTuple);
-      mStateTuple.setDepthFirstIndex(++mDepthIndex);
-      mStack.add(new PartialOrderStateTuplePairing(mStateTuple, current,PartialOrderParingRequest.VISIT));
+      if (mStateSet.getOrAdd(mStateTuple)== null){
+        mStack.add(new PartialOrderStateTuplePairing(mStateTuple, current,PartialOrderParingRequest.VISIT));
+      }
       mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
       if (mStateSet.size() > getNodeLimit()) {
         throw new OverflowException(getNodeLimit());
@@ -677,6 +691,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
     decode(current,mSystemState);
     events:
     for (int i = 0; i < mNumEvents; i++){
+      boolean selfLoop = true;
       final EventProxy event = mEventCodingList.get(i);
       final EventKind kind = translator.getEventKind(event);
       for (int j = 0; j < mNumAutomata; j++){
@@ -686,7 +701,8 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
           continue;
         }
         final int[][] transitionMap = plant ? mPlantTransitionMap.get(j) :
-          mSpecTransitionMap.get(j - mNumPlants);
+          mSpecTransitionMap.get(si);
+        selfLoop &= transitionMap[mSystemState[j]][i] == mSystemState[j];
         if (transitionMap[mSystemState[j]][i] == -1){
           if (kind == EventKind.UNCONTROLLABLE && !plant){
             mErrorEvent = i;
@@ -698,6 +714,9 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
             continue events;
           }
         }
+      }
+      if (selfLoop){
+        continue events;
       }
       temp.add(i);
     }
