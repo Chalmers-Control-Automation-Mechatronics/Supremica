@@ -1207,7 +1207,9 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
   private int mLoopCount;
   @SuppressWarnings("unused")
   private int mNumIndependentPairings;
+  @SuppressWarnings("unused")
   private int mComponentCount;
+  @SuppressWarnings("unused")
   private int mFullExpansions;
 }
 
