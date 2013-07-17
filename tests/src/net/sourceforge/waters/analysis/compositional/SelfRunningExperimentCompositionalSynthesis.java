@@ -45,7 +45,7 @@ public class SelfRunningExperimentCompositionalSynthesis
           System.out.println("*** " + preName + "/" + selName + "  without reduction" + " ***");
           CompositionalSynthesizerExperiments experiment =
             new CompositionalSynthesizerExperiments
-              (preName + "_" +  selName + "NR.csv",
+              (preName + "_" +  selName + "_NR.csv",
                preselectingMethod, selectingMethod);
           experiment.setSupervisorReductionEnabled(false);
           experiment.setUp();
@@ -55,7 +55,7 @@ public class SelfRunningExperimentCompositionalSynthesis
           System.out.println("*** " + preName + "/" + selName + "  with reduction" + " ***");
           experiment =
             new CompositionalSynthesizerExperiments
-              (preName + "_" +  selName + "R.csv",
+              (preName + "_" +  selName + "_R.csv",
                preselectingMethod, selectingMethod);
           experiment.setSupervisorReductionEnabled(true);
           experiment.setUp();
