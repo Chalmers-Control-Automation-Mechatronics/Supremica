@@ -33,7 +33,6 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -926,9 +925,8 @@ public class CompositionalSynthesizer extends
       checkAbort();
       final List<DistinguisherInfo> renamings =
         new LinkedList<DistinguisherInfo>();
-      final AutomatonProxy distinguisher = null;
       final boolean foundNondeterminism =
-        findNonDeterminism(rel, listIter, distinguisher, renamings);
+        findNonDeterminism(rel, listIter, renamings);
       // build modified supervisor
       if (!foundNondeterminism) {
         rel = createRenamedSupervisor(rel, renamings);
@@ -937,20 +935,19 @@ public class CompositionalSynthesizer extends
       }
     }
     rel = reduceSupervisor(rel);
-
     return removeDumpStates(rel);
   }
 
   private boolean findNonDeterminism(final ListBufferTransitionRelation rel,
                                      final ListIterator<DistinguisherInfo> listIter,
-                                     AutomatonProxy distinguisher,
                                      final List<DistinguisherInfo> renamings)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisException
   {
     final int numOfStates = rel.getNumberOfStates();
     final TransitionIterator transitionIter =
       rel.createSuccessorsReadOnlyIterator();
     boolean foundNondeterminism = false;
+    AutomatonProxy distinguisher = null;
     while (listIter.hasPrevious()) {
       checkAbort();
       final DistinguisherInfo info = listIter.previous();
@@ -1006,7 +1003,7 @@ public class CompositionalSynthesizer extends
 
   private ListBufferTransitionRelation createRenamedSupervisor(final ListBufferTransitionRelation rel,
                                                                final List<DistinguisherInfo> renamings)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisException
   {
     List<EventProxy> events = null;
     for (final DistinguisherInfo info : renamings) {
@@ -1096,8 +1093,7 @@ public class CompositionalSynthesizer extends
     final AutomatonProxy newSupervisor = builder.getComputedAutomaton();
     final KindTranslator translator = getKindTranslator();
     mEventEncoding = new EventEncoding(newSupervisor, translator);
-    return new ListBufferTransitionRelation(
-                                            newSupervisor,
+    return new ListBufferTransitionRelation(newSupervisor,
                                             mEventEncoding,
                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
   }
