@@ -920,29 +920,30 @@ public class CompositionalSynthesizer extends
   private AutomatonProxy createSupervisor(ListBufferTransitionRelation rel)
     throws AnalysisException
   {
-    rel = reduceSupervisor(rel);
     final ListIterator<DistinguisherInfo> listIter =
       mDistinguisherInfoList.listIterator(mDistinguisherInfoList.size());
     while (listIter.hasPrevious()) {
       checkAbort();
       final List<DistinguisherInfo> renamings =
         new LinkedList<DistinguisherInfo>();
-      mCurrDistinguisher = null;
+      final AutomatonProxy distinguisher = null;
       final boolean foundNondeterminism =
-        findNonDeterminism(rel, listIter, renamings);
+        findNonDeterminism(rel, listIter, distinguisher, renamings);
       // build modified supervisor
-      final KindTranslator translator = getKindTranslator();
       if (!foundNondeterminism) {
-        rel = createRenamedSupervisor(rel, renamings, translator);
+        rel = createRenamedSupervisor(rel, renamings);
       } else {
-        rel = createSynchronizedSupervisor(rel, renamings, translator);
+        rel = createSynchronizedSupervisor(rel, renamings);
       }
     }
+    rel = reduceSupervisor(rel);
+
     return removeDumpStates(rel);
   }
 
   private boolean findNonDeterminism(final ListBufferTransitionRelation rel,
                                      final ListIterator<DistinguisherInfo> listIter,
+                                     AutomatonProxy distinguisher,
                                      final List<DistinguisherInfo> renamings)
     throws AnalysisAbortException, OverflowException
   {
@@ -953,9 +954,9 @@ public class CompositionalSynthesizer extends
     while (listIter.hasPrevious()) {
       checkAbort();
       final DistinguisherInfo info = listIter.previous();
-      if (mCurrDistinguisher == null) {
-        mCurrDistinguisher = info.getDistinguisher();
-      } else if (mCurrDistinguisher != info.getDistinguisher()) {
+      if (distinguisher == null) {
+        distinguisher = info.getDistinguisher();
+      } else if (distinguisher != info.getDistinguisher()) {
         listIter.next();
         break;
       }
@@ -1004,8 +1005,7 @@ public class CompositionalSynthesizer extends
   }
 
   private ListBufferTransitionRelation createRenamedSupervisor(final ListBufferTransitionRelation rel,
-                                                               final List<DistinguisherInfo> renamings,
-                                                               final KindTranslator translator)
+                                                               final List<DistinguisherInfo> renamings)
     throws AnalysisAbortException, OverflowException
   {
     List<EventProxy> events = null;
@@ -1056,22 +1056,23 @@ public class CompositionalSynthesizer extends
       }
     }
     if (events != null) {
+      final KindTranslator translator = getKindTranslator();
       mEventEncoding = new EventEncoding(events, translator);
     }
     return rel;
   }
 
   private ListBufferTransitionRelation createSynchronizedSupervisor(final ListBufferTransitionRelation rel,
-                                                                    final List<DistinguisherInfo> renamings,
-                                                                    final KindTranslator translator)
+                                                                    final List<DistinguisherInfo> renamings)
     throws AnalysisException
   {
+    final AutomatonProxy distinguisher = renamings.get(0).getDistinguisher();
     final ProductDESProxyFactory factory = getFactory();
     final AutomatonProxy oldSupervisor =
       rel.createAutomaton(factory, mEventEncoding);
     final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
     automata.add(oldSupervisor);
-    automata.add(mCurrDistinguisher);
+    automata.add(distinguisher);
     final ProductDESProxy model = createProductDESProxy(automata);
     final MonolithicSynchronousProductBuilder builder =
       getSynchronousProductBuilder();
@@ -1093,6 +1094,7 @@ public class CompositionalSynthesizer extends
       builder.clearMask();
     }
     final AutomatonProxy newSupervisor = builder.getComputedAutomaton();
+    final KindTranslator translator = getKindTranslator();
     mEventEncoding = new EventEncoding(newSupervisor, translator);
     return new ListBufferTransitionRelation(
                                             newSupervisor,
@@ -1268,6 +1270,5 @@ public class CompositionalSynthesizer extends
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
-  private AutomatonProxy mCurrDistinguisher;
   private EventEncoding mEventEncoding;
 }
