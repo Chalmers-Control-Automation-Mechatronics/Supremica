@@ -35,27 +35,29 @@ public class SelfRunningExperimentCompositionalSynthesis
       preselectingFactory = synthesizer.getPreselectingMethodFactory();
       final AbstractCompositionalModelAnalyzer.SelectingMethodFactory
       selectingFactory = synthesizer.getSelectingMethodFactory();
+      int methodCount = 0;
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
            preselectingMethod : preselectingFactory.getEnumConstants()) {
         for (final AbstractCompositionalModelAnalyzer.SelectingMethod
              selectingMethod: selectingFactory.getEnumConstants()) {
           final String preName = preselectingMethod.toString();
           final String selName = selectingMethod.toString();
+          methodCount++;
           // without supervisor reduction:
-          System.out.println("*** " + preName + "/" + selName + "  without reduction" + " ***");
+          System.out.println("Method " + methodCount + " *** " + preName + "/" + selName + "  without reduction" + " ***");
           CompositionalSynthesizerExperiments experiment =
             new CompositionalSynthesizerExperiments
-              (preName + "_" +  selName + "NR.csv",
+              (methodCount + "_" + preName + "_" +  selName + "_NR.csv",
                preselectingMethod, selectingMethod);
           experiment.setSupervisorReductionEnabled(false);
           experiment.setUp();
           experiment.runAllTests();
           experiment.tearDown();
           // with supervisor reduction:
-          System.out.println("*** " + preName + "/" + selName + "  with reduction" + " ***");
+          System.out.println("Method " + methodCount + " *** " + preName + "/" + selName + "  with reduction" + " ***");
           experiment =
             new CompositionalSynthesizerExperiments
-              (preName + "_" +  selName + "R.csv",
+              (methodCount + "_" + preName + "_" +  selName + "_R.csv",
                preselectingMethod, selectingMethod);
           experiment.setSupervisorReductionEnabled(true);
           experiment.setUp();

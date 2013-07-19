@@ -449,15 +449,14 @@ public class CompositionalSynthesizer extends
     if (step instanceof SynthesisAbstractionStep) {
       final SynthesisAbstractionStep synStep =
         (SynthesisAbstractionStep) step;
-      final EventEncoding eventEnc = synStep.getEventEncoding();
+      mEventEncoding = synStep.getEventEncoding();
       final ListBufferTransitionRelation supervisor = synStep.getSupervisor();
       if (supervisor != null) {
         if (supervisor.isEmpty()) {
           result.setSatisfied(false);
           return;
         } else {
-          final AutomatonProxy newSupervisor =
-            createSupervisor(eventEnc, supervisor);
+          final AutomatonProxy newSupervisor = createSupervisor(supervisor);
           result.addSupervisor(newSupervisor);
         }
       }
@@ -523,15 +522,6 @@ public class CompositionalSynthesizer extends
     }
   }
 
-  private AutomatonProxy createSupervisor(final EventEncoding eventEnc,
-                                          final ListBufferTransitionRelation supervisor)
-    throws AnalysisException
-  {
-    final ListBufferTransitionRelation sup =
-      reduceSupervisor(eventEnc, supervisor);
-    return createRenamedSupervisor(sup, eventEnc);
-  }
-
   @Override
   protected boolean doMonolithicAnalysis(final List<AutomatonProxy> automata)
     throws AnalysisException
@@ -568,9 +558,9 @@ public class CompositionalSynthesizer extends
       automaton = syncBuilder.getComputedAutomaton();
       break;
     }
-    final EventEncoding encoding = createSynthesisEventEncoding(automaton);
+    mEventEncoding = createSynthesisEventEncoding(automaton);
     final ListBufferTransitionRelation supervisor =
-      synthesise(automaton, encoding);
+      synthesise(automaton, mEventEncoding);
     if (supervisor != null) {
       reportSupervisor("monolithic", supervisor);
       final CompositionalSynthesisResult result = getAnalysisResult();
@@ -579,8 +569,7 @@ public class CompositionalSynthesizer extends
         result.setSatisfied(false);
         return false;
       } else {
-        final AutomatonProxy renamedSup =
-          createSupervisor(encoding, supervisor);
+        final AutomatonProxy renamedSup = createSupervisor(supervisor);
         result.addSupervisor(renamedSup);
         return true;
       }
@@ -906,9 +895,7 @@ public class CompositionalSynthesizer extends
     return mHalfwaySimplifier.getPseudoSupervisor();
   }
 
-  private ListBufferTransitionRelation reduceSupervisor
-    (final EventEncoding eventEnc,
-     final ListBufferTransitionRelation rel)
+  private ListBufferTransitionRelation reduceSupervisor(final ListBufferTransitionRelation rel)
     throws AnalysisException
   {
     if (mSupervisorReductionEnabled) {
@@ -916,8 +903,8 @@ public class CompositionalSynthesizer extends
         mSupervisorSimplifier.setTransitionRelation(rel);//set TR
         mSupervisorSimplifier.setEvent(-1);//set event
         mSupervisorSimplifier.setBadStateIndex();//set bad state
-        mSupervisorSimplifier.setRetainedDumpStateEvents
-          (getRenamedControllables(eventEnc));//set retained transitions
+        mSupervisorSimplifier
+          .setRetainedDumpStateEvents(getRenamedControllables(mEventEncoding));//set retained transitions
         mSupervisorSimplifier.run();
         return mSupervisorSimplifier.getTransitionRelation();
       } catch (final OverflowException overflow) {
@@ -929,31 +916,38 @@ public class CompositionalSynthesizer extends
     }
   }
 
-  private AutomatonProxy createRenamedSupervisor(final ListBufferTransitionRelation rel,
-                                                 final EventEncoding encoding)
+  private AutomatonProxy createSupervisor(ListBufferTransitionRelation rel)
     throws AnalysisException
   {
     final ListIterator<DistinguisherInfo> listIter =
       mDistinguisherInfoList.listIterator(mDistinguisherInfoList.size());
-    return createRenamedSupervisor(rel, encoding, listIter);
+    while (listIter.hasPrevious()) {
+      checkAbort();
+      final List<DistinguisherInfo> renamings =
+        new LinkedList<DistinguisherInfo>();
+      final boolean foundNondeterminism =
+        findNonDeterminism(rel, listIter, renamings);
+      // build modified supervisor
+      if (!foundNondeterminism) {
+        rel = createRenamedSupervisor(rel, renamings);
+      } else {
+        rel = createSynchronizedSupervisor(rel, renamings);
+      }
+    }
+    rel = reduceSupervisor(rel);
+    return removeDumpStates(rel);
   }
 
-  private AutomatonProxy createRenamedSupervisor(final ListBufferTransitionRelation rel,
-                                                 EventEncoding encoding,
-                                                 final ListIterator<DistinguisherInfo> listIter)
+  private boolean findNonDeterminism(final ListBufferTransitionRelation rel,
+                                     final ListIterator<DistinguisherInfo> listIter,
+                                     final List<DistinguisherInfo> renamings)
     throws AnalysisException
   {
-    checkAbort();
-    if (!listIter.hasPrevious()) {
-      return removeDumpStates(rel, encoding);
-    }
     final int numOfStates = rel.getNumberOfStates();
     final TransitionIterator transitionIter =
       rel.createSuccessorsReadOnlyIterator();
-    final List<DistinguisherInfo> renamings =
-      new LinkedList<DistinguisherInfo>();
-    AutomatonProxy distinguisher = null;
     boolean foundNondeterminism = false;
+    AutomatonProxy distinguisher = null;
     while (listIter.hasPrevious()) {
       checkAbort();
       final DistinguisherInfo info = listIter.previous();
@@ -966,7 +960,7 @@ public class CompositionalSynthesizer extends
       final Collection<EventProxy> replacement = info.getReplacement();
       boolean found = false;
       for (final EventProxy event : replacement) {
-        if (encoding.getEventCode(event) >= 0) {
+        if (mEventEncoding.getEventCode(event) >= 0) {
           found = true;
           break;
         }
@@ -976,11 +970,10 @@ public class CompositionalSynthesizer extends
       }
       renamings.add(info);
       if (!foundNondeterminism) {
-        outer:
-        for (int state = 0; state < numOfStates; state++) {
+        outer: for (int state = 0; state < numOfStates; state++) {
           int foundSuccessor = -1;
           for (final EventProxy event : replacement) {
-            final int code = encoding.getEventCode(event);
+            final int code = mEventEncoding.getEventCode(event);
             final int successor;
             if (code < 0) {
               // not in alphabet - selflooped in all states
@@ -1005,104 +998,111 @@ public class CompositionalSynthesizer extends
         }
       }
     }
-
-    // build modified supervisor
-    final KindTranslator translator = getKindTranslator();
-    if (!foundNondeterminism) {
-      List<EventProxy> events = null;
-      for (final DistinguisherInfo info : renamings) {
-        final EventProxy original = info.getOriginalEvent();
-        final List<EventProxy> replacement = info.getReplacement();
-        // If one of the events is not in the encoding, and there is no
-        // nondeterminism, these events will be all-selfloops.
-        boolean selfloop= false;
-        for (final EventProxy event : replacement) {
-          if (encoding.getEventCode(event) < 0) {
-            selfloop = true;
-            break;
-          }
-        }
-        if (selfloop) {
-          for (final EventProxy event : replacement) {
-            final int e = encoding.getEventCode(event);
-            if (e >= 0) {
-              checkAbort();
-              rel.removeEvent(e);
-            }
-          }
-        } else {
-          int r = -1;
-          for (final EventProxy event : replacement) {
-            final int e = encoding.getEventCode(event);
-            if (r < 0) {
-              r = e;
-            } else {
-              checkAbort();
-              rel.replaceEvent(e, r);
-              final byte status = rel.getProperEventStatus(e);
-              rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
-            }
-          }
-          assert r >= 0 : "Replacement event not found!";
-          if (encoding.getEventCode(original) < 0) {
-            if (events == null) {
-              final int size = encoding.getNumberOfEvents();
-              events = new ArrayList<EventProxy>(size);
-              events.add(null);
-              events.addAll(encoding.getEvents());
-            }
-            events.set(r, original);
-          }
-        }
-      }
-      if (events != null) {
-        encoding = new EventEncoding(events, translator);
-      }
-      return createRenamedSupervisor(rel, encoding, listIter);
-    } else {
-      final ProductDESProxyFactory factory = getFactory();
-      final AutomatonProxy oldSupervisor =
-        rel.createAutomaton(factory, encoding);
-      final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
-      automata.add(oldSupervisor);
-      automata.add(distinguisher);
-      final ProductDESProxy model = createProductDESProxy(automata);
-      final MonolithicSynchronousProductBuilder builder =
-        getSynchronousProductBuilder();
-      builder.setNodeLimit(getMonolithicStateLimit());
-      builder.setTransitionLimit(getMonolithicTransitionLimit());
-      builder.setConstructsResult(true);
-      builder.setPropositions(getPropositions());
-      builder.setModel(model);
-      for (final DistinguisherInfo info : renamings) {
-        final EventProxy original = info.getOriginalEvent();
-        final List<EventProxy> replacement = info.getReplacement();
-        builder.addMask(replacement, original);
-      }
-      try {
-        builder.run();
-      } catch (final OverflowException exception) {
-        throw new SupervisorTooBigException(exception);
-      } finally {
-        builder.clearMask();
-      }
-      final AutomatonProxy newSupervisor = builder.getComputedAutomaton();
-      final EventEncoding newEncoding =
-        new EventEncoding(newSupervisor, translator);
-      final ListBufferTransitionRelation newRel =
-        new ListBufferTransitionRelation(newSupervisor,
-                                         newEncoding,
-                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      return createRenamedSupervisor(newRel, newEncoding, listIter);
-    }
+    return foundNondeterminism;
   }
 
-  private AutomatonProxy removeDumpStates(final ListBufferTransitionRelation rel,
-                                          final EventEncoding coding)
+  private ListBufferTransitionRelation createRenamedSupervisor(final ListBufferTransitionRelation rel,
+                                                               final List<DistinguisherInfo> renamings)
+    throws AnalysisException
+  {
+    List<EventProxy> events = null;
+    for (final DistinguisherInfo info : renamings) {
+      final EventProxy original = info.getOriginalEvent();
+      final List<EventProxy> replacement = info.getReplacement();
+      // If an event is not in the encoding, and there is no
+      // nondeterminism, these events will be all-selfloops.
+      boolean selfloop = false;
+      for (final EventProxy event : replacement) {
+        final int e = mEventEncoding.getEventCode(event);
+        if (e < 0) {
+          selfloop = true;
+          break;
+        }
+      }
+      if (selfloop) {
+        for (final EventProxy event : replacement) {
+          final int e = mEventEncoding.getEventCode(event);
+          if (e >= 0) {
+            checkAbort();
+            rel.removeEvent(e);
+          }
+        }
+      } else {
+        int r = -1;
+        for (final EventProxy event : replacement) {
+          final int e = mEventEncoding.getEventCode(event);
+          if (r < 0) {
+            r = e;
+          } else {
+            checkAbort();
+            rel.replaceEvent(e, r);
+            final byte status = rel.getProperEventStatus(e);
+            rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
+          }
+        }
+        assert r >= 0 : "Replacement event not found!";
+        if (mEventEncoding.getEventCode(original) < 0) {
+          if (events == null) {
+            final int size = mEventEncoding.getNumberOfEvents();
+            events = new ArrayList<EventProxy>(size);
+            events.add(null);
+            events.addAll(mEventEncoding.getEvents());
+          }
+          events.set(r, original);
+        }
+      }
+    }
+    if (events != null) {
+      final KindTranslator translator = getKindTranslator();
+      mEventEncoding = new EventEncoding(events, translator);
+    }
+    return rel;
+  }
+
+  private ListBufferTransitionRelation createSynchronizedSupervisor(final ListBufferTransitionRelation rel,
+                                                                    final List<DistinguisherInfo> renamings)
+    throws AnalysisException
+  {
+    final AutomatonProxy distinguisher = renamings.get(0).getDistinguisher();
+    final ProductDESProxyFactory factory = getFactory();
+    final AutomatonProxy oldSupervisor =
+      rel.createAutomaton(factory, mEventEncoding);
+    final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
+    automata.add(oldSupervisor);
+    automata.add(distinguisher);
+    final ProductDESProxy model = createProductDESProxy(automata);
+    final MonolithicSynchronousProductBuilder builder =
+      getSynchronousProductBuilder();
+    builder.setNodeLimit(getMonolithicStateLimit());
+    builder.setTransitionLimit(getMonolithicTransitionLimit());
+    builder.setConstructsResult(true);
+    builder.setPropositions(getPropositions());
+    builder.setModel(model);
+    for (final DistinguisherInfo info : renamings) {
+      final EventProxy original = info.getOriginalEvent();
+      final List<EventProxy> replacement = info.getReplacement();
+      builder.addMask(replacement, original);
+    }
+    try {
+      builder.run();
+    } catch (final OverflowException exception) {
+      throw new SupervisorTooBigException(exception);
+    } finally {
+      builder.clearMask();
+    }
+    final AutomatonProxy newSupervisor = builder.getComputedAutomaton();
+    final KindTranslator translator = getKindTranslator();
+    mEventEncoding = new EventEncoding(newSupervisor, translator);
+    return new ListBufferTransitionRelation(newSupervisor,
+                                            mEventEncoding,
+                                            ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+  }
+
+  private AutomatonProxy removeDumpStates(final ListBufferTransitionRelation rel)
     throws OverflowException
   {
     final EventProxy defaultMarking = getUsedDefaultMarking();
-    final int defaultMarkingID = coding.getEventCode(defaultMarking);
+    final int defaultMarkingID = mEventEncoding.getEventCode(defaultMarking);
     final boolean usesMarking = rel.isUsedProposition(defaultMarkingID);
     final int numOfStates = rel.getNumberOfStates();
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
@@ -1118,7 +1118,7 @@ public class CompositionalSynthesizer extends
     final String name = getUniqueSupervisorName(rel);
     rel.setName(name);
     rel.setKind(ComponentKind.SUPERVISOR);
-    return rel.createAutomaton(factory, coding);
+    return rel.createAutomaton(factory, mEventEncoding);
   }
 
   private String getUniqueSupervisorName(final ListBufferTransitionRelation rel)
@@ -1266,5 +1266,5 @@ public class CompositionalSynthesizer extends
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
   private List<DistinguisherInfo> mDistinguisherInfoList;
   private Set<EventProxy> mRenamedEvents;
-
+  private EventEncoding mEventEncoding;
 }

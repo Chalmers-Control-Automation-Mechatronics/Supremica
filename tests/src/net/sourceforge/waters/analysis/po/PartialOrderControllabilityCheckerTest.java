@@ -12,8 +12,7 @@ package net.sourceforge.waters.analysis.po;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.
-  AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -39,13 +38,10 @@ public class PartialOrderControllabilityCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ControllabilityChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
     return new PartialOrderControllabilityChecker(factory);
   }
-//  @Override
-//  public void testProfisafeI3HostEFA() throws Exception{}
-//  @Override
-//  public void testProfisafeI4Host() throws Exception{}
 }

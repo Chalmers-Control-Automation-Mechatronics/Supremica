@@ -608,7 +608,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       while (backtrace.get(backtrace.size() - 1) != pred){
         final PartialOrderStateTuple popped = backtrace.remove(backtrace.size() - 1);
         popped.setMayNeedExpansion(false);
-        if (popped.FullyExpand()){
+        if (popped.getFullyExpand()){
           current = popped;
           current.setFullyExpand(false);
           break;
