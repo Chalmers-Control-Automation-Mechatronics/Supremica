@@ -11,7 +11,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.analysis.compositional.EnabledEventsCompositionalConflictCheckerExperiments"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="enabledEventsTests.csv mustl mins"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="enabledEventsTests.csv mustl minsync"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dwaters.test.inputdir=&quot;${workspace_loc:waters}/examples&quot;&#13;&#10;-Dwaters.test.outputdir=&quot;${workspace_loc:waters}/logs/results&quot;&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#13;&#10;-Xmx512m"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dwaters.test.inputdir=&quot;${workspace_loc:waters}/examples&quot;&#13;&#10;-Dwaters.test.outputdir=&quot;${workspace_loc:waters}/logs/results&quot;&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#13;&#10;-Xmx1024m"/>
 </launchConfiguration>
