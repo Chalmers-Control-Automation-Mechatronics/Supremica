@@ -613,8 +613,11 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
       }
       else if (prev != null){
         if (!state.isInComponent()){
+          final int oldRoot = prev.getRootIndex();
           prev.setRootIndex(Math.min(prev.getRootIndex(), state.getRootIndex()));
-          prev.setRootChanged(true);
+          if (oldRoot != prev.getRootIndex()){
+            prev.setRootChanged(true);
+          }
         }
         final PartialOrderStateTuplePairing newTop = mStack.get(mStack.size()-1);
         if (newTop.getPrev() != null){
