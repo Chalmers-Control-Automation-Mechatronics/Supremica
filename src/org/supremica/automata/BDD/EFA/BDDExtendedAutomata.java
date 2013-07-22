@@ -387,11 +387,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                     bddVar2AutVarName.put(sourceVars[i], automatonName);
                 }
 
-                //System.err.println("sourceLocation variables: " + sourceLocationDomain.set().toString());
+                System.err.println("sourceLocation variables: " + sourceLocationDomain.set().toString());
                 final BDDDomain destLocationDomain = manager.createDomain(nbrOfStates);
                 numberOfUsedBDDVariables += destLocationDomain.varNum();
 
-                //System.err.println("destLocation variables: " + destLocationDomain.set().toString());
+                System.err.println("destLocation variables: " + destLocationDomain.set().toString());
 
                 sourceLocationVarSet.unionWith(sourceLocationDomain.set());
                 destLocationVarSet.unionWith(destLocationDomain.set());
@@ -621,7 +621,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         final String varName = var.getName();
         final int varIndex = theIndexMap.getVariableIndex(var);
 
-        //System.err.println("variable name: " + varName);
+        System.err.println("variable name: " + varName);
 //        int domain = orgExAutomata.getDomain();
         final int domain = orgExAutomata.getVarDomain(varName);
 
@@ -640,7 +640,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        int[] reversedTempVarOrdering = manager.partialReverseVarOrdering(tempDomain.vars());
 //        reversedTempVarOrderings.put(varIndex, new TIntArrayList(reversedTempVarOrdering));
         tempVarDomains[varIndex] = tempDomain;
-        //System.err.println("tempVar variables: " + tempDomain.set().toString());
+        System.err.println("tempVar variables: " + tempDomain.set().toString());
         
         tempVariablesVarSet = tempVariablesVarSet.union(tempDomain.set());
 
@@ -649,7 +649,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         variableToMinSourceBDDVar.put(varName, sourceDomain.vars()[0]);
 //        int[] reversedSourceVarOrdering = manager.partialReverseVarOrdering(sourceDomain.vars());
 //        reversedSourceVarOrderings.put(varIndex, new TIntArrayList(reversedSourceVarOrdering));
-        //System.err.println("sourceVar variables: " + sourceDomain.set().toString());
+        System.err.println("sourceVar variables: " + sourceDomain.set().toString());
         
         numberOfUsedBDDVariables += sourceDomain.varNum();
 
@@ -687,7 +687,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
 
         numberOfUsedBDDVariables += destDomain.varNum();
-        //System.err.println("destVar variables: " + destDomain.set().toString());
+        System.err.println("destVar variables: " + destDomain.set().toString());
         BDDBitVecTargetVarsMap.put(theIndexMap.getVariableIndex(var),
                 manager.createSupremicaBDDBitVector(BDDBitVectoryType,
                 orgExAutomata.getMinValueofVar(varName) < 0,

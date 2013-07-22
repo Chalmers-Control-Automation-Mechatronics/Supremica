@@ -1,5 +1,6 @@
 package org.supremica.automata;
 
+//import gnu.trove.TIntObjectHashMap;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -12,6 +13,7 @@ import java.util.StringTokenizer;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+//import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
@@ -37,6 +39,8 @@ public class FlowerEFABuilder {
     public static String RESOURCE_PREFIX = "r";
     public static String LOAD_EVENT_PREFIX = "load";
     public static String feasibleEquation = "";
+//    public TIntObjectHashMap<String> resourceToFeasibleEquationMap;
+//    public TIntObjectHashMap<StringBuilder> resourceToTransNamesMap; 
     private ExtendedAutomata exAutomata;
     private final ModuleSubject module;
     
@@ -67,7 +71,8 @@ public class FlowerEFABuilder {
             jobToInitialStages = new HashMap<Integer, Set<Integer>>();
             jobToLastStages = new HashMap<Integer, Set<Integer>>();
             nbrOfResources = Integer.parseInt(br.readLine());
-
+//            resourceToFeasibleEquationMap = new TIntObjectHashMap<String>(nbrOfResources);
+//            resourceToTransNamesMap = new TIntObjectHashMap<StringBuilder>(nbrOfResources);
             resourceToUsedInStages = new HashMap<Integer, Set<Pair>>();
             resourceCapacities = new int[nbrOfResources];
             
@@ -170,8 +175,10 @@ public class FlowerEFABuilder {
                             + ") == " + resourceCapacities[i];
                     final String and = feasibleEquation.isEmpty() ? "" : " & ";
                     feasibleEquation = feasibleEquation + and + resourceGuard;
+//                    resourceToFeasibleEquationMap.put(i, resourceGuard);
                 }
-
+                               
+//                resourceToTransNamesMap.put(i, new StringBuilder());
                 /*if (!blockEquation.isEmpty()) {
                     blockEquation = blockEquation + " == " + resourceCapacities[i];
                     resourceIndexToBlockEquation.put(i, blockEquation);
@@ -270,7 +277,8 @@ public class FlowerEFABuilder {
                                 + targetDemand;
 
                         action = action + ";" + resourceVar + "-="
-                                + targetDemand + ";";
+                                + targetDemand + ";";                      
+//                        resourceToTransNamesMap.get(r).append(LOAD_EVENT_PREFIX + i + ";");
                     }
 
                 }
@@ -317,6 +325,8 @@ public class FlowerEFABuilder {
                             action = action + ";" + resourceVar + "-="
                                     + targetDemand + ";";
                         }
+//                        resourceToTransNamesMap.get(r)
+//                                .append(sourceStageVar + targetStageVar + ";");
                     }
 
                 }
@@ -343,6 +353,26 @@ public class FlowerEFABuilder {
                         0);
             }
         }
+        
+//        // build the specification using 
+//        //resourceToTransNamesMap and resourceToFeasibleEquationMap
+//        ExtendedAutomaton spe = new ExtendedAutomaton("Specification", ComponentKind.SPEC);
+//        String singleLocation = "Spe";
+//        spe.addState(singleLocation, false, true, false);
+//        
+//        String action = "";
+//        
+//        int[] resourceIndices = resourceToFeasibleEquationMap.keys();
+//        for(int r: resourceIndices) {
+//            
+//            String guard = resourceToFeasibleEquationMap.get(r);
+//            
+//            spe.addTransition(singleLocation, singleLocation, 
+//                    resourceToTransNamesMap.get(r).toString(), guard, action);
+//        }
+//        
+//        exAutomata.addAutomaton(spe);
+//        
 
         /*for(Map.Entry<String, Integer> entry: eventToResourceBlocked.entrySet()) {
             System.err.println(entry.getKey() + " R" + entry.getValue());
