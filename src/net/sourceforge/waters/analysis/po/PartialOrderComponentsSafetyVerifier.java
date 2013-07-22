@@ -620,9 +620,8 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
           }
         }
         final PartialOrderStateTuplePairing newTop = mStack.get(mStack.size()-1);
-        if (newTop.getPrev() != null){
-          if (!(newTop.getPrev().equals(prev) && newTop.getReq() == PartialOrderParingRequest.VISIT)){
-            if(prev.getRootChanged()){
+          if (!(newTop.getPrev() == prev && newTop.getReq() == PartialOrderParingRequest.VISIT)){
+            if(!prev.getRootChanged()){
               boolean fullyExpanded = false;
               final int componentRootIndex = mComponentStack.indexOf(prev);
               final int lastIndex = mComponentStack.size()-1;
@@ -651,7 +650,6 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
               }
             }
           }
-        }
       }
     }
     return true;
