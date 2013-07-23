@@ -1078,7 +1078,7 @@ public class CompositionalSynthesizer extends
 
   private ListBufferTransitionRelation createRenamedSupervisor(final ListBufferTransitionRelation rel,
                                                                final List<DistinguisherInfo> renamings)
-    throws AnalysisAbortException, OverflowException
+    throws AnalysisException
   {
     List<EventProxy> events = null;
     for (final DistinguisherInfo info : renamings) {
@@ -1168,8 +1168,7 @@ public class CompositionalSynthesizer extends
     final AutomatonProxy newSupervisor = builder.getComputedAutomaton();
     final KindTranslator translator = getKindTranslator();
     mEventEncoding = new EventEncoding(newSupervisor, translator);
-    return new ListBufferTransitionRelation(
-                                            newSupervisor,
+    return new ListBufferTransitionRelation(newSupervisor,
                                             mEventEncoding,
                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
   }

@@ -222,7 +222,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesissAip0Alps();// 3
     synthesisFenCaiWon09B();// 4
     synthesisFenCaiWon09Synth();// 5
-    synthesissFms2003();// 6
+    synthesisFms2003();// 6
     synthesiseTbedNoderailB();// 7
     synthesiseTbedNoderailUncont();// 8
     synthesiseCentralLockingVerriegel3b();// 9
@@ -318,7 +318,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "hisc", "rhone_subsystem1_patch0.wmod");
   }
 
-  private void synthesissFms2003() throws Exception
+  private void synthesisFms2003() throws Exception
   {
     runModel("tests", "fms2003", "fms2003.wmod");
   }

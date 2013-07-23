@@ -613,39 +613,40 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
       }
       else if (prev != null){
         if (!state.isInComponent()){
+          final int oldRoot = prev.getRootIndex();
           prev.setRootIndex(Math.min(prev.getRootIndex(), state.getRootIndex()));
-          prev.setRootChanged(true);
+          if (oldRoot != prev.getRootIndex()){
+            prev.setRootChanged(true);
+          }
         }
         final PartialOrderStateTuplePairing newTop = mStack.get(mStack.size()-1);
-        if (newTop.getPrev() != null){
-          if (!(newTop.getPrev().equals(prev) && newTop.getReq() == PartialOrderParingRequest.VISIT)){
-            if(prev.getRootChanged()){
-              boolean fullyExpanded = false;
-              final int componentRootIndex = mComponentStack.indexOf(prev);
-              final int lastIndex = mComponentStack.size()-1;
-              if(lastIndex == componentRootIndex){
-                mComponentStack.remove(lastIndex);
-                prev.setInComponent(true);
-                continue;
+        if (!(newTop.getPrev() == prev &&
+              newTop.getReq() == PartialOrderParingRequest.VISIT)) {
+          if (!prev.getRootChanged()) {
+            boolean fullyExpanded = false;
+            final int componentRootIndex = mComponentStack.indexOf(prev);
+            final int lastIndex = mComponentStack.size() - 1;
+            if (lastIndex == componentRootIndex) {
+              mComponentStack.remove(lastIndex);
+              prev.setInComponent(true);
+              continue;
+            }
+            for (int i = lastIndex; i >= componentRootIndex && !fullyExpanded; i--) {
+              fullyExpanded |= mComponentStack.get(i).getFullyExpanded();
+            }
+            if (fullyExpanded) {
+              for (int i = lastIndex; i >= componentRootIndex; i--) {
+                final PartialOrderStateTuple temp = mComponentStack.remove(i);
+                temp.setInComponent(true);
               }
-              for(int i = lastIndex; i >= componentRootIndex && !fullyExpanded; i--){
-                fullyExpanded |= mComponentStack.get(i).getFullyExpanded();
-              }
-              if(fullyExpanded){
-                for(int i = lastIndex; i >= componentRootIndex; i--){
-                  final PartialOrderStateTuple temp = mComponentStack.remove(i);
-                  temp.setInComponent(true);
-                }
-                mComponentCount++;
-              }
-              else{
-                int[] events;
-                if((events = enabled(prev))==null)
-                  return false;
-                expand(prev,events,false);
-                prev.setFullyExpanded(true);
-                mFullExpansions++;
-              }
+              mComponentCount++;
+            } else {
+              int[] events;
+              if ((events = enabled(prev)) == null)
+                return false;
+              expand(prev, events, false);
+              prev.setFullyExpanded(true);
+              mFullExpansions++;
             }
           }
         }
@@ -674,9 +675,11 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
         }
       }
       encode(mSuccessor, mStateTuple);
-      if (mStateSet.getOrAdd(mStateTuple)== null){
-        mStack.add(new PartialOrderStateTuplePairing(mStateTuple, current,PartialOrderParingRequest.VISIT));
+      PartialOrderStateTuple found = mStateSet.getOrAdd(mStateTuple);
+      if (found == null) {
+        found = mStateTuple;
       }
+      mStack.add(new PartialOrderStateTuplePairing(found, current, PartialOrderParingRequest.VISIT));
       mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
       if (mStateSet.size() > getNodeLimit()) {
         throw new OverflowException(getNodeLimit());
@@ -1151,8 +1154,30 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
 
 
   //#########################################################################
-  //# Data Members
+  //# Debugging
+  @SuppressWarnings("unused")
+  private String dumpDecodedState(final PartialOrderStateTuple tuple)
+  {
+    final int[] decoded = new int[mNumAutomata];
+    decode(tuple, decoded);
+    final StringBuffer buffer = new StringBuffer();
+    for (int a = 0; a < mNumAutomata; a++) {
+      final AutomatonProxy aut = mAutomata[a];
+      buffer.append(aut.getName());
+      buffer.append(": ");
+      final int s = decoded[a];
+      final List<StateProxy> states =
+        new ArrayList<StateProxy>(aut.getStates());
+      final StateProxy state = states.get(s);
+      buffer.append(state.getName());
+      buffer.append("\n");
+    }
+    return buffer.toString();
+  }
 
+
+  //#########################################################################
+  //# Data Members
   // Ample conditions
   private PartialOrderEventDependencyTuple[][] mReducedEventDependencyMap;
   final int MAXDEPTH;

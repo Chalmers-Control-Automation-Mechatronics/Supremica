@@ -1393,7 +1393,7 @@ The control objective is to synthesise a strategy for the second player (black) 
                 </NodeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SUPERVISOR" Name="supervisor">
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_supervisor">
             <Graph>
                 <LabelBlock>
                     <SimpleIdentifier Name="winner_white_d1"/>
