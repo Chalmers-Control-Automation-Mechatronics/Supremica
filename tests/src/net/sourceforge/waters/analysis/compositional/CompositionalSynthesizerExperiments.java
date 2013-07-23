@@ -222,7 +222,6 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesissAip0Alps();// 3
     synthesisFenCaiWon09B();// 4
     synthesisFenCaiWon09Synth();// 5
-    /*
     synthesissFms2003();// 6
     synthesiseTbedNoderailB();// 7
     synthesiseTbedNoderailUncont();// 8
@@ -232,7 +231,6 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesis6linki();// 12
     synthesis6linkp();// 13
     synthesis6linkre();// 14
-    */
 
     //synthesisTransferline(100);
     //synthesisTransferline(200);

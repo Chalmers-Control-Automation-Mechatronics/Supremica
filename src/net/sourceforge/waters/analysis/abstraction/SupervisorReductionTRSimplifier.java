@@ -420,7 +420,7 @@ public class SupervisorReductionTRSimplifier extends
     final List<int[]> mergingStates = new ArrayList<int[]>();
     for (int i = 0; i < numStates; i++) {
       checkAbort();
-      if (i == mBadStateIndex) {
+      if (i == mBadStateIndex || !rel.isReachable(i)) {
         continue;
       }
       final int listID = mStateToClass[i];
