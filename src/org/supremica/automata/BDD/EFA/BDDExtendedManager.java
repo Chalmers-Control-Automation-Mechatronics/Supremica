@@ -45,6 +45,10 @@ public class BDDExtendedManager extends BDDAbstractManager {
     BDD feasibleDestStates = null;
     BDD unreachableStates = null;
     
+    BDD[] feasiableStatesBDDs = null;
+    BDD minimalBoundaryUnsafeStates = null;
+    BDD test = null;
+    
     TIntArrayList stageVarIndexList = null;
     List<BDDVarSet> varSetsTobeExisted = null;
     List<BDD> largerVarValues = null;
@@ -348,6 +352,211 @@ public class BDDExtendedManager extends BDDAbstractManager {
     // ##################################################################################
     // ################ THE MAIN ALGORITHM ##############################################
     // ### Zhennan
+    public BDD computeUnsafeStates2() {
+        
+        // compute some helper BDDs and maps
+        buildHelpers();
+        
+        // get forward transition relations from the monolithic approach
+        frwdTrans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges())
+                .getMonolithicEdgesForwardWithEventsBDD();
+        
+        // remove variables of locations
+        frwdTrans = frwdTrans
+                .exist(bddExAutomata.getSourceLocationVarSet()
+                .union(bddExAutomata.getDestLocationVarSet()));
+        
+        // switch variables to build the backward transition relation
+        bckwdTransEvents = frwdTrans
+                .replace(bddExAutomata.sourceToTempVariablePairing)
+                .replace(bddExAutomata.getDestToSourceVariablePairing())
+                .replace(bddExAutomata.tempToDestVariablePairing);
+        
+        frwdLoadingTrans = frwdTrans.relprod(bddExAutomata.loadEventsBDD,
+                bddExAutomata.getEventVarSet());
+        
+        // use relprod instead of AND + exists
+        frwdTrans = frwdTrans.relprod(bddExAutomata.loadEventsBDD.not(),
+                bddExAutomata.getDestVariablesVarSet());
+        
+        // compute the feasiable state arrays
+        computeFeasiableStatesBDDs();
+        
+        System.err.println("Computing all deadlock states...");
+        BDD deadlocks = getDeadlocks();
+        
+        System.err.println("Computing the boundary unsafe states...");
+
+        bckwdTransEvents.andWith(bddExAutomata.loadEventsBDD.not());
+
+        computeBoundaryUnsafeStates(deadlocks);
+        
+        minimalBoundaryUnsafeStates = minimalBoundaryUnsafeStates
+                .exist(bddExAutomata.getSourceResourceVarSet());
+
+        System.err.println("minimizing...");
+        minimalBoundaryUnsafeStates = removeLargerStates(minimalBoundaryUnsafeStates);
+
+//        BDD reachableStates = bddExAutomata.getReachableStates()
+//                .exist(bddExAutomata.getSourceLocationVarSet())
+//                .exist(bddExAutomata.getSourceResourceVarSet());
+//
+//        minimalBoundaryUnsafeStates = minimalBoundaryUnsafeStates.and(reachableStates);
+//        
+//        // get safe states from the monolithic BDD algorithm
+//        BDD nonblockingStates = bddExAutomata.getNonblockingStates()
+//                .exist(bddExAutomata.getSourceLocationVarSet())
+//                .exist(bddExAutomata.getSourceResourceVarSet());
+//        
+//        BDD unsafeStates = reachableStates.and(nonblockingStates.not());
+//        
+//        BDD minimalUnsafeStates = removeLargerStates(unsafeStates);
+//        
+//        System.err.println("#unsafeStates computed should equal #minimalUnsafeStates " 
+//         + minimalBoundaryUnsafeStates.satCount(bddExAutomata.getSourceStagesVarSet()) 
+//         + "; " 
+//         + minimalUnsafeStates.satCount(bddExAutomata.getSourceStagesVarSet()) + " "
+//         + minimalBoundaryUnsafeStates.and(unsafeStates)
+//           .equals(minimalBoundaryUnsafeStates));
+               
+        return minimalBoundaryUnsafeStates;
+    }
+    
+    public void computeBoundaryUnsafeStates(BDD deadlocks) {
+        
+        BDD newFoundUnsafeStates = deadlocks;
+
+        BDD unsafeStates = deadlocks;
+        
+        BDD tTrans = getZeroBDD();
+
+        do {
+            
+            System.err.println("1");
+            BDD bTransFromUnsafe = newFoundUnsafeStates.and(bckwdTransEvents);
+            
+            System.err.println("2");
+            BDD fTrans = bTransFromUnsafe
+                    .exist(bddExAutomata.getSourceVariablesVarSet())
+                    .replace(bddExAutomata.getDestToSourceVariablePairing());
+            
+            System.err.println("3");
+            //frwdTrans = frwdTrans.and(fTrans.not());
+            bTransFromUnsafe = bTransFromUnsafe.exist(bddExAutomata.getEventVarSet());
+            
+            System.err.println("4");
+            BDD possibleUnsafeStates = fTrans.exist(bddExAutomata.getEventVarSet());
+            
+            BDD transFromUnsafeStates = possibleUnsafeStates.and(frwdTrans);
+            
+            System.err.println("5");
+            //BDD nonUnsafeStates = frwdTrans.exist(bddExAutomata.getEventVarSet());
+            BDD nonUnsafeStates = transFromUnsafeStates.and(tTrans.not())
+                    .relprod(fTrans.not(), bddExAutomata.getEventVarSet());
+            
+            System.err.println("6");
+            newFoundUnsafeStates = possibleUnsafeStates.and(nonUnsafeStates.not());
+            
+            System.err.println("7");
+            BDD fromWhichUnsafeStatesReachNewUnsafe = newFoundUnsafeStates
+                    .replace(bddExAutomata.getSourceToDestVariablePairing())
+                    .relprod(bTransFromUnsafe, bddExAutomata.getDestVariablesVarSet());
+            
+            System.err.println("8");
+            minimalBoundaryUnsafeStates.andWith(fromWhichUnsafeStatesReachNewUnsafe.not());
+            
+            System.err.println("9");
+            newFoundUnsafeStates.andWith(unsafeStates.not());
+            
+            System.err.println("10");
+            unsafeStates = unsafeStates.or(newFoundUnsafeStates);
+            test = test.or(newFoundUnsafeStates);
+            
+            System.err.println("11");
+            minimalBoundaryUnsafeStates = 
+                    minimalBoundaryUnsafeStates.or(newFoundUnsafeStates);
+            
+            tTrans.orWith(fTrans.and(newFoundUnsafeStates.not()));
+
+        } while (!newFoundUnsafeStates.isZero());
+        
+        System.err.println("Test: " + test.satCount(bddExAutomata.getSourceVariablesVarSet()));
+        System.err.println("MinimalUnsafeStates: " + 
+                minimalBoundaryUnsafeStates.satCount(bddExAutomata.getSourceVariablesVarSet()));
+
+    }
+    
+    public BDD[] computeFeasiableStatesBDDs () {
+        
+        if (feasiableStatesBDDs == null) {
+
+            TIntObjectHashMap<String> r2FeaEquations 
+                    = FlowerEFABuilder.resourceToFeasibleEquationMap;
+            
+            feasiableStatesBDDs = new BDD[r2FeaEquations.size()];
+            
+            final ExpressionParser parser =
+                    new ExpressionParser(ModuleSubjectFactory.getInstance(),
+                    CompilerOperatorTable.getInstance());
+            
+            r2FeaEquations.forEachEntry(new TIntObjectProcedure<String>() {
+                public boolean execute(int rIndex, String equation) {
+
+                    SimpleExpressionSubject equationExpression = null;
+                    BDD equationBDD = null;
+
+                    if (!equation.isEmpty()) {
+                        try {
+                            equationExpression = (SimpleExpressionSubject) 
+                                    (parser.parse(equation, Operator.TYPE_BOOLEAN));
+                        } catch (final ParseException pe) {
+                            System.err.println(pe);
+                        }
+                        equationBDD = guard2BDD(equationExpression);
+                    } else {
+                        equationBDD = getOneBDD();
+                    }
+
+
+                    feasiableStatesBDDs[rIndex] = equationBDD;
+                    return true;
+                }
+            });
+        }
+                
+        return feasiableStatesBDDs;
+    }
+    
+    public BDD getDeadlocks() {
+        
+        BDD notDeadlockStates = frwdTrans.exist(bddExAutomata.getEventVarSet());
+
+        BDD potentialDeadlockStates = bckwdTransEvents
+                .exist(bddExAutomata.getEventVarSet())
+                .exist(bddExAutomata.getDestVariablesVarSet());
+
+        BDD initv = bddExAutomata.getInitialState()
+                .exist(bddExAutomata.getSourceLocationVarSet());
+
+        BDD deadlocks = potentialDeadlockStates
+                .andWith(notDeadlockStates.not()).andWith(initv.not());
+        
+        for (BDD feasiableSet : feasiableStatesBDDs) {
+            deadlocks = deadlocks.and(feasiableSet);
+        }
+        
+        minimalBoundaryUnsafeStates = deadlocks;
+        
+        minimalBoundaryUnsafeStates = minimalBoundaryUnsafeStates
+                .and(minimalBoundaryUnsafeStates
+                .relprod(frwdLoadingTrans, bddExAutomata.getSourceVariablesVarSet())
+                .replace(bddExAutomata.getDestToSourceVariablePairing()).not());
+        
+        test = minimalBoundaryUnsafeStates.id();
+   
+        return deadlocks;
+    }
+    
     public BDD computeUnsafeStates() {
        
         // compute some helper BDDs and maps
@@ -401,7 +610,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
             
             elements = computeElements(newUnsafeStates);
 
-            unsafeStates.orWith(elements[0]);
+                unsafeStates.orWith(elements[0]);
             unsafeStates = removeLargerStates(unsafeStates);
             
             newUnsafeStates = extractLargerUnsafeStates(unsafeStates, elements[1]);
@@ -465,11 +674,10 @@ public class BDDExtendedManager extends BDDAbstractManager {
                             tempUnsafeState.exist(varSetsTobeExisted.get(i))
                             .relprod(largerVarValues.get(i), 
                             bddExAutomata.tempVariablesVarSet);
-
+                    
                     localLargerStates = localLargerStates.and(partialLargerState);
                 }
-                largerStates.orWith(localLargerStates.
-                        andWith(possibleLargerStates));
+                largerStates.orWith(localLargerStates.andWith(possibleLargerStates));
             }
         }
 

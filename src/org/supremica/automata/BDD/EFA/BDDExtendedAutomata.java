@@ -320,19 +320,20 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         setVariableOrdering();
         
-        if(synType.equals(SynthesisAlgorithm.PARTITIONBDD))
+        if(synType.equals(SynthesisAlgorithm.MINIMALITY))
         {
             BDDPartitionVarOrdSorter forceSorter = new BDDPartitionVarOrdSorter(orgExAutomata, variableOrdering, variableOrderingNames);
             forceSorter.sort();
 
             variableOrdering.clear();
             variableOrderingNames.clear();
-            
-            variableOrdering.addAll(forceSorter.getVariableOrdering());
             variableOrdering.add(unionAlphabet);
+            variableOrderingNames.add("Events");
+            variableOrdering.addAll(forceSorter.getVariableOrdering());
+            //variableOrdering.add(unionAlphabet);
             
             variableOrderingNames.addAll(forceSorter.getVariableOrderingNames());
-            variableOrderingNames.add("Events");
+            //variableOrderingNames.add("Events");
             variableOrderingNames.add("1");
         }
 
@@ -1294,7 +1295,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        System.err.println("compute reachable states --- begin");
 //        computeReachableStates();
 //        System.err.println("compute reachable states --- end");
-        final BDD unsafeStates = manager.computeUnsafeStates();
+        final BDD unsafeStates = manager.computeUnsafeStates2();
 
 //        unsafeStates.printDot();
 
