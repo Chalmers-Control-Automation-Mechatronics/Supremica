@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   LimitedCertainConflictsTraceExpander
+//# CLASS:   EnabledEventsLimitedCertainConflictsTraceExpander
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -330,15 +330,15 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
       iter.resetEvents(0, mNumEnabledEvents);
       while (iter.advance()) {
         final int tcode = iter.getCurrentTargetState();
-                if (visited.add(tcode)) {
-                  final int tlevel = mSimplifier.getLevel(tcode);
-                  if (tlevel < 0 || tlevel > slevel) {
-                    continue;
-                  }
+        if (visited.add(tcode)) {
+          final int tlevel = mSimplifier.getLevel(tcode);
+          if (tlevel < 0 || tlevel > slevel) {
+            continue;
+          }
           final int event = iter.getCurrentEvent();
           final SearchRecord newRecord =
             new SearchRecord(tcode, 0, event, record);
-                   if (tlevel <= level) {
+          if (tlevel <= level) {
             record = newRecord;
             break search;
           }
@@ -371,6 +371,8 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
           if (aut.getEvents().contains(event)) {
             final StateProxy sourceState = entry.getValue();
             for (final TransitionProxy transition : aut.getTransitions()) {
+              // TODO Fix bug. If event is 'always enabled', may have to
+              // take tau (local to aut) transitions before.
               if (transition.getSource() == sourceState
                   && transition.getEvent() == event) {
                 entry.setValue(transition.getTarget()); //this but backwards
