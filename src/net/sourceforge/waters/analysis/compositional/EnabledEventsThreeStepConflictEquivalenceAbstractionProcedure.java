@@ -25,7 +25,6 @@ import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -75,10 +74,10 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       new TransitionRemovalTRSimplifier();
     transitionRemover.setTransitionLimit(limit);
     preChain.add(transitionRemover);
-    final SilentIncomingTRSimplifier silentInRemover =
-      new SilentIncomingTRSimplifier();
-    silentInRemover.setRestrictsToUnreachableStates(true);
-    preChain.add(silentInRemover);
+   // final SilentIncomingTRSimplifier silentInRemover =
+   //   new SilentIncomingTRSimplifier();
+   // silentInRemover.setRestrictsToUnreachableStates(true);
+   // preChain.add(silentInRemover);
 
     final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier =
       new EnabledEventsSilentIncomingTRSimplifier();
@@ -97,21 +96,21 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       new EnabledEventsSilentContinuationTRSimplifier();
     preChain.add(enabledEventsSilentContinuationSimplifier);
 
-    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
-    if (useLimitedCertainConflicts) {
-      limitedCertainConflictsRemover =
-        new LimitedCertainConflictsTRSimplifier();
-    } else {
-      limitedCertainConflictsRemover = null;
-    }
-    final EnabledEventsLimitedCertainConflictsTRSimplifier enabledEventsLimitedCertainConflictsRemover;
+    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover = null;
+   // if (useLimitedCertainConflicts) {
+   //   limitedCertainConflictsRemover =
+   //     new LimitedCertainConflictsTRSimplifier();
+   // } else {
+   //   limitedCertainConflictsRemover = null;
+   // }
 
+    final EnabledEventsLimitedCertainConflictsTRSimplifier enabledEventsLimitedCertainConflictsRemover;
     if (useAlwaysEnabledLimitedCertainConflicts) {
       enabledEventsLimitedCertainConflictsRemover = new EnabledEventsLimitedCertainConflictsTRSimplifier();
     } else {
       enabledEventsLimitedCertainConflictsRemover = null;
     }
-
+/*
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
@@ -120,7 +119,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     bisimulator.setTransitionLimit(limit);
     bisimulator.setUsingSpecialEvents(false); // Do not use selfloop-only
     postChain.add(bisimulator);
-
+*/
     final ObservationEquivalenceTRSimplifier slBisimulator =
       new ObservationEquivalenceTRSimplifier();
     slBisimulator.setEquivalence(equivalence);
@@ -199,22 +198,24 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
       final EnabledEventsCompositionalConflictChecker enabledEventsAnalyzer = (EnabledEventsCompositionalConflictChecker)getAnalyzer();
 
+      final List<EventProxy> eventsList = new ArrayList<EventProxy>(aut.getEvents().size());
+      int numEnabledEvents = 0;
+      final boolean AEPlus = false;
+      if(AEPlus)
+      {
       final List<EventProxy> enabledEventsList = new ArrayList<EventProxy>(aut.getEvents().size());
       enabledEventsList.addAll(enabledEventsAnalyzer.calculateAlwaysEnabledEvents(aut, candidate));
 
       final List<EventProxy> otherEventsList = new ArrayList<EventProxy>(aut.getEvents().size());
       otherEventsList.addAll(aut.getEvents());
       otherEventsList.removeAll(enabledEventsList);
-      final List<EventProxy> eventsList = new ArrayList<EventProxy>(aut.getEvents().size());
       //Creates an event encoding with always enabled events at start
       eventsList.addAll(enabledEventsList);
       eventsList.addAll(otherEventsList);
-      final int numEnabledEvents = enabledEventsList.size();
-
-      //System.out.println(numEnabledEvents + " " + enabledEventsList);
-      /*
-
-      int numEnabledEvents = 0;
+      numEnabledEvents = enabledEventsList.size();
+      }
+      else
+      {
       //for all the events
       for (final EventProxy event : aut.getEvents()) {
         //Get event info somewhere
@@ -229,13 +230,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
               numEnabledEvents++;
             }
           }
-          else
-          {
-            //Harder check for AE
-            //call something in other EE Compositional Conflict Checker class
-
-
-          }
         }
       }
       for(final EventProxy events : aut.getEvents()) {
@@ -245,8 +239,8 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           eventsList.add(events);
         }
       }
+      }
 
-*/
 
 
 
