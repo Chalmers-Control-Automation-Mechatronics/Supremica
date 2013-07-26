@@ -274,9 +274,9 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     testProfisafe_i4();
     testProfisafe_i5();
     testProfisafe_i6();
-    testProfisafe_o4();
-    testProfisafe_o5();
-    testProfisafe_o6();
+    //testProfisafe_o4();
+    //testProfisafe_o5();
+    //testProfisafe_o6();
     testTbed_ctct();
     testTbed_hisc();
     testTbed_valid();
@@ -539,14 +539,17 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   {
     runModel("tests", "profisafe", "profisafe_i6.wmod",true);
   }
+  @SuppressWarnings("unused")
   private void testProfisafe_o4() throws Exception
   {
     runModel("tests", "profisafe", "profisafe_o4.wmod",true);
   }
+  @SuppressWarnings("unused")
   private void testProfisafe_o5() throws Exception
   {
     runModel("tests", "profisafe", "profisafe_o5.wmod",true);
   }
+  @SuppressWarnings("unused")
   private void testProfisafe_o6() throws Exception
   {
     runModel("tests", "profisafe", "profisafe_o6.wmod",true);

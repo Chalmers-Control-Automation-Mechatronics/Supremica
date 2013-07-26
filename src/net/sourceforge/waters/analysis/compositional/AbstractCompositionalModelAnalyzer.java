@@ -178,7 +178,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     mPreselectingMethod = MustL;
     mSelectingMethod = MinS;
     mSubsumptionEnabled = false;
-    mUsingSpecialEvents = false;
+    mUsingSpecialEvents = true;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
     mInternalTransitionLimit = super.getTransitionLimit();
@@ -710,7 +710,6 @@ public abstract class AbstractCompositionalModelAnalyzer
       Candidate candidate = null;
       outer:
       do {
-        subsystem:
         do {
           checkAbort();
           candidates = mPreselectingHeuristic.findCandidates();
@@ -720,7 +719,7 @@ public abstract class AbstractCompositionalModelAnalyzer
               mMayBeSplit = false;
               applyCandidate(candidate);
               cancheck = true;
-              continue subsystem;
+              break;
             } catch (final OverflowException overflow) {
               // caught - go on ...
             }
@@ -1029,7 +1028,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     mRedundantEvents = new LinkedList<EventProxy>();
     for (final EventInfo info : mEventInfoMap.values()) {
-      if (info.isRemovable()) {
+      if (info.isRemovable(mUsingSpecialEvents)) {
         final EventProxy event = info.getEvent();
         mRedundantEvents.add(event);
       }
@@ -1124,7 +1123,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       info.removeAutomata(victims);
       if (info.isEmpty()) {
         iter.remove();
-      } else if (info.isRemovable()) {
+      } else if (info.isRemovable(mUsingSpecialEvents)) {
         final EventProxy event = entry.getKey();
         mRedundantEvents.add(event);
       }
@@ -2189,7 +2188,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     protected EventInfo(final EventProxy event)
     {
       mEvent = event;
-      mAutomataMap = new TObjectByteHashMap<AutomatonProxy>();
+      mAutomataMap = new TObjectByteHashMap<AutomatonProxy>(0, 0.5f, (byte) -1);
       mSortedAutomataList = null;
       mNumNonSelfloopAutomata = 0;
       mIsBlocked = false;
@@ -2311,18 +2310,18 @@ public abstract class AbstractCompositionalModelAnalyzer
       return mAutomataMap.isEmpty();
     }
 
-    private boolean isRemovable()
+    private boolean isRemovable(final boolean special)
     {
       if (mIsBlocked) {
         return true;
-      } else if (mNumNonSelfloopAutomata == 0) {
+      } else if (special && mNumNonSelfloopAutomata == 0) {
         return isSubjectToSelfloopRemoval();
       } else {
         return false;
       }
     }
 
-     void removeAutomata(final Collection<AutomatonProxy> victims)
+    void removeAutomata(final Collection<AutomatonProxy> victims)
     {
       for (final AutomatonProxy aut : victims) {
         final byte code = mAutomataMap.remove(aut);
@@ -2357,12 +2356,14 @@ public abstract class AbstractCompositionalModelAnalyzer
      */
     boolean isOnlyNonSelfLoopCandidate(final Candidate candidate)
     {
-      int remaining = mNumNonSelfloopAutomata;
-      if (remaining == 0) {
+      if (!isSubjectToSelfloopRemoval()) {
+        return false;
+      } else if (mNumNonSelfloopAutomata == 0) {
         return true;
-      } else if (remaining > candidate.getNumberOfAutomata()) {
+      } else if (mNumNonSelfloopAutomata > candidate.getNumberOfAutomata()) {
         return false;
       } else {
+        int remaining = mNumNonSelfloopAutomata;
         for (final AutomatonProxy aut : candidate.getAutomata()) {
           if (mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP) {
             remaining--;

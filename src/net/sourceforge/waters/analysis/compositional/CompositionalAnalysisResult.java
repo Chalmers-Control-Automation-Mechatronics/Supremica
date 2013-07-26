@@ -242,8 +242,6 @@ public class CompositionalAnalysisResult
     writer.println(mNumberOfSplits);
     formatter.format("Time consumed by split attempts: %.3fs\n",
                      0.001f * mSplitTime);
-    writer.print("Time consumed by split attempts: ");
-    writer.println(mNumberOfSplits);
     writer.print("Number of redundant events: ");
     writer.println(mRedundantEventsCount);
     if (mUnsuccessfulCompositionsCount > 0) {
