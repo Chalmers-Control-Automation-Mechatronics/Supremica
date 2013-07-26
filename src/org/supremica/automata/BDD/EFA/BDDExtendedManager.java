@@ -38,6 +38,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
     BDD bckwdTransEvents = null;
     
     BDD frwdLoadingTrans = null;
+    BDD frwdLastTrans = null;
     
     BDD globalOneStepLargerBDD = null;
     
@@ -47,7 +48,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
     
     BDD[] feasiableStatesBDDs = null;
     BDD minimalBoundaryUnsafeStates = null;
-    BDD test = null;
     
     TIntArrayList stageVarIndexList = null;
     List<BDDVarSet> varSetsTobeExisted = null;
@@ -357,28 +357,19 @@ public class BDDExtendedManager extends BDDAbstractManager {
         // compute some helper BDDs and maps
         buildHelpers();
         
-        // get forward transition relations from the monolithic approach
         frwdTrans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges())
-                .getMonolithicEdgesForwardWithEventsBDD();
-        
-        // remove variables of locations
-        frwdTrans = frwdTrans
+                .getMonolithicEdgesForwardWithEventsBDD()
                 .exist(bddExAutomata.getSourceLocationVarSet()
                 .union(bddExAutomata.getDestLocationVarSet()));
-        
-        // switch variables to build the backward transition relation
-        bckwdTransEvents = frwdTrans
-                .replace(bddExAutomata.sourceToTempVariablePairing)
-                .replace(bddExAutomata.getDestToSourceVariablePairing())
-                .replace(bddExAutomata.tempToDestVariablePairing);
         
         frwdLoadingTrans = frwdTrans.relprod(bddExAutomata.loadEventsBDD,
                 bddExAutomata.getEventVarSet());
         
-        // use relprod instead of AND + exists
-        frwdTrans = frwdTrans.relprod(bddExAutomata.loadEventsBDD.not(),
-                bddExAutomata.getDestVariablesVarSet());
+        frwdLastTrans = frwdTrans.relprod(bddExAutomata.lastEventsBDD,
+                bddExAutomata.getEventVarSet());
         
+        // compute bckwdPUnloadingTrans; - later
+                
         // compute the feasiable state arrays
         computeFeasiableStatesBDDs();
         
@@ -386,16 +377,11 @@ public class BDDExtendedManager extends BDDAbstractManager {
         BDD deadlocks = getDeadlocks();
         
         System.err.println("Computing the boundary unsafe states...");
-
-        bckwdTransEvents.andWith(bddExAutomata.loadEventsBDD.not());
-
         computeBoundaryUnsafeStates(deadlocks);
         
-        minimalBoundaryUnsafeStates = minimalBoundaryUnsafeStates
-                .exist(bddExAutomata.getSourceResourceVarSet());
-
         System.err.println("minimizing...");
-        minimalBoundaryUnsafeStates = removeLargerStates(minimalBoundaryUnsafeStates);
+        minimalBoundaryUnsafeStates = removeLargerStates(minimalBoundaryUnsafeStates
+                .exist(bddExAutomata.getSourceResourceVarSet()));
 
 //        BDD reachableStates = bddExAutomata.getReachableStates()
 //                .exist(bddExAutomata.getSourceLocationVarSet())
@@ -422,7 +408,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         return minimalBoundaryUnsafeStates;
     }
     
-    public void computeBoundaryUnsafeStates(BDD deadlocks) {
+    public BDD computeBoundaryUnsafeStates(BDD deadlocks) {
         
         BDD newFoundUnsafeStates = deadlocks;
 
@@ -432,58 +418,42 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         do {
             
-            System.err.println("1");
-            BDD bTransFromUnsafe = newFoundUnsafeStates.and(bckwdTransEvents);
+            BDD fTransToUnsafeStates = newFoundUnsafeStates
+                    .replace(bddExAutomata.getSourceToDestVariablePairing())
+                    .and(frwdTrans);
             
-            System.err.println("2");
-            BDD fTrans = bTransFromUnsafe
+            BDD possibleUnsafeStates = fTransToUnsafeStates
+                    .exist(bddExAutomata.getDestVariablesVarSet());
+            
+            BDD transFromPossUnStates = possibleUnsafeStates.and(frwdTrans);
+            
+            BDD nonUnsafeStates = transFromPossUnStates.and(tTrans.not())
+                    .relprod(fTransToUnsafeStates.not(), 
+                     bddExAutomata.getDestVariablesVarSet());
+            
+            newFoundUnsafeStates = possibleUnsafeStates.and(nonUnsafeStates.not());
+            
+            BDD transFromNewUnsafeStates = newFoundUnsafeStates.and(fTransToUnsafeStates);
+            transFromNewUnsafeStates = transFromNewUnsafeStates.and(frwdLastTrans.not());
+            
+            BDD fromWhichNewUnsafeStatesBeingFound = transFromNewUnsafeStates
                     .exist(bddExAutomata.getSourceVariablesVarSet())
                     .replace(bddExAutomata.getDestToSourceVariablePairing());
             
-            System.err.println("3");
-            //frwdTrans = frwdTrans.and(fTrans.not());
-            bTransFromUnsafe = bTransFromUnsafe.exist(bddExAutomata.getEventVarSet());
+            minimalBoundaryUnsafeStates.andWith(fromWhichNewUnsafeStatesBeingFound.not());
             
-            System.err.println("4");
-            BDD possibleUnsafeStates = fTrans.exist(bddExAutomata.getEventVarSet());
-            
-            BDD transFromUnsafeStates = possibleUnsafeStates.and(frwdTrans);
-            
-            System.err.println("5");
-            //BDD nonUnsafeStates = frwdTrans.exist(bddExAutomata.getEventVarSet());
-            BDD nonUnsafeStates = transFromUnsafeStates.and(tTrans.not())
-                    .relprod(fTrans.not(), bddExAutomata.getEventVarSet());
-            
-            System.err.println("6");
-            newFoundUnsafeStates = possibleUnsafeStates.and(nonUnsafeStates.not());
-            
-            System.err.println("7");
-            BDD fromWhichUnsafeStatesReachNewUnsafe = newFoundUnsafeStates
-                    .replace(bddExAutomata.getSourceToDestVariablePairing())
-                    .relprod(bTransFromUnsafe, bddExAutomata.getDestVariablesVarSet());
-            
-            System.err.println("8");
-            minimalBoundaryUnsafeStates.andWith(fromWhichUnsafeStatesReachNewUnsafe.not());
-            
-            System.err.println("9");
             newFoundUnsafeStates.andWith(unsafeStates.not());
             
-            System.err.println("10");
             unsafeStates = unsafeStates.or(newFoundUnsafeStates);
-            test = test.or(newFoundUnsafeStates);
             
-            System.err.println("11");
             minimalBoundaryUnsafeStates = 
                     minimalBoundaryUnsafeStates.or(newFoundUnsafeStates);
             
-            tTrans.orWith(fTrans.and(newFoundUnsafeStates.not()));
+            tTrans.orWith(fTransToUnsafeStates.and(newFoundUnsafeStates.not()));
 
-        } while (!newFoundUnsafeStates.isZero());
+        } while (!newFoundUnsafeStates.isZero());        
         
-        System.err.println("Test: " + test.satCount(bddExAutomata.getSourceVariablesVarSet()));
-        System.err.println("MinimalUnsafeStates: " + 
-                minimalBoundaryUnsafeStates.satCount(bddExAutomata.getSourceVariablesVarSet()));
-
+        return unsafeStates;
     }
     
     public BDD[] computeFeasiableStatesBDDs () {
@@ -529,11 +499,15 @@ public class BDDExtendedManager extends BDDAbstractManager {
     
     public BDD getDeadlocks() {
         
-        BDD notDeadlockStates = frwdTrans.exist(bddExAutomata.getEventVarSet());
-
-        BDD potentialDeadlockStates = bckwdTransEvents
-                .exist(bddExAutomata.getEventVarSet())
-                .exist(bddExAutomata.getDestVariablesVarSet());
+        BDD potentialDeadlockStates = frwdTrans
+                .exist(bddExAutomata.getEventVarSet()
+                .union(bddExAutomata.getSourceVariablesVarSet()))
+                .replace(bddExAutomata.getDestToSourceVariablePairing());
+        
+        frwdTrans = frwdTrans.relprod(bddExAutomata.loadEventsBDD.not(),
+                bddExAutomata.getEventVarSet());
+        
+        BDD notDeadlockStates = frwdTrans.exist(bddExAutomata.getDestVariablesVarSet());
 
         BDD initv = bddExAutomata.getInitialState()
                 .exist(bddExAutomata.getSourceLocationVarSet());
@@ -552,8 +526,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
                 .relprod(frwdLoadingTrans, bddExAutomata.getSourceVariablesVarSet())
                 .replace(bddExAutomata.getDestToSourceVariablePairing()).not());
         
-        test = minimalBoundaryUnsafeStates.id();
-   
         return deadlocks;
     }
     

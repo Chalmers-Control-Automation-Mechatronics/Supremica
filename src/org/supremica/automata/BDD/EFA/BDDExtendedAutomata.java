@@ -72,6 +72,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     private BDDVarSet destResourceVarSet = null;
     HashMap<VariableComponentProxy, BDDVarSet> stageVar2BDDTempVarSetMap;
     public BDD loadEventsBDD = null;
+    public BDD lastEventsBDD = null;
     
     //Related to all variables including regular variables and clocks
     BDDDomain[] tempVarDomains = null;
@@ -209,6 +210,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         plantAlphabetBDD = manager.getZeroBDD();
 
         loadEventsBDD = manager.getZeroBDD();
+        lastEventsBDD = manager.getZeroBDD();
 
         this.options = options;
         this.synType = options.getSynthesisAlgorithm();
@@ -355,6 +357,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                     final BDD eventBDD = manager.createBDD(currEventIndex, eventDomain);
                     if (event.getName().contains(FlowerEFABuilder.LOAD_EVENT_PREFIX)) {
                         loadEventsBDD = loadEventsBDD.or(eventBDD);
+                    }
+                    
+                    if (FlowerEFABuilder.lastEventList.contains(event.getName())) {
+                        lastEventsBDD = lastEventsBDD.or(eventBDD);
                     }
 
                     if (orgExAutomata.getPlantAlphabet().contains(event)) {

@@ -5,8 +5,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -43,6 +45,8 @@ public class FlowerEFABuilder {
     private ExtendedAutomata exAutomata;
     private final ModuleSubject module;
     
+    public static List<String> lastEventList; 
+    
     /*public static List<TIntIntHashMap> jobStageToUsedResource;
     
     public static TIntObjectHashMap<String> resourceIndexToBlockEquation;
@@ -74,6 +78,8 @@ public class FlowerEFABuilder {
 //            resourceToTransNamesMap = new TIntObjectHashMap<StringBuilder>(nbrOfResources);
             resourceToUsedInStages = new HashMap<Integer, Set<Pair>>();
             resourceCapacities = new int[nbrOfResources];
+            
+            lastEventList = new ArrayList<String>();
             
             //jobStageToUsedResource = new ArrayList<TIntIntHashMap>(nbrOfJobs);
             StringTokenizer st = new StringTokenizer(br.readLine());
@@ -130,6 +136,11 @@ public class FlowerEFABuilder {
                     st = new StringTokenizer(br.readLine());
                     final int sourceStage = Integer.parseInt(st.nextToken());
                     final int targetStage = Integer.parseInt(st.nextToken());
+                    
+                    if (targetStage == nbrOfStagesForJob[i] - 1)
+                        lastEventList.add(STAGE_PREFIX + i + sourceStage 
+                                + STAGE_PREFIX + i + targetStage);
+                    
                     trans.add(new Pair(sourceStage, targetStage));
                     initialStages.remove(targetStage);
                     lastStages.remove(sourceStage);
