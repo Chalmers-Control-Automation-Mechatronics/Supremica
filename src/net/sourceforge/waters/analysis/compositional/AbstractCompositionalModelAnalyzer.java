@@ -697,7 +697,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * system. This method does not take steps to put further data
    * (such as counterexamples) into the analysis result.
    */
-  protected void runCompositionalMinimisation()
+  protected void runCompositionalMinimisation0()
     throws AnalysisException
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
@@ -767,6 +767,84 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       } while (lastOverflow != null ||
                !result.isFinished() && popEventDisjointSubsystem());
+    }
+    if (!result.isFinished()) {
+      final List<AutomatonProxy> empty = Collections.emptyList();
+      doMonolithicAnalysis(empty);
+    }
+    restoreAutomata();
+  }
+
+  protected void runCompositionalMinimisation()
+    throws AnalysisException
+  {
+    final CompositionalAnalysisResult result = getAnalysisResult();
+    // If simplify() returns true, the global system has been trivially
+    // verified, and there is nothing left to do.
+    if (!simplify()) {
+      outer:
+      do {
+        boolean cancheck = true;
+        OverflowException lastOverflow = null;
+        do {
+          Collection<Candidate> candidates =
+            mPreselectingHeuristic.findCandidates();
+          while (true) {
+            checkAbort();
+            final Candidate candidate = selectCandidate(candidates);
+            if (candidate == null) {
+              break;
+            }
+            try {
+              mMayBeSplit = false;
+              applyCandidate(candidate);
+              cancheck = true;
+            } catch (final OverflowException overflow) {
+              recordUnsuccessfulComposition();
+              final List<AutomatonProxy> automata = candidate.getAutomata();
+              mOverflowCandidates.add(automata);
+              candidates.remove(candidate);
+              continue;
+            }
+            if (simplify()) {
+              if (result.isFinished()) {
+                break outer;
+              } else {
+                continue outer;
+              }
+            }
+            candidates = mPreselectingHeuristic.findCandidates();
+          }
+          try {
+            if (cancheck) {
+              doMonolithicAnalysis(mCurrentAutomata);
+              lastOverflow = null;
+            }
+          } catch (final OutOfMemoryError error) {
+            getLogger().debug("<out of memory>");
+            lastOverflow = new OverflowException(error);
+            cancheck = false;
+          } catch (final OverflowException overflow) {
+            lastOverflow = overflow;
+            cancheck = false;
+          }
+          if (lastOverflow != null) {
+            if (mCurrentInternalStateLimit < mUpperInternalStateLimit) {
+              mCurrentInternalStateLimit =
+                Math.min(2 * mCurrentInternalStateLimit, mUpperInternalStateLimit);
+              mOverflowCandidates.clear();
+              final Logger logger = getLogger();
+              if (logger.isDebugEnabled()) {
+                final String msg =
+                  "State limit increased to " + mCurrentInternalStateLimit + ".";
+                logger.debug(msg);
+              }
+            } else {
+              throw lastOverflow;
+            }
+          }
+        } while (lastOverflow != null);
+      } while (!result.isFinished() && popEventDisjointSubsystem());
     }
     if (!result.isFinished()) {
       final List<AutomatonProxy> empty = Collections.emptyList();
@@ -1489,8 +1567,8 @@ public abstract class AbstractCompositionalModelAnalyzer
           new THashSet<EventProxy>(aut.getEvents());
         for (final EventProxy event : oldEvents) {
           if (event != tau &&
-            translator.getEventKind(event) != EventKind.PROPOSITION &&
-            !local.contains(event) && !newEvents.contains(event)) {
+              translator.getEventKind(event) != EventKind.PROPOSITION &&
+              !local.contains(event) && !newEvents.contains(event)) {
             mMayBeSplit = true;
             break;
           }

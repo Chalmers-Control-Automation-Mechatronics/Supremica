@@ -1,13 +1,13 @@
 package net.sourceforge.waters.analysis.certainconf;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
 
@@ -23,6 +23,7 @@ public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
   }
 
 
+  @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     // TODO Auto-generated method stub
@@ -175,6 +176,14 @@ public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "certainconflicts_17.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_18() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_18.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

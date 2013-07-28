@@ -146,7 +146,7 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
 
     int initTest = initResult;
     if (initResult > 0 && mSimplifier.getWasOptimisationUsed()) {
-      initTest = FindTestAutomatonInit(initResult, newTraceSteps);
+      initTest = findTestAutomatonInit(initResult, newTraceSteps);
     }
 
     // Extend the trace to lowest (= most blocking) possible level ...
@@ -187,7 +187,7 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
     return newTraceSteps;
   }
 
-  private int FindTestAutomatonInit(final int initResult,
+  private int findTestAutomatonInit(final int initResult,
                                     final List<TraceStepProxy> traceSteps)
   {
     // iterate trace through mTestAutomaton

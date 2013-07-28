@@ -35,9 +35,6 @@ for F in "$@"; do
     -native)
         FACTORY="$WPACK.cpp.analysis.NativeModelVerifierFactory"
         ;;
-    -ndp)
-        FACTORY="$WPACK.analysis.modular.NDProjectingModelVerifierFactory"
-        ;;
     -po)
         FACTORY="$WPACK.analysis.po.PartialOrderModelVerifierFactory"
         ;;
