@@ -180,7 +180,7 @@ public class TransitionRemovalTRSimplifier
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
-      new TRSimplifierStatistics(this, true, false);
+      new TRSimplifierStatistics(this, false, true, false);
     return setStatistics(stats);
   }
 
