@@ -67,6 +67,27 @@ public class TransitionRemovalTRSimplifier
     return mTransitionLimit;
   }
 
+  /**
+   * Sets whether special events are to be considered in abstraction.
+   * If enabled, events marked as selfloop-only in all other automata
+   * will be treated specially. For such events, it is possible to assume
+   * implicit selfloops on all states of the automaton being simplified,
+   * potentially giving better state reduction.
+   */
+  public void setUsingSpecialEvents(final boolean enable)
+  {
+    mUsingSpecialEvents = enable;
+  }
+
+  /**
+   * Returns whether special events are considered in abstraction.
+   * @see #setUsingSpecialEvents(boolean)
+   */
+  public boolean isUsingSpecialEvents()
+  {
+    return mUsingSpecialEvents;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
@@ -108,15 +129,24 @@ public class TransitionRemovalTRSimplifier
     trans:
     while (iter0.advance()) {
       final int e = iter0.getCurrentEvent();
-      if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) != 0) {
+      final byte status = rel.getProperEventStatus(e);
+      if ((status & EventEncoding.STATUS_UNUSED) != 0) {
         continue;
       }
       checkAbort();
+      final boolean selflooped =
+        (status & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
+        mUsingSpecialEvents && e != EventEncoding.TAU;
       final int from0 = iter0.getCurrentFromState();
       final int to0 = iter0.getCurrentToState();
       iter1.resetState(from0);
       while (iter1.advance()) {
         final int p1 = iter1.getCurrentToState();
+        if (selflooped && p1 == to0) {
+          iter0.remove();
+          removedSome = true;
+          continue trans;
+        }
         iter2.reset(p1, e);
         while (iter2.advance()) {
           final int p2 = iter2.getCurrentToState();
@@ -158,6 +188,7 @@ public class TransitionRemovalTRSimplifier
   //#########################################################################
   //# Data Members
   private int mTransitionLimit = Integer.MAX_VALUE;
+  private boolean mUsingSpecialEvents = true;
 
 }
 

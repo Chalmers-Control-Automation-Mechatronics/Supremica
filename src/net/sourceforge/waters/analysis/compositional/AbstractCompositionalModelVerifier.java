@@ -478,6 +478,7 @@ public abstract class AbstractCompositionalModelVerifier
   private TraceProxy expandTrace(final TraceProxy trace)
     throws AnalysisException
   {
+    getLogger().debug("Property NOT satisfied --- expanding trace ...");
     final List<TraceStepProxy> unsat = trace.getTraceSteps();
     final Collection<AutomatonProxy> currentAutomata = getAllTraceAutomata();
     List<TraceStepProxy> traceSteps =

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="certainconflicts_18" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for certain conflicts abstraction.
+This test involves a moderately large automaton with moderately large state sets in its subset construction.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name=":symbols">
             <ConstantAliasExpression>
@@ -43,7 +45,7 @@
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>
         <EventDecl Kind="CONTROLLABLE" Name="restart"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="resume"/>
+        <EventDecl Kind="CONTROLLABLE" Name="resume"/>
         <EventDecl Kind="CONTROLLABLE" Name="s01"/>
         <EventDecl Kind="CONTROLLABLE" Name="s02"/>
         <EventDecl Kind="CONTROLLABLE" Name="s03"/>

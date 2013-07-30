@@ -11,8 +11,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.model.analysis.CommandLineTool"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory Conflict -limit 1000 &quot;${workspace_loc:waters}/examples/waters/handwritten/small_factory_2.wmod&quot; &quot;${workspace_loc:waters}/examples/waters/valid/central_locking/koordwsp.vprj&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="net.sourceforge.waters.analysis.compositional.CompositionalModelVerifierFactory Conflict -method NB -stats &quot;${workspace_loc:waters}/examples/waters/tests/incremental_suite/aip0alps.wmod&quot;"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#10;-ea"/>
-<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="/home/robi/work/teaching/comp552-10b/assignment3"/>
 </launchConfiguration>

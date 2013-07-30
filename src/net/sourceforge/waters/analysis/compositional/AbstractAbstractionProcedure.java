@@ -18,6 +18,8 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import org.apache.log4j.Logger;
+
 /**
  * A default implementation of the {@link AbstractionProcedure} interface.
  * This class makes it easy to access the model analyser
@@ -111,6 +113,15 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
       }
     }
     return enc;
+  }
+
+
+  //#########################################################################
+  //# Logging
+  public Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
   }
 
 
