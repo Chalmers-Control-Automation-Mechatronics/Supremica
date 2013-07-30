@@ -49,7 +49,7 @@ public class CompositionalModelVerifierFactory
 
   //#########################################################################
   //# Constructors
-  private CompositionalModelVerifierFactory()
+  CompositionalModelVerifierFactory()
   {
   }
 

@@ -66,6 +66,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     final ChainTRSimplifier postChain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
+    loopRemover.setDumpStateAware(true);
     preChain.add(loopRemover);
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
@@ -74,35 +75,25 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       new TransitionRemovalTRSimplifier();
     transitionRemover.setTransitionLimit(limit);
     preChain.add(transitionRemover);
-   // final SilentIncomingTRSimplifier silentInRemover =
-   //   new SilentIncomingTRSimplifier();
-   // silentInRemover.setRestrictsToUnreachableStates(true);
-   // preChain.add(silentInRemover);
 
     final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier =
       new EnabledEventsSilentIncomingTRSimplifier();
     enabledEventsSilentIncomingSimplifier.setRestrictsToUnreachableStates(true);
+    enabledEventsSilentIncomingSimplifier.setDumpStateAware(true);
     preChain.add(enabledEventsSilentIncomingSimplifier);
 
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
+    silentOutRemover.setDumpStateAware(true);
     preChain.add(silentOutRemover);
-    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
-      new IncomingEquivalenceTRSimplifier();
-    incomingEquivalenceSimplifier.setTransitionLimit(limit);
-    preChain.add(incomingEquivalenceSimplifier);
 
-    final EnabledEventsSilentContinuationTRSimplifier enabledEventsSilentContinuationSimplifier =
-      new EnabledEventsSilentContinuationTRSimplifier();
-    preChain.add(enabledEventsSilentContinuationSimplifier);
-
-    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover = null;
-   // if (useLimitedCertainConflicts) {
-   //   limitedCertainConflictsRemover =
-   //     new LimitedCertainConflictsTRSimplifier();
-   // } else {
-   //   limitedCertainConflictsRemover = null;
-   // }
+    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
+    if (useLimitedCertainConflicts) {
+      limitedCertainConflictsRemover =
+        new LimitedCertainConflictsTRSimplifier();
+    } else {
+      limitedCertainConflictsRemover = null;
+    }
 
     final EnabledEventsLimitedCertainConflictsTRSimplifier enabledEventsLimitedCertainConflictsRemover;
     if (useAlwaysEnabledLimitedCertainConflicts) {
@@ -126,25 +117,37 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     slBisimulator.setTransitionRemovalMode(ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     slBisimulator.setMarkingMode(ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     slBisimulator.setTransitionLimit(limit);
+    slBisimulator.setDumpStateAware(true);
     postChain.add(slBisimulator);
 
     if (includeNonAlphaDeterminisation) {
       final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
         new NonAlphaDeterminisationTRSimplifier();
       nonAlphaDeterminiser.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
       nonAlphaDeterminiser.setTransitionLimit(limit);
+      nonAlphaDeterminiser.setDumpStateAware(true);
       postChain.add(nonAlphaDeterminiser);
     }
+
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    incomingEquivalenceSimplifier.setTransitionLimit(limit);
+    postChain.add(incomingEquivalenceSimplifier);
+
+    final EnabledEventsSilentContinuationTRSimplifier silentContinuationSimplifier =
+      new EnabledEventsSilentContinuationTRSimplifier();
+    postChain.add(silentContinuationSimplifier);
+
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
     return new EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
-      (analyzer, preChain, limitedCertainConflictsRemover,          //Change this so limited is first, enabled events limited is second
-        enabledEventsLimitedCertainConflictsRemover,
-        enabledEventsSilentContinuationSimplifier,
-        enabledEventsSilentIncomingSimplifier,
-        postChain);
+      (analyzer, preChain, limitedCertainConflictsRemover,
+       enabledEventsLimitedCertainConflictsRemover,
+       silentContinuationSimplifier,
+       enabledEventsSilentIncomingSimplifier,
+       postChain);
   }
 
 
@@ -193,56 +196,54 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       final ProductDESProxyFactory factory = getFactory();
       final Iterator<EventProxy> iter = local.iterator();
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
-      final StateEncoding inputStateEnc = new StateEncoding(aut);       //can always access compisitionalconflictechcker
-      final int config = mPreChain.getPreferredInputConfiguration();    //use that to find mNumberofEnabledEvents
+      final StateEncoding inputStateEnc = new StateEncoding(aut);
+      final int config = mPreChain.getPreferredInputConfiguration();
 
       final EnabledEventsCompositionalConflictChecker enabledEventsAnalyzer = (EnabledEventsCompositionalConflictChecker)getAnalyzer();
 
       final List<EventProxy> eventsList = new ArrayList<EventProxy>(aut.getEvents().size());
       int numEnabledEvents = 0;
-      final boolean AEPlus = false;
-      if(AEPlus)
-      {
-      final List<EventProxy> enabledEventsList = new ArrayList<EventProxy>(aut.getEvents().size());
-      enabledEventsList.addAll(enabledEventsAnalyzer.calculateAlwaysEnabledEvents(aut, candidate));
-
-      final List<EventProxy> otherEventsList = new ArrayList<EventProxy>(aut.getEvents().size());
-      otherEventsList.addAll(aut.getEvents());
-      otherEventsList.removeAll(enabledEventsList);
-      //Creates an event encoding with always enabled events at start
-      eventsList.addAll(enabledEventsList);
-      eventsList.addAll(otherEventsList);
-      numEnabledEvents = enabledEventsList.size();
-      }
-      else
-      {
-      //for all the events
-      for (final EventProxy event : aut.getEvents()) {
-        //Get event info somewhere
-        final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo =
-          enabledEventsAnalyzer.getEventInfo(event);
-        if (eventInfo != null) {
-          //check if event is always enabled or this automaton is only disabler
-          if (eventInfo.isSingleDisablingCandidate(candidate)) {
-            eventsList.add(event);
-            // Count how many enabled events there are
-            if (event != tau) { //Tau is added to the list here but not counted as always Enabled.
-              numEnabledEvents++;
+      final boolean aePlus =
+        enabledEventsAnalyzer.getEnabledEventSearchStateLimit() >=
+        inputStateEnc.getNumberOfStates();
+      if (aePlus) {
+        final List<EventProxy> enabledEventsList =
+          new ArrayList<EventProxy>(aut.getEvents().size());
+        enabledEventsList.addAll
+          (enabledEventsAnalyzer.calculateAlwaysEnabledEvents(aut, candidate));
+        final List<EventProxy> otherEventsList =
+          new ArrayList<EventProxy>(aut.getEvents().size());
+        otherEventsList.addAll(aut.getEvents());
+        otherEventsList.removeAll(enabledEventsList);
+        //Creates an event encoding with always enabled events at start
+        eventsList.addAll(enabledEventsList);
+        eventsList.addAll(otherEventsList);
+        numEnabledEvents = enabledEventsList.size();
+      } else {
+        for (final EventProxy event : aut.getEvents()) {
+          final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo =
+            enabledEventsAnalyzer.getEventInfo(event);
+          if (eventInfo != null) {
+            //check if event is always enabled or this automaton is only disabler
+            if (eventInfo.isSingleDisablingCandidate(candidate)) {
+              eventsList.add(event);
+              // Count how many enabled events there are
+              if (event != tau) { //Tau is added to the list here but not counted as always Enabled.
+                numEnabledEvents++;
+              }
             }
           }
         }
-      }
-      for(final EventProxy events : aut.getEvents()) {
-        final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo  = enabledEventsAnalyzer.getEventInfo(events);
-        //Adds the propositions and other events.
-        if (eventInfo == null || !eventInfo.isSingleDisablingCandidate(candidate)) {
-          eventsList.add(events);
+        for (final EventProxy events : aut.getEvents()) {
+          final EnabledEventsCompositionalConflictChecker.EnabledEventsEventInfo eventInfo =
+            enabledEventsAnalyzer.getEventInfo(events);
+          //Adds the propositions and other events.
+          if (eventInfo == null ||
+              !eventInfo.isSingleDisablingCandidate(candidate)) {
+            eventsList.add(events);
+          }
         }
       }
-      }
-
-
-
 
       // Tell the simplifiers how many enabled events there are
       mEnabledEventsSilentContinuationSimplifier.

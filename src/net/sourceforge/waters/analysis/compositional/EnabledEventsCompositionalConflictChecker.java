@@ -28,6 +28,7 @@ import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -37,8 +38,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
-  * @author Colin Pilbrow
-  */
+ * @author Colin Pilbrow
+ */
+
 public class EnabledEventsCompositionalConflictChecker extends
   CompositionalConflictChecker
 {
@@ -90,7 +92,7 @@ public class EnabledEventsCompositionalConflictChecker extends
                                                    final EventProxy marking,
                                                    final ProductDESProxyFactory factory)
   {
-    this(model, marking, factory, ConflictAbstractionProcedureFactory.OEQ);
+    this(model, marking, factory, ConflictAbstractionProcedureFactory.EENB);
   }
 
   /**
@@ -118,21 +120,106 @@ public class EnabledEventsCompositionalConflictChecker extends
     super(model, marking, factory, abstractionFactory,
           new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
+
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Sets the state limit for the language inclusion check to find
+   * additional always enabled events.
+   * @param  Maximum state in language check,
+   *         or <CODE>0</CODE> to disable this search.
+   */
+  public void setEnabledEventSearchStateLimit(final int limit)
+  {
+    mEnabledEventSearchStateLimit = limit;
+  }
+
+  /**
+   * Gets the state limit for the language inclusion check to find
+   * additional always enabled events.
+   * @see #setEnabledEventSearchStateLimit(int) setEnabledEventSearchStateLimit()
+   */
+  public int getEnabledEventSearchStateLimit()
+  {
+    return mEnabledEventSearchStateLimit;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mControllabilityChecker != null) {
+      mControllabilityChecker.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mControllabilityChecker != null) {
+      mControllabilityChecker.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.compositional.
+  //# AbstractCompositionalModelAnalyzer
+  @Override
+  protected void setUp() throws AnalysisException
+  {
+    super.setUp();
+    if (mEnabledEventSearchStateLimit > 0) {
+      final ProductDESProxyFactory factory = getFactory();
+      final ControllabilityChecker inner =
+        new NativeControllabilityChecker(factory);
+      mControllabilityChecker =
+        new ModularControllabilityChecker(factory, inner);
+      mControllabilityChecker.setNodeLimit(mEnabledEventSearchStateLimit);
+    } else {
+      mControllabilityChecker = null;
+    }
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mControllabilityChecker = null;
+  }
+
+  @Override
+  protected EventInfo createEventInfo(final EventProxy event)
+  {
+    return new EnabledEventsEventInfo(event);
+  }
+
+  @Override
+  protected EnabledEventsEventInfo getEventInfo(final EventProxy event)
+  {
+    return (EnabledEventsEventInfo) super.getEventInfo(event);
+  }
+
   @Override
   protected void initialiseEventsToAutomata()
     throws OverflowException
   {
     super.initialiseEventsToAutomata();
-    for(final AutomatonProxy aut : getCurrentAutomata())
-    {
+    for (final AutomatonProxy aut : getCurrentAutomata()) {
       addDisablingAutomaton(aut);
     }
   }
 
   @Override
   protected void updateEventsToAutomata
-  (final AutomatonProxy autToAdd,
-   final List<AutomatonProxy> autToRemove)
+    (final AutomatonProxy autToAdd,
+     final List<AutomatonProxy> autToRemove)
   throws OverflowException
   {
     super.updateEventsToAutomata(autToAdd, autToRemove);
@@ -144,13 +231,185 @@ public class EnabledEventsCompositionalConflictChecker extends
   throws OverflowException
   {
     super.addEventsToAllAutomata();
-    for(final AutomatonProxy aut: getCurrentAutomata())
-    {
+    for (final AutomatonProxy aut : getCurrentAutomata()) {
       addDisablingAutomaton(aut);
     }
   }
 
 
+  //#########################################################################
+  //# Language Inclusion Search for Always Enabled Events
+  /**
+   * Returns a list of all always enabled events in the given automaton.
+   * @param  aut       The automaton being simplified.
+   * @param  candidate The candidate being simplified.
+   */
+  List<EventProxy> calculateAlwaysEnabledEvents
+    (final AutomatonProxy aut, final Candidate candidate)
+  throws AnalysisException
+  {
+    // If an automaton doesn't have tau or certain conflict states,
+    // don't bother calculating always enabled.
+    boolean autContainsTau = false;
+    for (final EventProxy e : aut.getEvents()) {
+      final EnabledEventsEventInfo eInfo = getEventInfo(e);
+      if (eInfo == null && e.getKind() != EventKind.PROPOSITION) {
+        autContainsTau = true;
+        break;
+      }
+    }
+
+    boolean autHasBlockingStates = false;
+    if (!autContainsTau) {
+      //Creates transRelIterator to find dump states
+      final KindTranslator translator = getKindTranslator();
+      int markingID = -1;
+      final EventEncoding encoding = new EventEncoding();
+      for (final EventProxy event : aut.getEvents()) {
+        final EventInfo info = getEventInfo(event);
+        if (info == null) {
+          final int code = encoding.addEvent(event, translator, 0);
+          if (event == getUsedDefaultMarking()) {
+            markingID = code;
+          }
+          //only looks for dump states if aut has no tau so no silent events
+        } else {
+          encoding.addEvent(event, translator, 0);
+        }
+      }
+      final ListBufferTransitionRelation transrel =
+        new ListBufferTransitionRelation(aut, encoding,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final TransitionIterator normalTransIterator =
+        transrel.createSuccessorsReadOnlyIterator();
+      for (int s = 0; s < transrel.getNumberOfStates(); s++) {
+        if (transrel.isReachable(s)) {
+          normalTransIterator.resetState(s);
+          if (!(normalTransIterator.advance() || markingID < 0 || transrel
+            .isMarked(s, markingID))) {
+            //Then s is not a dump state
+            autHasBlockingStates = true;
+            break;
+          }
+        }
+      }
+    }
+
+    final List<EventProxy> alwaysEnabledEventsList =
+      new ArrayList<EventProxy>();
+    if (autHasBlockingStates || autContainsTau) {
+      //getCurrentAut - ones in candidate + aut
+      final List<AutomatonProxy> modelList = new ArrayList<AutomatonProxy>();
+      modelList.addAll(getCurrentAutomata());
+      modelList.removeAll(candidate.getAutomata());
+      modelList.add(aut);
+
+      //for each of the events in aut
+      for (final EventProxy event : aut.getEvents()) {
+        //If it is not tau or proposition
+        final EnabledEventsEventInfo info = getEventInfo(event);
+        if (info != null && !info.isLocal(candidate.getAutomata())) {
+
+          boolean isEventAlwaysEnabledAlready = false;
+          //If an event is always enabled for this automaton we do not need to test it again
+          if (info.isAlwaysEnabledCandidate(candidate)) {
+            isEventAlwaysEnabledAlready = true;
+            info.addAlwaysEnabledAutomaton(aut);
+            //System.out.println("skipped");
+          }
+          //If the old rule finds this event is always enabled do not need to do hard test
+          if (!isEventAlwaysEnabledAlready
+              && info.isSingleDisablingCandidate(candidate)) {
+            isEventAlwaysEnabledAlready = true;
+            info.addAlwaysEnabledAutomaton(aut);
+            //System.out.println("skipped because of old test");
+          }
+          if (isEventAlwaysEnabledAlready) {
+            alwaysEnabledEventsList.add(event);
+          } else {
+            final List<AutomatonProxy> newModelList =
+              new ArrayList<AutomatonProxy>();
+            //Extend each of the specs to have helpful redundant transitions of this event
+            for (final AutomatonProxy specAut : modelList) {
+              //We don't want to change the plant here
+              if (!specAut.equals(aut)) {
+                if (specAut.getEvents().contains(event)) {
+                  newModelList
+                    .add(createAutomatonForAlwaysEnabledEvents(specAut, event));
+                } else {
+                  //Add unchanged aut to list
+                  newModelList.add(specAut);
+                }
+              } else {
+                newModelList.add(specAut);
+              }
+            }
+
+            mControllabilityChecker.setModel(createProductDESProxy(newModelList));
+            //Set new KindTranslator
+            mControllabilityChecker.setKindTranslator(new KindTranslator() {
+              //This event is set to uncontrollable, the rest are controllable
+              @Override
+              public EventKind getEventKind(final EventProxy e)
+              {
+                if (e == event) {
+                  return EventKind.UNCONTROLLABLE;
+                } else {
+                  final KindTranslator parentTranslator = getKindTranslator();
+                  switch (parentTranslator.getEventKind(e)) {
+                  case UNCONTROLLABLE:
+                  case CONTROLLABLE:
+                    return EventKind.CONTROLLABLE;
+                  default:
+                    return EventKind.PROPOSITION;
+                  }
+                }
+              }
+
+              //Set aut as plant, the rest as spec
+              @Override
+              public ComponentKind getComponentKind(final AutomatonProxy a)
+              {
+                //aut is changed and not in model
+                //a.equals(aut) getName()
+                if (a == aut) {
+                  return ComponentKind.PLANT;
+                } else {
+                  final KindTranslator parentTranslator = getKindTranslator();
+                  switch (parentTranslator.getComponentKind(a)) {
+                  case PLANT:
+                  case SPEC:
+                    return ComponentKind.SPEC;
+                  default:
+                    return null;
+                  }
+                }
+              }
+            });
+
+            try {
+              if (mControllabilityChecker.run()) {
+                //If mChecker returns true then this event is always enabled in this aut
+                alwaysEnabledEventsList.add(event);
+                info.addAlwaysEnabledAutomaton(aut);
+              }
+            } catch (final OverflowException ex) {
+              //If it runs out of space, assume it is not always enabled
+              //System.err.println("Ran out of space while checking for Always Enabled Events");
+            }
+          }
+        }
+      }
+
+    }
+    //System.out.println("Found " + alwaysEnabledEventsList.size() + " always enabled events in aut " + aut.getName());
+    return alwaysEnabledEventsList;
+
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void addDisablingAutomaton(final AutomatonProxy aut)
     throws OverflowException
   {
@@ -215,183 +474,10 @@ public class EnabledEventsCompositionalConflictChecker extends
     }
   }
 
-  /**
-   * Returns a list of all always enabled events in aut.
-   *
-   * @param aut is the automaton being simplified
-   * @param candidate is the candidate being simplified
-   * @return
-   * @throws AnalysisException
-   */
-  public List<EventProxy> calculateAlwaysEnabledEvents(final AutomatonProxy aut, final Candidate candidate) throws AnalysisException
-  {
-    //If an automaton doesn't have tau or certain conflict states, don't bother calculating always enabled.
-    boolean autContainsTau = false;
-    for(final EventProxy e : aut.getEvents())
-    {
-      final EnabledEventsEventInfo eInfo = getEventInfo(e);
-      if(eInfo == null && e.getKind() != EventKind.PROPOSITION)
-      {
-        autContainsTau = true;
-        break;
-      }
-    }
-
-    boolean autHasBlockingStates = false;
-    if(!autContainsTau)
-    {
-      //Creates transRelIterator to find dump states
-    final KindTranslator translator = getKindTranslator();
-    int markingID = -1;
-    final EventEncoding encoding = new EventEncoding();
-    for (final EventProxy event : aut.getEvents()) {
-      final EventInfo info = getEventInfo(event);
-      if (info == null) {
-        final int code = encoding.addEvent(event, translator, 0);
-        if (event == getUsedDefaultMarking()) {
-          markingID = code;
-        }
-        //only looks for dump states if aut has no tau so no silent events
-      } else {
-        encoding.addEvent(event, translator, 0);
-      }
-    }
-    final ListBufferTransitionRelation transrel =
-      new ListBufferTransitionRelation(aut, encoding,
-                                       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    final TransitionIterator normalTransIterator = transrel.createSuccessorsReadOnlyIterator();
-      for (int s = 0; s < transrel.getNumberOfStates(); s++) {
-        if (transrel.isReachable(s)) {
-          normalTransIterator.resetState(s);
-          if (!(normalTransIterator.advance() || markingID < 0 || transrel
-            .isMarked(s, markingID))) {
-            //Then s is not a dump state
-            autHasBlockingStates = true;
-            break;
-          }
-        }
-      }
-    }
-
-    final ArrayList<EventProxy> alwaysEnabledEventsList = new ArrayList<EventProxy>();
-    if(autHasBlockingStates || autContainsTau)
-    {
-  //getCurrentAut - ones in candidate + aut
-   final List<AutomatonProxy> modelList = new ArrayList<AutomatonProxy>();
-   modelList.addAll(getCurrentAutomata());
-   modelList.removeAll(candidate.getAutomata());
-   modelList.add(aut);
-
-    //for each of the events in aut
-    for (final EventProxy event : aut.getEvents()) {
-      //If it is not tau or proposition
-      final EnabledEventsEventInfo info = getEventInfo(event);
-      if (info != null && !info.isLocal(candidate.getAutomata())) {
-
-        boolean isEventAlwaysEnabledAlready = false;
-        //If an event is always enabled for this automaton we do not need to test it again
-        if(info.isAlwaysEnabledCandidate(candidate)) {
-          isEventAlwaysEnabledAlready = true;
-          info.addAlwaysEnabledAutomaton(aut);
-          //System.out.println("skipped");
-        }
-        //If the old rule finds this event is always enabled do not need to do hard test
-        if(!isEventAlwaysEnabledAlready && info.isSingleDisablingCandidate(candidate)) {
-          isEventAlwaysEnabledAlready = true;
-          info.addAlwaysEnabledAutomaton(aut);
-          //System.out.println("skipped because of old test");
-        }
-        if(isEventAlwaysEnabledAlready) {
-          alwaysEnabledEventsList.add(event);
-        }
-        else{
-          final List<AutomatonProxy> newModelList = new ArrayList<AutomatonProxy>();
-          //Extend each of the specs to have helpful redundant transitions of this event
-          for(final AutomatonProxy specAut : modelList)
-          {
-            //We don't want to change the plant here
-            if(!specAut.equals(aut))
-            {
-              if(specAut.getEvents().contains(event))
-              {
-                newModelList.add(createAutomatonForAlwaysEnabledEvents(specAut, event));
-              }
-              else
-              {
-                //Add unchanged aut to list
-                newModelList.add(specAut);
-              }
-            } else {
-              newModelList.add(specAut);
-            }
-          }
-
-         mChecker.setModel(createProductDESProxy(newModelList));
-        //Set new KindTranslator
-        mChecker.setKindTranslator(new KindTranslator() {
-          //This event is set to uncontrollable, the rest are controllable
-              @Override
-              public EventKind getEventKind(final EventProxy e)
-              {
-                if (e == event) {
-                  return EventKind.UNCONTROLLABLE;
-                } else {
-                  final KindTranslator parentTranslator = getKindTranslator();
-                  switch (parentTranslator.getEventKind(e)) {
-                  case UNCONTROLLABLE:
-                  case CONTROLLABLE:
-                    return EventKind.CONTROLLABLE;
-                  default:
-                    return EventKind.PROPOSITION;
-                  }
-                }
-              }
-
-          //Set aut as plant, the rest as spec
-          @Override
-          public ComponentKind getComponentKind(final AutomatonProxy a)
-          {
-            //aut is changed and not in model
-            //a.equals(aut) getName()
-            if (a == aut) {
-              return ComponentKind.PLANT;
-            } else {
-              final KindTranslator parentTranslator = getKindTranslator();
-              switch (parentTranslator.getComponentKind(a)) {
-              case PLANT:
-              case SPEC:
-                return ComponentKind.SPEC;
-              default:
-                return null;
-              }
-            }
-          }
-        });
-
-        try {
-          if (mChecker.run()) {
-            //If mChecker returns true then this event is always enabled in this aut
-            alwaysEnabledEventsList.add(event);
-            info.addAlwaysEnabledAutomaton(aut);
-          }
-        } catch (final OverflowException ex) {
-          //If it runs out of space, assume it is not always enabled
-          //System.err.println("Ran out of space while checking for Always Enabled Events");
-        }
-      }
-      }
-    }
-
-    }
-    //System.out.println("Found " + alwaysEnabledEventsList.size() + " always enabled events in aut " + aut.getName());
-    return alwaysEnabledEventsList;
-
-  }
-
   /*
-   * Change automata to automata that find more enabled events
-   *Add self loops of every event to dump states
-   *add in observation equivalent redundant transitions.
+   * Changes automata to automata that find more enabled events
+   * Adds selfloops of every event to dump states,
+   * adds in observation equivalent redundant transitions.
    */
   private AutomatonProxy createAutomatonForAlwaysEnabledEvents(final AutomatonProxy aut, final EventProxy AEEvent) throws OverflowException
   {
@@ -458,82 +544,8 @@ public class EnabledEventsCompositionalConflictChecker extends
       return aut;
   }
 
-  @Override
-  protected void setUp() throws AnalysisException
-  {
-    super.setUp();
 
-    mChecker = new ModularControllabilityChecker(getFactory(), new NativeControllabilityChecker(getFactory()));
-    mChecker.setNodeLimit(1000);
-  }
-  @Override
-  protected void tearDown()
-  {
-    super.tearDown();
-    mChecker = null;
-  }
-
-  @Override
-  protected EventInfo createEventInfo(final EventProxy event)
-  {
-
-    return new EnabledEventsEventInfo(event);
-  }
-
-  @Override
-  protected EnabledEventsEventInfo getEventInfo(final EventProxy event)
-  {
-    return (EnabledEventsEventInfo) super.getEventInfo(event);
-  }
-
-  private ModularControllabilityChecker mChecker;
-
-
-
-  /**
-   * The preselecting method that considers every set of automata with at
-   * least one local event as a candidate.
-   */
-  public static final PreselectingMethod MustLE = new PreselectingMethod(
-    "MustLE") {
-    @Override
-    PreselectingHeuristic createHeuristic(final AbstractCompositionalModelAnalyzer verifier)
-    {
-      final EnabledEventsCompositionalConflictChecker everifier =
-        (EnabledEventsCompositionalConflictChecker) verifier;
-      return everifier.new HeuristicMustLE();
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the highest
-   * proportion of local events.
-   */
-  public static final SelectingMethod MaxLE = new SelectingMethod("MaxLE") {
-    @Override
-    Comparator<Candidate> createComparator(final AbstractCompositionalModelAnalyzer verifier)
-    {
-      final EnabledEventsCompositionalConflictChecker everifier =
-        (EnabledEventsCompositionalConflictChecker) verifier;
-      return everifier.new ComparatorMaxLE();
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the minimum
-   * estimated number of states in the synchronous product.
-   */
-  public static final SelectingMethod MinSE = new SelectingMethod("MinSE") {
-    @Override
-    Comparator<Candidate> createComparator(final AbstractCompositionalModelAnalyzer verifier)
-    {
-      final EnabledEventsCompositionalConflictChecker everifier =
-        (EnabledEventsCompositionalConflictChecker) verifier;
-      return everifier.new ComparatorMinSE();
-    }
-  };
-
-
+  //#########################################################################
   //# Inner Class PreselectingMethodFactory
   protected static class PreselectingMethodFactory extends
     CompositionalConflictChecker.PreselectingMethodFactory
@@ -677,7 +689,8 @@ public class EnabledEventsCompositionalConflictChecker extends
   }
 
 
-  //INNER CLASS
+  //########################################################################
+  //# Inner Class EnabledEventsEventInfo
   static class EnabledEventsEventInfo extends EventInfo
   {
     //List of automata the disable this event
@@ -750,6 +763,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     {
       return mAlwaysEnabledAutomata.contains(aut);
     }
+
     boolean isAlwaysEnabledCandidate(final Candidate candidate)
     {
       boolean containsAlwaysEnabledAutomaton = false;
@@ -793,7 +807,59 @@ public class EnabledEventsCompositionalConflictChecker extends
       }
       return result;
     }
-
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private int mEnabledEventSearchStateLimit = 0;
+  private ModularControllabilityChecker mControllabilityChecker;
+
+
+  //#########################################################################
+  //# Class Constants
+  /**
+   * The preselecting method that considers every set of automata with at
+   * least one local event as a candidate.
+   */
+  public static final PreselectingMethod MustLE = new PreselectingMethod(
+    "MustLE") {
+    @Override
+    PreselectingHeuristic createHeuristic(final AbstractCompositionalModelAnalyzer verifier)
+    {
+      final EnabledEventsCompositionalConflictChecker everifier =
+        (EnabledEventsCompositionalConflictChecker) verifier;
+      return everifier.new HeuristicMustLE();
+    }
+  };
+
+  /**
+   * The selecting method that chooses the candidate with the highest
+   * proportion of local events.
+   */
+  public static final SelectingMethod MaxLE = new SelectingMethod("MaxLE") {
+    @Override
+    Comparator<Candidate> createComparator(final AbstractCompositionalModelAnalyzer verifier)
+    {
+      final EnabledEventsCompositionalConflictChecker everifier =
+        (EnabledEventsCompositionalConflictChecker) verifier;
+      return everifier.new ComparatorMaxLE();
+    }
+  };
+
+  /**
+   * The selecting method that chooses the candidate with the minimum
+   * estimated number of states in the synchronous product.
+   */
+  public static final SelectingMethod MinSE = new SelectingMethod("MinSE") {
+    @Override
+    Comparator<Candidate> createComparator(final AbstractCompositionalModelAnalyzer verifier)
+    {
+      final EnabledEventsCompositionalConflictChecker everifier =
+        (EnabledEventsCompositionalConflictChecker) verifier;
+      return everifier.new ComparatorMinSE();
+    }
+  };
+
 
 }

@@ -255,6 +255,14 @@ public abstract class AbstractTRSimplifier
     }
   }
 
+  /**
+   * Applies the computed partition to the transition relation.
+   * This method is called automatically at the end of {@link #run()}
+   * if the simplifier is configured to apply the result partition.
+   * Otherwise it is up to the user to partition the transition
+   * relation manually.
+   * @see #setAppliesPartitionAutomatically(boolean) setAppliesPartitionAutomatically()
+   */
   protected void applyResultPartition()
     throws AnalysisException
   {

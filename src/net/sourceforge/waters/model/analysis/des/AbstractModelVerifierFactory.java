@@ -85,6 +85,12 @@ public abstract class AbstractModelVerifierFactory
     mArgumentList.add(argument);
   }
 
+  protected void removeArgument(final String name)
+  {
+    final CommandLineArgument argument = mArgumentMap.remove(name);
+    mArgumentList.remove(argument);
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory

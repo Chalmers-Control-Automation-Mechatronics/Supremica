@@ -14,6 +14,9 @@ MAIN_FACTORY=
 
 for F in "$@"; do
     case $F in
+    -ae)
+        FACTORY="$WPACK.analysis.compositional.EnabledEventsCompositionalModelVerifierFactory"
+        ;;
     -bdd)
         FACTORY="$WPACK.analysis.bdd.BDDModelVerifierFactory"
         ;;

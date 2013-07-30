@@ -240,6 +240,12 @@ public class SilentIncomingTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
+  /**
+   * Returns whether the given state may be simplified by the silent
+   * continuation rule. A state is reducible if it has an outgoing
+   * tau transition or, in the case of generalised nonblocking, if it
+   * is not marked by the precondition (alpha) marking.
+   */
   private boolean isReducible(final int state)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
