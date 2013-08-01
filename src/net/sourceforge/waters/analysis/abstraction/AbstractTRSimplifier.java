@@ -343,9 +343,11 @@ public abstract class AbstractTRSimplifier
    */
   protected void logStart()
   {
-    final Logger logger = getLogger();
-    if (logger.isDebugEnabled()) {
-      logger.debug(ProxyTools.getShortClassName(this) + " ...");
+    if (mAppliesPartitionAutomatically) {
+      final Logger logger = getLogger();
+      if (logger.isDebugEnabled()) {
+        logger.debug(ProxyTools.getShortClassName(this) + " ...");
+      }
     }
   }
 
@@ -357,7 +359,7 @@ public abstract class AbstractTRSimplifier
    */
   protected void logFinish(final boolean success)
   {
-    if (success) {
+    if (success && mAppliesPartitionAutomatically) {
       final Logger logger = getLogger();
       if (logger.isDebugEnabled()) {
         logger.debug
