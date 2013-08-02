@@ -32,6 +32,7 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -305,7 +306,7 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
   }
 
   private List<TraceStepProxy> getAdditionalTauSteps
-    (final TraceStepProxy startStep, final int level)
+    (final TraceStepProxy startStep, final int level) throws OverflowException
   {
     final AutomatonProxy origAut = getOriginalAutomaton();
     final Map<AutomatonProxy,StateProxy> stepMap = startStep.getStateMap();
@@ -373,6 +374,75 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
             for (final TransitionProxy transition : aut.getTransitions()) {
               // TODO Fix bug. If event is 'always enabled', may have to
               // take tau (local to aut) transitions before.
+              final EventProxy e = transition.getEvent();
+              //TODO:Figure out which events are always enabled.
+              /*
+
+               if(e is an always enabled event)
+              //Look through each T with e enabled
+              //Do it's local events until it can do e
+              //If we reach a state without local events or e it is a dump state.
+              HashMap<EventProxy, ArrayList<AutomatonProxy>> localEventsCounter = new HashMap<EventProxy, ArrayList<AutomatonProxy>>();
+              for(AutomatonProxy autLocalCounter : workMap.keySet())
+              {
+              //Find which events are local events
+                for(EventProxy eventCount : autLocalCounter.getEvents())
+                {
+                  ArrayList<AutomatonProxy> autList = localEventsCounter.get(eventCount);
+                    if(autList == null)
+                    {
+                      ArrayList<AutomatonProxy> newAutList = new ArrayList<AutomatonProxy>();
+                      newAutList.add(autLocalCounter);
+                      localEventsCounter.put(eventCount, newAutList);
+                    }
+                    else
+                    {
+                      autList.add(autLocalCounter);
+                      localEventsCounter.put(eventCount, autList);
+                    }
+                }
+              }
+              //Create a list of automata that contain local events
+              ArrayList<AutomatonProxy> AutLocalEvents = new ArrayList<AutomatonProxy>();
+              for(EventProxy localEvent : localEventsCounter.keySet())
+              {
+                if(localEventsCounter.get(localEvent).size() == 1)
+                {
+                  AutomatonProxy autLocal = localEventsCounter.get(localEvent).get(0);
+                  if(autLocal != aut)
+                  AutLocalEvents.add(autLocal);
+                }
+              }
+              //TODO: If the automata contains no always enabled events remove it from list
+
+
+
+              for(AutomatonProxy Taut : AutLocalEvents)
+                {//For each test automaton, create transition iterator
+                  EventEncoding encoding = new EventEncoding(Taut, mKindTranslator);
+                  final ListBufferTransitionRelation transrel =
+                    new ListBufferTransitionRelation(Taut, encoding,
+                                                     ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+                  final TransitionIterator normalTransIterator =
+                    transrel.createSuccessorsReadOnlyIterator();
+                  //Start iterating over local events at the state we'd gotten up to
+                  normalTransIterator.resetState(sourceState);
+                  normalTransIterator.resetEventsByStatus(flags);
+                  //while the current state doesn't have e enabled
+                  while(normalTransIterator)
+                  {
+                    //Advance along a local event
+                    normalTransIterator.advance();
+                    //Add these transitions to the tracesteps.
+
+                    //If there are no more local events and e has still not been found, dump state
+                  }
+
+                }
+
+              */
+              //At the end every automata must be ready to do e
+              //Or we've reached a dump state
               if (transition.getSource() == sourceState
                   && transition.getEvent() == event) {
                 entry.setValue(transition.getTarget()); //this but backwards
