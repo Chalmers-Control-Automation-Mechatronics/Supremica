@@ -358,6 +358,50 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     final ProductDESProxyFactory factory = verifier.getFactory();
     final List<TraceStepProxy> additionalSteps =
       new LinkedList<TraceStepProxy>();
+
+    /*
+     * Better start differently from here ~~~ Robi
+     *
+     * Starting point is:
+     *   aut     - automaton with certain conflicts
+     *             to be un-abstracted
+     *   stepMap - contains states of all automata at the end of the
+     *             original trace, but before trace extension
+     *   trace   - list of search records containing trace extension into
+     *             certain conflicts of the un-abstracted automaton
+     *
+     * Step 1:
+     *   Go through trace, find all non-tau events---these are the always
+     *   enabled events.
+     *   Then find all automata in stepMap (other than aut) that use one of
+     *   these events---these are the ones that need special treatment.
+     *
+     * Step 2:
+     *   For each automaton identified in step 1, identify local events.
+     *   (Local events are with respect to _all_ automata, not only
+     *   those identified in step 1.)
+     *   (This step can be skipped if there a no always enabled events.)
+     *
+     * Step 3:
+     *   For each automaton identified in step 1,
+     *   make state and event encoding and transition relation.
+     *   Then track through trace.
+     *   For each step with event e:
+     *   a) If e is not in aut, keep the step.
+     *   b) If e is in aut, then it is an always enabled event.
+     *      Search from end state according to stepMap, and find a string
+     *      of events local to aut leading to state with e enabled.
+     *      Insert these transitions then e into the trace.
+     *      (Update end state of aut in case there are more steps.)
+     *   c) A special case arises if we cannot reach a state
+     *      with e enabled in b). This means aut is in a dumpstate.
+     *      Then truncate the trace so it ends with this step,
+     *      and skip forward to the next automaton.
+     *
+     * Step 4:
+     *   For each automaton not identified in step 1, update step maps.
+     */
+
     final Map<AutomatonProxy,StateProxy> workMap = //contains map of automata to state
       new HashMap<AutomatonProxy,StateProxy>(stepMap);
     for (final SearchRecord recordReverse : trace) {
@@ -374,21 +418,27 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
             for (final TransitionProxy transition : aut.getTransitions()) {
               // TODO Fix bug. If event is 'always enabled', may have to
               // take tau (local to aut) transitions before.
-              final EventProxy e = transition.getEvent();
-              //TODO:Figure out which events are always enabled.
+              // final EventProxy e = transition.getEvent();
+              // TODO Figure out which events are always enabled.
+              //   >>> All events here (except tau) are always enabled
               /*
-
                if(e is an always enabled event)
-              //Look through each T with e enabled
-              //Do it's local events until it can do e
-              //If we reach a state without local events or e it is a dump state.
-              HashMap<EventProxy, ArrayList<AutomatonProxy>> localEventsCounter = new HashMap<EventProxy, ArrayList<AutomatonProxy>>();
+
+              // Look through each T with e enabled
+              // Do it's local events until it can do e
+              // If we reach a state without local events or e it is a dump state.
+
+              //   >>> Better find local events first, not again for each
+              //   >>> automaton and each trace step. Rewrite loop from above.
+              Map<EventProxy,List<AutomatonProxy>> localEventsCounter =
+                new HashMap<EventProxy,List<AutomatonProxy>>();
+              //   >>> How about TObjectIntHashMap<EventProxy> instead ?
               for(AutomatonProxy autLocalCounter : workMap.keySet())
               {
               //Find which events are local events
                 for(EventProxy eventCount : autLocalCounter.getEvents())
                 {
-                  ArrayList<AutomatonProxy> autList = localEventsCounter.get(eventCount);
+                  List<AutomatonProxy> autList = localEventsCounter.get(eventCount);
                     if(autList == null)
                     {
                       ArrayList<AutomatonProxy> newAutList = new ArrayList<AutomatonProxy>();
@@ -403,7 +453,7 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
                 }
               }
               //Create a list of automata that contain local events
-              ArrayList<AutomatonProxy> AutLocalEvents = new ArrayList<AutomatonProxy>();
+              List<AutomatonProxy> AutLocalEvents = new ArrayList<AutomatonProxy>();
               for(EventProxy localEvent : localEventsCounter.keySet())
               {
                 if(localEventsCounter.get(localEvent).size() == 1)
@@ -425,6 +475,9 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
                                                      ListBufferTransitionRelation.CONFIG_SUCCESSORS);
                   final TransitionIterator normalTransIterator =
                     transrel.createSuccessorsReadOnlyIterator();
+                  //   >>> The iterator is fine, but we must use breadth-first
+                  //   >>> search following tau events to see if we can find
+                  //   >>> a state with e enabled
                   //Start iterating over local events at the state we'd gotten up to
                   normalTransIterator.resetState(sourceState);
                   normalTransIterator.resetEventsByStatus(flags);
