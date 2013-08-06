@@ -456,32 +456,42 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         addEvent(name, kind, true);
     }
 
-    public EventDeclProxy addEvent(final String name, final String kind, final boolean observable)
+    public EventDeclProxy addEvent(final String name, final String kind, final boolean observable) throws NullPointerException
     {
-        EventDeclProxy event = eventIdToProxyMap.get(name);
-        if(event == null){
-            final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy(name);
-            if (kind.equalsIgnoreCase(EventKind.CONTROLLABLE.value())) {
-                event = factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
-                module.getEventDeclListModifiable().add((EventDeclSubject)event);
-                if(!eventIdToProxyMap.containsKey(name)){
-                    controllableAlphabet.add(event);
-                    eventIdToProxyMap.put(name, event);
-                }
-            } else if (kind.equalsIgnoreCase(EventKind.UNCONTROLLABLE.value())) {
-                event = factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
-                module.getEventDeclListModifiable().add((EventDeclSubject)event);
-                if(!eventIdToProxyMap.containsKey(name)){
-                    uncontrollableAlphabet.add(event);
-                    eventIdToProxyMap.put(name, event);
-                }
-            } else if (kind.equalsIgnoreCase(EventKind.PROPOSITION.value())){
-                event = factory.createEventDeclProxy(ident, EventKind.PROPOSITION, observable, ScopeKind.LOCAL, null, null, null);
-                module.getEventDeclListModifiable().add((EventDeclSubject)event);
-                eventIdToProxyMap.put(name, event);
+        try {
+            if(name == null){
+                throw new NullPointerException("ExtendedFiniteAutomata.AddEvent(): Null input name.");
             }
+            EventDeclProxy event = eventIdToProxyMap.get(name);
+              if(event == null){
+                  final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy(name);
+                  if(kind == null){
+                      throw new NullPointerException("ExtendedFiniteAutomata.AddEvent(): Null kind name.");
+                  }
+                  if (kind.equalsIgnoreCase(EventKind.CONTROLLABLE.value())) {
+                      event = factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
+                      module.getEventDeclListModifiable().add((EventDeclSubject)event);
+                      if(!eventIdToProxyMap.containsKey(name)){
+                          controllableAlphabet.add(event);
+                          eventIdToProxyMap.put(name, event);
+                      }
+                  } else if (kind.equalsIgnoreCase(EventKind.UNCONTROLLABLE.value())) {
+                      event = factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
+                      module.getEventDeclListModifiable().add((EventDeclSubject)event);
+                      if(!eventIdToProxyMap.containsKey(name)){
+                          uncontrollableAlphabet.add(event);
+                          eventIdToProxyMap.put(name, event);
+                      }
+                  } else if (kind.equalsIgnoreCase(EventKind.PROPOSITION.value())){
+                      event = factory.createEventDeclProxy(ident, EventKind.PROPOSITION, observable, ScopeKind.LOCAL, null, null, null);
+                      module.getEventDeclListModifiable().add((EventDeclSubject)event);
+                      eventIdToProxyMap.put(name, event);
+                  }
+              }
+            return event;            
+        } catch (final Exception e) {
+            throw e;
         }
-        return event;
     }
 
     public Set<VariableComponentProxy> extractVariablesFromExpr(final SimpleExpressionProxy expr)
