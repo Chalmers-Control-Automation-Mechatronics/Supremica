@@ -489,7 +489,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                   }
               }
             return event;            
-        } catch (final Exception e) {
+        } catch (final NullPointerException e) {
             throw e;
         }
     }
