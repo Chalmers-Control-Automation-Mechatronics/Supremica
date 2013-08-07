@@ -920,39 +920,39 @@ public class CompositionalSynthesizer extends
   private AutomatonProxy createSupervisor(ListBufferTransitionRelation rel)
     throws AnalysisException
   {
+    boolean reduced = false;
     List<DistinguisherInfo> distinguisherList =
       new LinkedList<DistinguisherInfo>(mDistinguisherInfoList);
-
-    if (mReduceIncrementally) {
-      while (!distinguisherList.isEmpty()) {
-        final ListIterator<DistinguisherInfo> listIter =
-          distinguisherList.listIterator(distinguisherList.size());
-        final List<DistinguisherInfo> deferredDistinguishers =
+    while (!distinguisherList.isEmpty()) {
+      final ListIterator<DistinguisherInfo> listIter =
+        distinguisherList.listIterator(distinguisherList.size());
+      final List<DistinguisherInfo> deferredDistinguishers =
+        new LinkedList<DistinguisherInfo>();
+      final THashSet<EventProxy> deferredEvents =
+        new THashSet<EventProxy>();
+      boolean renamed = false;
+      while (listIter.hasPrevious()) {
+        final List<DistinguisherInfo> groupInfo =
           new LinkedList<DistinguisherInfo>();
-        final THashSet<EventProxy> deferredEvents =
-          new THashSet<EventProxy>();
-        boolean renamed = false;
-        while (listIter.hasPrevious()) {
-          final List<DistinguisherInfo> groupInfo =
-            new LinkedList<DistinguisherInfo>();
-          boolean isDeterministicGroup =
-            isDeterministicGroup(rel, listIter, groupInfo, deferredEvents);
-          ListIterator<DistinguisherInfo> iter =
-            groupInfo.listIterator(groupInfo.size());
-          if (isDeterministicGroup) {
-            group: while (iter.hasPrevious()) {
-              final DistinguisherInfo dist = iter.previous();
-              final List<EventProxy> replacement = dist.getReplacement();
-              final ListIterator<EventProxy> it =
-                replacement.listIterator(replacement.size());
-              while (it.hasPrevious()) {
-                if (deferredEvents.contains(it.previous())) {
-                  isDeterministicGroup = false;
-                  break group;
-                }
+        boolean isDeterministicGroup =
+          isDeterministicGroup(rel, listIter, groupInfo, deferredEvents);
+        ListIterator<DistinguisherInfo> iter =
+          groupInfo.listIterator(groupInfo.size());
+        if (isDeterministicGroup) {
+          group: while (iter.hasPrevious()) {
+            final DistinguisherInfo dist = iter.previous();
+            final List<EventProxy> replacement = dist.getReplacement();
+            final ListIterator<EventProxy> it =
+              replacement.listIterator(replacement.size());
+            while (it.hasPrevious()) {
+              if (deferredEvents.contains(it.previous())) {
+                isDeterministicGroup = false;
+                break group;
               }
             }
           }
+        }
+        if (!groupInfo.isEmpty()) {
           if (isDeterministicGroup) {
             rel = createRenamedSupervisor(rel, groupInfo);
             renamed = true;
@@ -965,45 +965,32 @@ public class CompositionalSynthesizer extends
             }
           }
         }
-        if (renamed || deferredDistinguishers.isEmpty()) {
-          rel = reduceSupervisor(rel);
-        } else {
-          final ListIterator<DistinguisherInfo> iter =
-            deferredDistinguishers
-              .listIterator(deferredDistinguishers.size());
-          final List<DistinguisherInfo> list =
-            new LinkedList<DistinguisherInfo>();
-          AutomatonProxy distinguisher = null;
-          while (iter.hasPrevious()) {
-            final DistinguisherInfo info = iter.previous();
-            if (distinguisher == null) {
-              distinguisher = info.getDistinguisher();
-            } else if (distinguisher != info.getDistinguisher()) {
-              break;
-            }
-            list.add(0, info);
-            iter.remove();
-          }
-          rel = createSynchronizedSupervisor(rel, list);
-        }
-        distinguisherList = deferredDistinguishers;
       }
-    } else {
-      final ListIterator<DistinguisherInfo> listIter =
-        distinguisherList.listIterator(distinguisherList.size());
-      while (listIter.hasPrevious()) {
-        checkAbort();
-        final List<DistinguisherInfo> renamings =
+      if (renamed && mReduceIncrementally) {
+        rel = reduceSupervisor(rel);
+        reduced = true;
+      } else if (!deferredDistinguishers.isEmpty()) {
+        final ListIterator<DistinguisherInfo> iter =
+          deferredDistinguishers.listIterator(deferredDistinguishers.size());
+        final List<DistinguisherInfo> list =
           new LinkedList<DistinguisherInfo>();
-        final boolean isDeterministicGroup =
-          isDeterministicGroup(rel, listIter, renamings,
-                               new THashSet<EventProxy>());
-        if (isDeterministicGroup) {
-          rel = createRenamedSupervisor(rel, renamings);
-        } else {
-          rel = createSynchronizedSupervisor(rel, renamings);
+        AutomatonProxy distinguisher = null;
+        while (iter.hasPrevious()) {
+          final DistinguisherInfo info = iter.previous();
+          if (distinguisher == null) {
+            distinguisher = info.getDistinguisher();
+          } else if (distinguisher != info.getDistinguisher()) {
+            break;
+          }
+          list.add(0, info);
+          iter.remove();
         }
+        rel = createSynchronizedSupervisor(rel, list);
+        reduced = false;
       }
+      distinguisherList = deferredDistinguishers;
+    }
+    if (!reduced) {
       rel = reduceSupervisor(rel);
     }
     return removeDumpStates(rel);
@@ -1171,6 +1158,20 @@ public class CompositionalSynthesizer extends
     return new ListBufferTransitionRelation(newSupervisor,
                                             mEventEncoding,
                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+  }
+
+  @SuppressWarnings("unused")
+  private int getNumberOfDumpStates(final ListBufferTransitionRelation rel)
+  {
+    int numBadState = 0;
+    for (int s = 0; s < rel.getNumberOfStates(); s++) {
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      iter.resetState(s);
+      if (!iter.advance() & rel.isReachable(s) & rel.getAllMarkings(s) == 0) {
+        numBadState++;
+      }
+    }
+    return numBadState;
   }
 
   private AutomatonProxy removeDumpStates(final ListBufferTransitionRelation rel)
@@ -1346,7 +1347,7 @@ public class CompositionalSynthesizer extends
   private String mOutputName;
   private boolean mConstructsResult = true;
   private boolean mSupervisorReductionEnabled = false;
-  private final boolean mReduceIncrementally = true;
+  private final boolean mReduceIncrementally = false;
   private SupervisorReductionTRSimplifier mSupervisorSimplifier;
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
   private List<DistinguisherInfo> mDistinguisherInfoList;
