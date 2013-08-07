@@ -457,8 +457,9 @@ public class CompositionalSynthesizer extends
           result.setSatisfied(false);
           return;
         } else {
+          result.addUnrenamedSupervisor(supervisor);
           final AutomatonProxy newSupervisor = createSupervisor(supervisor);
-          result.addSupervisor(newSupervisor);
+          result.addBackRenamedSupervisor(newSupervisor);
         }
       }
 
@@ -570,8 +571,9 @@ public class CompositionalSynthesizer extends
         result.setSatisfied(false);
         return false;
       } else {
+        result.addUnrenamedSupervisor(supervisor);
         final AutomatonProxy renamedSup = createSupervisor(supervisor);
-        result.addSupervisor(renamedSup);
+        result.addBackRenamedSupervisor(renamedSup);
         return true;
       }
     } else {

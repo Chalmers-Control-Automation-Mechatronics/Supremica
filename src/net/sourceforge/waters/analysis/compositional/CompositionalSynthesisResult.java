@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -44,16 +45,19 @@ public class CompositionalSynthesisResult
   public CompositionalSynthesisResult()
   {
     mSupervisors = new ArrayList<AutomatonProxy>();
+    mMaxUnrenamedSupervisorStates = -1;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProxyResult
+  @Override
   public ProductDESProxy getComputedProxy()
   {
     return mProductDES;
   }
 
+  @Override
   public void setComputedProxy(final ProductDESProxy des)
   {
     setSatisfied(des != null);
@@ -63,16 +67,19 @@ public class CompositionalSynthesisResult
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProductDESResult
+  @Override
   public ProductDESProxy getComputedProductDES()
   {
     return getComputedProxy();
   }
 
+  @Override
   public Collection<AutomatonProxy> getComputedAutomata()
   {
     return mSupervisors;
   }
 
+  @Override
   public void setComputedProductDES(final ProductDESProxy des)
   {
     setComputedProxy(des);
@@ -84,7 +91,13 @@ public class CompositionalSynthesisResult
   /**
    * Adds the given automaton to the list of synthesised supervisors.
    */
-  void addSupervisor(final AutomatonProxy sup)
+  void addUnrenamedSupervisor(final ListBufferTransitionRelation sup)
+  {
+    mMaxUnrenamedSupervisorStates =
+      Math.max(mMaxUnrenamedSupervisorStates, sup.getNumberOfReachableStates());
+  }
+
+  void addBackRenamedSupervisor(final AutomatonProxy sup)
   {
     mSupervisors.add(sup);
   }
@@ -142,7 +155,9 @@ public class CompositionalSynthesisResult
     writer.print(',');
     writer.print("NumberOfSupervisors");
     writer.print(',');
-    writer.print("LargestSupervisor");
+    writer.print("LargestUnrenamedSupervisor");
+    writer.print(',');
+    writer.print("LargestRenamedSupervisor");
   }
 
   @Override
@@ -155,6 +170,8 @@ public class CompositionalSynthesisResult
     writer.print(getRenamingIsUsed());
     writer.print(",");
     writer.print(mSupervisors.size());
+    writer.print(",");
+    writer.print(mMaxUnrenamedSupervisorStates);
     writer.print(",");
     int largest = 0;
     for (final AutomatonProxy sup : mSupervisors) {
@@ -196,5 +213,6 @@ public class CompositionalSynthesisResult
   private final List<AutomatonProxy> mSupervisors;
   private int mRenamingIsUsed;
   private int mSynchSize;
+  private int mMaxUnrenamedSupervisorStates;
 
 }
