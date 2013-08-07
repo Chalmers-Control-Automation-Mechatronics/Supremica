@@ -62,7 +62,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSelecting = selectingHeuristic;
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSynthesizer = new CompositionalSynthesizer(factory);
-    watchdog = new Watchdog(mSynthesizer, 300);
+    watchdog = new Watchdog(mSynthesizer, 600);
   }
 
   //#########################################################################
@@ -222,7 +222,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesissAip0Alps();// 3
     synthesisFenCaiWon09B();// 4
     synthesisFenCaiWon09Synth();// 5
-    synthesisFms2003();// 6
+    //synthesisFms2003();// 6
     synthesiseTbedNoderailB();// 7
     synthesiseTbedNoderailUncont();// 8
     synthesiseCentralLockingVerriegel3b();// 9
@@ -231,10 +231,10 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesis6linki();// 12
     synthesis6linkp();// 13
     synthesis6linkre();// 14
+    for (int n = 100; n <= 1000; n+=100) {
+      synthesisTransferline(n);
+    }
 
-    //synthesisTransferline(100);
-    //synthesisTransferline(200);
-    //synthesisTransferline(300);
     //synthesiseCentralLockingKoordwspBlock();
     //synthesissRhoneSubPatch0();
     //synthesissAip0Aip();
@@ -318,6 +318,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "hisc", "rhone_subsystem1_patch0.wmod");
   }
 
+  @SuppressWarnings("unused")
   private void synthesisFms2003() throws Exception
   {
     runModel("tests", "fms2003", "fms2003.wmod");
@@ -366,7 +367,6 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "6link", "6linkre.wmod");
   }
 
-  @SuppressWarnings("unused")
   private void synthesisTransferline(final int n) throws Exception
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
