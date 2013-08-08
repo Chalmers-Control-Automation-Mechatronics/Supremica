@@ -69,7 +69,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
    * these transitions are only removed in the abstraction.
    *
    * @param renamedEventIndexes
-   *          Set of proper events indexes to be considered as renamed.
+   *          Set of proper event indexes to be considered as renamed.
    */
   public void setRetainedDumpStateEvents(final TIntHashSet renamedEventIndexes)
   {
