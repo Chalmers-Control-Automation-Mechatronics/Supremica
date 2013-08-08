@@ -773,21 +773,6 @@ public class CompositionalSynthesizer extends
                                         originalAutomaton, renaming, eventEnc);
   }
 
-  TIntHashSet getRenamedControllables(final EventEncoding encoding)
-  {
-    final KindTranslator translator = getKindTranslator();
-    final int numEvents = encoding.getNumberOfProperEvents();
-    final TIntHashSet result = new TIntHashSet(numEvents);
-    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-      final EventProxy event = encoding.getProperEvent(e);
-      if (translator.getEventKind(event) == EventKind.CONTROLLABLE &&
-          mBackRenaming.containsKey(event)) {
-        result.add(e);
-      }
-    }
-    return result;
-  }
-
   private Collection<EventProxy> createAlphabet(final ListBufferTransitionRelation rel,
                                                 final EventEncoding eventEnc,
                                                 final Map<EventProxy,List<EventProxy>> eventMap)
@@ -903,8 +888,6 @@ public class CompositionalSynthesizer extends
         mSupervisorSimplifier.setTransitionRelation(rel);//set TR
         mSupervisorSimplifier.setEvent(-1);//set event
         mSupervisorSimplifier.setBadStateIndex();//set bad state
-        mSupervisorSimplifier
-          .setRetainedDumpStateEvents(getRenamedControllables(mTempEventEncoding));//set retained transitions
         mSupervisorSimplifier.run();
         return mSupervisorSimplifier.getTransitionRelation();
       } catch (final OverflowException overflow) {

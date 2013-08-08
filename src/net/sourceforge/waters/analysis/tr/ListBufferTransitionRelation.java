@@ -2266,6 +2266,47 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Removes all transitions to deadlock states.
+   * A deadlock state is a state that is not marked and has no outgoing
+   * transitions. This method uses the successor transition buffer to
+   * check for outgoing transitions and can only be called if the transition
+   * relation is configured for successors.
+   * @param prop
+   *          The proposition to determine whether a state is marked.
+   *          If the transition relation does not use this proposition,
+   *          then there are no deadlock states; otherwise states marked
+   *          with this proposition cannot be deadlock states.
+   * @return <CODE>true</CODE> if at least one transition was removed,
+   *         <CODE>false</CODE> otherwise.
+   * @see #isDeadlockState(int, int) isDeadlockState()
+   */
+  public boolean removeDeadlockStateTransitions(final int prop)
+  {
+    if (prop < 0) {
+      return false;
+    } else {
+      boolean removed = false;
+      final TransitionIterator iter = createAllTransitionsModifyingIterator();
+      while (iter.advance()) {
+        final int target = iter.getCurrentTargetState();
+        if (isDeadlockState(target, prop)) {
+          iter.remove();
+          removed = true;
+        }
+      }
+      if (removed) {
+        final int numStates = getNumberOfStates();
+        for (int s = 0; s < numStates; s++) {
+          if (isDeadlockState(s, prop)) {
+            setReachable(s, false);
+          }
+        }
+      }
+      return removed;
+    }
+  }
+
+  /**
    * Checks for each proposition whether is appears on all reachable states,
    * and if so, removes the proposition by marking it as unused.
    *

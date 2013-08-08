@@ -14,7 +14,6 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -154,6 +153,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     setPropositions(props);
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   @Override
@@ -281,8 +281,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
       // re-encode states (make only one bad state)
       mTransitionRelation =
-        new ListBufferTransitionRelation(
-                                         "rel",
+        new ListBufferTransitionRelation("rel",
                                          ComponentKind.SUPERVISOR,
                                          mNumProperEvents + 1,
                                          mCurrentPropositions.size(),
@@ -345,7 +344,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);//set TR
           mSupervisorSimplifier.setEvent(-1);//set event
           mSupervisorSimplifier.setBadStateIndex(mNumGoodStates);//set bad state
-          mSupervisorSimplifier.setRetainedDumpStateEvents(null);//set retained transitions
           mSupervisorSimplifier.run();
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           if (!mSupervisorLocalizationEnabled) {
@@ -377,21 +375,18 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                                                    ListBufferTransitionRelation.CONFIG_SUCCESSORS);
                 mSupervisorSimplifier.setTransitionRelation(copy);//set TR
                 mSupervisorSimplifier.setEvent(enabDisabEvents.get(e));//set event
-                mSupervisorSimplifier.setBadStateIndex(mSupervisorSimplifier
-                  .getBadStateIndex());//set bad state
-                mSupervisorSimplifier
-                  .setRetainedDumpStateEvents(new TIntHashSet());//set retained transitions
-                simplified = simplified & mSupervisorSimplifier.run();
+                simplified &= mSupervisorSimplifier.run();
                 if (!simplified) {
-                  removeBadStateTransitions(mTransitionRelation,
-                                            mSupervisorSimplifier
-                                              .getBadStateIndex());
+                  removeBadStateTransitions
+                    (mTransitionRelation, mSupervisorSimplifier.getBadStateIndex());
                   removeSelfloops(mTransitionRelation);
                   autList.add(mTransitionRelation
                     .createAutomaton(getFactory(), getEventEncoding()));
                   break;
                 }
                 copy = mSupervisorSimplifier.getTransitionRelation();
+                removeBadStateTransitions
+                  (copy, mSupervisorSimplifier.getBadStateIndex());
                 copy.setName("Supervisor:" + // set name
                              mEvents[enabDisabEvents.get(e)].getName());
                 autList.add(copy.createAutomaton(getFactory(),
@@ -455,8 +450,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return true;
   }
 
-  //#########################################################################
 
+  //#########################################################################
+  //# Auxiliary Methods
   private void removeBadStateTransitions(final ListBufferTransitionRelation rel,
                                          final int badStateIndex)
   {
@@ -490,6 +486,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     rel.removeProperSelfLoopEvents();
   }
 
+
   //#########################################################################
   //# Callbacks
   @SuppressWarnings("unchecked")
@@ -497,6 +494,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     return (List<EventProxy>) mStateMarkings[aut][state];
   }
+
 
   //#########################################################################
   //# Overrides for Base Class
@@ -852,9 +850,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mCurrentDeadlock = null;
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
-
   /**
    * It will take a single state tuple as a parameter and encode it.
    *
@@ -1424,8 +1422,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
   }
 
+
   //#########################################################################
-  //# Debug
+  //# Debugging
   @SuppressWarnings("unused")
   private int[] showTuple(final int[] encodedTuple)
   {
@@ -1448,6 +1447,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
     return msg;
   }
+
 
   //#########################################################################
   //# Data Members
@@ -1528,8 +1528,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private BitSet mGoodStates;
   private int[] mStateMap;
 
+
   //#########################################################################
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
   private static final int SIZE_INT = 32;
+
 }

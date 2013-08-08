@@ -166,16 +166,6 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
-  public void setRetainedDumpStateEvents(final TIntHashSet set)
-  {
-    mRetainedDumpStateEvents = set;
-  }
-
-  public TIntHashSet getRetainedDumpStateEvents()
-  {
-    return mRetainedDumpStateEvents;
-  }
-
 
   //#########################################################################
   //# Methods for Supervisor Reduction
@@ -411,9 +401,6 @@ public class SupervisorReductionTRSimplifier extends
 
   private boolean mergeTR() throws AnalysisAbortException
   {
-    if (mRetainedDumpStateEvents != null) {
-      retainTransitions();
-    }
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     boolean trChanged = false;
@@ -431,9 +418,7 @@ public class SupervisorReductionTRSimplifier extends
         trChanged = true;
       }
     }
-    if (mBadStateIndex >= 0
-        && ((mRetainedDumpStateEvents == null) || !mRetainedDumpStateEvents
-          .isEmpty())) {
+    if (mBadStateIndex >= 0) {
       final int[] badState = new int[1];
       badState[0] = mBadStateIndex;
       mBadStateIndex = mergingStates.size();
@@ -442,33 +427,6 @@ public class SupervisorReductionTRSimplifier extends
     rel.merge(mergingStates);
     final boolean selfLoofRemoved = rel.removeProperSelfLoopEvents();
     return trChanged | selfLoofRemoved;
-  }
-
-  private boolean retainTransitions() throws AnalysisAbortException
-  {
-    if (mRetainedDumpStateEvents == null) {
-      return false;
-    }
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    boolean trChanged = false;
-    final TransitionIterator iter =
-      rel.createAllTransitionsModifyingIterator();
-    boolean badStateReachable = false;
-    while (iter.advance()) {
-      checkAbort();
-      final int to = iter.getCurrentTargetState();
-      if (to == mBadStateIndex) {
-        final int e = iter.getCurrentEvent();
-        if (!mRetainedDumpStateEvents.contains(e)) {
-          iter.remove();
-          trChanged = true;
-        } else {
-          badStateReachable = true;
-        }
-      }
-    }
-    rel.setReachable(mBadStateIndex, badStateReachable);
-    return trChanged;
   }
 
   private int getSuccessorState(final int source, final int event)
@@ -587,23 +545,11 @@ public class SupervisorReductionTRSimplifier extends
     throws OverflowException, AnalysisAbortException
   {
     final ListBufferTransitionRelation oldRel = getTransitionRelation();
-    // get events that are in both disabEvents and mRetainedDumpStateEvents
-    TIntArrayList intersectEvents = new TIntArrayList();
-    if (mRetainedDumpStateEvents != null) {
-      for (int e = 0; e < disabEvents.size(); e++) {
-        if (mRetainedDumpStateEvents.contains(disabEvents.get(e))) {
-          intersectEvents.add(disabEvents.get(e));
-        }
-      }
-    } else {
-      intersectEvents = disabEvents;
-    }
-    // create a one-state automaton if the intersecting event set is empty
+    // create a one-state automaton if the disabled event set is empty
     // otherwise create a two-state automaton
-    final int numStates = intersectEvents.size() == 0 ? 1 : 2;
+    final int numStates = disabEvents.isEmpty() ? 1 : 2;
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(
-                                       "OneStateSup",
+      new ListBufferTransitionRelation("OneStateSup",
                                        ComponentKind.SUPERVISOR,
                                        mNumProperEvents + 1,
                                        oldRel.getNumberOfPropositions(),
@@ -620,8 +566,8 @@ public class SupervisorReductionTRSimplifier extends
 
     if (numStates == 2) {
       // add transitions from state 0 to dump state
-      for (int e = 0; e < intersectEvents.size(); e++) {
-        rel.addTransition(0, intersectEvents.get(e), 1);
+      for (int e = 0; e < disabEvents.size(); e++) {
+        rel.addTransition(0, disabEvents.get(e), 1);
       }
       // set initial state markings
       final int numProp = rel.getNumberOfPropositions();
@@ -650,7 +596,6 @@ public class SupervisorReductionTRSimplifier extends
   private int mNumProperEvents;
   private int mBadStateIndex;
   private int mCurrEvent;
-  private TIntHashSet mRetainedDumpStateEvents;
   private int[] mStateToClass;
   private IntListBuffer mClasses;
   private int[] mShadowStateToClass;
