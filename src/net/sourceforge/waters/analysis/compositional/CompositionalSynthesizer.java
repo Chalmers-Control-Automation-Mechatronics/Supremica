@@ -891,11 +891,6 @@ public class CompositionalSynthesizer extends
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultID = encoding.getEventCode(defaultMarking);
     mHalfwaySimplifier.setDefaultMarkingID(defaultID);
-    TIntHashSet renamed = getRenamedControllables(encoding);
-    if (getSupervisorReductionEnabled()) {
-      renamed = null;
-    }
-    mHalfwaySimplifier.setRetainedDumpStateEvents(renamed);
     mHalfwaySimplifier.run();
     return mHalfwaySimplifier.getPseudoSupervisor();
   }

@@ -62,38 +62,11 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
   //#########################################################################
   //# Configuration
   /**
-   * Sets the set of renamed event indexes. Renamed controllable events are
-   * treated specially for the benefit of compositional synthesis. Renamed
-   * controllable transitions to a dump state are not removed in the
-   * synthesised supervisor to facilitate composition with distinguishers;
-   * these transitions are only removed in the abstraction.
-   *
-   * @param renamedEventIndexes
-   *          Set of proper event indexes to be considered as renamed.
-   */
-  public void setRetainedDumpStateEvents(final TIntHashSet renamedEventIndexes)
-  {
-    mRenamedEvents = renamedEventIndexes;
-  }
-
-  /**
-   * Gets the set of renamed event indexes.
-   *
-   * @see #setRetainedDumpStateEvents(TIntHashSet) setRenamedEvents()
-   */
-  public TIntHashSet getRetainedDumpStateEvents()
-  {
-    return mRenamedEvents;
-  }
-
-  /**
    * Gets the supervisor computed by the last run of this simplifier. The
    * supervisor returned may contain transitions to a dump state, and
    * therefore is referred to as a pseudo-supervisor. Transitions with
-   * <I>renamed</I> controllable events leading to blocking states are not
-   * removed from the supervisor to facilitate composition with
-   * distinguishers.
-   *
+   * controllable events leading to blocking states are not removed from the
+   * supervisor to facilitate composition with distinguishers.
    * @return Transition relation representing the supervisor, or
    *         <CODE>null</CODE> if no controllable events need to be disabled.
    * @see #setRetainedDumpStateEvents(TIntHashSet) setRenamedEvents()
@@ -102,6 +75,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
   {
     return mPseudoSupervisor;
   }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
@@ -200,7 +174,8 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       iter.resetState(dumpState);
       while (iter.advance()) {
         final int event = iter.getCurrentEvent();
-        if (!isRetainedControllable(event)) {
+        final byte status = rel.getProperEventStatus(event);
+        if (!EventEncoding.isControllableEvent(status)) {
           final int source = iter.getCurrentSourceState();
           mPseudoSupervisor.removeTransition(source, event, dumpState);
         }
@@ -321,26 +296,9 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
     }
   }
 
-  /**
-   * Returns whether the given event should be retained on transitions to dump
-   * states in the pseudo supervisor.
-   */
-  private boolean isRetainedControllable(final int event)
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final byte status = rel.getProperEventStatus(event);
-    if (mRenamedEvents == null) {
-      return EventEncoding.isControllableEvent(status);
-    } else {
-      return EventEncoding.isControllableEvent(status)
-             & mRenamedEvents.contains(event);
-    }
-  }
 
   //#########################################################################
   //# Data Members
-  private TIntHashSet mRenamedEvents;
-
   private ListBufferTransitionRelation mPseudoSupervisor;
 
 }

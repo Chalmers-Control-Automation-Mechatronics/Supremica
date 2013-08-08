@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -233,23 +231,9 @@ public class SynthesisAbstractionProcedure extends
     }
     encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
                               EventEncoding.STATUS_CONTROLLABLE);
-    final CompositionalSynthesizer synthesizer = getAnalyzer();
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultMarkingID = encoding.getEventCode(defaultMarking);
     mChain.setDefaultMarkingID(defaultMarkingID);
-    for (int index = 0; index < mChain.size(); index++) {
-      final TransitionRelationSimplifier step = mChain.getStep(index);
-      if (step instanceof HalfWaySynthesisTRSimplifier) {
-        final HalfWaySynthesisTRSimplifier halfWay =
-          (HalfWaySynthesisTRSimplifier) step;
-        TIntHashSet renamed = null;
-        final CompositionalSynthesizer compSynth = getAnalyzer();
-        if (!compSynth.getSupervisorReductionEnabled()) {
-          renamed = synthesizer.getRenamedControllables(encoding);
-        }
-        halfWay.setRetainedDumpStateEvents(renamed);
-      }
-    }
     return encoding;
   }
 

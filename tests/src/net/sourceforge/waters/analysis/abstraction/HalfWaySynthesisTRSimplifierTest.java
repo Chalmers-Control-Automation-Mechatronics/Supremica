@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.set.hash.TIntHashSet;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -20,7 +19,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class HalfWaySynthesisTRSimplifierTest
@@ -65,17 +63,12 @@ public class HalfWaySynthesisTRSimplifierTest
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventEncoding encoding = new EventEncoding(aut, translator);
     final int numEvents = encoding.getNumberOfProperEvents();
-    if (mSettingRenamed) {
-      mRenamedEvents = new TIntHashSet(numEvents);
-    }
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final EventProxy event = encoding.getProperEvent(e);
       if (!event.isObservable()) {
         final byte status = encoding.getProperEventStatus(e);
         encoding.setProperEventStatus
           (e, status | EventEncoding.STATUS_LOCAL);
-      } else if (event.getKind() == EventKind.CONTROLLABLE) {
-        mRenamedEvents.add(e);
       }
     }
     mDefaultMarkingID = -1;
@@ -99,9 +92,6 @@ public class HalfWaySynthesisTRSimplifierTest
     final HalfWaySynthesisTRSimplifier simplifier =
       getTransitionRelationSimplifier();
     simplifier.setDefaultMarkingID(mDefaultMarkingID);
-    if (mRenamedEvents != null) {
-      simplifier.setRetainedDumpStateEvents(mRenamedEvents);
-    }
   }
 
 
@@ -257,10 +247,7 @@ public class HalfWaySynthesisTRSimplifierTest
 
   //#########################################################################
   //# Data Members
-  private final boolean mSettingRenamed = true;
-
   private int mDefaultMarkingID;
-  private TIntHashSet mRenamedEvents;
 
 }
 

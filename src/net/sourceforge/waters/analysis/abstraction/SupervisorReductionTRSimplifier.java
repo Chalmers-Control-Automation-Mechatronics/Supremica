@@ -176,9 +176,9 @@ public class SupervisorReductionTRSimplifier extends
     return mRetainedDumpStateEvents;
   }
 
-  //##########################################################################
-  // Methods for Supervisor Reduction
 
+  //#########################################################################
+  //# Methods for Supervisor Reduction
   private boolean mainProcedure(final TIntArrayList ctrlEvents)
     throws AnalysisAbortException
   {
