@@ -50,7 +50,7 @@ import org.apache.log4j.Logger;
 
 /**
  * An implementation of partial unfolding for extended finite-state machines.
- * Given an EFSM ({@link EFSMTransitionRelation}) and a variable to be removed
+ * Given an EFSM ({@link AbstractEFATransitionRelation}) and a variable to be removed
  * ({@link EFSMVariable}), a new EFSM is computed by removing the given
  * variable and expanding the states to include the different variables
  * values.

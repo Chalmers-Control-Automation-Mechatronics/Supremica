@@ -9,22 +9,17 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
-import gnu.trove.set.hash.THashSet;
 
 import java.util.BitSet;
 import java.util.Collection;
+import net.sourceforge.waters.analysis.efa.AbstractEFATransitionRelation;
 
+import net.sourceforge.waters.analysis.efa.AbstractEFAVariable;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.ComponentProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 
@@ -35,7 +30,9 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class EFSMVariable implements Comparable<EFSMVariable> {
+public class EFSMVariable
+  extends AbstractEFAVariable<EFSMTransitionRelation>
+{
 
   //#########################################################################
   //# Constructors
@@ -44,72 +41,13 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
                final ModuleProxyFactory factory,
                final CompilerOperatorTable op)
   {
-    mComponent = var;
-    mRange = range;
-    final ModuleProxyCloner cloner = factory.getCloner();
-    final IdentifierProxy ident = var.getIdentifier();
-    mVariableName = (IdentifierProxy) cloner.getClone(ident);
-    final SimpleExpressionProxy temp = (SimpleExpressionProxy) cloner.getClone(ident);
-    final UnaryOperator next = op.getNextOperator();
-    mPrimedVariableName = factory.createUnaryExpressionProxy(next, temp);
-    mInitialStatePredicate =
-      (SimpleExpressionProxy) cloner.getClone(var.getInitialStatePredicate());
-    mTransitionRelations = new THashSet<EFSMTransitionRelation>();
+    super(var, range, factory, op);
     mSelfloops = new EFSMEventEncoding();
   }
 
 
   //#########################################################################
-  //# Overrides for java.lang.Object
-  @Override
-  public String toString()
-  {
-    return mVariableName.toString();
-  }
-
-
-  //#########################################################################
-  //# Interface java.lang.Comparable<EFSMVariable>
-  @Override
-  public int compareTo(final EFSMVariable var)
-  {
-    return mComponent.compareTo(var.mComponent);
-  }
-
-
-  //#########################################################################
   //# Simple Access
-  ComponentProxy getComponent()
-  {
-    return mComponent;
-  }
-
-  public CompiledRange getRange()
-  {
-    return mRange;
-  }
-
-  String getName()
-  {
-    return mVariableName.toString();
-  }
-
-  IdentifierProxy getVariableName()
-  {
-    return mVariableName;
-  }
-
-  UnaryExpressionProxy getPrimedVariableName()
-  {
-    return mPrimedVariableName;
-  }
-
-  public SimpleExpressionProxy getInitialStatePredicate()
-  {
-    return mInitialStatePredicate;
-  }
-
-
   /**
    * Gets an event encoding representing selfloops involving this variable.
    * These are updates that were found as selfloops in all states of some
@@ -120,30 +58,6 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
   public EFSMEventEncoding getSelfloops()
   {
     return mSelfloops;
-  }
-
-  /**
-   * Returns a collection containing all transition relations (EFSMs)
-   * using this variable.
-   */
-  public Collection<EFSMTransitionRelation> getTransitionRelations()
-  {
-    return mTransitionRelations;
-  }
-
-  /**
-   * Returns the single transition relation using this variable.
-   * @return If this variable is used by exactly one transition relation,
-   *         that transition relation is returned; otherwise the result
-   *         is <CODE>null</CODE>.
-   */
-  public EFSMTransitionRelation getTransitionRelation()
-  {
-    if (mTransitionRelations.size() == 1) {
-      return mTransitionRelations.iterator().next();
-    } else {
-      return null;
-    }
   }
 
   public void addSelfloop(final ConstraintList update)
@@ -175,44 +89,13 @@ public class EFSMVariable implements Comparable<EFSMVariable> {
     mSelfloops = newSelfloops;
   }
 
-  public void addTransitionRelation(final EFSMTransitionRelation trans)
-  {
-    mTransitionRelations.add(trans);
-  }
-
-  public void removeTransitionRelation(final EFSMTransitionRelation trans)
-  {
-    mTransitionRelations.remove(trans);
-  }
-
-
-  /**
-   * Return whether this variable is local.
-   * @return <CODE>true</CODE> if the variable occurs in at most one
-   *         transition relation.
-   */
-  public boolean isLocal()
-  {
-    return mTransitionRelations.size() <= 1;
-  }
-
 
   //#########################################################################
   //# Data Members
-  private final ComponentProxy mComponent;
-  private final CompiledRange mRange;
-  private final IdentifierProxy mVariableName;
-  private final UnaryExpressionProxy mPrimedVariableName;
-  private final SimpleExpressionProxy mInitialStatePredicate;
-
   /**
    * Event encoding representing selfloops involving this variable.
    * @see #getSelfloops()
    */
   private EFSMEventEncoding mSelfloops;
-  /**
-   * Collection of transition relations (EFSM) using this variable.
-   */
-  private final Collection<EFSMTransitionRelation> mTransitionRelations;
 
 }
