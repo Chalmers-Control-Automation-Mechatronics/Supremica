@@ -41,8 +41,8 @@ public class AbstractEFAEventEncoding<L>
   public AbstractEFAEventEncoding(final AbstractEFAEventEncoding<L> encoding)
   {
     this(encoding.size());
-    for (int event=EventEncoding.NONTAU; event < encoding.size(); event++) {
-      final L update = encoding.getUpdate(event);
+    for (int e = EventEncoding.TAU; e < encoding.size(); e++) {
+      final L update = encoding.getUpdate(e);
       createEventId(update);
     }
   }
@@ -117,6 +117,9 @@ public class AbstractEFAEventEncoding<L>
   private final TObjectIntHashMap<L> mEventMap;
   private final List<L> mUpdateList;
 
-  private static final int DEFAULT_SIZE = 16;
+
+  //#########################################################################
+  //# Class Constants
+  protected static final int DEFAULT_SIZE = 16;
 }
 

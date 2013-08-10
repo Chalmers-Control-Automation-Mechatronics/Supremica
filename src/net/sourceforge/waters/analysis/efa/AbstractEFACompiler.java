@@ -23,7 +23,12 @@ import net.sourceforge.waters.model.module.ModuleProxy;
  * @author Robi Malik
  */
 
-public abstract class AbstractEFACompiler<S extends AbstractEFASystem>
+public abstract class AbstractEFACompiler
+  <L,
+   V extends AbstractEFAVariable<L>,
+   TR extends AbstractEFATransitionRelation<L>,
+   C extends AbstractEFAVariableContext<L,V>,
+   S extends AbstractEFASystem<L,V,TR,C>>
 {
 
   //##########################################################################
@@ -36,8 +41,8 @@ public abstract class AbstractEFACompiler<S extends AbstractEFASystem>
 
   //##########################################################################
   //# Compile the system
-  
   abstract S compile();
+
 
   //##########################################################################
   //# Simple Access
@@ -121,6 +126,7 @@ public abstract class AbstractEFACompiler<S extends AbstractEFASystem>
   {
     return mMarking;
   }
+
 
   //#########################################################################
   //# Data Members

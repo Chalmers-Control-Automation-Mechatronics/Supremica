@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.efsm;
 
 import net.sourceforge.waters.analysis.efa.AbstractEFAVariableContext;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 
@@ -18,7 +19,8 @@ import net.sourceforge.waters.model.module.ModuleProxy;
  * A variable context for EFSM compilation. Contains ranges of all
  * variables, and identifies enumeration atoms.
  */
-class EFSMVariableContext extends AbstractEFAVariableContext<EFSMVariable>
+class EFSMVariableContext
+  extends AbstractEFAVariableContext<ConstraintList,EFSMVariable>
 {
   //#######################################################################
   //# Constructor

@@ -26,6 +26,7 @@ public class EFSMEventEncoding extends AbstractEFAEventEncoding<ConstraintList>
   //# Constructors
   EFSMEventEncoding()
   {
+    this(DEFAULT_SIZE);
   }
 
   EFSMEventEncoding(final int size)

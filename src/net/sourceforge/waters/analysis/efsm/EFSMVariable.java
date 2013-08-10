@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.efsm;
 
 import java.util.BitSet;
 import java.util.Collection;
-import net.sourceforge.waters.analysis.efa.AbstractEFATransitionRelation;
 
 import net.sourceforge.waters.analysis.efa.AbstractEFAVariable;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -31,7 +30,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  */
 
 public class EFSMVariable
-  extends AbstractEFAVariable<EFSMTransitionRelation>
+  extends AbstractEFAVariable<ConstraintList>
 {
 
   //#########################################################################
@@ -87,6 +86,19 @@ public class EFSMVariable
       }
     }
     mSelfloops = newSelfloops;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Collection<EFSMTransitionRelation> getTransitionRelations()
+  {
+    return (Collection<EFSMTransitionRelation>) super.getTransitionRelations();
+  }
+
+  @Override
+  public EFSMTransitionRelation getTransitionRelation()
+  {
+    return (EFSMTransitionRelation) super.getTransitionRelation();
   }
 
 

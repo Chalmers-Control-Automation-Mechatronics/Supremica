@@ -19,26 +19,29 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 /**
  * @author Robi Malik
  */
-public abstract class AbstractEFATransitionRelation
-  implements Comparable<AbstractEFATransitionRelation>
+public abstract class AbstractEFATransitionRelation<L>
+  implements Comparable<AbstractEFATransitionRelation<?>>
 {
 
   //#########################################################################
   //# Constructors
-  public AbstractEFATransitionRelation(final ListBufferTransitionRelation rel,
-                               final AbstractEFAEventEncoding events,
-                               final Collection<? extends AbstractEFAVariable> variables,
-                               final List<SimpleNodeProxy> nodes)
+  @SuppressWarnings("unchecked")
+  public AbstractEFATransitionRelation
+    (final ListBufferTransitionRelation rel,
+     final AbstractEFAEventEncoding<L> events,
+     final Collection<? extends AbstractEFAVariable<L>> variables,
+     final List<SimpleNodeProxy> nodes)
   {
     mTransitionRelation = rel;
     mEventEncoding = events;
-    mVariables = variables;
+    mVariables = (Collection<AbstractEFAVariable<L>>) variables;
     mNodeList = nodes;
   }
 
-  public AbstractEFATransitionRelation(final ListBufferTransitionRelation rel,
-                               final AbstractEFAEventEncoding events,
-                               final Collection<? extends AbstractEFAVariable> variables)
+  public AbstractEFATransitionRelation
+    (final ListBufferTransitionRelation rel,
+     final AbstractEFAEventEncoding<L> events,
+     final Collection<? extends AbstractEFAVariable<L>> variables)
   {
     this(rel, events, variables, null);
   }
@@ -51,7 +54,7 @@ public abstract class AbstractEFATransitionRelation
     return mTransitionRelation;
   }
 
-  public AbstractEFAEventEncoding getEventEncoding()
+  public AbstractEFAEventEncoding<L> getEventEncoding()
   {
     return mEventEncoding;
   }
@@ -72,7 +75,7 @@ public abstract class AbstractEFATransitionRelation
   }
 
 
-  public Collection<? extends AbstractEFAVariable> getVariables()
+  public Collection<? extends AbstractEFAVariable<L>> getVariables()
   {
     return mVariables;
   }
@@ -83,7 +86,7 @@ public abstract class AbstractEFATransitionRelation
    */
   public void register()
   {
-    for (final AbstractEFAVariable var : mVariables) {
+    for (final AbstractEFAVariable<L> var : mVariables) {
       var.addTransitionRelation(this);
     }
   }
@@ -94,7 +97,7 @@ public abstract class AbstractEFATransitionRelation
    */
   public void dispose()
   {
-    for (final AbstractEFAVariable var : mVariables) {
+    for (final AbstractEFAVariable<L> var : mVariables) {
       var.removeTransitionRelation(this);
     }
   }
@@ -103,7 +106,7 @@ public abstract class AbstractEFATransitionRelation
   //#########################################################################
   //# Interface java.util.Comparable
   @Override
-  public int compareTo(final AbstractEFATransitionRelation efaTR)
+  public int compareTo(final AbstractEFATransitionRelation<?> efaTR)
   {
     final String name1 = getName();
     final String name2 = efaTR.getName();
@@ -123,8 +126,8 @@ public abstract class AbstractEFATransitionRelation
   //#########################################################################
   //# Data Members
   private final ListBufferTransitionRelation mTransitionRelation;
-  private final AbstractEFAEventEncoding mEventEncoding;
+  private final AbstractEFAEventEncoding<L> mEventEncoding;
+  private final Collection<AbstractEFAVariable<L>> mVariables;
   private final List<SimpleNodeProxy> mNodeList;
-  private final Collection<? extends AbstractEFAVariable> mVariables;
 
 }

@@ -32,16 +32,16 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  * @author Robi Malik
  */
 
-public abstract class AbstractEFAVariable<TR extends AbstractEFATransitionRelation>
-  implements Comparable<AbstractEFAVariable>
+public abstract class AbstractEFAVariable<L>
+  implements Comparable<AbstractEFAVariable<?>>
 {
 
   //#########################################################################
   //# Constructors
   public AbstractEFAVariable(final VariableComponentProxy var,
-                     final CompiledRange range,
-                     final ModuleProxyFactory factory,
-                     final CompilerOperatorTable op)
+                             final CompiledRange range,
+                             final ModuleProxyFactory factory,
+                             final CompilerOperatorTable op)
   {
     mComponent = var;
     mRange = range;
@@ -53,7 +53,7 @@ public abstract class AbstractEFAVariable<TR extends AbstractEFATransitionRelati
     mPrimedVariableName = factory.createUnaryExpressionProxy(next, temp);
     mInitialStatePredicate =
       (SimpleExpressionProxy) cloner.getClone(var.getInitialStatePredicate());
-    mTransitionRelations = new THashSet<TR>();
+    mTransitionRelations = new THashSet<AbstractEFATransitionRelation<L>>();
   }
 
 
@@ -69,7 +69,7 @@ public abstract class AbstractEFAVariable<TR extends AbstractEFATransitionRelati
   //#########################################################################
   //# Interface java.lang.Comparable<EFAVariable>
   @Override
-  public int compareTo(final AbstractEFAVariable var)
+  public int compareTo(final AbstractEFAVariable<?> var)
   {
     return mComponent.compareTo(var.mComponent);
   }
@@ -112,7 +112,8 @@ public abstract class AbstractEFAVariable<TR extends AbstractEFATransitionRelati
    * Returns a collection containing all transition relations (EFAs)
    * using this variable.
    */
-  public Collection<TR> getTransitionRelations()
+  public Collection<? extends AbstractEFATransitionRelation<L>>
+    getTransitionRelations()
   {
     return mTransitionRelations;
   }
@@ -123,7 +124,7 @@ public abstract class AbstractEFAVariable<TR extends AbstractEFATransitionRelati
    *         that transition relation is returned; otherwise the result
    *         is <CODE>null</CODE>.
    */
-  public TR getTransitionRelation()
+  public AbstractEFATransitionRelation<L> getTransitionRelation()
   {
     if (mTransitionRelations.size() == 1) {
       return mTransitionRelations.iterator().next();
@@ -132,12 +133,12 @@ public abstract class AbstractEFAVariable<TR extends AbstractEFATransitionRelati
     }
   }
 
-  public void addTransitionRelation(final TR trans)
+  public void addTransitionRelation(final AbstractEFATransitionRelation<L> trans)
   {
     mTransitionRelations.add(trans);
   }
 
-  public void removeTransitionRelation(final TR trans)
+  public void removeTransitionRelation(final AbstractEFATransitionRelation<L> trans)
   {
     mTransitionRelations.remove(trans);
   }
@@ -165,6 +166,6 @@ public abstract class AbstractEFAVariable<TR extends AbstractEFATransitionRelati
   /**
    * Collection of transition relations (EFA) using this variable.
    */
-  private final Collection<TR> mTransitionRelations;
+  private final Collection<AbstractEFATransitionRelation<L>> mTransitionRelations;
 
 }

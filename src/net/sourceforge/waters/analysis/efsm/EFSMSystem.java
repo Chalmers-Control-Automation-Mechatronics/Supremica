@@ -12,14 +12,18 @@ package net.sourceforge.waters.analysis.efsm;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.AbstractEFASystem;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
 
-class EFSMSystem 
-  extends AbstractEFASystem<EFSMVariable,EFSMTransitionRelation,EFSMVariableContext>
+class EFSMSystem
+  extends AbstractEFASystem<ConstraintList,
+                            EFSMVariable,
+                            EFSMTransitionRelation,
+                            EFSMVariableContext>
 {
 
   //#########################################################################

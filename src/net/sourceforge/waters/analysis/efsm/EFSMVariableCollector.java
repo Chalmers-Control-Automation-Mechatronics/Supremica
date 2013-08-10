@@ -24,7 +24,7 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
  */
 
 class EFSMVariableCollector
-  extends AbstractEFAVariableCollector<EFSMVariable>
+  extends AbstractEFAVariableCollector<ConstraintList,EFSMVariable>
 {
 
 
@@ -69,5 +69,5 @@ class EFSMVariableCollector
       collectAllVariables(update, unprimed, primed);
     }
   }
-  
+
 }

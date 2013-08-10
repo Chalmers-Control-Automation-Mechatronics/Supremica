@@ -28,14 +28,14 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-public abstract class AbstractEFAVariableCollector<V extends AbstractEFAVariable>
+public abstract class AbstractEFAVariableCollector<L, V extends AbstractEFAVariable<L>>
   extends DescendingModuleProxyVisitor
 {
 
   //#########################################################################
   //# Constructor
   protected AbstractEFAVariableCollector(final CompilerOperatorTable optable,
-                                         final AbstractEFAVariableContext<V> context)
+                                         final AbstractEFAVariableContext<L,V> context)
   {
     mNextOperator = optable.getNextOperator();
     mContext = context;
@@ -165,7 +165,7 @@ public abstract class AbstractEFAVariableCollector<V extends AbstractEFAVariable
   //#########################################################################
   //# Data Members
   private final UnaryOperator mNextOperator;
-  private final AbstractEFAVariableContext<V> mContext;
+  private final AbstractEFAVariableContext<L,V> mContext;
 
   private Collection<V> mUnprimedVariables;
   private Collection<V> mPrimedVariables;

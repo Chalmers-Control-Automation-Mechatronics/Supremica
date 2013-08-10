@@ -700,6 +700,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
       return hasRemovableEvents;
     }
 
+
     //#######################################################################
     //# Data Members
     private EFSMEventEncoding mEventEncoding;

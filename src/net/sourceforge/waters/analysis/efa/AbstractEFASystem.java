@@ -19,10 +19,11 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
  * @author Robi Malik
  */
 
-public abstract class AbstractEFASystem<V extends AbstractEFAVariable,
-                                        TR extends AbstractEFATransitionRelation,
-                                        C extends AbstractEFAVariableContext>
-  implements Comparable<AbstractEFASystem>
+public abstract class AbstractEFASystem<L,
+                                        V extends AbstractEFAVariable<L>,
+                                        TR extends AbstractEFATransitionRelation<L>,
+                                        C extends AbstractEFAVariableContext<L,V>>
+  implements Comparable<AbstractEFASystem<?,?,?,?>>
 {
 
   //#########################################################################
@@ -106,11 +107,11 @@ public abstract class AbstractEFASystem<V extends AbstractEFAVariable,
   public double getEstimatedSize()
   {
     double size = 1;
-    for (final AbstractEFATransitionRelation efaTR : mTransitionRelations) {
+    for (final AbstractEFATransitionRelation<?> efaTR : mTransitionRelations) {
       final ListBufferTransitionRelation rel = efaTR.getTransitionRelation();
       size = size * rel.getNumberOfStates();
     }
-    for (final AbstractEFAVariable var : mVariables) {
+    for (final V var : mVariables) {
       size = size * var.getRange().size();
     }
     return size;
@@ -120,7 +121,7 @@ public abstract class AbstractEFASystem<V extends AbstractEFAVariable,
   //#########################################################################
   //# Interface java.util.Comparable<EFASystem>
   @Override
-  public int compareTo(final AbstractEFASystem system)
+  public int compareTo(final AbstractEFASystem<?,?,?,?> system)
   {
     final double size1 = getEstimatedSize();
     final double size2 = system.getEstimatedSize();

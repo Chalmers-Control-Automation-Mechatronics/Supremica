@@ -28,10 +28,11 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 /**
  * A variable context for EFA compilation. Contains ranges of all
  * variables, and identifies enumeration atoms.
- * 
+ *
  * @author Robi Malik
  */
-public abstract class AbstractEFAVariableContext<V extends AbstractEFAVariable>
+
+public abstract class AbstractEFAVariableContext<L, V extends AbstractEFAVariable<L>>
   implements VariableContext
 {
   //#######################################################################
@@ -54,7 +55,8 @@ public abstract class AbstractEFAVariableContext<V extends AbstractEFAVariable>
   {
     if (varname instanceof IdentifierProxy) {
       final IdentifierProxy ident = (IdentifierProxy) varname;
-      final V variable = mGlobalVariableMap.getByProxy(ident);
+      final AbstractEFAVariable<L> variable =
+        mGlobalVariableMap.getByProxy(ident);
       if (variable != null) {
         return variable.getRange();
       }
@@ -105,7 +107,7 @@ public abstract class AbstractEFAVariableContext<V extends AbstractEFAVariable>
 
   public void addVariable(final V var)
   {
-    final IdentifierProxy ident = (IdentifierProxy) var.getVariableName();
+    final IdentifierProxy ident = var.getVariableName();
     mGlobalVariableMap.putByProxy(ident, var);
   }
 

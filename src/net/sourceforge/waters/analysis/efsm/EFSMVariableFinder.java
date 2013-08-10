@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.efsm;
 
 import net.sourceforge.waters.analysis.efa.AbstractEFAVariableFinder;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 
 /**
@@ -21,7 +22,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
  */
 
 class EFSMVariableFinder
-  extends AbstractEFAVariableFinder<EFSMVariable>
+  extends AbstractEFAVariableFinder<ConstraintList,EFSMVariable>
 {
 
   //#########################################################################

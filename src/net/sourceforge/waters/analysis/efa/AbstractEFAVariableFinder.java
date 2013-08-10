@@ -28,7 +28,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-public abstract class AbstractEFAVariableFinder<V extends AbstractEFAVariable>
+public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable<L>>
   extends DefaultModuleProxyVisitor
 {
 
