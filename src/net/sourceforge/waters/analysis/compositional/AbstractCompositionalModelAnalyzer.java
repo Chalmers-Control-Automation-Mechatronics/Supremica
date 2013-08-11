@@ -1457,7 +1457,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private boolean applyCandidate(final Candidate candidate)
     throws AnalysisException
   {
-    assert mCurrentAutomata.containsAll(candidate.getAutomata());
+    // assert mCurrentAutomata.containsAll(candidate.getAutomata());
     final List<AbstractionStep> steps = new LinkedList<AbstractionStep>();
     AutomatonProxy aut;
     try {
