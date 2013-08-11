@@ -48,6 +48,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -1058,10 +1059,12 @@ public class MonolithicSynchronousProductBuilder
       return n.getName().compareTo(getName());
     }
 
+    //#######################################################################
+    //# Debugging
     @Override
     public String toString()
     {
-      return getName();
+      return ProxyPrinter.getPrintString(this);
     }
 
     //#######################################################################

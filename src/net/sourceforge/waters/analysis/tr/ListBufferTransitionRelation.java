@@ -136,7 +136,7 @@ public class ListBufferTransitionRelation
                                       final int config)
     throws OverflowException
   {
-    this(aut, eventEnc, new StateEncoding(aut), config);
+    this(aut, eventEnc, null, config);
   }
 
   /**
@@ -150,7 +150,8 @@ public class ListBufferTransitionRelation
    *          events in the transition buffers.
    * @param stateEnc
    *          State encoding to define the assignment of integer codes to
-   *          events in the transition buffers.
+   *          events in the transition buffers, or <CODE>null</CODE> to
+   *          use a default state encoding.
    * @param config
    *          Configuration flags defining which transition buffers are to be
    *          created. Should be one of {@link #CONFIG_SUCCESSORS},
@@ -162,7 +163,7 @@ public class ListBufferTransitionRelation
    */
   public ListBufferTransitionRelation(final AutomatonProxy aut,
                                       final EventEncoding eventEnc,
-                                      final StateEncoding stateEnc,
+                                      StateEncoding stateEnc,
                                       final int config)
     throws OverflowException
   {
@@ -170,7 +171,11 @@ public class ListBufferTransitionRelation
     mName = aut.getName();
     mKind = aut.getKind();
     final Set<EventProxy> events = new THashSet<EventProxy>(aut.getEvents());
+    if (stateEnc == null) {
+      stateEnc = new StateEncoding(aut);
+    }
     mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, events);
+    mStateBuffer.setMissingStatesUnreachable(aut, stateEnc);
     mExtraStates = stateEnc.getNumberOfExtraStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     final List<TransitionProxy> list =

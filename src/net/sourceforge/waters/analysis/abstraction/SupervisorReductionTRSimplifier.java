@@ -31,7 +31,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 /**
  * Transition relation simplifier that implements halfway synthesis.
  *
- * @author Robi Malik, Sahar Mohajerani, fq11
+ * @author Fangqian Qiu, Robi Malik
  */
 
 public class SupervisorReductionTRSimplifier extends

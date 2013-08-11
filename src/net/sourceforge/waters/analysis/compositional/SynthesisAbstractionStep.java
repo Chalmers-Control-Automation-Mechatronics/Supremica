@@ -28,11 +28,9 @@ class SynthesisAbstractionStep extends AbstractionStep
   SynthesisAbstractionStep(final CompositionalSynthesizer synthesizer,
                            final AutomatonProxy result,
                            final AutomatonProxy original,
-                           final ListBufferTransitionRelation dis,
                            final EventEncoding coding)
   {
     super(synthesizer, result, original);
-    mSupervisor = dis;
     mEventEncoding = coding;
   }
 

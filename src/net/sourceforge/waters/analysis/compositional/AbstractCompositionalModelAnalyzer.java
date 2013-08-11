@@ -1056,6 +1056,14 @@ public abstract class AbstractCompositionalModelAnalyzer
     removeEventsToAutomata(autToRemove);
   }
 
+  protected void replaceDirtyAutomaton(final AutomatonProxy newAut,
+                                       final AutomatonProxy oldAut)
+  {
+    if (mDirtyAutomata.remove(oldAut)) {
+      mDirtyAutomata.add(newAut);
+    }
+  }
+
   /**
    * Creates an event information record for the given event.
    * @see EventInfo
@@ -1449,6 +1457,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private boolean applyCandidate(final Candidate candidate)
     throws AnalysisException
   {
+    assert mCurrentAutomata.containsAll(candidate.getAutomata());
     final List<AbstractionStep> steps = new LinkedList<AbstractionStep>();
     AutomatonProxy aut;
     try {

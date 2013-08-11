@@ -17,7 +17,6 @@ import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SynthesisObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -78,8 +77,10 @@ public class SynthesisAbstractionProcedure extends
       chain.add(halfWay);
     }
     if ((abstractionMethods & USE_BISIMULATION) != 0) {
-      final TransitionRelationSimplifier bisimulator =
-        new BisimulationTRSimplifier();
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier();
+      bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
       chain.add(bisimulator);
     }
     final int limit = synthesizer.getInternalTransitionLimit();
@@ -121,31 +122,53 @@ public class SynthesisAbstractionProcedure extends
     try {
       final EventEncoding eventEnc = createEventEncoding(aut, local);
       final StateEncoding inputStateEnc = createStateEncoding(aut);
-      final int config = mChain.getPreferredInputConfiguration();
-      final ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
+      final int inputConfig = mChain.getPreferredInputConfiguration();
+      ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(aut, eventEnc,
+                                         inputStateEnc, inputConfig);
+      final CompositionalSynthesizer synthesizer = getAnalyzer();
+      synthesizer.showDebugLog(rel);
       mChain.setTransitionRelation(rel);
       if (mChain.run()) {
-        final ListBufferTransitionRelation original =
-          getTransitionRelationBeforeSOE(rel);
-        final ListBufferTransitionRelation supervisor = getPseudoSupervisor();
-        final CompositionalSynthesizer synthesizer = getAnalyzer();
-        synthesizer.reportSupervisor("halfway synthesis", supervisor);
-        final SynthesisAbstractionStep step;
-        if (original == null) {
-          final ProductDESProxyFactory factory = getFactory();
-          final StateEncoding outputStateEnc = new StateEncoding();
-          final AutomatonProxy convertedAut =
-            rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          synthesizer.reportAbstractionResult(convertedAut, null);
-          step =
-            new SynthesisAbstractionStep(synthesizer, convertedAut, aut,
-                                         supervisor, eventEnc);
+        rel = mChain.getTransitionRelation();
+        final List<int[]> partition = mChain.getResultPartition();
+        final boolean det;
+        if (isMergingPartition(partition)) {
+          rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+          det = rel.isDeterministic();
         } else {
-          final List<int[]> partition = getResultPartition();
-          step =
-            synthesizer.createDeterministicAutomaton(aut, original, rel,
-                                                     partition, eventEnc);
+          det = true;
+        }
+        final SynthesisAbstractionStep step;
+        if (det) {
+          final ProductDESProxyFactory factory = getFactory();
+          final AutomatonProxy convertedAut =
+            rel.createAutomaton(factory, eventEnc, null);
+          synthesizer.reportAbstractionResult(convertedAut, null);
+          step = new SynthesisAbstractionStep
+            (synthesizer, convertedAut, aut, eventEnc);
+        } else {
+          final HalfWaySynthesisTRSimplifier.OutputMode absMode =
+            HalfWaySynthesisTRSimplifier.OutputMode.ABSTRACTION;
+          final int outputConfig =
+            ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+          final ListBufferTransitionRelation before =
+            synthesizer.createPseudoSupervisorTR
+              (aut, eventEnc, inputStateEnc, inputStateEnc,
+               partition, absMode, outputConfig);
+          step = synthesizer.createDeterministicAutomaton
+            (aut, before, rel, partition, eventEnc);
+        }
+        final HalfWaySynthesisTRSimplifier.OutputMode supMode =
+          HalfWaySynthesisTRSimplifier.OutputMode.PSEUDO_SUPERVISOR;
+        final int outputConfig =
+          ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+        final ListBufferTransitionRelation supervisor =
+          synthesizer.createPseudoSupervisorTR
+            (aut, eventEnc, inputStateEnc, null,
+             partition, supMode, outputConfig);
+        if (supervisor != null) {
+          synthesizer.reportSupervisor("halfway synthesis", supervisor);
           step.setSupervisor(supervisor);
         }
         steps.add(step);
@@ -244,86 +267,25 @@ public class SynthesisAbstractionProcedure extends
     return encoding;
   }
 
-  private ListBufferTransitionRelation getTransitionRelationBeforeSOE(final ListBufferTransitionRelation rel)
+  private boolean isMergingPartition(final List<int[]> partition)
   {
-    for (int index = 0; index < mChain.size(); index++) {
-      final TransitionRelationSimplifier step = mChain.getStep(index);
-      if (step instanceof SynthesisObservationEquivalenceTRSimplifier) {
-        final SynthesisObservationEquivalenceTRSimplifier soe =
-          (SynthesisObservationEquivalenceTRSimplifier) step;
-        final ListBufferTransitionRelation result =
-          soe.getOriginalTransitionRelation();
-        if (result != null) {
-          rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-          if (rel.isDeterministic()) {
-            return null;
-          } else {
-            return result;
-          }
+    if (partition == null) {
+      return false;
+    } else {
+      for (final int[] clazz : partition) {
+        if (clazz != null && clazz.length > 1) {
+          return true;
         }
       }
-    }
-    return null;
-  }
-
-  private List<int[]> getResultPartition()
-  {
-    return mChain.getResultPartition();
-  }
-
-  private ListBufferTransitionRelation getPseudoSupervisor()
-  {
-    for (int index = 0; index < mChain.size(); index++) {
-      final TransitionRelationSimplifier step = mChain.getStep(index);
-      if (step instanceof HalfWaySynthesisTRSimplifier) {
-        final HalfWaySynthesisTRSimplifier halfWay =
-          (HalfWaySynthesisTRSimplifier) step;
-        return halfWay.getPseudoSupervisor();
-      }
-    }
-    return null;
-  }
-
-
-  //#########################################################################
-  //# Inner Class BisimulationTRSimplifier
-  /**
-   * A specialised observation equivalence simplifier for use only in
-   * synthesis. This is used for bisimulation abstraction before synthesis
-   * observation equivalence.
-   */
-  private static class BisimulationTRSimplifier extends
-    ObservationEquivalenceTRSimplifier
-  {
-    //#######################################################################
-    //# Constructor
-    private BisimulationTRSimplifier()
-    {
-      setEquivalence(ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
-    /**
-     * Destructively applies the computed partitioning to the simplifier's
-     * transition relation. After applying the partition, this implementation
-     * removes the result partition from the simplifier, pretending to the
-     * chain that no partition was computed. In this way, the partition
-     * computed from the chain will only include the synthesis observation
-     * equivalence steps.
-     */
-    @Override
-    protected void applyResultPartition() throws AnalysisException
-    {
-      super.applyResultPartition();
-      setResultPartitionList(null);
+      return false;
     }
   }
+
 
   //#########################################################################
   //# Data Members
   private final ChainTRSimplifier mChain;
+
 
   //#########################################################################
   //# Class Constants

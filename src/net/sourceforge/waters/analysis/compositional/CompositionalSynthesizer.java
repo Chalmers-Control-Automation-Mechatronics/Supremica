@@ -16,6 +16,8 @@ import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -307,6 +309,8 @@ public class CompositionalSynthesizer extends
     mBackRenaming = new HashMap<EventProxy,EventProxy>();
     mSupervisorSimplifier = new SupervisorReductionTRSimplifier();
     mHalfwaySimplifier = new HalfWaySynthesisTRSimplifier();
+    mHalfwaySimplifier.setOutputMode
+      (HalfWaySynthesisTRSimplifier.OutputMode.PSEUDO_SUPERVISOR);
     super.setUp();
   }
 
@@ -518,6 +522,7 @@ public class CompositionalSynthesizer extends
                                            newAlphabet, aut.getStates(),
                                            newTransitions);
             updateEventsToAutomata(newAut, Collections.singletonList(aut));
+            replaceDirtyAutomaton(newAut, aut);
           }
         }
       }
@@ -542,13 +547,12 @@ public class CompositionalSynthesizer extends
         for (final AutomatonProxy aut : automata) {
           estimate *= aut.getStates().size();
         }
-        logger.debug("Monolithically composing " + automata.size()
-                     + " automata, estimated " + estimate + " states.");
+        logger.debug("Monolithically composing " + automata.size() +
+                     " automata, estimated " + estimate + " states.");
       }
       final MonolithicSynchronousProductBuilder syncBuilder =
         getSynchronousProductBuilder();
       final ProductDESProxy des = createProductDESProxy(automata);
-
       syncBuilder.setModel(des);
       final int slimit = getMonolithicStateLimit();
       syncBuilder.setNodeLimit(slimit);
@@ -595,10 +599,16 @@ public class CompositionalSynthesizer extends
 
     // Set up reverse state map of partition
     final int[] recoding = new int[numOfStates];
+    final int badClass = partition.indexOf(null);
+    if (badClass > 0) {
+      Arrays.fill(recoding, badClass);
+    }
     int code = 0;
     for (final int[] clazz : partition) {
-      for (final int state : clazz) {
-        recoding[state] = code;
+      if (clazz != null) {
+        for (final int state : clazz) {
+          recoding[state] = code;
+        }
       }
       code++;
     }
@@ -612,18 +622,20 @@ public class CompositionalSynthesizer extends
       if ((original.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
         int maxCount = 0;
         for (final int[] clazz : partition) {
-          final TIntHashSet successors = new TIntHashSet();
-          for (final int state : clazz) {
-            iter.reset(state, event);
-            while (iter.advance()) {
-              final int target = iter.getCurrentTargetState();
-              final int targetClass = recoding[target];
-              successors.add(targetClass);
+          if (clazz != null) {
+            final TIntHashSet successors = new TIntHashSet();
+            for (final int state : clazz) {
+              iter.reset(state, event);
+              while (iter.advance()) {
+                final int target = iter.getCurrentTargetState();
+                final int targetClass = recoding[target];
+                successors.add(targetClass);
+              }
             }
-          }
-          final int count = successors.size();
-          if (count > maxCount) {
-            maxCount = count;
+            final int count = successors.size();
+            if (count > maxCount) {
+              maxCount = count;
+            }
           }
         }
         if (maxCount > 1) {
@@ -701,39 +713,41 @@ public class CompositionalSynthesizer extends
         } else {
           for (int sourceClass = 0; sourceClass < partition.size(); sourceClass++) {
             final int[] clazz = partition.get(sourceClass);
-            final TIntObjectHashMap<EventProxy> successors =
-              new TIntObjectHashMap<EventProxy>(replacement.size());
-            int next = 0;
-            for (final int source : clazz) {
-              iter.reset(source, event);
-              while (iter.advance()) {
-                final int target = iter.getCurrentTargetState();
-                final int targetClass = recoding[target];
-                EventProxy replacementEventProxy =
-                  successors.get(targetClass);
-                if (replacementEventProxy == null) {
-                  replacementEventProxy = replacement.get(next);
-                  next++;
-                  successors.put(targetClass, replacementEventProxy);
+            if (clazz != null) {
+              final TIntObjectHashMap<EventProxy> successors =
+                new TIntObjectHashMap<EventProxy>(replacement.size());
+              int next = 0;
+              for (final int source : clazz) {
+                iter.reset(source, event);
+                while (iter.advance()) {
+                  final int target = iter.getCurrentTargetState();
+                  final int targetClass = recoding[target];
+                  EventProxy replacementEventProxy =
+                    successors.get(targetClass);
+                  if (replacementEventProxy == null) {
+                    replacementEventProxy = replacement.get(next);
+                    next++;
+                    successors.put(targetClass, replacementEventProxy);
+                    final StateProxy sourceProxy =
+                      simplifiedStatesArray[sourceClass];
+                    final StateProxy targetProxy =
+                      simplifiedStatesArray[targetClass];
+                    final TransitionProxy trans =
+                      factory.createTransitionProxy(sourceProxy,
+                                                    replacementEventProxy,
+                                                    targetProxy);
+                    simplifiedTransitions.add(trans);
+                  }
                   final StateProxy sourceProxy =
-                    simplifiedStatesArray[sourceClass];
+                    distinguisherStatesArray[source];
                   final StateProxy targetProxy =
-                    simplifiedStatesArray[targetClass];
+                    distinguisherStatesArray[target];
                   final TransitionProxy trans =
                     factory.createTransitionProxy(sourceProxy,
                                                   replacementEventProxy,
                                                   targetProxy);
-                  simplifiedTransitions.add(trans);
+                  distinguisherTransitions.add(trans);
                 }
-                final StateProxy sourceProxy =
-                  distinguisherStatesArray[source];
-                final StateProxy targetProxy =
-                  distinguisherStatesArray[target];
-                final TransitionProxy trans =
-                  factory.createTransitionProxy(sourceProxy,
-                                                replacementEventProxy,
-                                                targetProxy);
-                distinguisherTransitions.add(trans);
               }
             }
           }
@@ -864,20 +878,219 @@ public class CompositionalSynthesizer extends
     return encoding;
   }
 
-  private ListBufferTransitionRelation synthesise(final AutomatonProxy automaton,
-                                                  final EventEncoding encoding)
+  private ListBufferTransitionRelation synthesise(final AutomatonProxy aut,
+                                                  final EventEncoding eventEnc)
     throws AnalysisException
   {
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(automaton,
-                                       encoding,
+      new ListBufferTransitionRelation(aut,
+                                       eventEnc,
                                        ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    final int numStates = rel.getNumberOfStates();
     mHalfwaySimplifier.setTransitionRelation(rel);
     final EventProxy defaultMarking = getUsedDefaultMarking();
-    final int defaultID = encoding.getEventCode(defaultMarking);
+    final int defaultID = eventEnc.getEventCode(defaultMarking);
+    if (defaultID < 0) {
+      return null;
+    }
     mHalfwaySimplifier.setDefaultMarkingID(defaultID);
     mHalfwaySimplifier.run();
-    return mHalfwaySimplifier.getPseudoSupervisor();
+    final ListBufferTransitionRelation supervisor =
+      mHalfwaySimplifier.getTransitionRelation();
+    final List<int[]> partition = mHalfwaySimplifier.getResultPartition();
+    if (partition == null) {
+      return null;
+    } else if (partition.isEmpty()) {
+      return supervisor;
+    }
+    final BitSet safeStates = getSafeStates(partition, numStates);
+    final TransitionIterator iter =
+      supervisor.createAllTransitionsReadOnlyIterator();
+    while (iter.advance()) {
+      final int t = iter.getCurrentTargetState();
+      if (!safeStates.get(t)) {
+        final int e = iter.getCurrentEvent();
+        final byte status = rel.getProperEventStatus(e);
+        if (EventEncoding.isControllableEvent(status)) {
+          return supervisor;
+        }
+      }
+    }
+    return null;
+  }
+
+  ListBufferTransitionRelation createPseudoSupervisorTR
+    (final AutomatonProxy aut,
+     final EventEncoding eventEnc,
+     final StateEncoding inputStateEnc,
+     final StateEncoding outputStateEnc,
+     final List<int[]> partition,
+     final HalfWaySynthesisTRSimplifier.OutputMode mode,
+     final int config)
+    throws OverflowException
+  {
+    if (partition == null) {
+      return null;
+    } else if (partition.isEmpty()) {
+      return new ListBufferTransitionRelation
+        (":null", ComponentKind.SUPERVISOR, 1, 0, 0,
+         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    }
+    final AutomatonProxy supervisorAut = createPseudoSupervisorAut
+      (aut, eventEnc, inputStateEnc, partition, mode);
+    if (supervisorAut == aut &&
+        mode != HalfWaySynthesisTRSimplifier.OutputMode.ABSTRACTION) {
+      return null;
+    }
+    return new ListBufferTransitionRelation
+      (supervisorAut, eventEnc, outputStateEnc, config);
+  }
+
+  AutomatonProxy createPseudoSupervisorAut
+    (final AutomatonProxy aut,
+     final EventEncoding eventEnc,
+     final StateEncoding stateEnc,
+     final List<int[]> partition,
+     final HalfWaySynthesisTRSimplifier.OutputMode mode)
+    throws OverflowException
+  {
+    // 1. Find bad states. Are there any?
+    final int numStates = stateEnc.getNumberOfStates();
+    final BitSet safeStates = getSafeStates(partition, numStates);
+    final int numSafeStates = safeStates.cardinality();
+    if (numSafeStates == numStates) {
+      return aut;
+    }
+
+    // 2. Do we have to disable any controllable transitions?
+    final KindTranslator translator = getKindTranslator();
+    final Collection<TransitionProxy> transitions = aut.getTransitions();
+    boolean disabling = false;
+    for (final TransitionProxy trans : transitions) {
+      final StateProxy target = trans.getTarget();
+      final int t = stateEnc.getStateCode(target);
+      if (!safeStates.get(t)) {
+        final EventProxy event = trans.getEvent();
+        final EventKind kind = translator.getEventKind(event);
+        if (mode.isRetainedEvent(kind)) {
+          final StateProxy source = trans.getSource();
+          final int s = stateEnc.getStateCode(source);
+          if (safeStates.get(s)) {
+            disabling = true;
+            break;
+          }
+        }
+      }
+    }
+    if (!disabling) {
+      return aut;
+    }
+    // OK, it seems we really need a supervisor ...
+
+    // 3. Create state space
+    final EventProxy defaultMarking = getUsedDefaultMarking();
+    final List<StateProxy> supervisorStates =
+      new ArrayList<StateProxy>(numSafeStates + 1);
+    StateProxy dumpState = null;
+    for (int s = 0; s < numStates; s++) {
+      final StateProxy state = stateEnc.getState(s);
+      if (safeStates.get(s)) {
+        supervisorStates.add(state);
+      } else if (dumpState == null &&
+                 !state.getPropositions().contains(defaultMarking)) {
+        dumpState = state;
+      }
+    }
+    assert dumpState != null;
+    supervisorStates.add(dumpState);
+
+    // 4. Count selfloops and determine actual events
+    final int numEvents = eventEnc.getNumberOfProperEvents();
+    final int[] selfloops = new int[numEvents];
+    for (final TransitionProxy trans : transitions) {
+      final StateProxy source = trans.getSource();
+      final int s = stateEnc.getStateCode(source);
+      if (safeStates.get(s)) {
+        final EventProxy event = trans.getEvent();
+        final int e = eventEnc.getEventCode(event);
+        if (source != trans.getTarget()) {
+          selfloops[e] = -1;
+        } else if (selfloops[e] >= 0) {
+          selfloops[e]++;
+        }
+      }
+    }
+    int numSupervisorEvents = 0;
+    for (int e = 0; e < numEvents; e++) {
+      if (selfloops[e] < numSafeStates) {
+        numSupervisorEvents++;
+      }
+    }
+    final Collection<EventProxy> supervisorEvents;
+    if (numSupervisorEvents == numEvents) {
+      supervisorEvents = aut.getEvents();
+    } else {
+      supervisorEvents = new ArrayList<EventProxy>(numSupervisorEvents + 1);
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        if (selfloops[e] < numSafeStates) {
+          final EventProxy event = eventEnc.getProperEvent(e);
+          supervisorEvents.add(event);
+        }
+      }
+      supervisorEvents.add(defaultMarking);
+    }
+
+    // 5. Collect transitions
+    final ProductDESProxyFactory factory = getFactory();
+    final Collection<TransitionProxy> supervisorTransitions =
+      new ArrayList<TransitionProxy>(transitions.size());
+    for (final TransitionProxy trans : transitions) {
+      final StateProxy source = trans.getSource();
+      final int s = stateEnc.getStateCode(source);
+      if (!safeStates.get(s)) {
+        continue;
+      }
+      final EventProxy event = trans.getEvent();
+      final int e = eventEnc.getEventCode(event);
+      if (selfloops[e] == numSafeStates) {
+        continue;
+      }
+      final EventKind kind = translator.getEventKind(event);
+      final StateProxy target = trans.getTarget();
+      final int t = stateEnc.getStateCode(target);
+      if (safeStates.get(t)) {
+        supervisorTransitions.add(trans);
+      } else if (mode.isRetainedEvent(kind)) {
+        if (target == dumpState) {
+          supervisorTransitions.add(trans);
+        } else {
+          final TransitionProxy supervisorTrans =
+            factory.createTransitionProxy(source, event, dumpState);
+          supervisorTransitions.add(supervisorTrans);
+        }
+      }
+    }
+
+    // 6. Create pseudo-supervisor automaton
+    final String name = aut.getName();
+    final AutomatonProxy supervisorAut =
+      factory.createAutomatonProxy(name, ComponentKind.SUPERVISOR,
+                                   supervisorEvents, supervisorStates,
+                                   supervisorTransitions);
+    return supervisorAut;
+  }
+
+  private BitSet getSafeStates(final List<int[]> partition, final int numStates)
+  {
+    final BitSet safeStates = new BitSet(numStates);
+    for (final int[] clazz : partition) {
+      if (clazz != null) {
+        for (final int s : clazz) {
+          safeStates.set(s);
+        }
+      }
+    }
+    return safeStates;
   }
 
   private ListBufferTransitionRelation reduceSupervisor(final ListBufferTransitionRelation rel)
@@ -975,7 +1188,15 @@ public class CompositionalSynthesizer extends
     if (!reduced) {
       rel = reduceSupervisor(rel);
     }
-    return removeDumpStates(rel);
+
+    final EventProxy defaultMarking = getUsedDefaultMarking();
+    final int defaultID = mTempEventEncoding.getEventCode(defaultMarking);
+    rel.removeDeadlockStateTransitions(defaultID);
+    final ProductDESProxyFactory factory = getFactory();
+    final String name = getUniqueSupervisorName(rel);
+    rel.setName(name);
+    rel.setKind(ComponentKind.SUPERVISOR);
+    return rel.createAutomaton(factory, mTempEventEncoding);
   }
 
   private boolean isDeterministicGroup(final ListBufferTransitionRelation rel,
@@ -1140,29 +1361,6 @@ public class CompositionalSynthesizer extends
     return new ListBufferTransitionRelation(newSupervisor,
                                             mTempEventEncoding,
                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-  }
-
-  private AutomatonProxy removeDumpStates(final ListBufferTransitionRelation rel)
-    throws OverflowException
-  {
-    final EventProxy defaultMarking = getUsedDefaultMarking();
-    final int defaultMarkingID = mTempEventEncoding.getEventCode(defaultMarking);
-    final boolean usesMarking = rel.isUsedProposition(defaultMarkingID);
-    final int numOfStates = rel.getNumberOfStates();
-    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    for (int sourceState = 0; sourceState < numOfStates; sourceState++) {
-      iter.resetState(sourceState);
-      if (iter.advance()) {
-        //nothing
-      } else if (usesMarking && !rel.isMarked(sourceState, defaultMarkingID)) {
-        rel.setReachable(sourceState, false);
-      }
-    }
-    final ProductDESProxyFactory factory = getFactory();
-    final String name = getUniqueSupervisorName(rel);
-    rel.setName(name);
-    rel.setKind(ComponentKind.SUPERVISOR);
-    return rel.createAutomaton(factory, mTempEventEncoding);
   }
 
   private String getUniqueSupervisorName(final ListBufferTransitionRelation rel)
