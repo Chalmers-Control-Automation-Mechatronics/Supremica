@@ -28,22 +28,22 @@ public abstract class AbstractEFATransitionRelation<L>
   @SuppressWarnings("unchecked")
   public AbstractEFATransitionRelation
     (final ListBufferTransitionRelation rel,
-     final AbstractEFAEventEncoding<L> events,
+     final AbstractEFATransitionLabelEncoding<L> labels,
      final Collection<? extends AbstractEFAVariable<L>> variables,
      final List<SimpleNodeProxy> nodes)
   {
     mTransitionRelation = rel;
-    mEventEncoding = events;
+    mTransitionLabelEncoding = labels;
     mVariables = (Collection<AbstractEFAVariable<L>>) variables;
     mNodeList = nodes;
   }
 
   public AbstractEFATransitionRelation
     (final ListBufferTransitionRelation rel,
-     final AbstractEFAEventEncoding<L> events,
+     final AbstractEFATransitionLabelEncoding<L> labels,
      final Collection<? extends AbstractEFAVariable<L>> variables)
   {
-    this(rel, events, variables, null);
+    this(rel, labels, variables, null);
   }
 
 
@@ -54,9 +54,9 @@ public abstract class AbstractEFATransitionRelation<L>
     return mTransitionRelation;
   }
 
-  public AbstractEFAEventEncoding<L> getEventEncoding()
+  public AbstractEFATransitionLabelEncoding<L> getTransitionLabelEncoding()
   {
-    return mEventEncoding;
+    return mTransitionLabelEncoding;
   }
 
   public List<SimpleNodeProxy> getNodeList()
@@ -126,7 +126,7 @@ public abstract class AbstractEFATransitionRelation<L>
   //#########################################################################
   //# Data Members
   private final ListBufferTransitionRelation mTransitionRelation;
-  private final AbstractEFAEventEncoding<L> mEventEncoding;
+  private final AbstractEFATransitionLabelEncoding<L> mTransitionLabelEncoding;
   private final Collection<AbstractEFAVariable<L>> mVariables;
   private final List<SimpleNodeProxy> mNodeList;
 

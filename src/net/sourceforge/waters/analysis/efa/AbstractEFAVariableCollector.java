@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 /**
  * A utility class to collect all the EFA variables (primed or not) in
- * an update or event encoding.
+ * a constraint or transition label encoding.
  *
  * @author Robi Malik
  */

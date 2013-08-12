@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa
-//# CLASS:   AbstractEFAEventEncoding
+//# CLASS:   AbstractEFATransitionLabelEncoding
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,38 +12,35 @@ package net.sourceforge.waters.analysis.efa;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-
 
 /**
  * @author Robi Malik
  */
 
-public class AbstractEFAEventEncoding<L>
+public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
 {
 
   //#########################################################################
   //# Constructors
-  public AbstractEFAEventEncoding()
+  public AbstractEFATransitionLabelEncoding()
   {
     this(DEFAULT_SIZE);
   }
 
-  public AbstractEFAEventEncoding(final int size)
+  public AbstractEFATransitionLabelEncoding(final int size)
   {
-    mEventMap = new TObjectIntHashMap<L>(size, 0.5f, -1);
-    mUpdateList = new ArrayList<L>(size);
+    mTransitionLabelMap = new TObjectIntHashMap<L>(size, 0.5f, -1);
+    mTransitionLabelList = new ArrayList<L>(size);
   }
 
-  public AbstractEFAEventEncoding(final AbstractEFAEventEncoding<L> encoding)
+  public AbstractEFATransitionLabelEncoding(final AbstractEFATransitionLabelEncoding<L> encoding)
   {
     this(encoding.size());
-    for (int e = EventEncoding.TAU; e < encoding.size(); e++) {
-      final L update = encoding.getUpdate(e);
-      createEventId(update);
+    for (Iterator<L> it = encoding.iterator(); it.hasNext();) {
+      L label = it.next();
+      createTransitionLabelId(label);
     }
   }
 
@@ -57,29 +54,29 @@ public class AbstractEFAEventEncoding<L>
    */
   public int size()
   {
-    return mEventMap.size();
+    return mTransitionLabelMap.size();
   }
 
-  public int getEventId(final ConstraintList update)
+  public int getTransitionLabelId(final L label)
   {
-    return mEventMap.get(update);
+    return mTransitionLabelMap.get(label);
   }
 
-  public L getUpdate(final int event)
+  public L getTransitionLabel(final int labelId)
   {
-    return mUpdateList.get(event);
+    return mTransitionLabelList.get(labelId);
   }
 
-  public int createEventId(final L update)
+  public int createTransitionLabelId(final L label)
   {
-    final int id = mEventMap.get(update);
+    final int id = mTransitionLabelMap.get(label);
     if (id >= 0) {
       return id;
     } else {
-      final int event = mEventMap.size();
-      mEventMap.put(update, event);
-      mUpdateList.add(update);
-      return event;
+      final int labelId = mTransitionLabelMap.size();
+      mTransitionLabelMap.put(label, labelId);
+      mTransitionLabelList.add(label);
+      return labelId;
     }
   }
 
@@ -87,13 +84,16 @@ public class AbstractEFAEventEncoding<L>
    * Adds all updates found in the given event encoding to this event
    * encoding.
    */
-  public void merge(final AbstractEFAEventEncoding<L> enc)
+  public void merge(final AbstractEFATransitionLabelEncoding<L> enc)
   {
-    for (final L update : enc.mUpdateList) {
-      createEventId(update);
+    for (final L label : enc.mTransitionLabelList) {
+      createTransitionLabelId(label);
     }
   }
 
+  public Iterator<L> iterator() {
+    return mTransitionLabelList.iterator();
+  }
 
   //#########################################################################
   //# Debugging
@@ -102,7 +102,7 @@ public class AbstractEFAEventEncoding<L>
   {
     final StringBuffer buffer = new StringBuffer();
     int e = 0;
-    for (final L update : mUpdateList) {
+    for (final L update : mTransitionLabelList) {
       buffer.append(e++);
       buffer.append(" : ");
       buffer.append(update);
@@ -114,12 +114,13 @@ public class AbstractEFAEventEncoding<L>
 
   //#########################################################################
   //# Data Members
-  private final TObjectIntHashMap<L> mEventMap;
-  private final List<L> mUpdateList;
+  private final TObjectIntHashMap<L> mTransitionLabelMap;
+  private final List<L> mTransitionLabelList;
 
 
   //#########################################################################
   //# Class Constants
   protected static final int DEFAULT_SIZE = 16;
+
 }
 

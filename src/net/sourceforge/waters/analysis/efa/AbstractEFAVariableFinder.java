@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
 //# CLASS:   EFAVariableCollector
 //###########################################################################
