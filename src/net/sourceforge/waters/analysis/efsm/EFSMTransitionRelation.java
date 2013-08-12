@@ -45,10 +45,9 @@ public class EFSMTransitionRelation
 
   //#########################################################################
   //# Simple Access
-  @Override
   public EFSMEventEncoding getEventEncoding()
   {
-    return (EFSMEventEncoding) super.getEventEncoding();
+    return (EFSMEventEncoding) super.getTransitionLabelEncoding();
   }
 
   @Override

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa
 //# CLASS:   AbstractEFAVariableContext
 //###########################################################################

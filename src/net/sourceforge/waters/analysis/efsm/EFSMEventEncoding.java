@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.efsm;
 
-import net.sourceforge.waters.analysis.efa.AbstractEFAEventEncoding;
+import net.sourceforge.waters.analysis.efa.AbstractEFATransitionLabelEncoding;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class EFSMEventEncoding extends AbstractEFAEventEncoding<ConstraintList>
+public class EFSMEventEncoding extends AbstractEFATransitionLabelEncoding<ConstraintList>
 {
 
   //#########################################################################
@@ -42,7 +42,21 @@ public class EFSMEventEncoding extends AbstractEFAEventEncoding<ConstraintList>
     super(encoding);
   }
 
+  public int getEventId(final ConstraintList update)
+  {
+    return super.getTransitionLabelId(update);
+  }
 
+  public ConstraintList getUpdate(final int event)
+  {
+    return super.getTransitionLabel(event);
+  }
+
+  public int createEventId(final ConstraintList update)
+  {
+    return super.createTransitionLabelId(update);
+  }
+  
   //#########################################################################
   //# Simple Access
   void setSelfloops(final ListBufferTransitionRelation rel,
