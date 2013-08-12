@@ -10,13 +10,9 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import gnu.trove.iterator.TObjectByteIterator;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,7 +28,6 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifi
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -585,190 +580,28 @@ public class CompositionalSynthesizer extends
     }
   }
 
+
   //#########################################################################
   //# Renaming
-  SynthesisAbstractionStep createDeterministicAutomaton(final AutomatonProxy originalAutomaton,
-                                                        final ListBufferTransitionRelation original,
-                                                        final ListBufferTransitionRelation simplified,
-                                                        final List<int[]> partition,
-                                                        final EventEncoding eventEnc)
+  /**
+   * Gets the back-renamed original for the given event.
+   * @param  event  An event in the current context, which may or may not
+   *                have been renamed.
+   * @return The event corresponding to the given event in the original model.
+   */
+  EventProxy getOriginalEvent(final EventProxy event)
   {
-    final ProductDESProxyFactory factory = getFactory();
-    final int numOfStates = original.getNumberOfStates();
-    final int numOfEvents = eventEnc.getNumberOfProperEvents();
-
-    // Set up reverse state map of partition
-    final int[] recoding = new int[numOfStates];
-    final int badClass = partition.indexOf(null);
-    if (badClass > 0) {
-      Arrays.fill(recoding, badClass);
+    final EventProxy lookup = mBackRenaming.get(event);
+    if (lookup == null) {
+      return event;
+    } else {
+      return lookup;
     }
-    int code = 0;
-    for (final int[] clazz : partition) {
-      if (clazz != null) {
-        for (final int state : clazz) {
-          recoding[state] = code;
-        }
-      }
-      code++;
-    }
+  }
 
-    // Find event replacements
-    final Map<EventProxy,List<EventProxy>> renaming =
-      new HashMap<EventProxy,List<EventProxy>>(numOfEvents);
-    final TransitionIterator iter =
-      original.createSuccessorsReadOnlyIterator();
-    for (int event = 0; event < numOfEvents; event++) {
-      if ((original.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
-        int maxCount = 0;
-        for (final int[] clazz : partition) {
-          if (clazz != null) {
-            final TIntHashSet successors = new TIntHashSet();
-            for (final int state : clazz) {
-              iter.reset(state, event);
-              while (iter.advance()) {
-                final int target = iter.getCurrentTargetState();
-                final int targetClass = recoding[target];
-                successors.add(targetClass);
-              }
-            }
-            final int count = successors.size();
-            if (count > maxCount) {
-              maxCount = count;
-            }
-          }
-        }
-        if (maxCount > 1) {
-          final List<EventProxy> replacement =
-            new ArrayList<EventProxy>(maxCount);
-          final EventProxy eventProxy = eventEnc.getProperEvent(event);
-          for (int i = 0; i < maxCount; i++) {
-            final EventProxy newEvent =
-              factory.createEventProxy("{" + eventProxy.getName() + ":" + i
-                                         + "}", eventProxy.getKind(),
-                                       eventProxy.isObservable());
-            replacement.add(newEvent);
-          }
-          renaming.put(eventProxy, replacement);
-        }
-      }
-    }
-
-    // Create distinguisher and simplified automaton alphabet
-    final Collection<EventProxy> distinguisherEvents =
-      createAlphabet(original, eventEnc, renaming);
-    final Collection<EventProxy> simplifiedEvents =
-      createAlphabet(simplified, eventEnc, renaming);
-
-    // Create distinguisher and simplified automaton states
-    final StateProxy[] distinguisherStatesArray =
-      createStates(original, eventEnc);
-    final StateProxy[] simplifiedStatesArray =
-      createStates(simplified, eventEnc);
-    final Collection<StateProxy> distinguisherStates =
-      getNotNullStates(distinguisherStatesArray);
-    final Collection<StateProxy> simplifiedStates =
-      getNotNullStates(simplifiedStatesArray);
-
-    // Create distinguisher and simplified automaton transitions
-    final Collection<TransitionProxy> distinguisherTransitions =
-      new ArrayList<TransitionProxy>(original.getNumberOfTransitions());
-    final Collection<TransitionProxy> simplifiedTransitions =
-      new ArrayList<TransitionProxy>(original.getNumberOfTransitions());
-    final TransitionIterator originalIter =
-      original.createAllTransitionsReadOnlyIterator();
-    final TransitionIterator simplifiedIter =
-      simplified.createAllTransitionsReadOnlyIterator();
-    for (int event = 0; event < numOfEvents; event++) {
-      if ((original.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
-        final EventProxy eventProxy = eventEnc.getProperEvent(event);
-        final List<EventProxy> replacement = renaming.get(eventProxy);
-        if (replacement == null) {
-          originalIter.resetEvent(event);
-          while (originalIter.advance()) {
-            final int s = originalIter.getCurrentSourceState();
-            final int t = originalIter.getCurrentTargetState();
-            if (original.isReachable(s) && original.isReachable(t)) {
-              final StateProxy source = distinguisherStatesArray[s];
-              final StateProxy target = distinguisherStatesArray[t];
-              final TransitionProxy trans =
-                factory.createTransitionProxy(source, eventProxy, target);
-              distinguisherTransitions.add(trans);
-            }
-          }
-          if ((simplified.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
-            simplifiedIter.resetEvent(event);
-            while (simplifiedIter.advance()) {
-              final int s = simplifiedIter.getCurrentSourceState();
-              final int t = simplifiedIter.getCurrentTargetState();
-              if (simplified.isReachable(s) && simplified.isReachable(t)) {
-                final StateProxy source = simplifiedStatesArray[s];
-                final StateProxy target = simplifiedStatesArray[t];
-                final TransitionProxy trans =
-                  factory.createTransitionProxy(source, eventProxy, target);
-                simplifiedTransitions.add(trans);
-              }
-            }
-          }
-        } else {
-          for (int sourceClass = 0; sourceClass < partition.size(); sourceClass++) {
-            final int[] clazz = partition.get(sourceClass);
-            if (clazz != null) {
-              final TIntObjectHashMap<EventProxy> successors =
-                new TIntObjectHashMap<EventProxy>(replacement.size());
-              int next = 0;
-              for (final int source : clazz) {
-                iter.reset(source, event);
-                while (iter.advance()) {
-                  final int target = iter.getCurrentTargetState();
-                  final int targetClass = recoding[target];
-                  EventProxy replacementEventProxy =
-                    successors.get(targetClass);
-                  if (replacementEventProxy == null) {
-                    replacementEventProxy = replacement.get(next);
-                    next++;
-                    successors.put(targetClass, replacementEventProxy);
-                    final StateProxy sourceProxy =
-                      simplifiedStatesArray[sourceClass];
-                    final StateProxy targetProxy =
-                      simplifiedStatesArray[targetClass];
-                    final TransitionProxy trans =
-                      factory.createTransitionProxy(sourceProxy,
-                                                    replacementEventProxy,
-                                                    targetProxy);
-                    simplifiedTransitions.add(trans);
-                  }
-                  final StateProxy sourceProxy =
-                    distinguisherStatesArray[source];
-                  final StateProxy targetProxy =
-                    distinguisherStatesArray[target];
-                  final TransitionProxy trans =
-                    factory.createTransitionProxy(sourceProxy,
-                                                  replacementEventProxy,
-                                                  targetProxy);
-                  distinguisherTransitions.add(trans);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Create distinguisher and simplified automata
-    final String simplifiedName = original.getName();
-    final String distinguisherName = "dis:" + simplifiedName;
-    final AutomatonProxy simplifiedAutomaton =
-      factory.createAutomatonProxy(simplifiedName, ComponentKind.PLANT,
-                                   simplifiedEvents, simplifiedStates,
-                                   simplifiedTransitions);
-    final AutomatonProxy distinguisherAutomaton =
-      factory.createAutomatonProxy(distinguisherName,
-                                   ComponentKind.SUPERVISOR,
-                                   distinguisherEvents, distinguisherStates,
-                                   distinguisherTransitions);
-
-    // Create distinguisher info
+  void recordDistinuisherInfo(final Map<EventProxy,List<EventProxy>> renaming,
+                              final AutomatonProxy distinguisherAutomaton)
+  {
     for (final Map.Entry<EventProxy,List<EventProxy>> entry :
          renaming.entrySet()) {
       final EventProxy event = entry.getKey();
@@ -781,79 +614,6 @@ public class CompositionalSynthesizer extends
         mBackRenaming.put(replacement, backRenamed);
       }
     }
-    reportAbstractionResult(simplifiedAutomaton, distinguisherAutomaton);
-
-    return new SynthesisAbstractionStep(this, simplifiedAutomaton,
-                                        originalAutomaton, renaming, eventEnc);
-  }
-
-  private Collection<EventProxy> createAlphabet(final ListBufferTransitionRelation rel,
-                                                final EventEncoding eventEnc,
-                                                final Map<EventProxy,List<EventProxy>> eventMap)
-  {
-    final int numOfEvents = eventEnc.getNumberOfProperEvents();
-    final Collection<EventProxy> events =
-      new ArrayList<EventProxy>(numOfEvents);
-    for (int event = 0; event < numOfEvents; event++) {
-      if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
-        final EventProxy eventProxy = eventEnc.getProperEvent(event);
-        if (eventMap.get(eventProxy) != null) {
-          events.addAll(eventMap.get(eventProxy));
-        } else {
-          events.add(eventProxy);
-        }
-      }
-    }
-    for (int p = 0; p < rel.getNumberOfPropositions(); p++) {
-      if (rel.isUsedProposition(p)) {
-        final EventProxy event = eventEnc.getProposition(p);
-        events.add(event);
-      }
-    }
-    return events;
-  }
-
-  private StateProxy[] createStates(final ListBufferTransitionRelation rel,
-                                    final EventEncoding eventEnc)
-  {
-    final int numOfStates = rel.getNumberOfStates();
-    final int numProps = rel.getNumberOfPropositions();
-    final StateProxy[] states = new StateProxy[numOfStates];
-    final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
-      new TLongObjectHashMap<Collection<EventProxy>>();
-    int code = 0;
-    for (int s = 0; s < numOfStates; s++) {
-      if (rel.isReachable(s)) {
-        final StateProxy state;
-        final boolean init = rel.isInitial(s);
-        final long markings = rel.getAllMarkings(s);
-        Collection<EventProxy> props = markingsMap.get(markings);
-        if (props == null) {
-          props = new ArrayList<EventProxy>(numProps);
-          for (int p = 0; p < numProps; p++) {
-            if (rel.isMarked(s, p)) {
-              final EventProxy prop = eventEnc.getProposition(p);
-              props.add(prop);
-            }
-          }
-          markingsMap.put(markings, props);
-        }
-        state = new MemStateProxy(code++, init, props);
-        states[s] = state;
-      }
-    }
-    return states;
-  }
-
-  private Collection<StateProxy> getNotNullStates(final StateProxy[] states)
-  {
-    final List<StateProxy> notNull = new ArrayList<StateProxy>(states.length);
-    for (final StateProxy state : states) {
-      if (state != null) {
-        notNull.add(state);
-      }
-    }
-    return notNull;
   }
 
   private EventEncoding createSynthesisEventEncoding(final AutomatonProxy aut)
@@ -903,7 +663,8 @@ public class CompositionalSynthesizer extends
     } else if (partition.isEmpty()) {
       return supervisor;
     }
-    final BitSet safeStates = getSafeStates(partition, numStates);
+    final BitSet safeStates =
+      SynthesisAbstractionProcedure.getSafeStates(partition, numStates);
     final TransitionIterator iter =
       supervisor.createAllTransitionsReadOnlyIterator();
     while (iter.advance()) {
@@ -919,179 +680,6 @@ public class CompositionalSynthesizer extends
     return null;
   }
 
-  ListBufferTransitionRelation createPseudoSupervisorTR
-    (final AutomatonProxy aut,
-     final EventEncoding eventEnc,
-     final StateEncoding inputStateEnc,
-     final StateEncoding outputStateEnc,
-     final List<int[]> partition,
-     final HalfWaySynthesisTRSimplifier.OutputMode mode,
-     final int config)
-    throws OverflowException
-  {
-    if (partition == null) {
-      return null;
-    } else if (partition.isEmpty()) {
-      return new ListBufferTransitionRelation
-        (":null", ComponentKind.SUPERVISOR, 1, 0, 0,
-         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    }
-    final AutomatonProxy supervisorAut = createPseudoSupervisorAut
-      (aut, eventEnc, inputStateEnc, partition, mode);
-    if (supervisorAut == aut &&
-        mode != HalfWaySynthesisTRSimplifier.OutputMode.ABSTRACTION) {
-      return null;
-    }
-    return new ListBufferTransitionRelation
-      (supervisorAut, eventEnc, outputStateEnc, config);
-  }
-
-  AutomatonProxy createPseudoSupervisorAut
-    (final AutomatonProxy aut,
-     final EventEncoding eventEnc,
-     final StateEncoding stateEnc,
-     final List<int[]> partition,
-     final HalfWaySynthesisTRSimplifier.OutputMode mode)
-    throws OverflowException
-  {
-    // 1. Find bad states. Are there any?
-    final int numStates = stateEnc.getNumberOfStates();
-    final BitSet safeStates = getSafeStates(partition, numStates);
-    final int numSafeStates = safeStates.cardinality();
-    if (numSafeStates == numStates) {
-      return aut;
-    }
-
-    // 2. Do we have to disable any controllable transitions?
-    final KindTranslator translator = getKindTranslator();
-    final Collection<TransitionProxy> transitions = aut.getTransitions();
-    boolean disabling = false;
-    for (final TransitionProxy trans : transitions) {
-      final StateProxy target = trans.getTarget();
-      final int t = stateEnc.getStateCode(target);
-      if (!safeStates.get(t)) {
-        final EventProxy event = trans.getEvent();
-        final EventKind kind = translator.getEventKind(event);
-        if (mode.isRetainedEvent(kind)) {
-          final StateProxy source = trans.getSource();
-          final int s = stateEnc.getStateCode(source);
-          if (safeStates.get(s)) {
-            disabling = true;
-            break;
-          }
-        }
-      }
-    }
-    if (!disabling) {
-      return aut;
-    }
-    // OK, it seems we really need a supervisor ...
-
-    // 3. Create state space
-    final EventProxy defaultMarking = getUsedDefaultMarking();
-    final List<StateProxy> supervisorStates =
-      new ArrayList<StateProxy>(numSafeStates + 1);
-    StateProxy dumpState = null;
-    for (int s = 0; s < numStates; s++) {
-      final StateProxy state = stateEnc.getState(s);
-      if (safeStates.get(s)) {
-        supervisorStates.add(state);
-      } else if (dumpState == null &&
-                 !state.getPropositions().contains(defaultMarking)) {
-        dumpState = state;
-      }
-    }
-    assert dumpState != null;
-    supervisorStates.add(dumpState);
-
-    // 4. Count selfloops and determine actual events
-    final int numEvents = eventEnc.getNumberOfProperEvents();
-    final int[] selfloops = new int[numEvents];
-    for (final TransitionProxy trans : transitions) {
-      final StateProxy source = trans.getSource();
-      final int s = stateEnc.getStateCode(source);
-      if (safeStates.get(s)) {
-        final EventProxy event = trans.getEvent();
-        final int e = eventEnc.getEventCode(event);
-        if (source != trans.getTarget()) {
-          selfloops[e] = -1;
-        } else if (selfloops[e] >= 0) {
-          selfloops[e]++;
-        }
-      }
-    }
-    int numSupervisorEvents = 0;
-    for (int e = 0; e < numEvents; e++) {
-      if (selfloops[e] < numSafeStates) {
-        numSupervisorEvents++;
-      }
-    }
-    final Collection<EventProxy> supervisorEvents;
-    if (numSupervisorEvents == numEvents) {
-      supervisorEvents = aut.getEvents();
-    } else {
-      supervisorEvents = new ArrayList<EventProxy>(numSupervisorEvents + 1);
-      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-        if (selfloops[e] < numSafeStates) {
-          final EventProxy event = eventEnc.getProperEvent(e);
-          supervisorEvents.add(event);
-        }
-      }
-      supervisorEvents.add(defaultMarking);
-    }
-
-    // 5. Collect transitions
-    final ProductDESProxyFactory factory = getFactory();
-    final Collection<TransitionProxy> supervisorTransitions =
-      new ArrayList<TransitionProxy>(transitions.size());
-    for (final TransitionProxy trans : transitions) {
-      final StateProxy source = trans.getSource();
-      final int s = stateEnc.getStateCode(source);
-      if (!safeStates.get(s)) {
-        continue;
-      }
-      final EventProxy event = trans.getEvent();
-      final int e = eventEnc.getEventCode(event);
-      if (selfloops[e] == numSafeStates) {
-        continue;
-      }
-      final EventKind kind = translator.getEventKind(event);
-      final StateProxy target = trans.getTarget();
-      final int t = stateEnc.getStateCode(target);
-      if (safeStates.get(t)) {
-        supervisorTransitions.add(trans);
-      } else if (mode.isRetainedEvent(kind)) {
-        if (target == dumpState) {
-          supervisorTransitions.add(trans);
-        } else {
-          final TransitionProxy supervisorTrans =
-            factory.createTransitionProxy(source, event, dumpState);
-          supervisorTransitions.add(supervisorTrans);
-        }
-      }
-    }
-
-    // 6. Create pseudo-supervisor automaton
-    final String name = aut.getName();
-    final AutomatonProxy supervisorAut =
-      factory.createAutomatonProxy(name, ComponentKind.SUPERVISOR,
-                                   supervisorEvents, supervisorStates,
-                                   supervisorTransitions);
-    return supervisorAut;
-  }
-
-  private BitSet getSafeStates(final List<int[]> partition, final int numStates)
-  {
-    final BitSet safeStates = new BitSet(numStates);
-    for (final int[] clazz : partition) {
-      if (clazz != null) {
-        for (final int s : clazz) {
-          safeStates.set(s);
-        }
-      }
-    }
-    return safeStates;
-  }
 
   private ListBufferTransitionRelation reduceSupervisor(final ListBufferTransitionRelation rel)
     throws AnalysisException
@@ -1115,6 +703,7 @@ public class CompositionalSynthesizer extends
   private AutomatonProxy createSupervisor(ListBufferTransitionRelation rel)
     throws AnalysisException
   {
+    final String name = getUniqueSupervisorName(rel);
     boolean reduced = false;
     List<DistinguisherInfo> distinguisherList =
       new LinkedList<DistinguisherInfo>(mDistinguisherInfoList);
@@ -1123,26 +712,20 @@ public class CompositionalSynthesizer extends
         distinguisherList.listIterator(distinguisherList.size());
       final List<DistinguisherInfo> deferredDistinguishers =
         new LinkedList<DistinguisherInfo>();
-      final THashSet<EventProxy> deferredEvents =
-        new THashSet<EventProxy>();
+      final Set<EventProxy> deferredEvents = new THashSet<EventProxy>();
       boolean renamed = false;
       while (listIter.hasPrevious()) {
         final List<DistinguisherInfo> groupInfo =
           new LinkedList<DistinguisherInfo>();
         boolean isDeterministicGroup =
           isDeterministicGroup(rel, listIter, groupInfo, deferredEvents);
-        ListIterator<DistinguisherInfo> iter =
-          groupInfo.listIterator(groupInfo.size());
         if (isDeterministicGroup) {
-          group: while (iter.hasPrevious()) {
-            final DistinguisherInfo dist = iter.previous();
-            final List<EventProxy> replacement = dist.getReplacement();
-            final ListIterator<EventProxy> it =
-              replacement.listIterator(replacement.size());
-            while (it.hasPrevious()) {
-              if (deferredEvents.contains(it.previous())) {
+          outer:
+          for (final DistinguisherInfo info : groupInfo) {
+            for (final EventProxy event : info.getReplacement()) {
+              if (deferredEvents.contains(event)) {
                 isDeterministicGroup = false;
-                break group;
+                break outer;
               }
             }
           }
@@ -1152,12 +735,16 @@ public class CompositionalSynthesizer extends
             rel = createRenamedSupervisor(rel, groupInfo);
             renamed = true;
           } else {
-            iter = groupInfo.listIterator(groupInfo.size());
+            AutomatonProxy dist = null;
+            final ListIterator<DistinguisherInfo> iter =
+              groupInfo.listIterator(groupInfo.size());
             while (iter.hasPrevious()) {
               final DistinguisherInfo info = iter.previous();
               deferredDistinguishers.add(0, info);
               deferredEvents.add(info.getOriginalEvent());
+              dist = info.getDistinguisher();
             }
+            deferredEvents.addAll(dist.getEvents());
           }
         }
       }
@@ -1188,12 +775,10 @@ public class CompositionalSynthesizer extends
     if (!reduced) {
       rel = reduceSupervisor(rel);
     }
-
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultID = mTempEventEncoding.getEventCode(defaultMarking);
     rel.removeDeadlockStateTransitions(defaultID);
     final ProductDESProxyFactory factory = getFactory();
-    final String name = getUniqueSupervisorName(rel);
     rel.setName(name);
     rel.setKind(ComponentKind.SUPERVISOR);
     return rel.createAutomaton(factory, mTempEventEncoding);
@@ -1202,7 +787,7 @@ public class CompositionalSynthesizer extends
   private boolean isDeterministicGroup(final ListBufferTransitionRelation rel,
                                        final ListIterator<DistinguisherInfo> listIter,
                                        final List<DistinguisherInfo> groupInfo,
-                                       final THashSet<EventProxy> deferredEvents)
+                                       final Set<EventProxy> deferredEvents)
     throws AnalysisAbortException, OverflowException
   {
     boolean foundNondeterminism = false;
@@ -1387,22 +972,6 @@ public class CompositionalSynthesizer extends
       index++;
     } while (found);
     return supname;
-  }
-
-  /**
-   * Gets the back-renamed original for the given event.
-   * @param  event  An event in the current context, which may or may not
-   *                have been renamed.
-   * @return The event corresponding to the given event in the original model.
-   */
-  private EventProxy getOriginalEvent(final EventProxy event)
-  {
-    final EventProxy lookup = mBackRenaming.get(event);
-    if (lookup == null) {
-      return event;
-    } else {
-      return lookup;
-    }
   }
 
 

@@ -2487,6 +2487,7 @@ public class ListBufferTransitionRelation
                                         final EventEncoding eventEnc,
                                         StateEncoding stateEnc)
   {
+    assert getNumberOfProperEvents() == eventEnc.getNumberOfProperEvents();
     final int numEvents = eventEnc.getNumberOfEvents();
     final int numProps = eventEnc.getNumberOfPropositions();
     final Collection<EventProxy> events =

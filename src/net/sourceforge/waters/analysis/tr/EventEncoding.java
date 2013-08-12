@@ -870,13 +870,18 @@ public class EventEncoding
         @Override
         public boolean execute(final EventProxy event, final int code)
         {
-          if (mProperEvents.get(code) != event &&
-              mPropositions.get(code) != event) {
+          if (code < mProperEvents.size() &&
+              mProperEvents.get(code) == event) {
+            return true;
+          } else if (code < mPropositions.size() &&
+                     mPropositions.get(code) == event) {
+            return true;
+          } else {
             final EventProxy oldEvent = oldEvents.get(code);
             final int newCode = mEventCodeMap.get(oldEvent);
             mEventCodeMap.put(event, newCode);
+            return true;
           }
-          return true;
         }
       });
     }
