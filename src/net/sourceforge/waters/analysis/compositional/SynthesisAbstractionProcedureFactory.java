@@ -65,7 +65,7 @@ public enum SynthesisAbstractionProcedureFactory
 
   /**
    * An abstraction chain consisting of halfway synthesis, bisimulation,
-   * and synthesis observation equivalence.
+   * and weak synthesis observation equivalence.
    */
   WSOE {
     @Override
@@ -80,6 +80,26 @@ public enum SynthesisAbstractionProcedureFactory
     }
   },
 
+
+  /**
+   * An abstraction chain consisting of certain unsupervisability, bisimulation,
+   * and weak synthesis observation equivalence.
+   */
+  WSOE_UNSUP {
+    @Override
+    public AbstractionProcedure createAbstractionProcedure
+      (final AbstractCompositionalModelAnalyzer analyzer)
+    {
+      final CompositionalSynthesizer synthesizer =
+        (CompositionalSynthesizer) analyzer;
+      return SynthesisAbstractionProcedure.
+        createSynthesisAbstractionProcedure
+          (synthesizer,
+           SynthesisAbstractionProcedure.USE_UNSUP |
+           SynthesisAbstractionProcedure.USE_BISIMULATION |
+           SynthesisAbstractionProcedure.USE_WSOE);
+    }
+  },
 
   /**
    * An abstraction chain consisting of bisimulation

@@ -2632,7 +2632,7 @@ public class ListBufferTransitionRelation
       final EventKind kind = EventEncoding.isControllableEvent(status) ?
         EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE;
       final boolean local = EventEncoding.isLocalEvent(status);
-      final EventProxy event = factory.createEventProxy("e" + e, kind, local);
+      final EventProxy event = factory.createEventProxy("e" + e, kind, !local);
       events.add(event);
     }
     final KindTranslator translator = IdenticalKindTranslator.getInstance();

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.abstraction.CertainUnsupervisabilityTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
@@ -89,6 +90,11 @@ public class SynthesisAbstractionProcedure extends
       final HalfWaySynthesisTRSimplifier halfWay =
         new HalfWaySynthesisTRSimplifier();
       chain.add(halfWay);
+    }
+    if ((abstractionMethods & USE_UNSUP) != 0) {
+      final CertainUnsupervisabilityTRSimplifier unSup =
+        new CertainUnsupervisabilityTRSimplifier();
+      chain.add(unSup);
     }
     if ((abstractionMethods & USE_BISIMULATION) != 0) {
       final ObservationEquivalenceTRSimplifier bisimulator =
@@ -910,18 +916,22 @@ public class SynthesisAbstractionProcedure extends
    */
   static final int USE_HALFWAY = 0x01;
   /**
+   * Flag to include certain unsupervisability in abstraction chain.
+   */
+  static final int USE_UNSUP = 0x02;
+  /**
    * Flag to include halfway bisimulation in abstraction chain.
    */
-  static final int USE_BISIMULATION = 0x02;
+  static final int USE_BISIMULATION = 0x04;
   /**
    * Flag to include synthesis observation equivalence in abstraction chain.
    */
-  static final int USE_SOE = 0x04;
+  static final int USE_SOE = 0x08;
   /**
    * Flag to include weak synthesis observation equivalence in abstraction
    * chain.
    */
-  static final int USE_WSOE = 0x08;
+  static final int USE_WSOE = 0x10;
 
   /**
    * Argument to

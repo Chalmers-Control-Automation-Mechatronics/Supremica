@@ -44,10 +44,11 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   public CompositionalSynthesizerExperiments(final String statsFilename)
     throws FileNotFoundException
   {
-    this(statsFilename, null, null);
+    this(statsFilename, SynthesisAbstractionProcedureFactory.WSOE, null, null);
   }
 
   public CompositionalSynthesizerExperiments(final String statsFilename,
+                                             final SynthesisAbstractionProcedureFactory method,
                                              final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
                                              final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
     throws FileNotFoundException
@@ -58,6 +59,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     final File statsFile = new File(dir, statsFilename);
     mOut = new FileOutputStream(statsFile);
     mPrintWriter = null;
+    mMethod = method;
     mPreselecting = preselectingHeuristic;
     mSelecting = selectingHeuristic;
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
@@ -78,6 +80,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSynthesizer.setInternalTransitionLimit(internalTransitionLimit);
     final int finalStateLimit = 2000000;
     mSynthesizer.setMonolithicStateLimit(finalStateLimit);
+    mSynthesizer.setAbstractionProcedureFactory(mMethod);
     mSynthesizer.setPreselectingMethod(mPreselecting);
     mSynthesizer.setSelectingMethod(mSelecting);
     mSynthesizer.setSupervisorReductionEnabled(mSupervisorReductionEnabled);
@@ -401,6 +404,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   private boolean mHasBeenPrinted;
   private boolean mSupervisorReductionEnabled;
 
+  private final SynthesisAbstractionProcedureFactory mMethod;
   private AbstractCompositionalModelAnalyzer.PreselectingMethod mPreselecting;
   private AbstractCompositionalModelAnalyzer.SelectingMethod mSelecting;
 }
