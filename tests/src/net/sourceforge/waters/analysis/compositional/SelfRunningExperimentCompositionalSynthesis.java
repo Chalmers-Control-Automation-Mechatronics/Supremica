@@ -44,13 +44,14 @@ public class SelfRunningExperimentCompositionalSynthesis
            preselectingMethod : preselectingFactory.getEnumConstants()) {
         for (final AbstractCompositionalModelAnalyzer.SelectingMethod
              selectingMethod: selectingFactory.getEnumConstants()) {
+          methodCount++;
           for (final SynthesisAbstractionProcedureFactory method: methods) {
             final String preName = preselectingMethod.toString();
             final String selName = selectingMethod.toString();
-            methodCount++;
             // without supervisor reduction:
-            System.out.println("Method " + methodCount + " *** " + preName + "/"
-              + selName + "/" + method + "  without reduction" + " ***");
+            System.out.println
+              ("Method " + methodCount + " *** " + preName + "/" + selName +
+               "/" + method + " without reduction" + " ***");
             final CompositionalSynthesizerExperiments experiment =
               new CompositionalSynthesizerExperiments
               (methodCount + "_" + preName + "_" +  selName + "_" + method +"_NR.csv",
@@ -60,7 +61,7 @@ public class SelfRunningExperimentCompositionalSynthesis
             experiment.runAllTests();
             experiment.tearDown();
             // with supervisor reduction:
-            //          System.out.println("Method " + methodCount + " *** " + preName + "/" + selName + "  with reduction" + " ***");
+            //          System.out.println("Method " + methodCount + " *** " + preName + "/" + selName + " with reduction" + " ***");
             //          experiment =
             //            new CompositionalSynthesizerExperiments
             //              (methodCount + "_" + preName + "_" +  selName + "_R.csv",

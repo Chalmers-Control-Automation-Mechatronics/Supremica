@@ -68,6 +68,17 @@
                             <Point X="136" Y="128"/>
                         </SplineGeometry>
                     </Edge>
+                    <Edge Source="S2" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_u"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="137" Y="175"/>
+                        </SplineGeometry>
+                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>

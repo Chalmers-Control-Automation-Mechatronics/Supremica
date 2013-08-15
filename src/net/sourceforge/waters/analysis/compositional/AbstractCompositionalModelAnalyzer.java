@@ -1158,7 +1158,9 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (logger.isDebugEnabled()) {
       final StringBuffer buffer = new StringBuffer();
       String sep = "Removing events: ";
-      for (final EventProxy event : events) {
+      final List<EventProxy> ordered = new ArrayList<EventProxy>(events);
+      Collections.sort(ordered);
+      for (final EventProxy event : ordered) {
         buffer.append(sep);
         buffer.append(event.getName());
         sep = ", ";
