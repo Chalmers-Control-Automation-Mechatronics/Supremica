@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   HalfWaySynthesisTRSimplifier
+//# CLASS:   CertainUnsupervisabilityTRSimplifier
 //###########################################################################
 //# $Id: 44365f9ce27545868ec37b61ed041ded9c304a22 $
 //###########################################################################
@@ -26,16 +26,16 @@ import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * Transition relation simplifier that implements halfway synthesis.
+ * Transition relation simplifier that implements certain unsupervisability.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class CertainUnsupervisabilityTRSimplifier extends AbstractMarkingTRSimplifier
+public class CertainUnsupervisabilityTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
@@ -57,7 +57,7 @@ public class CertainUnsupervisabilityTRSimplifier extends AbstractMarkingTRSimpl
    * The operation mode determines which transitions to dump state are
    * retained and which are deleted.
    */
-  public void setOutputMode(final OutputMode mode)
+  public void setOutputMode(final HalfWaySynthesisTRSimplifier.OutputMode mode)
   {
     mOutputMode = mode;
   }
@@ -65,9 +65,31 @@ public class CertainUnsupervisabilityTRSimplifier extends AbstractMarkingTRSimpl
   /**
    * Gets the operation mode for halfway synthesis.
    */
-  public OutputMode getOutputMode()
+  public HalfWaySynthesisTRSimplifier.OutputMode getOutputMode()
   {
     return mOutputMode;
+  }
+
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions (including stored silent transitions of the
+   * transitive closure) that will be stored.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  public int getTransitionLimit()
+  {
+    return mTransitionLimit;
   }
 
 
@@ -96,8 +118,6 @@ public class CertainUnsupervisabilityTRSimplifier extends AbstractMarkingTRSimpl
     final int numStates = rel.getNumberOfStates();
     mBadStates = new BitSet(numStates);
   }
-
-  // TODO tearDown()
 
   @Override
   public void reset()
@@ -265,159 +285,83 @@ public class CertainUnsupervisabilityTRSimplifier extends AbstractMarkingTRSimpl
 
   //#########################################################################
   //# Auxiliary Methods
-
   private void calculateUnsupervisableStates()
+    throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final OrderingInfo info = rel.getOrderingInfo();
-    final int firstLocalUnont =  info.getFirstEventIndex
+    final int firstLocalUnont = info.getFirstEventIndex
       (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
     final int lastLocalUncont = info.getLastEventIndex
       (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
-    //TODO
     final TauClosure closure = rel.createPredecessorsTauClosure
-      (firstLocalUnont, lastLocalUncont, Integer.MAX_VALUE);
+      (firstLocalUnont, lastLocalUncont, mTransitionLimit);
     final TransitionIterator tauIter = closure.createIterator();
-    final TransitionIterator tauEventIter = closure.createPreEventClosureIterator();
-    final TransitionIterator eventIter = rel.createPredecessorsReadOnlyIterator();
-    final int prop = getDefaultMarkingID();
+    final TransitionIterator tauEventIter =
+      closure.createPreEventClosureIterator();
+    tauEventIter.resetEventsByStatus(~EventEncoding.STATUS_LOCAL,
+                                     ~EventEncoding.STATUS_CONTROLLABLE);
+    final TransitionIterator eventIter =
+      rel.createPredecessorsReadOnlyIterator();
+    final TIntStack stack = new TIntArrayStack();
+    final int marking = getDefaultMarkingID();
     final int numStates = rel.getNumberOfStates();
-    mBadStates = new BitSet(numStates);
-    mUnsupervisablePairs = new TLongHashSet(numStates);
-    boolean foundNewBad = true;
-    while (foundNewBad) {
-      mCoreachableStates = new BitSet(numStates);
-      final TIntStack stack = new TIntArrayStack();
-      tauIter.reset();
+    final TLongHashSet unsupervisablePairs = new TLongHashSet(numStates);
+    boolean foundNewBad;
+    do {
+      final BitSet coreachableStates = new BitSet(numStates);
       for (int x = 0; x < numStates; x++) {
-        if (rel.isMarked(x, prop)) {
-          tauIter.resume(x);
-          while (tauIter.advance()) {
-            final int w = tauIter.getCurrentSourceState();
-            if(!mBadStates.get(w)) {
-              mCoreachableStates.set(w);
-              stack.push(w);
-            }
-          }
+        if (rel.isMarked(x, marking) && !mBadStates.get(x)) {
+          coreachableStates.set(x);
+          stack.push(x);
         }
       }
       while (stack.size() > 0) {
+        checkAbort();
         final int x = stack.pop();
         eventIter.resetState(x);
         while (eventIter.advance()) {
           final int w = eventIter.getCurrentSourceState();
-          if (!mCoreachableStates.get(w) && !mBadStates.get(w)) {
+          if (!coreachableStates.get(w) && !mBadStates.get(w)) {
             final int sigma = eventIter.getCurrentEvent();
-            final long key = (((long)w)<<32)|sigma;
-            if (!mUnsupervisablePairs.contains(key)) {
-              mCoreachableStates.set(w);
+            final long key = (((long) w) << 32) | sigma;
+            if (!unsupervisablePairs.contains(key)) {
+              coreachableStates.set(w);
               stack.push(w);
             }
           }
         }
       }
       foundNewBad = false;
-      for (int s = mCoreachableStates.previousClearBit(numStates-1); s >= 0;
-           s = mCoreachableStates.previousClearBit(s-1)) {
+      for (int s = coreachableStates.previousClearBit(numStates-1); s >= 0;
+           s = coreachableStates.previousClearBit(s-1)) {
         if (!mBadStates.get(s) && rel.isReachable(s)) {
           foundNewBad = true;
-          tauIter.resetState(s);
+          tauIter.resume(s);
           while (tauIter.advance()) {
+            checkAbort();
             final int x = tauIter.getCurrentSourceState();
             mBadStates.set(x);
             tauEventIter.resetState(x);
-            tauEventIter.resetEventsByStatus(~EventEncoding.STATUS_LOCAL,
-                                             ~EventEncoding.STATUS_CONTROLLABLE);
             while (tauEventIter.advance()) {
               final int w = tauEventIter.getCurrentSourceState();
               final int upsilon = tauEventIter.getCurrentEvent();
-              final long key = (((long)w)<<32)|upsilon;
-              mUnsupervisablePairs.add(key);
+              final long key = (((long) w) << 32) | upsilon;
+              unsupervisablePairs.add(key);
             }
           }
         }
       }
-    }
-  }
-
-  //#########################################################################
-  //# Inner Enumeration OutputMode
-  /**
-   * The operation mode of halfway synthesis.
-   * Different settings determine which transitions to dump state are
-   * retained and which are deleted.
-   */
-  public enum OutputMode
-  {
-    /**
-     * Halfway synthesis mode to compute an abstraction.
-     * Controllable transitions to dump states are deleted,
-     * uncontrollable transitions to dump states are retained.
-     * This setting is the default.
-     */
-    ABSTRACTION {
-      @Override
-      public boolean isRetainedEvent(final byte status)
-      {
-        return !EventEncoding.isControllableEvent(status);
-      }
-
-      @Override
-      public boolean isRetainedEvent(final EventKind kind)
-      {
-        return kind == EventKind.UNCONTROLLABLE;
-      }
-    },
-    /**
-     * Halfway synthesis mode to compute a pseudo-supervisor.
-     * Uncontrollable transitions to dump states are deleted,
-     * controllable transitions to dump states are retained.
-     */
-    PSEUDO_SUPERVISOR {
-      @Override
-      public boolean isRetainedEvent(final byte status)
-      {
-        return EventEncoding.isControllableEvent(status);
-      }
-
-      @Override
-      public boolean isRetainedEvent(final EventKind kind)
-      {
-        return kind == EventKind.CONTROLLABLE;
-      }
-    },
-    /**
-     * Halfway synthesis mode to compute a proper supervisor.
-     * All transitions to dump states are deleted,
-     */
-    PROPER_SUPERVISOR {
-      @Override
-      public boolean isRetainedEvent(final byte status)
-      {
-        return false;
-      }
-
-      @Override
-      public boolean isRetainedEvent(final EventKind kind)
-      {
-        return false;
-      }
-    };
-
-    //#########################################################################
-    //# Data Members
-    public abstract boolean isRetainedEvent(byte status);
-
-    public abstract boolean isRetainedEvent(EventKind kind);
+    } while (foundNewBad);
   }
 
 
   //#########################################################################
   //# Data Members
-  private OutputMode mOutputMode = OutputMode.ABSTRACTION;
+  private HalfWaySynthesisTRSimplifier.OutputMode mOutputMode =
+    HalfWaySynthesisTRSimplifier.OutputMode.ABSTRACTION;
+  private int mTransitionLimit = Integer.MAX_VALUE;
 
   private BitSet mBadStates;
-  private BitSet mCoreachableStates;
-  private TLongHashSet mUnsupervisablePairs;
 
 }

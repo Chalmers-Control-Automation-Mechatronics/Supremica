@@ -75,6 +75,7 @@ public class SynthesisAbstractionProcedure extends
    *          sequence that performs only halfway synthesis and bisimulation.
    *
    * @see #USE_HALFWAY
+   * @see #USE_UNSUP
    * @see #USE_BISIMULATION
    * @see #USE_SOE
    * @see #USE_WSOE
@@ -82,9 +83,11 @@ public class SynthesisAbstractionProcedure extends
    * @see #CHAIN_WSOE
    * @see #CHAIN_ALL
    */
-  public static SynthesisAbstractionProcedure createSynthesisAbstractionProcedure(final CompositionalSynthesizer synthesizer,
-                                                                                  final int abstractionMethods)
+  public static SynthesisAbstractionProcedure createSynthesisAbstractionProcedure
+    (final CompositionalSynthesizer synthesizer,
+     final int abstractionMethods)
   {
+    final int limit = synthesizer.getInternalTransitionLimit();
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     if ((abstractionMethods & USE_HALFWAY) != 0) {
       final HalfWaySynthesisTRSimplifier halfWay =
@@ -94,6 +97,7 @@ public class SynthesisAbstractionProcedure extends
     if ((abstractionMethods & USE_UNSUP) != 0) {
       final CertainUnsupervisabilityTRSimplifier unSup =
         new CertainUnsupervisabilityTRSimplifier();
+      unSup.setTransitionLimit(limit);
       chain.add(unSup);
     }
     if ((abstractionMethods & USE_BISIMULATION) != 0) {
@@ -103,7 +107,6 @@ public class SynthesisAbstractionProcedure extends
         (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
       chain.add(bisimulator);
     }
-    final int limit = synthesizer.getInternalTransitionLimit();
     if ((abstractionMethods & USE_SOE) != 0) {
       final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction =
         new SynthesisObservationEquivalenceTRSimplifier();
@@ -120,6 +123,7 @@ public class SynthesisAbstractionProcedure extends
     }
     return new SynthesisAbstractionProcedure(synthesizer, chain);
   }
+
 
   //#########################################################################
   //# Constructor
