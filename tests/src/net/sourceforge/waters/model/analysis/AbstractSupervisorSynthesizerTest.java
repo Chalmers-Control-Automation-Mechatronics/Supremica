@@ -137,6 +137,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     testSajed();
     testSmallFactory2();
     testTransferLine1();
+    testCertainUnsup();
   }
 
   public void testOverflowException()
@@ -195,6 +196,13 @@ public abstract class AbstractSupervisorSynthesizerTest
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "cell.wmod");
     runSynthesizer(des, true);
+  }
+
+  public void testCertainUnsup() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "certainUnsup.wmod");
+    runSynthesizer(des, false);
   }
 
   public void testCoffeeMachine() throws Exception

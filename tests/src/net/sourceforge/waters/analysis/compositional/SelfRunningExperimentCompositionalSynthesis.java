@@ -40,37 +40,37 @@ public class SelfRunningExperimentCompositionalSynthesis
          SynthesisAbstractionProcedureFactory.WSOE,
          SynthesisAbstractionProcedureFactory.WSOE_UNSUP
       };
-      for (final SynthesisAbstractionProcedureFactory method: methods) {
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
            preselectingMethod : preselectingFactory.getEnumConstants()) {
         for (final AbstractCompositionalModelAnalyzer.SelectingMethod
              selectingMethod: selectingFactory.getEnumConstants()) {
-          final String preName = preselectingMethod.toString();
-          final String selName = selectingMethod.toString();
-          methodCount++;
-          // without supervisor reduction:
-          System.out.println("Method " + methodCount + " *** " + preName + "/"
-          + selName + "/" + method + "  without reduction" + " ***");
-          final CompositionalSynthesizerExperiments experiment =
-            new CompositionalSynthesizerExperiments
+          for (final SynthesisAbstractionProcedureFactory method: methods) {
+            final String preName = preselectingMethod.toString();
+            final String selName = selectingMethod.toString();
+            methodCount++;
+            // without supervisor reduction:
+            System.out.println("Method " + methodCount + " *** " + preName + "/"
+              + selName + "/" + method + "  without reduction" + " ***");
+            final CompositionalSynthesizerExperiments experiment =
+              new CompositionalSynthesizerExperiments
               (methodCount + "_" + preName + "_" +  selName + "_" + method +"_NR.csv",
                method, preselectingMethod, selectingMethod);
-          experiment.setSupervisorReductionEnabled(false);
-          experiment.setUp();
-          experiment.runAllTests();
-          experiment.tearDown();
-          // with supervisor reduction:
-//          System.out.println("Method " + methodCount + " *** " + preName + "/" + selName + "  with reduction" + " ***");
-//          experiment =
-//            new CompositionalSynthesizerExperiments
-//              (methodCount + "_" + preName + "_" +  selName + "_R.csv",
-//               preselectingMethod, selectingMethod);
-//          experiment.setSupervisorReductionEnabled(true);
-//          experiment.setUp();
-//          experiment.runAllTests();
-//          experiment.tearDown();
+            experiment.setSupervisorReductionEnabled(false);
+            experiment.setUp();
+            experiment.runAllTests();
+            experiment.tearDown();
+            // with supervisor reduction:
+            //          System.out.println("Method " + methodCount + " *** " + preName + "/" + selName + "  with reduction" + " ***");
+            //          experiment =
+            //            new CompositionalSynthesizerExperiments
+            //              (methodCount + "_" + preName + "_" +  selName + "_R.csv",
+            //               preselectingMethod, selectingMethod);
+            //          experiment.setSupervisorReductionEnabled(true);
+            //          experiment.setUp();
+            //          experiment.runAllTests();
+            //          experiment.tearDown();
+          }
         }
-      }
       }
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR");
