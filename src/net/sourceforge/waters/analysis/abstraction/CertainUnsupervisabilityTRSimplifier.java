@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.procedure.TLongProcedure;
 import gnu.trove.set.hash.TLongHashSet;
 import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
@@ -117,6 +118,7 @@ public class CertainUnsupervisabilityTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     mBadStates = new BitSet(numStates);
+    mUnsupervisablePairs = new TLongHashSet(numStates);
   }
 
   @Override
@@ -124,6 +126,7 @@ public class CertainUnsupervisabilityTRSimplifier
   {
     super.reset();
     mBadStates = null;
+    mUnsupervisablePairs = null;
   }
 
   @Override
@@ -158,11 +161,13 @@ public class CertainUnsupervisabilityTRSimplifier
       numBadStates++;
     }
 
-    // 3. The transitions relation changes if:
-    //  - there is more than one dump state;
-    //  - there are outgoing transitions from bad states;
-    //  - there are non-retained transitions to bad states;
-    boolean needPartition = numBadStates > 1;
+    // 3. Check if there is any change.'
+    // The transition relation changes if:
+    // a) there is more than one dump state;
+    // b) there are non-retained transitions to bad states;
+    // c) there are outgoing transitions from bad states;
+    // d) there are unsupervisable transitions to non-bad states.
+    boolean needPartition = numBadStates > 1; // a)
     if (!needPartition) {
       final TransitionIterator iter =
         rel.createPredecessorsReadOnlyIterator(dumpState);
@@ -170,7 +175,7 @@ public class CertainUnsupervisabilityTRSimplifier
         checkAbort();
         final int event = iter.getCurrentEvent();
         final byte status = rel.getProperEventStatus(event);
-        if (!mOutputMode.isRetainedEvent(status)) {
+        if (!mOutputMode.isRetainedEvent(status)) { // b)
           needPartition = true;
           break;
         }
@@ -181,9 +186,18 @@ public class CertainUnsupervisabilityTRSimplifier
       while (iter.advance()) {
         checkAbort();
         final int source = iter.getCurrentSourceState();
-        if (mBadStates.get(source)) {
+        if (mBadStates.get(source)) { // c)
           needPartition = true;
           break;
+        }
+        final int event = iter.getCurrentEvent();
+        final long key = (((long)source)<<32)|event;
+        if (mUnsupervisablePairs.contains(key)) {
+          final int target = iter.getCurrentTargetState();
+          if (!mBadStates.get(target)) { // d)
+            needPartition = true;
+            break;
+          }
         }
       }
     }
@@ -231,38 +245,56 @@ public class CertainUnsupervisabilityTRSimplifier
       //  Delete controllable transitions to bad state.
       //  Redirect other bad state transitions to dump state.
       final int dumpState = mBadStates.nextSetBit(0);
-      boolean dumpReachable = rel.isInitial(dumpState);
-      final TransitionIterator iter =
+      final TransitionIterator iterAllTrans =
         rel.createAllTransitionsModifyingIterator();
-      while (iter.advance()) {
+      while (iterAllTrans.advance()) {
         checkAbort();
-        final int source = iter.getCurrentSourceState();
+        final int source = iterAllTrans.getCurrentSourceState();
         if (mBadStates.get(source)) {
-          iter.remove();
+          iterAllTrans.remove();
         } else {
-          final int target = iter.getCurrentTargetState();
+          final int target = iterAllTrans.getCurrentTargetState();
           if (mBadStates.get(target)) {
-            final int event = iter.getCurrentEvent();
+            final int event = iterAllTrans.getCurrentEvent();
             final byte status = rel.getProperEventStatus(event);
             if (mOutputMode.isRetainedEvent(status)) {
               if (target != dumpState) {
                 rel.addTransition(source, event, dumpState);
-                iter.remove();
+                iterAllTrans.remove();
               }
-              dumpReachable = true;
             } else {
-              iter.remove();
+              iterAllTrans.remove();
             }
           }
         }
       }
-      int s = dumpReachable ? mBadStates.nextSetBit(dumpState + 1) : dumpState;
-      for (; s >= 0; s = mBadStates.nextSetBit(s + 1)) {
-        rel.setReachable(s, false);
-      }
       final int config = getPreferredOutputConfiguration() |
         ListBufferTransitionRelation.CONFIG_SUCCESSORS;
       rel.reconfigure(config);
+      /*
+       * A more sophisticated way is forEach method below.
+       * TLongIterator iterUnsupPairs = mUnsupervisablePairs.iterator();
+       * while (iterUnsupPairs.hasNext()) {
+       *   long key = iterUnsupPairs.next();
+       * }
+       */
+      final TransitionIterator iterSucc = rel.createSuccessorsModifyingIterator();
+      mUnsupervisablePairs.forEach(new TLongProcedure() {
+        @Override
+        public boolean execute(final long key)
+        {
+          final int source = (int) (key >> 32);
+          final int event = (int) (key & 0xffffffffL);
+          iterSucc.reset(source, event);
+          while (iterSucc.advance()) {
+            final int target = iterSucc.getCurrentTargetState();
+            if (!mBadStates.get(target)) {
+              iterSucc.remove();
+            }
+          }
+          return true;
+        }
+      });
       if (rel.checkReachability()) {
         // Fix result partition --- is this safe???
         final ListIterator<int[]> liter = partition.listIterator();
@@ -306,7 +338,6 @@ public class CertainUnsupervisabilityTRSimplifier
     final TIntStack stack = new TIntArrayStack();
     final int marking = getDefaultMarkingID();
     final int numStates = rel.getNumberOfStates();
-    final TLongHashSet unsupervisablePairs = new TLongHashSet(numStates);
     boolean foundNewBad;
     do {
       final BitSet coreachableStates = new BitSet(numStates);
@@ -325,7 +356,7 @@ public class CertainUnsupervisabilityTRSimplifier
           if (!coreachableStates.get(w) && !mBadStates.get(w)) {
             final int sigma = eventIter.getCurrentEvent();
             final long key = (((long) w) << 32) | sigma;
-            if (!unsupervisablePairs.contains(key)) {
+            if (!mUnsupervisablePairs.contains(key)) {
               coreachableStates.set(w);
               stack.push(w);
             }
@@ -347,7 +378,7 @@ public class CertainUnsupervisabilityTRSimplifier
               final int w = tauEventIter.getCurrentSourceState();
               final int upsilon = tauEventIter.getCurrentEvent();
               final long key = (((long) w) << 32) | upsilon;
-              unsupervisablePairs.add(key);
+              mUnsupervisablePairs.add(key);
             }
           }
         }
@@ -363,5 +394,5 @@ public class CertainUnsupervisabilityTRSimplifier
   private int mTransitionLimit = Integer.MAX_VALUE;
 
   private BitSet mBadStates;
-
+  private TLongHashSet mUnsupervisablePairs;
 }

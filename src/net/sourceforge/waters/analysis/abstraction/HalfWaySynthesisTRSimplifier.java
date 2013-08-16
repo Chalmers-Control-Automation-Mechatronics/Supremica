@@ -215,7 +215,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       //  Delete controllable transitions to bad state.
       //  Redirect other bad state transitions to dump state.
       final int dumpState = mBadStates.nextSetBit(0);
-      boolean dumpReachable = rel.isInitial(dumpState);
+//      boolean dumpReachable = rel.isInitial(dumpState);
       final TransitionIterator iter =
         rel.createAllTransitionsModifyingIterator();
       while (iter.advance()) {
@@ -233,17 +233,17 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
                 rel.addTransition(source, event, dumpState);
                 iter.remove();
               }
-              dumpReachable = true;
+//              dumpReachable = true;
             } else {
               iter.remove();
             }
           }
         }
       }
-      int s = dumpReachable ? mBadStates.nextSetBit(dumpState + 1) : dumpState;
-      for (; s >= 0; s = mBadStates.nextSetBit(s + 1)) {
-        rel.setReachable(s, false);
-      }
+//      int s = dumpReachable ? mBadStates.nextSetBit(dumpState + 1) : dumpState;
+//      for (; s >= 0; s = mBadStates.nextSetBit(s + 1)) {
+//        rel.setReachable(s, false);
+//      }
       final int config = getPreferredOutputConfiguration() |
         ListBufferTransitionRelation.CONFIG_SUCCESSORS;
       rel.reconfigure(config);

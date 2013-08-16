@@ -44,7 +44,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   public CompositionalSynthesizerExperiments(final String statsFilename)
     throws FileNotFoundException
   {
-    this(statsFilename, SynthesisAbstractionProcedureFactory.WSOE, null, null);
+    this(statsFilename, SynthesisAbstractionProcedureFactory.WSOE_UNSUP, null, null);
   }
 
   public CompositionalSynthesizerExperiments(final String statsFilename,
