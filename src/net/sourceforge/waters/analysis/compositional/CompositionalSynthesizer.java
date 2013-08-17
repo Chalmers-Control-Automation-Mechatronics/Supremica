@@ -30,7 +30,6 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -599,21 +598,21 @@ public class CompositionalSynthesizer extends
     }
   }
 
-  void recordDistinuisherInfo(final Map<EventProxy,List<EventProxy>> renaming,
+  void recordDistinuisherInfo(final Map<EventProxy,List<EventProxy>> renamings,
                               final AutomatonProxy distinguisherAutomaton)
   {
+    final DistinguisherInfo info = new DistinguisherInfo(distinguisherAutomaton);
     for (final Map.Entry<EventProxy,List<EventProxy>> entry :
-         renaming.entrySet()) {
-      final EventProxy event = entry.getKey();
+         renamings.entrySet()) {
+      final EventProxy original = entry.getKey();
       final List<EventProxy> replacements = entry.getValue();
-      final DistinguisherInfo info =
-        new DistinguisherInfo(event, replacements, distinguisherAutomaton);
-      mDistinguisherInfoList.add(info);
-      final EventProxy backRenamed = getOriginalEvent(event);
+      info.addReplacement(original, replacements);
+      final EventProxy backRenamed = getOriginalEvent(original);
       for (final EventProxy replacement : replacements) {
         mBackRenaming.put(replacement, backRenamed);
       }
     }
+    mDistinguisherInfoList.add(info);
   }
 
   private EventEncoding createSynthesisEventEncoding(final AutomatonProxy aut)
@@ -705,72 +704,40 @@ public class CompositionalSynthesizer extends
   {
     final String name = getUniqueSupervisorName(rel);
     boolean reduced = false;
-    List<DistinguisherInfo> distinguisherList =
-      new LinkedList<DistinguisherInfo>(mDistinguisherInfoList);
-    while (!distinguisherList.isEmpty()) {
-      final ListIterator<DistinguisherInfo> listIter =
-        distinguisherList.listIterator(distinguisherList.size());
-      final List<DistinguisherInfo> deferredDistinguishers =
-        new LinkedList<DistinguisherInfo>();
+    while (true) {
+      boolean applied = false;
+      DistinguisherInfo firstDeferred = null;
       final Set<EventProxy> deferredEvents = new THashSet<EventProxy>();
-      boolean renamed = false;
-      while (listIter.hasPrevious()) {
-        final List<DistinguisherInfo> groupInfo =
-          new LinkedList<DistinguisherInfo>();
-        boolean isDeterministicGroup =
-          isDeterministicGroup(rel, listIter, groupInfo, deferredEvents);
-        if (isDeterministicGroup) {
-          outer:
-          for (final DistinguisherInfo info : groupInfo) {
-            for (final EventProxy event : info.getReplacement()) {
-              if (deferredEvents.contains(event)) {
-                isDeterministicGroup = false;
-                break outer;
-              }
-            }
+      final ListIterator<DistinguisherInfo> iter =
+        mDistinguisherInfoList.listIterator(mDistinguisherInfoList.size());
+      while (iter.hasPrevious()) {
+        final DistinguisherInfo info = iter.previous();
+        if (!info.containsReplacedEvent(mTempEventEncoding)) {
+          // skip
+          continue;
+        } else if (info.containsReplacedEvent(deferredEvents) ||
+                   !isDeterministic(rel, info)) {
+          // defer
+          info.addDeferredEvents(deferredEvents);
+          if (firstDeferred == null) {
+            firstDeferred = info;
           }
-        }
-        if (!groupInfo.isEmpty()) {
-          if (isDeterministicGroup) {
-            rel = createRenamedSupervisor(rel, groupInfo);
-            renamed = true;
-          } else {
-            AutomatonProxy dist = null;
-            final ListIterator<DistinguisherInfo> iter =
-              groupInfo.listIterator(groupInfo.size());
-            while (iter.hasPrevious()) {
-              final DistinguisherInfo info = iter.previous();
-              deferredDistinguishers.add(0, info);
-              deferredEvents.add(info.getOriginalEvent());
-              dist = info.getDistinguisher();
-            }
-            deferredEvents.addAll(dist.getEvents());
-          }
+        } else {
+          // apply renaming
+          rel = createRenamedSupervisor(rel, info);
+          applied = true;
+          reduced = false;
         }
       }
-      if (renamed && mReduceIncrementally) {
+      if (firstDeferred == null) {
+        break;
+      } else if (applied && mReduceIncrementally) {
         rel = reduceSupervisor(rel);
         reduced = true;
-      } else if (!deferredDistinguishers.isEmpty()) {
-        final ListIterator<DistinguisherInfo> iter =
-          deferredDistinguishers.listIterator(deferredDistinguishers.size());
-        final List<DistinguisherInfo> list =
-          new LinkedList<DistinguisherInfo>();
-        AutomatonProxy distinguisher = null;
-        while (iter.hasPrevious()) {
-          final DistinguisherInfo info = iter.previous();
-          if (distinguisher == null) {
-            distinguisher = info.getDistinguisher();
-          } else if (distinguisher != info.getDistinguisher()) {
-            break;
-          }
-          list.add(0, info);
-          iter.remove();
-        }
-        rel = createSynchronizedSupervisor(rel, list);
+      } else {
+        rel = createSynchronizedSupervisor(rel, firstDeferred);
         reduced = false;
       }
-      distinguisherList = deferredDistinguishers;
     }
     if (!reduced) {
       rel = reduceSupervisor(rel);
@@ -784,81 +751,53 @@ public class CompositionalSynthesizer extends
     return rel.createAutomaton(factory, mTempEventEncoding);
   }
 
-  private boolean isDeterministicGroup(final ListBufferTransitionRelation rel,
-                                       final ListIterator<DistinguisherInfo> listIter,
-                                       final List<DistinguisherInfo> groupInfo,
-                                       final Set<EventProxy> deferredEvents)
-    throws AnalysisAbortException, OverflowException
+  private boolean isDeterministic(final ListBufferTransitionRelation rel,
+                                  final DistinguisherInfo info)
+    throws AnalysisException
   {
-    boolean foundNondeterminism = false;
-    AutomatonProxy distinguisher = null;
     final int numOfStates = rel.getNumberOfStates();
     final TransitionIterator transitionIter =
       rel.createSuccessorsReadOnlyIterator();
-    while (listIter.hasPrevious()) {
-      checkAbort();
-      final DistinguisherInfo info = listIter.previous();
-      if (distinguisher == null) {
-        distinguisher = info.getDistinguisher();
-      } else if (distinguisher != info.getDistinguisher()) {
-        listIter.next();
-        break;
-      }
-      final Collection<EventProxy> replacement = info.getReplacement();
-      boolean found = false;
-      for (final EventProxy event : replacement) {
-        if (deferredEvents.contains(event)) {
-          foundNondeterminism = true;
-          found = true;
-        }
-        if (mTempEventEncoding.getEventCode(event) >= 0) {
-          found = true;
-        }
-      }
-      if (!found) {
-        continue;
-      }
-      groupInfo.add(0, info);
-      if (!foundNondeterminism) {
-        outer: for (int state = 0; state < numOfStates; state++) {
-          int foundSuccessor = -1;
-          for (final EventProxy event : replacement) {
-            final int code = mTempEventEncoding.getEventCode(event);
-            final int successor;
-            if (code < 0) {
-              // not in alphabet - selflooped in all states
-              successor = state;
+    for (final DistinguisherReplacement pair : info.getReplacements()) {
+      for (int state = 0; state < numOfStates; state++) {
+        checkAbort();
+        int foundSuccessor = -1;
+        for (final EventProxy event : pair.getReplacedEvents()) {
+          final int code = mTempEventEncoding.getEventCode(event);
+          final int successor;
+          if (code < 0) {
+            // not in alphabet - selflooped in all states
+            successor = state;
+          } else {
+            transitionIter.reset(state, code);
+            if (transitionIter.advance()) {
+              successor = transitionIter.getCurrentTargetState();
             } else {
-              transitionIter.reset(state, code);
-              if (transitionIter.advance()) {
-                successor = transitionIter.getCurrentTargetState();
-              } else {
-                successor = -1;
-              }
+              successor = -1;
             }
-            if (successor < 0 || successor == foundSuccessor) {
-              //nothing
-            } else if (foundSuccessor < 0) {
-              foundSuccessor = successor;
-            } else {
-              foundNondeterminism = true;
-              break outer;
-            }
+          }
+          if (successor < 0 || successor == foundSuccessor) {
+            //nothing
+          } else if (foundSuccessor < 0) {
+            foundSuccessor = successor;
+          } else {
+            return false;
           }
         }
       }
     }
-    return !foundNondeterminism;
+    return true;
   }
 
-  private ListBufferTransitionRelation createRenamedSupervisor(final ListBufferTransitionRelation rel,
-                                                               final List<DistinguisherInfo> renamings)
+  private ListBufferTransitionRelation createRenamedSupervisor
+    (final ListBufferTransitionRelation rel,
+     final DistinguisherInfo info)
     throws AnalysisException
   {
     List<EventProxy> events = null;
-    for (final DistinguisherInfo info : renamings) {
-      final EventProxy original = info.getOriginalEvent();
-      final List<EventProxy> replacement = info.getReplacement();
+    for (final DistinguisherReplacement pair : info.getReplacements()) {
+      final EventProxy original = pair.getOriginalEvent();
+      final List<EventProxy> replacement = pair.getReplacedEvents();
       // If an event is not in the encoding, and there is no
       // nondeterminism, these events will be all-selfloops.
       boolean selfloop = false;
@@ -909,11 +848,12 @@ public class CompositionalSynthesizer extends
     return rel;
   }
 
-  private ListBufferTransitionRelation createSynchronizedSupervisor(final ListBufferTransitionRelation rel,
-                                                                    final List<DistinguisherInfo> renamings)
+  private ListBufferTransitionRelation createSynchronizedSupervisor
+    (final ListBufferTransitionRelation rel,
+     final DistinguisherInfo info)
     throws AnalysisException
   {
-    final AutomatonProxy distinguisher = renamings.get(0).getDistinguisher();
+    final AutomatonProxy distinguisher = info.getDistinguisher();
     final ProductDESProxyFactory factory = getFactory();
     final AutomatonProxy oldSupervisor =
       rel.createAutomaton(factory, mTempEventEncoding);
@@ -928,9 +868,9 @@ public class CompositionalSynthesizer extends
     builder.setConstructsResult(true);
     builder.setPropositions(getPropositions());
     builder.setModel(model);
-    for (final DistinguisherInfo info : renamings) {
-      final EventProxy original = info.getOriginalEvent();
-      final List<EventProxy> replacement = info.getReplacement();
+    for (final DistinguisherReplacement pair : info.getReplacements()) {
+      final EventProxy original = pair.getOriginalEvent();
+      final List<EventProxy> replacement = pair.getReplacedEvents();
       builder.addMask(replacement, original);
     }
     try {
@@ -1058,37 +998,68 @@ public class CompositionalSynthesizer extends
   //#########################################################################
   //# Inner Class DistinguisherInfo
   /**
-   * Contains information about event replacement and associated
-   * distinguishers.
+   * A record to hold information about distinguishers.
+   * Contains a distinguisher automaton and a list of associated
+   * event replacements.
    */
-  private class DistinguisherInfo
+  private static class DistinguisherInfo
   {
     //#######################################################################
     //# Constructor
-    private DistinguisherInfo(final EventProxy original,
-                              final List<EventProxy> replacement,
-                              final AutomatonProxy distinguisher)
+    private DistinguisherInfo(final AutomatonProxy distinguisher)
     {
-      mOriginalEvent = original;
-      mReplacement = replacement;
       mDistinguisher = distinguisher;
+      mReplacements = new LinkedList<DistinguisherReplacement>();
     }
 
     //#######################################################################
     //# Simple Access
-    EventProxy getOriginalEvent()
-    {
-      return mOriginalEvent;
-    }
-
-    List<EventProxy> getReplacement()
-    {
-      return mReplacement;
-    }
-
-    AutomatonProxy getDistinguisher()
+    private AutomatonProxy getDistinguisher()
     {
       return mDistinguisher;
+    }
+
+    private List<DistinguisherReplacement> getReplacements()
+    {
+      return mReplacements;
+    }
+
+    private void addReplacement(final EventProxy original,
+                                final List<EventProxy> replacements)
+    {
+      final DistinguisherReplacement pair =
+        new DistinguisherReplacement(original, replacements);
+      mReplacements.add(pair);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private boolean containsReplacedEvent(final Set<EventProxy> events)
+    {
+      for (final DistinguisherReplacement pair : mReplacements) {
+        if (pair.containsReplacedEvent(events)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private boolean containsReplacedEvent(final EventEncoding enc)
+    {
+      for (final DistinguisherReplacement pair : mReplacements) {
+        if (pair.containsReplacedEvent(enc)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void addDeferredEvents(final Collection<EventProxy> deferredEvents)
+    {
+      deferredEvents.addAll(mDistinguisher.getEvents());
+      for (final DistinguisherReplacement pair : mReplacements) {
+        deferredEvents.add(pair.getOriginalEvent());
+      }
     }
 
     //#######################################################################
@@ -1096,15 +1067,101 @@ public class CompositionalSynthesizer extends
     @Override
     public String toString()
     {
-      return mDistinguisher.getName() + " " + getReplacement().toString()
-             + " -> " + mOriginalEvent.getName();
+      final StringBuffer buffer = new StringBuffer();
+      buffer.append(mDistinguisher.getName());
+      for (final DistinguisherReplacement pair : mReplacements) {
+        buffer.append("\n  [");
+        boolean first = true;
+        for (final EventProxy event : pair.getReplacedEvents()) {
+          if (first) {
+            first = false;
+          } else {
+            buffer.append(", ");
+          }
+          buffer.append(event.getName());
+        }
+        buffer.append("] -> ");
+        final EventProxy original = pair.getOriginalEvent();
+        buffer.append(original.getName());
+      }
+      return buffer.toString();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final AutomatonProxy mDistinguisher;
+    private final List<DistinguisherReplacement> mReplacements;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class DistinguisherReplacement
+  /**
+   * An event replacement of a distinguisher.
+   * These objects are part of a {@link DistinguisherInfo}.
+   */
+  private static class DistinguisherReplacement
+  {
+    //#######################################################################
+    //# Constructor
+    private DistinguisherReplacement(final EventProxy original,
+                                     final List<EventProxy> replacement)
+    {
+      mOriginalEvent = original;
+      mReplacedEvents = replacement;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private EventProxy getOriginalEvent()
+    {
+      return mOriginalEvent;
+    }
+
+    private List<EventProxy> getReplacedEvents()
+    {
+      return mReplacedEvents;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private boolean containsReplacedEvent(final Set<EventProxy> events)
+    {
+      for (final EventProxy event : mReplacedEvents) {
+        if (events.contains(event)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private boolean containsReplacedEvent(final EventEncoding enc)
+    {
+      for (final EventProxy event : mReplacedEvents) {
+        final int e = enc.getEventCode(event);
+        if (e >= 0) {
+          final byte status = enc.getProperEventStatus(e);
+          if (EventEncoding.isUsedEvent(status)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mReplacedEvents.toString() + " -> " + mOriginalEvent.getName();
     }
 
     //#######################################################################
     //# Data Members
     private final EventProxy mOriginalEvent;
-    private final List<EventProxy> mReplacement;
-    private final AutomatonProxy mDistinguisher;
+    private final List<EventProxy> mReplacedEvents;
 
   }
 
