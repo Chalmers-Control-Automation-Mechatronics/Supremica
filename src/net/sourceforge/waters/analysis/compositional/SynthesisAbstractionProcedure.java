@@ -145,7 +145,6 @@ public class SynthesisAbstractionProcedure extends
     throws AnalysisException
   {
     try {
-      final boolean useRenaming = containsRenamedEvents(aut);
       final EventEncoding mergedEnc = createEventEncoding(aut, local, true);
       final StateEncoding inputStateEnc = createStateEncoding(aut);
       final int numStates = inputStateEnc.getNumberOfStates();
@@ -163,7 +162,7 @@ public class SynthesisAbstractionProcedure extends
         int[] invPartition = null;
         // 1. Check if the abstraction is deterministic
         boolean det = true;
-        if (!useRenaming) {
+        if (!mUsingRenaming) {
           // If there is no prior renaming, check the output directly
           if (isMergingPartition(partition)) {
             rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
@@ -288,17 +287,6 @@ public class SynthesisAbstractionProcedure extends
 
   //#########################################################################
   //# Auxiliary Methods
-  private boolean containsRenamedEvents(final AutomatonProxy aut)
-  {
-    final CompositionalSynthesizer synthesizer = getAnalyzer();
-    for (final EventProxy event : aut.getEvents()) {
-      if (synthesizer.getOriginalEvent(event) != event) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   private EventEncoding createEventEncoding(final AutomatonProxy aut,
                                             final Collection<EventProxy> local,
                                             final boolean useRenaming)
@@ -307,22 +295,45 @@ public class SynthesisAbstractionProcedure extends
     final KindTranslator translator = getKindTranslator();
     final Collection<EventProxy> props = getPropositions();
     final EventEncoding encoding = new EventEncoding();
+    EventProxy tauC = null;
+    EventProxy tauU = null;
+    mUsingRenaming = false;
     for (final EventProxy event : aut.getEvents()) {
-      if (translator.getEventKind(event) == EventKind.PROPOSITION) {
+      final EventKind kind = translator.getEventKind(event);
+      if (kind == EventKind.PROPOSITION) { // proposition event
         if (props != null && props.contains(event)) {
           final int p = encoding.addEvent(event, translator, 0);
           if (event == getUsedDefaultMarking()) {
             mChain.setDefaultMarkingID(p);
           }
         }
-      } else {
-        final byte status =
-          local.contains(event) ? EventEncoding.STATUS_LOCAL : 0;
+      } else if (!local.contains(event)) { // shared event
         if (useRenaming) {
           final EventProxy original = synthesizer.getOriginalEvent(event);
-          encoding.addEventAlias(event, original, translator, status);
+          encoding.addEventAlias(event, original, translator, 0);
+          mUsingRenaming |= original != event;
         } else {
-          encoding.addEvent(event, translator, status);
+          encoding.addEvent(event, translator, 0);
+        }
+      } else if (kind == EventKind.CONTROLLABLE) { // local controllable
+        if (tauC == null || !useRenaming) {
+          encoding.addEvent(event, translator,
+                            EventEncoding.STATUS_LOCAL);
+          tauC = event;
+        } else {
+          encoding.addEventAlias(event, tauC, translator,
+                                 EventEncoding.STATUS_LOCAL);
+          mUsingRenaming = true;
+        }
+      } else { // local uncontrollable
+        if (tauU == null || !useRenaming) {
+          encoding.addEvent(event, translator,
+                            EventEncoding.STATUS_LOCAL);
+          tauU = event;
+        } else {
+          encoding.addEventAlias(event, tauU, translator,
+                                 EventEncoding.STATUS_LOCAL);
+          mUsingRenaming = true;
         }
       }
     }
@@ -911,6 +922,8 @@ public class SynthesisAbstractionProcedure extends
   //#########################################################################
   //# Data Members
   private final ChainTRSimplifier mChain;
+
+  private boolean mUsingRenaming;
 
 
   //#########################################################################
