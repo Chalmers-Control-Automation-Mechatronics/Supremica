@@ -78,9 +78,9 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSynthesizer.setInternalStateLimit(internalStateLimit);
     final int internalTransitionLimit = 1000000;
     mSynthesizer.setInternalTransitionLimit(internalTransitionLimit);
-    final int finalStateLimit = 2000000;
+    final int finalStateLimit = 1000000;
     mSynthesizer.setMonolithicStateLimit(finalStateLimit);
-    final int finalTransitionLimit = 10000000;
+    final int finalTransitionLimit = 5000000;
     mSynthesizer.setMonolithicTransitionLimit(finalTransitionLimit);
     mSynthesizer.setAbstractionProcedureFactory(mMethod);
     mSynthesizer.setPreselectingMethod(mPreselecting);

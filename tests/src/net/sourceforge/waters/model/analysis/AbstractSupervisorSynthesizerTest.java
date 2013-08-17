@@ -254,6 +254,20 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+  public void testIPCcswitch() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC_cswitch.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testIPCuswicth() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC_uswitch.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testManufacturingSystem() throws Exception
   {
     final ProductDESProxy des =
