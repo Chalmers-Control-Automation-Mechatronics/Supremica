@@ -457,7 +457,7 @@ public class AutomataSynthesizer
            synthesizer.setPreselectingMethod
              (AbstractCompositionalModelAnalyzer.MustL);
            synthesizer.setSelectingMethod
-             (AbstractCompositionalModelAnalyzer.MinS);
+             (AbstractCompositionalModelAnalyzer.MinSync);
           synthesizer.run();
           final ProductDESResult watersResult =
             synthesizer.getAnalysisResult();
