@@ -93,6 +93,7 @@ public class EPSGraphPrinter extends Renderer
 
   //#########################################################################
   //# Interface org.apache.xmlgraphics.java2d.TextHandler
+  @Override
   public void drawString(final Graphics2D graphics, final String text,
                          final float x, final float y)
     throws IOException
@@ -118,6 +119,7 @@ public class EPSGraphPrinter extends Renderer
     gen.writeln("grestore");
   }
 
+  @Override
   @Deprecated
   public void drawString(final String text, final float x, final float y)
     throws IOException

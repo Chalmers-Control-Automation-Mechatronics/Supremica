@@ -24,15 +24,16 @@ import javax.swing.JScrollPane;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
-import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.renderer.GeometryChecker;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.model.base.DefaultProxyVisitor;
@@ -191,7 +192,7 @@ public class ProcessCommandLineArguments
               throw new ClassCastException("Unknown document type");
             }
 
-            // Loop throgh components and print eps-figures
+            // Loop through components and print eps-figures
             //module.acceptVisitor(new EPSPrinterVisitor(module));
             final List<Proxy> components = module.getComponentList();
             final DefaultProxyVisitor visitor =
@@ -290,24 +291,28 @@ public class ProcessCommandLineArguments
                                      (EditorWindowInterface) null,
                                      (ControlledToolbar) new ControlledToolbar() {
 
-                                       public Tool getTool()
+                                       @Override
+                                      public Tool getTool()
                                        {
                                          return ControlledToolbar.Tool.SELECT;
                                        }
 
-                                       public void attach(final Observer o)
+                                       @Override
+                                      public void attach(final Observer o)
                                        {
                                          throw new UnsupportedOperationException(
                                                                                  "Not supported yet.");
                                        }
 
-                                       public void detach(final Observer o)
+                                       @Override
+                                      public void detach(final Observer o)
                                        {
                                          throw new UnsupportedOperationException(
                                                                                  "Not supported yet.");
                                        }
 
-                                       public void fireEditorChangedEvent(final EditorChangedEvent e)
+                                       @Override
+                                      public void fireEditorChangedEvent(final EditorChangedEvent e)
                                        {
                                          throw new UnsupportedOperationException(
                                                                                  "Not supported yet.");
@@ -477,15 +482,20 @@ class EPSPrinterVisitor extends DefaultModuleProxyVisitor
   {
     try {
       final Map<String,String> attribs = comp.getAttributes();
+      final GraphProxy graph = comp.getGraph();
       if (attribs.containsKey(DefaultAttributeFactory.EPS_SUPPRESS_KEY)) {
         if (mVerbose) {
           System.out.println("Not generating EPS for " + comp.getName() +
                              ": suppressed.");
         }
+      } else if (!GeometryChecker.hasGeometry(graph)) {
+        if (mVerbose) {
+          System.out.println("Not generating EPS for " + comp.getName() +
+                             ": missing geometry.");
+        }
       } else {
         final String name = comp.getName();
         final File file = new File(name + ".eps");
-        final GraphProxy graph = comp.getGraph();
         final EPSGraphPrinter printer =
           new EPSGraphPrinter(graph, mContext, file);
         printer.print();
