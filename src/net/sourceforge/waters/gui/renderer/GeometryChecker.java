@@ -12,7 +12,6 @@ package net.sourceforge.waters.gui.renderer;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
-import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -21,7 +20,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 
 /**
- * A utility class to checker whether a {@link GraphProxy} has geometry
+ * A utility class to check whether a {@link GraphProxy} has geometry
  * information.
  *
  * @author Robi Malik
@@ -53,12 +52,6 @@ public class GeometryChecker extends DefaultModuleProxyVisitor
   //#######################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
-  public Boolean visitEdgeProxy(final EdgeProxy edge)
-  {
-    return edge.getGeometry() != null;
-  }
-
-  @Override
   public Boolean visitGraphProxy(final GraphProxy graph)
     throws VisitorException
   {
@@ -69,11 +62,6 @@ public class GeometryChecker extends DefaultModuleProxyVisitor
     for (final NodeProxy node : graph.getNodes()) {
       final boolean geo = (Boolean) node.acceptVisitor(this);
       if (!geo) {
-        return false;
-      }
-    }
-    for (final EdgeProxy edge : graph.getEdges()) {
-      if (!visitEdgeProxy(edge)) {
         return false;
       }
     }

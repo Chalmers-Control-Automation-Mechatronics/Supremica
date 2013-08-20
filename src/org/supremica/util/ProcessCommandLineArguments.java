@@ -478,24 +478,23 @@ class EPSPrinterVisitor extends DefaultModuleProxyVisitor
    */
   @Override
   public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
-    throws VisitorException
   {
-    try {
-      final Map<String,String> attribs = comp.getAttributes();
-      final GraphProxy graph = comp.getGraph();
-      if (attribs.containsKey(DefaultAttributeFactory.EPS_SUPPRESS_KEY)) {
-        if (mVerbose) {
-          System.out.println("Not generating EPS for " + comp.getName() +
-                             ": suppressed.");
-        }
-      } else if (!GeometryChecker.hasGeometry(graph)) {
-        if (mVerbose) {
-          System.out.println("Not generating EPS for " + comp.getName() +
-                             ": missing geometry.");
-        }
-      } else {
-        final String name = comp.getName();
-        final File file = new File(name + ".eps");
+    final Map<String,String> attribs = comp.getAttributes();
+    final String name = comp.getName();
+    final GraphProxy graph = comp.getGraph();
+    if (attribs.containsKey(DefaultAttributeFactory.EPS_SUPPRESS_KEY)) {
+      if (mVerbose) {
+        System.out.println("Not generating EPS for " + name +
+          ": suppressed.");
+      }
+    } else if (!GeometryChecker.hasGeometry(graph)) {
+      if (mVerbose) {
+        System.out.println("Not generating EPS for " + name +
+          ": missing geometry.");
+      }
+    } else {
+      final File file = new File(name + ".eps");
+      try {
         final EPSGraphPrinter printer =
           new EPSGraphPrinter(graph, mContext, file);
         printer.print();
@@ -503,12 +502,15 @@ class EPSPrinterVisitor extends DefaultModuleProxyVisitor
         if (mVerbose) {
           System.out.println("Wrote " + file.getAbsolutePath());
         }
+      } catch (final IOException exception) {
+        if (mVerbose) {
+          System.out.println("Failed generating EPS for " + name + ": " +
+            exception.getMessage());
+        }
       }
-      // Return any value ...
-      return null;
-    } catch (final IOException exception) {
-      throw wrap(exception);
     }
+    // Return any value ...
+    return null;
   }
 
 
