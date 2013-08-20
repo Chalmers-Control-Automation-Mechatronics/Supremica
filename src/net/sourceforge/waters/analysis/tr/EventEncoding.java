@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.tr;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.list.array.TByteArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.procedure.TObjectIntProcedure;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -226,7 +227,7 @@ public class EventEncoding
     mPropositions = new ArrayList<EventProxy>(numEvents);
     mProperEventStatus = new TByteArrayList(numEvents);
     mPropositionStatus = new TByteArrayList(numEvents);
-    mEventCodeMap = new TObjectIntHashMap<EventProxy>(numEvents);
+    mEventCodeMap = new TObjectIntHashMap<EventProxy>(numEvents, 0.5f, -1);
     mProperEvents.add(tau);
     if (tau == null) {
       mProperEventStatus.add((byte) (STATUS_FULLY_LOCAL | STATUS_UNUSED));
@@ -381,11 +382,7 @@ public class EventEncoding
    */
   public int getEventCode(final EventProxy event)
   {
-    if (mEventCodeMap.containsKey(event)) {
-      return mEventCodeMap.get(event);
-    } else {
-      return -1;
-    }
+    return mEventCodeMap.get(event);
   }
 
   /**
@@ -462,8 +459,7 @@ public class EventEncoding
    * with a new event, assigning a new code.
    * @param  event       The event to be added, which may be a proper event
    *                     or a proposition.
-   * @param  translator  Kind translator to distinguish propositions from
-   *                     proper events.
+   * @param  translator  Kind translator to get event kind information.
    * @param  status      Collection of status flags providing additional
    *                     information about the event. Should be a combination
    *                     of the bits {@link #STATUS_CONTROLLABLE},
@@ -477,7 +473,10 @@ public class EventEncoding
                       final KindTranslator translator,
                       int status)
   {
-    final int code;
+    int code = mEventCodeMap.get(event);
+    if (code >= 0) {
+      return code;
+    }
     switch (translator.getEventKind(event)) {
     case CONTROLLABLE:
       status |= STATUS_CONTROLLABLE;
@@ -497,6 +496,38 @@ public class EventEncoding
       throw new IllegalArgumentException
         ("Unknown event kind " + event.getKind() + "!");
     }
+    return code;
+  }
+
+  /**
+   * Adds an event renaming pair to this encoding.
+   * This method first adds the given event to the encoding.
+   * Then the given alias event is mapped to the same event code without
+   * adding it to the encoding. This provides a simple means to implement
+   * renaming, as it allows several events to use the same code.
+   * @param  alias       The alias to be added, which should be a proper
+   *                     event and not a proposition.
+   * @param  event       The event the alias should map to, which should be
+   *                     a proper event and not a proposition. If this event
+   *                     is not yet present in the encoding, it is added.
+   *                     Otherwise the existing event code is used.
+   * @param  translator  Kind translator to get event kind information.
+   * @param  status      Collection of status flags providing additional
+   *                     information about the event. Should be a combination
+   *                     of the bits {@link #STATUS_CONTROLLABLE},
+   *                     {@link #STATUS_LOCAL},
+   *                     {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                     {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                     {@link #STATUS_UNUSED}.
+   * @return The event code that was assigned to the event.
+   */
+  public int addEventAlias(final EventProxy alias,
+                           final EventProxy event,
+                           final KindTranslator translator,
+                           final int status)
+  {
+    final int code = addEvent(event, translator, status);
+    mEventCodeMap.put(alias, code);
     return code;
   }
 
@@ -799,7 +830,8 @@ public class EventEncoding
 
   //#########################################################################
   //# Inner Class EventOrdering
-  private class EventOrdering implements Comparator<EventProxy>
+  private class EventOrdering
+    implements Comparator<EventProxy>
   {
     //#######################################################################
     //# Constructor
@@ -822,6 +854,8 @@ public class EventEncoding
     //# Invocation
     private void sortProperEvents()
     {
+      final List<EventProxy> oldEvents =
+        new ArrayList<EventProxy>(mProperEvents);
       Collections.sort(mProperEvents, this);
       final int numEvents = mProperEvents.size();
       final TByteArrayList oldStatus = new TByteArrayList(mProperEventStatus);
@@ -832,6 +866,24 @@ public class EventEncoding
         final byte status = oldStatus.get(oldCode);
         mProperEventStatus.set(e, status);
       }
+      mEventCodeMap.forEachEntry(new TObjectIntProcedure<EventProxy>() {
+        @Override
+        public boolean execute(final EventProxy event, final int code)
+        {
+          if (code < mProperEvents.size() &&
+              mProperEvents.get(code) == event) {
+            return true;
+          } else if (code < mPropositions.size() &&
+                     mPropositions.get(code) == event) {
+            return true;
+          } else {
+            final EventProxy oldEvent = oldEvents.get(code);
+            final int newCode = mEventCodeMap.get(oldEvent);
+            mEventCodeMap.put(event, newCode);
+            return true;
+          }
+        }
+      });
     }
 
     //#######################################################################
@@ -841,6 +893,10 @@ public class EventEncoding
     {
       if (event1 == event2) {
         return 0;
+      } else if (event1 == null) {
+        return -1;
+      } else if (event2 == null) {
+        return 1;
       }
       final int e1 = mEventCodeMap.get(event1);
       final int e2 = mEventCodeMap.get(event2);

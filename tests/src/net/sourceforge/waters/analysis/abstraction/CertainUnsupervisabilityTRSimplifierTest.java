@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
-public class HalfWaySynthesisTRSimplifierTest
+public class CertainUnsupervisabilityTRSimplifierTest
   extends AbstractTRSimplifierTest
 {
 
@@ -30,7 +30,7 @@ public class HalfWaySynthesisTRSimplifierTest
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(HalfWaySynthesisTRSimplifierTest.class);
+        new TestSuite(CertainUnsupervisabilityTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -44,15 +44,15 @@ public class HalfWaySynthesisTRSimplifierTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest
   @Override
-  protected HalfWaySynthesisTRSimplifier createTransitionRelationSimplifier()
+  protected CertainUnsupervisabilityTRSimplifier createTransitionRelationSimplifier()
   {
-    return new HalfWaySynthesisTRSimplifier();
+    return new CertainUnsupervisabilityTRSimplifier();
   }
 
   @Override
-  protected HalfWaySynthesisTRSimplifier getTransitionRelationSimplifier()
+  protected CertainUnsupervisabilityTRSimplifier getTransitionRelationSimplifier()
   {
-    return (HalfWaySynthesisTRSimplifier)
+    return (CertainUnsupervisabilityTRSimplifier)
       super.getTransitionRelationSimplifier();
   }
 
@@ -89,7 +89,7 @@ public class HalfWaySynthesisTRSimplifierTest
   protected void configureTransitionRelationSimplifier()
   {
     super.configureTransitionRelationSimplifier();
-    final HalfWaySynthesisTRSimplifier simplifier =
+    final CertainUnsupervisabilityTRSimplifier simplifier =
       getTransitionRelationSimplifier();
     simplifier.setDefaultMarkingID(mDefaultMarkingID);
   }
@@ -122,6 +122,46 @@ public class HalfWaySynthesisTRSimplifierTest
    * a .des file (for text viewing) and as a .wmod file (to load into the IDE).
    * </P>
    */
+  public void test_CertainUnsup_1() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "CertainUnsup_01.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_CertainUnsup_2() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "CertainUnsup_02.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_CertainUnsup_3() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "CertainUnsup_03.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_CertainUnsup_4() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "CertainUnsup_04.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_CertainUnsupTrans_1() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "CertainUnsupTrans_01.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   public void test_HalfwaySynthesis_1() throws Exception
   {
     final String group = "tests";
@@ -218,14 +258,6 @@ public class HalfWaySynthesisTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_HalfwaySynthesis_13() throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "HalfwaySynthesis_13.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
-  }
-
   @Override
   public void test_basic_7() throws Exception
   {
@@ -234,6 +266,7 @@ public class HalfWaySynthesisTRSimplifierTest
     final String name = "HalfwaySynthesisBasic_7.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+
 
   /**
    * A test to see whether a single abstraction rule object can perform

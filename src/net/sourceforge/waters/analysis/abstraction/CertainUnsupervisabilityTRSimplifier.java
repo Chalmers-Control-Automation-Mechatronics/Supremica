@@ -2,13 +2,15 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   HalfWaySynthesisTRSimplifier
+//# CLASS:   CertainUnsupervisabilityTRSimplifier
 //###########################################################################
 //# $Id: 44365f9ce27545868ec37b61ed041ded9c304a22 $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.procedure.TLongProcedure;
+import gnu.trove.set.hash.TLongHashSet;
 import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
 
@@ -19,29 +21,31 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventEncoding.OrderingInfo;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * Transition relation simplifier that implements halfway synthesis.
+ * Transition relation simplifier that implements certain unsupervisability.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
+public class CertainUnsupervisabilityTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
   //# Constructors
-  public HalfWaySynthesisTRSimplifier()
+  public CertainUnsupervisabilityTRSimplifier()
   {
   }
 
-  public HalfWaySynthesisTRSimplifier(final ListBufferTransitionRelation rel)
+  public CertainUnsupervisabilityTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
   }
@@ -54,7 +58,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
    * The operation mode determines which transitions to dump state are
    * retained and which are deleted.
    */
-  public void setOutputMode(final OutputMode mode)
+  public void setOutputMode(final HalfWaySynthesisTRSimplifier.OutputMode mode)
   {
     mOutputMode = mode;
   }
@@ -62,9 +66,31 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
   /**
    * Gets the operation mode for halfway synthesis.
    */
-  public OutputMode getOutputMode()
+  public HalfWaySynthesisTRSimplifier.OutputMode getOutputMode()
   {
     return mOutputMode;
+  }
+
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions (including stored silent transitions of the
+   * transitive closure) that will be stored.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  public int getTransitionLimit()
+  {
+    return mTransitionLimit;
   }
 
 
@@ -92,6 +118,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     mBadStates = new BitSet(numStates);
+    mUnsupervisablePairs = new TLongHashSet(numStates);
   }
 
   @Override
@@ -99,6 +126,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
   {
     super.reset();
     mBadStates = null;
+    mUnsupervisablePairs = null;
   }
 
   @Override
@@ -112,17 +140,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
     final int numStates = rel.getNumberOfStates();
 
     // 1. Do synthesis --- find bad states
-    final BitSet coreachableStates = new BitSet(numStates);
-    do {
-      coreachableStates.clear();
-      findCoreachableStates(coreachableStates, mBadStates);
-      for (int s = coreachableStates.nextClearBit(0); s < numStates;
-           s = coreachableStates.nextClearBit(s + 1)) {
-        if (rel.isReachable(s)) {
-          mBadStates.set(s);
-        }
-      }
-    } while (findMoreBadStates());
+    calculateUnsupervisableStates();
     // If there are no bad states, no need to synthesise
     final int dumpState = mBadStates.nextSetBit(0);
     if (dumpState < 0) {
@@ -143,11 +161,13 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       numBadStates++;
     }
 
-    // 3. The transitions relation changes if:
-    //  - there is more than one dump state;
-    //  - there are outgoing transitions from bad states;
-    //  - there are non-retained transitions to bad states;
-    boolean needPartition = numBadStates > 1;
+    // 3. Check if there is any change.'
+    // The transition relation changes if:
+    // a) there is more than one dump state;
+    // b) there are non-retained transitions to bad states;
+    // c) there are outgoing transitions from bad states;
+    // d) there are unsupervisable transitions to non-bad states.
+    boolean needPartition = numBadStates > 1; // a)
     if (!needPartition) {
       final TransitionIterator iter =
         rel.createPredecessorsReadOnlyIterator(dumpState);
@@ -155,7 +175,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
         checkAbort();
         final int event = iter.getCurrentEvent();
         final byte status = rel.getProperEventStatus(event);
-        if (!mOutputMode.isRetainedEvent(status)) {
+        if (!mOutputMode.isRetainedEvent(status)) { // b)
           needPartition = true;
           break;
         }
@@ -166,9 +186,18 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       while (iter.advance()) {
         checkAbort();
         final int source = iter.getCurrentSourceState();
-        if (mBadStates.get(source)) {
+        if (mBadStates.get(source)) { // c)
           needPartition = true;
           break;
+        }
+        final int event = iter.getCurrentEvent();
+        final long key = (((long)source)<<32)|event;
+        if (mUnsupervisablePairs.contains(key)) {
+          final int target = iter.getCurrentTargetState();
+          if (!mBadStates.get(target)) { // d)
+            needPartition = true;
+            break;
+          }
         }
       }
     }
@@ -190,6 +219,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
 
     return needPartition;
   }
+
 
   @Override
   public void applyResultPartition()
@@ -215,38 +245,56 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       //  Delete controllable transitions to bad state.
       //  Redirect other bad state transitions to dump state.
       final int dumpState = mBadStates.nextSetBit(0);
-//      boolean dumpReachable = rel.isInitial(dumpState);
-      final TransitionIterator iter =
+      final TransitionIterator iterAllTrans =
         rel.createAllTransitionsModifyingIterator();
-      while (iter.advance()) {
+      while (iterAllTrans.advance()) {
         checkAbort();
-        final int source = iter.getCurrentSourceState();
+        final int source = iterAllTrans.getCurrentSourceState();
         if (mBadStates.get(source)) {
-          iter.remove();
+          iterAllTrans.remove();
         } else {
-          final int target = iter.getCurrentTargetState();
+          final int target = iterAllTrans.getCurrentTargetState();
           if (mBadStates.get(target)) {
-            final int event = iter.getCurrentEvent();
+            final int event = iterAllTrans.getCurrentEvent();
             final byte status = rel.getProperEventStatus(event);
             if (mOutputMode.isRetainedEvent(status)) {
               if (target != dumpState) {
                 rel.addTransition(source, event, dumpState);
-                iter.remove();
+                iterAllTrans.remove();
               }
-//              dumpReachable = true;
             } else {
-              iter.remove();
+              iterAllTrans.remove();
             }
           }
         }
       }
-//      int s = dumpReachable ? mBadStates.nextSetBit(dumpState + 1) : dumpState;
-//      for (; s >= 0; s = mBadStates.nextSetBit(s + 1)) {
-//        rel.setReachable(s, false);
-//      }
       final int config = getPreferredOutputConfiguration() |
         ListBufferTransitionRelation.CONFIG_SUCCESSORS;
       rel.reconfigure(config);
+      /*
+       * A more sophisticated way is forEach method below.
+       * TLongIterator iterUnsupPairs = mUnsupervisablePairs.iterator();
+       * while (iterUnsupPairs.hasNext()) {
+       *   long key = iterUnsupPairs.next();
+       * }
+       */
+      final TransitionIterator iterSucc = rel.createSuccessorsModifyingIterator();
+      mUnsupervisablePairs.forEach(new TLongProcedure() {
+        @Override
+        public boolean execute(final long key)
+        {
+          final int source = (int) (key >> 32);
+          final int event = (int) (key & 0xffffffffL);
+          iterSucc.reset(source, event);
+          while (iterSucc.advance()) {
+            final int target = iterSucc.getCurrentTargetState();
+            if (!mBadStates.get(target)) {
+              iterSucc.remove();
+            }
+          }
+          return true;
+        }
+      });
       if (rel.checkReachability()) {
         // Fix result partition --- is this safe???
         final ListIterator<int[]> liter = partition.listIterator();
@@ -269,144 +317,82 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
-  private void findCoreachableStates(final BitSet coreachable,
-                                     final BitSet badStates)
+  private void calculateUnsupervisableStates()
     throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    final int defaultID = getDefaultMarkingID();
+    final OrderingInfo info = rel.getOrderingInfo();
+    final int firstLocalUnont = info.getFirstEventIndex
+      (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
+    final int lastLocalUncont = info.getLastEventIndex
+      (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
+    final TauClosure closure = rel.createPredecessorsTauClosure
+      (firstLocalUnont, lastLocalUncont, mTransitionLimit);
+    final TransitionIterator tauIter = closure.createIterator();
+    final TransitionIterator tauEventIter =
+      closure.createPreEventClosureIterator();
+    tauEventIter.resetEventsByStatus(~EventEncoding.STATUS_LOCAL,
+                                     ~EventEncoding.STATUS_CONTROLLABLE);
+    final TransitionIterator eventIter =
+      rel.createPredecessorsReadOnlyIterator();
+    final TIntStack stack = new TIntArrayStack();
+    final int marking = getDefaultMarkingID();
     final int numStates = rel.getNumberOfStates();
-    final TIntStack unvisited = new TIntArrayStack();
-    // Creates a hash set of all states which can reach a marked state.
-    for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if (rel.isMarked(sourceID, defaultID) && rel.isReachable(sourceID)
-          && !badStates.get(sourceID) && !coreachable.get(sourceID)) {
+    boolean foundNewBad;
+    do {
+      final BitSet coreachableStates = new BitSet(numStates);
+      for (int x = 0; x < numStates; x++) {
+        if (rel.isMarked(x, marking) && !mBadStates.get(x)) {
+          coreachableStates.set(x);
+          stack.push(x);
+        }
+      }
+      while (stack.size() > 0) {
         checkAbort();
-        coreachable.set(sourceID);
-        unvisited.push(sourceID);
-        while (unvisited.size() > 0) {
-          final int newSource = unvisited.pop();
-          iter.resetState(newSource);
-          while (iter.advance()) {
-            final int predID = iter.getCurrentSourceState();
-            if (rel.isReachable(predID) && !badStates.get(predID) &&
-                !coreachable.get(predID)) {
-              coreachable.set(predID);
-              unvisited.push(predID);
+        final int x = stack.pop();
+        eventIter.resetState(x);
+        while (eventIter.advance()) {
+          final int w = eventIter.getCurrentSourceState();
+          if (!coreachableStates.get(w) && !mBadStates.get(w)) {
+            final int sigma = eventIter.getCurrentEvent();
+            final long key = (((long) w) << 32) | sigma;
+            if (!mUnsupervisablePairs.contains(key)) {
+              coreachableStates.set(w);
+              stack.push(w);
             }
           }
         }
       }
-    }
-  }
-
-  private boolean findMoreBadStates()
-    throws AnalysisAbortException
-  {
-    boolean hasAdded = false;
-    final BitSet oldBadStates = (BitSet) mBadStates.clone();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    iter.resetEventsByStatus(EventEncoding.STATUS_LOCAL,
-                             ~EventEncoding.STATUS_CONTROLLABLE);
-    final TIntStack unvisited = new TIntArrayStack();
-    for (int state = oldBadStates.nextSetBit(0); state >= 0;
-         state = oldBadStates.nextSetBit(state + 1)) {
-      unvisited.push(state);
-      while (unvisited.size() > 0) {
-        final int current = unvisited.pop();
-        iter.resetState(current);
-        while (iter.advance()) {
-          final int source = iter.getCurrentSourceState();
-          if (rel.isReachable(source) && !mBadStates.get(source)) {
-            hasAdded = true;
-            mBadStates.set(source);
-            unvisited.push(source);
+      foundNewBad = false;
+      for (int s = coreachableStates.previousClearBit(numStates-1); s >= 0;
+           s = coreachableStates.previousClearBit(s-1)) {
+        if (!mBadStates.get(s) && rel.isReachable(s)) {
+          foundNewBad = true;
+          tauIter.resume(s);
+          while (tauIter.advance()) {
+            checkAbort();
+            final int x = tauIter.getCurrentSourceState();
+            mBadStates.set(x);
+            tauEventIter.resetState(x);
+            while (tauEventIter.advance()) {
+              final int w = tauEventIter.getCurrentSourceState();
+              final int upsilon = tauEventIter.getCurrentEvent();
+              final long key = (((long) w) << 32) | upsilon;
+              mUnsupervisablePairs.add(key);
+            }
           }
         }
       }
-    }
-    return hasAdded;
-  }
-
-
-  //#########################################################################
-  //# Inner Enumeration OutputMode
-  /**
-   * The operation mode of halfway synthesis.
-   * Different settings determine which transitions to dump state are
-   * retained and which are deleted.
-   */
-  public enum OutputMode
-  {
-    /**
-     * Halfway synthesis mode to compute an abstraction.
-     * Controllable transitions to dump states are deleted,
-     * uncontrollable transitions to dump states are retained.
-     * This setting is the default.
-     */
-    ABSTRACTION {
-      @Override
-      public boolean isRetainedEvent(final byte status)
-      {
-        return !EventEncoding.isControllableEvent(status);
-      }
-
-      @Override
-      public boolean isRetainedEvent(final EventKind kind)
-      {
-        return kind == EventKind.UNCONTROLLABLE;
-      }
-    },
-    /**
-     * Halfway synthesis mode to compute a pseudo-supervisor.
-     * Uncontrollable transitions to dump states are deleted,
-     * controllable transitions to dump states are retained.
-     */
-    PSEUDO_SUPERVISOR {
-      @Override
-      public boolean isRetainedEvent(final byte status)
-      {
-        return EventEncoding.isControllableEvent(status);
-      }
-
-      @Override
-      public boolean isRetainedEvent(final EventKind kind)
-      {
-        return kind == EventKind.CONTROLLABLE;
-      }
-    },
-    /**
-     * Halfway synthesis mode to compute a proper supervisor.
-     * All transitions to dump states are deleted,
-     */
-    PROPER_SUPERVISOR {
-      @Override
-      public boolean isRetainedEvent(final byte status)
-      {
-        return false;
-      }
-
-      @Override
-      public boolean isRetainedEvent(final EventKind kind)
-      {
-        return false;
-      }
-    };
-
-    //#########################################################################
-    //# Data Members
-    public abstract boolean isRetainedEvent(byte status);
-
-    public abstract boolean isRetainedEvent(EventKind kind);
+    } while (foundNewBad);
   }
 
 
   //#########################################################################
   //# Data Members
-  private OutputMode mOutputMode = OutputMode.ABSTRACTION;
+  private HalfWaySynthesisTRSimplifier.OutputMode mOutputMode =
+    HalfWaySynthesisTRSimplifier.OutputMode.ABSTRACTION;
+  private int mTransitionLimit = Integer.MAX_VALUE;
 
   private BitSet mBadStates;
-
+  private TLongHashSet mUnsupervisablePairs;
 }

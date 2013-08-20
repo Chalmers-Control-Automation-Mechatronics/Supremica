@@ -171,19 +171,10 @@ public class SynthesisObservationEquivalenceTRSimplifier
   public void reset()
   {
     super.reset();
-    mOriginalTransitionRelation = null;
     mLocalUncontrollablePredecessorsTauClosure = null;
     mPredecessorIterator = null;
     mUncontrollableTauIterator = null;
     mUncontrollableEventIterator = null;
-  }
-
-
-  //#########################################################################
-  //# Simple access
-  public ListBufferTransitionRelation getOriginalTransitionRelation()
-  {
-    return mOriginalTransitionRelation;
   }
 
 
@@ -208,7 +199,6 @@ public class SynthesisObservationEquivalenceTRSimplifier
       mUncontrollableTransitionCache = new UncontrollableTransitionCache();
     }
     mTempClass = new TIntArrayList(numStates);
-    mOriginalTransitionRelation = null;
   }
 
   @Override
@@ -275,16 +265,9 @@ public class SynthesisObservationEquivalenceTRSimplifier
       mLocalUncontrollablePredecessorsTauClosure = null;
       mUncontrollableTauIterator = null;
       mUncontrollableEventIterator = null;
-      final ListBufferTransitionRelation copy =
-        new ListBufferTransitionRelation
-          (rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       super.applyResultPartition();
       rel.removeTauSelfLoops();
       rel.removeProperSelfLoopEvents();
-      // TODO Only need to keep original of the first synthesis abstraction,
-      // and only when this or some later abstraction is nondeterministic.
-      // Can we somehow save memory here?
-      mOriginalTransitionRelation = copy;
     } else {
       if (mHasModifications) {
         rel.removeProperSelfLoopEvents();
@@ -1285,8 +1268,6 @@ public class SynthesisObservationEquivalenceTRSimplifier
    * Whether or not weak synthesis observation equivalence is used.
    */
   private boolean mWeak = true;
-
-  private ListBufferTransitionRelation mOriginalTransitionRelation;
 
   private int mNumReachableStates;
   private int mNumClasses;

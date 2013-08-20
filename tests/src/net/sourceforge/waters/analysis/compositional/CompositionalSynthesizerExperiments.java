@@ -14,12 +14,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Collections;
-import java.util.Formatter;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.Watchdog;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.IntConstantProxy;
@@ -33,7 +33,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * a variety of configurations. The heuristics for choosing candidates can be
  * varied, as well as the abstraction rules applied and their order.
  *
- * @author Sahar Mohajerani
+ * @author Sahar Mohajerani, Fangqian Qiu, Robi Malik
  */
 
 public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
@@ -44,10 +44,11 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   public CompositionalSynthesizerExperiments(final String statsFilename)
     throws FileNotFoundException
   {
-    this(statsFilename, null, null);
+    this(statsFilename, SynthesisAbstractionProcedureFactory.WSOE_UNSUP, null, null);
   }
 
   public CompositionalSynthesizerExperiments(final String statsFilename,
+                                             final SynthesisAbstractionProcedureFactory method,
                                              final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
                                              final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
     throws FileNotFoundException
@@ -58,11 +59,12 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     final File statsFile = new File(dir, statsFilename);
     mOut = new FileOutputStream(statsFile);
     mPrintWriter = null;
+    mMethod = method;
     mPreselecting = preselectingHeuristic;
     mSelecting = selectingHeuristic;
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSynthesizer = new CompositionalSynthesizer(factory);
-    watchdog = new Watchdog(mSynthesizer, 600);
+    mWatchdog = new Watchdog(mSynthesizer, mTimeout);
   }
 
   //#########################################################################
@@ -76,8 +78,11 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSynthesizer.setInternalStateLimit(internalStateLimit);
     final int internalTransitionLimit = 1000000;
     mSynthesizer.setInternalTransitionLimit(internalTransitionLimit);
-    final int finalStateLimit = 2000000;
+    final int finalStateLimit = 1000000;
     mSynthesizer.setMonolithicStateLimit(finalStateLimit);
+    final int finalTransitionLimit = 5000000;
+    mSynthesizer.setMonolithicTransitionLimit(finalTransitionLimit);
+    mSynthesizer.setAbstractionProcedureFactory(mMethod);
     mSynthesizer.setPreselectingMethod(mPreselecting);
     mSynthesizer.setSelectingMethod(mSelecting);
     mSynthesizer.setSupervisorReductionEnabled(mSupervisorReductionEnabled);
@@ -85,8 +90,9 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
                          + ",InternalTransitionLimit,"
                          + internalTransitionLimit + ",FinalStateLimit,"
                          + finalStateLimit);
-    mPrintWriter.println("PreselHeuristic," + mPreselecting
-                         + ",SelecHeuristic," + mSelecting);
+    mPrintWriter.println("PreselHeuristic," + mPreselecting +
+                         ",SelecHeuristic," + mSelecting +
+                         ",Method," + mMethod);
     mPrintWriter.println("SupervisorReduction," + mSupervisorReductionEnabled);
     mHasBeenPrinted = false;
   }
@@ -133,6 +139,12 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSupervisorReductionEnabled = enabled;
   }
 
+  void setTimeOut(final int timeout)
+  {
+    mTimeout = timeout;
+  }
+
+
   //#########################################################################
   //# Invocation
   void runModel(final String group, final String subdir, final String name)
@@ -145,7 +157,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
                 final List<ParameterBindingProxy> bindings) throws Exception
   {
     printAndLog("Running " + name + " with " + mPreselecting + "/"
-                + mSelecting + " ...");
+                + mSelecting + " ... ", false);
     final String inputprop = System.getProperty("waters.test.inputdir");
     final File inputRoot = new File(inputprop);
     final File rootdir = new File(inputRoot, "waters");
@@ -156,16 +168,22 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     final File filename = new File(dir, name);
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mSynthesizer.setModel(des);
-    /*
-    mSynthesizer
-      .setAbstractionProcedureFactory(SynthesisAbstractionProcedureFactory.SOE_ONLY);
-    */
+    String answer = null;
+    final long start = System.currentTimeMillis();
     try {
-      watchdog.reset();
-      mSynthesizer.run();
+      mWatchdog.reset();
+      final boolean result = mSynthesizer.run();
+      answer = Boolean.toString(result);
     } catch (final AnalysisException exception) {
       mPrintWriter.println(name + "," + exception.getMessage());
+      answer = ProxyTools.getShortClassName(exception);
+    } catch (final Throwable exception) {
+      answer = ProxyTools.getShortClassName(exception);
     } finally {
+      final long stop = System.currentTimeMillis();
+      final float difftime = 0.001f * (stop - start);
+      final String msg = String.format("%s (%.3fs)", answer, difftime);
+      printAndLog(msg, true);
       final CompositionalSynthesisResult stats =
         mSynthesizer.getAnalysisResult();
       if (!mHasBeenPrinted) {
@@ -180,6 +198,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
       mPrintWriter.println();
     }
   }
+
 
   //#########################################################################
   //# Main Method
@@ -216,13 +235,13 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   //# Invocation
   void runAllTests() throws Exception
   {
-    watchdog.start();
+    mWatchdog.start();
     synthesisAGV();// 1
     synthesisAGVB();// 2
     synthesissAip0Alps();// 3
     synthesisFenCaiWon09B();// 4
     synthesisFenCaiWon09Synth();// 5
-    //synthesisFms2003();// 6
+    synthesisFms2003();// 6
     synthesiseTbedNoderailB();// 7
     synthesiseTbedNoderailUncont();// 8
     synthesiseCentralLockingVerriegel3b();// 9
@@ -231,9 +250,10 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesis6linki();// 12
     synthesis6linkp();// 13
     synthesis6linkre();// 14
-    for (int n = 100; n <= 1000; n+=100) {
+    for (int n = 100; n <= 300; n+=100) {
       synthesisTransferline(n);
     }
+
 
     //synthesiseCentralLockingKoordwspBlock();
     //synthesissRhoneSubPatch0();
@@ -318,7 +338,6 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "hisc", "rhone_subsystem1_patch0.wmod");
   }
 
-  @SuppressWarnings("unused")
   private void synthesisFms2003() throws Exception
   {
     runModel("tests", "fms2003", "fms2003.wmod");
@@ -375,32 +394,35 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
       factory.createParameterBindingProxy("N", expr);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    final long start = System.currentTimeMillis();
     runModel("handwritten", null, "transferline_uncont.wmod", bindings);
-    final long stop = System.currentTimeMillis();
-    @SuppressWarnings("resource")
-    final Formatter formatter = new Formatter(System.out);
-    final float difftime = 0.001f * (stop - start);
-    formatter.format("%.3f s\n", difftime);
   }
+
 
   //#########################################################################
   //# Logging
-  private void printAndLog(final String msg)
+  private void printAndLog(final String msg, final boolean newline)
   {
-    System.out.println(msg);
+    if (newline) {
+      System.out.println(msg);
+    } else {
+      System.out.print(msg);
+      System.out.flush();
+    }
     getLogger().info(msg);
   }
+
 
   //#########################################################################
   //# Data Members
   private CompositionalSynthesizer mSynthesizer;
   private final FileOutputStream mOut;
   private PrintWriter mPrintWriter;
-  private final Watchdog watchdog;
+  private final Watchdog mWatchdog;
   private boolean mHasBeenPrinted;
   private boolean mSupervisorReductionEnabled;
 
+  private int mTimeout = 600;
+  private final SynthesisAbstractionProcedureFactory mMethod;
   private AbstractCompositionalModelAnalyzer.PreselectingMethod mPreselecting;
   private AbstractCompositionalModelAnalyzer.SelectingMethod mSelecting;
 }

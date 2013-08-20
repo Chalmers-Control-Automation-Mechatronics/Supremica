@@ -137,6 +137,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     testSajed();
     testSmallFactory2();
     testTransferLine1();
+    testCertainUnsup();
   }
 
   public void testOverflowException()
@@ -197,6 +198,13 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+  public void testCertainUnsup() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "certainUnsup.wmod");
+    runSynthesizer(des, false);
+  }
+
   public void testCoffeeMachine() throws Exception
   {
     final ProductDESProxy des =
@@ -243,6 +251,28 @@ public abstract class AbstractSupervisorSynthesizerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "IPC.wmod");
+    runSynthesizer(des, true);
+  }
+
+
+  public void testIPCLockable() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC_lockableswitch.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testIPCcswitch() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC_cswitch.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testIPCuswicth() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC_uswitch.wmod");
     runSynthesizer(des, true);
   }
 
