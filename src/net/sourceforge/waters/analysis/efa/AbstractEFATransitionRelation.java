@@ -9,28 +9,26 @@
 
 package net.sourceforge.waters.analysis.efa;
 
-import java.util.Collection;
-import java.util.List;
-
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Robi Malik
  */
 public abstract class AbstractEFATransitionRelation<L>
-  implements Comparable<AbstractEFATransitionRelation<?>>
+ implements Comparable<AbstractEFATransitionRelation<?>>
 {
 
   //#########################################################################
   //# Constructors
   @SuppressWarnings("unchecked")
-  public AbstractEFATransitionRelation
-    (final ListBufferTransitionRelation rel,
-     final AbstractEFATransitionLabelEncoding<L> labels,
-     final Collection<? extends AbstractEFAVariable<L>> variables,
-     final List<SimpleNodeProxy> nodes)
+  protected AbstractEFATransitionRelation(final ListBufferTransitionRelation rel,
+                                          final AbstractEFATransitionLabelEncoding<L> labels,
+                                          final Collection<? extends AbstractEFAVariable<L>> variables,
+                                          final List<SimpleNodeProxy> nodes)
   {
     mTransitionRelation = rel;
     mTransitionLabelEncoding = labels;
@@ -38,18 +36,16 @@ public abstract class AbstractEFATransitionRelation<L>
     mNodeList = nodes;
   }
 
-  public AbstractEFATransitionRelation
-    (final ListBufferTransitionRelation rel,
-     final AbstractEFATransitionLabelEncoding<L> labels,
-     final Collection<? extends AbstractEFAVariable<L>> variables)
+  protected AbstractEFATransitionRelation(final ListBufferTransitionRelation rel,
+                                          final AbstractEFATransitionLabelEncoding<L> labels,
+                                          final Collection<? extends AbstractEFAVariable<L>> variables)
   {
     this(rel, labels, variables, null);
   }
 
-
   //#########################################################################
   //# Simple Access
-  public ListBufferTransitionRelation getTransitionRelation()
+  protected ListBufferTransitionRelation getTransitionRelation()
   {
     return mTransitionRelation;
   }
@@ -59,7 +55,7 @@ public abstract class AbstractEFATransitionRelation<L>
     return mTransitionLabelEncoding;
   }
 
-  public List<SimpleNodeProxy> getNodeList()
+  protected List<SimpleNodeProxy> getNodeList()
   {
     return mNodeList;
   }
@@ -74,15 +70,14 @@ public abstract class AbstractEFATransitionRelation<L>
     mTransitionRelation.setName(name);
   }
 
-
   public Collection<? extends AbstractEFAVariable<L>> getVariables()
   {
     return mVariables;
   }
 
   /**
-   * Registers this transition relation by adding its reference to all
-   * its variables.
+   * Registers this transition relation by adding its reference to all its
+   * variables.
    */
   public void register()
   {
@@ -92,8 +87,8 @@ public abstract class AbstractEFATransitionRelation<L>
   }
 
   /**
-   * Deregisters this transition relation by removing its reference from all
-   * its variables.
+   * Deregisters this transition relation by removing its reference from all its
+   * variables.
    */
   public void dispose()
   {
@@ -101,7 +96,6 @@ public abstract class AbstractEFATransitionRelation<L>
       var.removeTransitionRelation(this);
     }
   }
-
 
   //#########################################################################
   //# Interface java.util.Comparable
@@ -113,7 +107,6 @@ public abstract class AbstractEFATransitionRelation<L>
     return name1.compareTo(name2);
   }
 
-
   //#########################################################################
   //# Debugging
   @Override
@@ -121,13 +114,11 @@ public abstract class AbstractEFATransitionRelation<L>
   {
     return mTransitionRelation.getName() + "\n" + mTransitionRelation.toString();
   }
-
-
+  
   //#########################################################################
   //# Data Members
   private final ListBufferTransitionRelation mTransitionRelation;
   private final AbstractEFATransitionLabelEncoding<L> mTransitionLabelEncoding;
   private final Collection<AbstractEFAVariable<L>> mVariables;
   private final List<SimpleNodeProxy> mNodeList;
-
 }

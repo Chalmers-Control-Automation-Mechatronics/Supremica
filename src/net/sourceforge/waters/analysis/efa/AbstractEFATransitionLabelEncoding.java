@@ -38,8 +38,8 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
   public AbstractEFATransitionLabelEncoding(final AbstractEFATransitionLabelEncoding<L> encoding)
   {
     this(encoding.size());
-    for (Iterator<L> it = encoding.iterator(); it.hasNext();) {
-      L label = it.next();
+    for (Iterator<L> it = encoding.iterator(); it.hasNext(); ) {
+      final L label = it.next();
       createTransitionLabelId(label);
     }
   }
@@ -47,6 +47,7 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
 
   //#########################################################################
   //# Simple Access
+
   /**
    * Returns the number of updates in this event encoding.
    * Note that this method always returns at least&nbsp;1 because the
@@ -65,6 +66,11 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
   public L getTransitionLabel(final int labelId)
   {
     return mTransitionLabelList.get(labelId);
+  }
+
+  public List<L> getTransitionLabels()
+  {
+    return mTransitionLabelList;
   }
 
   public int createTransitionLabelId(final L label)
@@ -86,12 +92,14 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
    */
   public void merge(final AbstractEFATransitionLabelEncoding<L> enc)
   {
-    for (final L label : enc.mTransitionLabelList) {
+    for (final L label : enc.getTransitionLabels()) {
       createTransitionLabelId(label);
     }
   }
 
-  public Iterator<L> iterator() {
+  @Override
+  public Iterator<L> iterator()
+  {
     return mTransitionLabelList.iterator();
   }
 
@@ -111,16 +119,16 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
     return buffer.toString();
   }
 
+  //#########################################################################
+  //# Class Constants
+  protected static final int DEFAULT_SIZE = 16;
+
 
   //#########################################################################
   //# Data Members
   private final TObjectIntHashMap<L> mTransitionLabelMap;
   private final List<L> mTransitionLabelList;
 
-
-  //#########################################################################
-  //# Class Constants
-  protected static final int DEFAULT_SIZE = 16;
-
+  
 }
 

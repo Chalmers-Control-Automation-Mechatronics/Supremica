@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.efa;
 
-import java.util.Collection;
-
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -20,34 +18,35 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
+import java.util.Collection;
 
 /**
- * A utility class to collect all the EFA variables (primed or not) in
- * a constraint or transition label encoding.
- *
+ * A utility class to collect all the EFA variables (primed or not) in a
+ * constraint or transition label encoding.
+ * <p/>
  * @author Robi Malik
  */
-
-public abstract class AbstractEFAVariableCollector<L, V extends AbstractEFAVariable<L>>
-  extends DescendingModuleProxyVisitor
+public abstract class AbstractEFAVariableCollector<L, 
+                                                   V extends AbstractEFAVariable<L>>
+ extends DescendingModuleProxyVisitor
 {
 
   //#########################################################################
   //# Constructor
   protected AbstractEFAVariableCollector(final CompilerOperatorTable optable,
-                                         final AbstractEFAVariableContext<L,V> context)
+                                         final AbstractEFAVariableContext<L, V> context)
   {
     mNextOperator = optable.getNextOperator();
     mContext = context;
   }
 
-
   //#########################################################################
   //# Invocation
   /**
    * Collects all variables in the given expression.
-   * @param  expr     The expression to be searched.
-   * @param  vars     All variables will be added to this collection.
+   * <p/>
+   * @param expr The expression to be searched.
+   * @param vars All variables will be added to this collection.
    */
   public void collectAllVariables(final SimpleExpressionProxy expr,
                                   final Collection<V> vars)
@@ -57,8 +56,9 @@ public abstract class AbstractEFAVariableCollector<L, V extends AbstractEFAVaria
 
   /**
    * Collects all variables in the given constraint list.
-   * @param  update   The constraint list to be searched.
-   * @param  vars     All variables will be added to this collection.
+   * <p/>
+   * @param update The constraint list to be searched.
+   * @param vars   All variables will be added to this collection.
    */
   public void collectAllVariables(final ConstraintList update,
                                   final Collection<V> vars)
@@ -66,16 +66,16 @@ public abstract class AbstractEFAVariableCollector<L, V extends AbstractEFAVaria
     collectAllVariables(update, vars, vars);
   }
 
-
   /**
    * Collects all variables in the given expression.
-   * @param  expr     The expression to be searched.
-   * @param  unprimed Unprimed variables will be added to this collection.
-   *                  This may be <CODE>null</CODE> to suppress collecting
-   *                  unprimed variables.
-   * @param  primed   Primed variables will be added to this collection.
-   *                  This may be <CODE>null</CODE> to suppress collecting
-   *                  primed variables.
+   * <p/>
+   * @param expr     The expression to be searched.
+   * @param unprimed Unprimed variables will be added to this collection. This
+   *                 may be <CODE>null</CODE> to suppress collecting unprimed
+   *                 variables.
+   * @param primed   Primed variables will be added to this collection. This may
+   *                 be <CODE>null</CODE> to suppress collecting primed
+   *                 variables.
    */
   public void collectAllVariables(final SimpleExpressionProxy expr,
                                   final Collection<V> unprimed,
@@ -93,13 +93,14 @@ public abstract class AbstractEFAVariableCollector<L, V extends AbstractEFAVaria
 
   /**
    * Collects all variables in the given constraint list.
-   * @param  update   The constraint list to be searched.
-   * @param  unprimed Unprimed variables will be added to this collection.
-   *                  This may be <CODE>null</CODE> to suppress collecting
-   *                  unprimed variables.
-   * @param  primed   Primed variables will be added to this collection.
-   *                  This may be <CODE>null</CODE> to suppress collecting
-   *                  primed variables.
+   * <p/>
+   * @param update   The constraint list to be searched.
+   * @param unprimed Unprimed variables will be added to this collection. This
+   *                 may be <CODE>null</CODE> to suppress collecting unprimed
+   *                 variables.
+   * @param primed   Primed variables will be added to this collection. This may
+   *                 be <CODE>null</CODE> to suppress collecting primed
+   *                 variables.
    */
   public void collectAllVariables(final ConstraintList update,
                                   final Collection<V> unprimed,
@@ -109,7 +110,6 @@ public abstract class AbstractEFAVariableCollector<L, V extends AbstractEFAVaria
       collectAllVariables(expr, unprimed, primed);
     }
   }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -121,7 +121,6 @@ public abstract class AbstractEFAVariableCollector<L, V extends AbstractEFAVaria
       throw exception.getRuntimeException();
     }
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
@@ -145,7 +144,7 @@ public abstract class AbstractEFAVariableCollector<L, V extends AbstractEFAVaria
 
   @Override
   public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
-    throws VisitorException
+   throws VisitorException
   {
     final SimpleExpressionProxy subterm = expr.getSubTerm();
     if (expr.getOperator() == mNextOperator) {
@@ -161,13 +160,12 @@ public abstract class AbstractEFAVariableCollector<L, V extends AbstractEFAVaria
     return null;
   }
 
-
   //#########################################################################
   //# Data Members
   private final UnaryOperator mNextOperator;
-  private final AbstractEFAVariableContext<L,V> mContext;
-
+  private final AbstractEFAVariableContext<L, V> mContext;
   private Collection<V> mUnprimedVariables;
   private Collection<V> mPrimedVariables;
 
+  
 }

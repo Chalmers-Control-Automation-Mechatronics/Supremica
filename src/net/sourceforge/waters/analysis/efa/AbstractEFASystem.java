@@ -9,21 +9,19 @@
 
 package net.sourceforge.waters.analysis.efa;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Robi Malik
  */
-
-public abstract class AbstractEFASystem<L,
-                                        V extends AbstractEFAVariable<L>,
-                                        TR extends AbstractEFATransitionRelation<L>,
-                                        C extends AbstractEFAVariableContext<L,V>>
-  implements Comparable<AbstractEFASystem<?,?,?,?>>
+public abstract class AbstractEFASystem<L, 
+                                        V extends AbstractEFAVariable<L>, 
+                                        TR extends AbstractEFATransitionRelation<L>, 
+                                        C extends AbstractEFAVariableContext<L, V>>
+ implements Comparable<AbstractEFASystem<?, ?, ?, ?>>
 {
 
   //#########################################################################
@@ -55,7 +53,6 @@ public abstract class AbstractEFASystem<L,
     mVariableContext = context;
   }
 
-
   //#########################################################################
   //# Simple Access
   public String getName()
@@ -63,7 +60,7 @@ public abstract class AbstractEFASystem<L,
     return mName;
   }
 
-  public List<TR> getTransitionRelations()
+  protected List<TR> getTransitionRelations()
   {
     return mTransitionRelations;
   }
@@ -83,12 +80,12 @@ public abstract class AbstractEFASystem<L,
     mName = name;
   }
 
-  public void addTransitionRelation(final TR transitionRelation)
+  protected void addTransitionRelation(final TR transitionRelation)
   {
     mTransitionRelations.add(transitionRelation);
   }
 
-  public void removeTransitionRelation(final TR transitionRelation)
+  protected void removeTransitionRelation(final TR transitionRelation)
   {
     mTransitionRelations.remove(transitionRelation);
   }
@@ -103,25 +100,23 @@ public abstract class AbstractEFASystem<L,
     mVariables.remove(var);
   }
 
-
   public double getEstimatedSize()
   {
     double size = 1;
     for (final AbstractEFATransitionRelation<?> efaTR : mTransitionRelations) {
       final ListBufferTransitionRelation rel = efaTR.getTransitionRelation();
-      size = size * rel.getNumberOfStates();
+      size *= rel.getNumberOfStates();
     }
     for (final V var : mVariables) {
-      size = size * var.getRange().size();
+      size *= var.getRange().size();
     }
     return size;
   }
 
-
   //#########################################################################
   //# Interface java.util.Comparable<EFASystem>
   @Override
-  public int compareTo(final AbstractEFASystem<?,?,?,?> system)
+  public int compareTo(final AbstractEFASystem<?, ?, ?, ?> system)
   {
     final double size1 = getEstimatedSize();
     final double size2 = system.getEstimatedSize();
@@ -133,18 +128,15 @@ public abstract class AbstractEFASystem<L,
       return 0;
     }
   }
-
-
+  
+  //#########################################################################
+  //# Class Constants
+  private static final int DEFAULT_SIZE = 16;
   //#########################################################################
   //# Data Members
   private final List<TR> mTransitionRelations;
   private final List<V> mVariables;
   private final C mVariableContext;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final int DEFAULT_SIZE = 16;
   private String mName;
-
+  
 }

@@ -27,5 +27,8 @@ desktop.ini
 junit*.properties
 Thumbs.db
 .dropbox
+# IntelliJ IDEA
+.idea
+*.iml
 
 # Don't ignore .settings - shared run configurations for Eclipse.

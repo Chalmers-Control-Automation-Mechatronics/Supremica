@@ -10,30 +10,20 @@
 package net.sourceforge.waters.analysis.efa;
 
 import gnu.trove.set.hash.THashSet;
-
-import java.util.Collection;
-
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.ComponentProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleProxyCloner;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.*;
 
+import java.util.Collection;
 
 /**
- * A representation of an EFA variable for use in compositional
- * analysis.
- *
+ * A representation of an EFA variable for use in compositional analysis.
+ * <p/>
  * @author Robi Malik
  */
-
 public abstract class AbstractEFAVariable<L>
-  implements Comparable<AbstractEFAVariable<?>>
+ implements Comparable<AbstractEFAVariable<?>>
 {
 
   //#########################################################################
@@ -48,14 +38,15 @@ public abstract class AbstractEFAVariable<L>
     final ModuleProxyCloner cloner = factory.getCloner();
     final IdentifierProxy ident = var.getIdentifier();
     mVariableName = (IdentifierProxy) cloner.getClone(ident);
-    final SimpleExpressionProxy temp = (SimpleExpressionProxy) cloner.getClone(ident);
+    final SimpleExpressionProxy temp = (SimpleExpressionProxy) cloner.getClone(
+     ident);
     final UnaryOperator next = op.getNextOperator();
     mPrimedVariableName = factory.createUnaryExpressionProxy(next, temp);
     mInitialStatePredicate =
-      (SimpleExpressionProxy) cloner.getClone(var.getInitialStatePredicate());
+     (SimpleExpressionProxy) cloner.getClone(var.getInitialStatePredicate());
     mTransitionRelations = new THashSet<AbstractEFATransitionRelation<L>>();
+    mEventDecls = new THashSet<EventDeclProxy>();
   }
-
 
   //#########################################################################
   //# Overrides for java.lang.Object
@@ -65,7 +56,6 @@ public abstract class AbstractEFAVariable<L>
     return mVariableName.toString();
   }
 
-
   //#########################################################################
   //# Interface java.lang.Comparable<EFAVariable>
   @Override
@@ -74,10 +64,9 @@ public abstract class AbstractEFAVariable<L>
     return mComponent.compareTo(var.mComponent);
   }
 
-
   //#########################################################################
   //# Simple Access
-  public ComponentProxy getComponent()
+  public VariableComponentProxy getComponent()
   {
     return mComponent;
   }
@@ -107,30 +96,13 @@ public abstract class AbstractEFAVariable<L>
     return mInitialStatePredicate;
   }
 
-
   /**
-   * Returns a collection containing all transition relations (EFAs)
-   * using this variable.
+   * Returns a collection containing all transition relations (EFAs) using this
+   * variable.
    */
-  public Collection<? extends AbstractEFATransitionRelation<L>>
-    getTransitionRelations()
+  public Collection<? extends AbstractEFATransitionRelation<L>> getTransitionRelations()
   {
     return mTransitionRelations;
-  }
-
-  /**
-   * Returns the single transition relation using this variable.
-   * @return If this variable is used by exactly one transition relation,
-   *         that transition relation is returned; otherwise the result
-   *         is <CODE>null</CODE>.
-   */
-  public AbstractEFATransitionRelation<L> getTransitionRelation()
-  {
-    if (mTransitionRelations.size() == 1) {
-      return mTransitionRelations.iterator().next();
-    } else {
-      return null;
-    }
   }
 
   public void addTransitionRelation(final AbstractEFATransitionRelation<L> trans)
@@ -138,34 +110,51 @@ public abstract class AbstractEFAVariable<L>
     mTransitionRelations.add(trans);
   }
 
-  public void removeTransitionRelation(final AbstractEFATransitionRelation<L> trans)
+  public void removeTransitionRelation(
+   final AbstractEFATransitionRelation<L> trans)
   {
     mTransitionRelations.remove(trans);
   }
 
+  /**
+   * Returns a collection containing all events in the system using this
+   * variable.
+   */
+  public Collection<EventDeclProxy> getRelatedEvent()
+  {
+    return mEventDecls;
+  }
+
+  public void addTransitionRelation(final EventDeclProxy event)
+  {
+    mEventDecls.add(event);
+  }
+
+  public void removeTransitionRelation(final EventDeclProxy event)
+  {
+    mEventDecls.remove(event);
+  }
 
   /**
    * Return whether this variable is local.
-   * @return <CODE>true</CODE> if the variable occurs in at most one
-   *         transition relation.
+   * <p/>
+   * @return <CODE>true</CODE> if the variable occurs in at most one transition
+   *         relation.
    */
   public boolean isLocal()
   {
     return mTransitionRelations.size() <= 1;
   }
-
-
+  
   //#########################################################################
   //# Data Members
-  private final ComponentProxy mComponent;
+  private final VariableComponentProxy mComponent;
   private final CompiledRange mRange;
   private final IdentifierProxy mVariableName;
   private final UnaryExpressionProxy mPrimedVariableName;
   private final SimpleExpressionProxy mInitialStatePredicate;
-
-  /**
-   * Collection of transition relations (EFA) using this variable.
-   */
   private final Collection<AbstractEFATransitionRelation<L>> mTransitionRelations;
+  private final THashSet<EventDeclProxy> mEventDecls;
 
+  
 }
