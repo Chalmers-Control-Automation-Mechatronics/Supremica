@@ -17,24 +17,19 @@ import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierExceptio
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
-
+import net.sourceforge.waters.model.module.*;
 
 /**
- * A variable context for EFA compilation. Contains ranges of all
- * variables, and identifies enumeration atoms.
- *
+ * A variable context for EFA compilation. Contains ranges of all variables, and
+ * identifies enumeration atoms.
+ * <p/>
  * @author Robi Malik
  */
-
-public abstract class AbstractEFAVariableContext<L, V extends AbstractEFAVariable<L>>
-  implements VariableContext
+public abstract class AbstractEFAVariableContext<L, 
+                                                 V extends AbstractEFAVariable<L>>
+ implements VariableContext
 {
+  
   //#######################################################################
   //# Constructor
   public AbstractEFAVariableContext(final ModuleProxy module,
@@ -44,7 +39,7 @@ public abstract class AbstractEFAVariableContext<L, V extends AbstractEFAVariabl
     mModuleContext = new ModuleBindingContext(module);
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mGlobalVariableMap =
-      new ProxyAccessorHashMap<IdentifierProxy,V>(eq);
+     new ProxyAccessorHashMap<IdentifierProxy, V>(eq);
     mNextOperator = op.getNextOperator();
   }
 
@@ -56,7 +51,7 @@ public abstract class AbstractEFAVariableContext<L, V extends AbstractEFAVariabl
     if (varname instanceof IdentifierProxy) {
       final IdentifierProxy ident = (IdentifierProxy) varname;
       final AbstractEFAVariable<L> variable =
-        mGlobalVariableMap.getByProxy(ident);
+       mGlobalVariableMap.getByProxy(ident);
       if (variable != null) {
         return variable.getRange();
       }
@@ -70,7 +65,8 @@ public abstract class AbstractEFAVariableContext<L, V extends AbstractEFAVariabl
   }
 
   @Override
-  public SimpleExpressionProxy getBoundExpression(final SimpleExpressionProxy ident)
+  public SimpleExpressionProxy getBoundExpression(
+   final SimpleExpressionProxy ident)
   {
     return mModuleContext.getBoundExpression(ident);
   }
@@ -112,14 +108,15 @@ public abstract class AbstractEFAVariableContext<L, V extends AbstractEFAVariabl
   }
 
   public void insertEnumAtom(final SimpleIdentifierProxy ident)
-    throws DuplicateIdentifierException
+   throws DuplicateIdentifierException
   {
     mModuleContext.insertEnumAtom(ident);
   }
-
+  
   //#######################################################################
   //# Data Members
-  private final ProxyAccessorMap<IdentifierProxy,V> mGlobalVariableMap;
+  private final ProxyAccessorMap<IdentifierProxy, V> mGlobalVariableMap;
   private final ModuleBindingContext mModuleContext;
   private final UnaryOperator mNextOperator;
+  
 }

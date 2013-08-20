@@ -51,6 +51,18 @@ public class EFSMTransitionRelation
   }
 
   @Override
+  public ListBufferTransitionRelation getTransitionRelation()
+  {
+    return super.getTransitionRelation();
+  }
+  
+  @Override
+  public List<SimpleNodeProxy> getNodeList()
+  {
+    return super.getNodeList();
+  }
+  
+  @Override
   @SuppressWarnings("unchecked")
   public Collection<EFSMVariable> getVariables()
   {

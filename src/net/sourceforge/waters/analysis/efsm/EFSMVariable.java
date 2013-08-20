@@ -95,10 +95,20 @@ public class EFSMVariable
     return (Collection<EFSMTransitionRelation>) super.getTransitionRelations();
   }
 
-  @Override
+  /**
+   * Returns the single transition relation using this variable.
+   * @return If this variable is used by exactly one transition relation,
+   *         that transition relation is returned; otherwise the result
+   *         is <CODE>null</CODE>.
+   */
   public EFSMTransitionRelation getTransitionRelation()
   {
-    return (EFSMTransitionRelation) super.getTransitionRelation();
+    final Collection<EFSMTransitionRelation> trans = getTransitionRelations();
+    if (trans.size() == 1) {
+      return trans.iterator().next();
+    } else {
+      return null;
+    }
   }
 
 

@@ -13,23 +13,17 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
-
+import net.sourceforge.waters.model.module.*;
 
 /**
- * A utility class to determine whether a given variable occurs
- * in an expression in primed or unprimed form.
- *
+ * A utility class to determine whether a given variable occurs in an expression
+ * in primed or unprimed form.
+ * <p/>
  * @author Robi Malik
  */
-
-public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable<L>>
-  extends DefaultModuleProxyVisitor
+public abstract class AbstractEFAVariableFinder<L, 
+                                                V extends AbstractEFAVariable<L>>
+ extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################
@@ -40,17 +34,18 @@ public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable
     mEqualityVisitor = ModuleEqualityVisitor.getInstance(false);
   }
 
-
   //#########################################################################
   //# Invocation
   /**
    * Determines if a given variable is in the given expression.
-   * @param  expr     The expression to be searched.
-   * @param  var      The variable to be searched for.
-   * @return <CODE>true</CODE> if the variable has been found in its
-   *         primed or unprimed form. More detailed results can be
-   *         queried using the {@link #containsVariable()} and
-   *         {@link #containsPrimedVariable()} methods.
+   * <p/>
+   * @param expr The expression to be searched.
+   * @param var  The variable to be searched for.
+   * <p/>
+   * @return <CODE>true</CODE> if the variable has been found in its primed or
+   *         unprimed form. More detailed results can be queried using the
+   *         {@link #containsVariable()} and {@link #containsPrimedVariable()}
+   *         methods.
    */
   public boolean findVariable(final SimpleExpressionProxy expr, final V var)
   {
@@ -67,12 +62,14 @@ public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable
 
   /**
    * Determines if a given variable is in the given constraint list.
-   * @param  update   The constraint list to be searched.
-   * @param  var      The variable to be searched for.
-   * @return <CODE>true</CODE> if the variable has been found in its
-   *         primed or unprimed form. More detailed results can be
-   *         queried using the {@link #containsVariable()} and
-   *         {@link #containsPrimedVariable()} methods.
+   * <p/>
+   * @param update The constraint list to be searched.
+   * @param var    The variable to be searched for.
+   * <p/>
+   * @return <CODE>true</CODE> if the variable has been found in its primed or
+   *         unprimed form. More detailed results can be queried using the
+   *         {@link #containsVariable()} and {@link #containsPrimedVariable()}
+   *         methods.
    */
   public boolean findVariable(final ConstraintList update, final V var)
   {
@@ -94,7 +91,8 @@ public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable
 
   /**
    * Determines if a given expression contains a primed identifier.
-   * @param  expr     The expression to be searched.
+   * <p/>
+   * @param expr The expression to be searched.
    */
   public boolean findPrime(final SimpleExpressionProxy expr)
   {
@@ -111,7 +109,8 @@ public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable
 
   /**
    * Determines if a given constraint list contains a primed identifier.
-   * @param  update   The constraint list to be searched.
+   * <p/>
+   * @param update The constraint list to be searched.
    */
   public boolean findPrime(final ConstraintList update)
   {
@@ -147,7 +146,6 @@ public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable
     return mContainsPrimedVariable;
   }
 
-
   //#########################################################################
   //# Auxiliary Methods
   private void find(final SimpleExpressionProxy expr)
@@ -159,14 +157,13 @@ public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable
     }
   }
 
-
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
   public Object visitIdentifierProxy(final IdentifierProxy ident)
   {
-    if (mCurrentVariable != null &&
-        mEqualityVisitor.equals(ident, mCurrentVariable)) {
+    if (mCurrentVariable != null && mEqualityVisitor.equals(ident,
+                                                            mCurrentVariable)) {
       mContainsVariable = true;
     }
     return null;
@@ -174,7 +171,7 @@ public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable
 
   @Override
   public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
-    throws VisitorException
+   throws VisitorException
   {
     final SimpleExpressionProxy lhs = expr.getLeft();
     lhs.acceptVisitor(this);
@@ -194,12 +191,12 @@ public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable
 
   @Override
   public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
-    throws VisitorException
+   throws VisitorException
   {
     final SimpleExpressionProxy subterm = expr.getSubTerm();
     if (expr.getOperator() == mNextOperator) {
-      if (mCurrentVariable == null ||
-          mEqualityVisitor.equals(subterm, mCurrentVariable)) {
+      if (mCurrentVariable == null || mEqualityVisitor.equals(subterm,
+                                                              mCurrentVariable)) {
         mContainsPrimedVariable = true;
       }
     } else {
@@ -207,15 +204,13 @@ public abstract class AbstractEFAVariableFinder<L, V extends AbstractEFAVariable
     }
     return null;
   }
-
-
+  
   //#########################################################################
   //# Data Members
   private final ModuleEqualityVisitor mEqualityVisitor;
   private final UnaryOperator mNextOperator;
-
   private SimpleExpressionProxy mCurrentVariable;
   private boolean mContainsVariable;
   private boolean mContainsPrimedVariable;
-
+  
 }

@@ -47,5 +47,23 @@ class EFSMSystem
   {
     super(name, variables, transitionRelations, context);
   }
+  
+  @Override
+  public List<EFSMTransitionRelation> getTransitionRelations()
+  {
+    return super.getTransitionRelations();
+  }
+
+  @Override
+  protected void addTransitionRelation(final EFSMTransitionRelation transitionRelation)
+  {
+    super.addTransitionRelation(transitionRelation);
+  }
+
+  @Override
+  protected void removeTransitionRelation(final EFSMTransitionRelation transitionRelation)
+  {
+    super.removeTransitionRelation(transitionRelation);
+  }  
 
 }
