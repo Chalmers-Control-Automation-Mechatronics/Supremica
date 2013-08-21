@@ -11,39 +11,44 @@ package net.sourceforge.waters.analysis.efa;
 
 import gnu.trove.set.hash.THashSet;
 
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.DeleteCommand;
-import net.sourceforge.waters.gui.command.InsertCommand;
-import net.sourceforge.waters.gui.transfer.InsertInfo;
-import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
+import net.sourceforge.waters.subject.module.ComponentSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
-import org.supremica.gui.ide.actions.IDEActionInterface;
 
 /**
- * A utility to import a SimpleEFASystem to the editor or getting a module
- * containing this system
+ * A utility to pack a SimpleEFASystem into a module
  * <p/>
  * @author Mohammad Reza Shoaei
  */
@@ -59,10 +64,11 @@ public class SimpleEFASystemImporter
     mCloner = ModuleSubjectFactory.getCloningInstance();
     mGlobalEvents = new THashSet<EventDeclSubject>();
   }
+  
   /**
    * Creating a module representing the system
    * <p/>
-   * @param system An EFA system
+   * @param system An EFA system ({@link SimpleEFASystem})
    * <p/>
    * @return A module containing the EFA component, variables, and system
    *         events.
