@@ -11,40 +11,35 @@ package net.sourceforge.waters.analysis.efa;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.DeleteCommand;
+import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.module.ComponentProxy;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.ModuleProxyCloner;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.model.module.VariableMarkingProxy;
-import net.sourceforge.waters.subject.module.ComponentSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+
+import org.supremica.gui.ide.actions.IDEActionInterface;
 
 /**
  * A utility to import a SimpleEFASystem to the editor or getting a module
@@ -64,9 +59,8 @@ public class SimpleEFASystemImporter
     mCloner = ModuleSubjectFactory.getCloningInstance();
     mGlobalEvents = new THashSet<EventDeclSubject>();
   }
-
   /**
-   * Creating a module containing this system.
+   * Creating a module representing the system
    * <p/>
    * @param system An EFA system
    * <p/>
@@ -78,13 +72,6 @@ public class SimpleEFASystemImporter
     return createModule(system);
   }
 
-  /**
-   * Creating a module representing the system
-   * <p/>
-   * @param system An EFA system
-   * <p/>
-   * @return A module proxy
-   */
   private ModuleProxy createModule(final SimpleEFASystem system)
   {
     final List<SimpleEFAVariable> variableList = system.getVariables();
@@ -114,9 +101,8 @@ public class SimpleEFASystemImporter
   private VariableComponentProxy getVariableComponent(
    final SimpleEFAVariable variable)
   {
-    final String variableName = variable.getName();
-    final SimpleIdentifierProxy identifier =
-     mSubjectFactory.createSimpleIdentifierProxy(variableName);
+    IdentifierProxy iden = 
+     (IdentifierProxy) mCloner.getClone(variable.getVariableName());
     final CompiledRange range = variable.getRange();
     final SimpleExpressionProxy type =
      range.createExpression(mSubjectFactory, mOperatorTable);
@@ -127,7 +113,7 @@ public class SimpleEFASystemImporter
     final Collection<VariableMarkingProxy> variableMarkings =
      mCloner.getClonedList(variable.getVariableMarkings());
 
-    return mSubjectFactory.createVariableComponentProxy(identifier,
+    return mSubjectFactory.createVariableComponentProxy(iden,
                                                         type,
                                                         variable.isDeterministic(),
                                                         initialStatePredicate,
@@ -143,25 +129,38 @@ public class SimpleEFASystemImporter
     final SimpleEFATransitionLabelEncoding efaEvent =
      efaComponent.getTransitionLabelEncoding();
     final String name = rel.getName();
-    // Should marking ID be zero?
-    final boolean isMarkingIsUsed = rel.isUsedProposition(0);
+    final boolean isMarkingIsUsed = 
+     rel.isUsedProposition(SimpleEFACompiler.DEFAULT_MARKING_ID);
+    final boolean isForbiddenIsUsed = 
+     rel.isUsedProposition(SimpleEFACompiler.DEFAULT_FORBIDDEN_ID);
     final int numStates = rel.getNumberOfStates();
     final List<SimpleNodeProxy> nodeList =
      new ArrayList<SimpleNodeProxy>(numStates);
     int numOfMarkingState = 0;
     for (int i = 0; i < numStates; i++) {
       final boolean isInitial = rel.isInitial(i);
-      final boolean isMarked = rel.isMarked(i, 0);
-      PlainEventListProxy props = null;
-      if (isMarked && isMarkingIsUsed) {
+      final boolean isMarked = 
+       rel.isMarked(i, SimpleEFACompiler.DEFAULT_MARKING_ID);
+      final boolean isForbidden = 
+       rel.isMarked(i, SimpleEFACompiler.DEFAULT_FORBIDDEN_ID);
+      final List<SimpleIdentifierProxy> identList = 
+       new ArrayList<SimpleIdentifierProxy>();
+      if (isMarkingIsUsed && isMarked) {
         numOfMarkingState++;
         final SimpleIdentifierProxy ident =
          mModuleFactory.createSimpleIdentifierProxy(
          EventDeclProxy.DEFAULT_MARKING_NAME);
-        final List<SimpleIdentifierProxy> identList =
-         Collections.singletonList(ident);
-        props = mModuleFactory.createPlainEventListProxy(identList);
+        identList.add(ident);
       }
+      if (isForbiddenIsUsed && isForbidden) {
+        final SimpleIdentifierProxy ident =
+         mModuleFactory.createSimpleIdentifierProxy(
+         EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
+        identList.add(ident);
+      }
+      final PlainEventListProxy props = 
+       identList.isEmpty() ? null : 
+        mModuleFactory.createPlainEventListProxy(identList);
       final String nodeName;
       if (nodes == null) {
         nodeName = "S" + i;

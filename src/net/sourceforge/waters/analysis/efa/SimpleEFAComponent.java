@@ -16,7 +16,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
  * An implementation of the {@link AbstractEFATransitionRelation}.
@@ -104,19 +104,35 @@ public class SimpleEFAComponent
     ModuleProxyFactory factory = getFactory();
     final List<SimpleNodeProxy> nodes = getNodeList();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final boolean isMarkingIsUsed = rel.isUsedProposition(0);
+    final boolean isMarkingIsUsed = 
+     rel.isUsedProposition(SimpleEFACompiler.DEFAULT_MARKING_ID);
+    final boolean isForbiddenIsUsed = 
+     rel.isUsedProposition(SimpleEFACompiler.DEFAULT_FORBIDDEN_ID);
     final int numStates = rel.getNumberOfStates();
     final List<SimpleNodeProxy> nodeList =
      new ArrayList<SimpleNodeProxy>(numStates);
     for (int i = 0; i < numStates; i++) {
       final boolean isInitial = rel.isInitial(i);
-      final boolean isMarked = rel.isMarked(i, 0);
-      PlainEventListProxy props = null;
-      if (isMarked && isMarkingIsUsed) {
-        final List<SimpleIdentifierProxy> identList =
-         Collections.singletonList((SimpleIdentifierProxy) getMarking());
-        props = factory.createPlainEventListProxy(identList);
+      final boolean isMarked = 
+       rel.isMarked(i, SimpleEFACompiler.DEFAULT_MARKING_ID);
+      final boolean isForbidden = 
+       rel.isMarked(i, SimpleEFACompiler.DEFAULT_FORBIDDEN_ID);
+      final List<SimpleIdentifierProxy> identList = 
+       new ArrayList<SimpleIdentifierProxy>();
+      if (isMarkingIsUsed && isMarked) {
+        final SimpleIdentifierProxy ident =
+         factory.createSimpleIdentifierProxy(
+         EventDeclProxy.DEFAULT_MARKING_NAME);
+        identList.add(ident);
       }
+      if (isForbiddenIsUsed && isForbidden) {
+        final SimpleIdentifierProxy ident =
+         factory.createSimpleIdentifierProxy(
+         EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
+        identList.add(ident);
+      }
+      final PlainEventListProxy props = 
+       identList.isEmpty() ? null : factory.createPlainEventListProxy(identList);
       final String nodeName;
       if (nodes == null) {
         nodeName = "S" + i;
@@ -126,9 +142,10 @@ public class SimpleEFAComponent
       }
       final SimpleNodeProxy node =
        factory.createSimpleNodeProxy(nodeName, props, null,
-                                     isInitial, null, null, null);
+                                            isInitial, null, null, null);
       nodeList.add(node);
-    }
+    }    
+    
     return nodeList;
   }
 
@@ -152,15 +169,26 @@ public class SimpleEFAComponent
     return eq.contains(list.getEventIdentifierList(), marking);
   }
 
-  private ModuleProxyFactory getFactory()
+  public ModuleProxyFactory getFactory()
   {
-    if (mFactory != null) {
-      return mFactory;
-    } else {
-      return ModuleElementFactory.getInstance();
-    }
+    return mFactory;
   }
 
+  public void setFactory(ModuleProxyFactory factory)
+  {
+    mFactory = factory;
+  }
+
+  public ComponentKind getKind()
+  {
+    return getTransitionRelation().getKind();
+  }
+
+  public void setKind(ComponentKind kind)
+  {
+    getTransitionRelation().setKind(kind);
+  }
+  
   private IdentifierProxy getMarking()
   {
     ModuleProxyFactory factory = getFactory();
@@ -170,6 +198,6 @@ public class SimpleEFAComponent
   
   //#########################################################################
   //# Data Members  
-  private final ModuleProxyFactory mFactory;
+  private ModuleProxyFactory mFactory;
   
 }

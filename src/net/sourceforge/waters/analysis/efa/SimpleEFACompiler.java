@@ -9,16 +9,21 @@
 
 package net.sourceforge.waters.analysis.efa;
 
+import java.util.ArrayList;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 /**
  * A utility to compile the model and construct 
@@ -45,6 +50,9 @@ public class SimpleEFACompiler
     super(manager, module);
     mInputModule = super.getInputModule();
     mDocumentManager = super.getDocumentManager();
+    mEnabledPropositionNames = new ArrayList<String>(2);
+    mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_MARKING_NAME);
+    mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
   }
 
   @Override
@@ -67,8 +75,14 @@ public class SimpleEFACompiler
       } else {
         marking = mMarking;
       }
-      final Collection<String> propositions =
-       Collections.singletonList(marking.toString());
+      final IdentifierProxy forbidden;
+      if (mForbidden == null) {
+        forbidden =
+         modfactory.createSimpleIdentifierProxy(
+         EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
+      } else {
+        forbidden = mForbidden;
+      }
       initSourceInfo();
       mModuleInstanceCompiler = new ModuleInstanceCompiler(mDocumentManager,
                                                            modfactory,
@@ -76,7 +90,7 @@ public class SimpleEFACompiler
                                                            mInputModule);
       mModuleInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       mModuleInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
-      mModuleInstanceCompiler.setEnabledPropositionNames(propositions);
+      mModuleInstanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
       checkAbort();
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
       mModuleInstanceCompiler = null;
@@ -86,6 +100,7 @@ public class SimpleEFACompiler
                                                      intermediate);
       mEFASystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mEFASystemBuilder.setConfiguredDefaultMarking(marking);
+      mEFASystemBuilder.setConfiguredDefaultForbidden(forbidden);
       mEFASystemBuilder.setMarkingVariablEFAEnable(mIsMarkingVariablEFAEnable);
       return mEFASystemBuilder.compile();
     } finally {
@@ -167,11 +182,6 @@ public class SimpleEFACompiler
     mEnabledPropertyNames = names;
   }
 
-  public void setConfiguredDefaultMarking(final IdentifierProxy marking)
-  {
-    mMarking = marking;
-  }
-
   public boolean isMarkingVariablEFAEnable()
   {
     return mIsMarkingVariablEFAEnable;
@@ -182,11 +192,36 @@ public class SimpleEFACompiler
     mIsMarkingVariablEFAEnable = enable;
   }
 
+  public void setConfiguredDefaultMarking(final IdentifierProxy marking)
+  {
+    mMarking = marking;
+  }
+
   public IdentifierProxy getConfiguredDefaultMarking()
   {
     return mMarking;
   }
 
+  public void setConfiguredDefaultForbidden(final IdentifierProxy forbidden)
+  {
+    mForbidden = forbidden;
+  }
+
+  public IdentifierProxy getConfiguredDefaultForbidden()
+  {
+    return mForbidden;
+  }
+  
+  public Collection<String> getEnabledPropositionNames()
+  {
+    return mEnabledPropositionNames;
+  }
+
+  public void setEnabledPropositionNames(final Collection<String> names)
+  {
+    mEnabledPropositionNames = names;
+  }
+  
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
@@ -217,8 +252,11 @@ public class SimpleEFACompiler
   private boolean mIsSourceInfoEnabled = false;
   private boolean mIsMarkingVariablEFAEnable = false;
   private Collection<String> mEnabledPropertyNames = null;
+  private Collection<String> mEnabledPropositionNames;
   private IdentifierProxy mMarking;
   private boolean mIsUsingEventAlphabet;
   private boolean mIsExpandingEFATransitions;
-  
+  private IdentifierProxy mForbidden;
+  public final static int DEFAULT_MARKING_ID = 0;
+  public final static int DEFAULT_FORBIDDEN_ID = 1;
 }
