@@ -10,29 +10,41 @@
 package net.sourceforge.waters.analysis.efa;
 
 import gnu.trove.set.hash.THashSet;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.DeleteCommand;
-import net.sourceforge.waters.gui.command.InsertCommand;
-import net.sourceforge.waters.gui.transfer.InsertInfo;
-import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
+import net.sourceforge.waters.subject.module.ComponentSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.module.ScopeKind;
-import org.supremica.gui.ide.actions.IDEActionInterface;
-
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * A utility to import a SimpleEFASystem to the editor or getting a module
@@ -66,13 +78,15 @@ public class SimpleEFASystemImporter
     return createModule(system);
   }
 
+  // Commenting out unused methods because of build problem.
+  // Can't run 'ant initialize' because of build dependency problem.
+  // Code in net.sourceforge.waters.analysis.* cannot use org.supremica.*
+  // Please move this method under org.supremica.*
   /**
    * An importer to the editor. Note that, all the current components and events
    * will be replace by the new ones.
-   * <p/>
    * @param system The EFA system
    * @param ide    The IDE interface
-   */
   public void importToIDE(final SimpleEFASystem system,
                           final IDEActionInterface ide)
    throws IOException, UnsupportedFlavorException
@@ -114,6 +128,7 @@ public class SimpleEFASystemImporter
     root.getUndoInterface().executeCommand(insertCommand);
     panel.clearSelection(false);
   }
+  */
 
   /**
    * Creating a module representing the system
@@ -288,6 +303,7 @@ public class SimpleEFASystemImporter
     }
   }
 
+  @SuppressWarnings("unused")
   private List<ComponentSubject> getComponentSubjects(final List<Proxy> list)
   {
 
@@ -319,7 +335,7 @@ public class SimpleEFASystemImporter
     }
     return decls;
   }
-  
+
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mModuleFactory;
@@ -336,5 +352,5 @@ public class SimpleEFASystemImporter
       return c2.compareTo(c2); // sorting by name
     }
   };
-  
+
 }
