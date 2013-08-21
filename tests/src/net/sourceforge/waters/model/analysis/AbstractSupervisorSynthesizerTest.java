@@ -254,18 +254,17 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
-
-  public void testIPCLockable() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "synthesis", "IPC_lockableswitch.wmod");
-    runSynthesizer(des, true);
-  }
-
   public void testIPCcswitch() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "IPC_cswitch.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testIPClockableswitch() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC_lockableswitch.wmod");
     runSynthesizer(des, true);
   }
 
@@ -568,8 +567,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     mSynthesizer.setModel(des);
     final EventProxy marking =
       AbstractConflictChecker.getMarkingProposition(des);
-    final Collection<EventProxy> props = Collections.singletonList(marking);
-    mSynthesizer.setPropositions(props);
+    mSynthesizer.setConfiguredDefaultMarking(marking);
   }
 
 

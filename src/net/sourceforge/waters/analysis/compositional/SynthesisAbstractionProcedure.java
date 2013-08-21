@@ -337,8 +337,12 @@ public class SynthesisAbstractionProcedure extends
         }
       }
     }
-    encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
-                              EventEncoding.STATUS_CONTROLLABLE);
+    if (useRenaming) {
+      encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
+                                EventEncoding.STATUS_CONTROLLABLE);
+    } else {
+      encoding.sortProperEvents(EventEncoding.STATUS_CONTROLLABLE);
+    }
     return encoding;
   }
 

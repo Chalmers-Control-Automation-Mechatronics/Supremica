@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import java.util.Collection;
-
 import net.sourceforge.waters.model.des.EventProxy;
 
 
@@ -37,21 +35,32 @@ public interface SupervisorSynthesizer
   //#########################################################################
   //# Parameterisation
   /**
-   * Defines the set of propositions to be consider by synthesis.
-   * product. If specified, the synthesised supervisor must be nonblocking
-   * with respect to all propositions contained in this set. If unspecified,
-   * the default marking proposition (named {@link
-   * net.sourceforge.waters.model.module.EventDeclProxy#DEFAULT_MARKING_NAME
-   * DEFAULT_MARKING_NAME}) will be used.
-   * @param  props       The set of propositions to be retained,
-   *                     or <CODE>null</CODE> to keep all propositions.
+   * <P>Sets the <I>marking proposition</I> to be used for synthesis.</P>
+   * <P>The synthesised supervisor must ensure nonblocking with respect
+   * to this proposition.</P>
+   * <P>Every state has a list of propositions attached to it; the
+   * synthesiser considers only those states as marked that are labelled by
+   * <CODE>marking</CODE>, i.e., their list of propositions must contain
+   * this event (exactly the same object).</P>
+   * <P>A marking proposition of&nbsp;<CODE>null</CODE> may be specified to
+   * use the <I>default marking</I>. In this case, the model must contain a
+   * proposition event named {@link
+   * net.sourceforge.waters.model.module#EventDeclProxy.DEFAULT_MARKING_NAME
+   * EventDeclProxy.DEFAULT_MARKING_NAME}, which is used as marking
+   * proposition. It is an error to request default marking, if no suitable
+   * event is present.</P>
+   * @param  marking  The marking proposition to be used,
+   *                  or <CODE>null</CODE> to use the default marking
+   *                  proposition of the model.
    */
-  public void setPropositions(final Collection<EventProxy> props);
+  public void setConfiguredDefaultMarking(EventProxy marking);
 
   /**
-   * Gets the set of propositions considered by synthesis.
-   * @see #setPropositions(Collection) setPropositions()
+   * Gets the <I>marking proposition</I> used for synthesis.
+   * @return The current marking proposition or <CODE>null</CODE> to
+   *         indicate default marking.
+   * @see #setConfiguredDefaultMarking(EventProxy)
    */
-  public Collection<EventProxy> getPropositions();
+  public EventProxy getConfiguredDefaultMarking();
 
 }

@@ -191,7 +191,7 @@ public class ListBufferTransitionRelation
       }
       mEventStatus[e] = status;
     }
-    final EventEncoding.OrderingInfo orderingInfo = eventEnc.getOrderInfo();
+    final EventEncoding.OrderingInfo orderingInfo = eventEnc.getOrderingInfo();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
         new OutgoingTransitionListBuffer(numEvents, numStates,
@@ -248,7 +248,7 @@ public class ListBufferTransitionRelation
     for (int e = 0; e < numEvents; e++) {
       mEventStatus[e] = eventEnc.getProperEventStatus(e);
     }
-    final EventEncoding.OrderingInfo orderingInfo = eventEnc.getOrderInfo();
+    final EventEncoding.OrderingInfo orderingInfo = eventEnc.getOrderingInfo();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
         new OutgoingTransitionListBuffer(numEvents, numStates,
@@ -861,6 +861,28 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Creates a read-only iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.
+   * The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all outgoing transitions from a given state
+   * with events of the specified status.
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createSuccessorsReadOnlyIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createReadOnlyIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
    * Creates a read-only iterator for this transition relation's incoming
    * transitions. The iterator returned is not initialised, so one of the
    * methods {@link TransitionIterator#resetState(int)} or
@@ -915,6 +937,28 @@ public class ListBufferTransitionRelation
   {
     if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.createReadOnlyIterator(target, event);
+    } else {
+      throw createNoBufferException(CONFIG_PREDECESSORS);
+    }
+  }
+
+  /**
+   * Creates a read-only iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.
+   * The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all incoming transitions to a given state
+   * with events of the specified status.
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createPredecessorsReadOnlyIteratorByStatus
+    (final int...flags)
+  {
+    if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createReadOnlyIteratorByStatus(flags);
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }
@@ -981,6 +1025,30 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Creates a read-only iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.
+   * The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all outgoing or outgoing (whichever available)
+   * transitions of a given state with events of the specified status.
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createAnyReadOnlyIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createReadOnlyIteratorByStatus(flags);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createReadOnlyIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
    * Creates a read-only iterator over all transitions in this transition
    * relation. The iterator returned is set up to return the first transition
    * in this buffer after calling {@link TransitionIterator#advance()}. It
@@ -1022,15 +1090,40 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Creates a read/write iterator for this transition relation's outgoing
-   * transitions. The iterator returned is not initialised, so one of the
+   * Creates a read-only iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.
+   * The iterator returned is set up to return the first transition in
+   * this buffer after calling {@link TransitionIterator#advance()}. It does
+   * not implement the methods {@link TransitionIterator#resetState(int)}
+   * or {@link TransitionIterator#reset(int,int)}, and
+   * being a read-only iterator, it also does not implement the
+   * {@link TransitionIterator#remove()} method.
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createAllTransitionsReadOnlyIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createAllTransitionsReadOnlyIteratorByStatus(flags);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createAllTransitionsReadOnlyIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+  /**
+   * <P>Creates a read/write iterator for this transition relation's outgoing
+   * transitions.</P>
+   * <P>The iterator returned is not initialised, so one of the
    * methods {@link TransitionIterator#resetState(int)} or
-   * {@link TransitionIterator#reset(int, int)} before it can be used.
-   * <P>
-   * <STRONG>Warning.</STRONG> The transition relation should be configured to
+   * {@link TransitionIterator#reset(int, int)} before it can be used.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
    * use only a predecessor buffer. If both buffers are configured, the
-   * predecessor buffer will be closed!
-   * </P>
+   * predecessor buffer will be closed!</P>
    */
   public TransitionIterator createSuccessorsModifyingIterator()
   {
@@ -1043,21 +1136,72 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Creates a read/write iterator for this transition relation's incoming
-   * transitions. The iterator returned is not initialised, so one of the
-   * methods {@link TransitionIterator#resetState(int)} or
-   * {@link TransitionIterator#reset(int, int)} before it can be used.
-   * <P>
-   * <STRONG>Warning.</STRONG> The transition relation should be configured to
+   * <P>Creates a read/write iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.</P>
+   * <P>The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all outgoing transitions from a given state
+   * with events of the specified status.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
    * use only a predecessor buffer. If both buffers are configured, the
-   * successor buffer will be closed!
-   * </P>
+   * predecessor buffer will be closed!</P>
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createSuccessorsModifyingIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      mPredecessorBuffer = null;
+      return mSuccessorBuffer.createModifyingIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
+   * <P>Creates a read/write iterator for this transition relation's incoming
+   * transitions.</P>
+   * <P>The iterator returned is not initialised, so one of the
+   * methods {@link TransitionIterator#resetState(int)} or
+   * {@link TransitionIterator#reset(int, int)} before it can be used.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
+   * use only a predecessor buffer. If both buffers are configured, the
+   * successor buffer will be closed!</P>
    */
   public TransitionIterator createPredecessorsModifyingIterator()
   {
     if (mPredecessorBuffer != null) {
       mSuccessorBuffer = null;
       return mPredecessorBuffer.createModifyingIterator();
+    } else {
+      throw createNoBufferException(CONFIG_PREDECESSORS);
+    }
+  }
+
+  /**
+   * <P>Creates a read/write iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.</P>
+   * <P>The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all incoming transitions to a given state
+   * with events of the specified status.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
+   * use only a predecessor buffer. If both buffers are configured, the
+   * successor buffer will be closed!</P>
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createPredecessorsModifyingIteratorByStatus
+    (final int...flags)
+  {
+    if (mPredecessorBuffer != null) {
+      mSuccessorBuffer = null;
+      return mPredecessorBuffer.createModifyingIteratorByStatus(flags);
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }
@@ -1093,20 +1237,15 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * <P>
-   * Creates a read/write iterator over all transitions with the given event.
-   * </P>
-   * <P>
-   * The iterator returned is set up to return the first transition with the
-   * given event after calling {@link TransitionIterator#advance()}. It does
-   * not implement the methods {@link TransitionIterator#resetState(int)} or
-   * {@link TransitionIterator#reset(int,int)}.
-   * </P>
-   * <P>
-   * <STRONG>Warning.</STRONG> The transition relation should be configured to
+   * <P>Creates a read/write iterator over all transitions with the given
+   * event.</P>
+   * <P>The iterator returned is set up to return the first transition with
+   * the given event after calling {@link TransitionIterator#advance()}. It
+   * does not implement the methods {@link TransitionIterator#resetState(int)}
+   * or {@link TransitionIterator#reset(int,int)}.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
    * use only one transition buffer. If both buffers are configured, the
-   * predecessor buffer will be closed!
-   * </P>
+   * predecessor buffer will be closed!</P>
    */
   public TransitionIterator createAllTransitionsModifyingIterator(final int event)
   {
@@ -1121,13 +1260,41 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * <P>Creates a read/write iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.</P>
+   * <P>The iterator returned is set up to return the first transition in
+   * this buffer after calling {@link TransitionIterator#advance()}. It does
+   * not implement the methods {@link TransitionIterator#resetState(int)}
+   * or {@link TransitionIterator#reset(int,int)}.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
+   * use only one transition buffer. If both buffers are configured, the
+   * predecessor buffer will be closed!</P>
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createAllTransitionsModifyingIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      mPredecessorBuffer = null;
+      return mSuccessorBuffer.createAllTransitionsModifyingIteratorByStatus(flags);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createAllTransitionsModifyingIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+  /**
    * Obtains the tau-closure of the successors of this transition relation.
    * @param limit
    *          The maximum number of transitions that can be stored. If the
    *          number of transitions already in the transition relation plus
    *          the number of computed tau transitions exceeds the limit,
    *          precomputation is aborted and transitions will be produced on
-   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
+   *          the fly by iterators. A limit of&nbsp;0 forces the tau closure
    *          always to be computed on the fly.
    * @return A {@link TauClosure} object, which can be used to obtain a
    *         {@link TransitionIterator} over the tau-closure of the successor
@@ -1156,7 +1323,7 @@ public class ListBufferTransitionRelation
    *          number of transitions already in the transition relation plus
    *          the number of computed tau transitions exceeds the limit,
    *          precomputation is aborted and transitions will be produced on
-   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
+   *          the fly by iterators. A limit of&nbsp;0 forces the tau closure
    *          always to be computed on the fly.
    * @return A {@link TauClosure} object, which can be used to obtain a
    *         {@link TransitionIterator} over the tau-closure of the

@@ -169,6 +169,7 @@ public class VariableEditorDialog
     final ModuleContext context = mRoot.getModuleContext();
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent event)
         {
           commitDialog();
@@ -204,6 +205,7 @@ public class VariableEditorDialog
     mInitialInput.setAllowNull(false);
 
     final ActionListener dethandler = new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent event)
         {
           mInitialInput.updateShownExpression();
@@ -266,12 +268,14 @@ public class VariableEditorDialog
     prededitor.addCellEditorListener(mMarkingsModel);
     final ListSelectionModel selmodel = mMarkingsTable.getSelectionModel();
     selmodel.addListSelectionListener(new ListSelectionListener() {
+        @Override
         public void valueChanged(final ListSelectionEvent event)
         {
           updateListControlEnabled();
         }
       });
     mMarkingsTable.addMouseListener(new MouseAdapter() {
+        @Override
         public void mouseClicked(final MouseEvent event)
         {
           handleMarkingsTableClick(event);
@@ -526,6 +530,7 @@ public class VariableEditorDialog
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
               addMarking();
@@ -597,6 +602,7 @@ public class VariableEditorDialog
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
               moveMarkingsUp();
@@ -626,6 +632,7 @@ public class VariableEditorDialog
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
               moveMarkingsDown();
@@ -657,6 +664,7 @@ public class VariableEditorDialog
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
               commitDialog();
@@ -813,6 +821,7 @@ public class VariableEditorDialog
 
     //#######################################################################
     //# Overrides for Base Class javax.swing.JComponent
+    @Override
     public String getToolTipText(final MouseEvent event)
     {
        if (mDeterministicButton.isSelected()) {
@@ -861,9 +870,9 @@ public class VariableEditorDialog
             setValue(rhs);
           } else if (eq.equals(rhs, ident)) {
             setValue(lhs);
-          } else if (lhs instanceof SimpleIdentifierSubject) {
+          } else if (lhs instanceof IdentifierSubject) {
             setValue(rhs);
-          } else if (rhs instanceof SimpleIdentifierSubject) {
+          } else if (rhs instanceof IdentifierSubject) {
             setValue(lhs);
           }
         } else {
@@ -933,6 +942,7 @@ public class VariableEditorDialog
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    @Override
     public SimpleExpressionProxy parse(final String text)
       throws ParseException
     {
@@ -940,6 +950,7 @@ public class VariableEditorDialog
       return parser.parse(text, mTypeMask);
     }
 
+    @Override
     public DocumentFilter getDocumentFilter()
     {
       return mDocumentFilter;
@@ -984,6 +995,7 @@ public class VariableEditorDialog
     //#######################################################################
     //# Overrides for Base Class
     //# net.sourceforge.waters.gui.SimpleExpressionEditor
+    @Override
     public SimpleExpressionCell getTableCellEditorComponent
       (final JTable table, final Object value, final boolean isSelected,
        final int row, final int column)
@@ -1030,6 +1042,7 @@ public class VariableEditorDialog
 
     //#######################################################################
     //# Overrides for javax.swing.JTable
+    @Override
     public String getToolTipText(final MouseEvent event)
     {
       final Point point = event.getPoint();
@@ -1067,6 +1080,7 @@ public class VariableEditorDialog
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       addMarking();
@@ -1098,6 +1112,7 @@ public class VariableEditorDialog
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       removeMarkings();
@@ -1130,6 +1145,7 @@ public class VariableEditorDialog
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       moveMarkingsUp();
@@ -1162,6 +1178,7 @@ public class VariableEditorDialog
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       moveMarkingsDown();

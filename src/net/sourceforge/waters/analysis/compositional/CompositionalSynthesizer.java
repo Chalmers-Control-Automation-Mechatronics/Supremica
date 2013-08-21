@@ -685,9 +685,11 @@ public class CompositionalSynthesizer extends
   {
     if (mSupervisorReductionEnabled) {
       try {
+        final EventProxy marking = getUsedDefaultMarking();
+        final int markingID = mTempEventEncoding.getEventCode(marking);
+        mSupervisorSimplifier.setDefaultMarkingID(markingID);
         mSupervisorSimplifier.setTransitionRelation(rel);//set TR
-        mSupervisorSimplifier.setEvent(-1);//set event
-        mSupervisorSimplifier.setBadStateIndex();//set bad state
+        mSupervisorSimplifier.setControlledEvent(-1);//set event
         mSupervisorSimplifier.run();
         return mSupervisorSimplifier.getTransitionRelation();
       } catch (final OverflowException overflow) {
@@ -883,6 +885,7 @@ public class CompositionalSynthesizer extends
     final AutomatonProxy newSupervisor = builder.getComputedAutomaton();
     final KindTranslator translator = getKindTranslator();
     mTempEventEncoding = new EventEncoding(newSupervisor, translator);
+    mTempEventEncoding.sortProperEvents(EventEncoding.STATUS_CONTROLLABLE);
     return new ListBufferTransitionRelation(newSupervisor,
                                             mTempEventEncoding,
                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);

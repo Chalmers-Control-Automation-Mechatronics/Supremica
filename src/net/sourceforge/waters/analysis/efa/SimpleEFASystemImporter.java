@@ -81,7 +81,8 @@ public class SimpleEFASystemImporter
   // Commenting out unused methods because of build problem.
   // Can't run 'ant initialize' because of build dependency problem.
   // Code in net.sourceforge.waters.analysis.* cannot use org.supremica.*
-  // Please move this method under org.supremica.*
+  // Please move this method under org.supremica.gui.*
+  // or net.sourceforge.waters.gui.*
   /**
    * An importer to the editor. Note that, all the current components and events
    * will be replace by the new ones.
