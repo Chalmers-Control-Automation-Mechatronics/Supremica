@@ -14,8 +14,8 @@ import gnu.trove.set.hash.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.TreeMap;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -78,59 +78,6 @@ public class SimpleEFASystemImporter
     return createModule(system);
   }
 
-  // Commenting out unused methods because of build problem.
-  // Can't run 'ant initialize' because of build dependency problem.
-  // Code in net.sourceforge.waters.analysis.* cannot use org.supremica.*
-  // Please move this method under org.supremica.gui.*
-  // or net.sourceforge.waters.gui.*
-  /**
-   * An importer to the editor. Note that, all the current components and events
-   * will be replace by the new ones.
-   * @param system The EFA system
-   * @param ide    The IDE interface
-  public void importToIDE(final SimpleEFASystem system,
-                          final IDEActionInterface ide)
-   throws IOException, UnsupportedFlavorException
-  {
-    final ModuleProxy mModule = createModule(system);
-
-    final List<ComponentSubject> componentList =
-     getComponentSubjects(mModule.getComponentList());
-    final ModuleSubject oModule =
-     ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
-
-    oModule.getEventDeclListModifiable().clear();
-    oModule.getEventDeclListModifiable().addAll(mGlobalEvents);
-
-    final ModuleWindowInterface root = (ModuleWindowInterface) ide.getIDE().
-     getActiveDocumentContainer().getActivePanel();
-    final SelectionOwner panel = root.getComponentsPanel();
-
-    final List<InsertInfo> oList = new LinkedList<InsertInfo>();
-    final List<InsertInfo> deletionVictims = panel.getDeletionVictims(panel.
-     getAllSelectableItems());
-    oList.addAll(deletionVictims);
-    final Command deleteCommand = new DeleteCommand(oList, panel);
-    root.getUndoInterface().executeCommand(deleteCommand);
-    final InstanceSubject template =
-     new InstanceSubject(new SimpleIdentifierSubject(""), "");
-    final Transferable transfer =
-     WatersDataFlavor.createTransferable(template);
-    final List<InsertInfo> tInserts = panel.getInsertInfo(transfer);
-    final InsertInfo tInsert = tInserts.get(0);
-    final Object position = tInsert.getInsertPosition();
-    final List<InsertInfo> nList = new ArrayList<InsertInfo>();
-    for (int i = componentList.size() - 1; i >= 0; i--) {
-      final InsertInfo insert = new InsertInfo(componentList.get(i),
-                                               position);
-      nList.add(insert);
-    }
-    final Command insertCommand = new InsertCommand(nList, panel, root);
-    root.getUndoInterface().executeCommand(insertCommand);
-    panel.clearSelection(false);
-  }
-  */
-
   /**
    * Creating a module representing the system
    * <p/>
@@ -143,36 +90,30 @@ public class SimpleEFASystemImporter
     final List<SimpleEFAVariable> variableList = system.getVariables();
     final List<SimpleEFAComponent> comps =
      system.getTransitionRelations();
-    final int numComponents = variableList.size() + comps.size();
     mGlobalEvents.addAll(getEventDeclSubjects(system.getSystemEvents()));
-    final List<SimpleComponentProxy> compList =
-     new ArrayList<SimpleComponentProxy>(numComponents);
-
-    final List<VariableComponentProxy> varList =
-     new ArrayList<VariableComponentProxy>(numComponents);
-
+    final TreeMap<String, SimpleComponentProxy> compList =
+     new TreeMap<String, SimpleComponentProxy>(String.CASE_INSENSITIVE_ORDER);
+    final TreeMap<String, VariableComponentProxy> varList =
+     new TreeMap<String, VariableComponentProxy>(String.CASE_INSENSITIVE_ORDER);
     for (final SimpleEFAComponent comp : comps) {
-      importComponents(compList, comp);
+      compList.put(comp.getName(), getSimpleComponent(comp));
     }
-
     for (final SimpleEFAVariable variable : variableList) {
-      importVariable(varList, variable);
+      varList.put(variable.getName(), getVariableComponent(variable));
     }
-
-    Collections.sort(compList, comparator);
-    Collections.sort(varList, comparator);
-    final List<ComponentProxy> list = new ArrayList<ComponentProxy>();
-    list.addAll(compList);
-    list.addAll(varList);
+    final List<ComponentProxy> list = new ArrayList<ComponentProxy>(compList
+     .size() + varList.size());
+    list.addAll(compList.values());
+    list.addAll(varList.values());
     final ModuleProxy createModuleProxy = mModuleFactory.createModuleProxy(
      system.getName(), null, null, null, mGlobalEvents, null, list);
+
     return createModuleProxy;
   }
 
-  private void importVariable(final List<VariableComponentProxy> compList,
-                              final SimpleEFAVariable variable)
+  private VariableComponentProxy getVariableComponent(
+   final SimpleEFAVariable variable)
   {
-
     final String variableName = variable.getName();
     final SimpleIdentifierProxy identifier =
      mSubjectFactory.createSimpleIdentifierProxy(variableName);
@@ -185,17 +126,16 @@ public class SimpleEFASystemImporter
      getInitialStatePredicate());
     final Collection<VariableMarkingProxy> variableMarkings =
      mCloner.getClonedList(variable.getVariableMarkings());
-    final VariableComponentProxy var =
-     mSubjectFactory.createVariableComponentProxy(identifier,
-                                                  type,
-                                                  variable.isDeterministic(),
-                                                  initialStatePredicate,
-                                                  variableMarkings);
-    compList.add(var);
+
+    return mSubjectFactory.createVariableComponentProxy(identifier,
+                                                        type,
+                                                        variable.isDeterministic(),
+                                                        initialStatePredicate,
+                                                        variableMarkings);
   }
 
-  private void importComponents(final List<SimpleComponentProxy> compList,
-                                final SimpleEFAComponent efaComponent)
+  private SimpleComponentProxy getSimpleComponent(
+   final SimpleEFAComponent efaComponent)
   {
     final List<SimpleNodeProxy> nodes = efaComponent.getNodeList();
     final ListBufferTransitionRelation rel =
@@ -276,9 +216,8 @@ public class SimpleEFASystemImporter
     final SimpleIdentifierProxy ident =
      mModuleFactory.createSimpleIdentifierProxy(name);
 
-    final SimpleComponentProxy simpleComponent =
-     mModuleFactory.createSimpleComponentProxy(ident, rel.getKind(), graph);
-    compList.add(simpleComponent);
+    return mModuleFactory
+     .createSimpleComponentProxy(ident, rel.getKind(), graph);
   }
 
   //#########################################################################
@@ -336,7 +275,7 @@ public class SimpleEFASystemImporter
     }
     return decls;
   }
-
+  
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mModuleFactory;
@@ -344,14 +283,5 @@ public class SimpleEFASystemImporter
   private final ModuleSubjectFactory mSubjectFactory;
   private final ModuleProxyCloner mCloner;
   private final Collection<EventDeclSubject> mGlobalEvents;
-  private final Comparator<ComponentProxy> comparator =
-   new Comparator<ComponentProxy>()
-  {
-    @Override
-    public int compare(final ComponentProxy c1, final ComponentProxy c2)
-    {
-      return c2.compareTo(c2); // sorting by name
-    }
-  };
-
+  
 }
