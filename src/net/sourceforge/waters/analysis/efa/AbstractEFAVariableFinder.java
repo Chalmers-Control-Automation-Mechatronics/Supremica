@@ -13,7 +13,12 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 /**
  * A utility class to determine whether a given variable occurs in an expression
@@ -147,17 +152,6 @@ public abstract class AbstractEFAVariableFinder<L,
   }
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void find(final SimpleExpressionProxy expr)
-  {
-    try {
-      expr.acceptVisitor(this);
-    } catch (final VisitorException exception) {
-      throw exception.getRuntimeException();
-    }
-  }
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
   public Object visitIdentifierProxy(final IdentifierProxy ident)
@@ -168,10 +162,8 @@ public abstract class AbstractEFAVariableFinder<L,
     }
     return null;
   }
-
   @Override
-  public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
-   throws VisitorException
+  public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr) throws VisitorException
   {
     final SimpleExpressionProxy lhs = expr.getLeft();
     lhs.acceptVisitor(this);
@@ -190,8 +182,7 @@ public abstract class AbstractEFAVariableFinder<L,
   }
 
   @Override
-  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
-   throws VisitorException
+  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr) throws VisitorException
   {
     final SimpleExpressionProxy subterm = expr.getSubTerm();
     if (expr.getOperator() == mNextOperator) {
@@ -203,6 +194,16 @@ public abstract class AbstractEFAVariableFinder<L,
       subterm.acceptVisitor(this);
     }
     return null;
+  }
+
+  //#########################################################################
+    private void find(final SimpleExpressionProxy expr)
+  {
+    try {
+      expr.acceptVisitor(this);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    }
   }
   
   //#########################################################################

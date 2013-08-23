@@ -21,7 +21,7 @@ public class SimpleEFATransitionLabel
 {
 
   public SimpleEFATransitionLabel(final ConstraintList constraint,
-   final SimpleEFAEventDecl... event)
+                                  final SimpleEFAEventDecl... event)
   {
     super(constraint, event);
   }
@@ -31,4 +31,16 @@ public class SimpleEFATransitionLabel
     super(event);
   }
   
+  @Override
+  public String toString(){
+    final StringBuffer events = new StringBuffer();
+    events.append("{");
+    for (SimpleEFAEventDecl e : getEvents()){
+      events.append(e.toString());
+      events.append(",");
+    }
+    events.delete(events.length() - 1, events.length());
+    events.append("}");
+    return events.toString() + " : " + getConstraint().toString();
+  }
 }

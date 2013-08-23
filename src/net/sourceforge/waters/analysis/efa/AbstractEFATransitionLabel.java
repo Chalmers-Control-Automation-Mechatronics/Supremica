@@ -35,11 +35,11 @@ public abstract class AbstractEFATransitionLabel
   {
     mConstraint = constraint;
     mEvent = event;
-    mVariables = new THashSet<SimpleEFAVariable>();
-    mTransitionRelations = new THashSet<AbstractEFATransitionRelation<?>>();
+    mVariables = new THashSet<>();
+    mTransitionRelations = new THashSet<>();
     mIsObservable = event[0].isObservable();
     mKind = event[0].getKind();
-    mProxyList = new ArrayList<Proxy>();
+    mProxyList = new ArrayList<>();
     for (final SimpleEFAEventDecl e : mEvent) {
       mProxyList.add(e.getEventDecl());
     }
@@ -127,7 +127,7 @@ public abstract class AbstractEFATransitionLabel
        ModuleEqualityVisitor.getInstance(false);
       final AbstractEFATransitionLabel expected =
        (AbstractEFATransitionLabel) other;
-      final ArrayList<Proxy> pList = new ArrayList<Proxy>();
+      final ArrayList<Proxy> pList = new ArrayList<>();
       for (final SimpleEFAEventDecl e : expected.getEvents()) {
         pList.add(e.getEventDecl());
       }

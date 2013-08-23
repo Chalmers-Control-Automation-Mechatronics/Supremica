@@ -22,7 +22,7 @@ public class SimpleEFATransitionLabelEncoding
 
   public SimpleEFATransitionLabelEncoding()
   {
-    super();
+    this(DEFAULT_SIZE);
   }
 
   public SimpleEFATransitionLabelEncoding(final int size)
@@ -40,6 +40,26 @@ public class SimpleEFATransitionLabelEncoding
    final SimpleEFATransitionLabelEncoding encoding)
   {
     super(encoding);
+  }
+  
+  @Override
+  public String toString(){
+    if (super.isEmpty()){
+      return "[]";
+    }
+    final StringBuffer events = new StringBuffer();
+    final String sep = " <> ";
+    events.append("[");
+    for (SimpleEFATransitionLabel label : getTransitionLabels()){
+      String out = Integer.toString(getTransitionLabelId(label)) 
+                   + " -> "
+                   + label.toString()
+                   + sep;
+      events.append(out);
+    }
+    events.delete(events.length() - sep.length(), events.length());    
+    events.append("]");
+    return events.toString();
   }
   
 }

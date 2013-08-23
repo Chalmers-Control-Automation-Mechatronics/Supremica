@@ -10,14 +10,15 @@
 package net.sourceforge.waters.analysis.efa;
 
 import gnu.trove.set.hash.THashSet;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * An implementation of {@link AbstractEFAVariable}.
@@ -28,22 +29,15 @@ public class SimpleEFAVariable
  extends AbstractEFAVariable<SimpleEFATransitionLabel>
 {
 
-  /**
-   * Collection of transition relations (EFA) using this variable.
-   */
-  private final Collection<SimpleEFAComponent> mModifiers;
-  private final Collection<SimpleEFAComponent> mVisitors;
-  private final Collection<VariableMarkingProxy> mMarkings;
-
   public SimpleEFAVariable(final VariableComponentProxy var,
    final CompiledRange range,
    final ModuleProxyFactory factory,
    final CompilerOperatorTable op)
   {
     super(var, range, factory, op);
-    mModifiers = new THashSet<SimpleEFAComponent>();
-    mVisitors = new THashSet<SimpleEFAComponent>();
-    mMarkings = new ArrayList<VariableMarkingProxy>(var.getVariableMarkings());
+    mModifiers = new THashSet<>();
+    mVisitors = new THashSet<>();
+    mMarkings = new ArrayList<>(var.getVariableMarkings());
   }
 
   /**
@@ -114,5 +108,12 @@ public class SimpleEFAVariable
   {
     return getComponent().isDeterministic();
   }
+
+  /**
+   * Collection of transition relations (EFA) using this variable.
+   */
+  private final Collection<SimpleEFAComponent> mModifiers;
+  private final Collection<SimpleEFAComponent> mVisitors;
+  private final Collection<VariableMarkingProxy> mMarkings;
   
 }

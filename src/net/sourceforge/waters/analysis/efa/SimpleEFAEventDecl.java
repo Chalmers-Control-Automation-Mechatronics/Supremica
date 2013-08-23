@@ -10,13 +10,25 @@
 package net.sourceforge.waters.analysis.efa;
 
 import gnu.trove.set.hash.THashSet;
-import net.sourceforge.waters.model.module.*;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
-
-import java.util.*;
 
 /**
  * <P>A compiler-internal representation of an event group in a system of
@@ -39,10 +51,10 @@ public class SimpleEFAEventDecl
   public SimpleEFAEventDecl(final EventDeclProxy decl)
   {
     mEFAEventDecl = decl;
-    mVariables = new THashSet<SimpleEFAVariable>();
-    mPrimeVariables = new THashSet<SimpleEFAVariable>();
-    mUnPrimeVariables = new THashSet<SimpleEFAVariable>();
-    mComponents = new THashSet<SimpleEFAComponent>();
+    mVariables = new THashSet<>();
+    mPrimeVariables = new THashSet<>();
+    mUnPrimeVariables = new THashSet<>();
+    mComponents = new THashSet<>();
     mIsObservable = decl.isObservable();
     mKind = decl.getKind();
   }
@@ -51,10 +63,10 @@ public class SimpleEFAEventDecl
                             final EventKind kind)
   {
     mEFAEventDecl = new EventDeclSubject(identifier, kind);
-    mVariables = new THashSet<SimpleEFAVariable>();
-    mPrimeVariables = new THashSet<SimpleEFAVariable>();
-    mUnPrimeVariables = new THashSet<SimpleEFAVariable>();
-    mComponents = new THashSet<SimpleEFAComponent>();
+    mVariables = new THashSet<>();
+    mPrimeVariables = new THashSet<>();
+    mUnPrimeVariables = new THashSet<>();
+    mComponents = new THashSet<>();
     mIsObservable = true;
     mKind = kind;
   }
