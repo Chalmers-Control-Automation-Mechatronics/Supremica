@@ -154,6 +154,22 @@ public class CertainUnsupervisabilityTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_CertainUnsup_5() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "CertainUnsup_05.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_CertainUnsup_6() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "CertainUnsup_06.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   public void test_CertainUnsupTrans_1() throws Exception
   {
     final String group = "tests";
