@@ -55,9 +55,9 @@ class EFSMSystem
   }
 
   @Override
-  protected void addTransitionRelation(final EFSMTransitionRelation transitionRelation)
+  protected boolean addTransitionRelation(final EFSMTransitionRelation transitionRelation)
   {
-    super.addTransitionRelation(transitionRelation);
+    return super.addTransitionRelation(transitionRelation);
   }
 
   @Override

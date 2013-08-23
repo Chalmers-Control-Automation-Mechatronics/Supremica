@@ -31,8 +31,8 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
 
   public AbstractEFATransitionLabelEncoding(final int size)
   {
-    mTransitionLabelMap = new TObjectIntHashMap<L>(size, 0.5f, -1);
-    mTransitionLabelList = new ArrayList<L>(size);
+    mTransitionLabelMap = new TObjectIntHashMap<>(size, 0.5f, -1);
+    mTransitionLabelList = new ArrayList<>(size);
   }
 
   public AbstractEFATransitionLabelEncoding(final AbstractEFATransitionLabelEncoding<L> encoding)
@@ -58,6 +58,11 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
     return mTransitionLabelMap.size();
   }
 
+  public boolean isEmpty()
+  {
+    return mTransitionLabelMap.isEmpty();
+  }
+  
   public int getTransitionLabelId(final L label)
   {
     return mTransitionLabelMap.get(label);

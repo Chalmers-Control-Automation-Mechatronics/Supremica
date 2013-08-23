@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.efa;
 
+import java.util.Collection;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-
-import java.util.Collection;
 
 /**
  * An implementation of {@link AbstractEFAVariableCollector}.

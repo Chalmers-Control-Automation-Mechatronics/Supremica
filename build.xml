@@ -273,7 +273,7 @@
                verbose="false"
                nowarn="true"
                excludes="${supremica_basedir}/net/sourceforge/waters/external/promela/parser/**"
-               source="1.5"
+               source="1.7"
                fork="true"
                includeantruntime="false"
                memoryMaximumSize="512M">
@@ -293,7 +293,7 @@
                deprecation="false"
                verbose="false"
                nowarn="true"
-               source="1.5"
+               source="1.7"
                fork="true"
                includeantruntime="false"
                memoryMaximumSize="256M">
@@ -318,7 +318,7 @@
             verbose="false"
             nowarn="true"
             includes="${supremica_basedir}/manufacturingTables/xsd/**"          
-            source="1.5"
+            source="1.7"
             includeantruntime="false"
         />
     </target>
@@ -333,7 +333,7 @@
             verbose="false"
             nowarn="true"
             includes="${supremica_basedir}/external/genericPLCProgramDescription/xsd/**"                
-            source="1.5"
+            source="1.7"
             includeantruntime="false"
         />
     </target>
@@ -355,7 +355,7 @@
             verbose="false"
             nowarn="true"
             includes="${supremica_basedir}/automata/algorithms/scheduling/**"           
-            source="1.5"
+            source="1.7"
             includeantruntime="false"
         />
     </target>
@@ -488,9 +488,6 @@ Class-Path: ${manifest.pathlist}</echo>
         </jar>
     </target>
     
-    <target name="nb_tests" depends="-jar_supremica_tests"/>
-
-
     <target name="-jar_waters_jaxb">
         <ant dir="${waters.dir}" target="jaxb-jar" inheritAll="false"/>
     </target>
@@ -958,7 +955,7 @@ Class-Path: ${manifest.pathlist}</echo>
             version="true"
             use="true"
             private="true"
-            source="1.5"
+            source="1.7"
             maxmemory="512m"
             windowtitle="Supremica API"
             bottom="Copyright &#169; 2001 - 2011 Supremica and Knut Åkesson, Martin Fabian, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">

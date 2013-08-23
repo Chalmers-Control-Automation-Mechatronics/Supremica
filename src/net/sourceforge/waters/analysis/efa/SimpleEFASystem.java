@@ -31,7 +31,7 @@ public class SimpleEFASystem
                          final int size)
   {
     super(name, context, size);
-    mAlphabet = new THashSet<SimpleEFAEventDecl>();
+    mAlphabet = new THashSet<>();
   }
 
   public SimpleEFASystem(final String name,
@@ -40,7 +40,7 @@ public class SimpleEFASystem
                          final SimpleEFAVariableContext context)
   {
     super(name, variables, components, context);
-    mAlphabet = new THashSet<SimpleEFAEventDecl>();
+    mAlphabet = new THashSet<>();
   }
 
   public int getNbrComponents()
@@ -55,14 +55,11 @@ public class SimpleEFASystem
 
   public void addComponent(final SimpleEFAComponent component)
   {
-    super.addTransitionRelation(component);
+    if(super.addTransitionRelation(component)){
+      component.addSystem(this);
+    }
   }
 
-  protected void removeComponent(final SimpleEFAComponent component)
-  {
-    super.removeTransitionRelation(component);
-  }  
-  
   public Collection<SimpleEFAEventDecl> getSystemEvents()
   {
     return mAlphabet;
@@ -77,15 +74,31 @@ public class SimpleEFASystem
   {
     mAlphabet.addAll(events);
   }
-  
-  public void clearSystemEvents(){
+
+  public void clearSystemEvents()
+  {
     mAlphabet.clear();
   }
   
   public boolean removeSystemEvent(SimpleEFAEventDecl event){
     return mAlphabet.remove(event);
   }
+  
+  @Override
+  public void addVariable(final SimpleEFAVariable variable){
+    super.addVariable(variable);
+  }
 
+  @Override
+  public void removeVariable(final SimpleEFAVariable var)
+  {
+    super.removeVariable(var);
+  }
+
+    protected void removeComponent(final SimpleEFAComponent component)
+  {
+    super.removeTransitionRelation(component);
+  }
   //#########################################################################
   //# Data Members
   private final Collection<SimpleEFAEventDecl> mAlphabet;  

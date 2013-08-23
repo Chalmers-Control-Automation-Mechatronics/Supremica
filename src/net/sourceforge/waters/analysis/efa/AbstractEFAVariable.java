@@ -10,12 +10,19 @@
 package net.sourceforge.waters.analysis.efa;
 
 import gnu.trove.set.hash.THashSet;
+
+import java.util.Collection;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.*;
-
-import java.util.Collection;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 /**
  * A representation of an EFA variable for use in compositional analysis.
@@ -44,8 +51,8 @@ public abstract class AbstractEFAVariable<L>
     mPrimedVariableName = factory.createUnaryExpressionProxy(next, temp);
     mInitialStatePredicate =
      (SimpleExpressionProxy) cloner.getClone(var.getInitialStatePredicate());
-    mTransitionRelations = new THashSet<AbstractEFATransitionRelation<L>>();
-    mEventDecls = new THashSet<EventDeclProxy>();
+    mTransitionRelations = new THashSet<>();
+    mEventDecls = new THashSet<>();
   }
 
   //#########################################################################
@@ -155,6 +162,5 @@ public abstract class AbstractEFAVariable<L>
   private final SimpleExpressionProxy mInitialStatePredicate;
   private final Collection<AbstractEFATransitionRelation<L>> mTransitionRelations;
   private final THashSet<EventDeclProxy> mEventDecls;
-
   
 }

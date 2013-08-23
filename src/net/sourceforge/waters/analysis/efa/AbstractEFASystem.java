@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.efa;
 
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
 /**
  * @author Robi Malik
@@ -60,11 +60,6 @@ public abstract class AbstractEFASystem<L,
     return mName;
   }
 
-  protected List<TR> getTransitionRelations()
-  {
-    return mTransitionRelations;
-  }
-
   public List<V> getVariables()
   {
     return mVariables;
@@ -80,16 +75,6 @@ public abstract class AbstractEFASystem<L,
     mName = name;
   }
 
-  protected void addTransitionRelation(final TR transitionRelation)
-  {
-    mTransitionRelations.add(transitionRelation);
-  }
-
-  protected void removeTransitionRelation(final TR transitionRelation)
-  {
-    mTransitionRelations.remove(transitionRelation);
-  }
-
   public void addVariable(final V variable)
   {
     mVariables.add(variable);
@@ -98,9 +83,12 @@ public abstract class AbstractEFASystem<L,
   public void removeVariable(final V var)
   {
     mVariables.remove(var);
+    for (TR tran : mTransitionRelations){
+      tran.removeVariable(var);
+    }
   }
 
-  public double getEstimatedSize()
+  public double getEstimatedStateSpace()
   {
     double size = 1;
     for (final AbstractEFATransitionRelation<?> efaTR : mTransitionRelations) {
@@ -114,12 +102,11 @@ public abstract class AbstractEFASystem<L,
   }
 
   //#########################################################################
-  //# Interface java.util.Comparable<EFASystem>
   @Override
   public int compareTo(final AbstractEFASystem<?, ?, ?, ?> system)
   {
-    final double size1 = getEstimatedSize();
-    final double size2 = system.getEstimatedSize();
+    final double size1 = getEstimatedStateSpace();
+    final double size2 = system.getEstimatedStateSpace();
     if (size1 < size2) {
       return -1;
     } else if (size1 > size2) {
@@ -127,6 +114,20 @@ public abstract class AbstractEFASystem<L,
     } else {
       return 0;
     }
+  }
+
+  protected List<TR> getTransitionRelations()
+  {
+    return mTransitionRelations;
+  }
+
+  protected boolean addTransitionRelation(final TR transitionRelation)
+  {
+    return mTransitionRelations.add(transitionRelation);
+  }
+  protected void removeTransitionRelation(final TR transitionRelation)
+  {
+    mTransitionRelations.remove(transitionRelation);
   }
   
   //#########################################################################

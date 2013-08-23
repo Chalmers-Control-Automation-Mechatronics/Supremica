@@ -17,7 +17,12 @@ import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierExceptio
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 /**
  * A variable context for EFA compilation. Contains ranges of all variables, and
@@ -39,7 +44,7 @@ public abstract class AbstractEFAVariableContext<L,
     mModuleContext = new ModuleBindingContext(module);
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     mGlobalVariableMap =
-     new ProxyAccessorHashMap<IdentifierProxy, V>(eq);
+     new ProxyAccessorHashMap<>(eq);
     mNextOperator = op.getNextOperator();
   }
 

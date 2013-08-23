@@ -50,7 +50,7 @@ public class SimpleEFACompiler
     super(manager, module);
     mInputModule = super.getInputModule();
     mDocumentManager = super.getDocumentManager();
-    mEnabledPropositionNames = new ArrayList<String>(2);
+    mEnabledPropositionNames = new ArrayList<>(2);
     mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_MARKING_NAME);
     mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
   }
@@ -116,22 +116,7 @@ public class SimpleEFACompiler
     return super.getInputModule();
   }
 
-  private void initSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder = new SourceInfoBuilder();
-    }
-  }
-
-  private void shiftSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder.shift();
-    }
-  }
-
   //##########################################################################
-  //# Configuration
   public boolean isOptimizationEnabled()
   {
     return mIsOptimizationEnabled;
@@ -141,7 +126,6 @@ public class SimpleEFACompiler
   {
     mIsOptimizationEnabled = enable;
   }
-
   public boolean isExpandingEFATransitions()
   {
     return mIsExpandingEFATransitions;
@@ -223,7 +207,6 @@ public class SimpleEFACompiler
   }
   
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
   {
@@ -241,6 +224,21 @@ public class SimpleEFACompiler
       mEFASystemBuilder.resetAbort();
     }
   }
+  private void initSourceInfo()
+  {
+    if (mIsSourceInfoEnabled) {
+      mSourceInfoBuilder = new SourceInfoBuilder();
+    }
+  }
+
+    private void shiftSourceInfo()
+  {
+    if (mIsSourceInfoEnabled) {
+      mSourceInfoBuilder.shift();
+    }
+  }
+  public final static int DEFAULT_MARKING_ID = 0;
+  public final static int DEFAULT_FORBIDDEN_ID = 1;
 
   //#########################################################################
   //# Data Members  
@@ -257,6 +255,4 @@ public class SimpleEFACompiler
   private boolean mIsUsingEventAlphabet;
   private boolean mIsExpandingEFATransitions;
   private IdentifierProxy mForbidden;
-  public final static int DEFAULT_MARKING_ID = 0;
-  public final static int DEFAULT_FORBIDDEN_ID = 1;
 }

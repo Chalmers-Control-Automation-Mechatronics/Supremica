@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.efa;
 
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-
 import java.util.Collection;
 import java.util.List;
+
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 /**
  * @author Robi Malik
@@ -42,22 +42,9 @@ public abstract class AbstractEFATransitionRelation<L>
   {
     this(rel, labels, variables, null);
   }
-
-  //#########################################################################
-  //# Simple Access
-  protected ListBufferTransitionRelation getTransitionRelation()
-  {
-    return mTransitionRelation;
-  }
-
   public AbstractEFATransitionLabelEncoding<L> getTransitionLabelEncoding()
   {
     return mTransitionLabelEncoding;
-  }
-
-  protected List<SimpleNodeProxy> getNodeList()
-  {
-    return mNodeList;
   }
 
   public String getName()
@@ -97,22 +84,38 @@ public abstract class AbstractEFATransitionRelation<L>
     }
   }
 
-  //#########################################################################
-  //# Interface java.util.Comparable
   @Override
-  public int compareTo(final AbstractEFATransitionRelation<?> efaTR)
+public int compareTo(final AbstractEFATransitionRelation<?> efaTR)
   {
     final String name1 = getName();
     final String name2 = efaTR.getName();
     return name1.compareTo(name2);
   }
 
-  //#########################################################################
-  //# Debugging
   @Override
-  public String toString()
+public String toString()
   {
     return mTransitionRelation.getName() + "\n" + mTransitionRelation.toString();
+  }
+  
+  protected ListBufferTransitionRelation getTransitionRelation()
+  {
+    return mTransitionRelation;
+  }
+
+  protected List<SimpleNodeProxy> getNodeList()
+  {
+    return mNodeList;
+  }
+  protected void addVariable(final AbstractEFAVariable<L> variable)
+  {
+    mVariables.add(variable);
+    variable.addTransitionRelation(this);
+  }
+  protected void removeVariable(final AbstractEFAVariable<L> variable)
+  {
+    mVariables.remove(variable);
+    variable.removeTransitionRelation(this);
   }
   
   //#########################################################################

@@ -38,11 +38,6 @@ public abstract class AbstractEFACompiler
   }
 
   //##########################################################################
-  //# Compile the system
-  abstract S compile() throws EvalException;
-
-
-  //##########################################################################
   //# Simple Access
   public ModuleProxy getInputModule()
   {
@@ -53,6 +48,9 @@ public abstract class AbstractEFACompiler
   {
     return mDocumentManager;
   }
+
+  //##########################################################################
+  abstract S compile() throws EvalException;
 
   //#########################################################################
   //# Data Members

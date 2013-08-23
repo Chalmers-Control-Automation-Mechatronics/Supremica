@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.efa;
 
+import java.util.Collection;
+
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -17,8 +19,6 @@ import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
-
-import java.util.Collection;
 
 /**
  * A utility class to collect all the EFA variables (primed or not) in a
@@ -112,17 +112,6 @@ public abstract class AbstractEFAVariableCollector<L,
   }
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void collect(final SimpleExpressionProxy expr)
-  {
-    try {
-      expr.acceptVisitor(this);
-    } catch (final VisitorException exception) {
-      throw exception.getRuntimeException();
-    }
-  }
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
   public Object visitIdentifierProxy(final IdentifierProxy ident)
@@ -135,7 +124,6 @@ public abstract class AbstractEFAVariableCollector<L,
     }
     return null;
   }
-
   @Override
   public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
   {
@@ -143,8 +131,7 @@ public abstract class AbstractEFAVariableCollector<L,
   }
 
   @Override
-  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
-   throws VisitorException
+  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr) throws VisitorException
   {
     final SimpleExpressionProxy subterm = expr.getSubTerm();
     if (expr.getOperator() == mNextOperator) {
@@ -158,6 +145,16 @@ public abstract class AbstractEFAVariableCollector<L,
       subterm.acceptVisitor(this);
     }
     return null;
+  }
+
+  //#########################################################################
+    private void collect(final SimpleExpressionProxy expr)
+  {
+    try {
+      expr.acceptVisitor(this);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    }
   }
 
   //#########################################################################
