@@ -69,6 +69,7 @@ public class StatusGroupTransitionIterator implements TransitionIterator
   public void resetState(final int from)
   {
     mInnerIterator.resetState(from);
+    reset();
   }
 
   @Override
