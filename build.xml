@@ -274,6 +274,7 @@
                nowarn="true"
                excludes="${supremica_basedir}/net/sourceforge/waters/external/promela/parser/**"
                source="1.7"
+	       encoding="ISO-8859-15"
                fork="true"
                includeantruntime="false"
                memoryMaximumSize="512M">
@@ -294,6 +295,7 @@
                verbose="false"
                nowarn="true"
                source="1.7"
+	       encoding="ISO-8859-15"
                fork="true"
                includeantruntime="false"
                memoryMaximumSize="256M">
@@ -319,6 +321,7 @@
             nowarn="true"
             includes="${supremica_basedir}/manufacturingTables/xsd/**"          
             source="1.7"
+            encoding="ISO-8859-15"
             includeantruntime="false"
         />
     </target>
@@ -334,6 +337,7 @@
             nowarn="true"
             includes="${supremica_basedir}/external/genericPLCProgramDescription/xsd/**"                
             source="1.7"
+            encoding="ISO-8859-15"
             includeantruntime="false"
         />
     </target>
@@ -356,6 +360,7 @@
             nowarn="true"
             includes="${supremica_basedir}/automata/algorithms/scheduling/**"           
             source="1.7"
+            encoding="ISO-8859-15"
             includeantruntime="false"
         />
     </target>
@@ -373,6 +378,7 @@
                deprecation="false"
                verbose="false"
                includeantruntime="false"
+               encoding="ISO-8859-15"
         >
             <classpath> 
                 <pathelement location="${build}"/>
@@ -417,6 +423,7 @@
             includeJavaRuntime="yes"
             deprecation="false"
             verbose="false"
+            encoding="ISO-8859-15"
             includeantruntime="false">
         </javac>
         
