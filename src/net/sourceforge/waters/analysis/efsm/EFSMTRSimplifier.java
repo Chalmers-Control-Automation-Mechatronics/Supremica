@@ -363,8 +363,9 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
         if (logger.isDebugEnabled()) {
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
-          final String msg = String.format("%d states, %.3f seconds\n",
-                                     newRel.getNumberOfStates(), difftime);
+          final String msg = String.format("%d states, %.3f seconds",
+                                           newRel.getNumberOfStates(),
+                                           difftime);
           logger.debug(msg);
         }
         return newEFSMTR;
@@ -372,7 +373,7 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
         if (logger.isDebugEnabled()) {
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
-          final String msg = String.format("No change, %.3f seconds\n", difftime);
+          final String msg = String.format("No change, %.3f seconds", difftime);
           logger.debug(msg);
         }
         return null;
