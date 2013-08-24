@@ -145,6 +145,12 @@ public class CachingTransitionIterator implements TransitionIterator
   }
 
   @Override
+  public void setCurrentToState(final int state)
+  {
+    mInnerIterator.setCurrentToState(state);
+  }
+
+  @Override
   public void remove()
   {
     mInnerIterator.remove();

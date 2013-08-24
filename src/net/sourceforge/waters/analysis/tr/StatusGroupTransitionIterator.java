@@ -120,6 +120,12 @@ public class StatusGroupTransitionIterator implements TransitionIterator
   }
 
   @Override
+  public void setCurrentToState(final int state)
+  {
+    mInnerIterator.setCurrentToState(state);
+  }
+
+  @Override
   public int getCurrentTargetState()
   {
     return mInnerIterator.getCurrentTargetState();

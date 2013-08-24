@@ -152,6 +152,19 @@ public interface TransitionIterator
   public int getCurrentToState();
 
   /**
+   * Sets the ID of the to-state of the current transition in the iteration.
+   * This method changes the data in the transition buffer for the current
+   * transition. No checks for duplicates are performed.
+   * @param  state    The state number of the new to-state, which must
+   *                  be a valid state number in the transition buffer.
+   * @throws {@link java.util.NoSuchElementException NoSuchElementException}
+   *         if there is no more transition in the iteration, or if the method
+   *         is called without calling {@link #advance()} first.
+   * @see #getCurrentToState()
+   */
+  public void setCurrentToState(int state);
+
+  /**
    * Removes the current transition. This method removes the current
    * transition in the iteration from the associated transition buffer.
    * After removing, the current transition is undefined, and {@link

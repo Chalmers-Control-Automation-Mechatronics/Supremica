@@ -1590,7 +1590,7 @@ public abstract class TransitionListBuffer
     @Override
     public void reset()
     {
-      if (mFromState >= 0) {
+      if (mFromState >= 0 && mFirstEvent <= mLastEvent) {
         if (mFirstEvent == 0) {
           setCurrent(mStateTransitions[mFromState]);
         } else {
@@ -1706,6 +1706,14 @@ public abstract class TransitionListBuffer
     }
 
     @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
+    }
+
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -1728,6 +1736,11 @@ public abstract class TransitionListBuffer
         mCurrentData = block[offset + OFFSET_DATA];
         mNext = block[offset + OFFSET_NEXT];
       }
+    }
+
+    void setCurrentData(final int data)
+    {
+      mCurrentData = data;
     }
 
     //#######################################################################
@@ -1761,6 +1774,23 @@ public abstract class TransitionListBuffer
     {
       mPrevious = getCurrent();
       return super.advance();
+    }
+
+    @Override
+    public void setCurrentToState(final int state)
+    {
+      final int current = getCurrent();
+      if (current == NULL) {
+        throw new IllegalStateException
+          ("Attempting to modify TransitionListBuffer " +
+           "without previous call to advance()!");
+      }
+      final int[] block = mBlocks.get(current >>> mBlockShift);
+      final int offset = current & mBlockMask;
+      final int olddata = block[offset + OFFSET_DATA];
+      final int newdata = (state << mStateShift) | (olddata & mEventMask);
+      block[offset + OFFSET_DATA] = newdata;
+      setCurrentData(newdata);
     }
 
     @Override
@@ -1939,6 +1969,12 @@ public abstract class TransitionListBuffer
     public int getCurrentToState()
     {
       return mInnerIterator.getCurrentToState();
+    }
+
+    @Override
+    public void setCurrentToState(final int state)
+    {
+      mInnerIterator.setCurrentToState(state);
     }
 
     @Override

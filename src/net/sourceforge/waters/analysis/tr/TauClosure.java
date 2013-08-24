@@ -402,6 +402,14 @@ public class TauClosure
     }
 
     @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
+    }
+
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -741,6 +749,14 @@ public class TauClosure
     }
 
     @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
+    }
+
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -880,6 +896,14 @@ public class TauClosure
     }
 
     @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
+    }
+
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -1015,6 +1039,14 @@ public class TauClosure
       } else {
         return mTauIterator2.getCurrentToState();
       }
+    }
+
+    @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
     }
 
     @Override

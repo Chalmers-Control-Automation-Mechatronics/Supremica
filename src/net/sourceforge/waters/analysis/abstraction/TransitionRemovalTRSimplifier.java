@@ -112,64 +112,90 @@ public class TransitionRemovalTRSimplifier
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int config = rel.getConfiguration();
-    final TauClosure tauClosure;
+    boolean removedSome = false;
+
+    // 1. Check tau transitions
+    final int tau = EventEncoding.TAU;
+    final TauClosure exploredClosure;
     if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
-      tauClosure = rel.createPredecessorsTauClosure(mTransitionLimit);
+      exploredClosure = rel.createPredecessorsTauClosure(0);
     } else {
-      tauClosure = rel.createSuccessorsTauClosure(mTransitionLimit);
+      exploredClosure = rel.createSuccessorsTauClosure(0);
+    }
+    final TransitionIterator iterExplore = exploredClosure.createIterator();
+    final TransitionIterator iterCandidate =
+      rel.createAllTransitionsModifyingIterator(tau);
+    while (iterCandidate.advance()) {
+      checkAbort();
+      final int from0 = iterCandidate.getCurrentFromState();
+      final int to0 = iterCandidate.getCurrentToState();
+      // Temporarily change the transition to selfloop so it is not explored.
+      iterCandidate.setCurrentToState(from0);
+      boolean remove = false;
+      iterExplore.resetState(from0);
+      while (iterExplore.advance()) {
+        if (iterExplore.getCurrentToState() == to0) {
+          remove = true;
+          break;
+        }
+      }
+      if (remove) {
+        iterCandidate.remove();
+        removedSome = true;
+      } else {
+        // If the transition is not deleted, change it back.
+        iterCandidate.setCurrentToState(to0);
+      }
     }
 
-    final int tau = EventEncoding.TAU;
-    final TransitionIterator iter0 =
-      rel.createAllTransitionsModifyingIterator();
-    final TransitionIterator iter1 = tauClosure.createIterator();
-    final TransitionIterator iter2 = rel.createAnyReadOnlyIterator();
-    final TransitionIterator iter3 = tauClosure.createIterator();
-    boolean removedSome = false;
-    trans:
-    while (iter0.advance()) {
-      final int e = iter0.getCurrentEvent();
-      final byte status = rel.getProperEventStatus(e);
-      if ((status & EventEncoding.STATUS_UNUSED) != 0) {
-        continue;
-      }
+    // 2. Check proper event transitions
+    final TauClosure cachedClosure;
+    if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
+      cachedClosure = rel.createPredecessorsTauClosure(mTransitionLimit);
+    } else {
+      cachedClosure = rel.createSuccessorsTauClosure(0);
+    }
+    final TransitionIterator iterPrefix = cachedClosure.createIterator();
+    final TransitionIterator iterEvent = rel.createAnyReadOnlyIterator();
+    final TransitionIterator iterSuffix = cachedClosure.createIterator();
+    final int numEvents = rel.getNumberOfProperEvents();
+    iterCandidate.resetEvents(EventEncoding.NONTAU, numEvents);
+    while (iterCandidate.advance()) {
       checkAbort();
+      final int e = iterCandidate.getCurrentEvent();
+      final byte status = rel.getProperEventStatus(e);
       final boolean selflooped =
-        (status & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
-        mUsingSpecialEvents && e != EventEncoding.TAU;
-      final int from0 = iter0.getCurrentFromState();
-      final int to0 = iter0.getCurrentToState();
-      iter1.resetState(from0);
-      while (iter1.advance()) {
-        final int p1 = iter1.getCurrentToState();
+        mUsingSpecialEvents &&
+        EventEncoding.isOutsideAlwaysEnabledEvent(status);
+      final int from0 = iterCandidate.getCurrentFromState();
+      final int to0 = iterCandidate.getCurrentToState();
+      boolean remove = false;
+      iterPrefix.resetState(from0);
+      outer:
+      while (iterPrefix.advance()) {
+        final int p1 = iterPrefix.getCurrentToState();
         if (selflooped && p1 == to0) {
-          iter0.remove();
-          removedSome = true;
-          continue trans;
+          remove = true;
+          break;
         }
-        iter2.reset(p1, e);
-        while (iter2.advance()) {
-          final int p2 = iter2.getCurrentToState();
-          if (e == tau) {
-            if (p1 != from0 && p2 == to0) {
-              iter0.remove();
-              removedSome = true;
-              continue trans;
-            }
-          } else {
-            if (p1 != from0 || p2 != to0) {
-              iter3.resetState(p2);
-              while (iter3.advance()) {
-                final int p3 = iter3.getCurrentToState();
-                if (p3 == to0) {
-                  iter0.remove();
-                  removedSome = true;
-                  continue trans;
-                }
+        iterEvent.reset(p1, e);
+        iterSuffix.reset();
+        while (iterEvent.advance()) {
+          final int p2 = iterEvent.getCurrentToState();
+          if (p1 != from0 || p2 != to0) {
+            iterSuffix.resume(p2);
+            while (iterSuffix.advance()) {
+              if (iterSuffix.getCurrentToState() == to0) {
+                remove = true;
+                break outer;
               }
             }
           }
         }
+      }
+      if (remove) {
+        iterCandidate.remove();
+        removedSome = true;
       }
     }
 
