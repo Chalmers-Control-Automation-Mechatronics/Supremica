@@ -140,7 +140,7 @@ public class AutomataSynchronizerHelper
   // Stop execution after amount of state
   private int stopExecutionLimit = -1;
   //////////////////
-  private final ModuleSubjectFactory mFactory = 
+  private final ModuleSubjectFactory mFactory =
    ModuleSubjectFactory.getInstance();
   Set<EventProxy> mCurrentEvents;
   Set<EventProxy> mCurrentBlockedEvents;
@@ -153,17 +153,16 @@ public class AutomataSynchronizerHelper
 
   public AutomataSynchronizerHelper(final Automata theAutomata,
                                     final SynchronizationOptions syncOptions,
-                                    boolean sups_as_plants)
+                                    final boolean sups_as_plants)
   {
     this(theAutomata, syncOptions, null, null, sups_as_plants);
   }
 
-  @SuppressWarnings("deprecation")
   public AutomataSynchronizerHelper(final Automata theAutomata,
                                     final SynchronizationOptions syncOptions,
                                     final HashMap<Arc, EdgeSubject>[] arc2EdgeTable,
                                     final HashMap<String, Integer> autName2indexTable,
-                                    boolean sups_as_plants)
+                                    final boolean sups_as_plants)
   {
     if (syncOptions.getEFAMode()) {
       this.arc2EdgeTable = arc2EdgeTable;
@@ -440,8 +439,8 @@ public class AutomataSynchronizerHelper
     }
 
     helperStatistics.nbrOfCheckedStates++;
-    if ((executionDialog != null) && 
-        (helperStatistics.nbrOfCheckedStates % 2000 == 0)) 
+    if ((executionDialog != null) &&
+        (helperStatistics.nbrOfCheckedStates % 2000 == 0))
     {
       executionDialog.setValue((int) helperStatistics.nbrOfAddedStates);
     }
@@ -563,6 +562,7 @@ public class AutomataSynchronizerHelper
     return theStates.getIndex(state);
   }
 
+  @Override
   public String toString()
   {
     return theStates.toString();
@@ -1059,7 +1059,7 @@ public class AutomataSynchronizerHelper
      mFactory.createGraphProxy(deterministic, blockedblock,
                                nodes, mEdges);
     name = name.isEmpty() ? "Synchronized Automaton" : name;
-    final SimpleIdentifierProxy ident = 
+    final SimpleIdentifierProxy ident =
      mFactory.createSimpleIdentifierProxy(name);
 
     synchronizedComponent = mFactory.createSimpleComponentProxy(ident,

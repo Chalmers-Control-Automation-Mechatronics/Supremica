@@ -109,7 +109,7 @@ public class EFASynchronizer
     options.setEFAMode(true);
     mComponents = components;
     mVariables = new THashSet<>();
-    Automata automata = removeGuardsActionsFromEFAs(components);
+    final Automata automata = removeGuardsActionsFromEFAs(components);
     mFactory = components.iterator().next().getFactory();
     mAutomata = automata;
     syncOptions = options;
@@ -235,28 +235,28 @@ public class EFASynchronizer
     public SimpleEFAComponent getSynchronizedEFA(String name) throws EvalException
   {
     execute();
-    Automaton automaton = getAutomaton();
+    final Automaton automaton = getAutomaton();
     name = name.isEmpty() ? automaton.getName() : name;
     synchHelper.createExtendedAutomaton(name);
 
     final List<ComponentProxy> list =
      new ArrayList<>(mVariables.size() + 1);
-    SimpleComponentProxy synchEFA = synchHelper.getSynchronizedComponent();
+    final SimpleComponentProxy synchEFA = synchHelper.getSynchronizedComponent();
     list.add(synchEFA);
-    SimpleEFASystemImporter importer = new SimpleEFASystemImporter();
-    for (SimpleEFAVariable variable : mVariables) {
+    final SimpleEFASystemImporter importer = new SimpleEFASystemImporter();
+    for (final SimpleEFAVariable variable : mVariables) {
       list.add(importer.getVariableComponent(variable));
     }
-    Collection<SimpleEFAEventDecl> events = new THashSet<>();
+    final Collection<SimpleEFAEventDecl> events = new THashSet<>();
     boolean hasMarking = false;
-    for (SimpleEFAComponent component : mComponents) {
+    for (final SimpleEFAComponent component : mComponents) {
       events.addAll(component.getAlphabet());
       hasMarking = !component.getMarkedLocationSet().isEmpty();
     }
-    Collection<EventDeclProxy> edecls =
+    final Collection<EventDeclProxy> edecls =
      importer.getEventDeclProxy(events);
     if (hasMarking) {
-      EventDeclProxy mark =
+      final EventDeclProxy mark =
        mFactory.createEventDeclProxy(importer.getMarkingIdentifier(),
                                      EventKind.PROPOSITION);
       edecls.add(mark);
@@ -264,8 +264,8 @@ public class EFASynchronizer
     final ModuleProxy module = mFactory.createModuleProxy(
      synchEFA.getName(), null, null, null, edecls, null, list);
     final SimpleEFACompiler compiler = new SimpleEFACompiler(module);
-    SimpleEFASystem system = compiler.compile();
-    SimpleEFAComponent efa = system.getComponents().iterator().next();
+    final SimpleEFASystem system = compiler.compile();
+    final SimpleEFAComponent efa = system.getComponents().iterator().next();
     efa.setDeterministic(automaton.isDeterministic());
     return efa;
   }
@@ -286,7 +286,7 @@ public class EFASynchronizer
       synchronizationExecuters.add(currSynchronizationExecuter);
     }
     indexMap = synchHelper.getIndexMap();
-    for (SimpleEFAComponent component : mComponents) {
+    for (final SimpleEFAComponent component : mComponents) {
       mVariables.addAll(component.getVariables());
     }
   }
@@ -310,6 +310,7 @@ public class EFASynchronizer
    * <p/>
    * @return Automaton representing the synchronous composition.
    */
+  @SuppressWarnings("unused")
   private static Automaton synchronizeAutomata(final Automata automata)
    throws Exception
   {
@@ -368,15 +369,6 @@ public class EFASynchronizer
     return result;
   }
 
-  private SimpleComponentProxy getSynchronizedComponent(String name)
-  {
-    this.execute();
-    Automaton automaton = getAutomaton();
-    name = name.isEmpty() ? automaton.getName() : name;
-    synchHelper.createExtendedAutomaton(name);
-    return synchHelper.getSynchronizedComponent();
-  }
-
   @SuppressWarnings("unchecked")
   private Automata removeGuardsActionsFromEFAs(
    final List<SimpleEFAComponent> components) throws AnalysisException
@@ -423,8 +415,8 @@ public class EFASynchronizer
     LabeledEvent event;
     boolean initialFlag = true;
     if (!component.getEdges().isEmpty()){
-      for (EdgeProxy item : component.getEdges()) {
-        EdgeSubject edge = (EdgeSubject) item;
+      for (final EdgeProxy item : component.getEdges()) {
+        final EdgeSubject edge = (EdgeSubject) item;
         fromState = automaton.getStateWithName(edge.getSource().getName());
         if (fromState == null) {
           fromState = new State(edge.getSource().getName());
@@ -461,9 +453,9 @@ public class EFASynchronizer
             automaton.setInitialState(toState);
           }
         }
-        ListSubject<AbstractSubject> eventList =
+        final ListSubject<AbstractSubject> eventList =
          edge.getLabelBlock().getEventIdentifierListModifiable();
-        for (AbstractSubject e : eventList) {
+        for (final AbstractSubject e : eventList) {
           final SimpleIdentifierSubject eventSubject = (SimpleIdentifierSubject) e;
           event = automaton.getAlphabet().getEvent(eventSubject.getName());
           if (event == null) {
@@ -478,11 +470,11 @@ public class EFASynchronizer
           arc2edgeTable[automatonIndex].put(currArc, edge);
           automaton.addArc(currArc);
         }
-      }      
+      }
     } else {
-      for (SimpleNodeProxy location : component.getLocationSet()){
+      for (final SimpleNodeProxy location : component.getLocationSet()){
         if (location.isInitial()){
-          State state = new State(location.getName());
+          final State state = new State(location.getName());
           if (location.toString().contains("accepting")) {
             state.setAccepting(true);
           }
@@ -494,10 +486,11 @@ public class EFASynchronizer
         }
       }
     }
-    
+
     return automaton;
   }
-  
+
+  @SuppressWarnings("unused")
   private static Logger logger = LoggerFactory.createLogger(
    AutomataSynchronizer.class);
   private Automata mAutomata;
@@ -514,5 +507,5 @@ public class EFASynchronizer
   private final ModuleProxyFactory mFactory;
   private final List<SimpleEFAComponent> mComponents;
   private final THashSet<SimpleEFAVariable> mVariables;
-  
+
 }
