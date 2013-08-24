@@ -3,40 +3,43 @@
 package org.supremica.gui.ide;
 
 import java.awt.Frame;
-import javax.swing.*;
-import org.supremica.util.VPopupMenu;
-import org.supremica.log.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JMenu;
+import javax.swing.JPopupMenu;
 
 import org.supremica.gui.ide.actions.IDEActionInterface;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 class AnalyzerPopupMenu
-    extends VPopupMenu
+    extends JPopupMenu
 {
     private static Logger logger = LoggerFactory.createLogger(AnalyzerPopupMenu.class);
-    
+
     private static final long serialVersionUID = 1L;
-    private IDEActionInterface ide;
-    
-    public AnalyzerPopupMenu(Frame parent, IDEActionInterface ide)
+    private final IDEActionInterface ide;
+
+    public AnalyzerPopupMenu(final Frame parent, final IDEActionInterface ide)
     {
         setInvoker(parent);
         this.ide = ide;
-        
+
         try
         {
             initPopups();
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error(ex);
         }
     }
-    
+
     private void initPopups()
     throws Exception
     {
-        JMenu viewMenu = new JMenu("View");
+        final JMenu viewMenu = new JMenu("View");
         viewMenu.setToolTipText("Different graphical representations of the selected automata");
         viewMenu.setIcon(new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif")));
         add(viewMenu);
@@ -68,7 +71,7 @@ class AnalyzerPopupMenu
 
         if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get())
         {
-            JMenu experimentMenu = new JMenu("Experimental");
+            final JMenu experimentMenu = new JMenu("Experimental");
             experimentMenu.setToolTipText("Experimental functions (under development)");
             experimentMenu.setIcon(new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/development/Jar16.gif")));
             add(experimentMenu);
@@ -78,7 +81,7 @@ class AnalyzerPopupMenu
             experimentMenu.add(ide.getActions().analyzerScheduleAction.getMenuItem());
 
             experimentMenu.addSeparator();
-            
+
             experimentMenu.add(ide.getActions().analyzerDeadEventsDetectorAction.getMenuItem());
 
             experimentMenu.addSeparator();
@@ -87,8 +90,8 @@ class AnalyzerPopupMenu
             experimentMenu.add(ide.getActions().simulatorLaunchSimulatorAction.getMenuItem());
 
             experimentMenu.addSeparator();
-            experimentMenu.add(ide.getActions().analyzerSMVAction.getMenuItem());           
-            
+            experimentMenu.add(ide.getActions().analyzerSMVAction.getMenuItem());
+
 
             experimentMenu.add(ide.getActions().analyzerSatAction.getMenuItem());
 

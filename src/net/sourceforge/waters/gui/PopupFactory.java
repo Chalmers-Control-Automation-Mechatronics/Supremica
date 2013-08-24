@@ -24,8 +24,6 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
-import org.supremica.util.VPopupMenu;
-
 
 public abstract class PopupFactory
 {
@@ -69,6 +67,7 @@ public abstract class PopupFactory
       } else {
         invoker.requestFocusInWindow();
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
               if (invoker.isFocusOwner()) {
                 showPopup(invoker, event, proxy);
@@ -102,7 +101,7 @@ public abstract class PopupFactory
    */
   public JPopupMenu createPopup(final Proxy proxy, final MouseEvent event)
   {
-    final JPopupMenu popup = mPopupMenu = new VPopupMenu();
+    final JPopupMenu popup = mPopupMenu = new JPopupMenu();
     mEvent = event;
     if (proxy == null) {
       addDefaultMenuItems();
