@@ -58,11 +58,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.efa.EFAHelper;
 import net.sourceforge.waters.analysis.efa.SimpleEFACompiler;
 import net.sourceforge.waters.analysis.efa.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.SimpleEFAEventDecl;
 import net.sourceforge.waters.analysis.efa.SimpleEFASystem;
-import net.sourceforge.waters.analysis.efa.SimpleEFASystemImporter;
 import net.sourceforge.waters.analysis.efa.SimpleEFAVariable;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -98,6 +98,10 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
 
+/**
+ *
+ * @author Mohammad Reza Shoaei
+ */
 public class EFASynchronizer
  implements Abortable
 {
@@ -117,6 +121,7 @@ public class EFASynchronizer
                                                  arc2edgeTable,
                                                  autName2indexTable, false);
     initialize();
+    System.err.println("Synchronizer initialized ...");
   }
 
   public void execute()
@@ -234,18 +239,21 @@ public class EFASynchronizer
 
     public SimpleEFAComponent getSynchronizedEFA(String name) throws EvalException
   {
+    System.err.println("Synchronizer start executing ...");
     execute();
-    final Automaton automaton = getAutomaton();
+    Automaton automaton = getAutomaton();
+    System.err.println("Synchronizer finish executing ...");
     name = name.isEmpty() ? automaton.getName() : name;
     synchHelper.createExtendedAutomaton(name);
 
     final List<ComponentProxy> list =
      new ArrayList<>(mVariables.size() + 1);
-    final SimpleComponentProxy synchEFA = synchHelper.getSynchronizedComponent();
+    SimpleComponentProxy synchEFA = synchHelper.getSynchronizedComponent();
+    System.err.println("Synchronized component created ...");
     list.add(synchEFA);
-    final SimpleEFASystemImporter importer = new SimpleEFASystemImporter();
-    for (final SimpleEFAVariable variable : mVariables) {
-      list.add(importer.getVariableComponent(variable));
+    EFAHelper helper = new EFAHelper();
+    for (SimpleEFAVariable variable : mVariables) {
+      list.add(variable.getVariableComponent(mFactory));
     }
     final Collection<SimpleEFAEventDecl> events = new THashSet<>();
     boolean hasMarking = false;
@@ -253,14 +261,15 @@ public class EFASynchronizer
       events.addAll(component.getAlphabet());
       hasMarking = !component.getMarkedLocationSet().isEmpty();
     }
-    final Collection<EventDeclProxy> edecls =
-     importer.getEventDeclProxy(events);
+    Collection<EventDeclProxy> edecls =
+     helper.getEventDeclProxy(events);
     if (hasMarking) {
-      final EventDeclProxy mark =
-       mFactory.createEventDeclProxy(importer.getMarkingIdentifier(),
+      EventDeclProxy mark =
+       mFactory.createEventDeclProxy(helper.getMarkingIdentifier(),
                                      EventKind.PROPOSITION);
       edecls.add(mark);
     }
+    //TODO HDS: Checking for forbidden proposition
     final ModuleProxy module = mFactory.createModuleProxy(
      synchEFA.getName(), null, null, null, edecls, null, list);
     final SimpleEFACompiler compiler = new SimpleEFACompiler(module);

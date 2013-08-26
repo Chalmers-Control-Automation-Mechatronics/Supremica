@@ -15,25 +15,18 @@ import gnu.trove.set.hash.THashSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
@@ -59,6 +52,7 @@ public class SimpleEFAComponent
     mStateNameEncoding = stateEncoding;
     mBlockedEvents = blockedEvents;
     mSystems = new ArrayList<>();
+    mCloner = mFactory.getCloner();
   }
 
   public SimpleEFAComponent(final String name,
@@ -164,21 +158,81 @@ public class SimpleEFAComponent
          mFactory.createSimpleIdentifierProxy(e.getName());
         identList.add(ident);
       }
-      SimpleEFASystemImporter importer = new SimpleEFASystemImporter(mFactory);
-      final GuardActionBlockProxy guardActionBlock =
-       importer.createGuard(condition);
+      CompilerOperatorTable op = CompilerOperatorTable.getInstance();
+      final GuardActionBlockProxy guardActionBlock = createGuard(condition, op);
       final LabelBlockProxy block =
        mFactory.createLabelBlockProxy(identList, null);
       TIntObjectHashMap<SimpleNodeProxy> idStateMap = getStateEncoding();
       final SimpleNodeProxy sourceNode = idStateMap.get(source);
       final SimpleNodeProxy targetNode = idStateMap.get(target);
       final EdgeProxy edge =
-       mFactory.createEdgeProxy((NodeProxy) mFactory.getCloner().getClone(sourceNode), 
-                                (NodeProxy) mFactory.getCloner().getClone(targetNode), 
+       mFactory.createEdgeProxy((NodeProxy) mCloner.getClone(sourceNode),
+                                (NodeProxy) mCloner.getClone(targetNode),
                                 block, guardActionBlock, null, null, null);
       edgeList.add(edge);
     }
     return edgeList;
+  }
+
+  public GuardActionBlockProxy createGuard(final ConstraintList constraints,
+                                           final CompilerOperatorTable op)
+  {
+    if (constraints.isTrue()) {
+      return null;
+    } else {
+      final BinaryOperator bop = op.getAndOperator();
+      SimpleExpressionProxy guard = null;
+      for (final SimpleExpressionProxy constraint : constraints.getConstraints()) {
+        SimpleExpressionSubject subjectConstraint =
+         (SimpleExpressionSubject) mCloner.getClone(constraint);
+        if (guard == null) {
+          guard = subjectConstraint;
+        } else {
+          guard =
+           mFactory.createBinaryExpressionProxy(bop, guard, subjectConstraint);
+        }
+      }
+      final Collection<SimpleExpressionProxy> guards =
+       Collections.singletonList(guard);
+      return mFactory.createGuardActionBlockProxy(guards, null, null);
+    }
+  }
+  /**
+   * Constructing component proxy
+   * <p/>
+   * @return A simple component proxy {@SimpleComponentProxy}
+   */
+  public SimpleComponentProxy getSimpleComponent()
+  {
+    final String name = getName();
+    final List<SimpleNodeProxy> nodes = getLocationSet();
+    final List<EdgeProxy> edgeList = getEdges();
+    final boolean isMarkingIsUsed =
+     getTransitionRelation()
+     .isUsedProposition(SimpleEFAComponent.DEFAULT_MARKING_ID);
+    int numOfMarkingState = getMarkedLocationSet().size();
+    LabelBlockProxy markingBlock = null;
+    final List<SimpleIdentifierProxy> identList = new ArrayList<>();
+    Collection<SimpleEFAEventDecl> blockedEvents = getBlockedEvents();
+    if (!blockedEvents.isEmpty()) {
+      for (SimpleEFAEventDecl e : blockedEvents) {
+        identList.add(mFactory.createSimpleIdentifierProxy(e.getName()));
+      }
+    }
+    if (isMarkingIsUsed && numOfMarkingState < 1) {
+      final SimpleIdentifierProxy marking =
+       mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+      identList.add(marking);
+    }
+    if (!identList.isEmpty()) {
+      markingBlock = mFactory.createLabelBlockProxy(identList, null);
+    }
+    final GraphProxy graph =
+     mFactory.createGraphProxy(false, markingBlock, nodes, edgeList);
+    final SimpleIdentifierProxy ident =
+     mFactory.createSimpleIdentifierProxy(name);
+
+    return mFactory.createSimpleComponentProxy(ident, getKind(), graph);
   }
 
   public void setDeterministic(boolean deterministic)
@@ -191,8 +245,7 @@ public class SimpleEFAComponent
     return mIsDeterministic;
   }
   
-  public boolean addSystem(
-   SimpleEFASystem system)
+  public boolean addSystem(SimpleEFASystem system)
   {
     return mSystems.add(system);
   }
@@ -220,7 +273,8 @@ public class SimpleEFAComponent
     getTransitionRelation().setKind(kind);
   }
 
-  private boolean containsMarkingProposition(final EventListExpressionProxy list, final IdentifierProxy marking)
+  private boolean containsMarkingProposition(final EventListExpressionProxy list,
+                                             final IdentifierProxy marking)
   {
     final ModuleEqualityVisitor eq =
      ModuleEqualityVisitor.getInstance(false);
@@ -240,16 +294,16 @@ public class SimpleEFAComponent
     TIntObjectHashMap<SimpleNodeProxy> encoding =
       new TIntObjectHashMap<>(rel.getNumberOfStates());
     final boolean isMarkingIsUsed =
-     rel.isUsedProposition(SimpleEFACompiler.DEFAULT_MARKING_ID);
+     rel.isUsedProposition(DEFAULT_MARKING_ID);
     final boolean isForbiddenIsUsed =
-     rel.isUsedProposition(SimpleEFACompiler.DEFAULT_FORBIDDEN_ID);
+     rel.isUsedProposition(DEFAULT_FORBIDDEN_ID);
     final int numStates = rel.getNumberOfStates();
     for (int i = 0; i < numStates; i++) {
       final boolean isInitial = rel.isInitial(i);
       final boolean isMarked =
-       rel.isMarked(i, SimpleEFACompiler.DEFAULT_MARKING_ID);
+       rel.isMarked(i, DEFAULT_MARKING_ID);
       final boolean isForbidden =
-       rel.isMarked(i, SimpleEFACompiler.DEFAULT_FORBIDDEN_ID);
+       rel.isMarked(i, DEFAULT_FORBIDDEN_ID);
       final List<SimpleIdentifierProxy> identList =
        new ArrayList<>();
       if (isMarkingIsUsed && isMarked) {
@@ -283,9 +337,12 @@ public class SimpleEFAComponent
     
   //#########################################################################
   //# Data Members  
+  public final static int DEFAULT_MARKING_ID = 0;
+  public final static int DEFAULT_FORBIDDEN_ID = 1;
   private ModuleProxyFactory mFactory;
   private final TIntObjectHashMap<String> mStateNameEncoding;
   private final Collection<SimpleEFAEventDecl> mBlockedEvents;
   private final ArrayList<SimpleEFASystem> mSystems;
   private boolean mIsDeterministic = true;
+  private final ModuleProxyCloner mCloner;
 }

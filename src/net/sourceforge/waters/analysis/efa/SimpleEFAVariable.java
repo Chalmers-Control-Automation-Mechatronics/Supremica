@@ -16,7 +16,10 @@ import java.util.Collection;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
@@ -38,6 +41,7 @@ public class SimpleEFAVariable
     mModifiers = new THashSet<>();
     mVisitors = new THashSet<>();
     mMarkings = new ArrayList<>(var.getVariableMarkings());
+    mOperatorTable = op;
   }
 
   /**
@@ -109,11 +113,28 @@ public class SimpleEFAVariable
     return getComponent().isDeterministic();
   }
 
-  /**
-   * Collection of transition relations (EFA) using this variable.
-   */
+  public VariableComponentProxy getVariableComponent(ModuleProxyFactory factory)
+  {
+    ModuleProxyCloner cloner = factory.getCloner();
+    IdentifierProxy iden =
+     (IdentifierProxy) cloner.getClone(getVariableName());
+    final CompiledRange range = getRange();
+    final SimpleExpressionProxy type =
+     range.createExpression(factory, mOperatorTable);
+
+    final SimpleExpressionProxy initialStatePredicate =
+     (SimpleExpressionProxy) cloner.getClone(getInitialStatePredicate());
+    final Collection<VariableMarkingProxy> variableMarkings =
+     cloner.getClonedList(getVariableMarkings());
+
+    return factory.createVariableComponentProxy(iden,
+                                                type,
+                                                isDeterministic(),
+                                                initialStatePredicate,
+                                                variableMarkings);
+  }
   private final Collection<SimpleEFAComponent> mModifiers;
   private final Collection<SimpleEFAComponent> mVisitors;
   private final Collection<VariableMarkingProxy> mMarkings;
-  
+  private final CompilerOperatorTable mOperatorTable;
 }

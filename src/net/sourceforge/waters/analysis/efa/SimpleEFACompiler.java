@@ -20,10 +20,10 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 /**
  * A utility to compile the model and construct 
@@ -64,25 +64,10 @@ public class SimpleEFACompiler
   public SimpleEFASystem compile(final List<ParameterBindingProxy> bindings)
    throws EvalException
   {
+    setUp();
     ModuleInstanceCompiler mModuleInstanceCompiler;
     try {
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
-      final IdentifierProxy marking;
-      if (mMarking == null) {
-        marking =
-         modfactory.createSimpleIdentifierProxy(
-         EventDeclProxy.DEFAULT_MARKING_NAME);
-      } else {
-        marking = mMarking;
-      }
-      final IdentifierProxy forbidden;
-      if (mForbidden == null) {
-        forbidden =
-         modfactory.createSimpleIdentifierProxy(
-         EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
-      } else {
-        forbidden = mForbidden;
-      }
       initSourceInfo();
       mModuleInstanceCompiler = new ModuleInstanceCompiler(mDocumentManager,
                                                            modfactory,
@@ -93,18 +78,14 @@ public class SimpleEFACompiler
       mModuleInstanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
       checkAbort();
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
-      mModuleInstanceCompiler = null;
       shiftSourceInfo();
       mEFASystemBuilder = new SimpleEFASystemBuilder(modfactory,
                                                      mSourceInfoBuilder,
                                                      intermediate);
       mEFASystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
-      mEFASystemBuilder.setConfiguredDefaultMarking(marking);
-      mEFASystemBuilder.setConfiguredDefaultForbidden(forbidden);
       mEFASystemBuilder.setMarkingVariablEFAEnable(mIsMarkingVariablEFAEnable);
       return mEFASystemBuilder.compile();
     } finally {
-      mModuleInstanceCompiler = null;
       mEFASystemBuilder = null;
     }
   }
@@ -126,6 +107,7 @@ public class SimpleEFACompiler
   {
     mIsOptimizationEnabled = enable;
   }
+
   public boolean isExpandingEFATransitions()
   {
     return mIsExpandingEFATransitions;
@@ -134,16 +116,6 @@ public class SimpleEFACompiler
   public void setExpandingEFATransitions(final boolean expanding)
   {
     mIsExpandingEFATransitions = expanding;
-  }
-
-  public boolean isUsingEventAlphabet()
-  {
-    return mIsUsingEventAlphabet;
-  }
-
-  public void setUsingEventAlphabet(final boolean using)
-  {
-    mIsUsingEventAlphabet = using;
   }
 
   public boolean isSourceInfoEnabled()
@@ -176,26 +148,6 @@ public class SimpleEFACompiler
     mIsMarkingVariablEFAEnable = enable;
   }
 
-  public void setConfiguredDefaultMarking(final IdentifierProxy marking)
-  {
-    mMarking = marking;
-  }
-
-  public IdentifierProxy getConfiguredDefaultMarking()
-  {
-    return mMarking;
-  }
-
-  public void setConfiguredDefaultForbidden(final IdentifierProxy forbidden)
-  {
-    mForbidden = forbidden;
-  }
-
-  public IdentifierProxy getConfiguredDefaultForbidden()
-  {
-    return mForbidden;
-  }
-  
   public Collection<String> getEnabledPropositionNames()
   {
     return mEnabledPropositionNames;
@@ -204,6 +156,15 @@ public class SimpleEFACompiler
   public void setEnabledPropositionNames(final Collection<String> names)
   {
     mEnabledPropositionNames = names;
+  }
+
+  private void setUp()
+  {
+    if (mEnabledPropositionNames == null) {
+      mEnabledPropositionNames = new ArrayList<>(2);
+      mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_MARKING_NAME);
+      mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
+    }
   }
   
   //#########################################################################
@@ -237,9 +198,6 @@ public class SimpleEFACompiler
       mSourceInfoBuilder.shift();
     }
   }
-  public final static int DEFAULT_MARKING_ID = 0;
-  public final static int DEFAULT_FORBIDDEN_ID = 1;
-
   //#########################################################################
   //# Data Members  
   private final DocumentManager mDocumentManager;
@@ -250,9 +208,6 @@ public class SimpleEFACompiler
   private boolean mIsSourceInfoEnabled = false;
   private boolean mIsMarkingVariablEFAEnable = false;
   private Collection<String> mEnabledPropertyNames = null;
-  private Collection<String> mEnabledPropositionNames;
-  private IdentifierProxy mMarking;
-  private boolean mIsUsingEventAlphabet;
+  private Collection<String> mEnabledPropositionNames = null;
   private boolean mIsExpandingEFATransitions;
-  private IdentifierProxy mForbidden;
 }

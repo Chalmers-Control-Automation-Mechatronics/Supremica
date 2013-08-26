@@ -120,7 +120,7 @@ public abstract class AbstractEFAVariableContext<L,
   
   //#######################################################################
   //# Data Members
-  private final ProxyAccessorMap<IdentifierProxy, V> mGlobalVariableMap;
+  protected final ProxyAccessorMap<IdentifierProxy, V> mGlobalVariableMap;
   private final ModuleBindingContext mModuleContext;
   private final UnaryOperator mNextOperator;
   
