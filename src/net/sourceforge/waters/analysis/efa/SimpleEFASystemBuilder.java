@@ -43,7 +43,25 @@ import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.efa.EFAGuardCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -86,28 +104,28 @@ public class SimpleEFASystemBuilder implements Abortable
                                 final ModuleProxy module)
   {
     this(factory, null, module);
-  }  
+  }
 
   public SimpleEFASystemBuilder(final ModuleProxy module)
   {
     this(ModuleElementFactory.getInstance(), null, module);
-  }  
-  
+  }
+
   public SimpleEFASystem compile() throws EvalException
   {
     try {
       // Pass 1 ... Checking the user passes
-      for (DefaultModuleProxyVisitor pass : mUserPass) {
+      for (final DefaultModuleProxyVisitor pass : mUserPass) {
         mInputModule.acceptVisitor(pass);
       }
-      // Pass 2 ... Cunstructing global event sets and all variables used 
+      // Pass 2 ... Cunstructing global event sets and all variables used
       //            in the given system.
       final Pass2Visitor pass2 = new Pass2Visitor();
       mInputModule.acceptVisitor(pass2);
       // Pass 3 ... Cunstructing EFAs.
       final Pass3Visitor pass3 = new Pass3Visitor();
       mInputModule.acceptVisitor(pass3);
-      // Add all events 
+      // Add all events
       mResultEFASystem.AddSystemEvents(mEFAEventDeclMap.values());
       mResultEFASystem.addAllVariable(mVariableContext.getVariables());
       return mResultEFASystem;
@@ -217,6 +235,7 @@ public class SimpleEFASystemBuilder implements Abortable
     }
   }
 
+  @SuppressWarnings("unused")
   private void addSourceInfo(final Proxy target, final Proxy source)
   {
     if (mSourceInfoBuilder != null) {
@@ -325,9 +344,9 @@ public class SimpleEFASystemBuilder implements Abortable
     }
 
     //#########################################################################
-    //# Pass2 Data Members    
+    //# Pass2 Data Members
     private SimpleEFAVariable mCurrentVariable;
-    
+
   }
 
   //#########################################################################
@@ -349,7 +368,7 @@ public class SimpleEFASystemBuilder implements Abortable
       mEFAVariableCollector = new SimpleEFAVariableCollector(mOperatorTable,
                                                              mVariableContext);
     }
-    
+
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     // The vistor always first visit (call) this method.
@@ -363,7 +382,7 @@ public class SimpleEFASystemBuilder implements Abortable
        * simple components and visitVariableComponentProxy for variables).
        */
       visitCollection(components);
-      // If we are asked for creating a marking variable EFA, then we visit 
+      // If we are asked for creating a marking variable EFA, then we visit
       // {@link createMarkingVariablesEFA} method.
       if (mIsMarkingVariablEFAEnable) {
         try {
@@ -385,7 +404,7 @@ public class SimpleEFASystemBuilder implements Abortable
         final GraphProxy graph = comp.getGraph();
         // visiting the graph model (node and edges)
         visitGraphProxy(graph);
-        // creating a transition relation based on the information we obtained 
+        // creating a transition relation based on the information we obtained
         // by visiting graph proxy.
         ListBufferTransitionRelation rel = createTransitionRelation(comp);
         // simplifying the transition relation.
@@ -394,29 +413,29 @@ public class SimpleEFASystemBuilder implements Abortable
         }
         final Collection<SimpleEFAVariable> variables =
          new THashSet<>();
-        
+
         // Collecting all the variables in the colletion "variables".
         mEFAVariableCollector.collectAllVariables(mEventEncoding, variables);
-        TIntObjectHashMap<String> mStateNameEncoding = 
+        final TIntObjectHashMap<String> mStateNameEncoding =
          getStateNameEncoding(mStateMap.size());
-        
+
         // Creating a simple EFA component
         final SimpleEFAComponent efaComponent =
-         new SimpleEFAComponent(comp.getName(), 
-                                variables, 
-                                mStateNameEncoding, 
+         new SimpleEFAComponent(comp.getName(),
+                                variables,
+                                mStateNameEncoding,
                                 mEventEncoding,
                                 mBlockedEvents,
                                 rel,
                                 null);
         // Registering this component to all the variables.
         efaComponent.register();
-        // Add this component to the variables' modifiers (i.e. updating), 
-        // if it does so. 
+        // Add this component to the variables' modifiers (i.e. updating),
+        // if it does so.
         for (final SimpleEFAVariable v : mAllPrimeVars) {
           v.addModifier(efaComponent);
         }
-        // Add this component to the variables' visitors (i.e. checking), 
+        // Add this component to the variables' visitors (i.e. checking),
         // if it does so.
         for (final SimpleEFAVariable v : mAllUnprimeVars) {
           v.addVisitor(efaComponent);
@@ -455,7 +474,7 @@ public class SimpleEFASystemBuilder implements Abortable
       final LabelBlockProxy block = graph.getBlockedEvents();
       if (block != null) {
         visitLabelBlockProxy(block);
-        for (SimpleEFAEventDecl e : mEvents){
+        for (final SimpleEFAEventDecl e : mEvents){
           mBlockedEvents.add(e);
         }
         mUsesMarking = containsMarkingProposition(block);
@@ -463,7 +482,7 @@ public class SimpleEFASystemBuilder implements Abortable
       }
       // Clearing set for the next use
       mEvents.clear();
-      
+
       final Collection<NodeProxy> nodes = graph.getNodes();
       mStateMap =
        new TObjectIntHashMap<>(nodes.size(), 0.5f, -1);
@@ -480,7 +499,7 @@ public class SimpleEFASystemBuilder implements Abortable
       final Collection<EdgeProxy> edges = graph.getEdges();
       mEdgeLabelMap = new ProxyAccessorHashMap<>(eq2, edges.size());
       mEventEncoding = new SimpleEFATransitionLabelEncoding(edges.size());
-      int nbVariables = mVariableContext.getNumberOfVariables();
+      final int nbVariables = mVariableContext.getNumberOfVariables();
       mAllPrimeVars = new THashSet<>(nbVariables);
       mAllUnprimeVars = new THashSet<>(nbVariables);
       mCurrentPrime = new THashSet<>(nbVariables);
@@ -553,8 +572,8 @@ public class SimpleEFASystemBuilder implements Abortable
         // Visintg the label block and collecting all the events in that block
         // see visitLabelBlockProxy
         visitLabelBlockProxy(edge.getLabelBlock());
-        
-        for (SimpleEFAEventDecl edecl : mEvents) {
+
+        for (final SimpleEFAEventDecl edecl : mEvents) {
           edecl.addAllPrimeVariable(mCurrentPrime);
           edecl.addAllUnPrimeVariable(mCurrentUnprime);
         }
@@ -622,7 +641,7 @@ public class SimpleEFASystemBuilder implements Abortable
       }
     }
 
-    // visiting variables components. Since we already visited them 
+    // visiting variables components. Since we already visited them
     // it returns null.
     @Override
     public SimpleEFAVariable visitVariableComponentProxy(
@@ -785,7 +804,7 @@ public class SimpleEFASystemBuilder implements Abortable
         final SimpleEFATransitionLabelEncoding newEncoding =
          new SimpleEFATransitionLabelEncoding(newNumEvents);
         for (int e = EventEncoding.NONTAU; e < oldNumEvents; e++) {
-            final SimpleEFATransitionLabel label = 
+            final SimpleEFATransitionLabel label =
              mEventEncoding.getTransitionLabel(e);
           if (usedEvents[e]) {
             newEncoding.createTransitionLabelId(label);
@@ -796,11 +815,11 @@ public class SimpleEFASystemBuilder implements Abortable
         mEventEncoding = newEncoding;
         }
       return hasRemovableEvents;
-    }      
+    }
 
-    // Creating a marking variable EFA. Note that, all variables' 
-    // marking propositions will be removed. Furthermore, this introduces 
-    // extra node/transition to the system hence the supervisor is larger than 
+    // Creating a marking variable EFA. Note that, all variables'
+    // marking propositions will be removed. Furthermore, this introduces
+    // extra node/transition to the system hence the supervisor is larger than
     // of that computed by marking propositions.
     private void createMarkingVariablesEFA()
      throws AnalysisAbortException, DuplicateIdentifierException
@@ -838,9 +857,9 @@ public class SimpleEFASystemBuilder implements Abortable
           rel.setMarked(1, SimpleEFAComponent.DEFAULT_MARKING_ID, true);
           rel.addTransition(0, eventId, 1);
           final SimpleEFAComponent markingEFA =
-           new SimpleEFAComponent("VariablesMarking", 
-                                  mMarkedVariables, 
-                                  eventEncoding, 
+           new SimpleEFAComponent("VariablesMarking",
+                                  mMarkedVariables,
+                                  eventEncoding,
                                   rel);
           mResultEFASystem.addComponent(markingEFA);
           for (final SimpleEFAVariable var : mMarkedVariables) {
@@ -853,18 +872,18 @@ public class SimpleEFASystemBuilder implements Abortable
       }
     }
 
-    private TIntObjectHashMap<String> getStateNameEncoding(int size)
+    private TIntObjectHashMap<String> getStateNameEncoding(final int size)
     {
-      TIntObjectHashMap<String> encode = new TIntObjectHashMap<>(size);
-      for (SimpleNodeProxy state : mStateMap.keySet()) {
-        int id = mStateMap.get(state);
+      final TIntObjectHashMap<String> encode = new TIntObjectHashMap<>(size);
+      for (final SimpleNodeProxy state : mStateMap.keySet()) {
+        final int id = mStateMap.get(state);
         encode.put(id, state.getName());
       }
       return encode;
     }
 
     //#########################################################################
-  //# Pass3 Data Members    
+  //# Pass3 Data Members
     private SimpleEFATransitionLabelEncoding mEventEncoding;
     private TObjectIntHashMap<SimpleNodeProxy> mStateMap;
     private List<SimpleNodeProxy> mNodeList;
@@ -882,10 +901,11 @@ public class SimpleEFASystemBuilder implements Abortable
     private THashSet<SimpleEFAVariable> mAllUnprimeVars;
     private THashSet<SimpleEFAVariable> mCurrentPrime;
     private THashSet<SimpleEFAVariable> mCurrentUnprime;
+    @SuppressWarnings("unused")
     private THashMap<Object, Object> mNodeLocationMap;
 
   }
-  
+
   //#########################################################################
   //# SimpleEFASystemBuilder Data Members
   private final ModuleProxyFactory mFactory;
@@ -895,8 +915,8 @@ public class SimpleEFASystemBuilder implements Abortable
   //  private final SimpleEFAVariableFinder mEFAVariableFinder;
   private final ConstraintList mTrueGuard;
   private ProxyAccessorHashMap<IdentifierProxy, SimpleEFAEventDecl> mEFAEventDeclMap;
-  private IdentifierProxy mDefaultMarking;
-  private IdentifierProxy mDefaultForbidden;
+  private final IdentifierProxy mDefaultMarking;
+  private final IdentifierProxy mDefaultForbidden;
   private boolean mIsOptimizationEnabled;
   private boolean mIsMarkingVariablEFAEnable;
   private final ModuleProxy mInputModule;
@@ -906,5 +926,5 @@ public class SimpleEFASystemBuilder implements Abortable
   private final SimpleEFASystem mResultEFASystem;
   private boolean mIsAborting;
   private final Collection<DefaultModuleProxyVisitor> mUserPass;
-  
+
 }

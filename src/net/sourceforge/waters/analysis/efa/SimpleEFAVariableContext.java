@@ -10,16 +10,14 @@
 package net.sourceforge.waters.analysis.efa;
 
 import java.util.Collection;
-import java.util.List;
+
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
-import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 /**
@@ -49,7 +47,7 @@ public class SimpleEFAVariableContext
     }
     final SimpleEFAVariable var =
      new SimpleEFAVariable(comp, range, factory, optable);
-    ProxyAccessor<IdentifierProxy> key =
+    final ProxyAccessor<IdentifierProxy> key =
      mGlobalVariableMap.createAccessor(ident);
     if (mGlobalVariableMap.containsKey(key)) {
       throw new DuplicateIdentifierException(ident);

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: 
+//# PROJECT:
 //# PACKAGE: net.sourceforge.waters.analysis.efa
 //# CLASS:   EFAHelper
 //###########################################################################
@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.efa;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.Collection;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -86,6 +87,8 @@ public class EFAHelper {
 
   }
   private final ModuleProxyFactory mFactory;
+  @SuppressWarnings("unused")
   private final CompilerOperatorTable mOperatorTable;
+  @SuppressWarnings("unused")
   private final ModuleProxyCloner mCloner;
 }

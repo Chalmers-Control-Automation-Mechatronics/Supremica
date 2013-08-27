@@ -18,12 +18,10 @@ import java.util.TreeMap;
 
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 /**
  * An implementation of the {@link AbstractEFASystem}.
@@ -31,9 +29,9 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFASystem
- extends AbstractEFASystem<SimpleEFATransitionLabel, 
-                           SimpleEFAVariable, 
-                           SimpleEFAComponent, 
+ extends AbstractEFASystem<SimpleEFATransitionLabel,
+                           SimpleEFAVariable,
+                           SimpleEFAComponent,
                            SimpleEFAVariableContext>
 {
 
@@ -90,11 +88,11 @@ public class SimpleEFASystem
   {
     mAlphabet.clear();
   }
-  
-  public boolean removeSystemEvent(SimpleEFAEventDecl event){
+
+  public boolean removeSystemEvent(final SimpleEFAEventDecl event){
     return mAlphabet.remove(event);
   }
-  
+
   @Override
   public void addVariable(final SimpleEFAVariable variable){
     super.addVariable(variable);
@@ -102,7 +100,7 @@ public class SimpleEFASystem
 
   public void addAllVariable(final Collection<SimpleEFAVariable> variables)
   {
-    for (SimpleEFAVariable var : variables) {
+    for (final SimpleEFAVariable var : variables) {
       super.addVariable(var);
     }
   }
@@ -122,8 +120,8 @@ public class SimpleEFASystem
   {
     final List<SimpleEFAVariable> variableList = getVariables();
     final List<SimpleEFAComponent> comps = getComponents();
-    EFAHelper helper = new EFAHelper(factory);
-    Collection<EventDeclProxy> events =
+    final EFAHelper helper = new EFAHelper(factory);
+    final Collection<EventDeclProxy> events =
      helper.getEventDeclProxy(getSystemEvents());
     final TreeMap<String, SimpleComponentProxy> compList =
      new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -146,5 +144,5 @@ public class SimpleEFASystem
 
   //#########################################################################
   //# Data Members
-  private final Collection<SimpleEFAEventDecl> mAlphabet;  
+  private final Collection<SimpleEFAEventDecl> mAlphabet;
 }

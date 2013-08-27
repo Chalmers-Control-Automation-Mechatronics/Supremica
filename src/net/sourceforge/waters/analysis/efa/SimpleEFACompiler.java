@@ -10,32 +10,30 @@
 package net.sourceforge.waters.analysis.efa;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-
-import java.util.Collection;
-import java.util.List;
-
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 /**
- * A utility to compile the model and construct 
+ * A utility to compile the model and construct
  * an EFA system ({@link SimpleEFASystem}).
- * 
+ *
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFACompiler
- extends AbstractEFACompiler<SimpleEFATransitionLabel, 
-                             SimpleEFAVariable, 
-                             SimpleEFAComponent, 
-                             SimpleEFAVariableContext, 
+ extends AbstractEFACompiler<SimpleEFATransitionLabel,
+                             SimpleEFAVariable,
+                             SimpleEFAComponent,
+                             SimpleEFAVariableContext,
                              SimpleEFASystem>
 {
 
@@ -166,7 +164,7 @@ public class SimpleEFACompiler
       mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
     }
   }
-  
+
   //#########################################################################
   @Override
   public void requestAbort()
@@ -199,7 +197,7 @@ public class SimpleEFACompiler
     }
   }
   //#########################################################################
-  //# Data Members  
+  //# Data Members
   private final DocumentManager mDocumentManager;
   private final ModuleProxy mInputModule;
   private SimpleEFASystemBuilder mEFASystemBuilder;
