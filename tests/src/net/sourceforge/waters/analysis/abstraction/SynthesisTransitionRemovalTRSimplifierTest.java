@@ -159,6 +159,29 @@ public class SynthesisTransitionRemovalTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_synthesis_transition_removal_07() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesis_transition_removal_07.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesis_transition_removal_08() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesis_transition_removal_08.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesis_transition_removal_09() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "synthesis_transition_removal_09.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
 
   /**
    * A test to see whether a single transition relation simplifier

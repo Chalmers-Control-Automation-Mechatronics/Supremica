@@ -9,9 +9,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
-
+import net.sourceforge.waters.analysis.tr.DFSIntSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventEncoding.OrderingInfo;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -143,10 +141,10 @@ public class SynthesisTransitionRemovalTRSimplifier
       (EventEncoding.STATUS_LOCAL, EventEncoding.STATUS_CONTROLLABLE);
     mIteratorUncontrollableTo = rel.createSuccessorsReadOnlyIteratorByStatus
       (~EventEncoding.STATUS_CONTROLLABLE);
-    final TIntStack stack = new TIntArrayStack();
     boolean removedSome = false;
     trans:
     while (iterCandidate.advance()) {
+      final DFSIntSearchSpace searchSpace = new DFSIntSearchSpace();
       checkAbort();
       final int e = iterCandidate.getCurrentEvent();
       final byte status = rel.getProperEventStatus(e);
@@ -157,9 +155,9 @@ public class SynthesisTransitionRemovalTRSimplifier
       final boolean local = EventEncoding.isLocalEvent(status);
       final int from0 = iterCandidate.getCurrentFromState();
       final int to0 = iterCandidate.getCurrentToState();
-      stack.push(from0);
-      while (stack.size() > 0) {
-        final int p1 = stack.pop();
+      searchSpace.offer(from0);
+      while (searchSpace.size() > 0) {
+        final int p1 = searchSpace.poll();
         if (selflooped && p1 == to0) {
           iterCandidate.remove();
           removedSome = true;
@@ -209,7 +207,7 @@ public class SynthesisTransitionRemovalTRSimplifier
           final int target = iterFrom.getCurrentTargetState();
           // for tau uncontrollable. check to see if this is the transition we are trying to delete.
           if (p1 != from0 || target != to0 || !local || controllable) {
-            stack.push(target);
+            searchSpace.offer(target);
           }
         }
       }
@@ -235,11 +233,11 @@ public class SynthesisTransitionRemovalTRSimplifier
       return true;
     }
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TIntStack stack = new TIntArrayStack();
-    stack.push(source);
+    final DFSIntSearchSpace searchSpace = new DFSIntSearchSpace();
+    searchSpace.offer(source);
     outer:
-    while (stack.size() > 0) {
-      final int current = stack.pop();
+    while (searchSpace.size() > 0) {
+      final int current = searchSpace.poll();
       mIteratorUncontrollableTo.resetState(current);
       boolean foundEnd = false;
       int next = -1;
@@ -265,7 +263,7 @@ public class SynthesisTransitionRemovalTRSimplifier
         }
       }
       if (next >= 0) {
-        stack.push(next);
+        searchSpace.offer(next);
       } else if (foundEnd) {
         return true;
       } else {
@@ -275,7 +273,7 @@ public class SynthesisTransitionRemovalTRSimplifier
           // check to see if this is the transition we are trying to delete.
           if (source0 != current || target != target0) {
             if (target == target0) return true;
-            stack.push(target);
+            searchSpace.offer(target);
           }
         }
       }
