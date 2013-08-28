@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.compositional;
 /**
  * A collection of abstraction methods to be used for compositional
  * nonblocking verification. The members of this enumeration are passed to the
- * {@link CompositionalSynthesizer} using its
+ * {@link CompositionalAutomataSynthesizer} using its
  * {@link AbstractCompositionalModelAnalyzer#setAbstractionProcedureFactory(AbstractionProcedureFactory)
  * setAbstractionProcedureFactory()} method.
  *
@@ -36,8 +36,8 @@ public enum SynthesisAbstractionProcedureFactory
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
-      final CompositionalSynthesizer synthesizer =
-        (CompositionalSynthesizer) analyzer;
+      final CompositionalAutomataSynthesizer synthesizer =
+        (CompositionalAutomataSynthesizer) analyzer;
       return SynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer, SynthesisAbstractionProcedure.CHAIN_SOE);
@@ -53,8 +53,8 @@ public enum SynthesisAbstractionProcedureFactory
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
-      final CompositionalSynthesizer synthesizer =
-        (CompositionalSynthesizer) analyzer;
+      final CompositionalAutomataSynthesizer synthesizer =
+        (CompositionalAutomataSynthesizer) analyzer;
       return SynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer,
@@ -72,8 +72,8 @@ public enum SynthesisAbstractionProcedureFactory
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
-      final CompositionalSynthesizer synthesizer =
-        (CompositionalSynthesizer) analyzer;
+      final CompositionalAutomataSynthesizer synthesizer =
+        (CompositionalAutomataSynthesizer) analyzer;
       return SynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer, SynthesisAbstractionProcedure.CHAIN_WSOE);
@@ -90,8 +90,8 @@ public enum SynthesisAbstractionProcedureFactory
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
-      final CompositionalSynthesizer synthesizer =
-        (CompositionalSynthesizer) analyzer;
+      final CompositionalAutomataSynthesizer synthesizer =
+        (CompositionalAutomataSynthesizer) analyzer;
       return SynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer,
@@ -110,8 +110,8 @@ public enum SynthesisAbstractionProcedureFactory
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
-      final CompositionalSynthesizer synthesizer =
-        (CompositionalSynthesizer) analyzer;
+      final CompositionalAutomataSynthesizer synthesizer =
+        (CompositionalAutomataSynthesizer) analyzer;
       return SynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer,
@@ -130,8 +130,8 @@ public enum SynthesisAbstractionProcedureFactory
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
-      final CompositionalSynthesizer synthesizer =
-        (CompositionalSynthesizer) analyzer;
+      final CompositionalAutomataSynthesizer synthesizer =
+        (CompositionalAutomataSynthesizer) analyzer;
       return SynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer, SynthesisAbstractionProcedure.CHAIN_ALL);

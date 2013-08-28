@@ -29,8 +29,8 @@ public class SelfRunningExperimentCompositionalSynthesis
       //final String outputDir = System.getProperty("waters.test.outputdir");
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
-      final CompositionalSynthesizer synthesizer =
-        new CompositionalSynthesizer(factory);
+      final CompositionalAutomataSynthesizer synthesizer =
+        new CompositionalAutomataSynthesizer(factory);
       final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
       preselectingFactory = synthesizer.getPreselectingMethodFactory();
       final AbstractCompositionalModelAnalyzer.SelectingMethodFactory

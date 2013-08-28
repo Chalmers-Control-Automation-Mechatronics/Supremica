@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
  * A result returned by the compositional synthesis algorithms
- * ({@link CompositionalSynthesizer}). In addition to the common result data,
+ * ({@link CompositionalAutomataSynthesizer}). In addition to the common result data,
  * it includes a collection of automata representing the synthesised modular
  * supervisor.
  *

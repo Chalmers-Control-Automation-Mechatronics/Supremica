@@ -25,7 +25,7 @@ class SynthesisAbstractionStep extends AbstractionStep
 
   //#########################################################################
   //# Constructor
-  SynthesisAbstractionStep(final CompositionalSynthesizer synthesizer,
+  SynthesisAbstractionStep(final AbstractCompositionalSynthesizer synthesizer,
                            final AutomatonProxy result,
                            final AutomatonProxy original,
                            final EventEncoding coding)
@@ -34,7 +34,7 @@ class SynthesisAbstractionStep extends AbstractionStep
     mEventEncoding = coding;
   }
 
-  SynthesisAbstractionStep(final CompositionalSynthesizer synthesizer,
+  SynthesisAbstractionStep(final AbstractCompositionalSynthesizer synthesizer,
                            final AutomatonProxy result,
                            final AutomatonProxy original,
                            final Map<EventProxy, List<EventProxy>> renaming,

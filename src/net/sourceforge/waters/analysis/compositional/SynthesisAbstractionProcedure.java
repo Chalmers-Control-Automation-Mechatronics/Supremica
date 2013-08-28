@@ -84,7 +84,7 @@ public class SynthesisAbstractionProcedure extends
    * @see #CHAIN_ALL
    */
   public static SynthesisAbstractionProcedure createSynthesisAbstractionProcedure
-    (final CompositionalSynthesizer synthesizer,
+    (final CompositionalAutomataSynthesizer synthesizer,
      final int abstractionMethods)
   {
     final int limit = synthesizer.getInternalTransitionLimit();
@@ -127,7 +127,7 @@ public class SynthesisAbstractionProcedure extends
 
   //#########################################################################
   //# Constructor
-  private SynthesisAbstractionProcedure(final CompositionalSynthesizer synthesizer,
+  private SynthesisAbstractionProcedure(final CompositionalAutomataSynthesizer synthesizer,
                                         final ChainTRSimplifier chain)
   {
     super(synthesizer);
@@ -152,7 +152,7 @@ public class SynthesisAbstractionProcedure extends
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, mergedEnc,
                                          inputStateEnc, inputConfig);
-      final CompositionalSynthesizer synthesizer = getAnalyzer();
+      final CompositionalAutomataSynthesizer synthesizer = getAnalyzer();
       synthesizer.showDebugLog(rel);
       mChain.setTransitionRelation(rel);
       if (mChain.run()) {
@@ -274,9 +274,9 @@ public class SynthesisAbstractionProcedure extends
   //# Overrides for net.sourceforge.waters.analysis.compositional.
   //# AbstractAbstractionProcedure
   @Override
-  CompositionalSynthesizer getAnalyzer()
+  CompositionalAutomataSynthesizer getAnalyzer()
   {
-    return (CompositionalSynthesizer) super.getAnalyzer();
+    return (CompositionalAutomataSynthesizer) super.getAnalyzer();
   }
 
   @Override
@@ -291,7 +291,7 @@ public class SynthesisAbstractionProcedure extends
                                             final Collection<EventProxy> local,
                                             final boolean useRenaming)
   {
-    final CompositionalSynthesizer synthesizer = getAnalyzer();
+    final CompositionalAutomataSynthesizer synthesizer = getAnalyzer();
     final KindTranslator translator = getKindTranslator();
     final Collection<EventProxy> props = getPropositions();
     final EventEncoding encoding = new EventEncoding();
@@ -956,7 +956,7 @@ public class SynthesisAbstractionProcedure extends
 
   /**
    * Argument to
-   * {@link #createSynthesisAbstractionProcedure(CompositionalSynthesizer,int)
+   * {@link #createSynthesisAbstractionProcedure(CompositionalAutomataSynthesizer,int)
    * createSynthesisAbstractionProcedure()} for specifying an abstraction
    * chain consisting of halfway synthesis, bisimulation, and synthesis
    * observation equivalence.
@@ -964,7 +964,7 @@ public class SynthesisAbstractionProcedure extends
   static final int CHAIN_SOE = USE_HALFWAY | USE_BISIMULATION | USE_SOE;
   /**
    * Argument to
-   * {@link #createSynthesisAbstractionProcedure(CompositionalSynthesizer,int)
+   * {@link #createSynthesisAbstractionProcedure(CompositionalAutomataSynthesizer,int)
    * createSynthesisAbstractionProcedure()} for specifying an abstraction
    * chain consisting of halfway synthesis, bisimulation, and weak synthesis
    * observation equivalence. This is the default.
@@ -972,7 +972,7 @@ public class SynthesisAbstractionProcedure extends
   static final int CHAIN_WSOE = USE_HALFWAY | USE_BISIMULATION | USE_WSOE;
   /**
    * Argument to
-   * {@link #createSynthesisAbstractionProcedure(CompositionalSynthesizer,int)
+   * {@link #createSynthesisAbstractionProcedure(CompositionalAutomataSynthesizer,int)
    * createSynthesisAbstractionProcedure()} for specifying an abstraction
    * chain consisting of halfway synthesis, bisimulation, synthesis
    * observation equivalence, and weak synthesis observation equivalence.

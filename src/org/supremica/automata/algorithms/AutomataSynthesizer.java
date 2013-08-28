@@ -55,7 +55,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
-import net.sourceforge.waters.analysis.compositional.CompositionalSynthesizer;
+import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
 import net.sourceforge.waters.analysis.compositional.SynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.model.analysis.Abortable;
@@ -446,8 +446,8 @@ public class AutomataSynthesizer
           final AutomataToWaters exporter = new AutomataToWaters(factory);
           final ProductDESProxy des = exporter.convertAutomata(theAutomata);
 
-          final CompositionalSynthesizer synthesizer =
-            new CompositionalSynthesizer(des, factory, translator,
+          final CompositionalAutomataSynthesizer synthesizer =
+            new CompositionalAutomataSynthesizer(des, factory, translator,
                                          SynthesisAbstractionProcedureFactory.WSOE);
           synthesizer.setConfiguredDefaultMarking(marking);
           final boolean supervisorReduction =

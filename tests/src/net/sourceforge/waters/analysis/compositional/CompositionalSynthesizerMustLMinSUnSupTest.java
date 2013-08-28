@@ -39,11 +39,11 @@ public class CompositionalSynthesizerMustLMinSUnSupTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  protected CompositionalSynthesizer createSynthesizer
+  protected CompositionalAutomataSynthesizer createSynthesizer
     (final ProductDESProxyFactory factory)
   {
-    final CompositionalSynthesizer synthesizer =
-      new CompositionalSynthesizer(factory,
+    final CompositionalAutomataSynthesizer synthesizer =
+      new CompositionalAutomataSynthesizer(factory,
                                    SynthesisAbstractionProcedureFactory.WSOE_UNSUP);
     synthesizer.setInternalStateLimit(5000);
     synthesizer.setMonolithicStateLimit(100000);
