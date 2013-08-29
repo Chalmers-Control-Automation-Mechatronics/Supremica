@@ -64,10 +64,9 @@ abstract class TRAbstractionProcedure
     throws AnalysisException
   {
     try {
-      assert local.size() <= 1 : "At most one tau event supported!";
       final Iterator<EventProxy> iter = local.iterator();
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
-      final EventEncoding eventEnc = createEventEncoding(aut, tau, candidate);
+      final EventEncoding eventEnc = createEventEncoding(aut, local, candidate);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
       final int config = mSimplifier.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
@@ -149,11 +148,11 @@ abstract class TRAbstractionProcedure
   //# Overrides for AbstractAbstractionProcedure
   @Override
   protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
-                                              final EventProxy tau,
+                                              final Collection<EventProxy> local,
                                               final Candidate candidate)
   {
     final KindTranslator translator = getKindTranslator();
-    final EventEncoding enc = super.createEventEncoding(events, tau, candidate);
+    final EventEncoding enc = super.createEventEncoding(events, local, candidate);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     int defaultMarkingID = -1;
     if (defaultMarking != null) {

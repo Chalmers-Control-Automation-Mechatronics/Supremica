@@ -256,7 +256,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       }
       // Create Event Encoding in right order with all enabled events at front of list
       final EventEncoding eventEnc =
-        createEventEncoding(eventsList, tau, candidate);
+        createEventEncoding(eventsList, local, candidate);
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
 
@@ -419,10 +419,10 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   //# Auxiliary Methods
   @Override
   protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
-                                              final EventProxy tau,
+                                              final Collection<EventProxy> local,
                                               final Candidate candidate)
   {
-    final EventEncoding enc = super.createEventEncoding(events, tau, candidate);
+    final EventEncoding enc = super.createEventEncoding(events, local, candidate);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {

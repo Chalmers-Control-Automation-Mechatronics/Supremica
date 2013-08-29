@@ -165,10 +165,10 @@ class TRConflictEquivalenceAbstractionProcedure
   //# Overrides for TRSimplifierAbstractionProcedure
   @Override
   protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
-                                              final EventProxy tau,
+                                              final Collection<EventProxy> local,
                                               final Candidate candidate)
   {
-    final EventEncoding enc = super.createEventEncoding(events, tau, candidate);
+    final EventEncoding enc = super.createEventEncoding(events, local, candidate);
     final EventProxy preconditionMarking = getUsedPreconditionMarking();
     if (preconditionMarking == null) {
       mPreconditionMarkingID = -1;

@@ -17,6 +17,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
 
@@ -80,15 +81,15 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
   //#########################################################################
   //# Auxiliary Methods
   protected EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                              final EventProxy tau,
+                                              final Collection<EventProxy> local,
                                               final Candidate candidate)
   {
     final Collection<EventProxy> events = aut.getEvents();
-    return createEventEncoding(events, tau, candidate);
+    return createEventEncoding(events, local, candidate);
   }
 
   protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
-                                              final EventProxy tau,
+                                              final Collection<EventProxy> local,
                                               final Candidate candidate)
   {
     final KindTranslator translator = getKindTranslator();
@@ -96,25 +97,28 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
     if (filter == null) {
       filter = Collections.emptyList();
     }
-    final EventEncoding enc =
-      new EventEncoding(events, translator, tau, filter,
-                        EventEncoding.FILTER_PROPOSITIONS);
-    if (mAnalyzer.isUsingSpecialEvents()) {
-      final int numEvents = enc.getNumberOfProperEvents();
-      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-        final EventProxy event = enc.getProperEvent(e);
-        final AbstractCompositionalModelAnalyzer.EventInfo info =
-          mAnalyzer.getEventInfo(event);
-        if (info.isOnlyNonSelfLoopCandidate(candidate)) {
-          final byte status = enc.getProperEventStatus(e);
-          enc.setProperEventStatus
-            (e, status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
+    final EventEncoding enc = new EventEncoding();
+    for (final EventProxy event : events) {
+      if (local.contains(event)) {
+        enc.addSilentEvent(event);
+      } else if (translator.getEventKind(event) == EventKind.PROPOSITION) {
+        if (filter.contains(event)) {
+          enc.addEvent(event, translator, 0);
         }
+      } else {
+        byte status = 0;
+        if (mAnalyzer.isUsingSpecialEvents()) {
+          final AbstractCompositionalModelAnalyzer.EventInfo info =
+            mAnalyzer.getEventInfo(event);
+          if (info.isOnlyNonSelfLoopCandidate(candidate)) {
+            status = EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP;
+          }
+        }
+        enc.addEvent(event, translator, status);
       }
     }
     return enc;
   }
-
 
   //#########################################################################
   //# Logging

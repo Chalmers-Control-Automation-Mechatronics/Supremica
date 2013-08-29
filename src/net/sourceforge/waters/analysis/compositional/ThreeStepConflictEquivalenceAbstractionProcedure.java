@@ -212,7 +212,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
       final ProductDESProxyFactory factory = getFactory();
       final Iterator<EventProxy> iter = local.iterator();
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
-      final EventEncoding eventEnc = createEventEncoding(aut, tau, candidate);
+      final EventEncoding eventEnc = createEventEncoding(aut, local, candidate);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
       final int config = mPreChain.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
@@ -363,10 +363,10 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
   //# Auxiliary Methods
   @Override
   protected EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                              final EventProxy tau,
+                                              final Collection<EventProxy> local,
                                               final Candidate candidate)
   {
-    final EventEncoding enc = super.createEventEncoding(aut, tau, candidate);
+    final EventEncoding enc = super.createEventEncoding(aut, local, candidate);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
