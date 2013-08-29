@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 import gnu.trove.map.hash.TLongIntHashMap;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,9 +29,9 @@ public class SynthesisStateSpace
 
   //#########################################################################
   //# Constructor
-  public SynthesisStateSpace(final SynthesisStateMap stateMap)
+  public SynthesisStateSpace()
   {
-    mStateMap = stateMap;
+    mStateMaps = new LinkedList<SynthesisStateMap>();
   }
 
   public static SynthesisStateMap createStateEncodingMap
@@ -57,8 +58,19 @@ public class SynthesisStateSpace
   //# Simple Access
   public boolean isSafeState(final Map<AutomatonProxy,StateProxy> tuple)
   {
-    return mStateMap.getStateNumber(tuple) >= 0;
+    for (final SynthesisStateMap map : mStateMaps) {
+      if (map.getStateNumber(tuple) < 0) {
+        return false;
+      }
+    }
+    return true;
   }
+
+  public void addStateMap(final SynthesisStateMap map)
+  {
+    mStateMaps.add(map);
+  }
+
 
   //#########################################################################
   //# Inner Class
@@ -166,5 +178,5 @@ public class SynthesisStateSpace
 
   //#########################################################################
   //# Data Members
-  private final SynthesisStateMap mStateMap;
+  private final List<SynthesisStateMap> mStateMaps;
 }
