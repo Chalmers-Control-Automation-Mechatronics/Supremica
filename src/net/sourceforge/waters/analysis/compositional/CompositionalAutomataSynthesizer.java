@@ -75,7 +75,7 @@ public class CompositionalAutomataSynthesizer extends
    */
   public CompositionalAutomataSynthesizer(final ProductDESProxyFactory factory)
   {
-    this(factory, SynthesisAbstractionProcedureFactory.WSOE);
+    this(factory, AutomataSynthesisAbstractionProcedureFactory.WSOE);
   }
 
   /**
@@ -87,7 +87,7 @@ public class CompositionalAutomataSynthesizer extends
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalAutomataSynthesizer(final ProductDESProxyFactory factory,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
+                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(factory, IdenticalKindTranslator.getInstance(), abstractionFactory);
   }
@@ -104,7 +104,7 @@ public class CompositionalAutomataSynthesizer extends
    */
   public CompositionalAutomataSynthesizer(final ProductDESProxyFactory factory,
                                   final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
+                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(null, factory, translator, abstractionFactory);
   }
@@ -127,7 +127,7 @@ public class CompositionalAutomataSynthesizer extends
    */
   public CompositionalAutomataSynthesizer(final ProductDESProxyFactory factory,
                                   final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory,
+                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
                                   final PreselectingMethodFactory preselectingMethodFactory,
                                   final SelectingMethodFactory selectingMethodFactory)
   {
@@ -151,7 +151,7 @@ public class CompositionalAutomataSynthesizer extends
   public CompositionalAutomataSynthesizer(final ProductDESProxy model,
                                   final ProductDESProxyFactory factory,
                                   final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
+                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(model, factory, translator, abstractionFactory,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
@@ -179,7 +179,7 @@ public class CompositionalAutomataSynthesizer extends
   public CompositionalAutomataSynthesizer(final ProductDESProxy model,
                                   final ProductDESProxyFactory factory,
                                   final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory,
+                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
                                   final PreselectingMethodFactory preselectingMethodFactory,
                                   final SelectingMethodFactory selectingMethodFactory)
   {
@@ -496,7 +496,7 @@ public class CompositionalAutomataSynthesizer extends
       return supervisor;
     }
     final BitSet safeStates =
-      SynthesisAbstractionProcedure.getSafeStates(partition, numStates);
+      AutomataSynthesisAbstractionProcedure.getSafeStates(partition, numStates);
     final TransitionIterator iter =
       supervisor.createAllTransitionsReadOnlyIterator();
     while (iter.advance()) {

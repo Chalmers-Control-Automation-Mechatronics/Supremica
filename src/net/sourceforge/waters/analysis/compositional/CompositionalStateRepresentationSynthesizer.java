@@ -71,7 +71,7 @@ public class CompositionalStateRepresentationSynthesizer extends
    */
   public CompositionalStateRepresentationSynthesizer(final ProductDESProxyFactory factory)
   {
-    this(factory, SynthesisAbstractionProcedureFactory.WSOE);
+    this(factory, StateRepresentationSynthesisAbstractionProcedureFactory.WSOE);
   }
 
   /**
@@ -79,13 +79,13 @@ public class CompositionalStateRepresentationSynthesizer extends
    *
    * @param factory
    *          Factory used for trace construction.
-   * @param abstractionFactory
+   * @param wsoe
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalStateRepresentationSynthesizer(final ProductDESProxyFactory factory,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
+                                  final StateRepresentationSynthesisAbstractionProcedureFactory wsoe)
   {
-    this(factory, IdenticalKindTranslator.getInstance(), abstractionFactory);
+    this(factory, IdenticalKindTranslator.getInstance(), wsoe);
   }
 
   /**
@@ -95,14 +95,14 @@ public class CompositionalStateRepresentationSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
+   * @param wsoe
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalStateRepresentationSynthesizer(final ProductDESProxyFactory factory,
                                   final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
+                                  final StateRepresentationSynthesisAbstractionProcedureFactory wsoe)
   {
-    this(null, factory, translator, abstractionFactory);
+    this(null, factory, translator, wsoe);
   }
 
   /**
@@ -123,7 +123,7 @@ public class CompositionalStateRepresentationSynthesizer extends
    */
   public CompositionalStateRepresentationSynthesizer(final ProductDESProxyFactory factory,
                                   final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory,
+                                  final StateRepresentationSynthesisAbstractionProcedureFactory abstractionFactory,
                                   final PreselectingMethodFactory preselectingMethodFactory,
                                   final SelectingMethodFactory selectingMethodFactory)
   {
@@ -141,15 +141,15 @@ public class CompositionalStateRepresentationSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
+   * @param wsoe
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalStateRepresentationSynthesizer(final ProductDESProxy model,
                                   final ProductDESProxyFactory factory,
                                   final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
+                                  final StateRepresentationSynthesisAbstractionProcedureFactory wsoe)
   {
-    this(model, factory, translator, abstractionFactory,
+    this(model, factory, translator, wsoe,
          new PreselectingMethodFactory(), new SelectingMethodFactory());
   }
 
@@ -163,7 +163,7 @@ public class CompositionalStateRepresentationSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
+   * @param wsoe
    *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
@@ -175,11 +175,11 @@ public class CompositionalStateRepresentationSynthesizer extends
   public CompositionalStateRepresentationSynthesizer(final ProductDESProxy model,
                                   final ProductDESProxyFactory factory,
                                   final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory,
+                                  final StateRepresentationSynthesisAbstractionProcedureFactory wsoe,
                                   final PreselectingMethodFactory preselectingMethodFactory,
                                   final SelectingMethodFactory selectingMethodFactory)
   {
-    super(model, factory, translator, abstractionFactory,
+    super(model, factory, translator, wsoe,
           preselectingMethodFactory, selectingMethodFactory);
   }
 
@@ -269,19 +269,22 @@ public class CompositionalStateRepresentationSynthesizer extends
         mStateRepresentationMap.get(original);
       final SynthesisStateSpace.SynthesisStateMap parent = parentInfo.getMap();
       final List<int[]> partitionList = merge.getPartition();
-      final TRPartition partition =
-        new TRPartition(partitionList, original.getStates().size());
-      final SynthesisStateSpace.SynthesisStateMap map =
-        SynthesisStateSpace.createPartitionMap(partition, parent);
-      final StateRepresentationInfo info =
-        new StateRepresentationInfo(map, merge.getResultStateEncoding());
-      mStateRepresentationMap.put(result, info);
-      mStateRepresentationMap.remove(original);
+      if (partitionList != null){
+        final TRPartition partition =
+          new TRPartition(partitionList, original.getStates().size());
+        final SynthesisStateSpace.SynthesisStateMap map =
+          SynthesisStateSpace.createPartitionMap(partition, parent);
+        final StateRepresentationInfo info =
+          new StateRepresentationInfo(map, merge.getResultStateEncoding());
+        mStateRepresentationMap.put(result, info);
+        mStateRepresentationMap.remove(original);
+        return;
+      }
     } else if (step instanceof HidingStep) {
-      final HidingStep hide = (HidingStep) step;
       final List<AutomatonProxy> originals = step.getOriginalAutomata();
-      final AutomatonProxy result = step.getResultAutomaton();
-      if(originals.size()>=2) {
+      if (originals.size() >= 2) {
+        final HidingStep hide = (HidingStep) step;
+        final AutomatonProxy result = step.getResultAutomaton();
         final List<SynthesisStateSpace.SynthesisStateMap> parents =
           new ArrayList<SynthesisStateSpace.SynthesisStateMap>(originals.size());
         final int[] stateSize = new int[originals.size()];
@@ -320,14 +323,19 @@ public class CompositionalStateRepresentationSynthesizer extends
         final StateRepresentationInfo info =
           new StateRepresentationInfo(map, synchStateEncoding);
         mStateRepresentationMap.put(result, info);
-      } else {
-        final AutomatonProxy original = originals.get(0);
-        final StateRepresentationInfo info =
-          mStateRepresentationMap.get(original);
-        mStateRepresentationMap.put(result, info);
-        mStateRepresentationMap.remove(original);
+        return;
       }
     }
+    final List<AutomatonProxy> originals = step.getOriginalAutomata();
+    final List<AutomatonProxy> results = step.getResultAutomata();
+    for (int i = 0; i < originals.size(); i++) {
+      final AutomatonProxy original = originals.get(i);
+      final AutomatonProxy result = results.get(i);
+      final StateRepresentationInfo info =
+        mStateRepresentationMap.remove(original);
+      mStateRepresentationMap.put(result, info);
+    }
+
   }
 
   @Override
@@ -372,7 +380,7 @@ public class CompositionalStateRepresentationSynthesizer extends
     }
     final EventEncoding encoding = createSynthesisEventEncoding(automaton);
     final boolean finalResult = synthesise(automaton, encoding);
-    mStateRepresentationMap.clear();
+    mStateRepresentationMap.remove(automaton);
     return finalResult;
   }
 
@@ -513,6 +521,7 @@ public class CompositionalStateRepresentationSynthesizer extends
     private final SynthesisStateSpace.SynthesisStateMap mMap;
     private final StateEncoding mEncoding;
   }
+
 
   //#########################################################################
   //# Data Members

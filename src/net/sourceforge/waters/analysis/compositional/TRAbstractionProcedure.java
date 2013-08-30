@@ -67,7 +67,7 @@ abstract class TRAbstractionProcedure
       final Iterator<EventProxy> iter = local.iterator();
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
       final EventEncoding eventEnc = createEventEncoding(aut, local, candidate);
-      final StateEncoding inputStateEnc = new StateEncoding(aut);
+      final StateEncoding inputStateEnc = createStateEncoding(aut);
       final int config = mSimplifier.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, eventEnc,
@@ -176,6 +176,10 @@ abstract class TRAbstractionProcedure
     return enc;
   }
 
+  protected StateEncoding createStateEncoding(final AutomatonProxy automaton)
+  {
+    return new StateEncoding(automaton);
+  }
 
   //#########################################################################
   //# Auxiliary Methods

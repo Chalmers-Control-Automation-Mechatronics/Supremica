@@ -21,7 +21,7 @@ package net.sourceforge.waters.analysis.compositional;
  */
 
 
-public enum SynthesisAbstractionProcedureFactory
+public enum AutomataSynthesisAbstractionProcedureFactory
   implements AbstractionProcedureFactory
 {
 
@@ -38,9 +38,9 @@ public enum SynthesisAbstractionProcedureFactory
     {
       final CompositionalAutomataSynthesizer synthesizer =
         (CompositionalAutomataSynthesizer) analyzer;
-      return SynthesisAbstractionProcedure.
+      return AutomataSynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
-          (synthesizer, SynthesisAbstractionProcedure.CHAIN_SOE);
+          (synthesizer, AutomataSynthesisAbstractionProcedure.CHAIN_SOE);
     }
   },
 
@@ -55,11 +55,11 @@ public enum SynthesisAbstractionProcedureFactory
     {
       final CompositionalAutomataSynthesizer synthesizer =
         (CompositionalAutomataSynthesizer) analyzer;
-      return SynthesisAbstractionProcedure.
+      return AutomataSynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer,
-           SynthesisAbstractionProcedure.USE_BISIMULATION |
-           SynthesisAbstractionProcedure.USE_SOE);
+           AutomataSynthesisAbstractionProcedure.USE_BISIMULATION |
+           AutomataSynthesisAbstractionProcedure.USE_SOE);
     }
   },
 
@@ -74,9 +74,9 @@ public enum SynthesisAbstractionProcedureFactory
     {
       final CompositionalAutomataSynthesizer synthesizer =
         (CompositionalAutomataSynthesizer) analyzer;
-      return SynthesisAbstractionProcedure.
+      return AutomataSynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
-          (synthesizer, SynthesisAbstractionProcedure.CHAIN_WSOE);
+          (synthesizer, AutomataSynthesisAbstractionProcedure.CHAIN_WSOE);
     }
   },
 
@@ -92,12 +92,12 @@ public enum SynthesisAbstractionProcedureFactory
     {
       final CompositionalAutomataSynthesizer synthesizer =
         (CompositionalAutomataSynthesizer) analyzer;
-      return SynthesisAbstractionProcedure.
+      return AutomataSynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer,
-           SynthesisAbstractionProcedure.USE_UNSUP |
-           SynthesisAbstractionProcedure.USE_BISIMULATION |
-           SynthesisAbstractionProcedure.USE_WSOE);
+           AutomataSynthesisAbstractionProcedure.USE_UNSUP |
+           AutomataSynthesisAbstractionProcedure.USE_BISIMULATION |
+           AutomataSynthesisAbstractionProcedure.USE_WSOE);
     }
   },
 
@@ -112,11 +112,11 @@ public enum SynthesisAbstractionProcedureFactory
     {
       final CompositionalAutomataSynthesizer synthesizer =
         (CompositionalAutomataSynthesizer) analyzer;
-      return SynthesisAbstractionProcedure.
+      return AutomataSynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer,
-           SynthesisAbstractionProcedure.USE_BISIMULATION |
-           SynthesisAbstractionProcedure.USE_WSOE);
+           AutomataSynthesisAbstractionProcedure.USE_BISIMULATION |
+           AutomataSynthesisAbstractionProcedure.USE_WSOE);
     }
   },
 
@@ -132,9 +132,9 @@ public enum SynthesisAbstractionProcedureFactory
     {
       final CompositionalAutomataSynthesizer synthesizer =
         (CompositionalAutomataSynthesizer) analyzer;
-      return SynthesisAbstractionProcedure.
+      return AutomataSynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
-          (synthesizer, SynthesisAbstractionProcedure.CHAIN_ALL);
+          (synthesizer, AutomataSynthesisAbstractionProcedure.CHAIN_ALL);
     }
   };
 

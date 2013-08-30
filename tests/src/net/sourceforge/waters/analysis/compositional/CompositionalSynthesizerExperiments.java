@@ -44,11 +44,11 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   public CompositionalSynthesizerExperiments(final String statsFilename)
     throws FileNotFoundException
   {
-    this(statsFilename, SynthesisAbstractionProcedureFactory.WSOE_UNSUP, null, null);
+    this(statsFilename, AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP, null, null);
   }
 
   public CompositionalSynthesizerExperiments(final String statsFilename,
-                                             final SynthesisAbstractionProcedureFactory method,
+                                             final AutomataSynthesisAbstractionProcedureFactory method,
                                              final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
                                              final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
     throws FileNotFoundException
@@ -422,7 +422,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   private boolean mSupervisorReductionEnabled;
 
   private int mTimeout = 600;
-  private final SynthesisAbstractionProcedureFactory mMethod;
+  private final AutomataSynthesisAbstractionProcedureFactory mMethod;
   private AbstractCompositionalModelAnalyzer.PreselectingMethod mPreselecting;
   private AbstractCompositionalModelAnalyzer.SelectingMethod mSelecting;
 }

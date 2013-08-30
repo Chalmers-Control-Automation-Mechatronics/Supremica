@@ -36,16 +36,16 @@ public class SelfRunningExperimentCompositionalSynthesis
       final AbstractCompositionalModelAnalyzer.SelectingMethodFactory
       selectingFactory = synthesizer.getSelectingMethodFactory();
       int methodCount = 0;
-      final SynthesisAbstractionProcedureFactory[] methods = {
-         SynthesisAbstractionProcedureFactory.WSOE,
-         SynthesisAbstractionProcedureFactory.WSOE_UNSUP
+      final AutomataSynthesisAbstractionProcedureFactory[] methods = {
+         AutomataSynthesisAbstractionProcedureFactory.WSOE,
+         AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP
       };
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
            preselectingMethod : preselectingFactory.getEnumConstants()) {
         for (final AbstractCompositionalModelAnalyzer.SelectingMethod
              selectingMethod: selectingFactory.getEnumConstants()) {
           methodCount++;
-          for (final SynthesisAbstractionProcedureFactory method: methods) {
+          for (final AutomataSynthesisAbstractionProcedureFactory method: methods) {
             final String preName = preselectingMethod.toString();
             final String selName = selectingMethod.toString();
             // without supervisor reduction:

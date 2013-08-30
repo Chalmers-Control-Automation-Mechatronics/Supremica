@@ -44,7 +44,7 @@ public class CompositionalSynthesizerMinTMaxLTest
   {
     final CompositionalAutomataSynthesizer synthesizer =
       new CompositionalAutomataSynthesizer(factory,
-                                   SynthesisAbstractionProcedureFactory.WSOE);
+                                   AutomataSynthesisAbstractionProcedureFactory.WSOE);
     synthesizer.setInternalStateLimit(5000);
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);

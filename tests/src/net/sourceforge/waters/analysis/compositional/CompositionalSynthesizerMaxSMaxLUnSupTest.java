@@ -44,7 +44,7 @@ public class CompositionalSynthesizerMaxSMaxLUnSupTest
   {
     final CompositionalAutomataSynthesizer synthesizer =
       new CompositionalAutomataSynthesizer(factory,
-                                   SynthesisAbstractionProcedureFactory.WSOE_UNSUP);
+                                   AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
     synthesizer.setInternalStateLimit(5000);
     synthesizer.setMonolithicStateLimit(2000000);
     synthesizer.setInternalTransitionLimit(1000000);

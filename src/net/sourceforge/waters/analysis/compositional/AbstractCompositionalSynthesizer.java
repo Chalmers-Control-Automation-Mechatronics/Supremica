@@ -19,7 +19,6 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
@@ -59,85 +58,6 @@ public abstract class AbstractCompositionalSynthesizer extends
   //#########################################################################
   //# Constructors
   /**
-   * Creates a compositional synthesiser without a model.
-   *
-   * @param factory
-   *          Factory used for trace construction.
-   * @param abstractionFactory
-   *          Factory to define the abstraction sequence to be used.
-   */
-  public AbstractCompositionalSynthesizer(final ProductDESProxyFactory factory,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
-  {
-    this(factory, IdenticalKindTranslator.getInstance(), abstractionFactory);
-  }
-
-  /**
-   * Creates a compositional synthesiser without a model.
-   *
-   * @param factory
-   *          Factory used for trace construction.
-   * @param translator
-   *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
-   *          Factory to define the abstraction sequence to be used.
-   */
-  public AbstractCompositionalSynthesizer(final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
-  {
-    this(null, factory, translator, abstractionFactory);
-  }
-
-  /**
-   * Creates a compositional synthesiser without a model.
-   *
-   * @param factory
-   *          Factory used for trace construction.
-   * @param translator
-   *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
-   *          Factory to define the abstraction sequence to be used.
-   * @param preselectingMethodFactory
-   *          Enumeration factory that determines possible candidate
-   *          preselection methods.
-   * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate selection
-   *          methods.
-   */
-  public AbstractCompositionalSynthesizer(final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory,
-                                  final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectingMethodFactory selectingMethodFactory)
-  {
-    this(null, factory, translator, abstractionFactory,
-         preselectingMethodFactory, selectingMethodFactory);
-  }
-
-  /**
-   * Creates a compositional synthesiser to compute a supervisor for the given
-   * model.
-   *
-   * @param model
-   *          The model to be checked by this model verifier.
-   * @param factory
-   *          Factory used for trace construction.
-   * @param translator
-   *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
-   *          Factory to define the abstraction sequence to be used.
-   */
-  public AbstractCompositionalSynthesizer(final ProductDESProxy model,
-                                  final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory)
-  {
-    this(model, factory, translator, abstractionFactory,
-         new PreselectingMethodFactory(), new SelectingMethodFactory());
-  }
-
-  /**
    * Creates a compositional synthesiser to compute a supervisor for the given
    * model.
    *
@@ -159,7 +79,7 @@ public abstract class AbstractCompositionalSynthesizer extends
   public AbstractCompositionalSynthesizer(final ProductDESProxy model,
                                   final ProductDESProxyFactory factory,
                                   final KindTranslator translator,
-                                  final SynthesisAbstractionProcedureFactory abstractionFactory,
+                                  final AbstractionProcedureFactory abstractionFactory,
                                   final PreselectingMethodFactory preselectingMethodFactory,
                                   final SelectingMethodFactory selectingMethodFactory)
   {

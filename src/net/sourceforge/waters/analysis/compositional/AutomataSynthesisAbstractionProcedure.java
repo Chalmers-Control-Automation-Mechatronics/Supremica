@@ -46,7 +46,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik
  */
 
-public class SynthesisAbstractionProcedure extends
+public class AutomataSynthesisAbstractionProcedure extends
   AbstractAbstractionProcedure
 {
 
@@ -83,7 +83,7 @@ public class SynthesisAbstractionProcedure extends
    * @see #CHAIN_WSOE
    * @see #CHAIN_ALL
    */
-  public static SynthesisAbstractionProcedure createSynthesisAbstractionProcedure
+  public static AutomataSynthesisAbstractionProcedure createSynthesisAbstractionProcedure
     (final CompositionalAutomataSynthesizer synthesizer,
      final int abstractionMethods)
   {
@@ -121,13 +121,13 @@ public class SynthesisAbstractionProcedure extends
       synthesisAbstraction.setUsesWeakSynthesisObservationEquivalence(true);
       chain.add(synthesisAbstraction);
     }
-    return new SynthesisAbstractionProcedure(synthesizer, chain);
+    return new AutomataSynthesisAbstractionProcedure(synthesizer, chain);
   }
 
 
   //#########################################################################
   //# Constructor
-  private SynthesisAbstractionProcedure(final CompositionalAutomataSynthesizer synthesizer,
+  private AutomataSynthesisAbstractionProcedure(final CompositionalAutomataSynthesizer synthesizer,
                                         final ChainTRSimplifier chain)
   {
     super(synthesizer);
