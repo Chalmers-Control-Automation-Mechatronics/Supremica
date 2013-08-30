@@ -83,7 +83,7 @@ public abstract class AbstractEFASystem<L,
   public void removeVariable(final V var)
   {
     mVariables.remove(var);
-    for (TR tran : mTransitionRelations){
+    for (final TR tran : mTransitionRelations){
       tran.removeVariable(var);
     }
   }

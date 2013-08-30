@@ -30,7 +30,8 @@ public class SimpleEFATransitionLabelEncoding
     super(size);
     final ConstraintList trueg = new ConstraintList();
     final SimpleEFAEventDecl[] event = new SimpleEFAEventDecl[1];
-    event[0] = SimpleEFAEventDecl.getSimpleTAU(null);
+    final EFAHelper helper = new EFAHelper();
+    event[0] = new SimpleEFAEventDecl(helper.getTAUDecl());
     final SimpleEFATransitionLabel label = new SimpleEFATransitionLabel(trueg,
      event);
     createTransitionLabelId(label);
@@ -50,8 +51,8 @@ public class SimpleEFATransitionLabelEncoding
     final StringBuffer events = new StringBuffer();
     final String sep = " <> ";
     events.append("[");
-    for (SimpleEFATransitionLabel label : getTransitionLabels()){
-      String out = Integer.toString(getTransitionLabelId(label)) 
+    for (final SimpleEFATransitionLabel label : getTransitionLabels()){
+      final String out = Integer.toString(getTransitionLabelId(label))
                    + " -> "
                    + label.toString()
                    + sep;

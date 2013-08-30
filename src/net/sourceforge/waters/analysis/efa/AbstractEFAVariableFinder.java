@@ -68,7 +68,7 @@ public abstract class AbstractEFAVariableFinder<L,
   /**
    * Determines if a given variable is in the given constraint list.
    * <p/>
-   * @param update The constraint list to be searched.
+   * @param constraints The constraint list to be searched.
    * @param var    The variable to be searched for.
    * <p/>
    * @return <CODE>true</CODE> if the variable has been found in its primed or
@@ -76,13 +76,13 @@ public abstract class AbstractEFAVariableFinder<L,
    *         {@link #containsVariable()} and {@link #containsPrimedVariable()}
    *         methods.
    */
-  public boolean findVariable(final ConstraintList update, final V var)
+  public boolean findVariable(final ConstraintList constraints, final V var)
   {
     try {
       mCurrentVariable = var.getVariableName();
       mContainsVariable = false;
       mContainsPrimedVariable = false;
-      for (final SimpleExpressionProxy expr : update.getConstraints()) {
+      for (final SimpleExpressionProxy expr : constraints.getConstraints()) {
         find(expr);
         if (mContainsPrimedVariable && mContainsVariable) {
           return true;
@@ -115,15 +115,15 @@ public abstract class AbstractEFAVariableFinder<L,
   /**
    * Determines if a given constraint list contains a primed identifier.
    * <p/>
-   * @param update The constraint list to be searched.
+   * @param constraints The constraint list to be searched.
    */
-  public boolean findPrime(final ConstraintList update)
+  public boolean findPrime(final ConstraintList constraints)
   {
     try {
       mCurrentVariable = null;
       mContainsVariable = true;
       mContainsPrimedVariable = false;
-      for (final SimpleExpressionProxy expr : update.getConstraints()) {
+      for (final SimpleExpressionProxy expr : constraints.getConstraints()) {
         find(expr);
         if (mContainsPrimedVariable) {
           return true;
@@ -132,6 +132,49 @@ public abstract class AbstractEFAVariableFinder<L,
       return false;
     } finally {
       mContainsVariable = false;
+    }
+  }
+
+  /**
+   * Determines if a given expression contains a primed identifier.
+   * <p/>
+   * @param expr The expression to be searched.
+   */
+  public boolean findPrimeVariable(final SimpleExpressionProxy expr, final V var)
+  {
+    try {
+      mCurrentVariable = var.getVariableName();
+      mContainsVariable = true;
+      mContainsPrimedVariable = false;
+      find(expr);
+      return mContainsPrimedVariable;
+    } finally {
+      mContainsVariable = false;
+      mCurrentVariable = null;
+    }
+  }
+
+  /**
+   * Determines if a given constraint list contains a primed identifier.
+   * <p/>
+   * @param constraints The constraint list to be searched.
+   */
+  public boolean findPrimeVariable(final ConstraintList constraints, final V var)
+  {
+    try {
+      mCurrentVariable = var.getVariableName();
+      mContainsVariable = true;
+      mContainsPrimedVariable = false;
+      for (final SimpleExpressionProxy expr : constraints.getConstraints()) {
+        find(expr);
+        if (mContainsPrimedVariable) {
+          return true;
+        }
+      }
+      return false;
+    } finally {
+      mContainsVariable = false;
+      mCurrentVariable = null;
     }
   }
 
@@ -163,7 +206,8 @@ public abstract class AbstractEFAVariableFinder<L,
     return null;
   }
   @Override
-  public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr) throws VisitorException
+  public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+   throws VisitorException
   {
     final SimpleExpressionProxy lhs = expr.getLeft();
     lhs.acceptVisitor(this);
@@ -182,7 +226,8 @@ public abstract class AbstractEFAVariableFinder<L,
   }
 
   @Override
-  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr) throws VisitorException
+  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
+   throws VisitorException
   {
     final SimpleExpressionProxy subterm = expr.getSubTerm();
     if (expr.getOperator() == mNextOperator) {
@@ -213,5 +258,4 @@ public abstract class AbstractEFAVariableFinder<L,
   private SimpleExpressionProxy mCurrentVariable;
   private boolean mContainsVariable;
   private boolean mContainsPrimedVariable;
-  
 }

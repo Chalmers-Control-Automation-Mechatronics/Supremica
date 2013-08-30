@@ -30,15 +30,16 @@ public class SimpleEFAVariableContext
 {
 
   public SimpleEFAVariableContext(final ModuleProxy module,
-   final CompilerOperatorTable op)
+                                  final CompilerOperatorTable op,
+                                  final ModuleProxyFactory factory)
   {
     super(module, op);
+    mFactory = factory;
+    mOp = op;
   }
 
   public SimpleEFAVariable createVariables(final VariableComponentProxy comp,
-                                           final CompiledRange range,
-                                           final ModuleProxyFactory factory,
-                                           final CompilerOperatorTable optable)
+                                           final CompiledRange range)
    throws DuplicateIdentifierException
   {
     final IdentifierProxy ident = comp.getIdentifier();
@@ -46,7 +47,7 @@ public class SimpleEFAVariableContext
       throw new DuplicateIdentifierException(ident);
     }
     final SimpleEFAVariable var =
-     new SimpleEFAVariable(comp, range, factory, optable);
+     new SimpleEFAVariable(comp, range, mFactory, mOp);
     final ProxyAccessor<IdentifierProxy> key =
      mGlobalVariableMap.createAccessor(ident);
     if (mGlobalVariableMap.containsKey(key)) {
@@ -60,4 +61,6 @@ public class SimpleEFAVariableContext
   {
     return mGlobalVariableMap.values();
   }
+  private final ModuleProxyFactory mFactory;
+  private final CompilerOperatorTable mOp;
 }

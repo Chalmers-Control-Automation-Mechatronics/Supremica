@@ -80,7 +80,6 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
@@ -106,6 +105,7 @@ public class EFASynchronizer
  implements Abortable
 {
 
+  //TODO HDS: Accept ComponentProxy 
   public EFASynchronizer(final List<SimpleEFAComponent> components,
                          final SynchronizationOptions options)
    throws AnalysisException
@@ -198,6 +198,7 @@ public class EFASynchronizer
   {
     return synchHelper.getNumberOfAddedStates();
   }
+
   public AutomataSynchronizerHelper getHelper()
   {
     return synchHelper;
@@ -237,7 +238,7 @@ public class EFASynchronizer
     abortRequested = false;
   }
 
-    public SimpleEFAComponent getSynchronizedEFA(String name) throws EvalException
+  public SimpleEFAComponent getSynchronizedEFA(String name) throws EvalException
   {
     System.err.println("Synchronizer start executing ...");
     execute();
@@ -256,34 +257,26 @@ public class EFASynchronizer
       list.add(variable.getVariableComponent(mFactory));
     }
     final Collection<SimpleEFAEventDecl> events = new THashSet<>();
-    boolean hasMarking = false;
     for (final SimpleEFAComponent component : mComponents) {
       events.addAll(component.getAlphabet());
-      hasMarking = !component.getMarkedLocationSet().isEmpty();
     }
     Collection<EventDeclProxy> edecls =
      helper.getEventDeclProxy(events);
-    if (hasMarking) {
-      EventDeclProxy mark =
-       mFactory.createEventDeclProxy(helper.getMarkingIdentifier(),
-                                     EventKind.PROPOSITION);
-      edecls.add(mark);
-    }
-    //TODO HDS: Checking for forbidden proposition
     final ModuleProxy module = mFactory.createModuleProxy(
      synchEFA.getName(), null, null, null, edecls, null, list);
     final SimpleEFACompiler compiler = new SimpleEFACompiler(module);
     final SimpleEFASystem system = compiler.compile();
     final SimpleEFAComponent efa = system.getComponents().iterator().next();
+    efa.setBlockedEvents(null);
     efa.setDeterministic(automaton.isDeterministic());
     return efa;
   }
 
   /**
-   * Initializes the AutomataSynchronizerExecuter:s based on the
+   * Initializing the AutomataSynchronizerExecuter:s based on the
    * AutomataSynchronizerHelper.
    */
-    private void initialize()
+  private void initialize()
   {
     // Allocate and initialize the synchronizationExecuters
     final int nbrOfExecuters = syncOptions.getNbrOfExecuters();
@@ -333,7 +326,8 @@ public class EFASynchronizer
    * <p/>
    * @return Automaton representing the synchronous composition.
    */
-  private static Automaton synchronizeAutomata(final Automata automata, final boolean sups_as_plants)
+  private static Automaton synchronizeAutomata(final Automata automata,
+                                               final boolean sups_as_plants)
    throws Exception
   {
     final SynchronizationOptions options = SynchronizationOptions
@@ -350,7 +344,8 @@ public class EFASynchronizer
    * @return Automaton representing the synchronous composition.
    */
   private static Automaton synchronizeAutomata(
-   final Automata automata, final SynchronizationOptions options, final boolean sups_as_plants)
+   final Automata automata, final SynchronizationOptions options,
+   final boolean sups_as_plants)
    throws Exception
   {
     options.setEFAMode(false);
@@ -368,7 +363,8 @@ public class EFASynchronizer
    * <p/>
    * @return Automaton representing the synchronous composition.
    */
-  private static Automaton synchronizeAutomata(final AutomataSynchronizerHelper helper) throws Exception
+  private static Automaton synchronizeAutomata(
+   final AutomataSynchronizerHelper helper) throws Exception
   {
     final AutomataSynchronizer synchronizer = new AutomataSynchronizer(helper);
     synchronizer.execute();
@@ -423,7 +419,7 @@ public class EFASynchronizer
     State fromState, toState;
     LabeledEvent event;
     boolean initialFlag = true;
-    if (!component.getEdges().isEmpty()){
+    if (!component.getEdges().isEmpty()) {
       for (final EdgeProxy item : component.getEdges()) {
         final EdgeSubject edge = (EdgeSubject) item;
         fromState = automaton.getStateWithName(edge.getSource().getName());
@@ -465,7 +461,8 @@ public class EFASynchronizer
         final ListSubject<AbstractSubject> eventList =
          edge.getLabelBlock().getEventIdentifierListModifiable();
         for (final AbstractSubject e : eventList) {
-          final SimpleIdentifierSubject eventSubject = (SimpleIdentifierSubject) e;
+          final SimpleIdentifierSubject eventSubject =
+           (SimpleIdentifierSubject) e;
           event = automaton.getAlphabet().getEvent(eventSubject.getName());
           if (event == null) {
             event = new LabeledEvent(eventSubject.getName());
@@ -481,8 +478,8 @@ public class EFASynchronizer
         }
       }
     } else {
-      for (final SimpleNodeProxy location : component.getLocationSet()){
-        if (location.isInitial()){
+      for (final SimpleNodeProxy location : component.getStateSet()) {
+        if (location.isInitial()) {
           final State state = new State(location.getName());
           if (location.toString().contains("accepting")) {
             state.setAccepting(true);
@@ -516,5 +513,4 @@ public class EFASynchronizer
   private final ModuleProxyFactory mFactory;
   private final List<SimpleEFAComponent> mComponents;
   private final THashSet<SimpleEFAVariable> mVariables;
-
 }

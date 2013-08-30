@@ -13,10 +13,12 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -33,14 +35,15 @@ public class SimpleEFAVariable
 {
 
   public SimpleEFAVariable(final VariableComponentProxy var,
-   final CompiledRange range,
-   final ModuleProxyFactory factory,
-   final CompilerOperatorTable op)
+                           final CompiledRange range,
+                           final ModuleProxyFactory factory,
+                           final CompilerOperatorTable op)
   {
     super(var, range, factory, op);
     mModifiers = new THashSet<>();
     mVisitors = new THashSet<>();
     mMarkings = new ArrayList<>(var.getVariableMarkings());
+    mVar = var;
     mOperatorTable = op;
   }
 
@@ -48,7 +51,7 @@ public class SimpleEFAVariable
    * Returns a collection containing all transition relations (EFAs) updating
    * this variable.
    */
-  public Collection<SimpleEFAComponent> getModifiers()
+  public Collection<IdentifierProxy> getModifiers()
   {
     return mModifiers;
   }
@@ -60,20 +63,20 @@ public class SimpleEFAVariable
    */
   public void addModifier(final SimpleEFAComponent component)
   {
-    super.addTransitionRelation(component);
-    mModifiers.add(component);
+//    super.addTransitionRelation(component);
+    mModifiers.add(component.getIdentifier());
   }
 
-  public void removeModifiers(final SimpleEFAComponent trans)
+  public void removeModifiers(final IdentifierProxy component)
   {
-    mModifiers.remove(trans);
+    mModifiers.remove(component);
   }
 
   /**
    * Returns a collection containing all transition relations (EFAs) checking
    * this variable.
    */
-  public Collection<SimpleEFAComponent> getVisitors()
+  public Collection<IdentifierProxy> getVisitors()
   {
     return mVisitors;
   }
@@ -85,13 +88,23 @@ public class SimpleEFAVariable
    */
   public void addVisitor(final SimpleEFAComponent comopnent)
   {
-    super.addTransitionRelation(comopnent);
-    mVisitors.add(comopnent);
+//    super.addTransitionRelation(comopnent);
+    mVisitors.add(comopnent.getIdentifier());
   }
 
-  public void removeVisitor(final SimpleEFAComponent trans)
+  public void removeVisitor(final IdentifierProxy component)
   {
-    mVisitors.remove(trans);
+    mVisitors.remove(component);
+  }
+
+  public boolean isModifiedBy(final IdentifierProxy component)
+  {
+    return mModifiers.contains(component);
+  }
+
+  public boolean isVisitedBy(final IdentifierProxy component)
+  {
+    return mVisitors.contains(component);
   }
 
   /**
@@ -113,10 +126,22 @@ public class SimpleEFAVariable
     return getComponent().isDeterministic();
   }
 
-  public VariableComponentProxy getVariableComponent(ModuleProxyFactory factory)
+  /**
+   * Return whether this variable is local.
+   * <p/>
+   * @return <CODE>true</CODE> if the variable modifies in at most one EFA
+   *         component but may visit (appears in guards) by others.
+   */
+  @Override
+  public boolean isLocal()
   {
-    ModuleProxyCloner cloner = factory.getCloner();
-    IdentifierProxy iden =
+    return mModifiers.size() <= 1;
+  }
+
+  public VariableComponentProxy getVariableComponent(final ModuleProxyFactory factory)
+  {
+    final ModuleProxyCloner cloner = factory.getCloner();
+    final IdentifierProxy iden =
      (IdentifierProxy) cloner.getClone(getVariableName());
     final CompiledRange range = getRange();
     final SimpleExpressionProxy type =
@@ -133,8 +158,30 @@ public class SimpleEFAVariable
                                                 initialStatePredicate,
                                                 variableMarkings);
   }
-  private final Collection<SimpleEFAComponent> mModifiers;
-  private final Collection<SimpleEFAComponent> mVisitors;
+
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (obj instanceof SimpleEFAVariable) {
+      final VariableComponentProxy var = ((SimpleEFAVariable) obj).getComponent();
+      final ModuleEqualityVisitor eq =
+       ModuleEqualityVisitor.getInstance(false);
+      return eq.equals(this.mVar, var);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+    hash = 17 * hash + Objects.hashCode(this.mVar);
+    return hash;
+  }
+
+  private final Collection<IdentifierProxy> mModifiers;
+  private final Collection<IdentifierProxy> mVisitors;
   private final Collection<VariableMarkingProxy> mMarkings;
   private final CompilerOperatorTable mOperatorTable;
+  private final VariableComponentProxy mVar;
 }

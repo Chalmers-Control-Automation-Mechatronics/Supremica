@@ -48,9 +48,7 @@ public class SimpleEFACompiler
     super(manager, module);
     mInputModule = super.getInputModule();
     mDocumentManager = super.getDocumentManager();
-    mEnabledPropositionNames = new ArrayList<>(2);
-    mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_MARKING_NAME);
-    mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
+    mEnabledPropositionNames = null;
   }
 
   @Override
@@ -63,7 +61,7 @@ public class SimpleEFACompiler
    throws EvalException
   {
     setUp();
-    ModuleInstanceCompiler mModuleInstanceCompiler;
+    final ModuleInstanceCompiler mModuleInstanceCompiler;
     try {
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
       initSourceInfo();
@@ -156,31 +154,30 @@ public class SimpleEFACompiler
     mEnabledPropositionNames = names;
   }
 
-  private void setUp()
-  {
-    if (mEnabledPropositionNames == null) {
-      mEnabledPropositionNames = new ArrayList<>(2);
-      mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_MARKING_NAME);
-      mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
-    }
-  }
-
   //#########################################################################
   @Override
-  public void requestAbort()
+public void requestAbort()
   {
     super.requestAbort();
     if (mEFASystemBuilder != null) {
       mEFASystemBuilder.requestAbort();
     }
   }
-
   @Override
   public void resetAbort()
   {
     super.resetAbort();
     if (mEFASystemBuilder != null) {
       mEFASystemBuilder.resetAbort();
+    }
+  }
+
+  private void setUp()
+  {
+    if (mEnabledPropositionNames == null) {
+      mEnabledPropositionNames = new ArrayList<>(2);
+      mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_MARKING_NAME);
+      mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
     }
   }
   private void initSourceInfo()

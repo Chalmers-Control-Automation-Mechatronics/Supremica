@@ -104,45 +104,6 @@ public abstract class AbstractEFAVariable<L>
   }
 
   /**
-   * Returns a collection containing all transition relations (EFAs) using this
-   * variable.
-   */
-  public Collection<? extends AbstractEFATransitionRelation<L>> getTransitionRelations()
-  {
-    return mTransitionRelations;
-  }
-
-  public void addTransitionRelation(final AbstractEFATransitionRelation<L> trans)
-  {
-    mTransitionRelations.add(trans);
-  }
-
-  public void removeTransitionRelation(
-   final AbstractEFATransitionRelation<L> trans)
-  {
-    mTransitionRelations.remove(trans);
-  }
-
-  /**
-   * Returns a collection containing all events in the system using this
-   * variable.
-   */
-  public Collection<EventDeclProxy> getRelatedEvent()
-  {
-    return mEventDecls;
-  }
-
-  public void addTransitionRelation(final EventDeclProxy event)
-  {
-    mEventDecls.add(event);
-  }
-
-  public void removeTransitionRelation(final EventDeclProxy event)
-  {
-    mEventDecls.remove(event);
-  }
-
-  /**
    * Return whether this variable is local.
    * <p/>
    * @return <CODE>true</CODE> if the variable occurs in at most one transition
@@ -151,6 +112,46 @@ public abstract class AbstractEFAVariable<L>
   public boolean isLocal()
   {
     return mTransitionRelations.size() <= 1;
+  }
+
+  /**
+   * Returns a collection containing all transition relations (EFAs) using this
+   * variable.
+   */
+  protected Collection<? extends AbstractEFATransitionRelation<L>> getTransitionRelations(
+   )
+  {
+    return mTransitionRelations;
+  }
+
+  protected void addTransitionRelation(
+   final AbstractEFATransitionRelation<L> trans)
+  {
+    mTransitionRelations.add(trans);
+  }
+
+  protected void removeTransitionRelation(final AbstractEFATransitionRelation<L> trans)
+  {
+    mTransitionRelations.remove(trans);
+  }
+
+  /**
+   * Returns a collection containing all events in the system using this
+   * variable.
+   */
+  protected Collection<EventDeclProxy> getRelatedEvent()
+  {
+    return mEventDecls;
+  }
+
+  protected void addTransitionRelation(final EventDeclProxy event)
+  {
+    mEventDecls.add(event);
+  }
+
+  protected void removeTransitionRelation(final EventDeclProxy event)
+  {
+    mEventDecls.remove(event);
   }
   
   //#########################################################################

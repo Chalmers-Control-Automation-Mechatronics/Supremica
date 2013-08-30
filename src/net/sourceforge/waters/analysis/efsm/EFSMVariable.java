@@ -110,6 +110,10 @@ public class EFSMVariable
       return null;
     }
   }
+  void addTransitionRelation(EFSMTransitionRelation aThis)
+  {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 
 
   //#########################################################################

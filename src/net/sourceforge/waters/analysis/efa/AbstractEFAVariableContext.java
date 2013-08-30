@@ -117,11 +117,11 @@ public abstract class AbstractEFAVariableContext<L,
   {
     mModuleContext.insertEnumAtom(ident);
   }
+  private final ModuleBindingContext mModuleContext;
+  private final UnaryOperator mNextOperator;
   
   //#######################################################################
   //# Data Members
   protected final ProxyAccessorMap<IdentifierProxy, V> mGlobalVariableMap;
-  private final ModuleBindingContext mModuleContext;
-  private final UnaryOperator mNextOperator;
   
 }

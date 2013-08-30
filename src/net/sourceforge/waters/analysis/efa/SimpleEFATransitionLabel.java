@@ -35,7 +35,7 @@ public class SimpleEFATransitionLabel
   public String toString(){
     final StringBuffer events = new StringBuffer();
     events.append("{");
-    for (SimpleEFAEventDecl e : getEvents()){
+    for (final SimpleEFAEventDecl e : getEvents()){
       events.append(e.toString());
       events.append(",");
     }

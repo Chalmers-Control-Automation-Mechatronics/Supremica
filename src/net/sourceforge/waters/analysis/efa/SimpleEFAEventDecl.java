@@ -21,14 +21,10 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 /**
  * <P>A compiler-internal representation of an event group in a system of
@@ -230,24 +226,6 @@ public class SimpleEFAEventDecl
     return mEFAEventDecl.getName();
   }
 
-  public static EventDeclProxy getDeclTAU(String name)
-  {
-    if (name == null) {
-      name = "tau:";
-    }
-    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
-    final SimpleIdentifierProxy iden = factory.createSimpleIdentifierProxy(name);
-    final EventDeclProxy decl =
-     factory.createEventDeclProxy(iden, EventKind.CONTROLLABLE, false,
-                                  ScopeKind.LOCAL, null, null, null);
-    return decl;
-  }
-
-  public static SimpleEFAEventDecl getSimpleTAU(final String name)
-  {
-    return new SimpleEFAEventDecl(getDeclTAU(name));
-  }
-  
   //#########################################################################
   //# Data Members
   /**

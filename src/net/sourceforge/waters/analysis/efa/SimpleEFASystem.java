@@ -69,28 +69,29 @@ public class SimpleEFASystem
     }
   }
 
-  public Collection<SimpleEFAEventDecl> getSystemEvents()
+  public Collection<SimpleEFAEventDecl> getEvents()
   {
     return mAlphabet;
   }
 
-  public void AddSystemEvent(final SimpleEFAEventDecl event)
+  public void AddEvent(final SimpleEFAEventDecl event)
   {
     mAlphabet.add(event);
   }
 
-  public void AddSystemEvents(final Collection<SimpleEFAEventDecl> events)
+  public void AddEvents(final Collection<SimpleEFAEventDecl> events)
   {
     mAlphabet.addAll(events);
   }
 
-  public void clearSystemEvents()
+  public boolean removeEvent(final SimpleEFAEventDecl event)
   {
-    mAlphabet.clear();
+    return mAlphabet.remove(event);
   }
 
-  public boolean removeSystemEvent(final SimpleEFAEventDecl event){
-    return mAlphabet.remove(event);
+  public boolean removeEvents(final Collection<SimpleEFAEventDecl> events)
+  {
+    return mAlphabet.removeAll(events);
   }
 
   @Override
@@ -98,7 +99,7 @@ public class SimpleEFASystem
     super.addVariable(variable);
   }
 
-  public void addAllVariable(final Collection<SimpleEFAVariable> variables)
+  public void addVariables(final Collection<SimpleEFAVariable> variables)
   {
     for (final SimpleEFAVariable var : variables) {
       super.addVariable(var);
@@ -106,13 +107,34 @@ public class SimpleEFASystem
   }
 
   @Override
-  public void removeVariable(final SimpleEFAVariable var)
+  public void removeVariable(final SimpleEFAVariable variable)
   {
-    super.removeVariable(var);
+    super.removeVariable(variable);
   }
 
-  protected void removeComponent(final SimpleEFAComponent component)
+  public void removeVariables(final Collection<SimpleEFAVariable> variables)
   {
+    for (final SimpleEFAVariable var : variables) {
+      super.removeVariable(var);
+    }
+  }
+
+  public void removeComponent(final SimpleEFAComponent component)
+  {
+    final THashSet<SimpleEFAEventDecl> otherEvents =
+     new THashSet<>(getEvents().size());
+    for (final SimpleEFAComponent other : getComponents()) {
+      final String otherName = other.getIdentifier().getName();
+      if (!component.getIdentifier().getName().equalsIgnoreCase(otherName)) {
+        otherEvents.addAll(other.getAlphabet());
+      }
+    }
+    final Collection<SimpleEFAEventDecl> alphabet = component.getAlphabet();
+    alphabet.removeAll(otherEvents);
+    for (final SimpleEFAEventDecl event : alphabet) {
+      removeEvent(event);
+    }
+    component.dispose();
     super.removeTransitionRelation(component);
   }
 
@@ -122,7 +144,7 @@ public class SimpleEFASystem
     final List<SimpleEFAComponent> comps = getComponents();
     final EFAHelper helper = new EFAHelper(factory);
     final Collection<EventDeclProxy> events =
-     helper.getEventDeclProxy(getSystemEvents());
+     helper.getEventDeclProxy(getEvents());
     final TreeMap<String, SimpleComponentProxy> compList =
      new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     final TreeMap<String, VariableComponentProxy> varList =

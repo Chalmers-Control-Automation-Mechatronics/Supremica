@@ -131,7 +131,8 @@ public abstract class AbstractEFAVariableCollector<L,
   }
 
   @Override
-  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr) throws VisitorException
+  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
+   throws VisitorException
   {
     final SimpleExpressionProxy subterm = expr.getSubTerm();
     if (expr.getOperator() == mNextOperator) {

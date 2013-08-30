@@ -85,7 +85,7 @@ public abstract class AbstractEFATransitionRelation<L>
   }
 
   @Override
-public int compareTo(final AbstractEFATransitionRelation<?> efaTR)
+  public int compareTo(final AbstractEFATransitionRelation<?> efaTR)
   {
     final String name1 = getName();
     final String name2 = efaTR.getName();
@@ -93,7 +93,7 @@ public int compareTo(final AbstractEFATransitionRelation<?> efaTR)
   }
 
   @Override
-public String toString()
+  public String toString()
   {
     return mTransitionRelation.getName() + "\n" + mTransitionRelation.toString();
   }
