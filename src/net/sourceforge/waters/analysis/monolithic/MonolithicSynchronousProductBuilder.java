@@ -636,10 +636,10 @@ public class MonolithicSynchronousProductBuilder
       }
       target = mDeadlockState;
     } else {
-      target = getNewState();
-      if (mStateCallback != null) {
-        mStateCallback.countState(mTargetTuple);
+      if (mStateCallback != null && !mStateCallback.newState(mTargetTuple)) {
+        return;
       }
+      target = getNewState();
       final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
       mStates.put(newTuple, target);
       mUnvisited.offer(newTuple);
@@ -842,8 +842,11 @@ public class MonolithicSynchronousProductBuilder
      * before adding a new state to the synchronous product state space.
      * @param  tuple    Integer array representing state codes of a new
      *                  state tuple.
+     * @return <CODE>true</CODE> if the state should be included in the
+     *         synchronous product, <CODE>false</CODE> if it should be
+     *         suppressed.
      */
-    public void countState(int[] tuple) throws OverflowException;
+    public boolean newState(int[] tuple) throws OverflowException;
 
     /**
      * This method is called by the {@link MonolithicSynchronousProductBuilder}

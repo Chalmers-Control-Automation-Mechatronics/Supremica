@@ -1145,7 +1145,7 @@ public class CompositionalConflictChecker
     //# Interface net.sourceforge.waters.analysis.monolithic.
     //# MonolithicSynchronousProductBuilder.StateCounter
     @Override
-    public void countState(final int[] tuple)
+    public boolean newState(final int[] tuple)
       throws OverflowException
     {
       final MonolithicSynchronousProductBuilder builder =
@@ -1167,6 +1167,7 @@ public class CompositionalConflictChecker
       if (mCount >= mCurrentMinimum) {
         throw new OverflowException(OverflowKind.NODE, mCurrentMinimum);
       }
+      return true;
     }
 
     @Override

@@ -738,7 +738,7 @@ public abstract class AbstractCompositionalModelAnalyzer
             candidates = mPreselectingHeuristic.findCandidates();
           }
           try {
-            if (cancheck) {
+            if (cancheck && !result.isFinished()) {
               doMonolithicAnalysis(mCurrentAutomata);
               lastOverflow = null;
             }

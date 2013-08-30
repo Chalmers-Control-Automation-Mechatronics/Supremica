@@ -31,6 +31,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -207,10 +208,11 @@ public class CompositionalStateRepresentationSynthesizer extends
       }
       if (!result.isFinished()) {
         result.setSatisfied(true);
-        if (getConstructsResult()) {
-          final ProductDESProxyFactory factory = getFactory();
-          result.close(factory, getOutputName());
-        }
+      }
+      if (result.isSatisfied() && getConstructsResult()) {
+        result.addBackRenamedSupervisor(mSynthesisStateSpace);
+        final ProductDESProxyFactory factory = getFactory();
+        result.close(factory, getOutputName());
       }
       final Logger logger = getLogger();
       logger.debug("CompositionalSynthesizer done.");
@@ -234,17 +236,27 @@ public class CompositionalStateRepresentationSynthesizer extends
     mHalfwaySimplifier = new HalfWaySynthesisTRSimplifier();
     mHalfwaySimplifier.setOutputMode
       (HalfWaySynthesisTRSimplifier.OutputMode.PROPER_SUPERVISOR);
-    super.setUp();
-    final List<AutomatonProxy> automata = getCurrentAutomata();
+    final KindTranslator translator = getKindTranslator();
+    final Set<AutomatonProxy> automata = getModel().getAutomata();
     mStateRepresentationMap = new HashMap<>(automata.size());
+    mSynthesisStateSpace =
+      new SynthesisStateSpace(getFactory(), getKindTranslator(),
+                              getModel(), getOutputName());
     for (final AutomatonProxy automaton: automata) {
-      final StateEncoding encoding = new StateEncoding(automaton);
-      final SynthesisStateSpace.SynthesisStateMap map =
-        SynthesisStateSpace.createStateEncodingMap(automaton, encoding);
-      final StateRepresentationInfo info = new StateRepresentationInfo(map, encoding);
-      mStateRepresentationMap.put(automaton, info);
+      switch (translator.getComponentKind(automaton)) {
+      case PLANT:
+      case SPEC:
+        final StateEncoding encoding = new StateEncoding(automaton);
+        final SynthesisStateSpace.SynthesisStateMap map =
+          mSynthesisStateSpace.createStateEncodingMap(automaton, encoding);
+        final StateRepresentationInfo info = new StateRepresentationInfo(map, encoding);
+        mStateRepresentationMap.put(automaton, info);
+        break;
+      default:
+        break;
+      }
     }
-    mSynthesisStateSpace = new SynthesisStateSpace();
+    super.setUp();
   }
 
   @Override
@@ -256,6 +268,14 @@ public class CompositionalStateRepresentationSynthesizer extends
 
   //#########################################################################
   //# Hooks
+  @Override
+  protected AutomatonProxy plantify(final AutomatonProxy spec)
+    throws OverflowException
+  {
+    final AutomatonProxy plant = super.plantify(spec);
+    updateStateRepresentationInfo(spec, plant);
+    return plant;
+  }
 
   @Override
   protected void recordAbstractionStep(final AbstractionStep step)
@@ -265,6 +285,10 @@ public class CompositionalStateRepresentationSynthesizer extends
       final MergeStep merge = (MergeStep) step;
       final AutomatonProxy original = step.getOriginalAutomaton();
       final AutomatonProxy result = step.getResultAutomaton();
+      if (result.getStates().isEmpty()) {
+        setBooleanResult(false);
+        return;
+      }
       final StateRepresentationInfo parentInfo =
         mStateRepresentationMap.get(original);
       final SynthesisStateSpace.SynthesisStateMap parent = parentInfo.getMap();
@@ -273,14 +297,14 @@ public class CompositionalStateRepresentationSynthesizer extends
         final TRPartition partition =
           new TRPartition(partitionList, original.getStates().size());
         final SynthesisStateSpace.SynthesisStateMap map =
-          SynthesisStateSpace.createPartitionMap(partition, parent);
+          mSynthesisStateSpace.createPartitionMap(partition, parent);
         final StateRepresentationInfo info =
           new StateRepresentationInfo(map, merge.getResultStateEncoding());
         mStateRepresentationMap.put(result, info);
         mStateRepresentationMap.remove(original);
         return;
       }
-    } else if (step instanceof HidingStep) {
+    } else if (step instanceof HidingStep) { // synchronous product
       final List<AutomatonProxy> originals = step.getOriginalAutomata();
       if (originals.size() >= 2) {
         final HidingStep hide = (HidingStep) step;
@@ -319,7 +343,7 @@ public class CompositionalStateRepresentationSynthesizer extends
           synchMap.put(synchKey, synchStateCode);
         }
         final SynthesisStateSpace.SynthesisStateMap map =
-          SynthesisStateSpace.createSynchronisationMap(synchMap, synchEncoding, parents);
+          mSynthesisStateSpace.createSynchronisationMap(synchMap, synchEncoding, parents);
         final StateRepresentationInfo info =
           new StateRepresentationInfo(map, synchStateEncoding);
         mStateRepresentationMap.put(result, info);
@@ -336,6 +360,18 @@ public class CompositionalStateRepresentationSynthesizer extends
       mStateRepresentationMap.put(result, info);
     }
 
+  }
+
+  @Override
+  protected HidingStep createSynchronousProductStep
+    (final Collection<AutomatonProxy> automata,
+     final AutomatonProxy sync,
+     final Collection<EventProxy> hidden,
+     final EventProxy tau)
+  {
+    final SynchronousProductBuilder builder = getSynchronousProductBuilder();
+    final SynchronousProductStateMap stateMap =  builder.getStateMap();
+    return new HidingStep(this, sync, hidden, tau, stateMap);
   }
 
   @Override
@@ -439,10 +475,32 @@ public class CompositionalStateRepresentationSynthesizer extends
     } else {
       final TRPartition partition = new TRPartition(classes, numStates);
       final SynthesisStateSpace.SynthesisStateMap map =
-        SynthesisStateSpace.createPartitionMap(partition, parent);
+        mSynthesisStateSpace.createPartitionMap(partition, parent);
       mSynthesisStateSpace.addStateMap(map);
       return true;
     }
+  }
+
+  //#########################################################################
+  //# Auxiliary methods
+  private void updateStateRepresentationInfo(final AutomatonProxy original,
+                                             final AutomatonProxy result)
+  {
+    StateRepresentationInfo info = mStateRepresentationMap.remove(original);
+    final StateEncoding encoding = info.getEncoding();
+    boolean change = false;
+    for(final StateProxy state : result.getStates()) {
+      if (encoding.getStateCode(state) < 0) {
+        change = true;
+        break;
+      }
+    }
+    if (change) {
+      final StateEncoding newEncoding = new StateEncoding(result);
+      final SynthesisStateSpace.SynthesisStateMap map = info.getMap();
+      info = new StateRepresentationInfo(map, newEncoding);
+    }
+    mStateRepresentationMap.put(result, info);
   }
 
   //#########################################################################
