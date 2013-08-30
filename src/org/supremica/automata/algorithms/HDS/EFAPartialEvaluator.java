@@ -84,7 +84,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     final Collection<SimpleEFAComponent> residuals =
      new THashSet<>(mCompVarsMap.size());
     for (final SimpleEFAComponent component : mCompVarsMap.keySet()) {
-      final Collection<SimpleEFAVariable> PEVars = mCompVarsMap.get(component);
+      final THashSet<SimpleEFAVariable> PEVars = mCompVarsMap.get(component);
       if (PEVars.isEmpty()) {
         continue;
       }
@@ -99,46 +99,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   public THashMap<SimpleEFAComponent, THashSet<SimpleEFAVariable>> getComponentVariablesMap()
   {
     return mCompVarsMap;
-  }
-
-  //#########################################################################
-  @Override
-  public Object visitIdentifierProxy(final IdentifierProxy ident)
-  {
-    return null;
-  }
-
-  @Override
-  public BinaryExpressionProxy visitBinaryExpressionProxy(
-   final BinaryExpressionProxy expr)
-   throws VisitorException
-  {
-    final SimpleExpressionProxy lhs = expr.getLeft();
-    final SimpleExpressionProxy nlhs =
-     (SimpleExpressionProxy) lhs.acceptVisitor(this);
-    return mFactory.createBinaryExpressionProxy(expr.getOperator(),
-                                                nlhs,
-                                                expr.getRight());
-  }
-
-  @Override
-  public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
-  {
-    return expr;
-  }
-
-  @Override
-  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
-   throws VisitorException
-  {
-    final SimpleExpressionProxy subterm = expr.getSubTerm();
-    final UnaryOperator operator = expr.getOperator();
-    if (operator == mOperatorTable.getNextOperator()) {
-      return subterm;
-    }
-    final SimpleExpressionProxy result =
-     (SimpleExpressionProxy) subterm.acceptVisitor(this);
-    return mFactory.createUnaryExpressionProxy(operator, result);
   }
 
   private void setUp(
@@ -295,7 +255,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     } catch (EvalException | AnalysisException ex) {
       throw ex;
     } finally {
-      mCompVarsMap = null;
       mTupleStateMap = null;
     }
   }
@@ -502,6 +461,46 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     for (final SimpleEFAVariable var : primed) {
       var.addModifier(component);
     }
+  }
+
+  //#########################################################################
+  @Override
+  public Object visitIdentifierProxy(final IdentifierProxy ident)
+  {
+    return null;
+  }
+
+  @Override
+  public BinaryExpressionProxy visitBinaryExpressionProxy(
+   final BinaryExpressionProxy expr)
+   throws VisitorException
+  {
+    final SimpleExpressionProxy lhs = expr.getLeft();
+    final SimpleExpressionProxy nlhs =
+     (SimpleExpressionProxy) lhs.acceptVisitor(this);
+    return mFactory.createBinaryExpressionProxy(expr.getOperator(),
+                                                nlhs,
+                                                expr.getRight());
+  }
+
+  @Override
+  public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+  {
+    return expr;
+  }
+
+  @Override
+  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
+   throws VisitorException
+  {
+    final SimpleExpressionProxy subterm = expr.getSubTerm();
+    final UnaryOperator operator = expr.getOperator();
+    if (operator == mOperatorTable.getNextOperator()) {
+      return subterm;
+    }
+    final SimpleExpressionProxy result =
+     (SimpleExpressionProxy) subterm.acceptVisitor(this);
+    return mFactory.createUnaryExpressionProxy(operator, result);
   }
 
   //#########################################################################
