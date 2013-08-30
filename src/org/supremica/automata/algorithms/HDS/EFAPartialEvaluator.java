@@ -81,14 +81,14 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   public Collection<SimpleEFAComponent> evaluate()
    throws EvalException, AnalysisException
   {
-    Collection<SimpleEFAComponent> residuals =
+    final Collection<SimpleEFAComponent> residuals =
      new THashSet<>(mCompVarsMap.size());
-    for (SimpleEFAComponent component : mCompVarsMap.keySet()) {
-      Collection<SimpleEFAVariable> PEVars = mCompVarsMap.get(component);
+    for (final SimpleEFAComponent component : mCompVarsMap.keySet()) {
+      final Collection<SimpleEFAVariable> PEVars = mCompVarsMap.get(component);
       if (PEVars.isEmpty()) {
         continue;
       }
-      SimpleEFAComponent pe = evaluate(component, PEVars);
+      final SimpleEFAComponent pe = evaluate(component, PEVars);
       if (pe != null) {
         residuals.add(pe);
       }
@@ -142,17 +142,17 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   }
 
   private void setUp(
-   Collection<SimpleEFAComponent> components,
-   SimpleEFAVariableContext varContext)
+   final Collection<SimpleEFAComponent> components,
+   final SimpleEFAVariableContext varContext)
   {
     mCompVarsMap = new THashMap<>(components.size());
-    for (SimpleEFAComponent component : components) {
-      THashSet<SimpleEFAVariable> currLocalVars = new THashSet<>();
+    for (final SimpleEFAComponent component : components) {
+      final THashSet<SimpleEFAVariable> currLocalVars = new THashSet<>();
       if (!component.isEFA()) {
         mCompVarsMap.put(component, currLocalVars);
         continue;
       }
-      for (SimpleEFAVariable var : varContext.getVariables()) {
+      for (final SimpleEFAVariable var : varContext.getVariables()) {
         if (var.isLocal() && var.isModifiedBy(component.getIdentifier())) {
           currLocalVars.add(var);
         }
@@ -174,7 +174,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
        component.getTransitionRelation();
       oRel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       int oVarRange = 1;
-      for (SimpleEFAVariable var : PEVars) {
+      for (final SimpleEFAVariable var : PEVars) {
         oVarRange *= var.getRange().size();
       }
       final int oNbrStates = oRel.getNumberOfReachableStates();
@@ -184,7 +184,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       final SimpleEFATransitionLabelEncoding pLabelEncoding =
        new SimpleEFATransitionLabelEncoding(oLabelEncoding.size());
 
-      TIntObjectHashMap<String> oStateNameEncoding = component
+      final TIntObjectHashMap<String> oStateNameEncoding = component
        .getStateNameMap();
       final TIntObjectHashMap<String> pStateNameEncoding =
        new TIntObjectHashMap<>(pNbrStates, 0.6f);
@@ -219,12 +219,12 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       final String oStateName = oStateNameEncoding.get(oInitState);
       final ConstraintList pInitExps = getPretty(oInitExps);
       final Tuple initTuple = new Tuple(oInitState, pInitExps);
-      int pInitState = createStateId(initTuple);
+      final int pInitState = createStateId(initTuple);
       pStateNameEncoding.put(pInitState, getStateName(oStateName, pInitExps));
       pRel.setReachable(pInitState, true);
       pRel.setInitial(pInitState, true);
       pRel.setAllMarkings(pInitState, statePropMap.get(oInitState));
-      Stack<Tuple> stack = new Stack<>();
+      final Stack<Tuple> stack = new Stack<>();
       stack.push(initTuple);
       final TransitionIterator iter = oRel.createSuccessorsReadOnlyIterator();
       while (!stack.isEmpty()) {
@@ -237,9 +237,9 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
           final ConstraintList currConditions =
            getCompleteFormConstraint(currLabel.getConstraint(), PEVars);
           final ConstraintList currValues = currTuple.getConstrains();
-          List<SimpleExpressionProxy> nextValues = new ArrayList<>();
-          List<SimpleExpressionProxy> nextConditions = new ArrayList<>();
-          boolean isSatisfiable = execute(PEVars,
+          final List<SimpleExpressionProxy> nextValues = new ArrayList<>();
+          final List<SimpleExpressionProxy> nextConditions = new ArrayList<>();
+          final boolean isSatisfiable = execute(PEVars,
                                           currValues,
                                           currConditions,
                                           nextValues,
@@ -303,8 +303,8 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   private boolean execute(final Collection<SimpleEFAVariable> PEVars,
                           final ConstraintList currValues,
                           final ConstraintList currConditions,
-                          List<SimpleExpressionProxy> nextValues,
-                          List<SimpleExpressionProxy> nextConditions)
+                          final List<SimpleExpressionProxy> nextValues,
+                          final List<SimpleExpressionProxy> nextConditions)
    throws EvalException
   {
     mPropagator.init(currValues);
@@ -313,7 +313,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     if (mPropagator.isUnsatisfiable()) {
       return false;
     }
-    ConstraintList eCons = mPropagator.getAllConstraints();
+    final ConstraintList eCons = mPropagator.getAllConstraints();
     final List<SimpleExpressionProxy> eExps =
      new ArrayList<>(eCons.getConstraints());
     final List<SimpleExpressionProxy> oExps =
@@ -321,14 +321,14 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     // Removing all currValues
     final List<SimpleExpressionProxy> cExps =
      removeExpressions(eExps, oExps);
-    for (SimpleExpressionProxy eExp : cExps) {
+    for (final SimpleExpressionProxy eExp : cExps) {
 
       if (mVarFinder.findPrimeVariables(eExp, PEVars)) {
         final Collection<SimpleEFAVariable> primed = new THashSet<>();
         final Collection<SimpleEFAVariable> unprimed = new THashSet<>();
         mVarCollector.collectAllVariables(eExp, unprimed, primed);
         if (unprimed.isEmpty()) {
-          SimpleExpressionProxy nextValue = getNextValue(eExp);
+          final SimpleExpressionProxy nextValue = getNextValue(eExp);
           nextValues.add(nextValue);
         } else {
           nextConditions.add(eExp);
@@ -340,22 +340,22 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     return true;
   }
 
-  private SimpleExpressionProxy getNextValue(SimpleExpressionProxy eExp)
+  private SimpleExpressionProxy getNextValue(final SimpleExpressionProxy eExp)
    throws EvalException
   {
     try {
-      Object result = eExp.acceptVisitor(this);
+      final Object result = eExp.acceptVisitor(this);
       if (result != null) {
         return (SimpleExpressionProxy) result;
       } else {
         throw new EvalException("PE > getNextValue: Not the expected result");
       }
-    } catch (VisitorException ex) {
+    } catch (final VisitorException ex) {
       throw new EvalException("PE > getNextValue: " + ex);
     }
   }
 
-  private ConstraintList getPretty(ConstraintList constraint)
+  private ConstraintList getPretty(final ConstraintList constraint)
    throws EvalException
   {
     mPropagator.init(constraint);
@@ -369,7 +369,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   {
     final List<SimpleExpressionProxy> inits =
      new ArrayList<>(vars.size());
-    for (SimpleEFAVariable var : vars) {
+    for (final SimpleEFAVariable var : vars) {
       final SimpleExpressionProxy exp = var.getInitialStatePredicate();
       inits.add(exp);
     }
@@ -403,7 +403,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   {
     final List<SimpleExpressionProxy> exps =
      new ArrayList<>(contraints.getConstraints());
-    for (SimpleEFAVariable var : localVars) {
+    for (final SimpleEFAVariable var : localVars) {
       if (!mVarFinder.findPrimeVariable(contraints, var)) {
         final SimpleExpressionProxy exp =
          getKeepCurrentValue(var.getPrimedVariableName());
@@ -421,7 +421,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     final List<SimpleExpressionProxy> result = new ArrayList<>(list.size());
     final List<SimpleExpressionProxy> pair = new ArrayList<>(exps.size() + 1);
     pair.addAll(exps);
-    for (SimpleExpressionProxy item : list) {
+    for (final SimpleExpressionProxy item : list) {
       pair.add(item);
       mPropagator.init(new ConstraintList(pair));
       mPropagator.propagate();
@@ -468,7 +468,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
    final Collection<SimpleEFAVariable> primed)
   {
     final List<SimpleExpressionProxy> list = new ArrayList<>();
-    for (SimpleEFATransitionLabel label : labelEncoding.getTransitionLabels()) {
+    for (final SimpleEFATransitionLabel label : labelEncoding.getTransitionLabels()) {
       list.addAll(label.getConstraint().getConstraints());
     }
     final ConstraintList constraints = new ConstraintList(list);
@@ -480,10 +480,10 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   {
     final TIntObjectHashMap<ConstraintList> map =
      new TIntObjectHashMap<>(mTupleStateMap.size());
-    for (Tuple tuple : mTupleStateMap.keySet()) {
+    for (final Tuple tuple : mTupleStateMap.keySet()) {
       final Integer state = mTupleStateMap.get(tuple);
       final ConstraintList values = tuple.getConstrains();
-      ConstraintList put = map.put(state, values);
+      final ConstraintList put = map.put(state, values);
       if (put != null) {
         throw new AnalysisException(
          "PE > getStateValueMap: Found duplicate state");
@@ -492,14 +492,14 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     return map;
   }
 
-  private void registerComponent(SimpleEFAComponent component,
-                                 Collection<SimpleEFAVariable> unprimed,
-                                 Collection<SimpleEFAVariable> primed)
+  private void registerComponent(final SimpleEFAComponent component,
+                                 final Collection<SimpleEFAVariable> unprimed,
+                                 final Collection<SimpleEFAVariable> primed)
   {
-    for (SimpleEFAVariable var : unprimed) {
+    for (final SimpleEFAVariable var : unprimed) {
       var.addVisitor(component);
     }
-    for (SimpleEFAVariable var : primed) {
+    for (final SimpleEFAVariable var : primed) {
       var.addModifier(component);
     }
   }
@@ -509,12 +509,13 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   private class Tuple
   {
 
-    public Tuple(int state, ConstraintList constrains)
+    public Tuple(final int state, final ConstraintList constrains)
     {
       mState = state;
       mConstrains = constrains;
     }
 
+    @SuppressWarnings("unused")
     public Tuple()
     {
       this(-1, new ConstraintList());
@@ -531,10 +532,10 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     }
 
     @Override
-    public boolean equals(Object obj)
+    public boolean equals(final Object obj)
     {
       if (obj instanceof Tuple) {
-        Tuple item = (Tuple) obj;
+        final Tuple item = (Tuple) obj;
         if (item.getState() == mState && item.getConstrains()
          .equals(mConstrains)) {
           return true;
@@ -558,12 +559,12 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       return "(" + mState + "," + mConstrains.toString() + ")";
     }
     //#########################################################################
-    //# Data Members  
+    //# Data Members
     final private int mState;
     final private ConstraintList mConstrains;
   }
   //#########################################################################
-  //# Data Members    
+  //# Data Members
   private final ConstraintPropagator mPropagator;
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;

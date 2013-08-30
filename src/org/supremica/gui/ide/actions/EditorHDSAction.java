@@ -1,13 +1,6 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.ImageIcon;
-
-import gnu.trove.set.hash.THashSet;
-
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -15,9 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.Action;
 
 import net.sourceforge.waters.analysis.efa.SimpleEFACompiler;
-import net.sourceforge.waters.analysis.efa.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.SimpleEFASystem;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
@@ -26,7 +21,6 @@ import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -36,13 +30,8 @@ import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
-import org.supremica.automata.algorithms.HDS.EFAPartialEvaluator;
-import org.supremica.automata.algorithms.HDS.EFASynchronizer;
-import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -89,39 +78,39 @@ public class EditorHDSAction
       mFactory = ModuleSubjectFactory.getInstance();
       mCloner = mFactory.getCloner();
       final SimpleEFACompiler compiler = new SimpleEFACompiler(module);
-      SimpleEFASystem sys = compiler.compile();
+      final SimpleEFASystem sys = compiler.compile();
       System.err.println("Finish compiling ...");
 
       System.err.println("Start importing ...");
-      ModuleSubject system = (ModuleSubject) sys.getModuleProxy(mFactory);
+      final ModuleSubject system = (ModuleSubject) sys.getModuleProxy(mFactory);
       importToIDE(system, module);
       System.err.println("Finish importing ...");
     } catch (EvalException | IOException | UnsupportedFlavorException ex) {
 //      java.util.logging.Logger.getLogger(EditorTransitionProjectionAction.class
 //       .getName()).
-//       log(Level.SEVERE, null, ex);  
+//       log(Level.SEVERE, null, ex);
       logger.error(ex);
     }
   }
 
-  private Collection<EventDeclSubject> getEventSubject(List<EventDeclProxy> list)
+  private Collection<EventDeclSubject> getEventSubject(final List<EventDeclProxy> list)
   {
-    int size = list.size();
-    Collection<EventDeclSubject> result = new ArrayList<>(size);
-    for (Proxy item : list) {
+    final int size = list.size();
+    final Collection<EventDeclSubject> result = new ArrayList<>(size);
+    for (final Proxy item : list) {
       result.add((EventDeclSubject) mCloner.getClone(item));
     }
     return result;
   }
 
-  private void importToIDE(final ModuleProxy nModule, ModuleSubject oModule)
+  private void importToIDE(final ModuleProxy nModule, final ModuleSubject oModule)
    throws IOException, UnsupportedFlavorException
   {
     final List<Proxy> componentList = mCloner.getClonedList(nModule
      .getComponentList());
 
     oModule.getEventDeclListModifiable().clear();
-    Collection<EventDeclSubject> events =
+    final Collection<EventDeclSubject> events =
      getEventSubject(nModule.getEventDeclList());
     oModule.getEventDeclListModifiable().addAll(events);
 
@@ -153,7 +142,12 @@ public class EditorHDSAction
     panel.clearSelection(false);
   }
 
-  private final Logger logger = LoggerFactory.createLogger(IDE.class);
   private ModuleSubjectFactory mFactory;
   private ModuleProxyCloner mCloner;
+
+  //#########################################################################
+  //# Class Constants
+  private static final Logger logger = LoggerFactory.createLogger(IDE.class);
+  private static final long serialVersionUID = 5024850468101547938L;
+
 }

@@ -1,10 +1,6 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-
-import javax.swing.Action;
-
 import gnu.trove.set.hash.THashSet;
 
 import java.awt.datatransfer.Transferable;
@@ -14,6 +10,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.Action;
 
 import net.sourceforge.waters.analysis.efa.SimpleEFACompiler;
 import net.sourceforge.waters.analysis.efa.SimpleEFAComponent;
@@ -36,11 +35,10 @@ import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
-import org.supremica.automata.algorithms.HDS.EFASynchronizer;
 import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.HDS.EFASynchronizer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -86,9 +84,9 @@ public class EditorEFASynchAction
       mFactory = ModuleSubjectFactory.getInstance();
       mCloner = mFactory.getCloner();
       final SimpleEFACompiler compiler = new SimpleEFACompiler(module);
-      SimpleEFASystem sys = compiler.compile();
-      
-      List<SimpleEFAComponent> compList = new ArrayList<>();
+      final SimpleEFASystem sys = compiler.compile();
+
+      final List<SimpleEFAComponent> compList = new ArrayList<>();
       final List<? extends Proxy> currentSelection =
        ide.getActiveDocumentContainer().getEditorPanel()
        .getComponentsPanel().getCurrentSelection();
@@ -103,7 +101,7 @@ public class EditorEFASynchAction
       if (components.isEmpty()) {
         compList.addAll(sys.getComponents());
       } else if (components.size() > 1) {
-        for (SimpleEFAComponent comp : sys.getComponents()) {
+        for (final SimpleEFAComponent comp : sys.getComponents()) {
           if (components.contains(comp.getName())) {
             compList.add(comp);
           }
@@ -111,45 +109,45 @@ public class EditorEFASynchAction
       }
       if (!compList.isEmpty()) {
         final SynchronizationOptions option = new SynchronizationOptions();
-        EFASynchronizer synch = new EFASynchronizer(compList, option);
+        final EFASynchronizer synch = new EFASynchronizer(compList, option);
         System.err.println("Start synchronizing ...");
-        SimpleEFAComponent result =
+        final SimpleEFAComponent result =
          synch.getSynchronizedEFA("");
         System.err.println("Finish synchronizing ...");
         sys.addComponent(result);
       }
 
       System.err.println("Start importing ...");
-      ModuleSubject system = (ModuleSubject) sys.getModuleProxy(mFactory);
+      final ModuleSubject system = (ModuleSubject) sys.getModuleProxy(mFactory);
       importToIDE(system, module);
       System.err.println("Finish importing ...");
     } catch (EvalException | AnalysisException | IOException |
      UnsupportedFlavorException ex) {
 //      java.util.logging.Logger.getLogger(EditorTransitionProjectionAction.class
 //       .getName()).
-//       log(Level.SEVERE, null, ex);  
+//       log(Level.SEVERE, null, ex);
       logger.error(ex);
     }
   }
 
-  private Collection<EventDeclSubject> getEventSubject(List<EventDeclProxy> list)
+  private Collection<EventDeclSubject> getEventSubject(final List<EventDeclProxy> list)
   {
-    int size = list.size();
-    Collection<EventDeclSubject> result = new ArrayList<>(size);
-    for (Proxy item : list) {
+    final int size = list.size();
+    final Collection<EventDeclSubject> result = new ArrayList<>(size);
+    for (final Proxy item : list) {
       result.add((EventDeclSubject) mCloner.getClone(item));
     }
     return result;
   }
 
-  private void importToIDE(final ModuleProxy nModule, ModuleSubject oModule)
+  private void importToIDE(final ModuleProxy nModule, final ModuleSubject oModule)
    throws IOException, UnsupportedFlavorException
   {
     final List<Proxy> componentList = mCloner.getClonedList(nModule
      .getComponentList());
 
     oModule.getEventDeclListModifiable().clear();
-    Collection<EventDeclSubject> events =
+    final Collection<EventDeclSubject> events =
      getEventSubject(nModule.getEventDeclList());
     oModule.getEventDeclListModifiable().addAll(events);
 
@@ -181,7 +179,12 @@ public class EditorEFASynchAction
     panel.clearSelection(false);
   }
 
-  private final Logger logger = LoggerFactory.createLogger(IDE.class);
   private ModuleSubjectFactory mFactory;
   private ModuleProxyCloner mCloner;
+
+  //#########################################################################
+  //# Class Constants
+  private static final Logger logger = LoggerFactory.createLogger(IDE.class);
+  private static final long serialVersionUID = -4108158304486885027L;
+
 }
