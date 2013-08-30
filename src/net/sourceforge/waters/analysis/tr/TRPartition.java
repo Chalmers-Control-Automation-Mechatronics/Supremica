@@ -154,6 +154,36 @@ public class TRPartition
 
 
   //#########################################################################
+  //# Combining Partitions
+  /**
+   * Combines two partitions. This method computes the partition that results
+   * if a state space is first partitioned using the given <CODE>first</CODE>
+   * partition, and afterwards the result is further partitioned using the
+   * given <CODE>second partition. If either partition is <CODE>null</CODE>,
+   * the other one is returned.
+   */
+  public static TRPartition combine(final TRPartition first,
+                                    final TRPartition second)
+  {
+    if (first == null) {
+      return second;
+    } else if (second == null) {
+      return first;
+    } else if (first.mStateToClass != null && second.mStateToClass != null) {
+      return first.combineUsingStateToClass(second);
+    } else if (first.mClasses != null && second.mClasses != null) {
+      return first.combineUsingClasses(second);
+    } else if (first.mStateToClass != null) {
+      second.setUpStateToClass();
+      return first.combineUsingStateToClass(second);
+    } else {
+      second.setUpClasses();
+      return first.combineUsingClasses(second);
+    }
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private void setUpClasses()
   {
@@ -165,7 +195,7 @@ public class TRPartition
           counts[c]++;
         }
       }
-      mClasses = new ArrayList<int[]>(mNumberOfClasses);
+      mClasses = new ArrayList<>(mNumberOfClasses);
       for (int c = 0; c < mNumberOfClasses; c++) {
         final int count = counts[c];
         if (count > 0) {
@@ -202,6 +232,52 @@ public class TRPartition
         }
       }
     }
+  }
+
+  private TRPartition combineUsingClasses(final TRPartition second)
+  {
+    final int numClasses = second.getNumberOfClasses();
+    final List<int[]> classes = new ArrayList<>(numClasses);
+    for (final int[] clazz2 : second.getClasses()) {
+      if (clazz2 != null) {
+        int count = 0;
+        for (final int s2 : clazz2) {
+          final int[] clazz1 = mClasses.get(s2);
+          if (clazz1 != null) {
+            count += clazz1.length;
+          }
+        }
+        if (count > 0) {
+          final int[] clazz = new int[count];
+          int i = 0;
+          for (final int s2 : clazz2) {
+            final int[] clazz1 = mClasses.get(s2);
+            if (clazz1 != null) {
+              for (final int s1 : clazz1) {
+                clazz[i++] = s1;
+              }
+            }
+          }
+          classes.add(clazz);
+        }
+      } else {
+        classes.add(null);
+      }
+    }
+    return new TRPartition(classes, mNumberOfStates);
+  }
+
+  private TRPartition combineUsingStateToClass(final TRPartition second)
+  {
+    final int[] stateToClass = new int[mNumberOfStates];
+    for (int s = 0; s < mNumberOfStates; s++) {
+      int c = mStateToClass[s];
+      if (c >= 0) {
+        c = second.getClassCode(c);
+      }
+      stateToClass[s] = c;
+    }
+    return new TRPartition(stateToClass, second.getNumberOfClasses());
   }
 
 
