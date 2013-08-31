@@ -53,97 +53,60 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
 {
 
-  public EFAPartialEvaluator(
-   final THashMap<SimpleEFAComponent, THashSet<SimpleEFAVariable>> componentVariablesMap,
-   final SimpleEFAVariableContext varContext,
-   final CompilerOperatorTable op,
-   final ModuleProxyFactory factory)
-  {
-    mCompVarsMap = componentVariablesMap;
-    mFactory = factory;
-    mOperatorTable = op;
-    mPropagator = new ConstraintPropagator(mFactory, mOperatorTable, varContext);
-    mVarFinder = new SimpleEFAVariableFinder(mOperatorTable);
-    mVarCollector = new SimpleEFAVariableCollector(mOperatorTable, varContext);
-  }
-
-  public EFAPartialEvaluator(final Collection<SimpleEFAComponent> components,
+  public EFAPartialEvaluator(final ModuleProxyFactory factory,
+                             final CompilerOperatorTable op,
                              final SimpleEFAVariableContext varContext)
   {
-    setUp(components, varContext);
-    mFactory = ModuleElementFactory.getInstance();
-    mOperatorTable = CompilerOperatorTable.getInstance();
+    mCompVarsMap = null;
+    mFactory = factory;
+    mOperatorTable = op;
+    mVarContext = varContext;
     mPropagator = new ConstraintPropagator(mFactory, mOperatorTable, varContext);
     mVarFinder = new SimpleEFAVariableFinder(mOperatorTable);
     mVarCollector = new SimpleEFAVariableCollector(mOperatorTable, varContext);
+    mResiduals = new THashSet<>();
   }
 
-  public Collection<SimpleEFAComponent> evaluate()
+  public EFAPartialEvaluator(final SimpleEFAVariableContext varContext)
+  {
+    this(ModuleElementFactory.getInstance(), CompilerOperatorTable.getInstance(),
+         varContext);
+  }
+
+  public void init(final Collection<SimpleEFAComponent> components)
+  {
+    mResiduals.clear();
+    setUp(components);
+  }
+
+  public void init(
+   final THashMap<SimpleEFAComponent, THashSet<SimpleEFAVariable>> componentVariablesMap)
+  {
+    mResiduals.clear();
+    mCompVarsMap = componentVariablesMap;
+  }
+
+  public Collection<SimpleEFAComponent> getResidualComponents()
+  {
+    return mResiduals;
+  }
+
+  public void evaluate()
    throws EvalException, AnalysisException
   {
-    final Collection<SimpleEFAComponent> residuals =
-     new THashSet<>(mCompVarsMap.size());
     for (final SimpleEFAComponent component : mCompVarsMap.keySet()) {
-      final Collection<SimpleEFAVariable> PEVars = mCompVarsMap.get(component);
+      final THashSet<SimpleEFAVariable> PEVars = mCompVarsMap.get(component);
       if (PEVars.isEmpty()) {
         continue;
       }
       final SimpleEFAComponent pe = evaluate(component, PEVars);
       if (pe != null) {
-        residuals.add(pe);
+        mResiduals.add(pe);
       }
     }
-    return residuals;
   }
 
-  public THashMap<SimpleEFAComponent, THashSet<SimpleEFAVariable>> getComponentVariablesMap()
-  {
-    return mCompVarsMap;
-  }
-
-  //#########################################################################
-  @Override
-  public Object visitIdentifierProxy(final IdentifierProxy ident)
-  {
-    return null;
-  }
-
-  @Override
-  public BinaryExpressionProxy visitBinaryExpressionProxy(
-   final BinaryExpressionProxy expr)
-   throws VisitorException
-  {
-    final SimpleExpressionProxy lhs = expr.getLeft();
-    final SimpleExpressionProxy nlhs =
-     (SimpleExpressionProxy) lhs.acceptVisitor(this);
-    return mFactory.createBinaryExpressionProxy(expr.getOperator(),
-                                                nlhs,
-                                                expr.getRight());
-  }
-
-  @Override
-  public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
-  {
-    return expr;
-  }
-
-  @Override
-  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
-   throws VisitorException
-  {
-    final SimpleExpressionProxy subterm = expr.getSubTerm();
-    final UnaryOperator operator = expr.getOperator();
-    if (operator == mOperatorTable.getNextOperator()) {
-      return subterm;
-    }
-    final SimpleExpressionProxy result =
-     (SimpleExpressionProxy) subterm.acceptVisitor(this);
-    return mFactory.createUnaryExpressionProxy(operator, result);
-  }
-
-  private void setUp(
-   final Collection<SimpleEFAComponent> components,
-   final SimpleEFAVariableContext varContext)
+  private void setUp(final Collection<SimpleEFAComponent> components)
   {
     mCompVarsMap = new THashMap<>(components.size());
     for (final SimpleEFAComponent component : components) {
@@ -152,8 +115,8 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
         mCompVarsMap.put(component, currLocalVars);
         continue;
       }
-      for (final SimpleEFAVariable var : varContext.getVariables()) {
-        if (var.isLocal() && var.isModifiedBy(component.getIdentifier())) {
+      for (final SimpleEFAVariable var : mVarContext.getVariables()) {
+        if (var.isLocalIn(component.getIdentifier())) {
           currLocalVars.add(var);
         }
       }
@@ -163,10 +126,8 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
 
   private SimpleEFAComponent evaluate(final SimpleEFAComponent component,
                                       final Collection<SimpleEFAVariable> PEVars)
-   throws EvalException,
-          AnalysisException
+   throws EvalException, AnalysisException
   {
-
     try {
       //normalize();
       mTupleStateMap = new THashMap<>();
@@ -240,10 +201,10 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
           final List<SimpleExpressionProxy> nextValues = new ArrayList<>();
           final List<SimpleExpressionProxy> nextConditions = new ArrayList<>();
           final boolean isSatisfiable = execute(PEVars,
-                                          currValues,
-                                          currConditions,
-                                          nextValues,
-                                          nextConditions);
+                                                currValues,
+                                                currConditions,
+                                                nextValues,
+                                                nextConditions);
           if (!isSatisfiable) {
             continue;
           }
@@ -295,7 +256,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     } catch (EvalException | AnalysisException ex) {
       throw ex;
     } finally {
-      mCompVarsMap = null;
       mTupleStateMap = null;
     }
   }
@@ -505,6 +465,46 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   }
 
   //#########################################################################
+  @Override
+  public Object visitIdentifierProxy(final IdentifierProxy ident)
+  {
+    return null;
+  }
+
+  @Override
+  public BinaryExpressionProxy visitBinaryExpressionProxy(
+   final BinaryExpressionProxy expr)
+   throws VisitorException
+  {
+    final SimpleExpressionProxy lhs = expr.getLeft();
+    final SimpleExpressionProxy nlhs =
+     (SimpleExpressionProxy) lhs.acceptVisitor(this);
+    return mFactory.createBinaryExpressionProxy(expr.getOperator(),
+                                                nlhs,
+                                                expr.getRight());
+  }
+
+  @Override
+  public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+  {
+    return expr;
+  }
+
+  @Override
+  public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
+   throws VisitorException
+  {
+    final SimpleExpressionProxy subterm = expr.getSubTerm();
+    final UnaryOperator operator = expr.getOperator();
+    if (operator == mOperatorTable.getNextOperator()) {
+      return subterm;
+    }
+    final SimpleExpressionProxy result =
+     (SimpleExpressionProxy) subterm.acceptVisitor(this);
+    return mFactory.createUnaryExpressionProxy(operator, result);
+  }
+
+  //#########################################################################
   //# Inner Class tuple
   private class Tuple
   {
@@ -572,4 +572,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   private final SimpleEFAVariableCollector mVarCollector;
   private THashMap<SimpleEFAComponent, THashSet<SimpleEFAVariable>> mCompVarsMap;
   private THashMap<Tuple, Integer> mTupleStateMap;
+  private final SimpleEFAVariableContext mVarContext;
+  private Collection<SimpleEFAComponent> mResiduals;
 }
