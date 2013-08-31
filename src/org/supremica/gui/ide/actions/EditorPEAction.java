@@ -112,8 +112,11 @@ public class EditorPEAction
       }
       if (!compList.isEmpty()) {
         final EFAPartialEvaluator pe =
-         new EFAPartialEvaluator(compList, sys.getVariableContext());
-        final Collection<SimpleEFAComponent> residuals = pe.evaluate();
+          new EFAPartialEvaluator(sys.getVariableContext());
+        pe.init(compList);
+        pe.evaluate();
+        final Collection<SimpleEFAComponent> residuals =
+          pe.getResidualComponents();
         for (final SimpleEFAComponent res : residuals) {
           sys.addComponent(res);
         }
