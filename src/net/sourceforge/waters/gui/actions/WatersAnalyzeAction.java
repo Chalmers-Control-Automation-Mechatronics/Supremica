@@ -12,9 +12,10 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -70,6 +71,7 @@ public abstract class WatersAnalyzeAction
 
   //#########################################################################
   //# Interface java.awt.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent e)
   {
     @SuppressWarnings("unused")
@@ -79,6 +81,7 @@ public abstract class WatersAnalyzeAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     updateEnabledStatus();
@@ -87,6 +90,7 @@ public abstract class WatersAnalyzeAction
 
   //#########################################################################
   //# Interface org.supremica.properties.SupremicaPropertyChangeListener
+  @Override
   public void propertyChanged(final SupremicaPropertyChangeEvent event)
   {
     updateEnabledStatus();
@@ -113,7 +117,7 @@ public abstract class WatersAnalyzeAction
     throws ClassNotFoundException
   {
     final ModelVerifierFactoryLoader loader =
-      (ModelVerifierFactoryLoader) Config.GUI_ANALYZER_USED_FACTORY.get();
+      Config.GUI_ANALYZER_USED_FACTORY.get();
     return loader.getModelVerifierFactory();
   }
 
@@ -176,8 +180,7 @@ public abstract class WatersAnalyzeAction
     //# Constructor
     public AnalyzerDialog()
     {
-      setSize(DEFAULT_DIALOG_SIZE);
-      setLocation(DEFAULT_DIALOG_LOCATION);
+      setLocationAndSize();
       setVisible(true);
       setTitle(getCheckName() + " Check");
       mRunner = new AnalyzerThread();
@@ -191,6 +194,7 @@ public abstract class WatersAnalyzeAction
       mInformationLabel.setBorder(border);
       mExitButton = new JButton("Abort");
       mExitButton.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent e)
         {
           mRunner.abort();
@@ -214,6 +218,8 @@ public abstract class WatersAnalyzeAction
       mRunner.start();
     }
 
+    //#######################################################################
+    //# Buttons
     public void succeed()
     {
       final ProductDESProxy des = mVerifier.getModel();
@@ -223,6 +229,7 @@ public abstract class WatersAnalyzeAction
       mExitButton.setText("OK");
       mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
       mExitButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(final ActionEvent e)
         {
           AnalyzerDialog.this.dispose();
@@ -236,6 +243,7 @@ public abstract class WatersAnalyzeAction
       mExitButton.setText("OK");
       mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
       mExitButton.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent e)
         {
           AnalyzerDialog.this.dispose();
@@ -246,6 +254,7 @@ public abstract class WatersAnalyzeAction
       if (counterexample != null) {
         traceButton = new JButton("Show Trace");
         traceButton.addActionListener(new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent e)
           {
             AnalyzerDialog.this.dispose();
@@ -281,6 +290,7 @@ public abstract class WatersAnalyzeAction
       mExitButton.setText("OK");
       mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
       mExitButton.addActionListener(new ActionListener(){
+        @Override
         public void actionPerformed(final ActionEvent e)
         {
           AnalyzerDialog.this.dispose();
@@ -289,12 +299,23 @@ public abstract class WatersAnalyzeAction
       repaint();
     }
 
+    //#######################################################################
+    //# Auxiliary Methods
+    private void setLocationAndSize()
+    {
+      final Rectangle bounds = getIDE().getBounds();
+      final int x = bounds.x + (bounds.width - DEFAULT_DIALOG_SIZE.width) / 2;
+      final int y = bounds.y + (bounds.height - DEFAULT_DIALOG_SIZE.height) / 2;
+      setLocation(x, y);
+      setSize(DEFAULT_DIALOG_SIZE);
+    }
 
     //#######################################################################
     //# Inner Class AnalyzerThread
     private class AnalyzerThread extends Thread
     {
 
+      @Override
       public void run()
       {
         super.run();
@@ -305,22 +326,26 @@ public abstract class WatersAnalyzeAction
           return;
         } catch (final AnalysisException exception) {
           SwingUtilities.invokeLater
-            (new Runnable() {public void run() {error(exception);}});
+            (new Runnable() {@Override
+            public void run() {error(exception);}});
           return;
         } catch (final OutOfMemoryError error) {
           mVerifier = null;
           System.gc();
           SwingUtilities.invokeLater
-            (new Runnable() {public void run() {error(error);}});
+            (new Runnable() {@Override
+            public void run() {error(error);}});
           return;
         }
         final boolean result = mVerifier.isSatisfied();
         if (result) {
           SwingUtilities.invokeLater
-            (new Runnable() {public void run() {succeed();}});
+            (new Runnable() {@Override
+            public void run() {succeed();}});
         } else {
           SwingUtilities.invokeLater
-            (new Runnable() {public void run() {fail();}});
+            (new Runnable() {@Override
+            public void run() {fail();}});
         }
       }
 
@@ -364,6 +389,7 @@ public abstract class WatersAnalyzeAction
 
     //#######################################################################
     //# Overrides for javax.swing.JLabel
+    @Override
     public void setText(final String e)
     {
       super.setText(wrapInHTML(e));
@@ -381,6 +407,5 @@ public abstract class WatersAnalyzeAction
   private static final long serialVersionUID = -3797986885054648213L;
 
   private static final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 160);
-  private static final Point DEFAULT_DIALOG_LOCATION = new Point(250, 150);
 
 }
