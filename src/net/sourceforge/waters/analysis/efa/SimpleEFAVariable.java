@@ -129,13 +129,31 @@ public class SimpleEFAVariable
   /**
    * Return whether this variable is local.
    * <p/>
-   * @return <CODE>true</CODE> if the variable modifies in at most one EFA
+   * @return <CODE>true</CODE> if the variable is modifies by at most one
    *         component but may visit (appears in guards) by others.
    */
   @Override
   public boolean isLocal()
   {
     return mModifiers.size() <= 1;
+  }
+
+  /**
+   * Return whether this variable is local.
+   * <p/>
+   * @param component
+   * <p/>
+   * @return <CODE>true</CODE> if the variable is only modified by this
+   *         component but may visit (appears in guards) by others or it does
+   *         not have any modifier and only checked here.
+   */
+  public boolean isLocalIn(IdentifierProxy component)
+  {
+    if ((mModifiers.size() == 1 && mModifiers.contains(component))
+     || (mModifiers.isEmpty() && mVisitors.contains(component))) {
+      return true;
+    }
+    return false;
   }
 
   public VariableComponentProxy getVariableComponent(final ModuleProxyFactory factory)
