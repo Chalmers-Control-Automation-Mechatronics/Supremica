@@ -13,8 +13,6 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +27,7 @@ import net.sourceforge.waters.analysis.abstraction.SynthesisObservationEquivalen
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -147,7 +146,6 @@ public class AutomataSynthesisAbstractionProcedure extends
     try {
       final EventEncoding mergedEnc = createEventEncoding(aut, local, true);
       final StateEncoding inputStateEnc = createStateEncoding(aut);
-      final int numStates = inputStateEnc.getNumberOfStates();
       final int inputConfig = mChain.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, mergedEnc,
@@ -157,9 +155,8 @@ public class AutomataSynthesisAbstractionProcedure extends
       mChain.setTransitionRelation(rel);
       if (mChain.run()) {
         rel = mChain.getTransitionRelation();
-        final List<int[]> partition = mChain.getResultPartition();
+        final TRPartition partition = mChain.getResultPartition();
         final EventEncoding originalEnc;
-        int[] invPartition = null;
         // 1. Check if the abstraction is deterministic
         boolean det = true;
         if (!mUsingRenaming) {
@@ -168,17 +165,14 @@ public class AutomataSynthesisAbstractionProcedure extends
             rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
             if (!rel.isDeterministic()) {
               det = false;
-              invPartition = createInversePartition(partition, numStates);
             }
           }
           originalEnc = mergedEnc;
         } else {
           // Otherwise try to build the unrenamed abstraction
           originalEnc = createEventEncoding(aut, local, false);
-          invPartition = createInversePartition(partition, numStates);
           final ListBufferTransitionRelation mergedTR =
-            createMergedAbstraction(aut, originalEnc, inputStateEnc,
-                                    partition, invPartition);
+            createMergedAbstraction(aut, originalEnc, inputStateEnc, partition);
           if (mergedTR == null) {
             det = false;
           } else {
@@ -202,17 +196,17 @@ public class AutomataSynthesisAbstractionProcedure extends
             createPseudoSupervisorTR(aut, originalEnc, inputStateEnc, inputStateEnc,
                                      partition, absMode, outputConfig);
           final Map<EventProxy,List<EventProxy>> renaming =
-            findEventRenaming(before, originalEnc, partition, invPartition);
+            findEventRenaming(before, originalEnc, partition);
           final EventEncoding renamedEnc =
             createRenamedEventEncoding(originalEnc, renaming);
           final AutomatonProxy abstraction =
             createRenamedAbstraction(before, originalEnc, renamedEnc, renaming,
-                                     partition, invPartition);
+                                     partition);
           step = new SynthesisAbstractionStep
             (synthesizer, abstraction, aut, renaming, originalEnc);
           final AutomatonProxy distinguisher =
             createDistinguisher(before, originalEnc, renaming,
-                                inputStateEnc, partition, invPartition);
+                                inputStateEnc, partition);
           synthesizer.recordDistinuisherInfo(renaming, distinguisher);
           synthesizer.reportAbstractionResult(abstraction, distinguisher);
         }
@@ -353,12 +347,12 @@ public class AutomataSynthesisAbstractionProcedure extends
     return encoding;
   }
 
-  private boolean isMergingPartition(final List<int[]> partition)
+  private boolean isMergingPartition(final TRPartition partition)
   {
     if (partition == null) {
       return false;
     } else {
-      for (final int[] clazz : partition) {
+      for (final int[] clazz : partition.getClasses()) {
         if (clazz != null && clazz.length > 1) {
           return true;
         }
@@ -367,32 +361,14 @@ public class AutomataSynthesisAbstractionProcedure extends
     }
   }
 
-  private int[] createInversePartition(final List<int[]> partition,
-                                       final int numStates)
+  private int findDumpState(final TRPartition partition)
   {
-    final int[] invPartition = new int[numStates];
-    Arrays.fill(invPartition, -1);
-    int code = 0;
-    for (final int[] clazz : partition) {
-      if (clazz != null) {
-        for (final int state : clazz) {
-          invPartition[state] = code;
-        }
-      }
-      code++;
-    }
-    return invPartition;
-  }
-
-  private int findDumpState(final List<int[]> partition,
-                            final int[] invPartition)
-  {
-    final int numClasses = partition.size();
-    int dump = partition.indexOf(null);
+    int dump = partition.getClasses().indexOf(null);
     if (dump < 0) {
-      for (int s = 0; s < invPartition.length; s++) {
-        if (invPartition[s] < 0) {
-          dump = numClasses;
+      final int numStates = partition.getNumberOfStates();
+      for (int s = 0; s < numStates; s++) {
+        if (partition.getClassCode(s) < 0) {
+          dump = partition.getNumberOfClasses();
           break;
         }
       }
@@ -404,77 +380,77 @@ public class AutomataSynthesisAbstractionProcedure extends
     (final AutomatonProxy aut,
      final EventEncoding eventEnc,
      final StateEncoding inputStateEnc,
-     final List<int[]> partition,
-     final int[] invPartition)
+     final TRPartition partition)
     throws OverflowException
   {
     final String name = aut.getName();
     final ComponentKind  kind = aut.getKind();
-    final int numClasses = partition.size();
-    final int dump = findDumpState(partition, invPartition);
+    final int numClasses = partition.getNumberOfClasses();
+    final int dump = findDumpState(partition);
     final int numStates = dump == numClasses ? numClasses + 1 : numClasses;
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     final ListBufferTransitionRelation mergedTR =
       new ListBufferTransitionRelation(name, kind, eventEnc, numStates, config);
-    final TransitionIterator iter = mergedTR.createSuccessorsReadOnlyIterator();
-    final KindTranslator translator = getKindTranslator();
-    for (final TransitionProxy trans : aut.getTransitions()) {
-      final StateProxy source = trans.getSource();
-      final int s = invPartition[inputStateEnc.getStateCode(source)];
-      if (s < 0) {
-        continue;
-      }
-      final EventProxy event = trans.getEvent();
-      final int e = eventEnc.getEventCode(event);
-      final StateProxy target = trans.getTarget();
-      int t = invPartition[inputStateEnc.getStateCode(target)];
-      if (t < 0) {
-        t = dump;
-      }
-      iter.reset(s, e);
-      if (iter.advance()) {
-        if (iter.getCurrentTargetState() != t) {
-          return null;
+    if (!partition.isEmpty()) {
+      final TransitionIterator iter = mergedTR.createSuccessorsReadOnlyIterator();
+      final KindTranslator translator = getKindTranslator();
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        final StateProxy source = trans.getSource();
+        final int s = partition.getClassCode(inputStateEnc.getStateCode(source));
+        if (s < 0) {
+          continue;
         }
-      } else if (t != dump ||
-                 translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
-        mergedTR.addTransition(s, e, t);
-      }
-    }
-    final EventProxy defaultMarking = getUsedDefaultMarking();
-    final int defaultMarkingID = eventEnc.getEventCode(defaultMarking);
-    for (int c = 0; c < numClasses; c++) {
-      final int[] clazz = partition.get(c);
-      if (clazz != null) {
-        for (final int s : clazz) {
-          final StateProxy state = inputStateEnc.getState(s);
-          if (state.isInitial()) {
-            mergedTR.setInitial(c, true);
-            break;
+        final EventProxy event = trans.getEvent();
+        final int e = eventEnc.getEventCode(event);
+        final StateProxy target = trans.getTarget();
+        int t = partition.getClassCode(inputStateEnc.getStateCode(target));
+        if (t < 0) {
+          t = dump;
+        }
+        iter.reset(s, e);
+        if (iter.advance()) {
+          if (iter.getCurrentTargetState() != t) {
+            return null;
           }
+        } else if (t != dump ||
+          translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
+          mergedTR.addTransition(s, e, t);
         }
-        if (defaultMarkingID >= 0) {
+      }
+      final EventProxy defaultMarking = getUsedDefaultMarking();
+      final int defaultMarkingID = eventEnc.getEventCode(defaultMarking);
+      for (int c = 0; c < numClasses; c++) {
+        final int[] clazz = partition.getStates(c);
+        if (clazz != null) {
           for (final int s : clazz) {
             final StateProxy state = inputStateEnc.getState(s);
-            if (state.getPropositions().contains(defaultMarking)) {
-              mergedTR.setMarked(c, defaultMarkingID, true);
+            if (state.isInitial()) {
+              mergedTR.setInitial(c, true);
               break;
+            }
+          }
+          if (defaultMarkingID >= 0) {
+            for (final int s : clazz) {
+              final StateProxy state = inputStateEnc.getState(s);
+              if (state.getPropositions().contains(defaultMarking)) {
+                mergedTR.setMarked(c, defaultMarkingID, true);
+                break;
+              }
             }
           }
         }
       }
+      mergedTR.removeProperSelfLoopEvents(defaultMarkingID);
+      mergedTR.removeRedundantPropositions();
+      mergedTR.checkReachability();
     }
-    mergedTR.removeProperSelfLoopEvents(defaultMarkingID);
-    mergedTR.removeRedundantPropositions();
-    mergedTR.checkReachability();
     return mergedTR;
   }
 
   private Map<EventProxy,List<EventProxy>> findEventRenaming
     (final ListBufferTransitionRelation before,
      final EventEncoding eventEnc,
-     final List<int[]> partition,
-     final int[] invPartition)
+     final TRPartition partition)
   {
     final ProductDESProxyFactory factory = getFactory();
     final int numEvents = eventEnc.getNumberOfProperEvents();
@@ -486,14 +462,14 @@ public class AutomataSynthesisAbstractionProcedure extends
       final byte status = before.getProperEventStatus(e);
       if (EventEncoding.isUsedEvent(status)) {
         int maxCount = 0;
-        for (final int[] clazz : partition) {
+        for (final int[] clazz : partition.getClasses()) {
           if (clazz != null) {
             final TIntHashSet successors = new TIntHashSet();
             for (final int s : clazz) {
               iter.reset(s, e);
               while (iter.advance()) {
                 final int target = iter.getCurrentTargetState();
-                final int targetClass = invPartition[target];
+                final int targetClass = partition.getClassCode(target);
                 successors.add(targetClass);
               }
             }
@@ -555,7 +531,7 @@ public class AutomataSynthesisAbstractionProcedure extends
      final EventEncoding eventEnc,
      final StateEncoding inputStateEnc,
      final StateEncoding outputStateEnc,
-     final List<int[]> partition,
+     final TRPartition partition,
      final HalfWaySynthesisTRSimplifier.OutputMode mode,
      final int config)
     throws OverflowException
@@ -581,14 +557,13 @@ public class AutomataSynthesisAbstractionProcedure extends
     (final AutomatonProxy aut,
      final EventEncoding eventEnc,
      final StateEncoding stateEnc,
-     final List<int[]> partition,
+     final TRPartition partition,
      final HalfWaySynthesisTRSimplifier.OutputMode mode)
     throws OverflowException
   {
     // 1. Find bad states. Are there any?
     final int numStates = stateEnc.getNumberOfStates();
-    final BitSet safeStates = getSafeStates(partition, numStates);
-    final int numSafeStates = safeStates.cardinality();
+    final int numSafeStates = partition.getNumberOfAssignedStates();
     if (numSafeStates == numStates) {
       return aut;
     }
@@ -600,13 +575,13 @@ public class AutomataSynthesisAbstractionProcedure extends
     for (final TransitionProxy trans : transitions) {
       final StateProxy target = trans.getTarget();
       final int t = stateEnc.getStateCode(target);
-      if (!safeStates.get(t)) {
+      if (partition.getClassCode(t) < 0) {
         final EventProxy event = trans.getEvent();
         final EventKind kind = translator.getEventKind(event);
         if (mode.isRetainedEvent(kind)) {
           final StateProxy source = trans.getSource();
           final int s = stateEnc.getStateCode(source);
-          if (safeStates.get(s)) {
+          if (partition.getClassCode(s) >= 0) {
             disabling = true;
             break;
           }
@@ -625,7 +600,7 @@ public class AutomataSynthesisAbstractionProcedure extends
     StateProxy dumpState = null;
     for (int s = 0; s < numStates; s++) {
       final StateProxy state = stateEnc.getState(s);
-      if (safeStates.get(s)) {
+      if (partition.getClassCode(s) >= 0) {
         supervisorStates.add(state);
       } else if (dumpState == null &&
                  !state.getPropositions().contains(defaultMarking)) {
@@ -641,7 +616,7 @@ public class AutomataSynthesisAbstractionProcedure extends
     for (final TransitionProxy trans : transitions) {
       final StateProxy source = trans.getSource();
       final int s = stateEnc.getStateCode(source);
-      if (safeStates.get(s)) {
+      if (partition.getClassCode(s) >= 0) {
         final EventProxy event = trans.getEvent();
         final int e = eventEnc.getEventCode(event);
         if (source != trans.getTarget()) {
@@ -678,7 +653,7 @@ public class AutomataSynthesisAbstractionProcedure extends
     for (final TransitionProxy trans : transitions) {
       final StateProxy source = trans.getSource();
       final int s = stateEnc.getStateCode(source);
-      if (!safeStates.get(s)) {
+      if (partition.getClassCode(s) < 0) {
         continue;
       }
       final EventProxy event = trans.getEvent();
@@ -689,7 +664,7 @@ public class AutomataSynthesisAbstractionProcedure extends
       final EventKind kind = translator.getEventKind(event);
       final StateProxy target = trans.getTarget();
       final int t = stateEnc.getStateCode(target);
-      if (safeStates.get(t)) {
+      if (partition.getClassCode(t) >= 0) {
         supervisorTransitions.add(trans);
       } else if (mode.isRetainedEvent(kind)) {
         if (target == dumpState) {
@@ -716,8 +691,7 @@ public class AutomataSynthesisAbstractionProcedure extends
      final EventEncoding originalEnc,
      final Map<EventProxy,List<EventProxy>> renaming,
      final StateEncoding stateEnc,
-     final List<int[]> partition,
-     final int[] invPartition)
+     final TRPartition partition)
   {
     // 1. Create events --- renamed
     final int numEvents = originalEnc.getNumberOfProperEvents();
@@ -725,12 +699,11 @@ public class AutomataSynthesisAbstractionProcedure extends
 
     // 2. Create states --- no dump states in distinguisher
     final int numStates = stateEnc.getNumberOfStates();
-    final BitSet safeStates = getSafeStates(partition, numStates);
-    final int numSafeStates = safeStates.cardinality();
+    final int numSafeStates = partition.getNumberOfAssignedStates();
     final List<StateProxy> states = new ArrayList<StateProxy>(numSafeStates);
     for (int s = 0; s < numStates; s++) {
       final StateProxy state = stateEnc.getState(s);
-      if (safeStates.get(s)) {
+      if (partition.getClassCode(s) >= 0) {
         states.add(state);
       }
     }
@@ -747,7 +720,7 @@ public class AutomataSynthesisAbstractionProcedure extends
       if (replacements == null) {
         replacements = Collections.singletonList(event);
       }
-      for (final int[] clazz : partition) {
+      for (final int[] clazz : partition.getClasses()) {
         if (clazz != null) {
           final TIntObjectHashMap<EventProxy> replacementMap =
             new TIntObjectHashMap<EventProxy>();
@@ -756,13 +729,13 @@ public class AutomataSynthesisAbstractionProcedure extends
             iter.reset(s, e);
             if (iter.advance()) {
               final int t = iter.getCurrentTargetState();
-              final int c = invPartition[t];
+              final int c = partition.getClassCode(t);
               EventProxy replacement = replacementMap.get(c);
               if (replacement == null) {
                 replacement = replacements.get(r++);
                 replacementMap.put(c, replacement);
               }
-              if (safeStates.get(t)) {
+              if (partition.getClassCode(t) >= 0) {
                 final StateProxy source = stateEnc.getState(s);
                 final StateProxy target = stateEnc.getState(t);
                 final TransitionProxy trans =
@@ -786,15 +759,14 @@ public class AutomataSynthesisAbstractionProcedure extends
      final EventEncoding originalEnc,
      final EventEncoding renamedEnc,
      final Map<EventProxy,List<EventProxy>> renaming,
-     final List<int[]> partition,
-     final int[] invPartition)
+     final TRPartition partition)
     throws OverflowException
   {
     // 1. Initialise transition relation for output
     final String name = before.getName();
     final ComponentKind kind = before.getKind();
-    final int numClasses = partition.size();
-    final int dump = findDumpState(partition, invPartition);
+    final int numClasses = partition.getNumberOfClasses();
+    final int dump = findDumpState(partition);
     final int numStates = dump == numClasses ? numClasses + 1 : numClasses;
     final ListBufferTransitionRelation after =
       new ListBufferTransitionRelation(name, kind, renamedEnc, numStates,
@@ -804,7 +776,7 @@ public class AutomataSynthesisAbstractionProcedure extends
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultMarkingID = renamedEnc.getEventCode(defaultMarking);
     for (int c = 0; c < numClasses; c++) {
-      final int[] clazz = partition.get(c);
+      final int[] clazz = partition.getStates(c);
       if (clazz != null) {
         for (final int s : clazz) {
           if (before.isInitial(s)) {
@@ -844,7 +816,7 @@ public class AutomataSynthesisAbstractionProcedure extends
         }
       }
       for (int sc = 0; sc < numClasses; sc++) {
-        final int[] clazz = partition.get(sc);
+        final int[] clazz = partition.getStates(sc);
         if (clazz != null) {
           final TIntHashSet targetClasses = new TIntHashSet();
           int ri = 0;
@@ -852,7 +824,7 @@ public class AutomataSynthesisAbstractionProcedure extends
             iter.reset(s, e);
             if (iter.advance()) {
               final int t = iter.getCurrentTargetState();
-              int tc = invPartition[t];
+              int tc = partition.getClassCode(t);
               if (tc < 0) {
                 tc = dump;
               }
@@ -907,19 +879,6 @@ public class AutomataSynthesisAbstractionProcedure extends
       }
     }
     return events;
-  }
-
-  static BitSet getSafeStates(final List<int[]> partition, final int numStates)
-  {
-    final BitSet safeStates = new BitSet(numStates);
-    for (final int[] clazz : partition) {
-      if (clazz != null) {
-        for (final int s : clazz) {
-          safeStates.set(s);
-        }
-      }
-    }
-    return safeStates;
   }
 
 

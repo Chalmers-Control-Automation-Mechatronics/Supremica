@@ -16,6 +16,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
@@ -191,12 +192,12 @@ public class NonAlphaDeterminisationTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.reverse();
     mBisimulator.setTransitionRelation(rel);
-    List<int[]> partition = createInitialPartition();
+    TRPartition partition = createInitialPartition();
     mBisimulator.setUpInitialPartition(partition);
     mBisimulator.refinePartitionBasedOnInitialStates();
     final boolean modified = mBisimulator.run();
     partition = mBisimulator.getResultPartition();
-    setResultPartitionList(partition);
+    setResultPartition(partition);
     applyResultPartitionAutomatically();
     rel.reverse();
     if (modified && getAppliesPartitionAutomatically() &&
@@ -252,9 +253,8 @@ public class NonAlphaDeterminisationTRSimplifier
    * Creates an initial partition. This includes a separate equivalence class
    * for every state marked alpha, and an equivalence class which contains all
    * the remaining states.
-   * @return A list containing int[] representing equivalence classes.
    */
-  private List<int[]> createInitialPartition()
+  private TRPartition createInitialPartition()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
@@ -275,7 +275,7 @@ public class NonAlphaDeterminisationTRSimplifier
     assert remainingStates.size() > 1;
     final int[] remainingStatesArray = remainingStates.toArray();
     initialPartition.add(remainingStatesArray);
-    return initialPartition;
+    return new TRPartition(initialPartition, numStates);
   }
 
   private boolean isAlphaMarked(final int state)

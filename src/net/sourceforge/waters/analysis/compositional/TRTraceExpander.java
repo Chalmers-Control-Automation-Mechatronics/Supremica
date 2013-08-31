@@ -27,6 +27,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -61,7 +62,7 @@ public abstract class TRTraceExpander
                             final AutomatonProxy resultAut,
                             final StateEncoding resultStateEnc,
                             final AutomatonProxy originalAut,
-                            final List<int[]> partition)
+                            final TRPartition partition)
     throws AnalysisException
   {
     this(verifier, tau, null,
@@ -75,7 +76,7 @@ public abstract class TRTraceExpander
                             final StateEncoding resultStateEnc,
                             final AutomatonProxy originalAut,
                             final StateEncoding originalStateEnc,
-                            final List<int[]> partition,
+                            final TRPartition partition,
                             final boolean preconditionMarkingReduced)
     throws AnalysisException
   {
@@ -93,7 +94,7 @@ public abstract class TRTraceExpander
                           final StateEncoding resultStateEnc,
                           final AutomatonProxy originalAut,
                           final StateEncoding originalStateEnc,
-                          final List<int[]> partition,
+                          final TRPartition partition,
                           final boolean preconditionMarkingReduced)
     throws AnalysisException
   {
@@ -314,7 +315,7 @@ public abstract class TRTraceExpander
       mTargetSet = new TIntHashSet(1);
       mTargetSet.add(targetClass);
     } else {
-      final int[] targetArray = mPartition.get(targetClass);
+      final int[] targetArray = mPartition.getStates(targetClass);
       mTargetSet = new TIntHashSet(targetArray);
     }
   }
@@ -502,7 +503,7 @@ public abstract class TRTraceExpander
       chain.run();
       rel = chain.getTransitionRelation();
       final int numStates = rel.getNumberOfStates();
-      final List<int[]> partition = chain.getResultPartition();
+      final TRPartition partition = chain.getResultPartition();
       if (partition == null) {
         for (int state = 0; state < numStates; state++) {
           if (!rel.isMarked(state, mPreconditionMarkingID)) {
@@ -513,7 +514,7 @@ public abstract class TRTraceExpander
       } else {
         for (int state = 0; state < numStates; state++) {
           if (!rel.isMarked(state, mPreconditionMarkingID)) {
-            for (final int member : partition.get(state)) {
+            for (final int member : partition.getStates(state)) {
               mTransitionRelation.setMarked(member, mPreconditionMarkingID,
                                             false);
             }
@@ -663,7 +664,7 @@ public abstract class TRTraceExpander
    */
   private final StateEncoding mOriginalStateEncoding;
 
-  private final List<int[]> mPartition;
+  private final TRPartition mPartition;
 
   /**
    * Transition relation that was simplified.

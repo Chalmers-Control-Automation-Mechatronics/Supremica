@@ -20,6 +20,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -127,12 +128,12 @@ public class TauLoopRemovalTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (modified || !mToBeMerged.isEmpty()) {
       final int numStates = rel.getNumberOfStates();
-      List<int[]> partition = new ArrayList<int[]>(numStates);
+      List<int[]> classes = new ArrayList<int[]>(numStates);
       final BitSet merged = new BitSet(numStates);
       for (final TIntArrayList merge : mToBeMerged) {
         checkAbort();
         final int[] array = merge.toArray();
-        partition.add(array);
+        classes.add(array);
         modified |= array.length > 1;
         for (final int s : array) {
           merged.set(s);
@@ -144,13 +145,14 @@ public class TauLoopRemovalTRSimplifier
             checkAbort();
             final int[] array = new int[1];
             array[0] = s;
-            partition.add(array);
+            classes.add(array);
           }
         }
-        setResultPartitionList(partition);
+        final TRPartition partition = new TRPartition(classes, numStates);
+        setResultPartition(partition);
         applyResultPartitionAutomatically();
       } else {
-        partition = null;
+        classes = null;
       }
     }
     return modified;

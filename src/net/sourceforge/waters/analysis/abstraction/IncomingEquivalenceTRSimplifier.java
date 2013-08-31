@@ -23,6 +23,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersIntHashingStrategy;
@@ -185,10 +186,10 @@ public class IncomingEquivalenceTRSimplifier
     } while (change);
 
     if (trivial) {
-      setResultPartitionList(null);
+      setResultPartition(null);
       return false;
     } else {
-      final List<int[]> partition = new ArrayList<int[]>();
+      final List<int[]> classes = new ArrayList<>();
       final int[] codes = new int[numStates];
       final int[] offsets = new int[numStates];
       for (int state = 0; state < numStates; state++) {
@@ -199,18 +200,19 @@ public class IncomingEquivalenceTRSimplifier
             final int size = info.size();
             final int[] clazz = new int[size];
             clazz[0] = root;
-            codes[root] = partition.size();
+            codes[root] = classes.size();
             offsets[root] = 1;
-            partition.add(clazz);
+            classes.add(clazz);
           } else {
             final int code = codes[root];
-            final int[] clazz = partition.get(code);
+            final int[] clazz = classes.get(code);
             final int offset = offsets[root]++;
             clazz[offset] = state;
           }
         }
       }
-      setResultPartitionList(partition);
+      final TRPartition partition = new TRPartition(classes, numStates);
+      setResultPartition(partition);
       applyResultPartitionAutomatically();
       return true;
     }

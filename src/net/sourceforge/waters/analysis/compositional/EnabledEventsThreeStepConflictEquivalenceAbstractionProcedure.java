@@ -30,6 +30,7 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -267,7 +268,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       final int numMarkings = rel.getNumberOfMarkings();
       AutomatonProxy lastAut = aut;
       StateEncoding lastStateEnc = inputStateEnc;
-      List<int[]> partition = null;
+      TRPartition partition = null;
       boolean oeq = true;
       boolean reduced = false;
       AbstractionStep preStep = null;
@@ -299,9 +300,9 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
               (analyzer, mLimitedCertainConflictsSimplifier, outputAut,
                lastAut, tau, lastStateEnc, outputStateEnc);
           } else {
-            final List<int[]> ccPart =
+            final TRPartition ccPart =
               mLimitedCertainConflictsSimplifier.getResultPartition();
-            partition = ChainTRSimplifier.mergePartitions(partition, ccPart);
+            partition = TRPartition.combine(partition, ccPart);
             preStep = createStep(aut, inputStateEnc,
                                  outputAut, outputStateEnc, tau,
                                  partition, oeq, false);
@@ -319,22 +320,18 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           final StateEncoding outputStateEnc = new StateEncoding();
           final AutomatonProxy outputAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          if (mEnabledEventsLimitedCertainConflictsSimplifier.hasCertainConflictTransitions() || lccStep !=null)
-          {
-          eelccStep = new LimitedCertainConflictsStep                       //Give this lots of info
-            (analyzer, mEnabledEventsLimitedCertainConflictsSimplifier, outputAut,     //this creates the trace expander, so will get it this info
-             lastAut, tau, lastStateEnc, outputStateEnc, eventEnc, numEnabledEvents);
-          //System.out.println(numEnabledEvents);
-          }
-          else
-          {
-            final List<int[]> ccPart =
+          if (mEnabledEventsLimitedCertainConflictsSimplifier.hasCertainConflictTransitions() || lccStep != null) {
+            eelccStep = new LimitedCertainConflictsStep                       //Give this lots of info
+              (analyzer, mEnabledEventsLimitedCertainConflictsSimplifier, outputAut,     //this creates the trace expander, so will get it this info
+               lastAut, tau, lastStateEnc, outputStateEnc, eventEnc, numEnabledEvents);
+            //System.out.println(numEnabledEvents);
+          } else {
+            final TRPartition ccPart =
               mEnabledEventsLimitedCertainConflictsSimplifier.getResultPartition();
-            partition = ChainTRSimplifier.mergePartitions(partition, ccPart);
+            partition = TRPartition.combine(partition, ccPart);
             preStep = createStep(aut, inputStateEnc,
                                  outputAut, outputStateEnc, tau,
                                  partition, oeq, false);
-
           }
           lastAut = outputAut;
           lastStateEnc = outputStateEnc;
@@ -351,8 +348,8 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         } else if (lccStep == null && eelccStep == null) {
           lastAut = aut;
           lastStateEnc = inputStateEnc;
-          final List<int[]> postPart = mPostChain.getResultPartition();
-          partition = ChainTRSimplifier.mergePartitions(partition, postPart);
+          final TRPartition postPart = mPostChain.getResultPartition();
+          partition = TRPartition.combine(partition, postPart);
           oeq &= mPostChain.isObservationEquivalentAbstraction();
         } else {
           recordStep(steps, preStep);
@@ -438,7 +435,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
                                      final AutomatonProxy output,
                                      final StateEncoding outputStateEnc,
                                      final EventProxy tau,
-                                     final List<int[]> partition,
+                                     final TRPartition partition,
                                      final boolean oeq,
                                      final boolean reduced)
   {

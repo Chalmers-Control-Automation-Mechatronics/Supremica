@@ -24,6 +24,7 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -154,7 +155,7 @@ public class IsomorphismChecker
         throw new IsomorphismException
           ("Bisimulator did not identify any states!");
       }
-      final List<int[]> partition = bisimulator.getResultPartition();
+      final TRPartition partition = bisimulator.getResultPartition();
       checkIsomorphismPartition(partition, rel, stateEnc);
     }
   }
@@ -195,7 +196,7 @@ public class IsomorphismChecker
           return false;
         }
       }
-      final List<int[]> partition = bisimulator.getResultPartition();
+      final TRPartition partition = bisimulator.getResultPartition();
       if (!checkBisimulationPartition(partition, rel, stateEnc)) {
         return false;
       }
@@ -235,7 +236,7 @@ public class IsomorphismChecker
         throw new IsomorphismException
           ("Bisimulator did not identify any states!");
       }
-      final List<int[]> partition = bisimulator.getResultPartition();
+      final TRPartition partition = bisimulator.getResultPartition();
       checkBisimulationPartition(partition, rel, stateEnc);
     }
   }
@@ -478,7 +479,7 @@ public class IsomorphismChecker
     return list;
   }
 
-  private void checkIsomorphismPartition(final List<int[]> partition,
+  private void checkIsomorphismPartition(final TRPartition partition,
                                          final ListBufferTransitionRelation rel,
                                          final StateEncoding enc)
     throws IsomorphismException
@@ -487,7 +488,7 @@ public class IsomorphismChecker
     // transitions for each state.
     final int[] count = new int[2];
     final int[] initCount = new int[2];
-    for (final int[] clazz : partition) {
+    for (final int[] clazz : partition.getClasses()) {
       Arrays.fill(count, 0);
       Arrays.fill(initCount, 0);
       for (int i = 0; i < clazz.length; i++) {
@@ -510,14 +511,14 @@ public class IsomorphismChecker
   }
 
   private boolean checkBisimulationPartition
-    (final List<int[]> partition,
+    (final TRPartition partition,
      final ListBufferTransitionRelation rel,
      final StateEncoding enc)
     throws IsomorphismException
   {
     final boolean[] count = new boolean[2];
     final boolean[] initCount = new boolean[2];
-    for (final int[] clazz : partition) {
+    for (final int[] clazz : partition.getClasses()) {
       Arrays.fill(count, false);
       Arrays.fill(initCount, false);
       for (int i = 0; i < clazz.length; i++) {

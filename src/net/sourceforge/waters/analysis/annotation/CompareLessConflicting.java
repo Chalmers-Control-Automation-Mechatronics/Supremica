@@ -27,6 +27,7 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.gnonblocking.FindBlockingStates;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -539,12 +540,14 @@ public class CompareLessConflicting
       }
       System.out.println("same:" + group.size());
     }
-    final List<int[]> partitions = new ArrayList<int[]>();
+    final List<int[]> classes = new ArrayList<>();
     System.out.println(aut.getNumberOfStates() + "vs" + values.size());
     for (final TIntArrayList list : values) {
-      partitions.add(list.toArray());
+      classes.add(list.toArray());
     }
-    aut.merge(partitions);
+    final TRPartition partition =
+      new TRPartition(classes, aut.getNumberOfStates());
+    aut.merge(partition);
     return aut;
   }
 

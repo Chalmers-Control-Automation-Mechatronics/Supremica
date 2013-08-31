@@ -13,9 +13,9 @@
 package net.sourceforge.waters.analysis.efsm;
 import java.io.PrintWriter;
 import java.util.Formatter;
-import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.base.ProxyTools;
 
@@ -233,12 +233,12 @@ public class EFSMSimplifierStatistics
     }
   }
 
-  public void recordFinish(final EFSMVariable var, final List<int[]> partition)
+  public void recordFinish(final EFSMVariable var, final TRPartition partition)
   {
     if (partition != null) {
       mReductionCount++;
       if (mOutputStates >= 0) {
-        mOutputStates += partition.size();
+        mOutputStates += partition.getNumberOfClasses();
       }
 
     } else {

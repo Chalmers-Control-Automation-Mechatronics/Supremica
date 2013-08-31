@@ -22,6 +22,7 @@ import net.sourceforge.waters.analysis.abstraction.SynthesisTransitionRemovalTRS
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -210,7 +211,7 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
   {
     final AbstractCompositionalModelAnalyzer analyzer = getAnalyzer();
     final TransitionRelationSimplifier simplifier = getSimplifier();
-    final List<int[]> partition = simplifier.getResultPartition();
+    final TRPartition partition = simplifier.getResultPartition();
     return new MergeStep(analyzer, output, input, tau, inputStateEnc,
                          partition, false, outputStateEnc);
   }

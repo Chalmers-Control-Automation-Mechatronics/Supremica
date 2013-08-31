@@ -39,6 +39,7 @@ import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersLongHashingStrategy;
 import net.sourceforge.waters.analysis.tr.WatersLongIntHashMap;
@@ -1037,7 +1038,7 @@ public class OPSearchAutomatonSimplifier
     simp.setAppliesPartitionAutomatically(false);
     final boolean change = simp.run();
     if (force || change) {
-      final List<int[]> partition = simp.getResultPartition();
+      final TRPartition partition = simp.getResultPartition();
       return createOutputAutomaton(rel, partition);
     } else {
       return setAutomatonResult(mInputAutomaton);
@@ -1199,27 +1200,24 @@ public class OPSearchAutomatonSimplifier
   }
 
   private boolean createOutputAutomaton(final ListBufferTransitionRelation rel,
-                                        final List<int[]> partition)
+                                        final TRPartition partition)
     throws AnalysisException
   {
     // 1. Establish class map
     final int numInputStates = rel.getNumberOfStates();
-    final int[] classMap = new int[numInputStates];
     final int numClasses;
+    final int[] classMap;
     int[] current = null;
     if (partition == null) {
       numClasses = numInputStates;
+      classMap = new int[numInputStates];
       for (int c = 0; c < numClasses; c++) {
         classMap[c] = c;
       }
       current = new int[1];
     } else {
-      numClasses = partition.size();
-      for (int c = 0; c < numClasses; c++) {
-        for (final int s : partition.get(c)) {
-          classMap[s] = c;
-        }
-      }
+      numClasses = partition.getNumberOfClasses();
+      classMap = partition.getStateToClass();
     }
 
     // 2. Find degree of nondeterminism for each class
@@ -1235,7 +1233,7 @@ public class OPSearchAutomatonSimplifier
         if (partition == null) {
           current[0] = toClass;
         } else {
-          current = partition.get(toClass);
+          current = partition.getStates(toClass);
         }
         for (final int t : current) {
           iter.reset(t, e);
@@ -1280,7 +1278,7 @@ public class OPSearchAutomatonSimplifier
       if (partition == null) {
         current[0] = c;
       } else {
-        current = partition.get(c);
+        current = partition.getStates(c);
       }
       boolean init = false;
       long markings = 0;
@@ -1363,7 +1361,7 @@ public class OPSearchAutomatonSimplifier
           if (partition == null) {
             current[0] = toClass;
           } else {
-            current = partition.get(toClass);
+            current = partition.getStates(toClass);
           }
           selfloop = false;
           for (final int t : current) {
@@ -1396,7 +1394,7 @@ public class OPSearchAutomatonSimplifier
         if (partition == null) {
           current[0] = toClass;
         } else {
-          current = partition.get(toClass);
+          current = partition.getStates(toClass);
         }
         for (final int t : current) {
           iter.reset(t, e);

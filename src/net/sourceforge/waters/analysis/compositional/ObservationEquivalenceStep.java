@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.compositional;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -54,7 +55,7 @@ public class ObservationEquivalenceStep extends MergeStep
                              final AutomatonProxy originalAut,
                              final EventProxy tau,
                              final StateEncoding originalStateEnc,
-                             final List<int[]> partition,
+                             final TRPartition partition,
                              final StateEncoding resultStateEnc)
   {
     this(analyzer, resultAut, originalAut, tau,
@@ -83,7 +84,7 @@ public class ObservationEquivalenceStep extends MergeStep
                              final AutomatonProxy originalAut,
                              final EventProxy tau,
                              final StateEncoding originalStateEnc,
-                             final List<int[]> partition,
+                             final TRPartition partition,
                              final boolean reduced,
                              final StateEncoding resultStateEnc)
   {
@@ -106,7 +107,7 @@ public class ObservationEquivalenceStep extends MergeStep
     final StateEncoding resultStateEnc = getResultStateEncoding();
     final AutomatonProxy originalAut = getOriginalAutomaton();
     final StateEncoding originalStateEnc = getOriginalStateEncoding();
-    final List<int[]> partition = getPartition();
+    final TRPartition partition = getPartition();
     final boolean reduced = hasReducedPreconditionMarking();
     final ObservationEquivalenceTraceExpander expander =
       new ObservationEquivalenceTraceExpander

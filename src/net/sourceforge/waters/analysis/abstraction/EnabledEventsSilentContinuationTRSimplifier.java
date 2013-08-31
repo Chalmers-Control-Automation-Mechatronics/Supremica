@@ -19,6 +19,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersIntHashingStrategy;
@@ -174,7 +175,7 @@ public class EnabledEventsSilentContinuationTRSimplifier
       return false;                     //there are no incoming equivalence states
     } else {
       final int numSingles = numStates - numCandidates; //states which are not incoming equivalent to anything but themselves
-      final List<int[]> partition=
+      final List<int[]> classes=
         new ArrayList<int[]>(numClasses + numSingles);
       for (int state = 0; state < numStates; state++) {
         checkAbort();
@@ -183,15 +184,16 @@ public class EnabledEventsSilentContinuationTRSimplifier
           final int first = prepartition.getFirst(list);
           if (state == first) {
             final int[] clazz = prepartition.toArray(list);
-            partition.add(clazz);
+            classes.add(clazz);
           }
         } else if (rel.isReachable(state)) {
           final int[] clazz = new int[1];
           clazz[0] = state;
-          partition.add(clazz);
+          classes.add(clazz);
         }
       }
-      setResultPartitionList(partition);
+      final TRPartition partition = new TRPartition(classes, numStates);
+      setResultPartition(partition);
       applyResultPartitionAutomatically();
       return true;
     }

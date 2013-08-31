@@ -13,7 +13,6 @@ import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,6 +27,7 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifi
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -478,7 +478,6 @@ public class CompositionalAutomataSynthesizer extends
       new ListBufferTransitionRelation(aut,
                                        eventEnc,
                                        ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    final int numStates = rel.getNumberOfStates();
     mHalfwaySimplifier.setTransitionRelation(rel);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultID = eventEnc.getEventCode(defaultMarking);
@@ -489,19 +488,17 @@ public class CompositionalAutomataSynthesizer extends
     mHalfwaySimplifier.run();
     final ListBufferTransitionRelation supervisor =
       mHalfwaySimplifier.getTransitionRelation();
-    final List<int[]> partition = mHalfwaySimplifier.getResultPartition();
+    final TRPartition partition = mHalfwaySimplifier.getResultPartition();
     if (partition == null) {
       return null;
     } else if (partition.isEmpty()) {
       return supervisor;
     }
-    final BitSet safeStates =
-      AutomataSynthesisAbstractionProcedure.getSafeStates(partition, numStates);
     final TransitionIterator iter =
       supervisor.createAllTransitionsReadOnlyIterator();
     while (iter.advance()) {
       final int t = iter.getCurrentTargetState();
-      if (!safeStates.get(t)) {
+      if (partition.getClassCode(t) < 0) {
         final int e = iter.getCurrentEvent();
         final byte status = rel.getProperEventStatus(e);
         if (EventEncoding.isControllableEvent(status)) {

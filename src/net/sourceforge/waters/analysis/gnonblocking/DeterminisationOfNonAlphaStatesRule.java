@@ -10,13 +10,13 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
-import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -121,6 +121,7 @@ class DeterminisationOfNonAlphaStatesRule
 
   //#########################################################################
   //# Rule Application
+  @Override
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
     throws AnalysisException
@@ -160,6 +161,7 @@ class DeterminisationOfNonAlphaStatesRule
     }
   }
 
+  @Override
   CompositionalGeneralisedConflictChecker.Step createStep
     (final CompositionalGeneralisedConflictChecker checker,
      final AutomatonProxy abstractedAut)
@@ -172,6 +174,7 @@ class DeterminisationOfNonAlphaStatesRule
                                                              mOutputEncoding);
   }
 
+  @Override
   public void cleanup()
   {
     mInputEncoding = null;
@@ -187,7 +190,7 @@ class DeterminisationOfNonAlphaStatesRule
   private EventProxy mAlphaMarking;
   private EventProxy mTau;
   private StateEncoding mInputEncoding;
-  private List<int[]> mPartition;
+  private TRPartition mPartition;
   private StateEncoding mOutputEncoding;
 
 }

@@ -22,8 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.efa.AbstractEFATransitionRelation;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -110,7 +112,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
     mUnfoldedUpdateCache = null;
     mKnownAfterValueCache = null;
     mInputSelfloops = null;
-    mValueToClass = null;
+    mPartition = null;
     mClassToValue = null;
   }
 
@@ -123,7 +125,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
 
   EFSMTransitionRelation unfold(final EFSMVariable var,
                                 final EFSMSystem system,
-                                final List<int[]> partition)
+                                final TRPartition partition)
     throws EvalException, AnalysisException
   {
     EFSMTransitionRelation efsmRel = var.getTransitionRelation();
@@ -151,20 +153,17 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
       final CompiledRange range = var.getRange();
       mRangeValues = range.getValues();
       mRootContext = system.getVariableContext();
+      mPartition = partition;
       if (partition == null) {
         mReducedRangeSize = mRangeValues.size();
       } else {
-        mValueToClass = new int[mRangeValues.size()];
-        mClassToValue = new int[partition.size()];
+        mClassToValue = new int[partition.getNumberOfClasses()];
         int clazzNum = 0;
-        for (final int[] clazz : partition) {
+        for (final int[] clazz : partition.getClasses()) {
           mClassToValue[clazzNum] = clazz[0];
-          for (final int i : clazz) {
-            mValueToClass[i] = clazzNum;
-          }
           clazzNum++;
         }
-        mReducedRangeSize = partition.size();
+        mReducedRangeSize = partition.getNumberOfClasses();
       }
       checkAbort();
       mUnfoldingVariableContext =
@@ -468,10 +467,10 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
 
   private int getClazz(final int value)
   {
-    if (mValueToClass == null) {
+    if (mPartition == null) {
       return value;
     } else {
-      return mValueToClass[value];
+      return mPartition.getClassCode(value);
     }
   }
 
@@ -773,7 +772,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
   private EFSMVariable mUnfoldedVariable;
   private List<? extends SimpleExpressionProxy> mRangeValues;
   private int mReducedRangeSize;
-  private int[] mValueToClass;
+  private TRPartition mPartition;
   private int[] mClassToValue;
   private int mSourceShift;
   private int mTargetShift;

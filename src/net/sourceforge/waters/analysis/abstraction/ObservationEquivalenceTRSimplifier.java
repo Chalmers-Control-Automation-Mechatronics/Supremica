@@ -30,10 +30,12 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonTools;
 
 
@@ -341,11 +343,11 @@ public class ObservationEquivalenceTRSimplifier
    *          array in the collection represents a class of equivalent state
    *          codes.
    */
-  public void setUpInitialPartition(final Collection<int[]> partition)
+  public void setUpInitialPartition(final TRPartition partition)
   {
-    final int size = partition.size();
+    final int size = partition.getNumberOfClasses();
     setUpPartition(size);
-    for (final int[] clazz : partition) {
+    for (final int[] clazz : partition.getClasses()) {
       final EquivalenceClass sec =
         mEquivalence.createEquivalenceClass(this, clazz);
       sec.enqueue(true);
@@ -670,26 +672,28 @@ public class ObservationEquivalenceTRSimplifier
   {
     if (mNumClasses < mNumReachableStates) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates = rel.getNumberOfStates();
-      final List<int[]> partition = new ArrayList<int[]>(mNumClasses);
+      final int numStates =
+        rel.getNumberOfStates() - rel.getNumberOfExtraStates();
+      final List<int[]> classes = new ArrayList<int[]>(mNumClasses);
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
           final EquivalenceClass sec = mStateToClass[state];
           if (sec == null) {
             final int[] clazz = new int[1];
             clazz[0] = state;
-            partition.add(clazz);
+            classes.add(clazz);
           } else {
             final int[] clazz = sec.putResult(state);
             if (clazz != null) {
-              partition.add(clazz);
+              classes.add(clazz);
             }
           }
         }
       }
-      setResultPartitionList(partition);
+      final TRPartition partition = new TRPartition(classes, numStates);
+      setResultPartition(partition);
     } else {
-      setResultPartitionList(null);
+      setResultPartition(null);
     }
   }
 
@@ -715,7 +719,7 @@ public class ObservationEquivalenceTRSimplifier
     throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final List<int[]> partition = getResultPartition();
+    final TRPartition partition = getResultPartition();
     if (partition != null) {
       mTauClosure = null;
       mTauIterator = null;
@@ -838,30 +842,34 @@ public class ObservationEquivalenceTRSimplifier
   @Override
   public String toString()
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final StringWriter writer = new StringWriter();
-    final PrintWriter printer = new PrintWriter(writer);
-    final Collection<EquivalenceClass> printed =
-      new THashSet<EquivalenceClass>(mNumClasses);
-    for (int s = 0; s < mStateToClass.length; s++) {
-      final EquivalenceClass clazz = mStateToClass[s];
-      if (clazz == null) {
-        if (rel.isReachable(s)) {
+    if (mStateToClass == null) {
+      return ProxyTools.getShortClassName(this);
+    } else {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final StringWriter writer = new StringWriter();
+      final PrintWriter printer = new PrintWriter(writer);
+      final Collection<EquivalenceClass> printed =
+        new THashSet<EquivalenceClass>(mNumClasses);
+      for (int s = 0; s < mStateToClass.length; s++) {
+        final EquivalenceClass clazz = mStateToClass[s];
+        if (clazz == null) {
+          if (rel.isReachable(s)) {
+            if (s > 0) {
+              printer.println();
+            }
+            printer.print('[');
+            printer.print(s);
+            printer.print(']');
+          }
+        } else if (printed.add(clazz)) {
           if (s > 0) {
             printer.println();
           }
-          printer.print('[');
-          printer.print(s);
-          printer.print(']');
+          clazz.dump(printer);
         }
-      } else if (printed.add(clazz)) {
-        if (s > 0) {
-          printer.println();
-        }
-        clazz.dump(printer);
       }
+      return writer.toString();
     }
-    return writer.toString();
   }
 
 

@@ -21,6 +21,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -91,7 +92,7 @@ public class SupervisorReductionTRSimplifier
   @Override
   public boolean runSimplifier() throws AnalysisException
   {
-    final List<int[]> partition;
+    final TRPartition partition;
     if (findBadStates()) {
       setUpClasses();
       if (mControlledEvent < 0) {
@@ -111,7 +112,7 @@ public class SupervisorReductionTRSimplifier
     } else {
       partition = createOneStateTR(new TIntArrayList(0));
     }
-    setResultPartitionList(partition);
+    setResultPartition(partition);
     if (partition != null) {
       applyResultPartitionAutomatically();
     }
@@ -163,7 +164,7 @@ public class SupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Methods for Supervisor Reduction
-  private List<int[]> reduceSupervisor(final TIntArrayList ctrlEvents)
+  private TRPartition reduceSupervisor(final TIntArrayList ctrlEvents)
     throws AnalysisAbortException
   {
     boolean merged = false;
@@ -424,14 +425,14 @@ public class SupervisorReductionTRSimplifier
     return mNumBadStates > 0;
   }
 
-  private List<int[]> createResultPartition() throws AnalysisAbortException
+  private TRPartition createResultPartition() throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final int marking = getDefaultMarkingID();
     final int[] badClass = mNumBadStates > 0 ? new int[mNumBadStates] : null;
     int nextBad = 0;
-    final List<int[]> partition = new ArrayList<int[]>();
+    final List<int[]> classes = new ArrayList<>();
     boolean trChanged = mNumBadStates > 1;
     for (int s = 0; s < numStates; s++) {
       checkAbort();
@@ -442,7 +443,7 @@ public class SupervisorReductionTRSimplifier
           final int listID = mStateToClass[s];
           if (mClasses.getFirst(listID) == s) {
             final int[] states = mClasses.toArray(listID);
-            partition.add(states);
+            classes.add(states);
           } else {
             trChanged = true;
           }
@@ -451,9 +452,9 @@ public class SupervisorReductionTRSimplifier
     }
     if (trChanged) {
       if (badClass != null) {
-        partition.add(badClass);
+        classes.add(badClass);
       }
-      return partition;
+      return new TRPartition(classes, numStates);
     } else {
       return null;
     }
@@ -559,7 +560,7 @@ public class SupervisorReductionTRSimplifier
     return pair;
   }
 
-  private List<int[]> createOneStateTR(final TIntArrayList disabEvents)
+  private TRPartition createOneStateTR(final TIntArrayList disabEvents)
     throws OverflowException, AnalysisAbortException
   {
     final ListBufferTransitionRelation oldRel = getTransitionRelation();
@@ -597,27 +598,18 @@ public class SupervisorReductionTRSimplifier
       rel.setUsedPropositions(markings);
     }
     final int marking = getDefaultMarkingID();
-    final int numReachable = oldRel.getNumberOfReachableStates();
-    final int numGood = numReachable - mNumBadStates;
-    final int[] good = new int[numGood];
-    final int[] bad = numStates == 1 ? null : new int[mNumBadStates];
-    int g = 0;
-    int b = 0;
-    for (int s = 0; s < oldRel.getNumberOfStates(); s++) {
-      if (oldRel.isReachable(s)) {
-        if (!oldRel.isDeadlockState(s, marking)) {
-          good[g++] = s;
-        } else if (bad != null) {
-          bad[b++] = s;
-        }
+    final int oldNumStates = oldRel.getNumberOfStates();
+    final int[] stateToClass = new int[oldNumStates];
+    for (int s = 0; s < oldNumStates; s++) {
+      if (!oldRel.isReachable(s)) {
+        stateToClass[s] = -1;
+      } else if (!oldRel.isDeadlockState(s, marking)) {
+        stateToClass[s] = 0;
+      } else {
+        stateToClass[s] = 1;
       }
     }
-    final List<int[]> partition = new ArrayList<int[]>(numStates);
-    partition.add(good);
-    if (bad != null) {
-      partition.add(bad);
-    }
-    return partition;
+    return new TRPartition(stateToClass, numStates);
   }
 
   private int getSuccessorState(final int source, final int event)

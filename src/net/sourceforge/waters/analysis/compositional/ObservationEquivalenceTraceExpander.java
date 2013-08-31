@@ -17,6 +17,7 @@ import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -41,7 +42,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
      final AutomatonProxy resultAut,
      final StateEncoding resultStateEnc,
      final AutomatonProxy originalAut,
-     final List<int[]> partition)
+     final TRPartition partition)
     throws AnalysisException
   {
     super(verifier, tau, resultAut, resultStateEnc, originalAut, partition);
@@ -55,7 +56,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
      final StateEncoding resultStateEnc,
      final AutomatonProxy originalAut,
      final StateEncoding originalStateEnc,
-     final List<int[]> partition,
+     final TRPartition partition,
      final boolean preconditionMarkingReduced)
     throws AnalysisException
   {

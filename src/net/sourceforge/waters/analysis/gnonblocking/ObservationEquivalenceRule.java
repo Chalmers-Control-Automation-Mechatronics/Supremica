@@ -10,12 +10,12 @@
 package net.sourceforge.waters.analysis.gnonblocking;
 
 import java.util.Collection;
-import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -112,6 +112,7 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
 
   //#######################################################################
   //# Rule Application
+  @Override
   AutomatonProxy applyRuleToAutomaton(final AutomatonProxy autToAbstract,
                                       final EventProxy tau)
       throws AnalysisException
@@ -150,6 +151,7 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
     }
   }
 
+  @Override
   CompositionalGeneralisedConflictChecker.Step createStep(
                                                           final CompositionalGeneralisedConflictChecker checker,
                                                           final AutomatonProxy abstractedAut)
@@ -160,6 +162,7 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
                                                     mOutputEncoding);
   }
 
+  @Override
   public void cleanup()
   {
     mInputEncoding = null;
@@ -178,7 +181,7 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
   private AutomatonProxy mAutToAbstract;
   private EventProxy mTau;
   private StateEncoding mInputEncoding;
-  private List<int[]> mPartition;
+  private TRPartition mPartition;
   private StateEncoding mOutputEncoding;
 
 }

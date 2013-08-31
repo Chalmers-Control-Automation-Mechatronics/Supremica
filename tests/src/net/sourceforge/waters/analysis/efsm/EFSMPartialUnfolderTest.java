@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
@@ -227,7 +228,7 @@ public class EFSMPartialUnfolderTest
   {
     final EFSMSystem system = createEFSMSystem(module, bindings);
     final EFSMVariable unfoldedVariable = system.getVariables().get(0);
-    final List<int[]> partition;
+    final TRPartition partition;
     if (partitioned) {
       partition = computePartition(unfoldedVariable, system);
     } else {
@@ -241,7 +242,7 @@ public class EFSMPartialUnfolderTest
     compareWithAfter(resultTransitionRelation, system, module, after);
   }
 
-  private List<int[]> computePartition(final EFSMVariable var,
+  private TRPartition computePartition(final EFSMVariable var,
                                        final EFSMSystem system)
     throws EvalException, AnalysisException
   {
@@ -251,7 +252,7 @@ public class EFSMPartialUnfolderTest
   private SimpleComponentProxy renameForPartition
     (final SimpleComponentProxy oldComp,
      final EFSMVariable var,
-     final List<int[]> partition)
+     final TRPartition partition)
   {
     if (partition == null) {
       return oldComp;
@@ -260,7 +261,7 @@ public class EFSMPartialUnfolderTest
     final CompiledRange range = var.getRange();
     final int[] codeMap = new int[range.size()];
     int classno = 0;
-    for (final int[] clazz : partition) {
+    for (final int[] clazz : partition.getClasses()) {
       for (final int s : clazz) {
         codeMap[s] = classno;
       }

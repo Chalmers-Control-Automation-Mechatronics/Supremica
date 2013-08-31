@@ -14,12 +14,12 @@ import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -109,7 +109,8 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       return false;
     }
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
+    final int numStates =
+      rel.getNumberOfStates() - rel.getNumberOfExtraStates();
 
     // 1. Do synthesis --- find bad states
     final BitSet coreachableStates = new BitSet(numStates);
@@ -135,8 +136,9 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
     for (int s = dumpState; s >= 0; s = mBadStates.nextSetBit(s + 1)) {
       checkAbort();
       if (rel.isInitial(s)) {
-        final List<int[]> partition = Collections.emptyList();
-        setResultPartitionList(partition);
+        final TRPartition partition =
+          TRPartition.createEmptyPartition(numStates);
+        setResultPartition(partition);
         applyResultPartitionAutomatically();
         return true;
       }
@@ -175,17 +177,18 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
 
     // 4. Create result partition.
     //  Singleton classes for all safe states, no entries for bad states.
-    final List<int[]> partition = new ArrayList<int[]>(numStates);
+    final List<int[]> classes = new ArrayList<>(numStates);
     for (int s = 0; s < numStates; s++) {
       if (mBadStates.get(s) || !rel.isReachable(s)) {
-        partition.add(null);
+        classes.add(null);
       } else {
         final int[] clazz = new int[1];
         clazz[0] = s;
-        partition.add(clazz);
+        classes.add(clazz);
       }
     }
-    setResultPartitionList(partition);
+    final TRPartition partition = new TRPartition(classes, numStates);
+    setResultPartition(partition);
     applyResultPartitionAutomatically();
 
     return needPartition;
@@ -196,7 +199,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
     throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final List<int[]> partition = getResultPartition();
+    final TRPartition partition = getResultPartition();
     if (partition.isEmpty()) {
       // 5a. Set all states unreachable, set all events unused.
       final int numStates = rel.getNumberOfStates();
@@ -249,7 +252,8 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       rel.reconfigure(config);
       if (rel.checkReachability()) {
         // Fix result partition --- is this safe???
-        final ListIterator<int[]> liter = partition.listIterator();
+        final List<int[]> classes = partition.getClasses();
+        final ListIterator<int[]> liter = classes.listIterator();
         while (liter.hasNext()) {
           final int[] clazz = liter.next();
           if (clazz != null) {

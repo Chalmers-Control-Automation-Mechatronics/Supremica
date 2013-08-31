@@ -10,7 +10,6 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import java.util.Collection;
-import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.AlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
@@ -26,6 +25,7 @@ import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -187,7 +187,7 @@ class TRConflictEquivalenceAbstractionProcedure
   {
     final AbstractCompositionalModelAnalyzer analyzer = getAnalyzer();
     final ChainTRSimplifier simplifier = getSimplifier();
-    final List<int[]> partition = simplifier.getResultPartition();
+    final TRPartition partition = simplifier.getResultPartition();
     final boolean reduced =
       mPreconditionMarkingID >= 0 &&
       simplifier.isReducedMarking(mPreconditionMarkingID);

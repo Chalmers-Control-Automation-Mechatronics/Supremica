@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.efsm;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
@@ -100,7 +101,7 @@ public class EFSMVariablePartitionComputerTest
   {
     final EFSMSystem system = createEFSMSystem(module, bindings);
     final EFSMVariable var = system.getVariables().get(0);
-    final List<int[]> computedPartition =
+    final TRPartition computedPartition =
       mVariablePartitionComputer.computePartition(var, system);
     final EFSMVariablePartition expectedPartition =
       parseExpectedPartition(module, var);
@@ -212,7 +213,7 @@ public class EFSMVariablePartitionComputerTest
 
     //#########################################################################
     //# Testing
-    private void verify(final List<int[]> computedPartition)
+    private void verify(final TRPartition computedPartition)
     {
       final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
       final ProxyAccessorHashSet<SimpleExpressionProxy> unaccounted =
@@ -225,7 +226,7 @@ public class EFSMVariablePartitionComputerTest
       final List<? extends SimpleExpressionProxy> rangeValues =
         mRange.getValues();
       int classno = 0;
-      for (final int[] clazz : computedPartition) {
+      for (final int[] clazz : computedPartition.getClasses()) {
         for (final int s : clazz) {
           final SimpleExpressionProxy expr = rangeValues.get(s);
           final int expected = mStateToClass.getByProxy(expr);

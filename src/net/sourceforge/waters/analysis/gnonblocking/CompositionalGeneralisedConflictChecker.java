@@ -33,6 +33,7 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -1877,28 +1878,28 @@ public class CompositionalGeneralisedConflictChecker
     }
   }
 
-  public ObservationEquivalenceStep createObservationEquivalenceStep(
-                                                                     final AutomatonProxy abstractedAut,
-                                                                     final AutomatonProxy autToAbstract,
-                                                                     final EventProxy tau,
-                                                                     final StateEncoding inputEnc,
-                                                                     final List<int[]> partition,
-                                                                     final StateEncoding outputEnc)
+  public ObservationEquivalenceStep createObservationEquivalenceStep
+    (final AutomatonProxy abstractedAut,
+     final AutomatonProxy autToAbstract,
+     final EventProxy tau,
+     final StateEncoding inputEnc,
+     final TRPartition partition,
+     final StateEncoding outputEnc)
   {
     return new ObservationEquivalenceStep(abstractedAut, autToAbstract, tau,
-        inputEnc, partition, outputEnc);
+                                          inputEnc, partition, outputEnc);
   }
 
-  public DeterminisationOfNonAlphaStatesStep createDeterminisationOfNonAlphaStatesStep(
-                                                                                       final AutomatonProxy abstractedAut,
-                                                                                       final AutomatonProxy autToAbstract,
-                                                                                       final EventProxy tau,
-                                                                                       final StateEncoding inputEnc,
-                                                                                       final List<int[]> partition,
-                                                                                       final StateEncoding outputEnc)
+  public DeterminisationOfNonAlphaStatesStep createDeterminisationOfNonAlphaStatesStep
+    (final AutomatonProxy abstractedAut,
+     final AutomatonProxy autToAbstract,
+     final EventProxy tau,
+     final StateEncoding inputEnc,
+     final TRPartition partition,
+     final StateEncoding outputEnc)
   {
-    return new DeterminisationOfNonAlphaStatesStep(abstractedAut,
-        autToAbstract, tau, inputEnc, partition, outputEnc);
+    return new DeterminisationOfNonAlphaStatesStep
+      (abstractedAut, autToAbstract, tau, inputEnc, partition, outputEnc);
   }
 
   public RemovalOfMarkingsOrNoncoreachableStatesStep createRemovalOfMarkingsStep
@@ -2254,27 +2255,6 @@ public class CompositionalGeneralisedConflictChecker
     {
       mTransitionRelation = null;
       mOriginalStatesMap = null;
-    }
-
-    int[] createClassMap(final Collection<int[]> partition)
-    {
-      final AutomatonProxy aut = getOriginalAutomaton();
-      final int size = aut.getStates().size();
-      final int[] result = new int[size];
-      if (partition == null) {
-        for (int s = 0; s < size; s++) {
-          result[s] = s;
-        }
-      } else {
-        int c = 0;
-        for (final int[] clazz : partition) {
-          for (final int s : clazz) {
-            result[s] = c;
-          }
-          c++;
-        }
-      }
-      return result;
     }
 
     // #######################################################################
@@ -2686,26 +2666,26 @@ public class CompositionalGeneralisedConflictChecker
   }
 
 
-  // #########################################################################
-  // # Inner Class ObservationEquivalenceStep
+  //#########################################################################
+  //# Inner Class ObservationEquivalenceStep
   private class ObservationEquivalenceStep extends RemovalOfTransitionsStep
   {
 
-    // #########################################################################
-    // # Constructor
+    //#######################################################################
+    //# Constructor
     private ObservationEquivalenceStep(final AutomatonProxy resultAut,
                                        final AutomatonProxy originalAut,
                                        final EventProxy tau,
                                        final StateEncoding inputEnc,
-                                       final List<int[]> partition,
+                                       final TRPartition partition,
                                        final StateEncoding outputEnc)
     {
       super(resultAut, originalAut, tau, inputEnc, outputEnc);
-      mClassMap = createClassMap(partition);
+      mPartition = partition;
     }
 
-    // #########################################################################
-    // # Overrides for RemovalOfTransitionsStep
+    //#######################################################################
+    //# Overrides for RemovalOfTransitionsStep
     /**
      * Creates the beginning of a trace by doing a breadth-first search to find
      * the correct initial state of the original automaton. Steps are added for
@@ -2717,14 +2697,18 @@ public class CompositionalGeneralisedConflictChecker
      *         state of the trace).
      */
     @Override
-    protected List<SearchRecord> completeStartOfTrace(
-                                                      final TIntArrayList initialStateIDs,
-                                                      final int resultAutInitialStateClass)
+    protected List<SearchRecord> completeStartOfTrace
+      (final TIntArrayList initialStateIDs,
+       final int resultAutInitialStateClass)
     {
       final TIntHashSet targetSet = new TIntHashSet();
-      for (int s = 0; s < mClassMap.length; s++) {
-        if (mClassMap[s] == resultAutInitialStateClass) {
-          targetSet.add(s);
+      if (mPartition == null) {
+        targetSet.add(resultAutInitialStateClass);
+      } else {
+        for (int s = 0; s < mPartition.getNumberOfStates(); s++) {
+          if (mPartition.getClassCode(s) == resultAutInitialStateClass) {
+            targetSet.add(s);
+          }
         }
       }
       final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
@@ -2777,7 +2761,11 @@ public class CompositionalGeneralisedConflictChecker
     protected boolean isTargetState(final int stateFound,
                                     final int resultAutTarget)
     {
-      return mClassMap[stateFound] == resultAutTarget;
+      if (mPartition == null) {
+        return stateFound == resultAutTarget;
+      } else  {
+        return mPartition.getClassCode(stateFound) == resultAutTarget;
+      }
     }
 
     @Override
@@ -2795,7 +2783,7 @@ public class CompositionalGeneralisedConflictChecker
      * class numbers) in the output transition relation. Obtained from
      * observation equivalence minimiser.
      */
-    private final int[] mClassMap;
+    private final TRPartition mPartition;
 
   }
 
@@ -2809,11 +2797,11 @@ public class CompositionalGeneralisedConflictChecker
                                         final AutomatonProxy originalAut,
                                         final EventProxy tau,
                                         final StateEncoding inputEnc,
-                                        final List<int[]> partition,
+                                        final TRPartition partition,
                                         final StateEncoding outputEnc)
     {
       super(resultAut, originalAut, tau, inputEnc, outputEnc);
-      mClassMap = createClassMap(partition);
+      mPartition = partition;
     }
 
     /**
@@ -2835,8 +2823,8 @@ public class CompositionalGeneralisedConflictChecker
       final int tracesEndStateCode =
           getReverseOutputStateMap().get(tracesEndState);
       int originialEndStateCode = -1;
-      for (int s = 0; s < mClassMap.length; s++) {
-        if (mClassMap[s] == tracesEndStateCode) {
+      for (int s = 0; s < mPartition.getNumberOfStates(); s++) {
+        if (mPartition.getClassCode(s) == tracesEndStateCode) {
           // There must be exactly only one state in the class of the trace's
           // end state, because that state has to be marked alpha, and non-alpha
           // determinisation never merges alpha-marked states.
@@ -2893,7 +2881,7 @@ public class CompositionalGeneralisedConflictChecker
     protected boolean isTargetState(final int stateFound,
                                     final int resultAutTarget)
     {
-      return mClassMap[stateFound] == resultAutTarget;
+      return mPartition.getClassCode(stateFound) == resultAutTarget;
     }
 
     @Override
@@ -3061,7 +3049,7 @@ public class CompositionalGeneralisedConflictChecker
      * class numbers) in the output transition relation. Obtained from
      * observation equivalence minimiser.
      */
-    private final int[] mClassMap;
+    private final TRPartition mPartition;
 
   }
 

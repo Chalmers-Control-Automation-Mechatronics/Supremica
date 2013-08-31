@@ -22,6 +22,7 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -82,7 +83,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
 
   //#########################################################################
   //# Invocation
-  public List<int[]> computePartition(final EFSMVariable var,
+  public TRPartition computePartition(final EFSMVariable var,
                                       final EFSMSystem system)
     throws EvalException, AnalysisException
   {
@@ -95,7 +96,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
     statistics.recordStart(var);
     final long start = System.currentTimeMillis();
     mEFSMVariable = var;
-    List<int[]> partition = null;
+    TRPartition partition = null;
     try {
       setUp();
       mEFSMVariableCollector =
@@ -292,7 +293,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
       } else {
         statistics.recordFinish(var, partition);
         if (logger.isDebugEnabled()) {
-          logger.debug("Result partition size " + partition.size());
+          logger.debug("Result partition size " + partition.getNumberOfClasses());
         }
       }
       tearDown();

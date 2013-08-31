@@ -29,6 +29,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -165,10 +166,9 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     mSimplifier.run();
     copy = null;
     mSimplifier.setTransitionRelation(rel);
-    final List<int[]> partition = mSimplifier.getResultPartition();
-    final int[] stateMap = createStateMap(partition);
+    final TRPartition partition = mSimplifier.getResultPartition();
     final int initTest =
-      stateMap == null || initResult < 0 ? initResult : stateMap[initResult];
+      partition == null || initResult < 0 ? initResult : partition.getClassCode(initResult);
 
     // Extend the trace to lowest (= most blocking) possible level ...
     final AbstractCompositionalModelVerifier verifier = getModelVerifier();
@@ -189,7 +189,7 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     // Fix the initial segment of the trace ...
     final int ccState =
       foundData == null ? -1 : foundData.getTestAutomatonEndState();
-    newTraceSteps = relabelInitialTraceSteps(newTraceSteps, stateMap, ccState);
+    newTraceSteps = relabelInitialTraceSteps(newTraceSteps, partition, ccState);
 
     // Add the search results to the end of the trace ...
     if (foundData != null) {
@@ -236,21 +236,23 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
   //#########################################################################
   //# Trace Extension
   private List<TraceStepProxy> relabelInitialTraceSteps
-  (final List<TraceStepProxy> steps, final int[] stateMap, final int ccState)
+  (final List<TraceStepProxy> steps, final TRPartition partition, final int ccState)
   {
     final int numSteps = steps.size();
     final List<TraceStepProxy> newSteps =
       new ArrayList<TraceStepProxy>(numSteps);
     for (final TraceStepProxy step : steps) {
       final TraceStepProxy newStep =
-        relabelInitialTraceStep(step, stateMap, ccState);
+        relabelInitialTraceStep(step, partition, ccState);
       newSteps.add(newStep);
     }
     return newSteps;
   }
 
   private TraceStepProxy relabelInitialTraceStep
-    (final TraceStepProxy resultStep, final int[] stateMap, final int ccState)
+    (final TraceStepProxy resultStep,
+     final TRPartition partition,
+     final int ccState)
   {
     final AutomatonProxy resultAut = getResultAutomaton();
     final Map<AutomatonProxy,StateProxy> resultMap = resultStep.getStateMap();
@@ -265,10 +267,10 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
         final AutomatonProxy origAut = getOriginalAutomaton();
         final int resultCode = getResultAutomatonStateCode(state);
         final int origCode;
-        if (stateMap == null) {
+        if (partition == null) {
           origCode = resultCode;
-        } else if (stateMap[resultCode] >= 0) {
-          origCode = stateMap[resultCode];
+        } else if (partition.getClassCode(resultCode) >= 0) {
+          origCode = partition.getClassCode(resultCode);
         } else {
           origCode = ccState;
         }
@@ -621,25 +623,6 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     final StateProxy state = new MemStateProxy(0, true);
     final Collection<StateProxy> states = Collections.singletonList(state);
     return factory.createAutomatonProxy(name, kind, events, states, null);
-  }
-
-  private int[] createStateMap(final List<int[]> partition)
-  {
-    if (partition != null) {
-      final int mapSize = partition.size();
-      final int[]stateMap = new int[mapSize];
-      int c = 0;
-      for (final int[] clazz : partition) {
-        if (clazz.length == 1) {
-          stateMap[c++] = clazz[0];
-        } else {
-          stateMap[c++] = -1;
-        }
-      }
-      return stateMap;
-    } else {
-      return null;
-    }
   }
 
 

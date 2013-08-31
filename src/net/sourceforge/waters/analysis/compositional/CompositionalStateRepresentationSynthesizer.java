@@ -292,10 +292,8 @@ public class CompositionalStateRepresentationSynthesizer extends
       final StateRepresentationInfo parentInfo =
         mStateRepresentationMap.get(original);
       final SynthesisStateSpace.SynthesisStateMap parent = parentInfo.getMap();
-      final List<int[]> partitionList = merge.getPartition();
-      if (partitionList != null){
-        final TRPartition partition =
-          new TRPartition(partitionList, original.getStates().size());
+      final TRPartition partition = merge.getPartition();
+      if (partition != null){
         final SynthesisStateSpace.SynthesisStateMap map =
           mSynthesisStateSpace.createPartitionMap(partition, parent);
         final StateRepresentationInfo info =
@@ -455,7 +453,6 @@ public class CompositionalStateRepresentationSynthesizer extends
       new ListBufferTransitionRelation(aut,
                                        eventEnc,
                                        ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-    final int numStates = rel.getNumberOfStates();
     mHalfwaySimplifier.setTransitionRelation(rel);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultID = eventEnc.getEventCode(defaultMarking);
@@ -465,15 +462,14 @@ public class CompositionalStateRepresentationSynthesizer extends
     }
     mHalfwaySimplifier.setDefaultMarkingID(defaultID);
     mHalfwaySimplifier.run();
-    final List<int[]> classes = mHalfwaySimplifier.getResultPartition();
-    if (classes == null) {
+    final TRPartition partition = mHalfwaySimplifier.getResultPartition();
+    if (partition == null) {
       mSynthesisStateSpace.addStateMap(parent);
       return true;
-    } else if (classes.isEmpty()) {
+    } else if (partition.isEmpty()) {
       setBooleanResult(false);
       return false;
     } else {
-      final TRPartition partition = new TRPartition(classes, numStates);
       final SynthesisStateSpace.SynthesisStateMap map =
         mSynthesisStateSpace.createPartitionMap(partition, parent);
       mSynthesisStateSpace.addStateMap(map);

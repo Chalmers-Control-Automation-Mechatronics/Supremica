@@ -29,6 +29,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -365,20 +366,22 @@ public class SynthesisObservationEquivalenceTRSimplifier
   {
     if (mNumClasses < mNumReachableStates) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates = rel.getNumberOfStates();
-      final List<int[]> partition = new ArrayList<int[]>(mNumClasses);
+      final int numStates =
+        rel.getNumberOfStates() - rel.getNumberOfExtraStates();
+      final List<int[]> classes = new ArrayList<int[]>(mNumClasses + 1);
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
           final EquivalenceClass sec = mStateToClass[state];
           final int[] clazz = sec.putResult(state);
           if (clazz != null) {
-            partition.add(clazz);
+            classes.add(clazz);
           }
         }
       }
-      setResultPartitionList(partition);
+      final TRPartition partition = new TRPartition(classes, numStates);
+      setResultPartition(partition);
     } else {
-      setResultPartitionList(null);
+      setResultPartition(null);
     }
   }
 

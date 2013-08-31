@@ -479,6 +479,17 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Gets the number of extra spare states reserved by the transition
+   * relation. Extra states are held at the end of the state encoding
+   * for special purposes, but usually are not part of the transition
+   * relation.
+   */
+  public int getNumberOfExtraStates()
+  {
+    return mExtraStates;
+  }
+
+  /**
    * Gets the total number of markings in this transition relation. Each
    * instance of a proposition marking a reachable state counts as marking.
    */
@@ -2495,20 +2506,14 @@ public class ListBufferTransitionRelation
    * implements state merging by automaton quotient. It is used to merge
    * states after a partition has been obtained through a
    * {@link TransitionRelationSimplifier}.
-   *
    * @param partition
-   *          The partitioning to be imposed, or <CODE>null</CODE>. Each array
-   *          in the list defines the state codes comprising an equivalence
-   *          class to be merged into a single state. The index position in
-   *          the list identifies the state code to be given to the new merged
-   *          state. An argument of <CODE>null</CODE> indicates a trivial
-   *          partition, and has no effect.
+   *          The partition to be imposed, or <CODE>null</CODE>.
    */
-  public void merge(final List<int[]> partition)
+  public void merge(final TRPartition partition)
   {
     if (partition != null) {
       try {
-        final int newSize = partition.size() + mExtraStates;
+        final int newSize = partition.getNumberOfClasses() + mExtraStates;
         if (mSuccessorBuffer != null) {
           mSuccessorBuffer.merge(partition, mExtraStates);
         }
@@ -2520,15 +2525,19 @@ public class ListBufferTransitionRelation
         final IntStateBuffer newStateBuffer =
           new IntStateBuffer(newSize, numProps, used);
         int c = 0;
-        for (final int[] clazz : partition) {
-          boolean init = false;
-          long markings = 0;
-          for (final int state : clazz) {
-            init |= mStateBuffer.isInitial(state);
-            markings |= mStateBuffer.getAllMarkings(state);
+        for (final int[] clazz : partition.getClasses()) {
+          if (clazz == null) {
+            newStateBuffer.setReachable(c, false);
+          } else {
+            boolean init = false;
+            long markings = 0;
+            for (final int state : clazz) {
+              init |= mStateBuffer.isInitial(state);
+              markings |= mStateBuffer.getAllMarkings(state);
+            }
+            newStateBuffer.setInitial(c, init);
+            newStateBuffer.setAllMarkings(c, markings);
           }
-          newStateBuffer.setInitial(c, init);
-          newStateBuffer.setAllMarkings(c, markings);
           c++;
         }
         for (int state = newSize - mExtraStates; state < newSize; state++) {

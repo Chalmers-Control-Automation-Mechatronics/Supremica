@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.tr;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -101,6 +102,16 @@ public class TRPartition
   }
 
   /**
+   * Checks whether this partition is empty.
+   * A partition is empty contains no classes. It consists of only bad states
+   * that are removed as a result of partitioning.
+   */
+  public boolean isEmpty()
+  {
+    return mNumberOfClasses == 0;
+  }
+
+  /**
    * Gets the list of equivalence classes.
    * @return A list of integer arrays, each of which contains the states in
    *         an equivalence class. The state code of an equivalence class is
@@ -152,9 +163,62 @@ public class TRPartition
     return mStateToClass[state];
   }
 
+  /**
+   * Returns the number of assigned states in this partition.
+   * Assigned states are states of partitioned state space that have been
+   * assigned a class number.
+   */
+  public int getNumberOfAssignedStates()
+  {
+    int count = 0;
+    if (mClasses != null) {
+      for (final int[] clazz : mClasses) {
+        if (clazz != null) {
+          count += clazz.length;
+        }
+      }
+    } else {
+      for (int s = 0; s < mNumberOfStates; s++) {
+        if (mStateToClass[s] >= 0) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
 
   //#########################################################################
-  //# Combining Partitions
+  //# Static Methods
+  /**
+   * Creates an empty partition.
+   * An empty partition consists of only bad states that are removed
+   * as a result of partitioning.
+]  * @param numStates    The total number of states to be partitioned.
+   */
+  public static TRPartition createEmptyPartition(final int numStates)
+  {
+    final List<int[]> classes = Collections.emptyList();
+    return new TRPartition(classes, 0);
+  }
+
+  /**
+   * Creates an identical partition.
+   * An empty partition consists of only singleton classes.
+   * It does not merge any states and keeps every state in a class
+   * containing only that state.
+]  * @param numStates    The total number of states to be partitioned.
+   */
+  public static TRPartition createIdenticalPartition(final int numStates)
+  {
+    final int[] stateToClass = new int[numStates];
+    for (int s = 0; s < numStates; s++) {
+      stateToClass[s] = s;
+    }
+    return new TRPartition(stateToClass, numStates);
+  }
+
+
   /**
    * Combines two partitions. This method computes the partition that results
    * if a state space is first partitioned using the given <CODE>first</CODE>
@@ -236,6 +300,7 @@ public class TRPartition
 
   private TRPartition combineUsingClasses(final TRPartition second)
   {
+    assert mNumberOfClasses == second.getNumberOfStates();
     final int numClasses = second.getNumberOfClasses();
     final List<int[]> classes = new ArrayList<>(numClasses);
     for (final int[] clazz2 : second.getClasses()) {
@@ -259,6 +324,8 @@ public class TRPartition
             }
           }
           classes.add(clazz);
+        } else {
+          classes.add(null);
         }
       } else {
         classes.add(null);
@@ -269,6 +336,7 @@ public class TRPartition
 
   private TRPartition combineUsingStateToClass(final TRPartition second)
   {
+    assert mNumberOfClasses == second.getNumberOfStates();
     final int[] stateToClass = new int[mNumberOfStates];
     for (int s = 0; s < mNumberOfStates; s++) {
       int c = mStateToClass[s];
@@ -278,6 +346,43 @@ public class TRPartition
       stateToClass[s] = c;
     }
     return new TRPartition(stateToClass, second.getNumberOfClasses());
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringBuffer buffer = new StringBuffer();
+    if (mClasses != null) {
+      for (int c = 0; c < mNumberOfClasses; c++) {
+        final int[] clazz = mClasses.get(c);
+        if (clazz != null) {
+          buffer.append(c);
+          String sep = ": [";
+          for (final int s : clazz) {
+            buffer.append(sep);
+            buffer.append(s);
+            sep = ", ";
+          }
+          buffer.append("]\n");
+        }
+      }
+    } else {
+      for (int s = 0; s < mNumberOfStates; s++) {
+        buffer.append(s);
+        final int c = mStateToClass[s];
+        if (c >= 0) {
+          buffer.append(" -> ");
+          buffer.append(c);
+        } else {
+          buffer.append(" --");
+        }
+        buffer.append("\n");
+      }
+    }
+    return buffer.toString();
   }
 
 

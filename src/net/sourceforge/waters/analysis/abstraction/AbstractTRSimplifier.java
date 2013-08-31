@@ -9,10 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -146,7 +146,7 @@ public abstract class AbstractTRSimplifier
   }
 
   @Override
-  public List<int[]> getResultPartition()
+  public TRPartition getResultPartition()
   {
     return mResultPartition;
   }
@@ -233,18 +233,9 @@ public abstract class AbstractTRSimplifier
   {
   }
 
-  protected void setResultPartitionList(final List<int[]> partition)
+  protected void setResultPartition(final TRPartition partition)
   {
     mResultPartition = partition;
-  }
-
-  protected void setResultPartitionArray(final int[][] partition)
-  {
-    if (partition == null) {
-      mResultPartition = null;
-    } else {
-      mResultPartition = Arrays.asList(partition);
-    }
   }
 
   protected void applyResultPartitionAutomatically()
@@ -402,6 +393,6 @@ public abstract class AbstractTRSimplifier
   private int mPreferredOutputConfiguration;
   private TRSimplifierStatistics mStatistics;
   private ListBufferTransitionRelation mTransitionRelation;
-  private List<int[]> mResultPartition;
+  private TRPartition mResultPartition;
 
 }
