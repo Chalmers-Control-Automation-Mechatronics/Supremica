@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.map.hash.TLongIntHashMap;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,9 +19,9 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.tr.AbstractSynchronisationEncoding;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.LongSynchronisationEncoding;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -326,13 +324,11 @@ public class CompositionalStateRepresentationSynthesizer extends
           stateCounts[a] = originalStateEncodings[a].getNumberOfStates();
           a++;
         }
-        final LongSynchronisationEncoding synchEncoding =
-          new LongSynchronisationEncoding(stateCounts);
         final Set<StateProxy> synchStates = result.getStates();
-        final TLongIntHashMap synchMap =
-          new TLongIntHashMap(synchStates.size(), 0.5f, -1, -1);
+        final AbstractSynchronisationEncoding synchEncoding =
+          AbstractSynchronisationEncoding.createEncoding(stateCounts, synchStates.size());
         final StateEncoding synchStateEncoding = new StateEncoding(result);
-        final int[] stateCodes = new int[originals.size()];
+        final int[] tuple = new int[originals.size()];
         states:
         for (final StateProxy synchState : synchStates) {
           a = 0;
@@ -344,16 +340,14 @@ public class CompositionalStateRepresentationSynthesizer extends
             }
             final int stateCode = originalStateEncodings[a].getStateCode(originalState);
             assert stateCode >= 0;
-            stateCodes[a] = stateCode;
+            tuple[a] = stateCode;
             a++;
           }
           final int synchStateCode = synchStateEncoding.getStateCode(synchState);
-          final long synchKey = synchEncoding.encode(stateCodes);
-          assert synchKey>=0;
-          synchMap.put(synchKey, synchStateCode);
+          synchEncoding.addState(tuple, synchStateCode);
         }
         final SynthesisStateSpace.SynthesisStateMap map =
-          mSynthesisStateSpace.createSynchronisationMap(synchMap, synchEncoding, parents);
+          mSynthesisStateSpace.createSynchronisationMap(synchEncoding, parents);
         mStateRepresentationMap.put(result, map);
         return;
       }

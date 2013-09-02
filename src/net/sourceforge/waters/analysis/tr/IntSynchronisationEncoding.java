@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 
 import net.sourceforge.waters.model.des.AutomatonTools;
 
@@ -17,12 +17,12 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class LongSynchronisationEncoding
+public class IntSynchronisationEncoding
   extends AbstractSynchronisationEncoding
 {
   //#######################################################################
   //# Constructor
-  public LongSynchronisationEncoding(final int[] sizes, final int numStates)
+  public IntSynchronisationEncoding(final int[] sizes, final int numStates)
   {
     mShiftAmount = new int[sizes.length+1];
     mMask = new int[sizes.length];
@@ -34,7 +34,7 @@ public class LongSynchronisationEncoding
       mMask[i] = (1<<numberOfBits)-1;
     }
     assert shift <= MAX_BITS;
-    mMap = new TLongIntHashMap(numStates, 0.5f, -1, -1);
+    mMap = new TIntIntHashMap(numStates, 0.5f, -1, -1);
   }
 
 
@@ -43,32 +43,32 @@ public class LongSynchronisationEncoding
   @Override
   public int getStateCode(final int[] tuple)
   {
-    final long encodedTuple = encode(tuple);
+    final int encodedTuple = encode(tuple);
     return mMap.get(encodedTuple);
   }
 
   @Override
   public void addState(final int[] tuple, final int code)
   {
-    final long encodedTuple = encode(tuple);
+    final int encodedTuple = encode(tuple);
     mMap.put(encodedTuple, code);
   }
 
   //#######################################################################
   //# Specific methods
-  public long encode(final int[] tuple)
+  public int encode(final int[] tuple)
   {
-    long result = 0;
+    int result = 0;
     for(int i = 0; i < tuple.length; i++) {
-      result = result | (long)tuple[i]<<mShiftAmount[i];
+      result = result | tuple[i]<<mShiftAmount[i];
     }
     return result;
   }
 
-  public void decode(final long code, final int[] tuple)
+  public void decode(final int code, final int[] tuple)
   {
     for (int i = 0; i < tuple.length; i++) {
-      tuple[i] = (int) ((code >>> mShiftAmount[i]) & mMask[i]);
+      tuple[i] = ((code >>> mShiftAmount[i]) & mMask[i]);
     }
   }
 
@@ -77,11 +77,11 @@ public class LongSynchronisationEncoding
   //# Data Members
   private final int[] mShiftAmount;
   private final int[] mMask;
-  private final TLongIntHashMap mMap;
+  private final TIntIntHashMap mMap;
 
 
   //#######################################################################
   //# Data Members
-  static final int MAX_BITS = 63;
+  static final int MAX_BITS = 31;
 
 }

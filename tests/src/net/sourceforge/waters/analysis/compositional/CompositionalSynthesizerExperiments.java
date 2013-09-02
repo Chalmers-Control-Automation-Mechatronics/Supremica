@@ -254,6 +254,9 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesisFenCaiWon09B();// 4
     synthesisFenCaiWon09Synth();// 5
     synthesisFms2003();// 6
+    synthesisePSLBigWithManyRestartTrans();
+    synthesisePSLBig();
+    synthesiseTbedCtct();
     synthesiseTbedNoderailB();// 7
     synthesiseTbedNoderailUncont();// 8
     synthesiseCentralLockingVerriegel3b();// 9
@@ -321,7 +324,6 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "incremental_suite", "tbed_noderail_block.wmod");
   }
 
-  @SuppressWarnings("unused")
   private void synthesiseTbedCtct() throws Exception
   {
     runModel("tests", "incremental_suite", "tbed_ctct.wmod");
@@ -353,6 +355,17 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   private void synthesisFms2003() throws Exception
   {
     runModel("tests", "fms2003", "fms2003.wmod");
+  }
+
+  // PSL
+  private void synthesisePSLBig() throws Exception
+  {
+    runModel("tests", "psl", "pslBig.wmod");
+  }
+
+  private void synthesisePSLBigWithManyRestartTrans() throws Exception
+  {
+    runModel("tests", "psl", "pslBigWithManyRestartTrans.wmod");
   }
 
   //flexible production cell

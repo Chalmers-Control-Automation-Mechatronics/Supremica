@@ -40,10 +40,10 @@ public class SelfRunningExperimentCompositionalSynthesis
         new Configuration(automataSynthesizer,
                           AutomataSynthesisAbstractionProcedureFactory.WSOE);
       configurations.add(configWSOE);
-      final Configuration configWSOEUnsup =
-        new Configuration(automataSynthesizer,
-                          AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
-      configurations.add(configWSOEUnsup);
+//      final Configuration configWSOEUnsup =
+//        new Configuration(automataSynthesizer,
+//                          AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
+//      configurations.add(configWSOEUnsup);
       final AbstractCompositionalSynthesizer stateRepresentationSynthesizer =
         new CompositionalStateRepresentationSynthesizer(factory);
       final Configuration configStateRepresent =

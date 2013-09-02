@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.map.hash.TLongIntHashMap;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.tr.LongSynchronisationEncoding;
+import net.sourceforge.waters.analysis.tr.AbstractSynchronisationEncoding;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -94,11 +92,10 @@ public class SynthesisStateSpace implements AutomatonProxy
   }
 
   public SynthesisStateMap createSynchronisationMap
-                            (final TLongIntHashMap map,
-                             final LongSynchronisationEncoding encoding,
+                            (final AbstractSynchronisationEncoding encoding,
                              final List<SynthesisStateMap> parents)
   {
-    return new SynchronisationMap( map, encoding, parents);
+    return new SynchronisationMap(encoding, parents);
   }
 
 
@@ -304,11 +301,9 @@ public class SynthesisStateSpace implements AutomatonProxy
   {
     //#######################################################################
     //# Constructor
-    private SynchronisationMap(final TLongIntHashMap map,
-                               final LongSynchronisationEncoding encoding,
+    private SynchronisationMap(final AbstractSynchronisationEncoding encoding,
                                final List<SynthesisStateMap> parents)
     {
-      mSynchronisationMap = map;
       mSynchronisationEncoding = encoding;
       mParents = parents;
     }
@@ -325,14 +320,12 @@ public class SynthesisStateSpace implements AutomatonProxy
           return -1;
         }
       }
-      final long key = mSynchronisationEncoding.encode(tuple);
-      return mSynchronisationMap.get(key);
+      return mSynchronisationEncoding.getStateCode(tuple);
     }
 
     //#######################################################################
     //# Data Members
-    private final TLongIntHashMap mSynchronisationMap;
-    private final LongSynchronisationEncoding mSynchronisationEncoding;
+    private final AbstractSynchronisationEncoding mSynchronisationEncoding;
     private final List<SynthesisStateMap> mParents;
   }
 
