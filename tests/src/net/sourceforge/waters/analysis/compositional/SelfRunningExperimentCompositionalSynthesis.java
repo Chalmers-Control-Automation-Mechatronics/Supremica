@@ -9,6 +9,10 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
@@ -29,34 +33,47 @@ public class SelfRunningExperimentCompositionalSynthesis
       //final String outputDir = System.getProperty("waters.test.outputdir");
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
-      final CompositionalAutomataSynthesizer synthesizer =
+      final AbstractCompositionalSynthesizer automataSynthesizer =
         new CompositionalAutomataSynthesizer(factory);
-      final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
-      preselectingFactory = synthesizer.getPreselectingMethodFactory();
+      final List<Configuration> configurations = new LinkedList<>();
+      final Configuration configWSOE =
+        new Configuration(automataSynthesizer,
+                          AutomataSynthesisAbstractionProcedureFactory.WSOE);
+      configurations.add(configWSOE);
+      final Configuration configWSOEUnsup =
+        new Configuration(automataSynthesizer,
+                          AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
+      configurations.add(configWSOEUnsup);
+      final AbstractCompositionalSynthesizer stateRepresentationSynthesizer =
+        new CompositionalStateRepresentationSynthesizer(factory);
+      final Configuration configStateRepresent =
+        new Configuration(stateRepresentationSynthesizer,
+                          StateRepresentationSynthesisAbstractionProcedureFactory.WSOE);
+      configurations.add(configStateRepresent);
+     final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
+      preselectingFactory = automataSynthesizer.getPreselectingMethodFactory();
       final AbstractCompositionalModelAnalyzer.SelectingMethodFactory
-      selectingFactory = synthesizer.getSelectingMethodFactory();
+      selectingFactory = automataSynthesizer.getSelectingMethodFactory();
       int methodCount = 0;
-      final AutomataSynthesisAbstractionProcedureFactory[] methods = {
-         AutomataSynthesisAbstractionProcedureFactory.WSOE,
-         AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP
-      };
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
            preselectingMethod : preselectingFactory.getEnumConstants()) {
         for (final AbstractCompositionalModelAnalyzer.SelectingMethod
              selectingMethod: selectingFactory.getEnumConstants()) {
           methodCount++;
-          for (final AutomataSynthesisAbstractionProcedureFactory method: methods) {
+          for (final Configuration config: configurations) {
+            final AbstractCompositionalSynthesizer synthesizer = config.getSynthesizer();
+            final AbstractionProcedureFactory method = config.getMethod();
             final String preName = preselectingMethod.toString();
             final String selName = selectingMethod.toString();
             // without supervisor reduction:
             System.out.println
-              ("Method " + methodCount + " *** " + preName + "/" + selName +
-               "/" + method + " without reduction" + " ***");
+              ("Method " + methodCount + " *** " + config + "/" + preName +
+               "/" + selName + " without reduction" + " ***");
             final CompositionalSynthesizerExperiments experiment =
               new CompositionalSynthesizerExperiments
-              (methodCount + "_" + preName + "_" +  selName + "_" + method +"_NR.csv",
-               method, preselectingMethod, selectingMethod);
-            experiment.setSupervisorReductionEnabled(false);
+              (methodCount + "_" + config + "_" + preName + "_" +  selName +
+               "_NR.csv",
+               synthesizer, method, preselectingMethod, selectingMethod);
             experiment.setUp();
             experiment.runAllTests();
             experiment.tearDown();
@@ -78,4 +95,46 @@ public class SelfRunningExperimentCompositionalSynthesis
       exception.printStackTrace(System.err);
     }
   }
+
+  //#########################################################################
+  //# Inner class
+  private static class Configuration
+  {
+    private Configuration(final AbstractCompositionalSynthesizer synthesizer,
+                  final AbstractionProcedureFactory factory)
+    {
+      mSynthesizer = synthesizer;
+      mFactory = factory;
+    }
+
+    private AbstractCompositionalSynthesizer getSynthesizer()
+    {
+      return mSynthesizer;
+    }
+
+    private AbstractionProcedureFactory getMethod()
+    {
+      return mFactory;
+    }
+
+    @Override
+    public String toString()
+    {
+      String name = ProxyTools.getShortClassName(mSynthesizer);
+      if (name.startsWith("Compositional")) {
+        name = name.substring(13);
+      }
+      if (name.endsWith("Synthesizer")) {
+        name = name.substring(0,name.length()-11);
+      }
+      name += "_" + mFactory.toString();
+      return name;
+    }
+
+    //#######################################################################
+    //# Data members
+    private final AbstractCompositionalSynthesizer mSynthesizer;
+    private final AbstractionProcedureFactory mFactory;
+  }
+
 }

@@ -167,8 +167,7 @@ public class SynthesisStateSpace implements AutomatonProxy
   @Override
   public Set<EventProxy> getEvents()
   {
-    createAutomaton();
-    return mAutomaton.getEvents();
+    return mDES.getEvents();
   }
 
   @Override
@@ -221,7 +220,7 @@ public class SynthesisStateSpace implements AutomatonProxy
           new MonolithicSynchronousProductBuilder(mDES, mFactory);
         syncBuilder.setOutputName(mName);
         syncBuilder.setOutputKind(ComponentKind.SUPERVISOR);
-        syncBuilder.setRemovingSelfloops(true);
+//        syncBuilder.setRemovingSelfloops(true);
         final SynthesisStateCallBack callBack = new SynthesisStateCallBack();
         syncBuilder.setStateCallback(callBack);
         syncBuilder.run();

@@ -175,9 +175,13 @@ public class CompositionalSynthesisResult
     writer.print(",");
     int largest = 0;
     for (final AutomatonProxy sup : mSupervisors) {
-      final int currentSupSize = sup.getStates().size();
-      if (currentSupSize > largest) {
-        largest = currentSupSize;
+      if (sup instanceof SynthesisStateSpace) {
+        // TODO
+      } else {
+        final int currentSupSize = sup.getStates().size();
+        if (currentSupSize > largest) {
+          largest = currentSupSize;
+        }
       }
     }
     writer.print(largest);

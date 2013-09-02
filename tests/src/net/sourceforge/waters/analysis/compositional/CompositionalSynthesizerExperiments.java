@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
@@ -41,16 +42,21 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
 
   //#########################################################################
   //# Constructor
-  public CompositionalSynthesizerExperiments(final String statsFilename)
+  public CompositionalSynthesizerExperiments
+    (final AbstractCompositionalSynthesizer synthesizer,
+     final AbstractionProcedureFactory method,
+     final String statsFilename)
     throws FileNotFoundException
   {
-    this(statsFilename, AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP, null, null);
+    this(statsFilename, synthesizer, method, null, null);
   }
 
-  public CompositionalSynthesizerExperiments(final String statsFilename,
-                                             final AutomataSynthesisAbstractionProcedureFactory method,
-                                             final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
-                                             final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
+  public CompositionalSynthesizerExperiments
+    (final String statsFilename,
+     final AbstractCompositionalSynthesizer synthesizer,
+     final AbstractionProcedureFactory method,
+     final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
+     final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
     throws FileNotFoundException
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -59,11 +65,10 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     final File statsFile = new File(dir, statsFilename);
     mOut = new FileOutputStream(statsFile);
     mPrintWriter = null;
+    mSynthesizer = synthesizer;
     mMethod = method;
     mPreselecting = preselectingHeuristic;
     mSelecting = selectingHeuristic;
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mSynthesizer = new CompositionalAutomataSynthesizer(factory);
     mWatchdog = new Watchdog(mSynthesizer, mTimeout);
   }
 
@@ -82,10 +87,8 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSynthesizer.setMonolithicStateLimit(finalStateLimit);
     final int finalTransitionLimit = 5000000;
     mSynthesizer.setMonolithicTransitionLimit(finalTransitionLimit);
-    mSynthesizer.setAbstractionProcedureFactory(mMethod);
     mSynthesizer.setPreselectingMethod(mPreselecting);
     mSynthesizer.setSelectingMethod(mSelecting);
-    mSynthesizer.setSupervisorReductionEnabled(mSupervisorReductionEnabled);
     mPrintWriter.println("InternalStateLimit," + internalStateLimit
                          + ",InternalTransitionLimit,"
                          + internalTransitionLimit + ",FinalStateLimit,"
@@ -93,7 +96,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mPrintWriter.println("PreselHeuristic," + mPreselecting +
                          ",SelecHeuristic," + mSelecting +
                          ",Method," + mMethod);
-    mPrintWriter.println("SupervisorReduction," + mSupervisorReductionEnabled);
+    // mPrintWriter.println("SupervisorReduction," + mSupervisorReductionEnabled);
     mHasBeenPrinted = false;
   }
 
@@ -109,7 +112,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
 
   //#########################################################################
   //# Simple Access
-  CompositionalAutomataSynthesizer getSynthesizer()
+  AbstractCompositionalSynthesizer getSynthesizer()
   {
     return mSynthesizer;
   }
@@ -132,11 +135,6 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     final AbstractCompositionalModelAnalyzer.SelectingMethodFactory factory =
       mSynthesizer.getSelectingMethodFactory();
     mSelecting = factory.getEnumValue(name);
-  }
-
-  void setSupervisorReductionEnabled(final boolean enabled)
-  {
-    mSupervisorReductionEnabled = enabled;
   }
 
   void setTimeOut(final int timeout)
@@ -204,19 +202,31 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   //# Main Method
   public static void main(final String[] args)
   {
-    if (args.length == 4) {
+    if (args.length == 4 || args.length == 5) {
       try {
+        final ProductDESProxyFactory factory =
+          ProductDESElementFactory.getInstance();
+        final AbstractCompositionalSynthesizer synthesizer;
+        final AbstractionProcedureFactory method;
         final String filename = args[0];
-        final String preselectingHeuristic = args[1];
-        final String selectingHeuristic = args[2];
-        final int enabled = Integer.parseInt(args[3]);
-        final boolean supervisorReductionEnabled =
-          (enabled == 0) ? false : true;
+        final String preselectingHeuristic = args[2];
+        final String selectingHeuristic = args[3];
+        if (args[1].startsWith("S")|| args[1].startsWith("s")) {
+          synthesizer = new CompositionalStateRepresentationSynthesizer(factory);
+          method = AutomataSynthesisAbstractionProcedureFactory.WSOE;
+        } else {
+          final CompositionalAutomataSynthesizer automataSynthesizer =
+            new CompositionalAutomataSynthesizer(factory);
+          final boolean supervisorReductionEnabled =
+            args.length == 5 && Integer.parseInt(args[4]) != 0;
+          automataSynthesizer.setSupervisorReductionEnabled(supervisorReductionEnabled);
+          synthesizer = automataSynthesizer;
+          method = StateRepresentationSynthesisAbstractionProcedureFactory.WSOE;
+        }
         final CompositionalSynthesizerExperiments experiment =
-          new CompositionalSynthesizerExperiments(filename);
+          new CompositionalSynthesizerExperiments(synthesizer, method, filename);
         experiment.setPreselectingHeuristic(preselectingHeuristic);
         experiment.setSelectingHeuristic(selectingHeuristic);
-        experiment.setSupervisorReductionEnabled(supervisorReductionEnabled);
         experiment.setUp();
         experiment.runAllTests();
         experiment.tearDown();
@@ -227,7 +237,9 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     } else {
       System.err
         .println("Usage: CompositionalSynthesizerExperiments "
-                 + "<outputFilename> <preselectingHeuristic> <selectingHeuristic>");
+                 + "<outputFilename> Automata|StateRepresentation " +
+                 "<preselectingHeuristic> " +
+                 "<selectingHeuristic> [supervisorReductionEnabled]");
     }
   }
 
@@ -414,15 +426,14 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
 
   //#########################################################################
   //# Data Members
-  private CompositionalAutomataSynthesizer mSynthesizer;
-  private final FileOutputStream mOut;
-  private PrintWriter mPrintWriter;
-  private final Watchdog mWatchdog;
-  private boolean mHasBeenPrinted;
-  private boolean mSupervisorReductionEnabled;
-
-  private int mTimeout = 600;
-  private final AutomataSynthesisAbstractionProcedureFactory mMethod;
+  private AbstractCompositionalSynthesizer mSynthesizer;
+  private final AbstractionProcedureFactory mMethod;
   private AbstractCompositionalModelAnalyzer.PreselectingMethod mPreselecting;
   private AbstractCompositionalModelAnalyzer.SelectingMethod mSelecting;
+  private final Watchdog mWatchdog;
+  private int mTimeout = 600;
+
+  private final FileOutputStream mOut;
+  private PrintWriter mPrintWriter;
+  private boolean mHasBeenPrinted;
 }

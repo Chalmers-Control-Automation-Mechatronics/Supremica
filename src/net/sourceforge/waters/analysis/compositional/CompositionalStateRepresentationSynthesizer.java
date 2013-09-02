@@ -249,8 +249,7 @@ public class CompositionalStateRepresentationSynthesizer extends
         final StateEncoding encoding = new StateEncoding(automaton);
         final SynthesisStateSpace.SynthesisStateMap map =
           mSynthesisStateSpace.createStateEncodingMap(automaton, encoding);
-        final StateRepresentationInfo info = new StateRepresentationInfo(map, encoding);
-        mStateRepresentationMap.put(automaton, info);
+        mStateRepresentationMap.put(automaton, map);
         break;
       default:
         break;
@@ -273,7 +272,9 @@ public class CompositionalStateRepresentationSynthesizer extends
     throws OverflowException
   {
     final AutomatonProxy plant = super.plantify(spec);
-    updateStateRepresentationInfo(spec, plant);
+    final SynthesisStateSpace.SynthesisStateMap map =
+      mStateRepresentationMap.remove(spec);
+    mStateRepresentationMap.put(plant, map);
     return plant;
   }
 
@@ -289,12 +290,12 @@ public class CompositionalStateRepresentationSynthesizer extends
         setBooleanResult(false);
         return;
       }
-      final StateRepresentationInfo parentInfo =
+
+      final SynthesisStateSpace.SynthesisStateMap parent =
         mStateRepresentationMap.remove(original);
-      final SynthesisStateSpace.SynthesisStateMap parent = parentInfo.getMap();
       final TRPartition partition = merge.getPartition();
       if (partition == null) {
-        mStateRepresentationMap.put(result, parentInfo);
+        mStateRepresentationMap.put(result, parent);
       } else {
         final StateEncoding resultEncoding = merge.getResultStateEncoding();
         final StateEncoding defaultEncoding = new StateEncoding(result);
@@ -304,9 +305,7 @@ public class CompositionalStateRepresentationSynthesizer extends
           TRPartition.combine(partition, reencoding);
         final SynthesisStateSpace.SynthesisStateMap map =
           mSynthesisStateSpace.createPartitionMap(combinedPartition, parent);
-        final StateRepresentationInfo info =
-          new StateRepresentationInfo(map, defaultEncoding);
-        mStateRepresentationMap.put(result, info);
+        mStateRepresentationMap.put(result, map);
       }
       return;
     } else if (step instanceof HidingStep) { // synchronous product
@@ -316,19 +315,19 @@ public class CompositionalStateRepresentationSynthesizer extends
         final AutomatonProxy result = step.getResultAutomaton();
         final List<SynthesisStateSpace.SynthesisStateMap> parents =
           new ArrayList<SynthesisStateSpace.SynthesisStateMap>(originals.size());
-        final int[] stateSize = new int[originals.size()];
+        final int[] stateCounts = new int[originals.size()];
         final StateEncoding[] originalStateEncodings = new StateEncoding[originals.size()];
         int a = 0;
         for (final AutomatonProxy automaton : originals) {
-          final StateRepresentationInfo info = mStateRepresentationMap.remove(automaton);
-          final SynthesisStateSpace.SynthesisStateMap parent = info.getMap();
+          final SynthesisStateSpace.SynthesisStateMap parent =
+            mStateRepresentationMap.remove(automaton);
           parents.add(parent);
           originalStateEncodings[a] = new StateEncoding(automaton);
-          stateSize[a] = originalStateEncodings[a].getNumberOfStates();
+          stateCounts[a] = originalStateEncodings[a].getNumberOfStates();
           a++;
         }
         final LongSynchronisationEncoding synchEncoding =
-          new LongSynchronisationEncoding(stateSize);
+          new LongSynchronisationEncoding(stateCounts);
         final Set<StateProxy> synchStates = result.getStates();
         final TLongIntHashMap synchMap =
           new TLongIntHashMap(synchStates.size(), 0.5f, -1, -1);
@@ -355,9 +354,7 @@ public class CompositionalStateRepresentationSynthesizer extends
         }
         final SynthesisStateSpace.SynthesisStateMap map =
           mSynthesisStateSpace.createSynchronisationMap(synchMap, synchEncoding, parents);
-        final StateRepresentationInfo info =
-          new StateRepresentationInfo(map, synchStateEncoding);
-        mStateRepresentationMap.put(result, info);
+        mStateRepresentationMap.put(result, map);
         return;
       }
     }
@@ -371,21 +368,16 @@ public class CompositionalStateRepresentationSynthesizer extends
       final StateEncoding resultEncoding = new StateEncoding(result);
       final TRPartition reencoding =
         TRPartition.createReencodingPartition(originalEncoding, resultEncoding);
-      final StateRepresentationInfo info =
-          mStateRepresentationMap.remove(original);
+      final SynthesisStateSpace.SynthesisStateMap parent =
+        mStateRepresentationMap.remove(original);
       if (reencoding == null) {
-        mStateRepresentationMap.put(result, info);
+        mStateRepresentationMap.put(result, parent);
       } else {
-        mStateRepresentationMap.put(result, info);
-        final SynthesisStateSpace.SynthesisStateMap parent = info.getMap();
         final SynthesisStateSpace.SynthesisStateMap map =
           mSynthesisStateSpace.createPartitionMap(reencoding, parent);
-        final StateRepresentationInfo newInfo =
-          new StateRepresentationInfo(map, resultEncoding);
-        mStateRepresentationMap.put(result, newInfo);
+        mStateRepresentationMap.put(result, map);
       }
     }
-
   }
 
   @Override
@@ -475,8 +467,9 @@ public class CompositionalStateRepresentationSynthesizer extends
     (final AutomatonProxy aut, final EventEncoding eventEnc)
     throws AnalysisException
   {
-    final StateRepresentationInfo info = mStateRepresentationMap.get(aut);
-    final SynthesisStateSpace.SynthesisStateMap parent = info.getMap();
+
+    final SynthesisStateSpace.SynthesisStateMap parent =
+      mStateRepresentationMap.get(aut);
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut,
                                        eventEnc,
@@ -503,28 +496,6 @@ public class CompositionalStateRepresentationSynthesizer extends
       mSynthesisStateSpace.addStateMap(map);
       return true;
     }
-  }
-
-  //#########################################################################
-  //# Auxiliary methods
-  private void updateStateRepresentationInfo(final AutomatonProxy original,
-                                             final AutomatonProxy result)
-  {
-    StateRepresentationInfo info = mStateRepresentationMap.remove(original);
-    final StateEncoding encoding = info.getEncoding();
-    boolean change = false;
-    for(final StateProxy state : result.getStates()) {
-      if (encoding.getStateCode(state) < 0) {
-        change = true;
-        break;
-      }
-    }
-    if (change) {
-      final StateEncoding newEncoding = new StateEncoding(result);
-      final SynthesisStateSpace.SynthesisStateMap map = info.getMap();
-      info = new StateRepresentationInfo(map, newEncoding);
-    }
-    mStateRepresentationMap.put(result, info);
   }
 
   //#########################################################################
@@ -577,37 +548,8 @@ public class CompositionalStateRepresentationSynthesizer extends
   }
 
   //#########################################################################
-  //# Inner Class
-  private static class StateRepresentationInfo
-  {
-
-    StateRepresentationInfo(final SynthesisStateSpace.SynthesisStateMap map,
-                            final StateEncoding encoding)
-    {
-      mMap = map;
-      mEncoding = encoding;
-    }
-
-    private SynthesisStateSpace.SynthesisStateMap getMap()
-    {
-      return mMap;
-    }
-
-    private StateEncoding getEncoding()
-    {
-      return mEncoding;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final SynthesisStateSpace.SynthesisStateMap mMap;
-    private final StateEncoding mEncoding;
-  }
-
-
-  //#########################################################################
   //# Data Members
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
-  private Map<AutomatonProxy,StateRepresentationInfo> mStateRepresentationMap;
+  private Map<AutomatonProxy,SynthesisStateSpace.SynthesisStateMap> mStateRepresentationMap;
   private SynthesisStateSpace mSynthesisStateSpace;
 }

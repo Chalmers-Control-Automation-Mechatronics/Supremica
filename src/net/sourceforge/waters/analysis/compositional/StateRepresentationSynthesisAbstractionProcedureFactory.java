@@ -86,7 +86,7 @@ public enum StateRepresentationSynthesisAbstractionProcedureFactory
 
   /**
    * An abstraction chain consisting of halfway synthesis, bisimulation,
-   * and weak synthesis observation equivalence.
+   * weak synthesis observation equivalence and transition removal.
    */
   WSOE {
     @Override
