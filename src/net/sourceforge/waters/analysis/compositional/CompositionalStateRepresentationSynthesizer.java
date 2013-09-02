@@ -290,21 +290,28 @@ public class CompositionalStateRepresentationSynthesizer extends
         return;
       }
       final StateRepresentationInfo parentInfo =
-        mStateRepresentationMap.get(original);
+        mStateRepresentationMap.remove(original);
       final SynthesisStateSpace.SynthesisStateMap parent = parentInfo.getMap();
       final TRPartition partition = merge.getPartition();
-      if (partition != null){
+      if (partition == null) {
+        mStateRepresentationMap.put(result, parentInfo);
+      } else {
+        final StateEncoding resultEncoding = merge.getResultStateEncoding();
+        final StateEncoding defaultEncoding = new StateEncoding(result);
+        final TRPartition reencoding =
+          TRPartition.createReencodingPartition(resultEncoding, defaultEncoding);
+        final TRPartition combinedPartition =
+          TRPartition.combine(partition, reencoding);
         final SynthesisStateSpace.SynthesisStateMap map =
-          mSynthesisStateSpace.createPartitionMap(partition, parent);
+          mSynthesisStateSpace.createPartitionMap(combinedPartition, parent);
         final StateRepresentationInfo info =
-          new StateRepresentationInfo(map, merge.getResultStateEncoding());
+          new StateRepresentationInfo(map, defaultEncoding);
         mStateRepresentationMap.put(result, info);
-        mStateRepresentationMap.remove(original);
-        return;
       }
+      return;
     } else if (step instanceof HidingStep) { // synchronous product
       final List<AutomatonProxy> originals = step.getOriginalAutomata();
-      if (originals.size() >= 2) {
+      if (originals.size() >= 1) {
         final HidingStep hide = (HidingStep) step;
         final AutomatonProxy result = step.getResultAutomaton();
         final List<SynthesisStateSpace.SynthesisStateMap> parents =
@@ -316,7 +323,7 @@ public class CompositionalStateRepresentationSynthesizer extends
           final StateRepresentationInfo info = mStateRepresentationMap.remove(automaton);
           final SynthesisStateSpace.SynthesisStateMap parent = info.getMap();
           parents.add(parent);
-          originalStateEncodings[a] = info.getEncoding();
+          originalStateEncodings[a] = new StateEncoding(automaton);
           stateSize[a] = originalStateEncodings[a].getNumberOfStates();
           a++;
         }
@@ -327,17 +334,23 @@ public class CompositionalStateRepresentationSynthesizer extends
           new TLongIntHashMap(synchStates.size(), 0.5f, -1, -1);
         final StateEncoding synchStateEncoding = new StateEncoding(result);
         final int[] stateCodes = new int[originals.size()];
+        states:
         for (final StateProxy synchState : synchStates) {
           a = 0;
           for (final AutomatonProxy automaton : originals) {
             final StateProxy originalState =
               hide.getOriginalState(synchState, automaton);
+            if (originalState == null) {  // dumpstate
+              continue states;
+            }
             final int stateCode = originalStateEncodings[a].getStateCode(originalState);
+            assert stateCode >= 0;
             stateCodes[a] = stateCode;
             a++;
           }
           final int synchStateCode = synchStateEncoding.getStateCode(synchState);
           final long synchKey = synchEncoding.encode(stateCodes);
+          assert synchKey>=0;
           synchMap.put(synchKey, synchStateCode);
         }
         final SynthesisStateSpace.SynthesisStateMap map =
@@ -348,14 +361,29 @@ public class CompositionalStateRepresentationSynthesizer extends
         return;
       }
     }
+
     final List<AutomatonProxy> originals = step.getOriginalAutomata();
     final List<AutomatonProxy> results = step.getResultAutomata();
     for (int i = 0; i < originals.size(); i++) {
       final AutomatonProxy original = originals.get(i);
       final AutomatonProxy result = results.get(i);
+      final StateEncoding originalEncoding = new StateEncoding(original);
+      final StateEncoding resultEncoding = new StateEncoding(result);
+      final TRPartition reencoding =
+        TRPartition.createReencodingPartition(originalEncoding, resultEncoding);
       final StateRepresentationInfo info =
-        mStateRepresentationMap.remove(original);
-      mStateRepresentationMap.put(result, info);
+          mStateRepresentationMap.remove(original);
+      if (reencoding == null) {
+        mStateRepresentationMap.put(result, info);
+      } else {
+        mStateRepresentationMap.put(result, info);
+        final SynthesisStateSpace.SynthesisStateMap parent = info.getMap();
+        final SynthesisStateSpace.SynthesisStateMap map =
+          mSynthesisStateSpace.createPartitionMap(reencoding, parent);
+        final StateRepresentationInfo newInfo =
+          new StateRepresentationInfo(map, resultEncoding);
+        mStateRepresentationMap.put(result, newInfo);
+      }
     }
 
   }

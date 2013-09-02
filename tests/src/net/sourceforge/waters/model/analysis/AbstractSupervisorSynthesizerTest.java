@@ -317,6 +317,14 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+
+  public void testOneStateSup() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "one_state_sup.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testParrow() throws Exception
   {
     final ProductDESProxy des =

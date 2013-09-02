@@ -27,6 +27,7 @@ public class LongSynchronisationEncoding
       mShiftAmount[i+1]= shift;
       mMask[i] = (1<<numberOfBits)-1;
     }
+    assert shift <= 63;
   }
 
   public int size()
@@ -38,7 +39,7 @@ public class LongSynchronisationEncoding
   {
     long result = 0;
     for(int i = 0; i < tuple.length; i++) {
-      result = result | tuple[i]<<mShiftAmount[i];
+      result = result | (long)tuple[i]<<mShiftAmount[i];
     }
     return result;
   }

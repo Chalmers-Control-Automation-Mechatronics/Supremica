@@ -2683,7 +2683,7 @@ public class ListBufferTransitionRelation
       }
     }
 
-    final int numStates = getNumberOfStates();
+    final int numStates = getNumberOfStates() - mExtraStates;
     final StateProxy[] states = new StateProxy[numStates];
     final List<StateProxy> reachable = new ArrayList<StateProxy>(numStates);
     final TLongObjectHashMap<Collection<EventProxy>> markingsMap =

@@ -44,7 +44,7 @@ public class CompositionalStateRepresentationSynthesizerMustLMinSTest
   {
     final CompositionalStateRepresentationSynthesizer synthesizer =
       new CompositionalStateRepresentationSynthesizer(factory,
-                                   StateRepresentationSynthesisAbstractionProcedureFactory.NO_TRANSITIONREMOVAL);
+          StateRepresentationSynthesisAbstractionProcedureFactory.WSOE);
     synthesizer.setInternalStateLimit(5000);
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);

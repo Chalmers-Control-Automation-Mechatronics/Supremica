@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.des.StateProxy;
+
 /**
  * <P>A partition to represent equivalent states of a {@link
  * ListBufferTransitionRelation}.</P>
@@ -216,6 +218,29 @@ public class TRPartition
       stateToClass[s] = s;
     }
     return new TRPartition(stateToClass, numStates);
+  }
+
+  /**
+   * Creates a partition to convert from one state encoding to another.
+   */
+  public static TRPartition createReencodingPartition(final StateEncoding first,
+                                                      final StateEncoding second)
+  {
+    final int[] stateToClass = new int[first.getNumberOfStates()];
+    boolean trivial = first.getNumberOfStates() == second.getNumberOfStates();
+    for (int i=0; i< first.getNumberOfStates(); i++) {
+      final StateProxy state = first.getState(i);
+      final int clazz = second.getStateCode(state);
+      if (clazz != i) {
+        trivial = false;
+      }
+      stateToClass[i] = clazz;
+    }
+    if (trivial) {
+      return null;
+    } else {
+      return new TRPartition(stateToClass, second.getNumberOfStates());
+    }
   }
 
 
