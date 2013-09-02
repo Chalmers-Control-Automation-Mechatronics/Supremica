@@ -21,8 +21,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 
+import net.sourceforge.waters.analysis.efa.EFAHelper;
 import net.sourceforge.waters.analysis.efa.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.SimpleEFAEventDecl;
+import net.sourceforge.waters.analysis.efa.SimpleEFAState;
+import net.sourceforge.waters.analysis.efa.SimpleEFAStateEncoding;
 import net.sourceforge.waters.analysis.efa.SimpleEFATransitionLabel;
 import net.sourceforge.waters.analysis.efa.SimpleEFATransitionLabelEncoding;
 import net.sourceforge.waters.analysis.efa.SimpleEFAVariable;
@@ -32,6 +35,7 @@ import net.sourceforge.waters.analysis.efa.SimpleEFAVariableFinder;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -45,6 +49,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
  *
@@ -65,6 +70,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     mVarFinder = new SimpleEFAVariableFinder(mOperatorTable);
     mVarCollector = new SimpleEFAVariableCollector(mOperatorTable, varContext);
     mResiduals = new THashSet<>();
+    mHelper = new EFAHelper(mFactory, mOperatorTable);
   }
 
   public EFAPartialEvaluator(final SimpleEFAVariableContext varContext)
@@ -86,9 +92,28 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     mCompVarsMap = componentVariablesMap;
   }
 
+  public void setReadStateNameAsValue(boolean enable)
+  {
+    mReadStateNameAsValue = enable;
+  }
+
+  public void setAppendValueToStateName(boolean enable)
+  {
+    mAppendValueToStateName = enable;
+  }
+
   public Collection<SimpleEFAComponent> getResidualComponents()
   {
     return mResiduals;
+  }
+
+  public Collection<SimpleEFAVariable> getEvaluatedVariables()
+  {
+    final THashSet<SimpleEFAVariable> list = new THashSet<>(mCompVarsMap.size());
+    for (final THashSet<SimpleEFAVariable> vars : mCompVarsMap.values()) {
+      list.addAll(vars);
+    }
+    return list;
   }
 
   public void evaluate()
@@ -129,8 +154,15 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
    throws EvalException, AnalysisException
   {
     try {
-      //normalize();
       mTupleStateMap = new THashMap<>();
+      final String pComponentName = component.getName() + mSuffixName;
+      final SimpleEFAStateEncoding oStateEncoding = component.getStateEncoding();
+      final TIntObjectHashMap<ConstraintList> oStateValueMap =
+       createStateValueMap(oStateEncoding);
+      boolean hasStateValue = false;
+      if (!oStateValueMap.isEmpty()) {
+        hasStateValue = true;
+      }
       final ListBufferTransitionRelation oRel =
        component.getTransitionRelation();
       oRel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
@@ -140,26 +172,14 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       }
       final int oNbrStates = oRel.getNumberOfReachableStates();
       final int pNbrStates = oVarRange * oNbrStates;
+      System.err.println("PE Stimated Nbr State: " + pNbrStates);
       final SimpleEFATransitionLabelEncoding oLabelEncoding =
        component.getTransitionLabelEncoding();
       final SimpleEFATransitionLabelEncoding pLabelEncoding =
        new SimpleEFATransitionLabelEncoding(oLabelEncoding.size());
-
-      final TIntObjectHashMap<String> oStateNameEncoding = component
-       .getStateNameMap();
-      final TIntObjectHashMap<String> pStateNameEncoding =
-       new TIntObjectHashMap<>(pNbrStates, 0.6f);
-
-      final ListBufferTransitionRelation pRel =
-       new ListBufferTransitionRelation(oRel.getName(),
-                                        oRel.getKind(),
-                                        pNbrStates,
-                                        oRel.getNumberOfPropositions(),
-                                        pNbrStates,
-                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      for (int i = 0; i < pNbrStates; i++) {
-        pRel.setReachable(i, false);
-      }
+      final SimpleEFAStateEncoding pStateEncoding =
+       new SimpleEFAStateEncoding();
+      final ArrayList<Integer[]> pTR = new ArrayList<>();
       final TIntLongMap statePropMap = new TIntLongHashMap(oNbrStates);
       int oInitState = -1;
       for (int s = 0; s < oRel.getNumberOfStates(); s++) {
@@ -177,27 +197,44 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
          "PE > evaluate: Initial state cannot be found.");
       }
       final ConstraintList oInitExps = getInitialExpressions(PEVars);
-      final String oStateName = oStateNameEncoding.get(oInitState);
-      final ConstraintList pInitExps = getPretty(oInitExps);
+      final SimpleEFAState oState = oStateEncoding.getSimpleState(oInitState);
+      ConstraintList pInitExps = getPretty(oInitExps);
+      if (hasStateValue) {
+        final ConstraintList oValue = oStateValueMap.get(oInitState);
+        pInitExps = mergeString(pInitExps, oValue);
+      }
       final Tuple initTuple = new Tuple(oInitState, pInitExps);
       final int pInitState = createStateId(initTuple);
-      pStateNameEncoding.put(pInitState, getStateName(oStateName, pInitExps));
-      pRel.setReachable(pInitState, true);
-      pRel.setInitial(pInitState, true);
-      pRel.setAllMarkings(pInitState, statePropMap.get(oInitState));
+      final SimpleEFAState pState = new SimpleEFAState(oState.getSimpleNode());
+      if (mAppendValueToStateName) {
+        pState.setName(getStateName(oState.getName(), pInitExps));
+      } else {
+        pState.setName("S" + pInitState);
+      }
+      pState.mergeToAttribute(DEFAULT_STATEVALUE_STRING,
+                              print(pInitExps, "", DEFAULT_VALUE_SEPARATOR, ""),
+                              DEFAULT_VALUE_SEPARATOR);
+      pState.setMarkings(statePropMap.get(oInitState));
+      pStateEncoding.put(pState, pInitState);
       final Stack<Tuple> stack = new Stack<>();
       stack.push(initTuple);
       final TransitionIterator iter = oRel.createSuccessorsReadOnlyIterator();
+      System.err.println("PE Start Analyzing");
       while (!stack.isEmpty()) {
         final Tuple currTuple = stack.pop();
-        iter.resetState(currTuple.getState());
+        iter.resetState(currTuple.getStateId());
         while (iter.advance()) {
           final int currLabelId = iter.getCurrentEvent();
           final SimpleEFATransitionLabel currLabel =
            oLabelEncoding.getTransitionLabel(currLabelId);
           final ConstraintList currConditions =
            getCompleteFormConstraint(currLabel.getConstraint(), PEVars);
-          final ConstraintList currValues = currTuple.getConstrains();
+          ConstraintList currValues = currTuple.getConstrains();
+          if (hasStateValue) {
+            final int oCurrSource = iter.getCurrentSourceState();
+            final ConstraintList oValue = oStateValueMap.get(oCurrSource);
+            currValues = mergeConstraints(currValues, oValue);
+          }
           final List<SimpleExpressionProxy> nextValues = new ArrayList<>();
           final List<SimpleExpressionProxy> nextConditions = new ArrayList<>();
           final boolean isSatisfiable = execute(PEVars,
@@ -209,7 +246,11 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
             continue;
           }
           final int oCurrTarget = iter.getCurrentTargetState();
-          final ConstraintList nextValue = new ConstraintList(nextValues);
+          ConstraintList nextValue = new ConstraintList(nextValues);
+          if (hasStateValue) {
+            final ConstraintList oValue = oStateValueMap.get(oCurrTarget);
+            nextValue = mergeConstraints(nextValue, oValue);
+          }
           final Tuple nextTuple = new Tuple(oCurrTarget, nextValue);
           final SimpleEFAEventDecl[] nextEvent = currLabel.getEvents();
           final SimpleEFATransitionLabel pLabel =
@@ -217,47 +258,100 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
                                         nextEvent);
           final int nextLabelId = pLabelEncoding.createTransitionLabelId(pLabel);
           final int pCurrSource = getStateId(currTuple);
-          int pCurrTarget;
+          final int pCurrTarget;
           if (isTupleVisited(nextTuple)) {
             pCurrTarget = getStateId(nextTuple);
           } else {
             pCurrTarget = createStateId(nextTuple);
-            final String currStateName = oStateNameEncoding.get(oCurrTarget);
-            pStateNameEncoding.put(pCurrTarget,
-                                   getStateName(currStateName, nextValue));
-            pRel.setReachable(pCurrTarget, true);
-            pRel.setAllMarkings(pCurrTarget, statePropMap.get(oCurrTarget));
+            final SimpleEFAState oCurrTargetState =
+             oStateEncoding.getSimpleState(oCurrTarget);
+            final SimpleEFAState pCurrTargetState =
+             new SimpleEFAState(oCurrTargetState.getSimpleNode());
+            pCurrTargetState.setInitial(false);
+            if (mAppendValueToStateName) {
+              pCurrTargetState.setName(getStateName(oCurrTargetState.getName(),
+                                                    nextValue));
+            } else {
+              pCurrTargetState.setName("S" + pCurrTarget);
+            }
+
+            pCurrTargetState.mergeToAttribute(DEFAULT_STATEVALUE_STRING,
+                                              print(nextValue, "",
+                                                    DEFAULT_VALUE_SEPARATOR, ""),
+                                              DEFAULT_VALUE_SEPARATOR);
+            pCurrTargetState.setMarkings(statePropMap.get(oCurrTarget));
+            pStateEncoding.put(pCurrTargetState, pCurrTarget);
             stack.push(nextTuple);
           }
-          pRel.addTransition(pCurrSource, nextLabelId, pCurrTarget);
+          final Integer[] tr = new Integer[]{pCurrSource, nextLabelId,
+                                             pCurrTarget};
+          pTR.add(tr);
         }
       }
+      System.err.println("PE Finish Analyzing");
       final Collection<SimpleEFAVariable> unprimed = new THashSet<>();
       final Collection<SimpleEFAVariable> primed = new THashSet<>();
       getRemainingVariables(pLabelEncoding, unprimed, primed);
-      final THashSet<SimpleEFAVariable> vars = new THashSet<>(unprimed);
-      vars.addAll(primed);
+      final THashSet<SimpleEFAVariable> pVars = new THashSet<>(unprimed);
+      pVars.addAll(primed);
+      final ListBufferTransitionRelation pRel =
+       createTransitionRelation(pStateEncoding,
+                                pTR,
+                                pComponentName,
+                                oRel.getKind(),
+                                pLabelEncoding.size(),
+                                oRel.getNumberOfPropositions(),
+                                pStateEncoding.size());
+      System.err.println("PE Finish TR");
       final SimpleEFAComponent residual =
-       new SimpleEFAComponent(component.getName() + "-PE",
-                              vars,
-                              pStateNameEncoding,
+       new SimpleEFAComponent(pComponentName,
+                              pVars,
+                              pStateEncoding,
                               pLabelEncoding,
                               component.getBlockedEvents(),
                               pRel,
                               component.getKind(),
-                              getStateValueMap(),
                               null);
+      System.err.println("PE Finish EFA");
       residual.register();
       residual.setDeterministic(true);
       registerComponent(residual, unprimed, primed);
-      final boolean isEFA = vars.isEmpty() ? false : true;
+      final boolean isEFA = !pVars.isEmpty();
       residual.setIsEFA(isEFA);
       return residual;
-    } catch (EvalException | AnalysisException ex) {
-      throw ex;
     } finally {
       mTupleStateMap = null;
     }
+  }
+
+  private ListBufferTransitionRelation createTransitionRelation(
+   final SimpleEFAStateEncoding pStateEncoding,
+   final ArrayList<Integer[]> pTR,
+   final String pComponentName,
+   final ComponentKind kind,
+   final int nbrLabels,
+   final int nbrPropositions,
+   final int nbrStates)
+   throws OverflowException
+  {
+    final ListBufferTransitionRelation pRel =
+     new ListBufferTransitionRelation(pComponentName, kind, nbrLabels,
+                                      nbrPropositions, nbrStates,
+                                      ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    for (int i = 0; i < pTR.size(); i++) {
+      final Integer[] tr = pTR.get(i);
+      final int from = tr[0];
+      final int label = tr[1];
+      final int to = tr[2];
+      if (i == 0) {
+        pRel.setInitial(from, true);
+      }
+      pRel.setAllMarkings(from, pStateEncoding.getSimpleState(from)
+       .getMarkings());
+      pRel.setAllMarkings(to, pStateEncoding.getSimpleState(to).getMarkings());
+      pRel.addTransition(from, label, to);
+    }
+    return pRel;
   }
 
   private boolean execute(final Collection<SimpleEFAVariable> PEVars,
@@ -325,7 +419,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
 
   private ConstraintList getInitialExpressions(
    final Collection<SimpleEFAVariable> vars)
-   throws EvalException
   {
     final List<SimpleExpressionProxy> inits =
      new ArrayList<>(vars.size());
@@ -345,16 +438,19 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
 
   private String getStateName(final String oStateName, final ConstraintList list)
   {
-    if (list.size() < 1) {
+    final List<SimpleExpressionProxy> nList = new ArrayList<>();
+    for (final SimpleExpressionProxy exp : list.getConstraints()) {
+      if (!oStateName.contains(exp.toString())) {
+        nList.add(exp);
+      }
+    }
+    if (nList.size() < 1) {
       return oStateName;
     }
-    return oStateName + "." + list.toString();
-  }
-
-  @SuppressWarnings("unused")
-  private void normalize()
-  {
-    //TODO HDS: DNF of the conditions
+    return oStateName + print(new ConstraintList(nList),
+                              DEFAULT_VALUE_OPENING,
+                              DEFAULT_VALUE_SEPARATOR,
+                              DEFAULT_VALUE_CLOSING);
   }
 
   private ConstraintList getCompleteFormConstraint(
@@ -435,18 +531,34 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     mVarCollector.collectAllVariables(constraints, unprimed, primed);
   }
 
-  private TIntObjectHashMap<ConstraintList> getStateValueMap()
-   throws AnalysisException
+  private TIntObjectHashMap<ConstraintList> createStateValueMap(
+   final SimpleEFAStateEncoding stateEncoding)
   {
     final TIntObjectHashMap<ConstraintList> map =
-     new TIntObjectHashMap<>(mTupleStateMap.size());
-    for (final Tuple tuple : mTupleStateMap.keySet()) {
-      final Integer state = mTupleStateMap.get(tuple);
-      final ConstraintList values = tuple.getConstrains();
-      final ConstraintList put = map.put(state, values);
-      if (put != null) {
-        throw new AnalysisException(
-         "PE > getStateValueMap: Found duplicate state");
+     new TIntObjectHashMap<>(stateEncoding.size());
+    for (final SimpleEFAState state : stateEncoding.getSimpleStates()) {
+      final int stateId = stateEncoding.getStateId(state);
+      final ConstraintList stateValue;
+      final String value =
+       state.getAttribute(DEFAULT_STATEVALUE_STRING);
+      if (value != null && !value.trim().isEmpty()) {
+        final String[] str = value.split(DEFAULT_VALUE_SEPARATOR);
+        final List<SimpleExpressionProxy> exps = mHelper.parse(str);
+        stateValue = new ConstraintList(exps);
+        map.put(stateId, stateValue);
+      } else {
+        if (mReadStateNameAsValue) {
+          final String str = state.getName();
+          if (str.contains(DEFAULT_VALUE_OPENING)
+           && str.contains(DEFAULT_VALUE_CLOSING)) {
+            final List<SimpleExpressionProxy> exps =
+             mHelper.parseString(str,
+                                 DEFAULT_VALUE_OPENING,
+                                 DEFAULT_VALUE_CLOSING);
+            stateValue = new ConstraintList(exps);
+            map.put(stateId, stateValue);
+          }
+        }
       }
     }
     return map;
@@ -462,6 +574,58 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     for (final SimpleEFAVariable var : primed) {
       var.addModifier(component);
     }
+  }
+
+  private ConstraintList mergeString(final ConstraintList con1, final ConstraintList con2)
+  {
+    if (con2 == null) {
+      return con1;
+    }
+    final THashSet<String> sList = new THashSet<>();
+    for (final SimpleExpressionProxy con : con1.getConstraints()) {
+      sList.add(con.toString());
+    }
+    for (final SimpleExpressionProxy con : con2.getConstraints()) {
+      sList.add(con.toString());
+    }
+    final List<SimpleExpressionProxy> exps =
+     mHelper.parse(sList.toArray(new String[0]));
+    return new ConstraintList(exps);
+  }
+
+  private ConstraintList mergeConstraints(final ConstraintList con1,
+                                          final ConstraintList con2)
+  {
+    if (con2 == null) {
+      return con1;
+    }
+    final List<SimpleExpressionProxy> list = new ArrayList<>(con1.getConstraints());
+    list.addAll(con2.getConstraints());
+    return new ConstraintList(list);
+  }
+
+  public void setSuffixName(final String suffix)
+  {
+    mSuffixName = suffix;
+  }
+
+  private String print(final ConstraintList constraints,
+                       final String opening,
+                       final String separator,
+                       final String closing)
+  {
+    final StringBuffer result = new StringBuffer();
+    if (constraints.getConstraints().isEmpty()) {
+      return "";
+    }
+    result.append(opening);
+    for (final SimpleExpressionProxy exp : constraints.getConstraints()) {
+      result.append(exp.toString());
+      result.append(separator);
+    }
+    result.delete(result.length() - separator.length(), result.length());
+    result.append(closing);
+    return result.toString();
   }
 
   //#########################################################################
@@ -506,22 +670,22 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Inner Class tuple
-  private class Tuple
+  class Tuple
   {
 
-    public Tuple(final int state, final ConstraintList constrains)
+    Tuple(final int state, final ConstraintList constrains)
     {
       mState = state;
       mConstrains = constrains;
     }
 
     @SuppressWarnings("unused")
-    public Tuple()
+    Tuple()
     {
       this(-1, new ConstraintList());
     }
 
-    public int getState()
+    public int getStateId()
     {
       return mState;
     }
@@ -536,7 +700,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     {
       if (obj instanceof Tuple) {
         final Tuple item = (Tuple) obj;
-        if (item.getState() == mState && item.getConstrains()
+        if (item.getStateId() == mState && item.getConstrains()
          .equals(mConstrains)) {
           return true;
         }
@@ -565,6 +729,10 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   }
   //#########################################################################
   //# Data Members
+  public final static String DEFAULT_STATEVALUE_STRING = "PE:";
+  public final static String DEFAULT_VALUE_OPENING = "<";
+  public final static String DEFAULT_VALUE_CLOSING = ">";
+  public final static String DEFAULT_VALUE_SEPARATOR = ",";
   private final ConstraintPropagator mPropagator;
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
@@ -573,5 +741,9 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   private THashMap<SimpleEFAComponent, THashSet<SimpleEFAVariable>> mCompVarsMap;
   private THashMap<Tuple, Integer> mTupleStateMap;
   private final SimpleEFAVariableContext mVarContext;
-  private Collection<SimpleEFAComponent> mResiduals;
+  private final Collection<SimpleEFAComponent> mResiduals;
+  private String mSuffixName = ".PE";
+  private final EFAHelper mHelper;
+  private boolean mReadStateNameAsValue = false;
+  private boolean mAppendValueToStateName = true;
 }

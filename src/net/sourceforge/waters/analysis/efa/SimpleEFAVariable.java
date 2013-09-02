@@ -149,11 +149,8 @@ public class SimpleEFAVariable
    */
   public boolean isLocalIn(IdentifierProxy component)
   {
-    if ((mModifiers.size() == 1 && mModifiers.contains(component))
-     || (mModifiers.isEmpty() && mVisitors.contains(component))) {
-      return true;
-    }
-    return false;
+    return (mModifiers.size() == 1 && mModifiers.contains(component))
+     || (mModifiers.isEmpty() && mVisitors.contains(component));
   }
 
   public VariableComponentProxy getVariableComponent(final ModuleProxyFactory factory)

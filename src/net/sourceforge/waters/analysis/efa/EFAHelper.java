@@ -9,22 +9,24 @@
 
 package net.sourceforge.waters.analysis.efa;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.sourceforge.waters.analysis.efa.SimpleEFAComponent.DEFAULT_FORBIDDEN_ID;
 import static net.sourceforge.waters.analysis.efa.SimpleEFAComponent.DEFAULT_MARKING_ID;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -32,10 +34,8 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
@@ -125,12 +125,11 @@ public class EFAHelper {
     }
   }
 
-  public TIntObjectHashMap<SimpleNodeProxy> getStateEncoding(
-   final TIntObjectHashMap<String> stateNameEncoding,
-   final ListBufferTransitionRelation rel) throws AnalysisException
+  public SimpleEFAStateEncoding getStateEncoding(
+   final ListBufferTransitionRelation rel)
   {
-    final TIntObjectHashMap<SimpleNodeProxy> encoding =
-     new TIntObjectHashMap<>(rel.getNumberOfStates());
+    final SimpleEFAStateEncoding encoding =
+     new SimpleEFAStateEncoding(rel.getNumberOfStates());
     final boolean isMarkingIsUsed =
      rel.isUsedProposition(DEFAULT_MARKING_ID);
     final boolean isForbiddenIsUsed =
@@ -145,37 +144,12 @@ public class EFAHelper {
        rel.isMarked(i, DEFAULT_MARKING_ID);
       final boolean isForbidden =
        rel.isMarked(i, DEFAULT_FORBIDDEN_ID);
-      final List<SimpleIdentifierProxy> identList =
-       new ArrayList<>();
-      if (isMarkingIsUsed && isMarked) {
-        final SimpleIdentifierProxy ident =
-         mFactory.createSimpleIdentifierProxy(
-         EventDeclProxy.DEFAULT_MARKING_NAME);
-        identList.add(ident);
-      }
-      if (isForbiddenIsUsed && isForbidden) {
-        final SimpleIdentifierProxy ident =
-         mFactory.createSimpleIdentifierProxy(
-         EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
-        identList.add(ident);
-      }
-      final PlainEventListProxy props =
-       identList.isEmpty() ? null : mFactory.createPlainEventListProxy(
-       identList);
-      final String nodeName;
-      if (stateNameEncoding == null) {
-        nodeName = "S" + i;
-      } else {
-        nodeName = stateNameEncoding.get(i);
-      }
-      if (nodeName == null) {
-        throw new AnalysisException(
-         "EFAHelpre > getStateEncoding: Name for node " + i + " is null.");
-      }
-      final SimpleNodeProxy node =
-       mFactory.createSimpleNodeProxy(nodeName, props, null,
-                                      isInitial, null, null, null);
-      encoding.put(i, node);
+      final String nodeName = "S" + i;
+      SimpleEFAState state = new SimpleEFAState(nodeName, isInitial,
+                                                isMarkingIsUsed && isMarked,
+                                                isForbiddenIsUsed && isForbidden,
+                                                null, mFactory);
+      encoding.createSimpleStateId(state);
     }
     return encoding;
   }
@@ -237,6 +211,59 @@ public class EFAHelper {
     final VariableComponentProxy cloneVar =
      (VariableComponentProxy) mCloner.getClone(comp);
     return new SimpleEFAVariable(cloneVar, range, mFactory, mOperatorTable);
+  }
+
+  public String printer(final ConstraintList constraints,
+                        final String opening,
+                        final String separator,
+                        final String closing)
+  {
+    final StringBuilder result = new StringBuilder();
+    result.append(opening);
+    for (SimpleExpressionProxy exp : constraints.getConstraints()) {
+      result.append(exp.toString());
+      result.append(separator);
+    }
+    result.delete(result.length() - separator.length(), result.length());
+    result.append(closing);
+    return result.toString();
+  }
+
+  public String printer(final List<SimpleExpressionProxy> exps,
+                        final String opening,
+                        final String separator,
+                        final String closing)
+  {
+    return printer(new ConstraintList(exps), opening, separator, closing);
+  }
+
+  public List<SimpleExpressionProxy> parseString(String str,
+                                                 String opening,
+                                                 String closing)
+  {
+    final List<SimpleExpressionProxy> exps = new ArrayList<>();
+    final Pattern pattern = Pattern.compile(opening + "(.*?)" + closing);
+    final Matcher matcher = pattern.matcher(str);
+    while (matcher.find()) {
+      matcher.start();
+      final String exp = matcher.group(1);
+      exps.addAll(parse(exp));
+    }
+    return exps;
+  }
+
+  public List<SimpleExpressionProxy> parse(String... str)
+  {
+    final ExpressionParser parser =
+     new ExpressionParser(mFactory, mOperatorTable);
+    List<SimpleExpressionProxy> exps = new ArrayList<>();
+    for (String s : str) {
+      try {
+        exps.add(parser.parse(s));
+      } catch (ParseException ex) {
+      }
+    }
+    return exps;
   }
 
   private final ModuleProxyFactory mFactory;

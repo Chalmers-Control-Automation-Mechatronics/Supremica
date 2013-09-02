@@ -18,6 +18,8 @@ import javax.swing.Action;
 import net.sourceforge.waters.analysis.efa.SimpleEFACompiler;
 import net.sourceforge.waters.analysis.efa.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.SimpleEFASystem;
+import net.sourceforge.waters.analysis.efa.SimpleEFAVariable;
+import net.sourceforge.waters.analysis.efa.SimpleEFAVariableContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteCommand;
@@ -111,12 +113,17 @@ public class EditorPEAction
         }
       }
       if (!compList.isEmpty()) {
-        final EFAPartialEvaluator pe =
-          new EFAPartialEvaluator(sys.getVariableContext());
+        SimpleEFAVariableContext context = sys.getVariableContext();
+        final EFAPartialEvaluator pe = new EFAPartialEvaluator(context);
         pe.init(compList);
         pe.evaluate();
         final Collection<SimpleEFAComponent> residuals =
-          pe.getResidualComponents();
+         pe.getResidualComponents();
+        Collection<SimpleEFAVariable> vars =
+         pe.getEvaluatedVariables();
+        for (SimpleEFAVariable var : vars) {
+          System.err.println("Evaluated: " + var.getName());
+        }
         for (final SimpleEFAComponent res : residuals) {
           sys.addComponent(res);
         }

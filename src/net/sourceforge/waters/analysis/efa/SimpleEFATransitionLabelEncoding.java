@@ -48,7 +48,7 @@ public class SimpleEFATransitionLabelEncoding
     if (super.isEmpty()){
       return "[]";
     }
-    final StringBuffer events = new StringBuffer();
+    final StringBuilder events = new StringBuilder();
     final String sep = " <> ";
     events.append("[");
     for (final SimpleEFATransitionLabel label : getTransitionLabels()){
