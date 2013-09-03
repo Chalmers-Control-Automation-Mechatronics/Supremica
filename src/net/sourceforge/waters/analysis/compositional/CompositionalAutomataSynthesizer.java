@@ -220,7 +220,7 @@ public class CompositionalAutomataSynthesizer extends
   {
     try {
       setUp();
-      final CompositionalSynthesisResult result = getAnalysisResult();
+      final CompositionalAutomataSynthesisResult result = getAnalysisResult();
       if (!result.isFinished()) {
         runCompositionalMinimisation();
       }
@@ -233,7 +233,7 @@ public class CompositionalAutomataSynthesizer extends
       }
       final Logger logger = getLogger();
       logger.debug("CompositionalSynthesizer done.");
-      result.setRenamingIsUsed(mDistinguisherInfoList.size());
+      result.setNumberOfRenamings(mDistinguisherInfoList.size());
       return result.isSatisfied();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -248,6 +248,18 @@ public class CompositionalAutomataSynthesizer extends
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  @Override
+  protected CompositionalAutomataSynthesisResult createAnalysisResult()
+  {
+    return new CompositionalAutomataSynthesisResult();
+  }
+
+  @Override
+  public CompositionalAutomataSynthesisResult getAnalysisResult()
+  {
+    return (CompositionalAutomataSynthesisResult) super.getAnalysisResult();
+  }
+
   @Override
   protected void setUp() throws AnalysisException
   {
@@ -276,7 +288,7 @@ public class CompositionalAutomataSynthesizer extends
   protected void recordAbstractionStep(final AbstractionStep step)
     throws AnalysisException
   {
-    final CompositionalSynthesisResult result = getAnalysisResult();
+    final CompositionalAutomataSynthesisResult result = getAnalysisResult();
     final ProductDESProxyFactory factory = getFactory();
     if (step instanceof SynthesisAbstractionStep) {
       final SynthesisAbstractionStep synStep =
@@ -396,7 +408,7 @@ public class CompositionalAutomataSynthesizer extends
       synthesise(automaton, mTempEventEncoding);
     if (supervisor != null) {
       reportSupervisor("monolithic", supervisor);
-      final CompositionalSynthesisResult result = getAnalysisResult();
+      final CompositionalAutomataSynthesisResult result = getAnalysisResult();
       result.addSynchSize(automaton.getStates().size());
       if (supervisor.getNumberOfReachableStates() == 0) {
         result.setSatisfied(false);
@@ -723,7 +735,7 @@ public class CompositionalAutomataSynthesizer extends
 
   private String getUniqueSupervisorName(final ListBufferTransitionRelation rel)
   {
-    final CompositionalSynthesisResult result = getAnalysisResult();
+    final CompositionalAutomataSynthesisResult result = getAnalysisResult();
     final Collection<AutomatonProxy> supervisors =
       result.getComputedAutomata();
     String supname;

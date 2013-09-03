@@ -615,7 +615,7 @@ public abstract class AbstractSupervisorSynthesizerTest
         ProxyTools.getShortClassName(mSynthesizer) + '.';
       final Collection<EventProxy> events = des.getEvents();
       final Collection<AutomatonProxy> plants = des.getAutomata();
-      final Collection<AutomatonProxy> computedSupervisors =
+      final Collection<? extends AutomatonProxy> computedSupervisors =
         result.getComputedAutomata();
       final int numAutomata = plants.size() + computedSupervisors.size();
       final Collection<AutomatonProxy> automata =
@@ -709,7 +709,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     //#######################################################################
     //# Constructor
     private LeastRestrictivenessKindTranslator
-      (final Collection<AutomatonProxy> computedSupervisors)
+      (final Collection<? extends AutomatonProxy> computedSupervisors)
     {
       mComputedSupervisors = new THashSet<AutomatonProxy>(computedSupervisors);
     }

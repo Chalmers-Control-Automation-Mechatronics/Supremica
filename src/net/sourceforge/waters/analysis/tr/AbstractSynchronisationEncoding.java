@@ -35,10 +35,14 @@ public abstract class AbstractSynchronisationEncoding
       return new ArraySynchronisationEncoding(sizes, numStates);
     }
   }
+
+
   //#######################################################################
   //# Access
   public abstract int getStateCode(int[] tuple);
 
   public abstract void addState(int[] tuple, int code);
+
+  public abstract int getMemoryEstimate();
 
 }

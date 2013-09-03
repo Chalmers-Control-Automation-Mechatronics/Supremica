@@ -234,7 +234,7 @@ public class AutomataSynthesisAbstractionProcedure extends
   @Override
   public void storeStatistics()
   {
-    final CompositionalSynthesisResult result = getAnalysisResult();
+    final CompositionalAutomataSynthesisResult result = getAnalysisResult();
     result.setSimplifierStatistics(mChain);
   }
 
@@ -274,9 +274,9 @@ public class AutomataSynthesisAbstractionProcedure extends
   }
 
   @Override
-  CompositionalSynthesisResult getAnalysisResult()
+  CompositionalAutomataSynthesisResult getAnalysisResult()
   {
-    return (CompositionalSynthesisResult) super.getAnalysisResult();
+    return (CompositionalAutomataSynthesisResult) super.getAnalysisResult();
   }
 
   //#########################################################################

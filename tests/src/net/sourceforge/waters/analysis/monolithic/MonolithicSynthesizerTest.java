@@ -74,7 +74,7 @@ public class MonolithicSynthesizerTest
       // For monolithic synthesis, check whether the computed supervisor is
       // isomorphic (including markings) to the synchronous product of the
       // expected result and the plants and specs in the system.
-      final Collection<AutomatonProxy> computedSupervisors =
+      final Collection<? extends AutomatonProxy> computedSupervisors =
         result.getComputedAutomata();
       assertEquals("Monolithic synthesis did not return exactly one supervisor!",
                    1, computedSupervisors.size());

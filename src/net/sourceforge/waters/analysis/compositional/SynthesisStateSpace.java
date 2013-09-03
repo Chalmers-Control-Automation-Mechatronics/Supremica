@@ -164,7 +164,8 @@ public class SynthesisStateSpace implements AutomatonProxy
   @Override
   public Set<EventProxy> getEvents()
   {
-    return mDES.getEvents();
+    createAutomaton();
+    return mAutomaton.getEvents();
   }
 
   @Override
@@ -206,6 +207,23 @@ public class SynthesisStateSpace implements AutomatonProxy
     mStateMaps.add(map);
   }
 
+  public int getNumberOfMaps()
+  {
+    int maps = 0;
+    for (final SynthesisStateMap stateMap : mStateMaps) {
+      maps += stateMap.getNumberOfMaps();
+    }
+    return maps;
+  }
+
+  public int getMemoryEstimate()
+  {
+    int mem = 0;
+    for (final SynthesisStateMap stateMap : mStateMaps) {
+      mem += stateMap.getMemoryEstimate();
+    }
+    return mem;
+  }
 
   //#########################################################################
   //# Automaton Construction
@@ -217,7 +235,7 @@ public class SynthesisStateSpace implements AutomatonProxy
           new MonolithicSynchronousProductBuilder(mDES, mFactory);
         syncBuilder.setOutputName(mName);
         syncBuilder.setOutputKind(ComponentKind.SUPERVISOR);
-//        syncBuilder.setRemovingSelfloops(true);
+        syncBuilder.setRemovingSelfloops(true);
         final SynthesisStateCallBack callBack = new SynthesisStateCallBack();
         syncBuilder.setStateCallback(callBack);
         syncBuilder.run();
@@ -235,6 +253,10 @@ public class SynthesisStateSpace implements AutomatonProxy
   abstract static class SynthesisStateMap
   {
     abstract int getStateNumber(Map<AutomatonProxy,StateProxy> tuple);
+
+    abstract int getNumberOfMaps();
+
+    abstract int getMemoryEstimate();
   }
 
 
@@ -257,6 +279,18 @@ public class SynthesisStateSpace implements AutomatonProxy
     {
       final StateProxy state = tuple.get(mAutomaton);
       return mStateEncoding.getStateCode(state);
+    }
+
+    @Override
+    int getNumberOfMaps()
+    {
+      return 1;
+    }
+
+    @Override
+    int getMemoryEstimate()
+    {
+      return mStateEncoding.getNumberOfStates()*4;
     }
 
     //#######################################################################
@@ -288,6 +322,17 @@ public class SynthesisStateSpace implements AutomatonProxy
       return state < 0 ? -1 : mStateToClass[state];
     }
 
+    @Override
+    int getNumberOfMaps()
+    {
+      return 1 + mParent.getNumberOfMaps();
+    }
+
+    @Override
+    int getMemoryEstimate()
+    {
+      return mStateToClass.length*4 + mParent.getMemoryEstimate();
+    }
     //#######################################################################
     //# Data Members
     private final int[] mStateToClass;
@@ -321,6 +366,26 @@ public class SynthesisStateSpace implements AutomatonProxy
         }
       }
       return mSynchronisationEncoding.getStateCode(tuple);
+    }
+
+    @Override
+    int getNumberOfMaps()
+    {
+      int maps = 0;
+      for (final SynthesisStateMap parent : mParents) {
+        maps += parent.getNumberOfMaps();
+      }
+      return 1 + maps;
+    }
+
+    @Override
+    int getMemoryEstimate()
+    {
+      int mem = 0;
+      for (final SynthesisStateMap parent :mParents) {
+        mem += parent.getMemoryEstimate();
+      }
+      return mSynchronisationEncoding.getMemoryEstimate()+mem;
     }
 
     //#######################################################################

@@ -54,6 +54,12 @@ public class IntSynchronisationEncoding
     mMap.put(encodedTuple, code);
   }
 
+  @Override
+  public int getMemoryEstimate()
+  {
+    return mMap.size()*8;
+  }
+
   //#######################################################################
   //# Specific methods
   public int encode(final int[] tuple)

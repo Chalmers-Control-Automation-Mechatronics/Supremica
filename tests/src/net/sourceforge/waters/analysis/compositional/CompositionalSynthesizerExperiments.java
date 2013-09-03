@@ -79,7 +79,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   {
     super.setUp();
     mPrintWriter = new PrintWriter(mOut, true);
-    final int internalStateLimit = 5000;
+    final int internalStateLimit = 20000;
     mSynthesizer.setInternalStateLimit(internalStateLimit);
     final int internalTransitionLimit = 1000000;
     mSynthesizer.setInternalTransitionLimit(internalTransitionLimit);
@@ -265,7 +265,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesis6linki();// 12
     synthesis6linkp();// 13
     synthesis6linkre();// 14
-    for (int n = 100; n <= 300; n+=100) {
+    for (int n = 100; n <= 1000; n+=100) {
       synthesisTransferline(n);
     }
 

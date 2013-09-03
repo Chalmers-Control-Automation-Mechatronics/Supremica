@@ -132,6 +132,12 @@ public abstract class AbstractCompositionalSynthesizer extends
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   @Override
+  public CompositionalSynthesisResult getAnalysisResult()
+  {
+    return (CompositionalSynthesisResult) super.getAnalysisResult();
+  }
+
+  @Override
   protected void setUp() throws AnalysisException
   {
     final EventProxy defaultMarking = createDefaultMarking();
@@ -139,17 +145,6 @@ public abstract class AbstractCompositionalSynthesizer extends
     super.setUp();
   }
 
-  @Override
-  protected CompositionalSynthesisResult createAnalysisResult()
-  {
-    return new CompositionalSynthesisResult();
-  }
-
-  @Override
-  public CompositionalSynthesisResult getAnalysisResult()
-  {
-    return (CompositionalSynthesisResult) super.getAnalysisResult();
-  }
 
   //#########################################################################
   //# Hooks

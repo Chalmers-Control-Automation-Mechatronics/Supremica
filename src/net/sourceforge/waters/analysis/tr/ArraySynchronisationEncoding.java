@@ -70,6 +70,13 @@ public class ArraySynchronisationEncoding extends
     mMap.put(encoded, code);
   }
 
+  @Override
+  public int getMemoryEstimate()
+  {
+    return (mNumberOfWords+1)*4*mMap.size();
+  }
+
+
   //#######################################################################
   //# Specific methods
   public int getNumberOfWords()

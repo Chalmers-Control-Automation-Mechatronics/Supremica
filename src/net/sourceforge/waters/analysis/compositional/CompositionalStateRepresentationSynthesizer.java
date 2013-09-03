@@ -200,7 +200,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   {
     try {
       setUp();
-      final CompositionalSynthesisResult result = getAnalysisResult();
+      final CompositionalStateRepresentationSynthesisResult result = getAnalysisResult();
       if (!result.isFinished()) {
         runCompositionalMinimisation();
       }
@@ -208,9 +208,10 @@ public class CompositionalStateRepresentationSynthesizer extends
         result.setSatisfied(true);
       }
       if (result.isSatisfied() && getConstructsResult()) {
-        result.addBackRenamedSupervisor(mSynthesisStateSpace);
+        result.addSynthesisStateSpace(mSynthesisStateSpace);
         final ProductDESProxyFactory factory = getFactory();
-        result.close(factory, getOutputName());
+        final Collection<EventProxy> events = getModel().getEvents();
+        result.close(factory, events, getOutputName());
       }
       final Logger logger = getLogger();
       logger.debug("CompositionalSynthesizer done.");
@@ -228,6 +229,18 @@ public class CompositionalStateRepresentationSynthesizer extends
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  @Override
+  protected CompositionalStateRepresentationSynthesisResult createAnalysisResult()
+  {
+    return new CompositionalStateRepresentationSynthesisResult();
+  }
+
+  @Override
+  public CompositionalStateRepresentationSynthesisResult getAnalysisResult()
+  {
+    return (CompositionalStateRepresentationSynthesisResult) super.getAnalysisResult();
+  }
+
   @Override
   protected void setUp() throws AnalysisException
   {

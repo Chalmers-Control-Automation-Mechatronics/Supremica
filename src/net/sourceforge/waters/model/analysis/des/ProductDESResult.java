@@ -43,7 +43,7 @@ public interface ProductDESResult
    * Gets the collection of automata computed by the model analyser,
    * or <CODE>null</CODE> if the computation was unsuccessful.
    */
-  public Collection<AutomatonProxy> getComputedAutomata();
+  public Collection<? extends AutomatonProxy> getComputedAutomata();
 
   /**
    * Sets the computed product DES for this result. Setting the computed

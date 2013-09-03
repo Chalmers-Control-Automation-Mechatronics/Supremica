@@ -54,6 +54,12 @@ public class LongSynchronisationEncoding
     mMap.put(encodedTuple, code);
   }
 
+  @Override
+  public int getMemoryEstimate()
+  {
+    return mMap.size()*12;
+  }
+
   //#######################################################################
   //# Specific methods
   public long encode(final int[] tuple)
