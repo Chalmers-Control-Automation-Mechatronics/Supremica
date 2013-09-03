@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: 
+//# PROJECT:
 //# PACKAGE: net.sourceforge.waters.analysis.efa
 //# CLASS:   SimpleEFAStateEncoding
 //###########################################################################
@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
  *
  * @author Mohammad Reza Shoaei
  */
-public class SimpleEFAStateEncoding implements Iterable
+public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
 {
 
   public SimpleEFAStateEncoding(final int size)
@@ -52,7 +52,7 @@ public class SimpleEFAStateEncoding implements Iterable
 
   public int getNodeId(final SimpleNodeProxy node)
   {
-    for (SimpleEFAState state : mStateMap.keySet()) {
+    for (final SimpleEFAState state : mStateMap.keySet()) {
       if (state.equals(node)) {
         return mStateMap.get(state);
       }
@@ -67,7 +67,7 @@ public class SimpleEFAStateEncoding implements Iterable
 
   public SimpleNodeProxy getSimpleNode(final int stateId)
   {
-    SimpleEFAState state = mStateList.get(stateId);
+    final SimpleEFAState state = mStateList.get(stateId);
     return state.getSimpleNode();
   }
 

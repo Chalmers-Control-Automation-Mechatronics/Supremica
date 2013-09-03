@@ -121,7 +121,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
    * <p/>
    * @param enable
    */
-  public void setReadStateNameAsValue(boolean enable)
+  public void setReadStateNameAsValue(final boolean enable)
   {
     mReadStateNameAsValue = enable;
   }
@@ -132,7 +132,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
    * <p/>
    * @param enable
    */
-  public void setAppendValueToStateName(boolean enable)
+  public void setAppendValueToStateName(final boolean enable)
   {
     mAppendValueToStateName = enable;
   }
@@ -221,7 +221,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       final String pComponentName = component.getName() + mSuffixName;
       // Old state encoding.
       final SimpleEFAStateEncoding oStateEncoding = component.getStateEncoding();
-      // Creating values either from states attributes or states name 
+      // Creating values either from states attributes or states name
       // (if mReadStateNameAsValue is true).
       final TIntObjectHashMap<ConstraintList> oStateValueMap =
        createStateValueMap(oStateEncoding);
@@ -264,7 +264,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       final ConstraintList oInitExps = getInitialExpressions(PEVars);
       // Getting original state.
       final SimpleEFAState oState = oStateEncoding.getSimpleState(oInitState);
-      // Making initial expressions pretty . 
+      // Making initial expressions pretty .
       ConstraintList pInitExps = getPrettyExpressions(oInitExps);
       if (hasStateValue) {
         final ConstraintList oValue = oStateValueMap.get(oInitState);
@@ -277,7 +277,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       final int pInitState = createStateId(initTuple);
       // Creating a new state based on original state.
       final SimpleEFAState pState = new SimpleEFAState(oState.getSimpleNode());
-      // If we have to append the evaluated values to states name, by default it 
+      // If we have to append the evaluated values to states name, by default it
       // is true.
       if (mAppendValueToStateName) {
         pState.setName(getStateName(oState.getName(), pInitExps));
@@ -403,7 +403,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       // Registering the remaning variables to this component.
       residual.register();
       residual.setDeterministic(true);
-      // Setting the visitor / modifiers of the variables 
+      // Setting the visitor / modifiers of the variables
       registerComponent(residual, unprimed, primed);
       residual.setIsEFA(!pVars.isEmpty());
       return residual;
@@ -752,7 +752,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       mConstrains = constrains;
     }
 
-    @SuppressWarnings("unused")
     Tuple()
     {
       this(-1, new ConstraintList());
