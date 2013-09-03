@@ -38,8 +38,7 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
   public AbstractEFATransitionLabelEncoding(final AbstractEFATransitionLabelEncoding<L> encoding)
   {
     this(encoding.size());
-    for (Iterator<L> it = encoding.iterator(); it.hasNext(); ) {
-      final L label = it.next();
+    for (final L label : encoding) {
       createTransitionLabelId(label);
     }
   }
@@ -113,7 +112,7 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
   @Override
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     int e = 0;
     for (final L update : mTransitionLabelList) {
       buffer.append(e++);

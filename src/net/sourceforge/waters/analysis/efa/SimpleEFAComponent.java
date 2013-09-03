@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.efa;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import java.util.List;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -48,25 +46,22 @@ public class SimpleEFAComponent
 
   public SimpleEFAComponent(final String name,
                             final Collection<SimpleEFAVariable> variables,
-                            final TIntObjectHashMap<String> stateNameMap,
+                            final SimpleEFAStateEncoding stateEncoding,
                             final SimpleEFATransitionLabelEncoding labels,
                             final Collection<SimpleEFAEventDecl> blockedEvents,
                             final ListBufferTransitionRelation rel,
                             final ComponentKind kind,
-                            final TIntObjectHashMap<ConstraintList> stateValueMap,
                             final ModuleProxyFactory factory)
-   throws AnalysisException
   {
     super(rel, labels, variables, null);
     super.setName(name);
     mFactory = factory != null ? factory : ModuleSubjectFactory.getInstance();
-    mStateNameMap = stateNameMap;
-    mStateValueMap = stateValueMap;
+    mHelper = new EFAHelper(mFactory);
+    mStateEncoding = stateEncoding != null ? stateEncoding
+                     : mHelper.getStateEncoding(rel);
     mBlockedEvents = blockedEvents;
     mSystems = new ArrayList<>();
     mCloner = mFactory.getCloner();
-    mHelper = new EFAHelper(mFactory);
-    mStateEncoding = mHelper.getStateEncoding(stateNameMap, rel);
     mAlphabet = initAlphabet();
     mIdentifier = mFactory.createSimpleIdentifierProxy(name);
     mKind = kind != null ? kind : ComponentKind.PLANT;
@@ -77,9 +72,8 @@ public class SimpleEFAComponent
                             final Collection<SimpleEFAVariable> variables,
                             final SimpleEFATransitionLabelEncoding labels,
                             final ListBufferTransitionRelation rel)
-   throws AnalysisException
   {
-    this(name, variables, null, labels, null, rel, null, null, null);
+    this(name, variables, null, labels, null, rel, null, null);
   }
 
   @Override
@@ -137,31 +131,31 @@ public class SimpleEFAComponent
     return constrains;
   }
 
-  public List<SimpleNodeProxy> getStateSet()
+  public SimpleEFAStateEncoding getStateEncoding()
   {
-    return new ArrayList<>(mStateEncoding.valueCollection());
+    return mStateEncoding;
   }
 
-  public List<SimpleNodeProxy> getMarkedStates()
+  public void setStateEncoding(SimpleEFAStateEncoding encoding)
   {
-    final List<SimpleNodeProxy> states = getStateSet();
-    final List<SimpleNodeProxy> markedState = new ArrayList<>();
-    for (final SimpleNodeProxy state : states) {
-      if (mHelper.containsMarkingProposition(state.getPropositions())) {
+    mStateEncoding = encoding;
+  }
+
+  public List<SimpleEFAState> getStateSet()
+  {
+    return mStateEncoding.getSimpleStates();
+  }
+
+  public List<SimpleEFAState> getMarkedStates()
+  {
+    final List<SimpleEFAState> states = getStateSet();
+    final List<SimpleEFAState> markedState = new ArrayList<>();
+    for (final SimpleEFAState state : states) {
+      if (state.isMarked()) {
         markedState.add(state);
       }
     }
     return markedState;
-  }
-
-  public TIntObjectHashMap<String> getStateNameMap()
-  {
-    return mStateNameMap;
-  }
-
-  public TIntObjectHashMap<ConstraintList> getStateValueMap()
-  {
-    return mStateValueMap;
   }
 
   public List<EdgeProxy> getEdges()
@@ -192,8 +186,8 @@ public class SimpleEFAComponent
        mHelper.createGuardActionBlock(condition, op);
       final LabelBlockProxy block =
        mFactory.createLabelBlockProxy(identList, null);
-      final SimpleNodeProxy sourceNode = mStateEncoding.get(source);
-      final SimpleNodeProxy targetNode = mStateEncoding.get(target);
+      final SimpleNodeProxy sourceNode = mStateEncoding.getSimpleNode(source);
+      final SimpleNodeProxy targetNode = mStateEncoding.getSimpleNode(target);
       final EdgeProxy edge =
        mFactory.createEdgeProxy((NodeProxy) mCloner.getClone(sourceNode),
                                 (NodeProxy) mCloner.getClone(targetNode),
@@ -211,7 +205,11 @@ public class SimpleEFAComponent
   public SimpleComponentProxy getSimpleComponent()
   {
     final String name = getName();
-    final List<SimpleNodeProxy> nodes = getStateSet();
+    final List<SimpleEFAState> stateSet = getStateSet();
+    final List<SimpleNodeProxy> nodes = new ArrayList<>(stateSet.size());
+    for (SimpleEFAState state : stateSet) {
+      nodes.add((SimpleNodeProxy) mCloner.getClone(state.getSimpleNode()));
+    }
     final List<EdgeProxy> edgeList = getEdges();
     final boolean isMarkingIsUsed =
      getTransitionRelation()
@@ -335,14 +333,12 @@ public class SimpleEFAComponent
   public final static int DEFAULT_MARKING_ID = 0;
   public final static int DEFAULT_FORBIDDEN_ID = 1;
   private ModuleProxyFactory mFactory;
-  private final TIntObjectHashMap<String> mStateNameMap;
+  private SimpleEFAStateEncoding mStateEncoding;
   private Collection<SimpleEFAEventDecl> mBlockedEvents;
   private final ArrayList<SimpleEFASystem> mSystems;
   private final ModuleProxyCloner mCloner;
   private final EFAHelper mHelper;
-  private final TIntObjectHashMap<SimpleNodeProxy> mStateEncoding;
   private final Collection<SimpleEFAEventDecl> mAlphabet;
-  private final TIntObjectHashMap<ConstraintList> mStateValueMap;
   private boolean mIsDeterministic = true;
   private boolean mIsEFA = true;
   private final SimpleIdentifierProxy mIdentifier;

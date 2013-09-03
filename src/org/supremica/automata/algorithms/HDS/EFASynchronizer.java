@@ -62,6 +62,8 @@ import net.sourceforge.waters.analysis.efa.EFAHelper;
 import net.sourceforge.waters.analysis.efa.SimpleEFACompiler;
 import net.sourceforge.waters.analysis.efa.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.SimpleEFAEventDecl;
+import net.sourceforge.waters.analysis.efa.SimpleEFAState;
+import net.sourceforge.waters.analysis.efa.SimpleEFAStateEncoding;
 import net.sourceforge.waters.analysis.efa.SimpleEFASystem;
 import net.sourceforge.waters.analysis.efa.SimpleEFAVariable;
 import net.sourceforge.waters.model.analysis.Abortable;
@@ -73,7 +75,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -117,6 +119,7 @@ public class EFASynchronizer
     mFactory = components.iterator().next().getFactory();
     mAutomata = automata;
     syncOptions = options;
+    mHelper = new EFAHelper(mFactory);
     synchHelper = new AutomataSynchronizerHelper(automata, options,
                                                  arc2edgeTable,
                                                  autName2indexTable, false);
@@ -238,30 +241,34 @@ public class EFASynchronizer
     abortRequested = false;
   }
 
+  public void setStateNameAsValue(boolean enable)
+  {
+    mStateNameAsValue = enable;
+  }
+
   public SimpleEFAComponent getSynchronizedEFA(String name) throws EvalException
   {
     System.err.println("Synchronizer start executing ...");
     execute();
-    Automaton automaton = getAutomaton();
+    final Automaton automaton = getAutomaton();
     System.err.println("Synchronizer finish executing ...");
     name = name.isEmpty() ? automaton.getName() : name;
     synchHelper.createExtendedAutomaton(name);
 
     final List<ComponentProxy> list =
      new ArrayList<>(mVariables.size() + 1);
-    SimpleComponentProxy synchEFA = synchHelper.getSynchronizedComponent();
+    final SimpleComponentProxy synchEFA = synchHelper.getSynchronizedComponent();
     System.err.println("Synchronized component created ...");
     list.add(synchEFA);
-    EFAHelper helper = new EFAHelper();
-    for (SimpleEFAVariable variable : mVariables) {
+    for (final SimpleEFAVariable variable : mVariables) {
       list.add(variable.getVariableComponent(mFactory));
     }
     final Collection<SimpleEFAEventDecl> events = new THashSet<>();
     for (final SimpleEFAComponent component : mComponents) {
       events.addAll(component.getAlphabet());
     }
-    Collection<EventDeclProxy> edecls =
-     helper.getEventDeclProxy(events);
+    final Collection<EventDeclProxy> edecls =
+     mHelper.getEventDeclProxy(events);
     final ModuleProxy module = mFactory.createModuleProxy(
      synchEFA.getName(), null, null, null, edecls, null, list);
     final SimpleEFACompiler compiler = new SimpleEFACompiler(module);
@@ -269,6 +276,9 @@ public class EFASynchronizer
     final SimpleEFAComponent efa = system.getComponents().iterator().next();
     efa.setBlockedEvents(null);
     efa.setDeterministic(automaton.isDeterministic());
+    if (mStateNameAsValue) {
+      readStateNames(efa.getStateEncoding());
+    }
     return efa;
   }
 
@@ -364,7 +374,7 @@ public class EFASynchronizer
    * @return Automaton representing the synchronous composition.
    */
   private static Automaton synchronizeAutomata(
-   final AutomataSynchronizerHelper helper) throws Exception
+   final AutomataSynchronizerHelper helper)
   {
     final AutomataSynchronizer synchronizer = new AutomataSynchronizer(helper);
     synchronizer.execute();
@@ -399,7 +409,7 @@ public class EFASynchronizer
   }
 
   private Automaton removeGuardsActionsFromEFA(
-   final SimpleEFAComponent component) throws AnalysisException
+   final SimpleEFAComponent component)
   {
     final Automaton automaton = new Automaton(component.getName());
 
@@ -478,17 +488,18 @@ public class EFASynchronizer
         }
       }
     } else {
-      for (final SimpleNodeProxy location : component.getStateSet()) {
+      for (final SimpleEFAState location : component.getStateSet()) {
         if (location.isInitial()) {
           final State state = new State(location.getName());
-          if (location.toString().contains("accepting")) {
+          if (location.isMarked()) {
             state.setAccepting(true);
           }
-          if (location.toString().contains("forbidden")) {
+          if (location.isForbidden()) {
             state.setForbidden(true);
           }
           automaton.addState(state);
           automaton.setInitialState(state);
+          break;
         }
       }
     }
@@ -496,8 +507,24 @@ public class EFASynchronizer
     return automaton;
   }
 
+  private void readStateNames(final SimpleEFAStateEncoding oStateEncoding)
+  {
+    for (final SimpleEFAState state : oStateEncoding.getSimpleStates()) {
+      final String str = state.getName();
+      final List<SimpleExpressionProxy> exps =
+       mHelper.parseString(str,
+                           EFAPartialEvaluator.DEFAULT_VALUE_OPENING,
+                           EFAPartialEvaluator.DEFAULT_VALUE_CLOSING);
+      for (final SimpleExpressionProxy exp : exps) {
+        state.mergeToAttribute(EFAPartialEvaluator.DEFAULT_STATEVALUE_STRING,
+                               exp.toString(),
+                               EFAPartialEvaluator.DEFAULT_VALUE_SEPARATOR);
+      }
+    }
+  }
+
   @SuppressWarnings("unused")
-  private static Logger logger = LoggerFactory.createLogger(
+  private static final Logger logger = LoggerFactory.createLogger(
    AutomataSynchronizer.class);
   private Automata mAutomata;
   private AutomataSynchronizerHelper synchHelper;
@@ -513,4 +540,6 @@ public class EFASynchronizer
   private final ModuleProxyFactory mFactory;
   private final List<SimpleEFAComponent> mComponents;
   private final THashSet<SimpleEFAVariable> mVariables;
+  private final EFAHelper mHelper;
+  private boolean mStateNameAsValue = false;
 }
