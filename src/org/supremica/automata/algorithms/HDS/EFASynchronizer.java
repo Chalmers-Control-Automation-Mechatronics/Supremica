@@ -241,6 +241,11 @@ public class EFASynchronizer
     abortRequested = false;
   }
 
+  public void setStateNameAsValue(boolean enable)
+  {
+    mStateNameAsValue = enable;
+  }
+
   public SimpleEFAComponent getSynchronizedEFA(String name) throws EvalException
   {
     System.err.println("Synchronizer start executing ...");
@@ -271,7 +276,9 @@ public class EFASynchronizer
     final SimpleEFAComponent efa = system.getComponents().iterator().next();
     efa.setBlockedEvents(null);
     efa.setDeterministic(automaton.isDeterministic());
-    analyzeStateEncoding(efa.getStateEncoding());
+    if (mStateNameAsValue) {
+      readStateNames(efa.getStateEncoding());
+    }
     return efa;
   }
 
@@ -500,7 +507,7 @@ public class EFASynchronizer
     return automaton;
   }
 
-  private void analyzeStateEncoding(final SimpleEFAStateEncoding oStateEncoding)
+  private void readStateNames(final SimpleEFAStateEncoding oStateEncoding)
   {
     for (final SimpleEFAState state : oStateEncoding.getSimpleStates()) {
       final String str = state.getName();
@@ -534,4 +541,5 @@ public class EFASynchronizer
   private final List<SimpleEFAComponent> mComponents;
   private final THashSet<SimpleEFAVariable> mVariables;
   private final EFAHelper mHelper;
+  private boolean mStateNameAsValue = false;
 }

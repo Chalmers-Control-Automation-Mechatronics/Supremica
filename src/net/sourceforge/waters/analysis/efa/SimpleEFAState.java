@@ -127,15 +127,6 @@ public class SimpleEFAState
   {
     mAttributes = attributes;
   }
-  public void setMarkings(long marking)
-  {
-    mMarking = marking;
-  }
-
-  public long getMarkings()
-  {
-    return mMarking;
-  }
 
   private PlainEventListProxy createPropositions(PlainEventListProxy proposition)
   {
@@ -231,5 +222,4 @@ public class SimpleEFAState
   private PointGeometryProxy mInitialArrowGeometry = null;
   private LabelGeometryProxy mLabelGeometry = null;
   private PointGeometryProxy mPointGeometry = null;
-  private long mMarking = -1;
 }
