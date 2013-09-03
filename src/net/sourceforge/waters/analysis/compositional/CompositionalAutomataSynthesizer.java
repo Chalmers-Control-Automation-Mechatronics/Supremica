@@ -403,12 +403,14 @@ public class CompositionalAutomataSynthesizer extends
       automaton = syncBuilder.getComputedAutomaton();
       break;
     }
+    final int numberOfStates = automaton.getStates().size();
+    final CompositionalAutomataSynthesisResult result = getAnalysisResult();
+    result.addSynchSize(numberOfStates);
     mTempEventEncoding = createSynthesisEventEncoding(automaton);
     final ListBufferTransitionRelation supervisor =
       synthesise(automaton, mTempEventEncoding);
     if (supervisor != null) {
       reportSupervisor("monolithic", supervisor);
-      final CompositionalAutomataSynthesisResult result = getAnalysisResult();
       result.addSynchSize(automaton.getStates().size());
       if (supervisor.getNumberOfReachableStates() == 0) {
         result.setSatisfied(false);

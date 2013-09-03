@@ -439,6 +439,9 @@ public class CompositionalStateRepresentationSynthesizer extends
       recordAbstractionStep(step);
       break;
     }
+    final int numberOfStates = automaton.getStates().size();
+    final CompositionalStateRepresentationSynthesisResult result = getAnalysisResult();
+    result.addSynchSize(numberOfStates);
     final EventEncoding encoding = createSynthesisEventEncoding(automaton);
     final boolean finalResult = synthesise(automaton, encoding);
     mStateRepresentationMap.remove(automaton);

@@ -145,13 +145,13 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
 
   //#########################################################################
   //# Invocation
-  void runModel(final String group, final String subdir, final String name)
+  boolean runModel(final String group, final String subdir, final String name)
     throws Exception
   {
-    runModel(group, subdir, name, null);
+    return runModel(group, subdir, name, null);
   }
 
-  void runModel(final String group, final String subdir, final String name,
+  boolean runModel(final String group, final String subdir, final String name,
                 final List<ParameterBindingProxy> bindings) throws Exception
   {
     printAndLog("Running " + name + " with " + mPreselecting + "/"
@@ -172,11 +172,14 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
       mWatchdog.reset();
       final boolean result = mSynthesizer.run();
       answer = Boolean.toString(result);
+      return true;
     } catch (final AnalysisException exception) {
       mPrintWriter.println(name + "," + exception.getMessage());
       answer = ProxyTools.getShortClassName(exception);
+      return false;
     } catch (final Throwable exception) {
       answer = ProxyTools.getShortClassName(exception);
+      return false;
     } finally {
       final long stop = System.currentTimeMillis();
       final float difftime = 0.001f * (stop - start);
@@ -251,11 +254,15 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesisAGV();// 1
     synthesisAGVB();// 2
     synthesissAip0Alps();// 3
+    synthesiseAip0though();
     synthesisFenCaiWon09B();// 4
     synthesisFenCaiWon09Synth();// 5
     synthesisFms2003();// 6
-    synthesisePSLBigWithManyRestartTrans();
     synthesisePSLBig();
+    synthesisePSLBigWithManyRestartTrans();
+    synthesisePSLWithResetTrans();
+    synthesisePSLWithResetTransWithPartLeftCounters();
+    synthesisePSLWithResetTransWithPartLeftPlants();
     synthesiseTbedCtct();
     synthesiseTbedNoderailB();// 7
     synthesiseTbedNoderailUncont();// 8
@@ -266,7 +273,9 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesis6linkp();// 13
     synthesis6linkre();// 14
     for (int n = 100; n <= 1000; n+=100) {
-      synthesisTransferline(n);
+      if (!synthesisTransferline(n)) {
+        break;
+      }
     }
 
 
@@ -311,6 +320,11 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   private void synthesiseAip0Aip() throws Exception
   {
     runModel("tests", "incremental_suite", "aip0aip.wmod");
+  }
+
+  private void synthesiseAip0though() throws Exception
+  {
+    runModel("tests", "incremental_suite", "aip0tough.wmod");
   }
 
   // Train testbed
@@ -368,6 +382,21 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "psl", "pslBigWithManyRestartTrans.wmod");
   }
 
+  private void synthesisePSLWithResetTrans() throws Exception
+  {
+    runModel("tests", "psl", "pslWithResetTrans.wmod");
+  }
+
+  private void synthesisePSLWithResetTransWithPartLeftCounters() throws Exception
+  {
+    runModel("tests", "psl", "pslWithResetTransWithPartLeftCounters.wmod");
+  }
+
+  private void synthesisePSLWithResetTransWithPartLeftPlants() throws Exception
+  {
+    runModel("tests", "psl", "pslWithResetTransWithPartLeftPlants.wmod");
+  }
+
   //flexible production cell
   @SuppressWarnings("unused")
   private void synthesiseFischertechnik() throws Exception
@@ -411,7 +440,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "6link", "6linkre.wmod");
   }
 
-  private void synthesisTransferline(final int n) throws Exception
+  private boolean synthesisTransferline(final int n) throws Exception
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final IntConstantProxy expr = factory.createIntConstantProxy(n);
@@ -419,7 +448,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
       factory.createParameterBindingProxy("N", expr);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    runModel("handwritten", null, "transferline_uncont.wmod", bindings);
+    return runModel("handwritten", null, "transferline_uncont.wmod", bindings);
   }
 
 
