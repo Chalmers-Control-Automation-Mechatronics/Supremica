@@ -336,10 +336,10 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
           }
           // Creating the next tuple to process.
           final Tuple nextTuple = new Tuple(oCurrTarget, nextValue);
-          final SimpleEFAEventDecl[] nextEvent = currLabel.getEvents();
+          final SimpleEFAEventDecl nextEvent = currLabel.getEvent();
           final SimpleEFATransitionLabel pLabel =
-           new SimpleEFATransitionLabel(new ConstraintList(nextConditions),
-                                        nextEvent);
+           new SimpleEFATransitionLabel(nextEvent,
+                                        new ConstraintList(nextConditions));
           final int nextLabelId = pLabelEncoding.createTransitionLabelId(pLabel);
           final int pCurrSource = getStateId(currTuple);
           final int pCurrTarget;
