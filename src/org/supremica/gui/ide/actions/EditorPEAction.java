@@ -15,11 +15,11 @@ import java.util.logging.Level;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.analysis.efa.SimpleEFACompiler;
-import net.sourceforge.waters.analysis.efa.SimpleEFAComponent;
-import net.sourceforge.waters.analysis.efa.SimpleEFASystem;
-import net.sourceforge.waters.analysis.efa.SimpleEFAVariable;
-import net.sourceforge.waters.analysis.efa.SimpleEFAVariableContext;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFACompiler;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFASystem;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariable;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteCommand;

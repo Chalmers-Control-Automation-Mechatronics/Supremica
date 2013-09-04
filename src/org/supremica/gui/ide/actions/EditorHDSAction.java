@@ -12,8 +12,8 @@ import java.util.List;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.analysis.efa.SimpleEFACompiler;
-import net.sourceforge.waters.analysis.efa.SimpleEFASystem;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFACompiler;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFASystem;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteCommand;
