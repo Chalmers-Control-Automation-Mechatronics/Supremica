@@ -20,13 +20,13 @@ public class SimpleEFATransitionLabel
  extends AbstractEFATransitionLabel
 {
 
-  public SimpleEFATransitionLabel(final ConstraintList constraint,
-                                  final SimpleEFAEventDecl... event)
+  public SimpleEFATransitionLabel(final SimpleEFAEventDecl event,
+                                  final ConstraintList constraint)
   {
     super(constraint, event);
   }
 
-  public SimpleEFATransitionLabel(final SimpleEFAEventDecl... event)
+  public SimpleEFATransitionLabel(final SimpleEFAEventDecl event)
   {
     super(event);
   }
@@ -35,12 +35,10 @@ public class SimpleEFATransitionLabel
   public String toString(){
     final StringBuilder events = new StringBuilder();
     events.append("{");
-    for (final SimpleEFAEventDecl e : getEvents()){
-      events.append(e.toString());
-      events.append(",");
-    }
-    events.delete(events.length() - 1, events.length());
+    events.append(getEvent().toString());
+    events.append(" : ");
+    events.append(getConstraint().toString());
     events.append("}");
-    return events.toString() + " : " + getConstraint().toString();
+    return events.toString();
   }
 }

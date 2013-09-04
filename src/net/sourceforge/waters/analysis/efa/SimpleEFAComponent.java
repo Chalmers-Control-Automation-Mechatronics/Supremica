@@ -176,11 +176,9 @@ public class SimpleEFAComponent
       final ConstraintList condition = label.getConstraint();
       final List<SimpleIdentifierProxy> identList =
        new ArrayList<>();
-      for (final SimpleEFAEventDecl e : label.getEvents()) {
-        final SimpleIdentifierProxy ident =
-         mFactory.createSimpleIdentifierProxy(e.getName());
-        identList.add(ident);
-      }
+      final SimpleIdentifierProxy ident =
+       mFactory.createSimpleIdentifierProxy(label.getEvent().getName());
+      identList.add(ident);
       final CompilerOperatorTable op = CompilerOperatorTable.getInstance();
       final GuardActionBlockProxy guardActionBlock =
        mHelper.createGuardActionBlock(condition, op);
@@ -307,9 +305,7 @@ public class SimpleEFAComponent
     final Collection<SimpleEFAEventDecl> blockedEvents = getBlockedEvents();
     final Collection<SimpleEFAEventDecl> alphabet = new THashSet<>();
     for (int i = EventEncoding.NONTAU; i < labels.size(); i++) {
-      final SimpleEFAEventDecl[] events = labels.getTransitionLabel(i)
-       .getEvents();
-      alphabet.addAll(Arrays.asList(events));
+      alphabet.add(labels.getTransitionLabel(i).getEvent());
     }
     if (!blockedEvents.isEmpty()) {
       alphabet.addAll(blockedEvents);

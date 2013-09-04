@@ -71,8 +71,6 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
     return state.getSimpleNode();
   }
 
-
-
   public List<SimpleEFAState> getSimpleStates()
   {
     return mStateList;

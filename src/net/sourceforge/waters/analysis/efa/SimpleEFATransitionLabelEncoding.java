@@ -29,11 +29,10 @@ public class SimpleEFATransitionLabelEncoding
   {
     super(size);
     final ConstraintList trueg = new ConstraintList();
-    final SimpleEFAEventDecl[] event = new SimpleEFAEventDecl[1];
     final EFAHelper helper = new EFAHelper();
-    event[0] = new SimpleEFAEventDecl(helper.getTAUDecl());
-    final SimpleEFATransitionLabel label = new SimpleEFATransitionLabel(trueg,
-     event);
+    final SimpleEFAEventDecl event = new SimpleEFAEventDecl(helper.getTAUDecl());
+    final SimpleEFATransitionLabel label =
+     new SimpleEFATransitionLabel(event, trueg);
     createTransitionLabelId(label);
   }
 

@@ -31,27 +31,25 @@ public abstract class AbstractEFATransitionLabel
 {
 
   public AbstractEFATransitionLabel(final ConstraintList constraint,
-                                    final SimpleEFAEventDecl... event)
+                                    final SimpleEFAEventDecl event)
   {
     mConstraint = constraint;
     mEvent = event;
     mVariables = new THashSet<>();
     mTransitionRelations = new THashSet<>();
-    mIsObservable = event[0].isObservable();
-    mKind = event[0].getKind();
+    mIsObservable = mEvent.isObservable();
+    mKind = mEvent.getKind();
     mProxyList = new ArrayList<>();
-    for (final SimpleEFAEventDecl e : mEvent) {
-      mProxyList.add(e.getEventDecl());
-    }
+    mProxyList.add(mEvent.getEventDecl());
     mProxyList.addAll(mConstraint.getConstraints());
   }
 
-  public AbstractEFATransitionLabel(final SimpleEFAEventDecl... event)
+  public AbstractEFATransitionLabel(final SimpleEFAEventDecl event)
   {
     this(new ConstraintList(), event);
   }
 
-  public SimpleEFAEventDecl[] getEvents()
+  public SimpleEFAEventDecl getEvent()
   {
     return mEvent;
   }
@@ -73,7 +71,7 @@ public abstract class AbstractEFATransitionLabel
 
   public Map<String, String> getAttributes()
   {
-    return mEvent[0].getAttributes();
+    return mEvent.getAttributes();
   }
 
   public boolean isBlocked()
@@ -128,9 +126,7 @@ public abstract class AbstractEFATransitionLabel
       final AbstractEFATransitionLabel expected =
        (AbstractEFATransitionLabel) other;
       final ArrayList<Proxy> pList = new ArrayList<>();
-      for (final SimpleEFAEventDecl e : expected.getEvents()) {
-        pList.add(e.getEventDecl());
-      }
+      pList.add(expected.getEvent().getEventDecl());
       pList.addAll(expected.getConstraint().getConstraints());
       return eq.isEqualList(mProxyList, pList);
     }
@@ -154,6 +150,6 @@ public abstract class AbstractEFATransitionLabel
   private EventKind mKind;
   private boolean mIsObservable;
   private final List<Proxy> mProxyList;
-  private final SimpleEFAEventDecl[] mEvent;
+  private final SimpleEFAEventDecl mEvent;
 
 }

@@ -570,19 +570,20 @@ public class SimpleEFASystemBuilder implements Abortable
         // Visintg the label block and collecting all the events in that block
         // see visitLabelBlockProxy
         visitLabelBlockProxy(edge.getLabelBlock());
-        
+
+        final List<SimpleEFATransitionLabel> labels =
+         new ArrayList<>(mEvents.size());
         for (final SimpleEFAEventDecl edecl : mEvents) {
           edecl.addAllPrimeVariable(mCurrentPrime);
           edecl.addAllUnPrimeVariable(mCurrentUnprime);
+          // creating a new label which is a pair of an event and a condition
+          final SimpleEFATransitionLabel label =
+           new SimpleEFATransitionLabel(edecl, mSimplifyConstraint);
+          labels.add(label);
+          mEventEncoding.createTransitionLabelId(label);
         }
-        final SimpleEFAEventDecl[] events =
-         mEvents.toArray(new SimpleEFAEventDecl[mEvents.size()]);
-        // creating a new label which contains an array of events and a condition
-        final SimpleEFATransitionLabel label =
-         new SimpleEFATransitionLabel(mSimplifyConstraint, events);
-        mEdgeLabelMap.putByProxy(mEdge, label);
-        mEventEncoding.createTransitionLabelId(label);
-        }
+        mEdgeLabelMap.putByProxy(mEdge, labels);
+      }
       // Clearing the sets for the next round
       mCurrentPrime.clear();
       mCurrentUnprime.clear();
@@ -683,22 +684,24 @@ public class SimpleEFASystemBuilder implements Abortable
       final Collection<EdgeProxy> edges = graph.getEdges();
       for (final EdgeProxy edge : edges) {
         checkAbort();
-        final SimpleEFATransitionLabel label = mEdgeLabelMap.getByProxy(edge);
-        if (label == null) {
-          continue;
-        }
-        final int labelId = mEventEncoding.getTransitionLabelId(label);
-        if (labelId < 0) {
-          continue;
-        }
         final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
         final int sourceState = mStateEncoding.getNodeId(source);
-        if (sourceState < 0) {
-          continue;
-        }
         final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
         final int targetState = mStateEncoding.getNodeId(target);
-        rel.addTransition(sourceState, labelId, targetState);
+        if (sourceState < 0 || targetState < 0) {
+          continue;
+        }
+        List<SimpleEFATransitionLabel> labels = mEdgeLabelMap.getByProxy(edge);
+        if (labels == null) {
+          continue;
+        }
+        for (SimpleEFATransitionLabel label : labels) {
+          final int labelId = mEventEncoding.getTransitionLabelId(label);
+          if (labelId < 0) {
+            continue;
+          }
+          rel.addTransition(sourceState, labelId, targetState);
+        }
       }
       return rel;
     }
@@ -789,7 +792,7 @@ public class SimpleEFASystemBuilder implements Abortable
           if (usedEvents[e]) {
             newEncoding.createTransitionLabelId(label);
           } else {
-            mBlockedEvents.addAll(Arrays.asList(label.getEvents()));
+            mBlockedEvents.add(label.getEvent());
           }
         }
         mEventEncoding = newEncoding;
@@ -825,8 +828,8 @@ public class SimpleEFASystemBuilder implements Abortable
           } else {
             edecl = getEventDecl(eventIdent);
           }
-          final SimpleEFATransitionLabel label = new SimpleEFATransitionLabel(
-           markingUpdate, edecl);
+          final SimpleEFATransitionLabel label =
+           new SimpleEFATransitionLabel(edecl, markingUpdate);
           edecl.addAllUnPrimeVariable(mMarkedVariables);
           label.addVariables(mMarkedVariables);
           final int eventId = eventEncoding.createTransitionLabelId(label);
@@ -860,7 +863,7 @@ public class SimpleEFASystemBuilder implements Abortable
     private List<SimpleNodeProxy> mNodeList;
     private boolean mUsesMarking;
     private boolean mUsesForbidden;
-    private ProxyAccessorMap<EdgeProxy, SimpleEFATransitionLabel> mEdgeLabelMap;
+    private ProxyAccessorMap<EdgeProxy, List<SimpleEFATransitionLabel>> mEdgeLabelMap;
     private ConstraintList mSimplifyConstraint;
     private final EFAGuardCompiler mGuardCompiler;
     private final ConstraintPropagator mConstraintPropagator;
