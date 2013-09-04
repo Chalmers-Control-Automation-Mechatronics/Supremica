@@ -216,7 +216,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
         final String selectingHeuristic = args[3];
         if (args[1].startsWith("S")|| args[1].startsWith("s")) {
           synthesizer = new CompositionalStateRepresentationSynthesizer(factory);
-          method = AutomataSynthesisAbstractionProcedureFactory.WSOE;
+          method = AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP;
         } else {
           final CompositionalAutomataSynthesizer automataSynthesizer =
             new CompositionalAutomataSynthesizer(factory);
@@ -224,7 +224,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
             args.length == 5 && Integer.parseInt(args[4]) != 0;
           automataSynthesizer.setSupervisorReductionEnabled(supervisorReductionEnabled);
           synthesizer = automataSynthesizer;
-          method = StateRepresentationSynthesisAbstractionProcedureFactory.WSOE;
+          method = StateRepresentationSynthesisAbstractionProcedureFactory.WSOE_UNSUP;
         }
         final CompositionalSynthesizerExperiments experiment =
           new CompositionalSynthesizerExperiments(synthesizer, method, filename);

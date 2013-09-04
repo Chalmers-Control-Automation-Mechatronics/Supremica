@@ -137,6 +137,8 @@ public class SynthesisTransitionRemovalTRSimplifier
       (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
     final TransitionIterator iterEvent = rel.createAnyReadOnlyIterator();
     final TransitionIterator iterUncontrollableTo = tauClosure.createIterator();
+    mIteratorUncontrollableClosure =
+      tauClosure.createFullEventClosureIterator();
     mIteratorControllableTo = rel.createSuccessorsReadOnlyIteratorByStatus
       (EventEncoding.STATUS_LOCAL, EventEncoding.STATUS_CONTROLLABLE);
     mIteratorUncontrollableTo = rel.createSuccessorsReadOnlyIteratorByStatus
@@ -229,6 +231,7 @@ public class SynthesisTransitionRemovalTRSimplifier
   //# Auxiliary Methods
   private boolean isWeaklyControllablePath(final int source0, final int source, final int target0)
   {
+
     if (source == target0) {
       return true;
     }
@@ -241,6 +244,7 @@ public class SynthesisTransitionRemovalTRSimplifier
       mIteratorUncontrollableTo.resetState(current);
       boolean foundEnd = false;
       int next = -1;
+      inner:
       while (mIteratorUncontrollableTo.advance()) {
         final int target = mIteratorUncontrollableTo.getCurrentTargetState();
         final int event = mIteratorUncontrollableTo.getCurrentEvent();
@@ -258,7 +262,14 @@ public class SynthesisTransitionRemovalTRSimplifier
             continue outer;
           }
         } else {
-          // TODO weak synthesis observation equivalence ?
+          mIteratorUncontrollableClosure.reset(target0, event);
+          while (mIteratorUncontrollableClosure.advance()) {
+            final int targetFrom0 =
+              mIteratorUncontrollableClosure.getCurrentTargetState();
+            if (targetFrom0 == target) {
+              continue inner;
+            }
+          }
           continue outer;
         }
       }
@@ -288,6 +299,7 @@ public class SynthesisTransitionRemovalTRSimplifier
   private boolean mUsingSpecialEvents = true;
   private TransitionIterator mIteratorControllableTo;
   private TransitionIterator mIteratorUncontrollableTo;
+  private TransitionIterator mIteratorUncontrollableClosure;
 
 }
 

@@ -88,7 +88,15 @@ public class SynthesisStateSpace implements AutomatonProxy
   public SynthesisStateMap createPartitionMap
   (final TRPartition partition, final SynthesisStateMap parent)
   {
-    return new PartitionMap(partition, parent);
+    if (parent instanceof PartitionMap) {
+      final PartitionMap parentDown = (PartitionMap)parent;
+      final TRPartition parentPartition = parentDown.getPartition();
+      final TRPartition newPartition = TRPartition.combine(parentPartition, partition);
+      final SynthesisStateMap grandParent = parentDown.getParent();
+      return new PartitionMap(newPartition, grandParent);
+    } else {
+      return new PartitionMap(partition, parent);
+    }
   }
 
   public SynthesisStateMap createSynchronisationMap
@@ -311,6 +319,18 @@ public class SynthesisStateSpace implements AutomatonProxy
     {
       mStateToClass = partition.getStateToClass();
       mParent = parent;
+      mNumberOfClasses = partition.getNumberOfClasses();
+    }
+    //#######################################################################
+    //# Simple access
+    TRPartition getPartition()
+    {
+      return new TRPartition(mStateToClass, mNumberOfClasses);
+    }
+
+    SynthesisStateMap getParent()
+    {
+      return mParent;
     }
 
     //#######################################################################
@@ -337,6 +357,7 @@ public class SynthesisStateSpace implements AutomatonProxy
     //# Data Members
     private final int[] mStateToClass;
     private final SynthesisStateMap mParent;
+    private final int mNumberOfClasses;
   }
 
 

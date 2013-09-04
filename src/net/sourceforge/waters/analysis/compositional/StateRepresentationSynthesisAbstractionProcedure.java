@@ -111,10 +111,10 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
       chain.add(synthesisAbstraction);
     }
     if ((abstractionMethods & USE_TRANSITIONREMOVAL) != 0) {
-      final SynthesisTransitionRemovalTRSimplifier synthesisAbstraction =
+      final SynthesisTransitionRemovalTRSimplifier transitionRemoval =
         new SynthesisTransitionRemovalTRSimplifier();
-      synthesisAbstraction.setTransitionLimit(limit);
-      chain.add(synthesisAbstraction);
+      transitionRemoval.setTransitionLimit(limit);
+      chain.add(transitionRemoval);
     }
     return new StateRepresentationSynthesisAbstractionProcedure(synthesizer, chain);
   }

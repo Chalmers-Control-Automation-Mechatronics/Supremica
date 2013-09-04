@@ -118,7 +118,8 @@ public enum StateRepresentationSynthesisAbstractionProcedureFactory
           (synthesizer,
            StateRepresentationSynthesisAbstractionProcedure.USE_UNSUP |
            StateRepresentationSynthesisAbstractionProcedure.USE_BISIMULATION |
-           StateRepresentationSynthesisAbstractionProcedure.USE_WSOE);
+           StateRepresentationSynthesisAbstractionProcedure.USE_WSOE |
+           StateRepresentationSynthesisAbstractionProcedure.USE_TRANSITIONREMOVAL);
     }
   },
 
