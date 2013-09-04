@@ -32,7 +32,8 @@ public class EFSMTransitionRelation
                                 final Collection<EFSMVariable> variables,
                                 final List<SimpleNodeProxy> nodes)
   {
-    super(rel, events, variables, nodes);
+    super(rel, events, nodes);
+    mVariables = variables;
   }
 
   public EFSMTransitionRelation(final ListBufferTransitionRelation rel,
@@ -50,23 +51,46 @@ public class EFSMTransitionRelation
     return (EFSMEventEncoding) super.getTransitionLabelEncoding();
   }
 
-  @Override
-  public ListBufferTransitionRelation getTransitionRelation()
+  void addVariable(final EFSMVariable variable)
   {
-    return super.getTransitionRelation();
+    mVariables.add(variable);
+    variable.addTransitionRelation(this);
   }
 
-  @Override
-  public List<SimpleNodeProxy> getNodeList()
+  void removeVariable(final EFSMVariable variable)
   {
-    return super.getNodeList();
+    mVariables.remove(variable);
+    variable.removeTransitionRelation(this);
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public Collection<EFSMVariable> getVariables()
+  Collection<EFSMVariable> getVariables()
   {
-    return (Collection<EFSMVariable>) super.getVariables();
+    return mVariables;
   }
 
+  /**
+   * Registers this transition relation by adding its reference to all its
+   * variables.
+   */
+  void register()
+  {
+    for (final EFSMVariable var : mVariables) {
+      var.addTransitionRelation(this);
+    }
+  }
+
+  /**
+   * Deregisters this transition relation by removing its reference from all its
+   * variables.
+   */
+  void dispose()
+  {
+    for (final EFSMVariable var : mVariables) {
+      var.removeTransitionRelation(this);
+    }
+  }
+
+  //#########################################################################
+  //# Data members
+  private final Collection<EFSMVariable> mVariables;
 }

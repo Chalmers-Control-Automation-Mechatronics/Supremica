@@ -17,9 +17,9 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 /**
  * @author Robi Malik
  */
-public abstract class AbstractEFASystem<L, 
-                                        V extends AbstractEFAVariable<L>, 
-                                        TR extends AbstractEFATransitionRelation<L>, 
+public abstract class AbstractEFASystem<L,
+                                        V extends AbstractEFAVariable<L>,
+                                        TR extends AbstractEFATransitionRelation<L>,
                                         C extends AbstractEFAVariableContext<L, V>>
  implements Comparable<AbstractEFASystem<?, ?, ?, ?>>
 {
@@ -83,9 +83,6 @@ public abstract class AbstractEFASystem<L,
   public void removeVariable(final V var)
   {
     mVariables.remove(var);
-    for (final TR tran : mTransitionRelations){
-      tran.removeVariable(var);
-    }
   }
 
   public double getEstimatedStateSpace()
@@ -129,7 +126,7 @@ public abstract class AbstractEFASystem<L,
   {
     mTransitionRelations.remove(transitionRelation);
   }
-  
+
   //#########################################################################
   //# Class Constants
   private static final int DEFAULT_SIZE = 16;
@@ -139,5 +136,5 @@ public abstract class AbstractEFASystem<L,
   private final List<V> mVariables;
   private final C mVariableContext;
   private String mName;
-  
+
 }

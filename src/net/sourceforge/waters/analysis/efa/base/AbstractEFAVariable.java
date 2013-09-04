@@ -51,7 +51,6 @@ public abstract class AbstractEFAVariable<L>
     mPrimedVariableName = factory.createUnaryExpressionProxy(next, temp);
     mInitialStatePredicate =
      (SimpleExpressionProxy) cloner.getClone(var.getInitialStatePredicate());
-    mTransitionRelations = new THashSet<>();
     mEventDecls = new THashSet<>();
   }
 
@@ -103,37 +102,6 @@ public abstract class AbstractEFAVariable<L>
     return mInitialStatePredicate;
   }
 
-  /**
-   * Return whether this variable is local.
-   * <p/>
-   * @return <CODE>true</CODE> if the variable occurs in at most one transition
-   *         relation.
-   */
-  public boolean isLocal()
-  {
-    return mTransitionRelations.size() <= 1;
-  }
-
-  /**
-   * Returns a collection containing all transition relations (EFAs) using this
-   * variable.
-   */
-  protected Collection<? extends AbstractEFATransitionRelation<L>> getTransitionRelations(
-   )
-  {
-    return mTransitionRelations;
-  }
-
-  protected void addTransitionRelation(
-   final AbstractEFATransitionRelation<L> trans)
-  {
-    mTransitionRelations.add(trans);
-  }
-
-  protected void removeTransitionRelation(final AbstractEFATransitionRelation<L> trans)
-  {
-    mTransitionRelations.remove(trans);
-  }
 
   /**
    * Returns a collection containing all events in the system using this
@@ -153,7 +121,7 @@ public abstract class AbstractEFAVariable<L>
   {
     mEventDecls.remove(event);
   }
-  
+
   //#########################################################################
   //# Data Members
   private final VariableComponentProxy mComponent;
@@ -161,7 +129,6 @@ public abstract class AbstractEFAVariable<L>
   private final IdentifierProxy mVariableName;
   private final UnaryExpressionProxy mPrimedVariableName;
   private final SimpleExpressionProxy mInitialStatePredicate;
-  private final Collection<AbstractEFATransitionRelation<L>> mTransitionRelations;
   private final THashSet<EventDeclProxy> mEventDecls;
-  
+
 }

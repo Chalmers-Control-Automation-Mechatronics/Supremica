@@ -10,6 +10,8 @@
 package net.sourceforge.waters.analysis.efa.efsm;
 
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.BitSet;
 import java.util.Collection;
 
@@ -41,6 +43,7 @@ public class EFSMVariable
                final CompilerOperatorTable op)
   {
     super(var, range, factory, op);
+    mTransitionRelations = new THashSet<>();
     mSelfloops = new EFSMEventEncoding();
   }
 
@@ -88,11 +91,23 @@ public class EFSMVariable
     mSelfloops = newSelfloops;
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public Collection<EFSMTransitionRelation> getTransitionRelations()
+  /**
+   * Returns a collection containing all transition relations (EFAs) using this
+   * variable.
+   */
+  protected Collection<EFSMTransitionRelation> getTransitionRelations()
   {
-    return (Collection<EFSMTransitionRelation>) super.getTransitionRelations();
+    return mTransitionRelations;
+  }
+
+  protected void addTransitionRelation(final EFSMTransitionRelation trans)
+  {
+    mTransitionRelations.add(trans);
+  }
+
+  protected void removeTransitionRelation(final EFSMTransitionRelation trans)
+  {
+    mTransitionRelations.remove(trans);
   }
 
   /**
@@ -110,14 +125,21 @@ public class EFSMVariable
       return null;
     }
   }
-  void addTransitionRelation(final EFSMTransitionRelation aThis)
+  /**
+   * Return whether this variable is local.
+   * <p/>
+   * @return <CODE>true</CODE> if the variable occurs in at most one transition
+   *         relation.
+   */
+  public boolean isLocal()
   {
-    throw new UnsupportedOperationException("Not supported yet.");
+    return mTransitionRelations.size() <= 1;
   }
 
 
   //#########################################################################
   //# Data Members
+  private final Collection<EFSMTransitionRelation> mTransitionRelations;
   /**
    * Event encoding representing selfloops involving this variable.
    * @see #getSelfloops()

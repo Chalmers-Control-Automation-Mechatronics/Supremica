@@ -111,6 +111,10 @@ public class SimpleEFASystem
   public void removeVariable(final SimpleEFAVariable variable)
   {
     super.removeVariable(variable);
+    for (final SimpleEFAComponent tran : getTransitionRelations()) {
+      tran.removeVariable(variable);
+    }
+
   }
 
   public void removeVariables(final Collection<SimpleEFAVariable> variables)

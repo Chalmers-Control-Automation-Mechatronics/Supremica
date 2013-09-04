@@ -46,6 +46,7 @@ public class SimpleEFAVariable
     mMarkings = new ArrayList<>(var.getVariableMarkings());
     mVar = var;
     mOperatorTable = op;
+    mTransitionRelations = new THashSet<>();
   }
 
   /**
@@ -128,16 +129,35 @@ public class SimpleEFAVariable
   }
 
   /**
+   * Returns a collection containing all transition relations (EFAs) using this
+   * variable.
+   */
+  protected Collection<SimpleEFAComponent> getTransitionRelations()
+  {
+    return mTransitionRelations;
+  }
+
+  protected void addTransitionRelation(final SimpleEFAComponent trans)
+  {
+    mTransitionRelations.add(trans);
+  }
+
+  protected void removeTransitionRelation(final SimpleEFAComponent trans)
+  {
+    mTransitionRelations.remove(trans);
+  }
+
+  /**
    * Return whether this variable is local.
    * <p/>
    * @return <CODE>true</CODE> if the variable is modifies by at most one
    *         component but may visit (appears in guards) by others.
    */
-  @Override
   public boolean isLocal()
   {
     return mModifiers.size() <= 1;
   }
+
 
   /**
    * Return whether this variable is local.
@@ -148,7 +168,7 @@ public class SimpleEFAVariable
    *         component but may visit (appears in guards) by others or it does
    *         not have any modifier and only checked here.
    */
-  public boolean isLocalIn(IdentifierProxy component)
+  public boolean isLocalIn(final IdentifierProxy component)
   {
     return (mModifiers.size() == 1 && mModifiers.contains(component))
      || (mModifiers.isEmpty() && mVisitors.contains(component));
@@ -200,4 +220,5 @@ public class SimpleEFAVariable
   private final Collection<VariableMarkingProxy> mMarkings;
   private final CompilerOperatorTable mOperatorTable;
   private final VariableComponentProxy mVar;
+  private final Collection<SimpleEFAComponent> mTransitionRelations;
 }

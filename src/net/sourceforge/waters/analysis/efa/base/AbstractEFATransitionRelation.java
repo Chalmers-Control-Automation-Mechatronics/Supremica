@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.efa.base;
 
-import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -24,23 +23,19 @@ public abstract class AbstractEFATransitionRelation<L>
 
   //#########################################################################
   //# Constructors
-  @SuppressWarnings("unchecked")
   protected AbstractEFATransitionRelation(final ListBufferTransitionRelation rel,
                                           final AbstractEFATransitionLabelEncoding<L> labels,
-                                          final Collection<? extends AbstractEFAVariable<L>> variables,
                                           final List<SimpleNodeProxy> nodes)
   {
     mTransitionRelation = rel;
     mTransitionLabelEncoding = labels;
-    mVariables = (Collection<AbstractEFAVariable<L>>) variables;
     mNodeList = nodes;
   }
 
   protected AbstractEFATransitionRelation(final ListBufferTransitionRelation rel,
-                                          final AbstractEFATransitionLabelEncoding<L> labels,
-                                          final Collection<? extends AbstractEFAVariable<L>> variables)
+                                          final AbstractEFATransitionLabelEncoding<L> labels)
   {
-    this(rel, labels, variables, null);
+    this(rel, labels, null);
   }
   public AbstractEFATransitionLabelEncoding<L> getTransitionLabelEncoding()
   {
@@ -57,33 +52,6 @@ public abstract class AbstractEFATransitionRelation<L>
     mTransitionRelation.setName(name);
   }
 
-  public Collection<? extends AbstractEFAVariable<L>> getVariables()
-  {
-    return mVariables;
-  }
-
-  /**
-   * Registers this transition relation by adding its reference to all its
-   * variables.
-   */
-  public void register()
-  {
-    for (final AbstractEFAVariable<L> var : mVariables) {
-      var.addTransitionRelation(this);
-    }
-  }
-
-  /**
-   * Deregisters this transition relation by removing its reference from all its
-   * variables.
-   */
-  public void dispose()
-  {
-    for (final AbstractEFAVariable<L> var : mVariables) {
-      var.removeTransitionRelation(this);
-    }
-  }
-
   @Override
   public int compareTo(final AbstractEFATransitionRelation<?> efaTR)
   {
@@ -97,31 +65,20 @@ public abstract class AbstractEFATransitionRelation<L>
   {
     return mTransitionRelation.getName() + "\n" + mTransitionRelation.toString();
   }
-  
-  protected ListBufferTransitionRelation getTransitionRelation()
+
+  public ListBufferTransitionRelation getTransitionRelation()
   {
     return mTransitionRelation;
   }
 
-  protected List<SimpleNodeProxy> getNodeList()
+  public List<SimpleNodeProxy> getNodeList()
   {
     return mNodeList;
   }
-  protected void addVariable(final AbstractEFAVariable<L> variable)
-  {
-    mVariables.add(variable);
-    variable.addTransitionRelation(this);
-  }
-  protected void removeVariable(final AbstractEFAVariable<L> variable)
-  {
-    mVariables.remove(variable);
-    variable.removeTransitionRelation(this);
-  }
-  
+
   //#########################################################################
   //# Data Members
   private final ListBufferTransitionRelation mTransitionRelation;
   private final AbstractEFATransitionLabelEncoding<L> mTransitionLabelEncoding;
-  private final Collection<AbstractEFAVariable<L>> mVariables;
   private final List<SimpleNodeProxy> mNodeList;
 }

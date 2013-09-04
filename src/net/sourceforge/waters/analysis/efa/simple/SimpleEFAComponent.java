@@ -53,12 +53,13 @@ public class SimpleEFAComponent
                             final ComponentKind kind,
                             final ModuleProxyFactory factory)
   {
-    super(rel, labels, variables, null);
+    super(rel, labels, null);
     super.setName(name);
     mFactory = factory != null ? factory : ModuleSubjectFactory.getInstance();
     mHelper = new EFAHelper(mFactory);
     mStateEncoding = stateEncoding != null ? stateEncoding
                      : mHelper.getStateEncoding(rel);
+    mVariables = variables;
     mBlockedEvents = blockedEvents;
     mSystems = new ArrayList<>();
     mCloner = mFactory.getCloner();
@@ -82,21 +83,42 @@ public class SimpleEFAComponent
     return (SimpleEFATransitionLabelEncoding) super.getTransitionLabelEncoding();
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public Collection<SimpleEFAVariable> getVariables()
+  protected void addVariable(final SimpleEFAVariable variable)
   {
-    return (Collection<SimpleEFAVariable>) super.getVariables();
+    mVariables.add(variable);
+    variable.addTransitionRelation(this);
+  }
+  protected void removeVariable(final SimpleEFAVariable variable)
+  {
+    mVariables.remove(variable);
+    variable.removeTransitionRelation(this);
   }
 
-  public void addVariable(final SimpleEFAVariable variable)
+  public Collection<? extends SimpleEFAVariable> getVariables()
   {
-    super.addVariable(variable);
+    return mVariables;
   }
 
-  public void removeVariable(final SimpleEFAVariable variable)
+  /**
+   * Registers this transition relation by adding its reference to all its
+   * variables.
+   */
+  public void register()
   {
-    super.removeVariable(variable);
+    for (final SimpleEFAVariable var : mVariables) {
+      var.addTransitionRelation(this);
+    }
+  }
+
+  /**
+   * Deregisters this transition relation by removing its reference from all its
+   * variables.
+   */
+  public void dispose()
+  {
+    for (final SimpleEFAVariable var : mVariables) {
+      var.removeTransitionRelation(this);
+    }
   }
 
   @Override
@@ -330,6 +352,7 @@ public class SimpleEFAComponent
   public final static int DEFAULT_FORBIDDEN_ID = 1;
   private ModuleProxyFactory mFactory;
   private SimpleEFAStateEncoding mStateEncoding;
+  private final Collection<SimpleEFAVariable> mVariables;
   private Collection<SimpleEFAEventDecl> mBlockedEvents;
   private final ArrayList<SimpleEFASystem> mSystems;
   private final ModuleProxyCloner mCloner;

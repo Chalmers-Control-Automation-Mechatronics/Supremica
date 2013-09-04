@@ -66,4 +66,14 @@ class EFSMSystem
     super.removeTransitionRelation(transitionRelation);
   }
 
+  @Override
+  public void removeVariable(final EFSMVariable var)
+  {
+    super.removeVariable(var);
+    for (final EFSMTransitionRelation tran : getTransitionRelations()) {
+      tran.removeVariable(var);
+    }
+  }
+
+
 }
