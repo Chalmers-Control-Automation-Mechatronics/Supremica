@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionRelation;
+import net.sourceforge.waters.analysis.efa.base.EFASimplifierStatistics;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -144,7 +145,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
       logger.debug(efsmRel.getTransitionRelation().getNumberOfStates() + " states");
     }
     final long start = System.currentTimeMillis();
-    final EFSMSimplifierStatistics statistics = getStatistics();
+    final EFASimplifierStatistics statistics = getStatistics();
     statistics.recordStart(efsmRel);
     EFSMTransitionRelation result = null;
     try {

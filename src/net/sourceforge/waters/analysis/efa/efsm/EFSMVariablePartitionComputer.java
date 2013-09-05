@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.efa.base.EFASimplifierStatistics;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -92,7 +93,7 @@ public class EFSMVariablePartitionComputer extends AbstractEFSMAlgorithm
       logger.debug("Computing partition for " + var.getName() + " (" +
                    var.getRange().size() + " states) ...");
     }
-    final EFSMSimplifierStatistics statistics = getStatistics();
+    final EFASimplifierStatistics statistics = getStatistics();
     statistics.recordStart(var);
     final long start = System.currentTimeMillis();
     mEFSMVariable = var;

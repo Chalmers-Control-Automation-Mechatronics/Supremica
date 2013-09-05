@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
+import net.sourceforge.waters.analysis.efa.base.EFASimplifierStatistics;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
@@ -88,7 +89,7 @@ public class EFSMConflictCheckerAnalysisResult
   /**
    * Gets the statistics of the intermediate synchronous product steps.
    */
-  public EFSMSimplifierStatistics getSynchronousProductAnalysisResult()
+  public EFASimplifierStatistics getSynchronousProductAnalysisResult()
   {
     return mSynchronisationStatistics;
   }
@@ -133,7 +134,7 @@ public class EFSMConflictCheckerAnalysisResult
     mUnsuccessfulCompositionsCount++;
   }
 
-  public void addSynchronousProductStatistics(final EFSMSimplifierStatistics result)
+  public void addSynchronousProductStatistics(final EFASimplifierStatistics result)
   {
     if (mSynchronisationStatistics == null) {
       mSynchronisationStatistics = result;
@@ -146,7 +147,7 @@ public class EFSMConflictCheckerAnalysisResult
     }
   }
 
-  public void addPartitioningStatistics(final EFSMSimplifierStatistics result)
+  public void addPartitioningStatistics(final EFASimplifierStatistics result)
   {
     if (mPartitioningStatistics == null) {
       mPartitioningStatistics = result;
@@ -159,7 +160,7 @@ public class EFSMConflictCheckerAnalysisResult
     }
   }
 
-  public void addUnfoldingStatistics(final EFSMSimplifierStatistics result)
+  public void addUnfoldingStatistics(final EFASimplifierStatistics result)
   {
     if (mUnfoldingStatistics == null) {
       mUnfoldingStatistics = result;
@@ -336,9 +337,9 @@ public class EFSMConflictCheckerAnalysisResult
 
   //#########################################################################
   //# Data Members
-  private EFSMSimplifierStatistics mSynchronisationStatistics;
-  private EFSMSimplifierStatistics mPartitioningStatistics;
-  private EFSMSimplifierStatistics mUnfoldingStatistics;
+  private EFASimplifierStatistics mSynchronisationStatistics;
+  private EFASimplifierStatistics mPartitioningStatistics;
+  private EFASimplifierStatistics mUnfoldingStatistics;
   private List<TRSimplifierStatistics> mSimplifierStatistics;
 
   private int mTotalCompositionsCount;

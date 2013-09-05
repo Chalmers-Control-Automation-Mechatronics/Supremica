@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.efa.base.EFASimplifierStatistics;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -60,7 +61,7 @@ public class EFSMSynchronizer extends AbstractEFSMAlgorithm
     throws AnalysisException
   {
     final long start = System.currentTimeMillis();
-    final EFSMSimplifierStatistics statistics = getStatistics();
+    final EFASimplifierStatistics statistics = getStatistics();
     statistics.recordStart(efsmTR1, efsmTR2);
     EFSMTransitionRelation synchResult = null;
     try{

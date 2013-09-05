@@ -9,14 +9,24 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyAccessor;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
+import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -27,19 +37,31 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
@@ -93,8 +115,8 @@ public class EFAUnifier extends AbortableCompiler
   //#########################################################################
   //# Constructors
   public EFAUnifier(final ModuleProxyFactory factory,
-                     final SourceInfoBuilder builder,
-                     final ModuleProxy module)
+                    final SourceInfoBuilder builder,
+                    final ModuleProxy module)
   {
     mFactory = factory;
     mSourceInfoBuilder = builder;
@@ -134,8 +156,20 @@ public class EFAUnifier extends AbortableCompiler
       // Pass 2 ...
       mPropagator =
         new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+      mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final int size = mInputModule.getEventDeclList().size();
+      mEventMap = new ProxyAccessorHashMap<IdentifierProxy,EFAEventInfo>(eq,size);
+      final Pass2Visitor pass2 = new Pass2Visitor();
+      mInputModule.acceptVisitor(pass2);
       // Pass 3 ...
-      return null;
+      mEventUpdateMap = new ProxyAccessorHashMap<>(eq, size);
+      for (final EFAEventInfo info : mEventMap.values()) {
+        info.combineUpdates();
+      }
+      // Pass 4 ...
+      final Pass4Visitor pass4 = new Pass4Visitor();
+      return pass4.visitModuleProxy(mInputModule);
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -151,13 +185,48 @@ public class EFAUnifier extends AbortableCompiler
 
   //#########################################################################
   //# Configuration
+  public void setCreatesGuardAutomaton(final boolean create)
+  {
+    mCreatesGuardAutomaton = create;
+  }
 
+  public boolean getCreatesGuardAutomaton()
+  {
+    return mCreatesGuardAutomaton;
+  }
 
 
   //#########################################################################
   //# Auxiliary Methods
+  private void insertEventInfo(final IdentifierProxy ident,
+                               final EFAEventInfo edecl)
+    throws DuplicateIdentifierException
+  {
+    final ProxyAccessor<IdentifierProxy> accessor =
+      mEventMap.createAccessor(ident);
+    if (mEventMap.containsKey(accessor)) {
+      throw new DuplicateIdentifierException(ident, "event");
+    } else {
+      mEventMap.put(accessor, edecl);
+    }
+  }
 
-  @SuppressWarnings("unused")
+  private EFAEventInfo getEventInfo(final IdentifierProxy ident)
+  {
+    return mEventMap.getByProxy(ident);
+  }
+
+  private EFAEventInfo findEventInfo(final IdentifierProxy ident)
+    throws UndefinedIdentifierException
+  {
+    final EFAEventInfo edecl = getEventInfo(ident);
+    if (edecl == null) {
+      throw new UndefinedIdentifierException(ident, "event");
+    } else {
+      return edecl;
+    }
+  }
+
   private void addSourceInfo(final Proxy target, final Proxy source)
   {
     if (mSourceInfoBuilder != null) {
@@ -165,6 +234,41 @@ public class EFAUnifier extends AbortableCompiler
     }
   }
 
+  private SimpleComponentProxy createGuardAutomaton
+    (final List<EventDeclProxy> events)
+  {
+    if (mCreatesGuardAutomaton) {
+      final SimpleNodeProxy node =
+        mFactory.createSimpleNodeProxy("init",null, null, true,null,null,null);
+      final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
+      final List<EdgeProxy> edges =
+        new ArrayList<EdgeProxy>(mEventUpdateMap.size());
+      for (final EventDeclProxy event : events) {
+        final IdentifierProxy ident = event.getIdentifier();
+        final ConstraintList update = mEventUpdateMap.getByProxy(ident);
+        if (update != null) {
+          final SimpleExpressionProxy guard =
+            update.createExpression(mFactory, mOperatorTable.getAndOperator());
+          final List<SimpleExpressionProxy> guards =
+            Collections.singletonList(guard);
+          final GuardActionBlockProxy ga =
+            mFactory.createGuardActionBlockProxy(guards, null, null);
+          final List<IdentifierProxy> labels = Collections.singletonList(ident);
+          final LabelBlockProxy block =
+            mFactory.createLabelBlockProxy(labels, null);
+          final EdgeProxy edge =
+            mFactory.createEdgeProxy(node, node, block, ga, null, null, null);
+          edges.add(edge);
+        }
+      }
+      final GraphProxy graph = mFactory.createGraphProxy(true, null, nodes, edges);
+      final IdentifierProxy name = mFactory.createSimpleIdentifierProxy(":guards");
+      return
+        mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
+    } else {
+      return null;
+    }
+  }
 
   //#########################################################################
   //# Inner Class Pass1Visitor
@@ -177,7 +281,6 @@ public class EFAUnifier extends AbortableCompiler
    */
   private class Pass1Visitor extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
@@ -267,18 +370,437 @@ public class EFAUnifier extends AbortableCompiler
   }
 
   //#########################################################################
+  //# Inner Class Pass2Visitor
+  /**
+   * The visitor implementing the second pass of EFA unification. For
+   * each automaton, it collects all the information about events and their
+   * relevant updates and stores it in the map {@link EFAUnifier#mEventMap}.
+   */
+  private class Pass2Visitor extends DefaultModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
+    {
+      try {
+        final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+        if (ga == null) {
+          mCurrentUpdate = mTrueGuard;
+        } else {
+          visitGuardActionBlockProxy(ga);
+        }
+        final LabelBlockProxy block = edge.getLabelBlock();
+        visitLabelBlockProxy(block);
+        return null;
+      } finally {
+        mCurrentUpdate = null;
+      }
+    }
+
+    @Override
+    public EFAEventInfo visitEventDeclProxy(final EventDeclProxy decl)
+      throws VisitorException
+    {
+      try {
+        checkAbortInVisitor();
+        final IdentifierProxy ident = decl.getIdentifier();
+        final EFAEventInfo edecl = new EFAEventInfo(decl);
+        insertEventInfo(ident, edecl);
+        return edecl;
+      } catch (final DuplicateIdentifierException e) {
+        throw wrap(e);
+      }
+    }
+
+    @Override
+    public Object visitGraphProxy(final GraphProxy graph)
+      throws VisitorException
+    {
+      final Collection<EdgeProxy> edges = graph.getEdges();
+      visitCollection(edges);
+      return null;
+    }
+
+    @Override
+    public ConstraintList visitGuardActionBlockProxy
+      (final GuardActionBlockProxy ga)
+      throws VisitorException
+    {
+      try {
+        checkAbortInVisitor();
+        mCurrentUpdate = mGuardCompiler.getCompiledGuard(ga);
+        return mCurrentUpdate;
+      } catch (final EvalException exception) {
+        throw wrap(exception);
+      }
+    }
+
+    @Override
+    public EFAEventInfo visitIdentifierProxy(final IdentifierProxy ident)
+      throws VisitorException
+    {
+      try {
+        checkAbortInVisitor();
+        final EFAEventInfo edecl = findEventInfo(ident);
+        edecl.addUpdate(mCurrentComponent, mCurrentUpdate);
+        return edecl;
+      } catch (final UndefinedIdentifierException exception) {
+        throw wrap(exception);
+      }
+    }
+
+    @Override
+    public Object visitLabelBlockProxy(final LabelBlockProxy block)
+      throws VisitorException
+    {
+      final List<Proxy> list = block.getEventIdentifierList();
+      visitCollection(list);
+      return null;
+    }
+
+    @Override
+    public Object visitModuleProxy(final ModuleProxy module)
+      throws VisitorException
+    {
+      final List<EventDeclProxy> events = module.getEventDeclList();
+      visitCollection(events);
+      final List<Proxy> components = module.getComponentList();
+      visitCollection(components);
+      return null;
+    }
+
+    @Override
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
+      throws VisitorException
+    {
+      try {
+        mCurrentComponent = comp;
+        final GraphProxy graph = comp.getGraph();
+        visitGraphProxy(graph);
+        return null;
+      } finally {
+        mCurrentComponent = null;
+      }
+    }
+
+    @Override
+    public Object visitVariableComponentProxy(final VariableComponentProxy var)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private SimpleComponentProxy mCurrentComponent;
+    private ConstraintList mCurrentUpdate;
+  }
+
+
+  //#########################################################################
+  //# Inner Class Pass4Visitor
+  /**
+   * The visitor implementing the fourth pass of EFA compilation.
+   */
+  private class Pass4Visitor extends DefaultModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Constructor
+    private Pass4Visitor()
+    {
+      mCloner = mFactory.getCloner();
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitEventDeclProxy(final EventDeclProxy decl)
+      throws VisitorException
+    {
+      try {
+        checkAbortInVisitor();
+        final IdentifierProxy ident = decl.getIdentifier();
+        final EFAEventInfo edecl = findEventInfo(ident);
+        final EventKind kind = decl.getKind();
+        final boolean observable = decl.isObservable();
+        final Map<String,String> attribs = decl.getAttributes();
+        for (final IdentifierProxy subIdent : edecl.getIdentifiers()) {
+          final IdentifierProxy subClone =
+            (IdentifierProxy) mCloner.getClone(subIdent);
+          final EventDeclProxy subDecl = mFactory.createEventDeclProxy
+            (subClone, kind, observable, ScopeKind.LOCAL, null, null, attribs);
+          mEventDeclarations.add(subDecl);
+          addSourceInfo(subDecl, decl);
+        }
+        return null;
+      } catch (final UndefinedIdentifierException exception) {
+        throw wrap(exception);
+      }
+    }
+
+    @Override
+    public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
+    {
+      try{
+        final NodeProxy source0 = edge.getSource();
+        final NodeProxy source1 = mNodeMap.get(source0);
+        final NodeProxy target0 = edge.getTarget();
+        final NodeProxy target1 = mNodeMap.get(target0);
+        final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+        if (ga == null) {
+          mCurrentUpdate = mTrueGuard;
+        } else {
+          visitGuardActionBlockProxy(ga);
+        }
+        final LabelBlockProxy block0 = edge.getLabelBlock();
+        final LabelBlockProxy block1 = visitLabelBlockProxy(block0);
+        final EdgeProxy result = mFactory.createEdgeProxy
+          (source1, target1, block1, null, null, null, null);
+        mEdgeList.add(result);
+        return result;
+      } finally {
+        mCurrentUpdate = null;
+      }
+    }
+
+    @Override
+    public GraphProxy visitGraphProxy(final GraphProxy graph)
+      throws VisitorException
+    {
+      try {
+        final Collection<NodeProxy> nodes = graph.getNodes();
+        final int numnodes = nodes.size();
+        mNodeList = new ArrayList<NodeProxy>(numnodes);
+        mNodeMap = new HashMap<NodeProxy,NodeProxy>(numnodes);
+        visitCollection(nodes);
+        final Collection<EdgeProxy> edges = graph.getEdges();
+        final int numedges = edges.size();
+        mEdgeList = new ArrayList<EdgeProxy>(numedges);
+        final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+        mUnblockedIdentifiers = new ProxyAccessorHashSet<>(eq);
+        visitCollection(edges);
+        final LabelBlockProxy blocked0 = graph.getBlockedEvents();
+        LabelBlockProxy blocked1 = null;
+        if (blocked0 != null) {
+          blocked1 = visitLabelBlockProxy(blocked0);
+          if (blocked1.getEventIdentifierList().isEmpty()) {
+            blocked1 = null;
+          }
+        }
+        final boolean deterministic = graph.isDeterministic();
+        return mFactory.createGraphProxy
+          (deterministic, blocked1, mNodeList, mEdgeList);
+      } finally {
+        mNodeList = null;
+        mNodeMap = null;
+        mEdgeList = null;
+        mUnblockedIdentifiers = null;
+      }
+    }
+
+    @Override
+    public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
+      throws VisitorException
+    {
+      final String name = group.getName();
+      final PlainEventListProxy props0 = group.getPropositions();
+      final PlainEventListProxy props1 =
+        (PlainEventListProxy) mCloner.getClone(props0);
+      final Map<String,String> attribs0 = group.getAttributes();
+      final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
+      final Collection<NodeProxy> children0 = group.getImmediateChildNodes();
+      final int numchildren = children0.size();
+      final Collection<NodeProxy> children1 =
+        new ArrayList<NodeProxy>(numchildren);
+      for (final NodeProxy child0 : children0) {
+        final NodeProxy child1 = mNodeMap.get(child0);
+        children1.add(child1);
+      }
+      final GroupNodeProxy result =
+        mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
+      mNodeList.add(result);
+      mNodeMap.put(group, result);
+      addSourceInfo(result, group);
+      return result;
+    }
+
+    @Override
+    public ConstraintList visitGuardActionBlockProxy
+      (final GuardActionBlockProxy ga)
+      throws VisitorException
+    {
+      try {
+        checkAbortInVisitor();
+        mCurrentUpdate = mGuardCompiler.getCompiledGuard(ga);
+        return mCurrentUpdate;
+      } catch (final EvalException exception) {
+        throw wrap(exception);
+      }
+    }
+
+    @Override
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+      throws VisitorException
+    {
+      try {
+        checkAbortInVisitor();
+        final EFAEventInfo eventInfo = findEventInfo(ident);
+        final List<IdentifierProxy> identifiers;
+        if (mCurrentUpdate == null) {
+          final List<IdentifierProxy> subIdentifiers = eventInfo.getIdentifiers();
+          identifiers = new ArrayList<IdentifierProxy>(subIdentifiers.size());
+          for (final IdentifierProxy subIdent : subIdentifiers) {
+            if (!mUnblockedIdentifiers.containsProxy(subIdent)) {
+              identifiers.add(subIdent);
+            }
+          }
+        } else {
+          identifiers = eventInfo.getIdentifiers(mCurrentComponent, mCurrentUpdate);
+        }
+        for (final IdentifierProxy subident : identifiers) {
+          mLabelList.add(subident);
+          addSourceInfo(subident, ident);
+          mUnblockedIdentifiers.addProxy(subident);
+        }
+        return null;
+      } catch(final UndefinedIdentifierException exception) {
+        throw wrap(exception);
+      }
+    }
+
+    @Override
+    public LabelBlockProxy visitLabelBlockProxy(final LabelBlockProxy block)
+      throws VisitorException
+    {
+      try {
+        mLabelList = new LinkedList<IdentifierProxy>();
+        final List<Proxy> list = block.getEventIdentifierList();
+        visitCollection(list);
+        return mFactory.createLabelBlockProxy(mLabelList, null);
+      } finally {
+        mLabelList = null;
+      }
+    }
+
+    @Override
+    public ModuleProxy visitModuleProxy(final ModuleProxy module)
+      throws VisitorException
+    {
+      try {
+        final String name = module.getName();
+        final String comment = module.getComment();
+        final List<EventDeclProxy> decls = module.getEventDeclList();
+        final int numdecls = decls.size();
+        mEventDeclarations = new ArrayList<>(numdecls);
+        visitCollection(decls);
+        final List<Proxy> components = module.getComponentList();
+        final int numcomps = components.size()+(mCreatesGuardAutomaton? 1:0);
+        mComponents = new ArrayList<>(numcomps);
+        visitCollection(components);
+        final SimpleComponentProxy aut = createGuardAutomaton(mEventDeclarations);
+        if (aut != null) {
+          mComponents.add(aut);
+        }
+        return mFactory.createModuleProxy
+          (name, comment, null, null, mEventDeclarations, null, mComponents);
+      } finally {
+        mEventDeclarations = null;
+        mComponents = null;
+      }
+    }
+
+    @Override
+    public SimpleComponentProxy visitSimpleComponentProxy
+      (final SimpleComponentProxy comp)
+      throws VisitorException
+    {
+      try {
+        mCurrentComponent = comp;
+        final IdentifierProxy ident0 = comp.getIdentifier();
+        final IdentifierProxy ident1 =
+          (IdentifierProxy) mCloner.getClone(ident0);
+        final ComponentKind kind = comp.getKind();
+        final GraphProxy graph0 = comp.getGraph();
+        final GraphProxy graph1 = visitGraphProxy(graph0);
+        final Map<String,String> attribs = comp.getAttributes();
+        final SimpleComponentProxy result =
+          mFactory.createSimpleComponentProxy(ident1, kind, graph1, attribs);
+        addSourceInfo(result, comp);
+        mComponents.add(result);
+        return result;
+      } finally {
+        mCurrentComponent = null;
+      }
+    }
+
+    @Override
+    public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
+      throws VisitorException
+    {
+      checkAbortInVisitor();
+      final String name = node.getName();
+      final PlainEventListProxy props0 = node.getPropositions();
+      final PlainEventListProxy props1 =
+        (PlainEventListProxy) mCloner.getClone(props0);
+      final Map<String,String> attribs0 = node.getAttributes();
+      final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
+      final boolean initial = node.isInitial();
+      final SimpleNodeProxy result = mFactory.createSimpleNodeProxy
+        (name, props1, attribs1, initial, null, null, null);
+      mNodeList.add(result);
+      mNodeMap.put(node, result);
+      addSourceInfo(result, node);
+      return result;
+    }
+
+    @Override
+    public VariableComponentProxy visitVariableComponentProxy
+      (final VariableComponentProxy comp)
+      throws VisitorException
+    {
+      checkAbortInVisitor();
+      final VariableComponentProxy variable =
+        (VariableComponentProxy) mCloner.getClone(comp);
+      addSourceInfo(variable, comp);
+      mComponents.add(variable);
+      return variable;
+    }
+
+
+    //#######################################################################
+    //# Data Members
+    private final ModuleProxyCloner mCloner;
+
+    private List<EventDeclProxy> mEventDeclarations;
+    private List<ComponentProxy> mComponents;
+    private SimpleComponentProxy mCurrentComponent;
+    private ConstraintList mCurrentUpdate;
+    private List<NodeProxy> mNodeList;
+    private Map<NodeProxy,NodeProxy> mNodeMap;
+    private List<EdgeProxy> mEdgeList;
+    private List<IdentifierProxy> mLabelList;
+    private ProxyAccessorSet<IdentifierProxy> mUnblockedIdentifiers;
+
+  }
+
+
+  //#########################################################################
   //# Inner Class
-  @SuppressWarnings("unused")
-  private class ModuleEventInfo
+  private class EFAEventInfo
   {
     //#######################################################################
     //# Constructor
-    private ModuleEventInfo(final IdentifierProxy eventName)
+    private EFAEventInfo(final EventDeclProxy eventDecl)
     {
-      mEventName = eventName;
+      mEventDecl = eventDecl;
       mMap = new HashMap<>();
       mList = new ArrayList<>();
       mConstraintMap = new HashMap<>();
+      mIdentifierList = new ArrayList<>();
     }
 
     //#######################################################################
@@ -286,9 +808,9 @@ public class EFAUnifier extends AbortableCompiler
     private void addUpdate(final SimpleComponentProxy automaton,
                            final ConstraintList update)
     {
-      EFAEventInfo info = mMap.get(automaton);
+      EFAUpdateInfo info = mMap.get(automaton);
       if (info == null) {
-        info = new EFAEventInfo();
+        info = new EFAUpdateInfo();
         mMap.put(automaton, info);
         mList.add(info);
       }
@@ -297,56 +819,96 @@ public class EFAUnifier extends AbortableCompiler
 
     private void combineUpdates() throws EvalException
     {
-      combineUpdates(new ConstraintList(), 0);
+      Collections.sort(mList);
+      combineUpdates(mTrueGuard, 0);
     }
 
-    private void combineUpdates(final ConstraintList oldUpdate, final int index)
+    private List<IdentifierProxy> combineUpdates(final ConstraintList oldUpdate,
+                                                 final int index)
       throws EvalException
     {
       if (index < mList.size()) {
-        final EFAEventInfo info = mList.get(index);
-        for (final ConstraintList update : info) {
+        final EFAUpdateInfo info = mList.get(index);
+        final List<IdentifierProxy> eventIdentifiers = new ArrayList<>();
+        for (final ConstraintList update : info.getUpdates()) {
           final List<SimpleExpressionProxy> constraints =
             new ArrayList<>(oldUpdate.size()+update.size());
           constraints.addAll(oldUpdate.getConstraints());
           constraints.addAll(update.getConstraints());
           final ConstraintList newUpdate = new ConstraintList(constraints);
-          combineUpdates(newUpdate, index + 1);
+          final List<IdentifierProxy> updateIndentifiers =
+            combineUpdates(newUpdate, index + 1);
+          info.addEvents(update, updateIndentifiers);
+          eventIdentifiers.addAll(updateIndentifiers);
         }
+        return eventIdentifiers;
       } else {
         mPropagator.init(oldUpdate);
         mPropagator.propagate();
-        if (!mPropagator.isUnsatisfiable()) {
+        if (mPropagator.isUnsatisfiable()) {
+          return Collections.emptyList();
+        } else {
           final ConstraintList result = mPropagator.getAllConstraints();
           IdentifierProxy ident = mConstraintMap.get(result);
-          if (ident == null){
+          if (ident == null) {
             final String name =
-              mEventName.toString() + ":" + mConstraintMap.size();
+              mEventDecl.getName() + ":" + mConstraintMap.size();
             ident = mFactory.createSimpleIdentifierProxy(name);
+            mIdentifierList.add(ident);
             mConstraintMap.put(result, ident);
+            if (!result.isTrue()) {
+              mEventUpdateMap.putByProxy(ident, result);
+            }
           }
+          return Collections.singletonList(ident);
         }
+      }
+    }
+
+    private List<IdentifierProxy> getIdentifiers()
+    {
+      if (mIdentifierList.size() == 1) {
+        final IdentifierProxy identifier = mEventDecl.getIdentifier();
+        return Collections.singletonList(identifier);
+      } else {
+        return mIdentifierList;
+      }
+    }
+
+    private List<IdentifierProxy> getIdentifiers(final SimpleComponentProxy comp,
+                                                 final ConstraintList update)
+    {
+      final EFAUpdateInfo info = mMap.get(comp);
+      final List<IdentifierProxy> identifiers = info.getIdentifiers(update);
+      if (mIdentifierList.size() == 1 && !identifiers.isEmpty()) {
+        final IdentifierProxy identifier = mEventDecl.getIdentifier();
+        return Collections.singletonList(identifier);
+      } else {
+        return identifiers;
       }
     }
 
     //#######################################################################
     //# Data Members
-    private final IdentifierProxy mEventName;
-    private final Map<SimpleComponentProxy, EFAEventInfo> mMap;
-    private final List<EFAEventInfo> mList;
+    private final EventDeclProxy mEventDecl;
+    private final Map<SimpleComponentProxy, EFAUpdateInfo> mMap;
+    private final List<EFAUpdateInfo> mList;
     private final Map<ConstraintList, IdentifierProxy> mConstraintMap;
+    private final List<IdentifierProxy> mIdentifierList;
   }
 
 
   //#########################################################################
   //# Inner Class
-  private static class EFAEventInfo implements Iterable<ConstraintList>
+  private static class EFAUpdateInfo
+    implements Comparable<EFAUpdateInfo>
   {
     //#######################################################################
     //# Constructor
-    private EFAEventInfo()
+    private EFAUpdateInfo()
     {
       mUpdates = new ArrayList<>();
+      mMap = new HashMap<>();
     }
 
     //#######################################################################
@@ -362,42 +924,106 @@ public class EFAUnifier extends AbortableCompiler
       mUpdates.add(update);
     }
 
-    @SuppressWarnings("unused")
-    private ConstraintList getUpdate(final int index)
+    private List<ConstraintList> getUpdates()
     {
-      return mUpdates.get(index);
+      return mUpdates;
     }
 
-    @SuppressWarnings("unused")
-    private int getIndexOfUpdate(final ConstraintList update)
+    private void addEvents(final ConstraintList update,
+                           final Collection<IdentifierProxy> events)
     {
-      return mUpdates.indexOf(update);
+      EFAEventList list = mMap.get(update);
+      if (list == null) {
+        list = new EFAEventList();
+        mMap.put(update, list);
+      }
+      list.addAll(events);
     }
 
+    private List<IdentifierProxy> getIdentifiers(final ConstraintList update)
+    {
+      return mMap.get(update);
+    }
     //#######################################################################
-    //# Interface java.lang.Iterable<ConstraintList>
+    //# Interface java.lang.Comparable<EFAUpdateInfo>
     @Override
-    public Iterator<ConstraintList> iterator()
+    public int compareTo(final EFAUpdateInfo info)
     {
-      return mUpdates.iterator();
+      return mUpdates.size() - info.mUpdates.size();
     }
 
     //#######################################################################
     //# Data Members
     private final List<ConstraintList> mUpdates;
+    private final Map<ConstraintList, EFAEventList> mMap;
   }
+
+
+  //#########################################################################
+  //# Inner Class
+  /**
+   * A list of identifiers that avoids duplicate entries.
+   */
+  private static class EFAEventList extends AbstractList<IdentifierProxy>
+  {
+    //#######################################################################
+    //# Constructor
+    private EFAEventList()
+    {
+      mList = new ArrayList<>();
+      mSet = new THashSet<>();
+    }
+
+    private EFAEventList(final int size)
+    {
+      mList = new ArrayList<>(size);
+      mSet = new THashSet<>(size);
+    }
+
+    //#######################################################################
+    //# Interface java.util.List<IdentifierProxy>
+    @Override
+    public void add(final int index, final IdentifierProxy ident)
+    {
+      if (mSet.add(ident)) {
+        mList.add(index, ident);
+      }
+    }
+
+    @Override
+    public IdentifierProxy get(final int index)
+    {
+      return mList.get(index);
+    }
+
+    @Override
+    public int size()
+    {
+      return mList.size();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final List<IdentifierProxy> mList;
+    private final Set<IdentifierProxy> mSet;
+  }
+
 
   //#########################################################################
   //# Data Members
+  private boolean mCreatesGuardAutomaton = false;
+
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
-  @SuppressWarnings("unused")
   private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleProxy mInputModule;
 
   private EFAModuleContext mRootContext;
   private ConstraintPropagator mPropagator;
+  private EFAGuardCompiler mGuardCompiler;
+  private ProxyAccessorMap<IdentifierProxy, EFAEventInfo> mEventMap;
+  private ProxyAccessorMap<IdentifierProxy, ConstraintList> mEventUpdateMap;
 
 }

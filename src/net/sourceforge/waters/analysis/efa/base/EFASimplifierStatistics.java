@@ -1,19 +1,20 @@
-
-
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   TRSimplifierStatistics
+//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
+//# CLASS:   EFASimplifierStatistics
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.analysis.efa.efsm;
+package net.sourceforge.waters.analysis.efa.base;
+
 import java.io.PrintWriter;
 import java.util.Formatter;
 
+import net.sourceforge.waters.analysis.efa.efsm.EFSMTransitionRelation;
+import net.sourceforge.waters.analysis.efa.efsm.EFSMVariable;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
@@ -26,14 +27,14 @@ import net.sourceforge.waters.model.base.ProxyTools;
  * rule will be applied multiple times during the composition of a model, and
  * this will hold accumulative data of each application of the rule.
  *
- * @author Rachel Francis, Robi Malik
+ * @author Sahar Mohajerani, Robi Malik
  */
-public class EFSMSimplifierStatistics
+public class EFASimplifierStatistics
 {
 
   //#########################################################################
   //# Constructors
-  public EFSMSimplifierStatistics(final Object simplifier,
+  public EFASimplifierStatistics(final Object simplifier,
                                   final boolean trans)
   {
     mSimplifierClass = simplifier.getClass();
@@ -263,7 +264,7 @@ public class EFSMSimplifierStatistics
     mRunTime = runTime;
   }
 
-  public void merge(final EFSMSimplifierStatistics stats)
+  public void merge(final EFASimplifierStatistics stats)
   {
     if (mSimplifierClass == stats.mSimplifierClass) {
       mApplicationCount += stats.mApplicationCount;

@@ -2,21 +2,23 @@
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
-//# CLASS:   EFSMCompiler
+//# CLASS:   UnifiedEFACompiler
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa.efsm;
+package net.sourceforge.waters.analysis.efa.unified;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.efa.EFAUnifier;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -32,13 +34,13 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-class EFSMCompiler extends AbstractEFSMAlgorithm
+class UnifiedEFACompiler extends AbstractEFAAlgorithm
 {
 
   //##########################################################################
   //# Constructors
-  EFSMCompiler(final DocumentManager manager,
-               final ModuleProxy module)
+  UnifiedEFACompiler(final DocumentManager manager,
+                     final ModuleProxy module)
   {
     mDocumentManager = manager;
     mInputModule = module;
@@ -62,8 +64,8 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
     if (mModuleInstanceCompiler != null) {
       mModuleInstanceCompiler.requestAbort();
     }
-    if (mEFSMSystemBuilder != null) {
-      mEFSMSystemBuilder.requestAbort();
+    if (mEFAUnifier != null) {
+      mEFAUnifier.requestAbort();
     }
   }
 
@@ -74,8 +76,8 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
     if (mModuleInstanceCompiler != null) {
       mModuleInstanceCompiler.resetAbort();
     }
-    if (mEFSMSystemBuilder != null) {
-      mEFSMSystemBuilder.resetAbort();
+    if (mEFAUnifier != null) {
+      mEFAUnifier.resetAbort();
     }
   }
 
@@ -87,16 +89,16 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
   {
     super.tearDown();
     mModuleInstanceCompiler = null;
-    mEFSMSystemBuilder = null;
+    mEFAUnifier = null;
   }
 
-  EFSMSystem compile()
+  ModuleProxy compile()
     throws EvalException, AnalysisException
   {
     return compile(null);
   }
 
-  EFSMSystem compile(final List<ParameterBindingProxy> bindings)
+  ModuleProxy compile(final List<ParameterBindingProxy> bindings)
     throws EvalException, AnalysisException
   {
     try {
@@ -120,11 +122,9 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
       mModuleInstanceCompiler = null;
       shiftSourceInfo();
-      mEFSMSystemBuilder = new EFSMSystemBuilder
-        (modfactory, mSourceInfoBuilder, intermediate);
-      mEFSMSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
-      mEFSMSystemBuilder.setConfiguredDefaultMarking(marking);
-      return mEFSMSystemBuilder.compile();
+      mEFAUnifier = new EFAUnifier(modfactory, mSourceInfoBuilder, intermediate);
+      mEFAUnifier.setCreatesGuardAutomaton(true);
+      return mEFAUnifier.compile();
     } finally {
       tearDown();
     }
@@ -206,7 +206,7 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
   private final ModuleProxy mInputModule;
 
   private ModuleInstanceCompiler mModuleInstanceCompiler;
-  private EFSMSystemBuilder mEFSMSystemBuilder;
+  private EFAUnifier mEFAUnifier;
   private SourceInfoBuilder mSourceInfoBuilder;
 
   private boolean mIsOptimizationEnabled = true;
