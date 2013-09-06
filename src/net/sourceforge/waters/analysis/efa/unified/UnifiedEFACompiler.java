@@ -94,13 +94,13 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
     mEFAUnifier = null;
   }
 
-  ModuleProxy compile()
+  UnifiedEFASystem compile()
     throws EvalException, AnalysisException
   {
     return compile(null);
   }
 
-  ModuleProxy compile(final List<ParameterBindingProxy> bindings)
+  UnifiedEFASystem compile(final List<ParameterBindingProxy> bindings)
     throws EvalException, AnalysisException
   {
     try {
@@ -125,7 +125,6 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       mModuleInstanceCompiler = null;
       shiftSourceInfo();
       mEFAUnifier = new EFAUnifier(modfactory, mSourceInfoBuilder, instantiated);
-      mEFAUnifier.setCreatesGuardAutomaton(true);
       final ModuleProxy unified = mEFAUnifier.compile();
       shiftSourceInfo();
       final ProxyAccessorMap<IdentifierProxy, ConstraintList> map =
@@ -133,9 +132,8 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       mSystemBuilder =
         new UnifiedEFASystemBuilder(modfactory, mSourceInfoBuilder, unified, map);
       mSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
-      mSystemBuilder.setConfiguredDefaultMarking(mMarking);
-      mSystemBuilder.compile();
-      return unified;
+      mSystemBuilder.setConfiguredDefaultMarking(marking);
+      return mSystemBuilder.compile();
     } finally {
       tearDown();
     }

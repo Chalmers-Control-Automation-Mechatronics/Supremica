@@ -46,7 +46,6 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
 
   //#########################################################################
   //# Simple Access
-
   /**
    * Returns the number of updates in this event encoding.
    * Note that this method always returns at least&nbsp;1 because the
@@ -61,7 +60,7 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
   {
     return mTransitionLabelMap.isEmpty();
   }
-  
+
   public int getTransitionLabelId(final L label)
   {
     return mTransitionLabelMap.get(label);
@@ -133,6 +132,6 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
   private final TObjectIntHashMap<L> mTransitionLabelMap;
   private final List<L> mTransitionLabelList;
 
-  
+
 }
 

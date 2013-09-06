@@ -86,7 +86,6 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
     super.setUp();
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     final int numEvents = mInputModule.getEventDeclList().size();
-    mEvents = new ArrayList<>(numEvents);
     mIdentifierMap = new ProxyAccessorHashMap<>(eq,numEvents);
     final String moduleName = mInputModule.getName();
     final CompilerOperatorTable opTable = CompilerOperatorTable.getInstance();
@@ -158,7 +157,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       final ConstraintList update = mEventUpdateMap.getByProxy(ident);
       if (update != null) {
         final UnifiedEFAEvent event = new UnifiedEFAEvent(eventDec, update);
-        mEvents.add(event);
+        mResultEFASystem.addEvent(event);
         mIdentifierMap.putByProxy(ident, event);
       }
     }
@@ -219,7 +218,9 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       final Collection<NodeProxy> nodes = graph.getNodes();
       visitCollection(nodes);
       final LabelBlockProxy blockedEvents = graph.getBlockedEvents();
-      visitLabelBlockProxy(blockedEvents);
+      if (blockedEvents != null) {
+        visitLabelBlockProxy(blockedEvents);
+      }
       final Collection<EdgeProxy> edges = graph.getEdges();
       visitCollection(edges);
       return null;
@@ -327,6 +328,12 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
           mRevisiting = true;
           visitGraphProxy(graph);
         }
+        mTransitionRelation.setProperEventStatus(EventEncoding.TAU,
+                                                 EventEncoding.STATUS_FULLY_LOCAL
+                                                 | EventEncoding.STATUS_UNUSED);
+        if (isTrivial(mTransitionRelation)) {
+          return null;
+        }
         final UnifiedEFATransitionRelation unifiedEFATransitionRelation =
           new UnifiedEFATransitionRelation(mTransitionRelation,
                                            mEventEncoding, mNodeList);
@@ -379,7 +386,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       }
       final EventListExpressionProxy props = node.getPropositions();
       if (containsMarkingProposition(props)) {
-        mTransitionRelation.setMarked(code, OMEGA, true);
+        mTransitionRelation.setMarked(code, UnifiedEFAEventEncoding.OMEGA, true);
       }
       return null;
     }
@@ -437,7 +444,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
         final CompiledRange range =
           mSimpleExpressionCompiler.getRangeValue(value);
         final UnifiedEFAVariable result =
-          new UnifiedEFAVariable(var, range, mFactory, mOperatorTable);
+          new UnifiedEFAVariable(var, range, mDefaultMarking, mFactory, mOperatorTable);
         mVariableContext.addVariable(result);
         mResultEFASystem.addVariable(result);
       } catch (final EvalException exception) {
@@ -459,7 +466,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
         // 3. Check for redundant propositions
         final boolean hasRemovablePropositions = rel.removeRedundantPropositions();
         if (hasRemovablePropositions) {
-          mFoundDefaultMarking = rel.isUsedProposition(OMEGA);
+          mFoundDefaultMarking = rel.isUsedProposition(UnifiedEFAEventEncoding.OMEGA);
         }
         return hasUnreachableStates || hasRemovableEvents || hasRemovablePropositions;
       } else {
@@ -548,10 +555,9 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
         }
       }
       if (hasRemovableEvents) {
-        usedEvents[EventEncoding.TAU] = true;
         final UnifiedEFAEventEncoding newEncoding =
           new UnifiedEFAEventEncoding(newNumEvents);
-        for (int e = 0; e < oldNumEvents; e++) {
+        for (int e = EventEncoding.NONTAU; e < oldNumEvents; e++) {
           if (usedEvents[e]) {
             final UnifiedEFAEvent update = mEventEncoding.getUpdate(e);
             newEncoding.createEventId(update);
@@ -562,6 +568,26 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       return hasRemovableEvents;
     }
 
+    private boolean isTrivial(final ListBufferTransitionRelation rel)
+    {
+      for (int e = EventEncoding.TAU; e < rel.getNumberOfProperEvents(); e++) {
+        final byte status = rel.getProperEventStatus(e);
+        if (EventEncoding.isUsedEvent(status)) {
+          return false;
+        }
+      }
+      for (int p = 0; p < rel.getNumberOfPropositions(); p++) {
+        if (rel.isUsedProposition(p)) {
+          return false;
+        }
+      }
+      for (int s = 0; s < rel.getNumberOfStates(); s++) {
+        if (rel.isInitial(s)){
+          return true;
+        }
+      }
+        return false;
+    }
 
     //#######################################################################
     //# Data Members
@@ -588,15 +614,9 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
 
   private final ModuleProxy mInputModule;
   private final ProxyAccessorMap<IdentifierProxy,ConstraintList> mEventUpdateMap;
-  private List<UnifiedEFAEvent> mEvents;
   private ProxyAccessorMap<IdentifierProxy, UnifiedEFAEvent> mIdentifierMap;
   private UnifiedEFAVariableContext mVariableContext;
   private UnifiedEFASystem mResultEFASystem;
   private SimpleExpressionCompiler mSimpleExpressionCompiler;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final int OMEGA = 0;
 
 }

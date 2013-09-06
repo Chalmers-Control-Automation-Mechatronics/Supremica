@@ -53,6 +53,7 @@ public abstract class AbstractEFASystem<L,
     mVariableContext = context;
   }
 
+
   //#########################################################################
   //# Simple Access
   public String getName()
@@ -60,19 +61,14 @@ public abstract class AbstractEFASystem<L,
     return mName;
   }
 
-  public List<V> getVariables()
-  {
-    return mVariables;
-  }
-
-  public C getVariableContext()
-  {
-    return mVariableContext;
-  }
-
   public void setName(final String name)
   {
     mName = name;
+  }
+
+  public List<V> getVariables()
+  {
+    return mVariables;
   }
 
   public void addVariable(final V variable)
@@ -85,6 +81,28 @@ public abstract class AbstractEFASystem<L,
     mVariables.remove(var);
   }
 
+  public C getVariableContext()
+  {
+    return mVariableContext;
+  }
+
+  public List<TR> getTransitionRelations()
+  {
+    return mTransitionRelations;
+  }
+
+  public boolean addTransitionRelation(final TR transitionRelation)
+  {
+    return mTransitionRelations.add(transitionRelation);
+  }
+
+  public void removeTransitionRelation(final TR transitionRelation)
+  {
+    mTransitionRelations.remove(transitionRelation);
+  }
+
+
+  //#########################################################################
   public double getEstimatedStateSpace()
   {
     double size = 1;
@@ -97,6 +115,7 @@ public abstract class AbstractEFASystem<L,
     }
     return size;
   }
+
 
   //#########################################################################
   @Override
@@ -113,28 +132,17 @@ public abstract class AbstractEFASystem<L,
     }
   }
 
-  protected List<TR> getTransitionRelations()
-  {
-    return mTransitionRelations;
-  }
 
-  public boolean addTransitionRelation(final TR transitionRelation)
-  {
-    return mTransitionRelations.add(transitionRelation);
-  }
-  protected void removeTransitionRelation(final TR transitionRelation)
-  {
-    mTransitionRelations.remove(transitionRelation);
-  }
+  //#########################################################################
+  //# Data Members
+  private String mName;
+  private final List<TR> mTransitionRelations;
+  private final List<V> mVariables;
+  private final C mVariableContext;
+
 
   //#########################################################################
   //# Class Constants
   private static final int DEFAULT_SIZE = 16;
-  //#########################################################################
-  //# Data Members
-  private final List<TR> mTransitionRelations;
-  private final List<V> mVariables;
-  private final C mVariableContext;
-  private String mName;
 
 }

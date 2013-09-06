@@ -61,7 +61,7 @@ class EFSMSystem
   }
 
   @Override
-  protected void removeTransitionRelation(final EFSMTransitionRelation transitionRelation)
+  public void removeTransitionRelation(final EFSMTransitionRelation transitionRelation)
   {
     super.removeTransitionRelation(transitionRelation);
   }

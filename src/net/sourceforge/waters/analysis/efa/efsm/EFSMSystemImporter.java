@@ -35,7 +35,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 //###########################################################################
 //# PROJECT: Waters/Supremica GUI
 //# PACKAGE:
-//# CLASS:   EFSMSystemImporter
+//# CLASS:   UnifiedEFASystemImporter
 //###########################################################################
 //# $Id$
 //###########################################################################

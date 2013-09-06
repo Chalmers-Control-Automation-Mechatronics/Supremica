@@ -64,11 +64,11 @@ public class UnifiedEFACompilerTest
     final String name = "empty";
     final ModuleProxy module = mModuleFactory.createModuleProxy
       (name, null, null, null, null, null, null);
-    @SuppressWarnings("unused")
-    final ModuleProxy des = compile(module);
-//    assertTrue("Unexpected variable!", des.getVariables().isEmpty());
-//    assertTrue("Unexpected transition relation",
-//               des.getTransitionRelations().isEmpty());
+    final UnifiedEFASystem des = compile(module);
+    assertTrue("Unexpected variable!", des.getVariables().isEmpty());
+    assertTrue("Unexpected event!", des.getEvents().isEmpty());
+    assertTrue("Unexpected transition relation",
+               des.getTransitionRelations().isEmpty());
   }
 
   public void testCompile_empty_2()
@@ -113,13 +113,13 @@ public class UnifiedEFACompilerTest
   public void testEFSMCompiler3()
     throws IOException, WatersException
   {
-    compileError("tests", "efsm", "efsm3",null,SharedEventException.class, "'a'");
+    compile("tests", "efsm", "efsm3");
   }
 
   public void testEFSMCompiler4()
     throws IOException, WatersException
   {
-    compileError("tests", "efsm", "efsm4",null,SharedEventException.class, "'a'");
+    compile("tests", "efsm", "efsm4");
   }
 
   public void testEFSMCompiler5()
@@ -238,7 +238,7 @@ public class UnifiedEFACompilerTest
 
   String getTestSuffix()
   {
-    return "result";
+    return "unified";
   }
 
 
@@ -428,9 +428,7 @@ public class UnifiedEFACompilerTest
     buffer.append(ext);
     final String suffixedname = buffer.toString();
     final File suffixedfilename = new File(dir, suffixedname);
-    if (suffixedfilename.exists()) {
-      compare(outputModule, suffixedfilename);
-    }
+    compare(outputModule, suffixedfilename);
   }
 
   private ModuleProxy compile(final File infilename,
@@ -440,13 +438,16 @@ public class UnifiedEFACompilerTest
   {
     final URI uri = infilename.toURI();
     final ModuleProxy inputModule = mModuleMarshaller.unmarshal(uri);
-    final ModuleProxy outputModule = compile(inputModule, bindings);
+    final UnifiedEFASystem system = compile(inputModule, bindings);
+    final String name = system.getName() + "-" + getTestSuffix();
+    system.setName(name);
+    final ModuleProxy outputModule = mImporter.importModule(system);
     mModuleMarshaller.marshal(outputModule, outfilename);
     return outputModule;
   }
 
 
-  private ModuleProxy compile(final ModuleProxy module,
+  private UnifiedEFASystem compile(final ModuleProxy module,
                              final List<ParameterBindingProxy> bindings)
     throws EvalException, AnalysisException
   {
@@ -456,7 +457,7 @@ public class UnifiedEFACompilerTest
     return compiler.compile(bindings);
   }
 
-  private ModuleProxy compile(final ModuleProxy module)
+  private UnifiedEFASystem compile(final ModuleProxy module)
     throws EvalException, AnalysisException
   {
     return compile(module, null);
@@ -504,6 +505,7 @@ public class UnifiedEFACompilerTest
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
+    mImporter = new UnifiedEFASystemImporter(mModuleFactory, optable);
   }
 
   @Override
@@ -524,6 +526,8 @@ public class UnifiedEFACompilerTest
   private ModuleProxyFactory mModuleFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
+
+  private UnifiedEFASystemImporter mImporter;
 
 }
 

@@ -897,6 +897,9 @@ public class EFAUnifier extends AbortableCompiler
 
     private void generateEventNames()
     {
+      if (mEventDecl.getKind() == EventKind.PROPOSITION) {
+        return;
+      }
       final IdentifierProxy base = mEventDecl.getIdentifier();
       switch (mEventList.size()) {
       case 0:

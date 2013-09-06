@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.efa.unified;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 
 /**
@@ -30,6 +31,9 @@ public class UnifiedEFAEventEncoding
   UnifiedEFAEventEncoding(final int size)
   {
     super(size);
+    final ConstraintList empty = new ConstraintList();
+    final UnifiedEFAEvent tau = new UnifiedEFAEvent(null, empty);
+    createEventId(tau);
   }
 
   UnifiedEFAEventEncoding(final UnifiedEFAEventEncoding encoding)
@@ -51,6 +55,10 @@ public class UnifiedEFAEventEncoding
   {
     return super.createTransitionLabelId(update);
   }
+
+  //#########################################################################
+  //# Class Constants
+  public static final int OMEGA = 0;
 
 }
 
