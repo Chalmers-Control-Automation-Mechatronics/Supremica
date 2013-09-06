@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.compiler.efa;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +30,7 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -59,6 +62,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -237,38 +241,43 @@ public class EFAUnifier extends AbortableCompiler
   private SimpleComponentProxy createGuardAutomaton
     (final List<EventDeclProxy> events)
   {
-    if (mCreatesGuardAutomaton) {
-      final SimpleNodeProxy node =
-        mFactory.createSimpleNodeProxy("init",null, null, true,null,null,null);
-      final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
-      final List<EdgeProxy> edges =
-        new ArrayList<EdgeProxy>(mEventUpdateMap.size());
-      for (final EventDeclProxy event : events) {
-        final IdentifierProxy ident = event.getIdentifier();
-        final ConstraintList update = mEventUpdateMap.getByProxy(ident);
-        if (update != null) {
-          final SimpleExpressionProxy guard =
-            update.createExpression(mFactory, mOperatorTable.getAndOperator());
-          final List<SimpleExpressionProxy> guards =
-            Collections.singletonList(guard);
-          final GuardActionBlockProxy ga =
-            mFactory.createGuardActionBlockProxy(guards, null, null);
-          final List<IdentifierProxy> labels = Collections.singletonList(ident);
-          final LabelBlockProxy block =
-            mFactory.createLabelBlockProxy(labels, null);
-          final EdgeProxy edge =
-            mFactory.createEdgeProxy(node, node, block, ga, null, null, null);
-          edges.add(edge);
-        }
-      }
-      final GraphProxy graph = mFactory.createGraphProxy(true, null, nodes, edges);
-      final IdentifierProxy name = mFactory.createSimpleIdentifierProxy(":guards");
-      return
-        mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
-    } else {
+    if (!mCreatesGuardAutomaton) {
       return null;
     }
+    final SimpleNodeProxy node =
+      mFactory.createSimpleNodeProxy("init", null, null, true, null, null, null);
+    final List<EdgeProxy> edges =
+      new ArrayList<EdgeProxy>(mEventUpdateMap.size());
+    for (final EventDeclProxy event : events) {
+      final IdentifierProxy ident = event.getIdentifier();
+      final ConstraintList update = mEventUpdateMap.getByProxy(ident);
+      if (update != null && !update.isTrue()) {
+        final SimpleExpressionProxy guard =
+          update.createExpression(mFactory, mOperatorTable.getAndOperator());
+        final List<SimpleExpressionProxy> guards =
+          Collections.singletonList(guard);
+        final GuardActionBlockProxy ga =
+          mFactory.createGuardActionBlockProxy(guards, null, null);
+        final List<IdentifierProxy> labels = Collections.singletonList(ident);
+        final LabelBlockProxy block =
+          mFactory.createLabelBlockProxy(labels, null);
+        final EdgeProxy edge =
+          mFactory.createEdgeProxy(node, node, block, ga, null, null, null);
+        edges.add(edge);
+      }
+    }
+    if (edges.isEmpty()) {
+      return null;
+    }
+    final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
+    final GraphProxy graph =
+      mFactory.createGraphProxy(true, null, nodes, edges);
+    final IdentifierProxy name =
+      mFactory.createSimpleIdentifierProxy(":updates");
+    return
+      mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
   }
+
 
   //#########################################################################
   //# Inner Class Pass1Visitor
@@ -770,7 +779,6 @@ public class EFAUnifier extends AbortableCompiler
       return variable;
     }
 
-
     //#######################################################################
     //# Data Members
     private final ModuleProxyCloner mCloner;
@@ -784,12 +792,11 @@ public class EFAUnifier extends AbortableCompiler
     private List<EdgeProxy> mEdgeList;
     private List<IdentifierProxy> mLabelList;
     private ProxyAccessorSet<IdentifierProxy> mUnblockedIdentifiers;
-
   }
 
 
   //#########################################################################
-  //# Inner Class
+  //# Inner Class EFAEventInfo
   private class EFAEventInfo
   {
     //#######################################################################
@@ -851,14 +858,12 @@ public class EFAUnifier extends AbortableCompiler
           final ConstraintList result = mPropagator.getAllConstraints();
           IdentifierProxy ident = mConstraintMap.get(result);
           if (ident == null) {
-            final String name =
-              mEventDecl.getName() + ":" + mConstraintMap.size();
+            final int gen = mConstraintMap.size();
+            final String name = generateEventName(gen);
             ident = mFactory.createSimpleIdentifierProxy(name);
             mIdentifierList.add(ident);
             mConstraintMap.put(result, ident);
-            if (!result.isTrue()) {
-              mEventUpdateMap.putByProxy(ident, result);
-            }
+            mEventUpdateMap.putByProxy(ident, result);
           }
           return Collections.singletonList(ident);
         }
@@ -888,6 +893,27 @@ public class EFAUnifier extends AbortableCompiler
       }
     }
 
+    private String generateEventName(final int index)
+    {
+      try {
+        final StringWriter writer = new StringWriter();
+        final IdentifierProxy ident = mEventDecl.getIdentifier();
+        if (ident instanceof SimpleIdentifierProxy) {
+          final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+          writer.write(simple.getName());
+        } else {
+          writer.write('{');
+          ProxyPrinter.printProxy(writer, ident);
+          writer.write('}');
+        }
+        writer.write(':');
+        writer.write(index);
+        return writer.toString();
+      } catch (final IOException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
     //#######################################################################
     //# Data Members
     private final EventDeclProxy mEventDecl;
@@ -899,7 +925,7 @@ public class EFAUnifier extends AbortableCompiler
 
 
   //#########################################################################
-  //# Inner Class
+  //# Inner Class EFAUpdateInfo
   private static class EFAUpdateInfo
     implements Comparable<EFAUpdateInfo>
   {
@@ -960,7 +986,7 @@ public class EFAUnifier extends AbortableCompiler
 
 
   //#########################################################################
-  //# Inner Class
+  //# Inner Class EFAEventList
   /**
    * A list of identifiers that avoids duplicate entries.
    */
