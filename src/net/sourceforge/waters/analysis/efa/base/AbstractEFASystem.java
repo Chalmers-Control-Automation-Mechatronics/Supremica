@@ -118,7 +118,7 @@ public abstract class AbstractEFASystem<L,
     return mTransitionRelations;
   }
 
-  protected boolean addTransitionRelation(final TR transitionRelation)
+  public boolean addTransitionRelation(final TR transitionRelation)
   {
     return mTransitionRelations.add(transitionRelation);
   }

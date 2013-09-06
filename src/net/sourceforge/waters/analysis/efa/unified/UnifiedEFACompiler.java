@@ -16,6 +16,8 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.efa.EFAUnifier;
@@ -119,12 +121,21 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       mModuleInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       mModuleInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
       mModuleInstanceCompiler.setEnabledPropositionNames(propositions);
-      final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
+      final ModuleProxy instantiated = mModuleInstanceCompiler.compile(bindings);
       mModuleInstanceCompiler = null;
       shiftSourceInfo();
-      mEFAUnifier = new EFAUnifier(modfactory, mSourceInfoBuilder, intermediate);
+      mEFAUnifier = new EFAUnifier(modfactory, mSourceInfoBuilder, instantiated);
       mEFAUnifier.setCreatesGuardAutomaton(true);
-      return mEFAUnifier.compile();
+      final ModuleProxy unified = mEFAUnifier.compile();
+      shiftSourceInfo();
+      final ProxyAccessorMap<IdentifierProxy, ConstraintList> map =
+        mEFAUnifier.getEventUpdateMap();
+      mSystemBuilder =
+        new UnifiedEFASystemBuilder(modfactory, mSourceInfoBuilder, unified, map);
+      mSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
+      mSystemBuilder.setConfiguredDefaultMarking(mMarking);
+      mSystemBuilder.compile();
+      return unified;
     } finally {
       tearDown();
     }
@@ -207,6 +218,7 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
 
   private ModuleInstanceCompiler mModuleInstanceCompiler;
   private EFAUnifier mEFAUnifier;
+  private UnifiedEFASystemBuilder mSystemBuilder;
   private SourceInfoBuilder mSourceInfoBuilder;
 
   private boolean mIsOptimizationEnabled = true;

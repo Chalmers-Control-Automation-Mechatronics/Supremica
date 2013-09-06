@@ -9,22 +9,45 @@
 
 package net.sourceforge.waters.analysis.efa.unified;
 
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
+import net.sourceforge.waters.analysis.efa.efsm.EFSMVariable;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
+import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
@@ -44,32 +67,49 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   public UnifiedEFASystemBuilder(final ModuleProxyFactory factory,
                            final SourceInfoBuilder builder,
                            final ModuleProxy module,
-                           final ProxyAccessorMap<IdentifierProxy, ConstraintList> map)
+                           final ProxyAccessorMap<IdentifierProxy,
+                           ConstraintList> map)
   {
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mInputModule = module;
     mEventUpdateMap = map;
-    mEvents = new ArrayList<>(module.getEventDeclList().size());
-    final String moduleName = module.getName();
-    final CompilerOperatorTable opTable = CompilerOperatorTable.getInstance();
-    mVariableContext = new UnifiedEFAVariableContext(module, opTable);
-    final int size = module.getComponentList().size();
-    mResultEFAMSystem = new UnifiedEFASystem(moduleName, mVariableContext, size);
+    mOperatorTable = CompilerOperatorTable.getInstance();
   }
 
 
   //#########################################################################
   //# Invocation
+  @Override
+  protected void setUp() throws AnalysisException
+  {
+    super.setUp();
+    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final int numEvents = mInputModule.getEventDeclList().size();
+    mEvents = new ArrayList<>(numEvents);
+    mIdentifierMap = new ProxyAccessorHashMap<>(eq,numEvents);
+    final String moduleName = mInputModule.getName();
+    final CompilerOperatorTable opTable = CompilerOperatorTable.getInstance();
+    mVariableContext = new UnifiedEFAVariableContext(mInputModule, opTable);
+    final int numComponents = mInputModule.getComponentList().size();
+    mResultEFASystem =
+      new UnifiedEFASystem(moduleName, mVariableContext, numComponents);
+    mSimpleExpressionCompiler =
+      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+
+
+  }
   public UnifiedEFASystem compile()
     throws EvalException, AnalysisException
   {
     try {
       setUp();
       // Pass 1 ...
-      final Pass1Visitor pass1 = new Pass1Visitor();
-      mInputModule.acceptVisitor(pass1);
-      return mResultEFAMSystem;
+      createEvents();
+      // Pass 2 ...
+      final Pass2Visitor pass2 = new Pass2Visitor();
+      mInputModule.acceptVisitor(pass2);
+      return mResultEFASystem;
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -109,28 +149,143 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  @SuppressWarnings("unused")
+  //# Pass 1
   private void createEvents()
   {
     final List<EventDeclProxy> eventDecls = mInputModule.getEventDeclList();
     for (final EventDeclProxy eventDec : eventDecls) {
       final IdentifierProxy ident = eventDec.getIdentifier();
       final ConstraintList update = mEventUpdateMap.getByProxy(ident);
-      final UnifiedEFAEvent event = new UnifiedEFAEvent(eventDec, update);
-      mEvents.add(event);
+      if (update != null) {
+        final UnifiedEFAEvent event = new UnifiedEFAEvent(eventDec, update);
+        mEvents.add(event);
+        mIdentifierMap.putByProxy(ident, event);
+      }
     }
   }
+
+
   //#########################################################################
-//# Inner Class Pass1Visitor
-  private class Pass1Visitor extends DefaultModuleProxyVisitor
+  //# Auxiliary Methods
+  private boolean containsMarkingProposition
+    (final EventListExpressionProxy list)
+  {
+    final ModuleEqualityVisitor eq =
+      ModuleEqualityVisitor.getInstance(false);
+    return eq.contains(list.getEventIdentifierList(), mDefaultMarking);
+  }
+
+
+  //#########################################################################
+  //# Inner Class EventCollectVisitor
+  private class EventCollectVisitor extends DefaultModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    private UnifiedEFAEventEncoding collectEvents(final SimpleComponentProxy comp)
+    {
+      try {
+        mCollectedEvents = new UnifiedEFAEventEncoding();
+        mFoundDefaultMarking = false;
+        visitSimpleComponentProxy(comp);
+        return mCollectedEvents;
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      } finally {
+        mCollectedEvents = null;
+      }
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private boolean getFoundDefaultMarking()
+    {
+      return mFoundDefaultMarking;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitEdgeProxy(final EdgeProxy edge) throws VisitorException
+    {
+      final LabelBlockProxy labelBlock = edge.getLabelBlock();
+      visitLabelBlockProxy(labelBlock);
+      return null;
+    }
+
+    @Override
+    public Object visitGraphProxy(final GraphProxy graph) throws VisitorException
+    {
+      final Collection<NodeProxy> nodes = graph.getNodes();
+      visitCollection(nodes);
+      final LabelBlockProxy blockedEvents = graph.getBlockedEvents();
+      visitLabelBlockProxy(blockedEvents);
+      final Collection<EdgeProxy> edges = graph.getEdges();
+      visitCollection(edges);
+      return null;
+    }
+
+    @Override
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      final UnifiedEFAEvent event = mIdentifierMap.getByProxy(ident);
+      if (event != null) {
+        mCollectedEvents.createEventId(event);
+      } else {
+        final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+        if (eq.equals(ident, mDefaultMarking)) {
+          mFoundDefaultMarking = true;
+        }
+      }
+      return null;
+    }
+
+    @Override
+    public Object visitLabelBlockProxy(final LabelBlockProxy labelBlock)
+      throws VisitorException
+    {
+      final List<Proxy> idents = labelBlock.getEventIdentifierList();
+      visitCollection(idents);
+      return null;
+    }
+
+    @Override
+    public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
+      throws VisitorException
+    {
+      final GraphProxy graph = comp.getGraph();
+      visitGraphProxy(graph);
+      return null;
+    }
+
+    @Override
+    public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
+    {
+      final EventListExpressionProxy props = node.getPropositions();
+      if (containsMarkingProposition(props)) {
+        mFoundDefaultMarking = true;
+      }
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private UnifiedEFAEventEncoding mCollectedEvents;
+    private boolean mFoundDefaultMarking;
+  }
+
+
+  //#########################################################################
+  //# Inner Class Pass2Visitor
+  private class Pass2Visitor extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Constructor
-    private Pass1Visitor()
+    private Pass2Visitor()
     {
+      mEventCollectVisitor = new EventCollectVisitor();
     }
-    /*
+
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
@@ -147,19 +302,35 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       throws VisitorException
     {
       try {
+        mEventEncoding = mEventCollectVisitor.collectEvents(comp);
+        mFoundDefaultMarking = mEventCollectVisitor.getFoundDefaultMarking();
         final GraphProxy graph = comp.getGraph();
+        final String name = comp.getName();
+        final ComponentKind kind = comp.getKind();
+        int numProperEvents = mEventEncoding.size();
+        int numPropositions = mFoundDefaultMarking ? 1 : 0;
+        int numStates = graph.getNodes().size();
+        final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+        mTransitionRelation = new ListBufferTransitionRelation
+          (name, kind, numProperEvents, numPropositions, numStates, config);
+        mRevisiting = false;
         visitGraphProxy(graph);
-        ListBufferTransitionRelation rel = createTransitionRelation(comp);
-        if (simplifyTransitionRelation(rel)) {
-          if (mEventEncoding.size() <= 1 && !mUsesMarking) {
+        if (simplifyTransitionRelation(mTransitionRelation)) {
+          if (mEventEncoding.size() <= 1 && !mFoundDefaultMarking) {
             return null;
           }
-          rel = createTransitionRelation(comp);
+          numProperEvents = mEventEncoding.size();
+          numPropositions = mFoundDefaultMarking ? 1 : 0;
+          numStates = mStateMap.size();
+          mTransitionRelation = new ListBufferTransitionRelation
+            (name, kind, numProperEvents, numPropositions, numStates, config);
+          mRevisiting = true;
+          visitGraphProxy(graph);
         }
         final UnifiedEFATransitionRelation unifiedEFATransitionRelation =
-          new UnifiedEFATransitionRelation(rel, mEventEncoding, variables, mNodeList);
-        unifiedEFATransitionRelation.register();
-        mResultEFAMSystem.addTransitionRelation(unifiedEFATransitionRelation);
+          new UnifiedEFATransitionRelation(mTransitionRelation,
+                                           mEventEncoding, mNodeList);
+        mResultEFASystem.addTransitionRelation(unifiedEFATransitionRelation);
         return unifiedEFATransitionRelation;
       } catch (final AnalysisException exception) {
         throw wrap(exception);
@@ -174,11 +345,6 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
-      mUsesMarking = false;
-      final LabelBlockProxy block = graph.getBlockedEvents();
-      if (block != null) {
-        mUsesMarking = containsMarkingProposition(block);
-      }
       final Collection<NodeProxy> nodes = graph.getNodes();
       mStateMap =
         new TObjectIntHashMap<SimpleNodeProxy>(nodes.size(), 0.5f, -1);
@@ -188,27 +354,32 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
         mNodeList = null;
       }
       visitCollection(nodes);
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
       final Collection<EdgeProxy> edges = graph.getEdges();
-      mSimplifiedGuardActionBlockMap =
-        new ProxyAccessorHashMap<GuardActionBlockProxy,ConstraintList>
-          (eq, edges.size());
-      mEventEncoding = new EFSMEventEncoding(edges.size());
       return visitCollection(edges);
     }
 
     @Override
     public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
     {
-      final int code = mStateMap.size();
-      mStateMap.put(node, code);
-      if (mNodeList != null) {
-        mNodeList.add(node);
+      final int code;
+      if (mRevisiting) {
+        code = mStateMap.get(node);
+        if (code < 0) {
+          return null;
+        }
+      } else {
+        code = mStateMap.size();
+        mStateMap.put(node, code);
+        if (mNodeList != null) {
+          mNodeList.add(node);
+        }
+      }
+      if (node.isInitial()) {
+        mTransitionRelation.setInitial(code, true);
       }
       final EventListExpressionProxy props = node.getPropositions();
       if (containsMarkingProposition(props)) {
-        mUsesMarking = true;
+        mTransitionRelation.setMarked(code, OMEGA, true);
       }
       return null;
     }
@@ -218,111 +389,65 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       throws VisitorException
     {
       checkAbortInVisitor();
-      final GuardActionBlockProxy update = edge.getGuardActionBlock();
-      if (update == null) {
-        mSimplifiedGuardActionBlockMap.putByProxy(update, mTrueGuard);
-        mEventEncoding.createEventId(mTrueGuard);
-      } else {
-        visitGuardActionBlockProxy(update);
+      final NodeProxy source = edge.getSource();
+      mSource = mStateMap.get(source);
+      if (mSource < 0) {
+        return null;
       }
+      final NodeProxy target = edge.getTarget();
+      mTarget = mStateMap.get(target);
+      if (mTarget < 0) {
+        return null;
+      }
+      final LabelBlockProxy labelBlock = edge.getLabelBlock();
+      visitLabelBlockProxy(labelBlock);
       return null;
     }
 
     @Override
-    public Object visitGuardActionBlockProxy(final GuardActionBlockProxy update)
+    public Object visitLabelBlockProxy(final LabelBlockProxy labelBlock)
       throws VisitorException
     {
-      try {
-        final ConstraintList list = mGuardCompiler.getCompiledGuard(update);
-        mConstraintPropagator.init(list);
-        mConstraintPropagator.propagate();
-        if (!mConstraintPropagator.isUnsatisfiable()) {
-          mConstraintPropagator.removeUnchangedVariables();
-          final ConstraintList allConstraints =
-            mConstraintPropagator.getAllConstraints();
-          mSimplifiedGuardActionBlockMap.putByProxy(update, allConstraints);
-          mEventEncoding.createEventId(allConstraints);
-        }
+      final List<Proxy> idents = labelBlock.getEventIdentifierList();
+      visitCollection(idents);
+      return null;
+    }
+
+    @Override
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      final UnifiedEFAEvent event = mIdentifierMap.getByProxy(ident);
+      final int eventCode = mEventEncoding.getEventId(event);
+      if (eventCode < 0) {
         return null;
-      } catch (final EvalException exception) {
-        throw wrap(exception);
       }
+      mTransitionRelation.addTransition(mSource, eventCode, mTarget);
+      return null;
     }
 
     @Override
     public EFSMVariable visitVariableComponentProxy
       (final VariableComponentProxy var)
+      throws VisitorException
     {
+      try {
+        final SimpleExpressionProxy type = var.getType();
+        final SimpleExpressionProxy value =
+          mSimpleExpressionCompiler.eval(type, mVariableContext);
+        final CompiledRange range =
+          mSimpleExpressionCompiler.getRangeValue(value);
+        final UnifiedEFAVariable result =
+          new UnifiedEFAVariable(var, range, mFactory, mOperatorTable);
+        mVariableContext.addVariable(result);
+        mResultEFASystem.addVariable(result);
+      } catch (final EvalException exception) {
+        throw wrap(exception);
+      }
       return null;
     }
 
     //#######################################################################
     //# Auxiliary Methods
-    private boolean containsMarkingProposition
-      (final EventListExpressionProxy list)
-    {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
-      return eq.contains(list.getEventIdentifierList(), mDefaultMarking);
-    }
-
-    private ListBufferTransitionRelation createTransitionRelation
-      (final SimpleComponentProxy comp)
-      throws AnalysisException
-    {
-      final GraphProxy graph = comp.getGraph();
-      final String name = comp.getName();
-      final int eventSize = mEventEncoding.size();
-      final ComponentKind kind = comp.getKind();
-      final int numProps = mUsesMarking ? 1 : 0;
-      final ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(name,
-                                         kind,
-                                         eventSize,
-                                         numProps,
-                                         mStateMap.size(),
-                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      if (mIsOptimizationEnabled) {
-        mEventEncoding.setSelfloops(rel, mEFSMVariableFinder);
-      }
-      final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
-      while (iter.hasNext()) {
-        iter.advance();
-        final SimpleNodeProxy node = iter.key();
-        final int code = iter.value();
-        if (node.isInitial()) {
-          rel.setInitial(code, true);
-        }
-        if (mUsesMarking &&
-            containsMarkingProposition(node.getPropositions())) {
-          rel.setMarked(code, 0, true);
-        }
-      }
-      final Collection<EdgeProxy> edges = graph.getEdges();
-      for (final EdgeProxy edge : edges) {
-        checkAbort();
-        final GuardActionBlockProxy update = edge.getGuardActionBlock();
-        final ConstraintList simplifiedList =
-          mSimplifiedGuardActionBlockMap.getByProxy(update);
-        if (simplifiedList == null) {
-          continue;
-        }
-        final int event = mEventEncoding.getEventId(simplifiedList);
-        if (event < 0) {
-          continue;
-        }
-        final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
-        final int sourceState = mStateMap.get(source);
-        if (sourceState < 0) {
-          continue;
-        }
-        final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
-        final int targetState = mStateMap.get(target);
-        rel.addTransition(sourceState, event, targetState);
-      }
-      return rel;
-    }
-
     private boolean simplifyTransitionRelation
       (final ListBufferTransitionRelation rel)
     {
@@ -332,10 +457,11 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
         // 2. Check for unused events or selfloops
         final boolean hasRemovableEvents = removeRedundantEvents(rel);
         // 3. Check for redundant propositions
-        if (rel.removeRedundantPropositions()) {
-          mUsesMarking = rel.isUsedProposition(0);
+        final boolean hasRemovablePropositions = rel.removeRedundantPropositions();
+        if (hasRemovablePropositions) {
+          mFoundDefaultMarking = rel.isUsedProposition(OMEGA);
         }
-        return hasUnreachableStates || hasRemovableEvents;
+        return hasUnreachableStates || hasRemovableEvents || hasRemovablePropositions;
       } else {
         return false;
       }
@@ -417,25 +543,17 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
         } else if (selfloops[e] == numReachable) {
           usedEvents[e] = false;
           hasRemovableEvents = true;
-          final ConstraintList update = mEventEncoding.getUpdate(e);
-          final int numVars = mResultEFAMSystem.getVariables().size();
-          final List<EFSMVariable> vars =
-            new ArrayList<EFSMVariable>(numVars);
-          mEFSMVariableCollector.collectAllVariables(update, vars);
-          for (final EFSMVariable var : vars) {
-            var.addSelfloop(update);
-          }
         } else {
           newNumEvents++;
         }
       }
       if (hasRemovableEvents) {
         usedEvents[EventEncoding.TAU] = true;
-        final EFSMEventEncoding newEncoding =
-          new EFSMEventEncoding(newNumEvents);
+        final UnifiedEFAEventEncoding newEncoding =
+          new UnifiedEFAEventEncoding(newNumEvents);
         for (int e = 0; e < oldNumEvents; e++) {
           if (usedEvents[e]) {
-            final ConstraintList update = mEventEncoding.getUpdate(e);
+            final UnifiedEFAEvent update = mEventEncoding.getUpdate(e);
             newEncoding.createEventId(update);
           }
         }
@@ -447,33 +565,38 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
 
     //#######################################################################
     //# Data Members
-    private EFSMEventEncoding mEventEncoding;
+    private final EventCollectVisitor mEventCollectVisitor;
+    private UnifiedEFAEventEncoding mEventEncoding;
+    private ListBufferTransitionRelation mTransitionRelation;
     private TObjectIntHashMap<SimpleNodeProxy> mStateMap;
     private List<SimpleNodeProxy> mNodeList;
-    private boolean mUsesMarking;
-    private ProxyAccessorMap<GuardActionBlockProxy,ConstraintList>
-      mSimplifiedGuardActionBlockMap;
-
-    private final EFAGuardCompiler mGuardCompiler;
-    private final ConstraintPropagator mConstraintPropagator;
-    private final EFSMVariableCollector mEFSMVariableCollector;
-    */
+    private boolean mFoundDefaultMarking;
+    private int mSource;
+    private int mTarget;
+    private boolean mRevisiting;
   }
+
 
   //#########################################################################
   //# Data Members
-  @SuppressWarnings("unused")
   private final ModuleProxyFactory mFactory;
-  @SuppressWarnings("unused")
+  private final CompilerOperatorTable mOperatorTable;
   private final SourceInfoBuilder mSourceInfoBuilder;
 
   private boolean mIsOptimizationEnabled;
   private IdentifierProxy mDefaultMarking;
 
   private final ModuleProxy mInputModule;
-  private final ProxyAccessorMap<IdentifierProxy, ConstraintList> mEventUpdateMap;
-  private final List<UnifiedEFAEvent> mEvents;
-  private final UnifiedEFAVariableContext mVariableContext;
-  private final UnifiedEFASystem mResultEFAMSystem;
+  private final ProxyAccessorMap<IdentifierProxy,ConstraintList> mEventUpdateMap;
+  private List<UnifiedEFAEvent> mEvents;
+  private ProxyAccessorMap<IdentifierProxy, UnifiedEFAEvent> mIdentifierMap;
+  private UnifiedEFAVariableContext mVariableContext;
+  private UnifiedEFASystem mResultEFASystem;
+  private SimpleExpressionCompiler mSimpleExpressionCompiler;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final int OMEGA = 0;
 
 }

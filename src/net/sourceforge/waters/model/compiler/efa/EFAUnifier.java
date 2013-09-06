@@ -278,6 +278,10 @@ public class EFAUnifier extends AbortableCompiler
       mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
   }
 
+  public ProxyAccessorMap<IdentifierProxy, ConstraintList> getEventUpdateMap()
+  {
+    return mEventUpdateMap;
+  }
 
   //#########################################################################
   //# Inner Class Pass1Visitor
