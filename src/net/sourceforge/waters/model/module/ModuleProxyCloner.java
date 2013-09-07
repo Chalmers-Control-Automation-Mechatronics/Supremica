@@ -711,7 +711,6 @@ public class ModuleProxyCloner
     final IdentifierProxy identifier = visitIdentifierProxy(identifier0);
     final SimpleExpressionProxy type0 = proxy.getType();
     final SimpleExpressionProxy type = visitSimpleExpressionProxy(type0);
-    final boolean deterministic = proxy.isDeterministic();
     final SimpleExpressionProxy initialStatePredicate0 =
       proxy.getInitialStatePredicate();
     final SimpleExpressionProxy initialStatePredicate =
@@ -722,7 +721,6 @@ public class ModuleProxyCloner
       cloneProxyCollection(variableMarkings0);
     return mFactory.createVariableComponentProxy(identifier,
                                                  type,
-                                                 deterministic,
                                                  initialStatePredicate,
                                                  variableMarkings);
   }

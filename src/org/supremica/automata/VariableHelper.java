@@ -96,7 +96,7 @@ public class VariableHelper {
             markings = Collections.singletonList(marking);
         }
         return factory.createVariableComponentProxy
-            (ident, range, true, init, markings);
+            (ident, range, init, markings);
 	}
 
     public static VariableComponentSubject createEnumerationVariable
@@ -149,7 +149,7 @@ public class VariableHelper {
             }
         }
         return factory.createVariableComponentProxy
-            (ident, type, true, init, markings);
+            (ident, type, init, markings);
     }
 
     public static boolean isInteger(final VariableComponentProxy variable)

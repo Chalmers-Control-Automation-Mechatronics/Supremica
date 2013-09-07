@@ -605,11 +605,6 @@ public class ModuleHashCodeVisitor
     final SimpleExpressionProxy type = proxy.getType();
     result *= 5;
     result += computeProxyHashCode(type);
-    final boolean deterministic = proxy.isDeterministic();
-    result *= 5;
-    if (deterministic) {
-      result++;
-    }
     final SimpleExpressionProxy initialStatePredicate =
       proxy.getInitialStatePredicate();
     result *= 5;

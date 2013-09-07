@@ -50,7 +50,8 @@ public class UnifiedEFAEvent
   @Override
   public String toString()
   {
-    return mEventDecl.getName() + mUpdate.toString();
+    final String name = mEventDecl == null ? "(null)" : mEventDecl.getName();
+    return name + mUpdate.toString();
   }
 
 

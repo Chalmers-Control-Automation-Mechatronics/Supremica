@@ -951,11 +951,6 @@ public class ModuleEqualityVisitor
       if (!mNonReportingEqualityVisitor.equals(type1, type2)) {
         return reportAttributeMismatch("range", type1, type2);
       }
-      final boolean deterministic1 = proxy.isDeterministic();
-      final boolean deterministic2 = expected.isDeterministic();
-      if (deterministic1 != deterministic2) {
-        return reportAttributeMismatch("deterministic", deterministic1, deterministic2);
-      }
       final SimpleExpressionProxy initialStatePredicate1 =
         proxy.getInitialStatePredicate();
       final SimpleExpressionProxy initialStatePredicate2 =

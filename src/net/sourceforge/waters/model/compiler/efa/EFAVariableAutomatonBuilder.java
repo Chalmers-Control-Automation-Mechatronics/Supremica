@@ -85,12 +85,10 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
       constructEdges();
       final VariableComponentProxy comp =
         (VariableComponentProxy) mVariable.getComponent();
-      final boolean deterministic = comp.isDeterministic();
       final LabelBlockProxy blocked =
         mFactory.createLabelBlockProxy(mBlockedEvents, null);
       final GraphProxy graph =
-        mFactory.createGraphProxy(deterministic, blocked,
-                                  mNodeList, mEdgeList);
+        mFactory.createGraphProxy(false, blocked, mNodeList, mEdgeList);
       final ModuleProxyCloner cloner = mFactory.getCloner();
       final IdentifierProxy ident = comp.getIdentifier();
       final IdentifierProxy iclone = (IdentifierProxy) cloner.getClone(ident);

@@ -11,8 +11,8 @@ package net.sourceforge.waters.model.base;
 
 import java.util.AbstractMap;
 import java.util.Collection;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -63,11 +63,13 @@ public class ProxyAccessorHashMap<P extends Proxy,V>
 
   //#########################################################################
   //# Interface java.util.Map
+  @Override
   public Set<Map.Entry<ProxyAccessor<P>,V>> entrySet()
   {
     return mMap.entrySet();
   }
 
+  @Override
   public V put(final ProxyAccessor<P> key, final V value)
   {
     return mMap.put(key, value);
@@ -76,6 +78,7 @@ public class ProxyAccessorHashMap<P extends Proxy,V>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.ProxyAccessorMap
+  @Override
   public boolean containsProxyKey(final P proxy)
   {
     final ProxyAccessor<P> accessor = createAccessor(proxy);
@@ -92,23 +95,27 @@ public class ProxyAccessorHashMap<P extends Proxy,V>
     return true;
   }
 
+  @Override
   public <PP extends P> ProxyAccessor<P> createAccessor(final PP proxy)
   {
     return new Accessor<P>(proxy);
   }
 
+  @Override
   public V getByProxy(final P proxy)
   {
     final ProxyAccessor<P> accessor = createAccessor(proxy);
     return mMap.get(accessor);
   }
 
+  @Override
   public V putByProxy(final P proxy, final V value)
   {
     final ProxyAccessor<P> accessor = createAccessor(proxy);
     return mMap.put(accessor, value);
   }
 
+  @Override
   public void putAllByProxies(final Map<? extends P,? extends V> map)
   {
     for (final Map.Entry<? extends P,? extends V> entry : map.entrySet()) {
@@ -118,12 +125,14 @@ public class ProxyAccessorHashMap<P extends Proxy,V>
     }
   }
 
+  @Override
   public boolean removeProxy(final P proxy)
   {
     final ProxyAccessor<P> accessor = createAccessor(proxy);
     return remove(accessor) != null;
   }
 
+  @Override
   public boolean removeAllProxies(final Collection<? extends P> collection)
   {
     boolean result = false;
@@ -150,6 +159,7 @@ public class ProxyAccessorHashMap<P extends Proxy,V>
 
     //#######################################################################
     //# Equality and HashCode
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals(final Object partner)
     {
@@ -161,6 +171,7 @@ public class ProxyAccessorHashMap<P extends Proxy,V>
       }
     }
 
+    @Override
     public int hashCode()
     {
       return mHashCodeVisitor.hashCode(mProxy);
@@ -168,9 +179,18 @@ public class ProxyAccessorHashMap<P extends Proxy,V>
 
     //#########################################################################
     //# Interface net.sourceforge.waters.base.ProxyAccessor<P>
+    @Override
     public PP getProxy()
     {
       return mProxy;
+    }
+
+    //#########################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mProxy.toString();
     }
 
     //#########################################################################

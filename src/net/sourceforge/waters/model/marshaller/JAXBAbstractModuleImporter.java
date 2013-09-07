@@ -1162,7 +1162,6 @@ public abstract class JAXBAbstractModuleImporter
     throws WatersUnmarshalException
   {
     final IdentifierProxy identifier = createIdentifier(element);
-    final boolean deterministic = element.isDeterministic();
     final VariableRange vrange = element.getVariableRange();
     final SimpleExpressionType typeElement = vrange.getRange();
     final SimpleExpressionProxy type =
@@ -1182,7 +1181,7 @@ public abstract class JAXBAbstractModuleImporter
       markingList.add(markingProxy);
     }
     return mFactory.createVariableComponentProxy
-      (identifier, type, deterministic, initialStatePredicate, markingList);
+      (identifier, type, initialStatePredicate, markingList);
   }
 
   private VariableMarkingProxy importVariableMarking

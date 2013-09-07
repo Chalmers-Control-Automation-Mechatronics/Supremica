@@ -137,8 +137,7 @@ public class UnifiedEFACompilerTest
   public void testEFSMCompiler7()
     throws IOException, WatersException
   {
-    compileError("tests", "efsm", "efsm7", null,
-                 SharedEventException.class, "'a'");
+    compile("tests", "efsm", "efsm7");
   }
 
   public void testEFSMCompiler8()
@@ -150,8 +149,7 @@ public class UnifiedEFACompilerTest
   public void testEFSMCompiler9()
     throws IOException, WatersException
   {
-    compileError("tests", "efsm", "efsm9", null,
-                 SharedEventException.class, "'a'");
+    compile("tests", "efsm", "efsm9");
   }
 
   public void testEFSMCompiler10()

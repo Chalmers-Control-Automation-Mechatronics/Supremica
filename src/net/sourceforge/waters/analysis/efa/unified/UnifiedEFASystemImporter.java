@@ -125,7 +125,7 @@ public class UnifiedEFASystemImporter
     }
     final VariableComponentProxy var =
       mFactory.createVariableComponentProxy
-        (identifier, type, false, initialStatePredicate, markings);
+        (identifier, type, initialStatePredicate, markings);
     compList.add(var);
   }
 

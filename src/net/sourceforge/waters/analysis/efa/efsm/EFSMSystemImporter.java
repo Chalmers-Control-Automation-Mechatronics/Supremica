@@ -95,7 +95,7 @@ public class EFSMSystemImporter
       variable.getInitialStatePredicate();
     final VariableComponentProxy var =
       mModuleFactory.createVariableComponentProxy
-        (identifier, type, false, initialStatePredicate);
+        (identifier, type, initialStatePredicate);
     compList.add(var);
     importSelfloops(eventList, compList, variable);
   }

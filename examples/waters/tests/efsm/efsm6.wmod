@@ -107,7 +107,7 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="&gt;">
+                                <BinaryExpression Operator="&gt;" Text="x &gt; 1">
                                     <SimpleIdentifier Name="x"/>
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>

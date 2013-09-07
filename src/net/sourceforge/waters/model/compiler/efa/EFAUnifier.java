@@ -426,6 +426,10 @@ public class EFAUnifier extends AbortableCompiler
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
+      final LabelBlockProxy blockedEvents = graph.getBlockedEvents();
+      if (blockedEvents != null) {
+        visitLabelBlockProxy(blockedEvents);
+      }
       final Collection<EdgeProxy> edges = graph.getEdges();
       visitCollection(edges);
       return null;
@@ -860,16 +864,18 @@ public class EFAUnifier extends AbortableCompiler
         final List<EFAIdentifier> events = new ArrayList<>();
         final EFAUpdateInfo info = mList.get(index);
         for (final ConstraintList update : info.getUpdates()) {
-          final ConstraintPropagator subPropagator =
-            new ConstraintPropagator(propagator);
-          subPropagator.addConstraints(update);
-          subPropagator.propagate();
-          if (!subPropagator.isUnsatisfiable()) {
-            final List<EFAIdentifier> identifiers =
-              combineUpdates(subPropagator, index + 1);
-            if (!identifiers.isEmpty()) {
-              info.addEvents(update, identifiers);
-              events.addAll(identifiers);
+          if (update != null) {
+            final ConstraintPropagator subPropagator =
+              new ConstraintPropagator(propagator);
+            subPropagator.addConstraints(update);
+            subPropagator.propagate();
+            if (!subPropagator.isUnsatisfiable()) {
+              final List<EFAIdentifier> identifiers =
+                combineUpdates(subPropagator, index + 1);
+              if (!identifiers.isEmpty()) {
+                info.addEvents(update, identifiers);
+                events.addAll(identifiers);
+              }
             }
           }
         }

@@ -1,65 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="efsm9" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="efsm9-unified" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
-        <EventDecl Kind="CONTROLLABLE" Name="a"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c:0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c:1"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
-        <EventDecl Kind="CONTROLLABLE" Name="c"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT" Name="G">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
-                        <PointGeometry>
-                            <Point X="80" Y="48"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="8" Y="-8"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <PointGeometry>
-                            <Point X="80" Y="128"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="9" Y="-5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="S0" Target="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-18" Y="-9"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="65" Y="88"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="S1" Target="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="b"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="7" Y="-5"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="96" Y="88"/>
-                        </SplineGeometry>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
+        <VariableComponent Name="x">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="H">
             <Graph>
-                <LabelBlock>
-                    <SimpleIdentifier Name="a"/>
-                    <LabelGeometry Anchor="NW">
-                        <Point X="120" Y="30"/>
-                    </LabelGeometry>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
@@ -81,9 +44,9 @@
                 <EdgeList>
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="c"/>
+                            <SimpleIdentifier Name="c:0"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-20" Y="-11"/>
+                                <Point X="-30" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -92,13 +55,40 @@
                     </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="c"/>
+                            <SimpleIdentifier Name="c:1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="9" Y="-2"/>
+                                <Point X="6" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="95" Y="88"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name=":updates">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="init">
+                        <PointGeometry>
+                            <Point X="64" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-18" Y="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="init" Target="init">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="8" Y="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="115" Y="65"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -107,32 +97,18 @@
                                         <SimpleIdentifier Name="x"/>
                                     </UnaryExpression>
                                     <BinaryExpression Operator="+">
-                                        <SimpleIdentifier Name="x"/>
                                         <IntConstant Value="1"/>
+                                        <SimpleIdentifier Name="x"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="5" Y="-20"/>
+                                <Point X="8" Y="-19"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <VariableComponent Name="x">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="2"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="x"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-        </VariableComponent>
     </ComponentList>
 </Module>

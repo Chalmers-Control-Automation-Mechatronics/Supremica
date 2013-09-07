@@ -649,14 +649,12 @@ public interface ModuleProxyFactory
    * Creates a new variable.
    * @param identifier The identifier defining the name of the new variable.
    * @param type The range of the new variable.
-   * @param deterministic The deterministic of the new variable.
    * @param initialStatePredicate The initial state predicate of the new variable.
    * @param variableMarkings The list of markings of the new variable, or <CODE>null</CODE> if empty.
    */
   public VariableComponentProxy createVariableComponentProxy
       (IdentifierProxy identifier,
        SimpleExpressionProxy type,
-       boolean deterministic,
        SimpleExpressionProxy initialStatePredicate,
        Collection<? extends VariableMarkingProxy> variableMarkings);
 
@@ -666,13 +664,11 @@ public interface ModuleProxyFactory
    * an empty list of markings.
    * @param identifier The identifier defining the name of the new variable.
    * @param type The range of the new variable.
-   * @param deterministic The deterministic of the new variable.
    * @param initialStatePredicate The initial state predicate of the new variable.
    */
   public VariableComponentProxy createVariableComponentProxy
       (IdentifierProxy identifier,
        SimpleExpressionProxy type,
-       boolean deterministic,
        SimpleExpressionProxy initialStatePredicate);
 
   /**

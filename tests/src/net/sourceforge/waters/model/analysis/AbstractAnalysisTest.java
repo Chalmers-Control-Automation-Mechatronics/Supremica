@@ -163,14 +163,12 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
       return des;
     } else if (doc instanceof ModuleProxy) {
       final ModuleProxy module = (ModuleProxy) doc;
-      final DeterministicModuleChecker checker =
-        DeterministicModuleChecker.getInstance();
-      mProductDESIsDeterministic =
-        checker.isDeterministic(module, mDocumentManager);
       final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
       configure(compiler);
-      return compiler.compile(bindings);
+      final ProductDESProxy des = compiler.compile(bindings);
+      mProductDESIsDeterministic = AutomatonTools.isDeterministic(des);
+      return des;
     } else {
       fail("Unknown document type " + doc.getClass().getName() + "!");
       return null;

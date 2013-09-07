@@ -79,12 +79,14 @@ public class EditorReadFisherThompsonAction
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
 
 
+    @Override
     public void doAction()
     {
         final JFileChooser chooser = new JFileChooser();
@@ -247,7 +249,7 @@ public class EditorReadFisherThompsonAction
                     final String varName = "time";
                     final SimpleExpressionSubject initialStatePredicate = (SimpleExpressionSubject)(parser.parse(varName+"==0",Operator.TYPE_BOOLEAN));
                     final SimpleExpressionSubject range = (SimpleExpressionSubject)(parser.parse("0..1",Operator.TYPE_RANGE));
-                    final VariableComponentSubject bookingVar = factory.createVariableComponentProxy(factory.createSimpleIdentifierProxy(varName), range, true, initialStatePredicate);
+                    final VariableComponentSubject bookingVar = factory.createVariableComponentProxy(factory.createSimpleIdentifierProxy(varName), range, initialStatePredicate);
                     module.getComponentListModifiable().add(bookingVar);
                 } catch(final ParseException pe){}
 
@@ -259,7 +261,7 @@ public class EditorReadFisherThompsonAction
                         final String varName = "m"+nM;
                         final SimpleExpressionSubject initialStatePredicate = (SimpleExpressionSubject)(parser.parse(varName+"==0",Operator.TYPE_BOOLEAN));
                         final SimpleExpressionSubject range = (SimpleExpressionSubject)(parser.parse("0..1",Operator.TYPE_RANGE));
-                        final VariableComponentSubject bookingVar = factory.createVariableComponentProxy(factory.createSimpleIdentifierProxy(varName), range, true, initialStatePredicate);
+                        final VariableComponentSubject bookingVar = factory.createVariableComponentProxy(factory.createSimpleIdentifierProxy(varName), range, initialStatePredicate);
                         module.getComponentListModifiable().add(bookingVar);
                         machine2Variable.put(nM, bookingVar);
                     } catch(final ParseException pe){}
@@ -272,7 +274,7 @@ public class EditorReadFisherThompsonAction
                        final String clockName = "c"+(i+1);
                        final SimpleExpressionSubject initialStatePredicate = (SimpleExpressionSubject)(parser.parse(clockName+"==0",Operator.TYPE_BOOLEAN));
                        final SimpleExpressionSubject range = (SimpleExpressionSubject)(parser.parse("0.."+maxValuesOfClocks[i],Operator.TYPE_RANGE));
-                       final VariableComponentSubject clockVar = factory.createVariableComponentProxy(factory.createSimpleIdentifierProxy(clockName), range, true, initialStatePredicate);
+                       final VariableComponentSubject clockVar = factory.createVariableComponentProxy(factory.createSimpleIdentifierProxy(clockName), range, initialStatePredicate);
                        module.getComponentListModifiable().add(clockVar);
                    } catch(final ParseException pe){}
                }

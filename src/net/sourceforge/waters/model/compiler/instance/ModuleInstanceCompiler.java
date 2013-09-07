@@ -852,7 +852,6 @@ public class ModuleInstanceCompiler
       final SimpleExpressionProxy value =
         mSimpleExpressionCompiler.eval(expr, mContext);
       mSimpleExpressionCompiler.getRangeValue(value);
-      final boolean deterministic = var.isDeterministic();
       final SimpleExpressionProxy oldinit = var.getInitialStatePredicate();
       final SimpleExpressionProxy newinit =
         mSimpleExpressionCompiler.simplify(oldinit, context);
@@ -884,8 +883,8 @@ public class ModuleInstanceCompiler
         }
       }
       final VariableComponentProxy newvar =
-        mFactory.createVariableComponentProxy
-        (fullname, value, deterministic, newinit, newmarkings);
+        mFactory.createVariableComponentProxy(fullname, value,
+                                              newinit, newmarkings);
       mNameSpace.addComponent(suffix, newvar);
       mCompiledComponents.add(newvar);
       addSourceInfo(newvar, var);

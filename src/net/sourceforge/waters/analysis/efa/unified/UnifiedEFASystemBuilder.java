@@ -361,12 +361,14 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       throws VisitorException
     {
       final Collection<NodeProxy> nodes = graph.getNodes();
-      mStateMap =
-        new TObjectIntHashMap<SimpleNodeProxy>(nodes.size(), 0.5f, -1);
-      if (mSourceInfoBuilder != null) {
-        mNodeList = new ArrayList<SimpleNodeProxy>(nodes.size());
-      } else {
-        mNodeList = null;
+      if (!mRevisiting) {
+        mStateMap =
+          new TObjectIntHashMap<SimpleNodeProxy>(nodes.size(), 0.5f, -1);
+        if (mSourceInfoBuilder != null) {
+          mNodeList = new ArrayList<SimpleNodeProxy>(nodes.size());
+        } else {
+          mNodeList = null;
+        }
       }
       visitCollection(nodes);
       final Collection<EdgeProxy> edges = graph.getEdges();

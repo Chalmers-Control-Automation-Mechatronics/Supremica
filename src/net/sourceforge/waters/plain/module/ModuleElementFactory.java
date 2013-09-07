@@ -565,13 +565,11 @@ public class ModuleElementFactory
   public VariableComponentElement createVariableComponentProxy
       (final IdentifierProxy identifier,
        final SimpleExpressionProxy type,
-       final boolean deterministic,
        final SimpleExpressionProxy initialStatePredicate,
        final Collection<? extends VariableMarkingProxy> variableMarkings)
   {
     return new VariableComponentElement(identifier,
                                         type,
-                                        deterministic,
                                         initialStatePredicate,
                                         variableMarkings);
   }
@@ -579,12 +577,10 @@ public class ModuleElementFactory
   public VariableComponentElement createVariableComponentProxy
       (final IdentifierProxy identifier,
        final SimpleExpressionProxy type,
-       final boolean deterministic,
        final SimpleExpressionProxy initialStatePredicate)
   {
     return new VariableComponentElement(identifier,
                                         type,
-                                        deterministic,
                                         initialStatePredicate);
   }
 

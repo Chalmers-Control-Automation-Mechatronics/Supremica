@@ -17,7 +17,6 @@ import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.efa.efsm.EFSMConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.WatersException;
@@ -76,7 +75,7 @@ public class EFSMConflictCheckerTest
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "efsm", "efsm2");
-    checkConflict(module, true);
+    checkConflict(module, false);
   }
 
   public void testEFSMCompiler5()

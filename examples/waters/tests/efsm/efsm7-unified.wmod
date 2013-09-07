@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="efsm7" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="efsm7-unified" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="CONTROLLABLE" Name="c"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
+        <VariableComponent Name="x">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="G">
             <Graph>
                 <NodeList>
@@ -37,17 +52,6 @@
                         <SplineGeometry>
                             <Point X="110" Y="128"/>
                         </SplineGeometry>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="&lt;=" Text="x &lt;= 1">
-                                    <SimpleIdentifier Name="x"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Guards>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="8" Y="-1"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
                     </Edge>
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
@@ -105,34 +109,47 @@
                         <SplineGeometry>
                             <Point X="112" Y="128"/>
                         </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name=":updates">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="init">
+                        <PointGeometry>
+                            <Point X="96" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="init" Target="init">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="8" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="127" Y="74"/>
+                        </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="&gt;=" Text="x &gt;= 1">
+                                <BinaryExpression Operator="==" Text="x == 1">
                                     <SimpleIdentifier Name="x"/>
                                     <IntConstant Value="1"/>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="10" Y="-1"/>
+                                <Point X="9" Y="6"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <VariableComponent Name="x">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="3"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="x"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-        </VariableComponent>
     </ComponentList>
 </Module>

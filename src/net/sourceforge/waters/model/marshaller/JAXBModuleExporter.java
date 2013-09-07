@@ -1168,9 +1168,6 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyComponentProxy(proxy, element);
-    if (!proxy.isDeterministic()) {
-      element.setDeterministic(false);
-    }
     final SimpleExpressionProxy typeProxy = proxy.getType();
     final SimpleExpressionType typeElement =
       (SimpleExpressionType) typeProxy.acceptVisitor(this);

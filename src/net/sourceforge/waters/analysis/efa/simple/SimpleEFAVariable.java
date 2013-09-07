@@ -123,11 +123,6 @@ public class SimpleEFAVariable
     mMarkings.clear();
   }
 
-  public boolean isDeterministic()
-  {
-    return getComponent().isDeterministic();
-  }
-
   /**
    * Returns a collection containing all transition relations (EFAs) using this
    * variable.
@@ -190,7 +185,6 @@ public class SimpleEFAVariable
 
     return factory.createVariableComponentProxy(iden,
                                                 type,
-                                                isDeterministic(),
                                                 initialStatePredicate,
                                                 variableMarkings);
   }

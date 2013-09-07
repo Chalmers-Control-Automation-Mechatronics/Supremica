@@ -52,20 +52,17 @@ public final class VariableComponentSubject
    * Creates a new variable.
    * @param identifier The identifier defining the name of the new variable.
    * @param type The range of the new variable.
-   * @param deterministic The deterministic of the new variable.
    * @param initialStatePredicate The initial state predicate of the new variable.
    * @param variableMarkings The list of markings of the new variable, or <CODE>null</CODE> if empty.
    */
   public VariableComponentSubject(final IdentifierProxy identifier,
                                   final SimpleExpressionProxy type,
-                                  final boolean deterministic,
                                   final SimpleExpressionProxy initialStatePredicate,
                                   final Collection<? extends VariableMarkingProxy> variableMarkings)
   {
     super(identifier);
     mType = (SimpleExpressionSubject) type;
     mType.setParent(this);
-    mIsDeterministic = deterministic;
     mInitialStatePredicate = (SimpleExpressionSubject) initialStatePredicate;
     mInitialStatePredicate.setParent(this);
     if (variableMarkings == null) {
@@ -83,17 +80,14 @@ public final class VariableComponentSubject
    * an empty list of markings.
    * @param identifier The identifier defining the name of the new variable.
    * @param type The range of the new variable.
-   * @param deterministic The deterministic of the new variable.
    * @param initialStatePredicate The initial state predicate of the new variable.
    */
   public VariableComponentSubject(final IdentifierProxy identifier,
                                   final SimpleExpressionProxy type,
-                                  final boolean deterministic,
                                   final SimpleExpressionProxy initialStatePredicate)
   {
     this(identifier,
          type,
-         deterministic,
          initialStatePredicate,
          null);
   }
@@ -124,9 +118,6 @@ public final class VariableComponentSubject
         mType.setParent(this);
         return ModelChangeEvent.createStateChanged(this);
       case 3:
-        mIsDeterministic = (Boolean) newValue;
-        return ModelChangeEvent.createStateChanged(this);
-      case 4:
         mInitialStatePredicate.setParent(null);
         mInitialStatePredicate = (SimpleExpressionSubject) newValue;
         mInitialStatePredicate.setParent(this);
@@ -155,28 +146,23 @@ public final class VariableComponentSubject
       final UndoInfo step2 = new ReplacementUndoInfo(2, mType, clone2);
       info.add(step2);
     }
-    if (mIsDeterministic != downcast.mIsDeterministic) {
-      final UndoInfo step3 =
-        new ReplacementUndoInfo(3, mIsDeterministic, downcast.mIsDeterministic);
-      info.add(step3);
-    }
     if (mInitialStatePredicate.getClass() == downcast.mInitialStatePredicate.getClass()) {
-      final UndoInfo step4 =
+      final UndoInfo step3 =
         mInitialStatePredicate.createUndoInfo(downcast.mInitialStatePredicate, boundary);
-      if (step4 != null) {
-        info.add(step4);
+      if (step3 != null) {
+        info.add(step3);
       }
     } else {
-      final SimpleExpressionSubject clone4 =
+      final SimpleExpressionSubject clone3 =
         downcast.mInitialStatePredicate.clone();
-      final UndoInfo step4 =
-        new ReplacementUndoInfo(4, mInitialStatePredicate, clone4);
-      info.add(step4);
+      final UndoInfo step3 =
+        new ReplacementUndoInfo(3, mInitialStatePredicate, clone3);
+      info.add(step3);
     }
-    final UndoInfo step5 =
+    final UndoInfo step4 =
       mVariableMarkings.createUndoInfo(downcast.mVariableMarkings, boundary);
-    if (step5 != null) {
-      info.add(step5);
+    if (step4 != null) {
+      info.add(step4);
     }
   }
 
@@ -204,11 +190,6 @@ public final class VariableComponentSubject
   public SimpleExpressionSubject getType()
   {
     return mType;
-  }
-
-  public boolean isDeterministic()
-  {
-    return mIsDeterministic;
   }
 
   public SimpleExpressionSubject getInitialStatePredicate()
@@ -242,15 +223,6 @@ public final class VariableComponentSubject
     fireStateChanged();
   }
 
-  public void setDeterministic(final boolean deterministic)
-  {
-    if (mIsDeterministic == deterministic) {
-      return;
-    }
-    mIsDeterministic = deterministic;
-    fireStateChanged();
-  }
-
   /**
    * Sets the initial state predicate for this variable.
    */
@@ -277,7 +249,6 @@ public final class VariableComponentSubject
   //#########################################################################
   //# Data Members
   private SimpleExpressionSubject mType;
-  private boolean mIsDeterministic;
   private SimpleExpressionSubject mInitialStatePredicate;
   private ListSubject<VariableMarkingSubject> mVariableMarkings;
 
