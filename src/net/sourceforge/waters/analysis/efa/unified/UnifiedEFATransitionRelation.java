@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters EFSM Analysis
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
 //# CLASS:   UnifiedEFATransitionRelation
 //###########################################################################
@@ -17,8 +17,11 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 
 /**
+ * A transition relation in a unified EFA system.
+ *
  * @author Robi Malik, Sahar Mohajerani
  */
+
 public class UnifiedEFATransitionRelation
   extends AbstractEFATransitionRelation<UnifiedEFAEvent>
 {
@@ -26,14 +29,14 @@ public class UnifiedEFATransitionRelation
   //#########################################################################
   //# Constructors
   public UnifiedEFATransitionRelation(final ListBufferTransitionRelation rel,
-                                final UnifiedEFAEventEncoding events,
-                                final List<SimpleNodeProxy> nodes)
+                                      final UnifiedEFAEventEncoding events,
+                                      final List<SimpleNodeProxy> nodes)
   {
     super(rel, events, nodes);
   }
 
   public UnifiedEFATransitionRelation(final ListBufferTransitionRelation rel,
-                                final UnifiedEFAEventEncoding events)
+                                      final UnifiedEFAEventEncoding events)
   {
     this(rel, events, null);
   }
@@ -48,5 +51,6 @@ public class UnifiedEFATransitionRelation
 
 
   //#########################################################################
-  //# Data members
+  //# Data Members
+
  }

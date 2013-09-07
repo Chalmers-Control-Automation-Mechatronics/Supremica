@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters EFSM Analysis
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa
 //# CLASS:   UnifiedEFASystem
 //###########################################################################
@@ -54,6 +54,7 @@ class UnifiedEFASystem
     mUnifiedEvents = unifiedEvents;
   }
 
+
   //#########################################################################
   //# Simple Access
   public Collection<UnifiedEFAEvent> getEvents()
@@ -71,9 +72,9 @@ class UnifiedEFASystem
     mUnifiedEvents.remove(event);
   }
 
+
   //#########################################################################
   //# Data Members
   private final Collection<UnifiedEFAEvent> mUnifiedEvents;
-
 
 }

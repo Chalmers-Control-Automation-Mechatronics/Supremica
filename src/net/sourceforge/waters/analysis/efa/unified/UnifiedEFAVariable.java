@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters EFSM Analysis
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.model.analysis.efa
 //# CLASS:   UnifiedEFAVariable
 //###########################################################################
@@ -22,8 +22,8 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
 
 /**
- * A representation of an EFSM variable for use in compositional
- * analysis.
+ * A variable in a unified EFA system.
+ * Extends general EFA variables by including a marking predicate.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
@@ -58,7 +58,6 @@ public class UnifiedEFAVariable
   {
     return mMarkedStatePredicate;
   }
-
 
 
   //#########################################################################

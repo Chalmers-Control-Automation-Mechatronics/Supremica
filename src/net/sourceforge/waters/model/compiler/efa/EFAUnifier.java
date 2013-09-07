@@ -136,8 +136,6 @@ public class EFAUnifier extends AbortableCompiler
       final Pass1Visitor pass1 = new Pass1Visitor();
       mInputModule.acceptVisitor(pass1);
       // Pass 2 ...
-      mPropagator =
-        new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
       mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
       final ModuleEqualityVisitor eq =
         ModuleEqualityVisitor.getInstance(false);
@@ -830,27 +828,23 @@ public class EFAUnifier extends AbortableCompiler
     private void combineUpdates() throws EvalException
     {
       Collections.sort(mList);
-      combineUpdates(mTrueGuard, 0);
+      final ConstraintPropagator propagator =
+        new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+      combineUpdates(propagator, 0);
     }
 
     private List<EFAIdentifier> getEvents()
     {
-      if (mEventList.size() == 1) {
-        final EFAIdentifier event = new EFAIdentifier(mEventDecl, mTrueGuard);
-        return Collections.singletonList(event);
-      } else {
-        return mEventList;
-      }
+      return mEventList;
     }
 
     private List<EFAIdentifier> getEvents(final SimpleComponentProxy comp,
-                                         final ConstraintList update)
+                                          final ConstraintList update)
     {
       final EFAUpdateInfo info = mMap.get(comp);
       final List<EFAIdentifier> identifiers = info.getEvents(update);
-      if (mEventList.size() == 1 && !identifiers.isEmpty()) {
-        final EFAIdentifier event = new EFAIdentifier(mEventDecl, mTrueGuard);
-        return Collections.singletonList(event);
+      if (identifiers == null) {
+        return Collections.emptyList();
       } else {
         return identifiers;
       }
@@ -858,40 +852,38 @@ public class EFAUnifier extends AbortableCompiler
 
     //#######################################################################
     //# Data Members
-    private List<EFAIdentifier> combineUpdates(final ConstraintList oldUpdate,
-                                               final int index)
+    private List<EFAIdentifier> combineUpdates
+      (final ConstraintPropagator propagator, final int index)
       throws EvalException
     {
       if (index < mList.size()) {
-        final EFAUpdateInfo info = mList.get(index);
         final List<EFAIdentifier> events = new ArrayList<>();
+        final EFAUpdateInfo info = mList.get(index);
         for (final ConstraintList update : info.getUpdates()) {
-          final List<SimpleExpressionProxy> constraints =
-            new ArrayList<>(oldUpdate.size() + update.size());
-          constraints.addAll(oldUpdate.getConstraints());
-          constraints.addAll(update.getConstraints());
-          final ConstraintList newUpdate = new ConstraintList(constraints);
-          final List<EFAIdentifier> updateIndentifiers =
-            combineUpdates(newUpdate, index + 1);
-          info.addEvents(update, updateIndentifiers);
-          events.addAll(updateIndentifiers);
+          final ConstraintPropagator subPropagator =
+            new ConstraintPropagator(propagator);
+          subPropagator.addConstraints(update);
+          subPropagator.propagate();
+          if (!subPropagator.isUnsatisfiable()) {
+            final List<EFAIdentifier> identifiers =
+              combineUpdates(subPropagator, index + 1);
+            if (!identifiers.isEmpty()) {
+              info.addEvents(update, identifiers);
+              events.addAll(identifiers);
+            }
+          }
         }
         return events;
       } else {
-        mPropagator.init(oldUpdate);
-        mPropagator.propagate();
-        if (mPropagator.isUnsatisfiable()) {
-          return Collections.emptyList();
-        } else {
-          final ConstraintList result = mPropagator.getAllConstraints();
-          EFAIdentifier event = mConstraintMap.get(result);
-          if (event == null) {
-            event = new EFAIdentifier(mEventDecl, result);
-            mEventList.add(event);
-            mConstraintMap.put(result, event);
-          }
-          return Collections.singletonList(event);
+        propagator.removeUnchangedVariables();
+        final ConstraintList constraints = propagator.getAllConstraints();
+        EFAIdentifier event = mConstraintMap.get(constraints);
+        if (event == null) {
+          event = new EFAIdentifier(mEventDecl, constraints);
+          mEventList.add(event);
+          mConstraintMap.put(constraints, event);
         }
+        return Collections.singletonList(event);
       }
     }
 
@@ -1030,7 +1022,7 @@ public class EFAUnifier extends AbortableCompiler
     //#######################################################################
     //# Data Members
     private final List<ConstraintList> mUpdates;
-    private final Map<ConstraintList, EFAEventList> mMap;
+    private final Map<ConstraintList,EFAEventList> mMap;
   }
 
 
@@ -1118,6 +1110,14 @@ public class EFAUnifier extends AbortableCompiler
     }
 
     //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mIdentifier.toString() + mUpdate.toString();
+    }
+
+    //#######################################################################
     //# Data Members
     private IdentifierProxy mIdentifier;
     private final ConstraintList mUpdate;
@@ -1134,13 +1134,12 @@ public class EFAUnifier extends AbortableCompiler
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-  private EFAEventNameBuilder mEventNameBuilder;
 
   private final ModuleProxy mInputModule;
 
   private EFAModuleContext mRootContext;
-  private ConstraintPropagator mPropagator;
   private EFAGuardCompiler mGuardCompiler;
+  private EFAEventNameBuilder mEventNameBuilder;
   private ProxyAccessorMap<IdentifierProxy,EFAEventInfo> mEventMap;
   private ProxyAccessorMap<IdentifierProxy,ConstraintList> mEventUpdateMap;
 

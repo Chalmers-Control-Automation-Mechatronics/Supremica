@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters EFSM Analysis
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
 //# CLASS:   UnifiedEFAEventEncoding
 //###########################################################################
@@ -23,12 +23,12 @@ public class UnifiedEFAEventEncoding
 
   //#########################################################################
   //# Constructors
-  UnifiedEFAEventEncoding()
+  public UnifiedEFAEventEncoding()
   {
     this(DEFAULT_SIZE);
   }
 
-  UnifiedEFAEventEncoding(final int size)
+  public UnifiedEFAEventEncoding(final int size)
   {
     super(size);
     final ConstraintList empty = new ConstraintList();
@@ -36,11 +36,14 @@ public class UnifiedEFAEventEncoding
     createEventId(tau);
   }
 
-  UnifiedEFAEventEncoding(final UnifiedEFAEventEncoding encoding)
+  public UnifiedEFAEventEncoding(final UnifiedEFAEventEncoding encoding)
   {
     super(encoding);
   }
 
+
+  //#########################################################################
+  //# Simple Access
   public int getEventId(final UnifiedEFAEvent update)
   {
     return super.getTransitionLabelId(update);
@@ -55,6 +58,7 @@ public class UnifiedEFAEventEncoding
   {
     return super.createTransitionLabelId(update);
   }
+
 
   //#########################################################################
   //# Class Constants

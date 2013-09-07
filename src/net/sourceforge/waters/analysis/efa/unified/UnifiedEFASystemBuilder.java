@@ -64,17 +64,17 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
 
   //#########################################################################
   //# Constructors
-  public UnifiedEFASystemBuilder(final ModuleProxyFactory factory,
-                           final SourceInfoBuilder builder,
-                           final ModuleProxy module,
-                           final ProxyAccessorMap<IdentifierProxy,
-                           ConstraintList> map)
+  public UnifiedEFASystemBuilder
+    (final ModuleProxyFactory factory,
+     final SourceInfoBuilder builder,
+     final ModuleProxy module,
+     final ProxyAccessorMap<IdentifierProxy,ConstraintList> map)
   {
     mFactory = factory;
+    mOperatorTable = CompilerOperatorTable.getInstance();
     mSourceInfoBuilder = builder;
     mInputModule = module;
     mEventUpdateMap = map;
-    mOperatorTable = CompilerOperatorTable.getInstance();
   }
 
 
@@ -84,6 +84,8 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   protected void setUp() throws AnalysisException
   {
     super.setUp();
+    mSimpleExpressionCompiler =
+      new SimpleExpressionCompiler(mFactory, mOperatorTable);
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     final int numEvents = mInputModule.getEventDeclList().size();
     mIdentifierMap = new ProxyAccessorHashMap<>(eq,numEvents);
@@ -93,11 +95,8 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
     final int numComponents = mInputModule.getComponentList().size();
     mResultEFASystem =
       new UnifiedEFASystem(moduleName, mVariableContext, numComponents);
-    mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable);
-
-
   }
+
   public UnifiedEFASystem compile()
     throws EvalException, AnalysisException
   {
@@ -121,6 +120,15 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
     } finally {
       tearDown();
     }
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mSimpleExpressionCompiler = null;
+    mIdentifierMap = null;
+    mVariableContext = null;
   }
 
 
@@ -613,10 +621,10 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   private IdentifierProxy mDefaultMarking;
 
   private final ModuleProxy mInputModule;
+  private SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ProxyAccessorMap<IdentifierProxy,ConstraintList> mEventUpdateMap;
   private ProxyAccessorMap<IdentifierProxy, UnifiedEFAEvent> mIdentifierMap;
   private UnifiedEFAVariableContext mVariableContext;
   private UnifiedEFASystem mResultEFASystem;
-  private SimpleExpressionCompiler mSimpleExpressionCompiler;
 
 }

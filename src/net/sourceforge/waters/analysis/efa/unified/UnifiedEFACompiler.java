@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters EFSM Analysis
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
 //# CLASS:   UnifiedEFACompiler
 //###########################################################################
@@ -33,6 +33,9 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
+ * The compiler to convert a module ({@link ModuleProxy}) to a unified
+ * EFA system ({@link UnifiedEFASystem}).
+ *
  * @author Robi Malik, Sahar Mohajerani
  */
 
@@ -46,14 +49,6 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   {
     mDocumentManager = manager;
     mInputModule = module;
-  }
-
-
-  //##########################################################################
-  //# Simple Access
-  ModuleProxy getInputModule()
-  {
-    return mInputModule;
   }
 
 
@@ -92,15 +87,16 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
     super.tearDown();
     mModuleInstanceCompiler = null;
     mEFAUnifier = null;
+    mSystemBuilder = null;
   }
 
-  UnifiedEFASystem compile()
+  public UnifiedEFASystem compile()
     throws EvalException, AnalysisException
   {
     return compile(null);
   }
 
-  UnifiedEFASystem compile(final List<ParameterBindingProxy> bindings)
+  public UnifiedEFASystem compile(final List<ParameterBindingProxy> bindings)
     throws EvalException, AnalysisException
   {
     try {
@@ -113,30 +109,41 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       } else {
         marking = mMarking;
       }
-      final Collection<String> propositions =
+      final Collection<String> propositionNames =
         Collections.singletonList(marking.toString());
       initSourceInfo();
       mModuleInstanceCompiler = new ModuleInstanceCompiler
         (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
       mModuleInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       mModuleInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
-      mModuleInstanceCompiler.setEnabledPropositionNames(propositions);
-      final ModuleProxy instantiated = mModuleInstanceCompiler.compile(bindings);
+      mModuleInstanceCompiler.setEnabledPropositionNames(propositionNames);
+      final ModuleProxy instantiated =
+        mModuleInstanceCompiler.compile(bindings);
       mModuleInstanceCompiler = null;
       shiftSourceInfo();
-      mEFAUnifier = new EFAUnifier(modfactory, mSourceInfoBuilder, instantiated);
+      mEFAUnifier =
+        new EFAUnifier(modfactory, mSourceInfoBuilder, instantiated);
       final ModuleProxy unified = mEFAUnifier.compile();
       shiftSourceInfo();
       final ProxyAccessorMap<IdentifierProxy, ConstraintList> map =
         mEFAUnifier.getEventUpdateMap();
-      mSystemBuilder =
-        new UnifiedEFASystemBuilder(modfactory, mSourceInfoBuilder, unified, map);
+      mEFAUnifier = null;
+      mSystemBuilder = new UnifiedEFASystemBuilder
+        (modfactory, mSourceInfoBuilder, unified, map);
       mSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mSystemBuilder.setConfiguredDefaultMarking(marking);
       return mSystemBuilder.compile();
     } finally {
       tearDown();
     }
+  }
+
+
+  //##########################################################################
+  //# Simple Access
+  public ModuleProxy getInputModule()
+  {
+    return mInputModule;
   }
 
   public Map<Object,SourceInfo> getSourceInfoMap()

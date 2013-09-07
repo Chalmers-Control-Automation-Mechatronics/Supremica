@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.unified
 //# CLASS:   UnifiedEFAEvent
 //###########################################################################
@@ -12,17 +12,28 @@ package net.sourceforge.waters.analysis.efa.unified;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 
+
 /**
+ * An event in a unified EFA system.
+ * Consists of an event name plus associated update.
+ *
  * @author Robi Malik, Sahar Mohajerani
  */
+
 public class UnifiedEFAEvent
 {
-  UnifiedEFAEvent(final EventDeclProxy eventDecl, final ConstraintList update)
+  //#########################################################################
+  //# Data Members
+  public UnifiedEFAEvent(final EventDeclProxy eventDecl,
+                         final ConstraintList update)
   {
     mEventDecl = eventDecl;
     mUpdate = update;
   }
 
+
+  //#########################################################################
+  //# Data Members
   public EventDeclProxy getEventDecl()
   {
     return mEventDecl;
@@ -32,6 +43,16 @@ public class UnifiedEFAEvent
   {
     return mUpdate;
   }
+
+
+  //#######################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return mEventDecl.getName() + mUpdate.toString();
+  }
+
 
   //#########################################################################
   //# Data Members

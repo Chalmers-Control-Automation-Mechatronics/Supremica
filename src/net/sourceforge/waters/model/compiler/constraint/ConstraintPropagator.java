@@ -324,7 +324,8 @@ public class ConstraintPropagator
    * Removes unchanged primed variables from this constraint propagator.
    * This method checks for primed variables with bindings that are equal
    * to the current values of the variables, and removes them. This
-   * suppresses equations of the form x'==x in the output.
+   * suppresses equations of the form x'==x in the output, provided that
+   * x' does not appear elsewhere.
    */
   public void removeUnchangedVariables()
   {

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
 //# CLASS:   UnifiedEFAVariableContext
 //###########################################################################
@@ -15,12 +15,15 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 
 
 /**
- * A variable context for EFSM compilation. Contains ranges of all
- * variables, and identifies enumeration atoms.
+ * A variable context for unified EFA compilation.
+ *
+ * @author Sahar Mohajerani, Robi Malik
  */
+
 class UnifiedEFAVariableContext
   extends AbstractEFAVariableContext<UnifiedEFAEvent,UnifiedEFAVariable>
 {
+
   //#######################################################################
   //# Constructor
   public UnifiedEFAVariableContext(final ModuleProxy module,

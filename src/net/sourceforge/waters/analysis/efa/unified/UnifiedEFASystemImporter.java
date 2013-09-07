@@ -43,9 +43,12 @@ import net.sourceforge.waters.xsd.base.EventKind;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
+
 public class UnifiedEFASystemImporter
 {
 
+  //#########################################################################
+  //# Constructors
   public UnifiedEFASystemImporter(final ModuleProxyFactory factory,
                                   final CompilerOperatorTable optable)
   {
@@ -54,6 +57,9 @@ public class UnifiedEFASystemImporter
     mOperatorTable = optable;
   }
 
+
+  //#########################################################################
+  //# Invocation
   public ModuleProxy importModule(final UnifiedEFASystem system)
   {
     final List<UnifiedEFAVariable> variableList = system.getVariables();
@@ -85,7 +91,11 @@ public class UnifiedEFASystemImporter
       (system.getName(), null, null, null, eventList, null, compList);
   }
 
-  private void importEvent(final List<EventDeclProxy> eventList, final UnifiedEFAEvent uniEvent)
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void importEvent(final List<EventDeclProxy> eventList,
+                           final UnifiedEFAEvent uniEvent)
   {
     final EventDeclProxy eventDecl = uniEvent.getEventDecl();
     final EventDeclProxy eventDeclClone = (EventDeclProxy) mCloner.getClone(eventDecl);
