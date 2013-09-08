@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT:
 //# PACKAGE: net.sourceforge.waters.analysis.efa
-//# CLASS:   EFAHelper
+//# CLASS:   SimpleEFAHelper
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -47,9 +47,9 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  *
  * @author Mohammad Reza Shoaei
  */
-public class EFAHelper {
+public class SimpleEFAHelper {
 
-  public EFAHelper(final ModuleProxyFactory factory,
+  public SimpleEFAHelper(final ModuleProxyFactory factory,
                    final CompilerOperatorTable optable)
   {
     mFactory = factory;
@@ -63,7 +63,7 @@ public class EFAHelper {
    * @CompilerOperatorTable)} instances
    * @param factory Factory to be used for components construction
    */
-  public EFAHelper(final ModuleProxyFactory factory)
+  public SimpleEFAHelper(final ModuleProxyFactory factory)
   {
     this(factory, CompilerOperatorTable.getInstance());
   }
@@ -74,7 +74,7 @@ public class EFAHelper {
    * @ModuleSubjectFactory)} and operation table {(
    * @CompilerOperatorTable)} instances
    */
-  public EFAHelper()
+  public SimpleEFAHelper()
   {
     this(ModuleSubjectFactory.getInstance(),
          CompilerOperatorTable.getInstance());
@@ -146,7 +146,7 @@ public class EFAHelper {
       final boolean isForbidden =
        rel.isMarked(i, DEFAULT_FORBIDDEN_ID);
       final String nodeName = "S" + i;
-      SimpleEFAState state = new SimpleEFAState(nodeName, isInitial,
+      final SimpleEFAState state = new SimpleEFAState(nodeName, isInitial,
                                                 isMarkingIsUsed && isMarked,
                                                 isForbiddenIsUsed && isForbidden,
                                                 null, mFactory);
@@ -221,7 +221,7 @@ public class EFAHelper {
   {
     final StringBuilder result = new StringBuilder();
     result.append(opening);
-    for (SimpleExpressionProxy exp : constraints.getConstraints()) {
+    for (final SimpleExpressionProxy exp : constraints.getConstraints()) {
       result.append(exp.toString());
       result.append(separator);
     }
@@ -238,9 +238,9 @@ public class EFAHelper {
     return printer(new ConstraintList(exps), opening, separator, closing);
   }
 
-  public List<SimpleExpressionProxy> parseString(String str,
-                                                 String opening,
-                                                 String closing)
+  public List<SimpleExpressionProxy> parseString(final String str,
+                                                 final String opening,
+                                                 final String closing)
   {
     final List<SimpleExpressionProxy> exps = new ArrayList<>();
     final Pattern pattern = Pattern.compile(opening + "(.*?)" + closing);
@@ -253,15 +253,15 @@ public class EFAHelper {
     return exps;
   }
 
-  public List<SimpleExpressionProxy> parse(String... str)
+  public List<SimpleExpressionProxy> parse(final String... str)
   {
     final ExpressionParser parser =
      new ExpressionParser(mFactory, mOperatorTable);
-    List<SimpleExpressionProxy> exps = new ArrayList<>();
-    for (String s : str) {
+    final List<SimpleExpressionProxy> exps = new ArrayList<>();
+    for (final String s : str) {
       try {
         exps.add(parser.parse(s));
-      } catch (ParseException ex) {
+      } catch (ParseException ignored) {
       }
     }
     return exps;

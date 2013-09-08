@@ -68,6 +68,7 @@ public class SimpleEFASystem
     if(super.addTransitionRelation(component)){
       component.addSystem(this);
     }
+    AddEvents(component.getAlphabet());
   }
 
   public Collection<SimpleEFAEventDecl> getEvents()
@@ -147,7 +148,7 @@ public class SimpleEFASystem
   {
     final List<SimpleEFAVariable> variableList = getVariables();
     final List<SimpleEFAComponent> comps = getComponents();
-    final EFAHelper helper = new EFAHelper(factory);
+    final SimpleEFAHelper helper = new SimpleEFAHelper(factory);
     final Collection<EventDeclProxy> events =
      helper.getEventDeclProxy(getEvents());
     final TreeMap<String, SimpleComponentProxy> compList =

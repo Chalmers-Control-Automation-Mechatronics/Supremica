@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.compiler.efa.EFACompiler;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -119,6 +120,21 @@ public class SimpleEFAEventDecl
     mIsBlocked = true;
   }
 
+  public void addComponent(final SimpleEFAComponent component)
+  {
+    mComponents.add(component.getIdentifier());
+  }
+
+  public Set<SimpleEFAVariable> getVariables()
+  {
+    return mVariables;
+  }
+
+  public boolean isLocal()
+  {
+    return mComponents.size() < 2;
+  }
+
   public void addVariable(final SimpleEFAVariable var)
   {
     mVariables.add(var);
@@ -153,9 +169,9 @@ public class SimpleEFAEventDecl
     mVariables.addAll(var);
   }
 
-  public Set<SimpleEFAVariable> getVariables()
+  public Set<IdentifierProxy> getComponents()
   {
-    return mVariables;
+    return mComponents;
   }
 
   public Set<SimpleEFAVariable> getPrimeVariables()
@@ -249,7 +265,7 @@ public class SimpleEFAEventDecl
    * Automata that do not have the event in their alphabet are not listed.
    * Automata that block the event are listed with an empty transition group.
    */
-  private final Set<SimpleEFAComponent> mComponents;
+  private final Set<IdentifierProxy> mComponents;
   /**
    * A flag indicating that the event has been recognised as globally blocked.
    * In some cases, the EFA compiler can identify that an event is globally
@@ -259,5 +275,4 @@ public class SimpleEFAEventDecl
   private boolean mIsBlocked;
   private EventKind mKind;
   private boolean mIsObservable;
-  
 }

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 
-import net.sourceforge.waters.analysis.efa.simple.EFAHelper;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAHelper;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAEventDecl;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAState;
@@ -77,7 +77,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     mVarFinder = new SimpleEFAVariableFinder(mOperatorTable);
     mVarCollector = new SimpleEFAVariableCollector(mOperatorTable, varContext);
     mResiduals = new THashSet<>();
-    mHelper = new EFAHelper(mFactory, mOperatorTable);
+    mHelper = new SimpleEFAHelper(mFactory, mOperatorTable);
   }
 
   /**
@@ -815,7 +815,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
   private final SimpleEFAVariableContext mVarContext;
   private final Collection<SimpleEFAComponent> mResiduals;
   private String mSuffixName = ".PE";
-  private final EFAHelper mHelper;
+  private final SimpleEFAHelper mHelper;
   private boolean mReadStateNameAsValue = false;
   private boolean mAppendValueToStateName = true;
   private TIntLongHashMap pStatePropMap = null;
