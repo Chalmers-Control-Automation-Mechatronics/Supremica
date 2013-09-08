@@ -58,7 +58,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.efa.simple.EFAHelper;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAHelper;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFACompiler;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAEventDecl;
@@ -119,7 +119,7 @@ public class EFASynchronizer
     mFactory = components.iterator().next().getFactory();
     mAutomata = automata;
     syncOptions = options;
-    mHelper = new EFAHelper(mFactory);
+    mHelper = new SimpleEFAHelper(mFactory);
     synchHelper = new AutomataSynchronizerHelper(automata, options,
                                                  arc2edgeTable,
                                                  autName2indexTable, false);
@@ -241,7 +241,7 @@ public class EFASynchronizer
     abortRequested = false;
   }
 
-  public void setStateNameAsValue(boolean enable)
+  public void setStateNameAsValue(final boolean enable)
   {
     mStateNameAsValue = enable;
   }
@@ -356,7 +356,6 @@ public class EFASynchronizer
   private static Automaton synchronizeAutomata(
    final Automata automata, final SynchronizationOptions options,
    final boolean sups_as_plants)
-   throws Exception
   {
     options.setEFAMode(false);
     final AutomataSynchronizerHelper helper = new AutomataSynchronizerHelper(
@@ -386,7 +385,7 @@ public class EFASynchronizer
 
   @SuppressWarnings("unchecked")
   private Automata removeGuardsActionsFromEFAs(
-   final List<SimpleEFAComponent> components) throws AnalysisException
+   final List<SimpleEFAComponent> components)
   {
     final Automata automata = new Automata();
     final HashSet<SimpleEFAComponent> efas = new HashSet<>();
@@ -540,6 +539,6 @@ public class EFASynchronizer
   private final ModuleProxyFactory mFactory;
   private final List<SimpleEFAComponent> mComponents;
   private final THashSet<SimpleEFAVariable> mVariables;
-  private final EFAHelper mHelper;
+  private final SimpleEFAHelper mHelper;
   private boolean mStateNameAsValue = false;
 }

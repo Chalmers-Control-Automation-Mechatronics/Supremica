@@ -56,7 +56,7 @@ public class SimpleEFAComponent
     super(rel, labels, null);
     super.setName(name);
     mFactory = factory != null ? factory : ModuleSubjectFactory.getInstance();
-    mHelper = new EFAHelper(mFactory);
+    mHelper = new SimpleEFAHelper(mFactory);
     mStateEncoding = stateEncoding != null ? stateEncoding
                      : mHelper.getStateEncoding(rel);
     mVariables = variables;
@@ -107,6 +107,9 @@ public class SimpleEFAComponent
   {
     for (final SimpleEFAVariable var : mVariables) {
       var.addTransitionRelation(this);
+    }
+    for (final SimpleEFAEventDecl event : mAlphabet) {
+      event.addComponent(this);
     }
   }
 
@@ -321,7 +324,7 @@ public class SimpleEFAComponent
     return mIdentifier.getName();
   }
 
-    private Collection<SimpleEFAEventDecl> initAlphabet()
+  private Collection<SimpleEFAEventDecl> initAlphabet()
   {
     final SimpleEFATransitionLabelEncoding labels = getTransitionLabelEncoding();
     final Collection<SimpleEFAEventDecl> blockedEvents = getBlockedEvents();
@@ -356,7 +359,7 @@ public class SimpleEFAComponent
   private Collection<SimpleEFAEventDecl> mBlockedEvents;
   private final ArrayList<SimpleEFASystem> mSystems;
   private final ModuleProxyCloner mCloner;
-  private final EFAHelper mHelper;
+  private final SimpleEFAHelper mHelper;
   private final Collection<SimpleEFAEventDecl> mAlphabet;
   private boolean mIsDeterministic = true;
   private boolean mIsEFA = true;

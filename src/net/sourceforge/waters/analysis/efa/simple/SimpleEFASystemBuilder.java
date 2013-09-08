@@ -89,7 +89,7 @@ public class SimpleEFASystemBuilder implements Abortable
     final int size = module.getComponentList().size();
     mResultEFASystem = new SimpleEFASystem(moduleName, mVariableContext, size);
     mUserPass = new THashSet<>(5, 0.8f);
-    mHelper = new EFAHelper(factory, mOperatorTable);
+    mHelper = new SimpleEFAHelper(factory, mOperatorTable);
   }
 
   public SimpleEFASystemBuilder(final ModuleProxyFactory factory,
@@ -408,9 +408,6 @@ public class SimpleEFASystemBuilder implements Abortable
 
         // Collecting all the variables in the colletion "variables".
         mEFAVariableCollector.collectAllVariables(mEventEncoding, variables);
-//        final TIntObjectHashMap<String> mStateNameEncoding =
-//         getStateNameEncoding(mStateEncoding.size());
-
         // Creating a simple EFA component
         final SimpleEFAComponent efaComponent =
          new SimpleEFAComponent(comp.getName(),
@@ -421,7 +418,7 @@ public class SimpleEFASystemBuilder implements Abortable
                                 rel,
                                 comp.getKind(),
                                 null);
-        // Registering this component to all the variables.
+        // Registering this component to all the events and variables.
         efaComponent.register();
         // Add this component to the variables' modifiers (i.e. updating),
         // if it does so.
@@ -896,6 +893,6 @@ public class SimpleEFASystemBuilder implements Abortable
   private final SimpleEFASystem mResultEFASystem;
   private boolean mIsAborting;
   private final Collection<DefaultModuleProxyVisitor> mUserPass;
-  private final EFAHelper mHelper;
+  private final SimpleEFAHelper mHelper;
 
 }

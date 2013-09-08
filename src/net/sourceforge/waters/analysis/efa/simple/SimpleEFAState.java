@@ -44,10 +44,10 @@ public class SimpleEFAState
     mName = node.getName();
     mIsInitial = node.isInitial();
     mAttributes = new HashMap<>(node.getAttributes());
-    PlainEventListProxy propositions = node.getPropositions();
+    final PlainEventListProxy propositions = node.getPropositions();
     mPropositions = propositions != null ? propositions
                     : mFactory.createPlainEventListProxy();
-    mHelper = new EFAHelper(mFactory);
+    mHelper = new SimpleEFAHelper(mFactory);
     mIsMarked = mHelper.containsMarkingProposition(mPropositions);
     mIsForbidden = mHelper.containsForbiddenProposition(mPropositions);
     mInitialArrowGeometry = node.getInitialArrowGeometry();
@@ -65,8 +65,9 @@ public class SimpleEFAState
     mIsInitial = isInitial;
     mIsMarked = isMarked;
     mIsForbidden = isForbidden;
-    mHelper = new EFAHelper(factory);
     mFactory = factory != null ? factory : ModuleSubjectFactory.getInstance();
+    mHelper = new SimpleEFAHelper(mFactory);
+    mPropositions = mFactory.createPlainEventListProxy();
     mAttributes = attributes != null ? attributes
                   : new HashMap<String, String>();
   }
@@ -83,7 +84,7 @@ public class SimpleEFAState
     return mName;
   }
 
-  public void setName(String name)
+  public void setName(final String name)
   {
     mName = name;
   }
@@ -123,18 +124,22 @@ public class SimpleEFAState
     return mAttributes.isEmpty() ? null : mAttributes;
   }
 
-  public void setAttributes(Map<String, String> attributes)
+  public void setAttributes(final Map<String, String> attributes)
   {
     mAttributes = attributes;
   }
 
-  private PlainEventListProxy createPropositions(PlainEventListProxy proposition)
+  private PlainEventListProxy createPropositions()
   {
-    List<Proxy> list = new ArrayList<>(proposition.getEventIdentifierList());
-    if (mIsForbidden && !mHelper.containsForbiddenProposition(proposition)) {
+    final List<Proxy> list = new ArrayList<>();
+    final List<Proxy> eventIdentifierList = mPropositions.getEventIdentifierList();
+    if (eventIdentifierList != null) {
+      list.addAll(eventIdentifierList);
+    }
+    if (mIsForbidden && !mHelper.containsForbiddenProposition(mPropositions)) {
       list.add(mHelper.getForbiddenIdentifier());
     }
-    if (mIsMarked && !mHelper.containsMarkingProposition(proposition)) {
+    if (mIsMarked && !mHelper.containsMarkingProposition(mPropositions)) {
       list.add(mHelper.getMarkingIdentifier());
     }
     if (list.isEmpty()) {
@@ -146,10 +151,10 @@ public class SimpleEFAState
 
   private PlainEventListProxy getPropositions()
   {
-    return createPropositions(mPropositions);
+    return createPropositions();
   }
 
-  public void setPropositions(PlainEventListProxy propositions)
+  public void setPropositions(final PlainEventListProxy propositions)
   {
     mPropositions = propositions;
   }
@@ -191,11 +196,11 @@ public class SimpleEFAState
   }
 
   @Override
-  public boolean equals(Object obj)
+  public boolean equals(final Object obj)
   {
     if (obj instanceof SimpleNodeProxy) {
-      SimpleNodeProxy otherNode = (SimpleNodeProxy) obj;
-      SimpleNodeProxy thisNode = getSimpleNode();
+      final SimpleNodeProxy otherNode = (SimpleNodeProxy) obj;
+      final SimpleNodeProxy thisNode = getSimpleNode();
       if (otherNode.compareTo(thisNode) == 0) {
         return true;
       }
@@ -218,7 +223,7 @@ public class SimpleEFAState
   private Map<String, String> mAttributes;
   private PlainEventListProxy mPropositions;
   private String mName;
-  private final EFAHelper mHelper;
+  private final SimpleEFAHelper mHelper;
   private PointGeometryProxy mInitialArrowGeometry = null;
   private LabelGeometryProxy mLabelGeometry = null;
   private PointGeometryProxy mPointGeometry = null;
