@@ -17,7 +17,9 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,7 @@ import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -103,6 +106,9 @@ public class EFAUnifier extends AbortableCompiler
   {
     mFactory = factory;
     mOperatorTable = CompilerOperatorTable.getInstance();
+    final ExpressionComparator comparator =
+      new ExpressionComparator(mOperatorTable);
+    mComparator = new EFAIdentifierComparator(comparator);
     mSourceInfoBuilder = builder;
     mTrueGuard = new ConstraintList();
     mSimpleExpressionCompiler =
@@ -154,7 +160,7 @@ public class EFAUnifier extends AbortableCompiler
       for (final EFAEventInfo info : mEventMap.values()) {
         info.addComplementaryUpdates();
         info.combineUpdates();
-        info.generateEventNames();
+        info.generateEventNames(mComparator);
       }
       mEventNameBuilder = null;
       // Pass 4 ...
@@ -963,7 +969,7 @@ public class EFAUnifier extends AbortableCompiler
       }
     }
 
-    private void generateEventNames()
+    private void generateEventNames(final Comparator<EFAIdentifier> comparator)
     {
       if (mEventDecl.getKind() == EventKind.PROPOSITION || isBlocked()) {
         return;
@@ -979,6 +985,7 @@ public class EFAUnifier extends AbortableCompiler
         break;
       default:
         if (mEventNameBuilder == null) {
+          Collections.sort(mEventList, comparator);
           int index = 0;
           for (final EFAIdentifier event : mEventList) {
             final String name = generateEventName(index);
@@ -1218,8 +1225,8 @@ public class EFAUnifier extends AbortableCompiler
   /**
    * A placeholder for an event identifier to be inserted in label blocks.
    */
-  private static class EFAIdentifier {
-
+  private static class EFAIdentifier
+  {
     //#######################################################################
     //# Constructor
     private EFAIdentifier(final EventDeclProxy decl,
@@ -1262,12 +1269,66 @@ public class EFAUnifier extends AbortableCompiler
 
 
   //#########################################################################
+  //# Inner Class EFAIdentifierComparator
+  /**
+   * <P>A implementation of the {@link Comparator} interface, used to
+   * compare {@link EFAIdentifier} objects based on an expression
+   * ordering of the elements of the update's {@link ConstraintList}.</P>
+   *
+   * @see ExpressionComparator
+   */
+  private static class EFAIdentifierComparator
+    implements Comparator<EFAIdentifier>
+  {
+    //#######################################################################
+    //# Constructors
+    private EFAIdentifierComparator(final ExpressionComparator inner)
+    {
+      mExpressionComparator = inner;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparator
+    @Override
+    public int compare(final EFAIdentifier ident1,
+                       final EFAIdentifier ident2)
+    {
+      final ConstraintList update1 = ident1.getUpdate();
+      final int len1 = update1.size();
+      final ConstraintList update2 = ident2.getUpdate();
+      final int len2 = update2.size();
+      if (len1 != len2) {
+        return len1 - len2;
+      }
+      final List<SimpleExpressionProxy> list1 = update1.getConstraints();
+      final Iterator<SimpleExpressionProxy> iter1 = list1.iterator();
+      final List<SimpleExpressionProxy> list2 = update2.getConstraints();
+      final Iterator<SimpleExpressionProxy> iter2 = list2.iterator();
+      while (iter1.hasNext()) {
+        final SimpleExpressionProxy expr1 = iter1.next();
+        final SimpleExpressionProxy expr2 = iter2.next();
+        final int result = mExpressionComparator.compare(expr1, expr2);
+        if (result != 0) {
+          return result;
+        }
+      }
+      return 0;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ExpressionComparator mExpressionComparator;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private boolean mCreatesGuardAutomaton = false;
   private boolean mUsesEventNameBuilder = false;
 
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
+  private final EFAIdentifierComparator mComparator;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;

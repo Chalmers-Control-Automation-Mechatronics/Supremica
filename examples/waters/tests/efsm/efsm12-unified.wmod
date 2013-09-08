@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="efsm12" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="efsm12-unified" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="a"/>
+        <EventDecl Kind="CONTROLLABLE" Name="a:0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="a:1"/>
     </EventDeclList>
     <ComponentList>
+        <VariableComponent Name="x">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <SimpleComponent Kind="PLANT" Name="G">
             <Graph>
                 <NodeList>
@@ -31,9 +46,9 @@
                 <EdgeList>
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="a:0"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="9" Y="-16"/>
+                                <Point X="7" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -42,47 +57,57 @@
                     </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="a:1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-17" Y="-18"/>
+                                <Point X="-30" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="112" Y="184"/>
                         </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name=":updates">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="init">
+                        <PointGeometry>
+                            <Point X="80" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="init" Target="init">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a:1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="12" Y="-4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==">
+                                <BinaryExpression Operator="==" Text="x' == -2+x">
                                     <UnaryExpression Operator="'">
                                         <SimpleIdentifier Name="x"/>
                                     </UnaryExpression>
-                                    <BinaryExpression Operator="-">
+                                    <BinaryExpression Operator="+">
+                                        <IntConstant Value="-2"/>
                                         <SimpleIdentifier Name="x"/>
-                                        <IntConstant Value="2"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-57" Y="-2"/>
+                                <Point X="14" Y="12"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <VariableComponent Name="x">
-            <VariableRange>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="0"/>
-                    <IntConstant Value="4"/>
-                </BinaryExpression>
-            </VariableRange>
-            <VariableInitial>
-                <BinaryExpression Operator="==">
-                    <SimpleIdentifier Name="x"/>
-                    <IntConstant Value="0"/>
-                </BinaryExpression>
-            </VariableInitial>
-        </VariableComponent>
     </ComponentList>
 </Module>

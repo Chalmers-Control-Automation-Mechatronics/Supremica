@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
-//# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFAEventDecl
+//# PACKAGE: net.sourceforge.waters.analysis.efa.simple
+//# CLASS:   SimpleEFAEventDecl
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -27,19 +27,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-/**
- * <P>A compiler-internal representation of an event group in a system of
- * synchronised EFA.</P>
- * <p/>
- * <P>Each compiled event represents a single event declaration ({@link
- * EventDeclProxy}) of the input module, which has been flattened so as not to
- * allow any further array indexes. EFA compilation may split this event,
- * creating individual events of type {@link EFAEvent} for different value
- * combinations of EFA variable components.</P>
- * <p/>
- * @author Robi Malik
- * @see {@link EFACompiler}.
- */
+
 public class SimpleEFAEventDecl
 {
 
