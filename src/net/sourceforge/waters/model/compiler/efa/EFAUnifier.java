@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -151,6 +152,7 @@ public class EFAUnifier extends AbortableCompiler
       }
       mEventUpdateMap = new ProxyAccessorHashMap<>(eq, size);
       for (final EFAEventInfo info : mEventMap.values()) {
+        info.addComplementaryUpdates();
         info.combineUpdates();
         info.generateEventNames();
       }
@@ -167,6 +169,9 @@ public class EFAUnifier extends AbortableCompiler
       }
     } finally {
       mRootContext = null;
+      mGuardCompiler = null;
+      mEventMap = null;
+      mEventNameBuilder = null;
     }
   }
 
@@ -426,12 +431,12 @@ public class EFAUnifier extends AbortableCompiler
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
+      final Collection<EdgeProxy> edges = graph.getEdges();
+      visitCollection(edges);
       final LabelBlockProxy blockedEvents = graph.getBlockedEvents();
       if (blockedEvents != null) {
         visitLabelBlockProxy(blockedEvents);
       }
-      final Collection<EdgeProxy> edges = graph.getEdges();
-      visitCollection(edges);
       return null;
     }
 
@@ -456,7 +461,11 @@ public class EFAUnifier extends AbortableCompiler
       try {
         checkAbortInVisitor();
         final EFAEventInfo edecl = findEventInfo(ident);
-        edecl.addUpdate(mCurrentComponent, mCurrentUpdate);
+        if (mCurrentUpdate == null) {
+          edecl.setBlocked(mCurrentComponent);
+        } else {
+          edecl.addUpdate(mCurrentComponent, mCurrentUpdate);
+        }
         return edecl;
       } catch (final UndefinedIdentifierException exception) {
         throw wrap(exception);
@@ -591,24 +600,30 @@ public class EFAUnifier extends AbortableCompiler
         final Collection<EdgeProxy> edges = graph.getEdges();
         final int numedges = edges.size();
         mEdgeList = new ArrayList<>(numedges);
-        mUnblockedEvents = new THashSet<>();
+        mCurrentEvents = new THashSet<>();
+        mCurrentIdentifiers = new THashSet<>();
         visitCollection(edges);
-        final LabelBlockProxy blocked0 = graph.getBlockedEvents();
-        LabelBlockProxy blocked1 = null;
-        if (blocked0 != null) {
-          blocked1 = visitLabelBlockProxy(blocked0);
-          if (blocked1.getEventIdentifierList().isEmpty()) {
-            blocked1 = null;
+        final List<EFAEventInfo> events = new ArrayList<>(mCurrentEvents);
+        Collections.sort(events);
+        final List<IdentifierProxy> blockedList = new LinkedList<>();
+        for (final EFAEventInfo event : events) {
+          for (final EFAIdentifier ident : event.getEvents()) {
+            if (!mCurrentIdentifiers.contains(ident)) {
+              blockedList.add(ident.getIdentifier());
+            }
           }
         }
+        final LabelBlockProxy blocked = blockedList.isEmpty() ? null :
+          mFactory.createLabelBlockProxy(blockedList, null);
         final boolean deterministic = graph.isDeterministic();
         return mFactory.createGraphProxy
-          (deterministic, blocked1, mNodeList, mEdgeList);
+          (deterministic, blocked, mNodeList, mEdgeList);
       } finally {
         mNodeList = null;
         mNodeMap = null;
         mEdgeList = null;
-        mUnblockedEvents = null;
+        mCurrentEvents = null;
+        mCurrentIdentifiers = null;
       }
     }
 
@@ -658,26 +673,14 @@ public class EFAUnifier extends AbortableCompiler
     {
       try {
         checkAbortInVisitor();
-        final EFAEventInfo eventInfo = findEventInfo(ident);
-        List<EFAIdentifier> events;
-        if (mCurrentUpdate == null) {
-          events = eventInfo.getEvents();
-          if (!mUnblockedEvents.isEmpty()) {
-            final List<EFAIdentifier> retained = new ArrayList<>();
-            for (final EFAIdentifier event : events) {
-              if (!mUnblockedEvents.contains(event)) {
-                retained.add(event);
-              }
-            }
-            events = retained;
-          }
-        } else {
-          events = eventInfo.getEvents(mCurrentComponent, mCurrentUpdate);
-          mUnblockedEvents.addAll(events);
-        }
+        final EFAEventInfo info = findEventInfo(ident);
+        mCurrentEvents.add(info);
+        final List<EFAIdentifier> events =
+          info.getEvents(mCurrentComponent, mCurrentUpdate);
         for (final EFAIdentifier event : events) {
           final IdentifierProxy subident = event.getIdentifier();
           mLabelList.add(subident);
+          mCurrentIdentifiers.add(event);
           addSourceInfo(subident, ident);
         }
         return null;
@@ -791,18 +794,19 @@ public class EFAUnifier extends AbortableCompiler
     private List<EventDeclProxy> mEventDeclarations;
     private List<ComponentProxy> mComponents;
     private SimpleComponentProxy mCurrentComponent;
+    private Set<EFAEventInfo> mCurrentEvents;
+    private Set<EFAIdentifier> mCurrentIdentifiers;
     private ConstraintList mCurrentUpdate;
     private List<NodeProxy> mNodeList;
     private Map<NodeProxy,NodeProxy> mNodeMap;
     private List<EdgeProxy> mEdgeList;
     private List<IdentifierProxy> mLabelList;
-    private Set<EFAIdentifier> mUnblockedEvents;
   }
 
 
   //#########################################################################
   //# Inner Class EFAEventInfo
-  private class EFAEventInfo
+  private class EFAEventInfo implements Comparable<EFAEventInfo>
   {
     //#######################################################################
     //# Constructor
@@ -816,27 +820,15 @@ public class EFAUnifier extends AbortableCompiler
     }
 
     //#######################################################################
+    //# Interface java.lang.Comparable<EFAEventInfo>
+    @Override
+    public int compareTo(final EFAEventInfo info)
+    {
+      return mEventDecl.compareTo(info.mEventDecl);
+    }
+
+    //#######################################################################
     //# Simple Access
-    private void addUpdate(final SimpleComponentProxy automaton,
-                           final ConstraintList update)
-    {
-      EFAUpdateInfo info = mMap.get(automaton);
-      if (info == null) {
-        info = new EFAUpdateInfo();
-        mMap.put(automaton, info);
-        mList.add(info);
-      }
-      info.addUpdate(update);
-    }
-
-    private void combineUpdates() throws EvalException
-    {
-      Collections.sort(mList);
-      final ConstraintPropagator propagator =
-        new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
-      combineUpdates(propagator, 0);
-    }
-
     private List<EFAIdentifier> getEvents()
     {
       return mEventList;
@@ -845,6 +837,9 @@ public class EFAUnifier extends AbortableCompiler
     private List<EFAIdentifier> getEvents(final SimpleComponentProxy comp,
                                           final ConstraintList update)
     {
+      if (isBlocked()) {
+        return Collections.emptyList();
+      }
       final EFAUpdateInfo info = mMap.get(comp);
       final List<EFAIdentifier> identifiers = info.getEvents(update);
       if (identifiers == null) {
@@ -854,48 +849,123 @@ public class EFAUnifier extends AbortableCompiler
       }
     }
 
-    //#######################################################################
-    //# Data Members
-    private List<EFAIdentifier> combineUpdates
-      (final ConstraintPropagator propagator, final int index)
-      throws EvalException
+    /**
+     * Returns whether this event is blocked.
+     * Blocked events are events known to be always disabled by the plant.
+     * These events are removed from the model entirely.
+     */
+    private boolean isBlocked()
     {
-      if (index < mList.size()) {
-        final List<EFAIdentifier> events = new ArrayList<>();
-        final EFAUpdateInfo info = mList.get(index);
-        for (final ConstraintList update : info.getUpdates()) {
-          if (update != null) {
-            final ConstraintPropagator subPropagator =
-              new ConstraintPropagator(propagator);
-            subPropagator.addConstraints(update);
-            subPropagator.propagate();
-            if (!subPropagator.isUnsatisfiable()) {
-              final List<EFAIdentifier> identifiers =
-                combineUpdates(subPropagator, index + 1);
-              if (!identifiers.isEmpty()) {
-                info.addEvents(update, identifiers);
-                events.addAll(identifiers);
-              }
+      return mList == null;
+    }
+
+    /**
+     * Marks this event as blocked.
+     */
+    private void setBlocked()
+    {
+      mMap = null;
+      mList = null;
+      mConstraintMap = null;
+      mEventList = Collections.emptyList();
+    }
+
+    /**
+     * Records a transition.
+     * @param  comp       The automaton containing the transition.
+     * @param  update     The update associated with the transition.
+     */
+    private void addUpdate(final SimpleComponentProxy comp,
+                           final ConstraintList update)
+    {
+      if (!isBlocked()) {
+        EFAUpdateInfo info = mMap.get(comp);
+        if (info == null) {
+          info = new EFAUpdateInfo();
+          mMap.put(comp, info);
+          mList.add(info);
+        }
+        info.addUpdate(update);
+      }
+    }
+
+    /**
+     * <P>Records a blocked events list entry.</P>
+     * <P>This method is to be called after all regular transitions have been
+     * added using {@link #addUpdate(SimpleComponentProxy, ConstraintList)
+     * addUpdate()}.</P>
+     * <P>If this method is called with another update already recorded for
+     * the given automaton, it has no effect. Otherwise, the effect of
+     * blocked events depends on the component kind.
+     * If an event only occurs in a blocked events list of a plant, then it
+     * is marked as blocked&nbsp;- effectively removing it from the model.
+     * If an event occurs in blocked events list of some other type of
+     * component, an update associated with a true guard is recorded for
+     * the automaton.</P>
+     * @param  comp       The automaton containing the blocked events list.
+     */
+    private void setBlocked(final SimpleComponentProxy comp)
+    {
+      if (!mMap.containsKey(comp)) {
+        if (comp.getKind() == ComponentKind.PLANT) {
+          setBlocked();
+        } else {
+          addUpdate(comp, mTrueGuard);
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Pass 3
+    /**
+     * Adds complementary updates.
+     * For each specification or supervisor automaton associated with an
+     * uncontrollable event, and for each property automaton associated
+     * with a controllable or uncontrollable event, this method records
+     * an update with a guard representing the negation of all other
+     * recorded updates. This ensures that attempts to disable an update in
+     * specifications and properties are explicit in the compiled model.
+     */
+    private void addComplementaryUpdates() throws EvalException
+    {
+      final EventKind ekind = mEventDecl.getKind();
+      if (ekind != EventKind.PROPOSITION && !isBlocked()) {
+        final ConstraintPropagator propagator =
+          new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+        for (final Entry<SimpleComponentProxy,EFAUpdateInfo> entry :
+             mMap.entrySet()) {
+          final SimpleComponentProxy comp = entry.getKey();
+          switch (comp.getKind()) {
+          case PLANT:
+            break;
+          case SPEC:
+          case SUPERVISOR:
+            if (ekind == EventKind.CONTROLLABLE) {
+              break;
             }
+            // fall through ...
+          default:
+            final EFAUpdateInfo info = entry.getValue();
+            info.addComplementaryUpdate(propagator);
+            break;
           }
         }
-        return events;
-      } else {
-        propagator.removeUnchangedVariables();
-        final ConstraintList constraints = propagator.getAllConstraints();
-        EFAIdentifier event = mConstraintMap.get(constraints);
-        if (event == null) {
-          event = new EFAIdentifier(mEventDecl, constraints);
-          mEventList.add(event);
-          mConstraintMap.put(constraints, event);
-        }
-        return Collections.singletonList(event);
+      }
+    }
+
+    private void combineUpdates() throws EvalException
+    {
+      if (mEventDecl.getKind() != EventKind.PROPOSITION && !isBlocked()) {
+        Collections.sort(mList);
+        final ConstraintPropagator propagator =
+          new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+        combineUpdates(propagator, 0);
       }
     }
 
     private void generateEventNames()
     {
-      if (mEventDecl.getKind() == EventKind.PROPOSITION) {
+      if (mEventDecl.getKind() == EventKind.PROPOSITION || isBlocked()) {
         return;
       }
       final IdentifierProxy base = mEventDecl.getIdentifier();
@@ -945,6 +1015,45 @@ public class EFAUnifier extends AbortableCompiler
       }
     }
 
+    //#######################################################################
+    //# Auxiliary Methods
+    private List<EFAIdentifier> combineUpdates
+      (final ConstraintPropagator propagator, final int index)
+      throws EvalException
+    {
+      if (index < mList.size()) {
+        final List<EFAIdentifier> events = new ArrayList<>();
+        final EFAUpdateInfo info = mList.get(index);
+        for (final ConstraintList update : info.getUpdates()) {
+          if (update != null) {
+            final ConstraintPropagator subPropagator =
+              new ConstraintPropagator(propagator);
+            subPropagator.addConstraints(update);
+            subPropagator.propagate();
+            if (!subPropagator.isUnsatisfiable()) {
+              final List<EFAIdentifier> identifiers =
+                combineUpdates(subPropagator, index + 1);
+              if (!identifiers.isEmpty()) {
+                info.addEvents(update, identifiers);
+                events.addAll(identifiers);
+              }
+            }
+          }
+        }
+        return events;
+      } else {
+        propagator.removeUnchangedVariables();
+        final ConstraintList constraints = propagator.getAllConstraints();
+        EFAIdentifier event = mConstraintMap.get(constraints);
+        if (event == null) {
+          event = new EFAIdentifier(mEventDecl, constraints);
+          mEventList.add(event);
+          mConstraintMap.put(constraints, event);
+        }
+        return Collections.singletonList(event);
+      }
+    }
+
     private String generateEventName(final int index)
     {
       try {
@@ -969,15 +1078,20 @@ public class EFAUnifier extends AbortableCompiler
     //#######################################################################
     //# Data Members
     private final EventDeclProxy mEventDecl;
-    private final Map<SimpleComponentProxy, EFAUpdateInfo> mMap;
-    private final List<EFAUpdateInfo> mList;
-    private final Map<ConstraintList,EFAIdentifier> mConstraintMap;
-    private final List<EFAIdentifier> mEventList;
+    private Map<SimpleComponentProxy,EFAUpdateInfo> mMap;
+    private List<EFAUpdateInfo> mList;
+    private Map<ConstraintList,EFAIdentifier> mConstraintMap;
+    private List<EFAIdentifier> mEventList;
   }
 
 
   //#########################################################################
   //# Inner Class EFAUpdateInfo
+  /**
+   * A record containing information on a given event in a given automaton.
+   * Contains the the updates that together with the event appear in the
+   * automaton, and associated them with combined updates in the model.
+   */
   private static class EFAUpdateInfo
     implements Comparable<EFAUpdateInfo>
   {
@@ -1023,6 +1137,23 @@ public class EFAUnifier extends AbortableCompiler
     public int compareTo(final EFAUpdateInfo info)
     {
       return mUpdates.size() - info.mUpdates.size();
+    }
+
+    //#######################################################################
+    //# Pass 3
+    private void addComplementaryUpdate(final ConstraintPropagator propagator)
+      throws EvalException
+    {
+      for (final ConstraintList update : mUpdates) {
+        propagator.addNegation(update);
+      }
+      propagator.propagate();
+      if (!propagator.isUnsatisfiable()) {
+        propagator.removeUnchangedVariables();
+        final ConstraintList update = propagator.getAllConstraints();
+        addUpdate(update);
+      }
+      propagator.reset();
     }
 
     //#######################################################################

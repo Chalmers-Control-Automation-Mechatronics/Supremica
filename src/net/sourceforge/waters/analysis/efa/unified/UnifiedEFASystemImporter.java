@@ -12,8 +12,10 @@ package net.sourceforge.waters.analysis.efa.unified;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -132,60 +134,66 @@ public class UnifiedEFASystemImporter
   private void importTransitionRelation(final List<ComponentProxy> compList,
                                         final UnifiedEFATransitionRelation efsmTransition)
   {
-    final List<SimpleNodeProxy> nodeListFromEFA = efsmTransition.getNodeList();
+    final List<SimpleNodeProxy> nodeListFromEFA =
+      efsmTransition.getNodeList();
     final ListBufferTransitionRelation rel =
       efsmTransition.getTransitionRelation();
-    final UnifiedEFAEventEncoding eventEncoding = efsmTransition.getEventEncoding();
+    final UnifiedEFAEventEncoding eventEncoding =
+      efsmTransition.getEventEncoding();
     final String name = rel.getName();
+    final int numStates = rel.getNumberOfStates();
+    final List<SimpleNodeProxy> nodeList = new ArrayList<>(numStates);
+    final SimpleNodeProxy[] nodeArray = new SimpleNodeProxy[numStates];
     final boolean isMarkingIsUsed =
       rel.isUsedProposition(UnifiedEFAEventEncoding.OMEGA);
-    final int numStates = rel.getNumberOfStates();
-    final List<SimpleNodeProxy> nodeList =
-      new ArrayList<SimpleNodeProxy>(numStates);
-    int numOfMarkingStates = 0;
-    for (int i = 0; i < numStates; i++) {
-      final boolean isInitial = rel.isInitial(i);
-      final boolean isMarked =
-        isMarkingIsUsed && rel.isMarked(i, UnifiedEFAEventEncoding.OMEGA);
-      PlainEventListProxy props = null;
-      if (isMarked) {
-        numOfMarkingStates++;
-        final SimpleIdentifierProxy ident =
-          mFactory.createSimpleIdentifierProxy
+    int numMarkedStates = isMarkingIsUsed ? 0 : -1;
+    for (int s = 0; s < numStates; s++) {
+      if (rel.isReachable(s)) {
+        final boolean isInitial = rel.isInitial(s);
+        final boolean isMarked =
+          isMarkingIsUsed && rel.isMarked(s, UnifiedEFAEventEncoding.OMEGA);
+        PlainEventListProxy props = null;
+        if (isMarked) {
+          numMarkedStates++;
+          final SimpleIdentifierProxy ident =
+            mFactory.createSimpleIdentifierProxy
             (EventDeclProxy.DEFAULT_MARKING_NAME);
-        final List<SimpleIdentifierProxy> identList =
-          Collections.singletonList(ident);
-        props = mFactory.createPlainEventListProxy(identList);
+          final List<SimpleIdentifierProxy> identList =
+            Collections.singletonList(ident);
+          props = mFactory.createPlainEventListProxy(identList);
+        }
+        final String nodeName;
+        if (nodeListFromEFA == null) {
+          nodeName = "S" + s;
+        } else {
+          final SimpleNodeProxy nodeFromEFSM = nodeListFromEFA.get(s);
+          nodeName = nodeFromEFSM.getName();
+        }
+        final SimpleNodeProxy node =
+          mFactory.createSimpleNodeProxy(nodeName, props, null,
+                                         isInitial, null, null, null);
+        nodeList.add(node);
+        nodeArray[s] = node;
       }
-      final String nodeName;
-      if (nodeListFromEFA == null) {
-        nodeName = "S" + i;
-      } else {
-        final SimpleNodeProxy nodeFromEFSM = nodeListFromEFA.get(i);
-        nodeName = nodeFromEFSM.getName();
-      }
-      final SimpleNodeProxy node =
-        mFactory.createSimpleNodeProxy(nodeName, props, null,
-                                             isInitial, null, null, null);
-      nodeList.add(node);
     }
-    LabelBlockProxy markingBlock = null;
-    if (isMarkingIsUsed && numOfMarkingStates < 1) {
-      final SimpleIdentifierProxy ident = mFactory
-          .createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
-      final List<SimpleIdentifierProxy> identList =
-        Collections.singletonList(ident);
-      markingBlock = mFactory.createLabelBlockProxy(identList, null);
+    final List<IdentifierProxy> blockedList = new LinkedList<>();
+    if (numMarkedStates == 0) {
+      final SimpleIdentifierProxy ident =
+        mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+      blockedList.add(ident);
     }
+    final int numEvents = rel.getNumberOfProperEvents();
+    final boolean[] foundEvent = new boolean[numEvents];
     final List<EdgeProxy> edgeList =
       new ArrayList<EdgeProxy>(rel.getNumberOfTransitions());
     final TransitionIterator iter =
       rel.createAllTransitionsReadOnlyIterator();
     while (iter.advance()) {
-      final int eventCode = iter.getCurrentEvent();
-      final int source = iter.getCurrentSourceState();
-      final int target = iter.getCurrentTargetState();
-      final UnifiedEFAEvent event = eventEncoding.getUpdate(eventCode);
+      final int e = iter.getCurrentEvent();
+      foundEvent[e] = true;
+      final int s = iter.getCurrentSourceState();
+      final int t = iter.getCurrentTargetState();
+      final UnifiedEFAEvent event = eventEncoding.getUpdate(e);
       final IdentifierProxy ident = event.getEventDecl().getIdentifier();
       final IdentifierProxy cloneIdent =
         (IdentifierProxy) mCloner.getClone(ident);
@@ -193,16 +201,27 @@ public class UnifiedEFASystemImporter
         Collections.singletonList(cloneIdent);
       final LabelBlockProxy block =
         mFactory.createLabelBlockProxy(identList, null);
-      final SimpleNodeProxy sourceNode = nodeList.get(source);
-      final SimpleNodeProxy targetNode = nodeList.get(target);
+      final SimpleNodeProxy source = nodeArray[s];
+      final SimpleNodeProxy target = nodeArray[t];
       final EdgeProxy edge =
-        mFactory.createEdgeProxy(sourceNode, targetNode, block,
-                                       null, null, null, null);
+        mFactory.createEdgeProxy(source, target, block, null, null, null, null);
       edgeList.add(edge);
     }
+    for (int e = 0; e < numEvents; e++) {
+      final byte status = rel.getProperEventStatus(e);
+      if (EventEncoding.isUsedEvent(status) && !foundEvent[e]) {
+        final UnifiedEFAEvent event = eventEncoding.getUpdate(e);
+        final IdentifierProxy ident = event.getEventDecl().getIdentifier();
+        final IdentifierProxy cloneIdent =
+          (IdentifierProxy) mCloner.getClone(ident);
+        blockedList.add(cloneIdent);
+      }
+    }
+    final LabelBlockProxy blocked = blockedList.isEmpty() ? null :
+      mFactory.createLabelBlockProxy(blockedList, null);
     final boolean deterministic = rel.isDeterministic();
     final GraphProxy graph =
-      mFactory.createGraphProxy(deterministic, markingBlock, nodeList, edgeList);
+      mFactory.createGraphProxy(deterministic, blocked, nodeList, edgeList);
     final SimpleIdentifierProxy ident =
       mFactory.createSimpleIdentifierProxy(name);
     final SimpleComponentProxy simpleComponent =

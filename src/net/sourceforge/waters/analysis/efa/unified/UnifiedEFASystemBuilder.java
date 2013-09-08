@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.efa.unified;
 
-import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.analysis.efa.efsm.EFSMVariable;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
@@ -316,30 +314,17 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
         final GraphProxy graph = comp.getGraph();
         final String name = comp.getName();
         final ComponentKind kind = comp.getKind();
-        int numProperEvents = mEventEncoding.size();
-        int numPropositions = mFoundDefaultMarking ? 1 : 0;
-        int numStates = graph.getNodes().size();
+        final int numProperEvents = mEventEncoding.size();
+        final int numPropositions = mFoundDefaultMarking ? 1 : 0;
+        final int numStates = graph.getNodes().size();
         final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
         mTransitionRelation = new ListBufferTransitionRelation
           (name, kind, numProperEvents, numPropositions, numStates, config);
-        mRevisiting = false;
-        visitGraphProxy(graph);
-        if (simplifyTransitionRelation(mTransitionRelation)) {
-          if (mEventEncoding.size() <= 1 && !mFoundDefaultMarking) {
-            return null;
-          }
-          numProperEvents = mEventEncoding.size();
-          numPropositions = mFoundDefaultMarking ? 1 : 0;
-          numStates = mStateMap.size();
-          mTransitionRelation = new ListBufferTransitionRelation
-            (name, kind, numProperEvents, numPropositions, numStates, config);
-          mRevisiting = true;
-          visitGraphProxy(graph);
-        }
         mTransitionRelation.setProperEventStatus(EventEncoding.TAU,
-                                                 EventEncoding.STATUS_FULLY_LOCAL
-                                                 | EventEncoding.STATUS_UNUSED);
-        if (isTrivial(mTransitionRelation)) {
+          EventEncoding.STATUS_FULLY_LOCAL | EventEncoding.STATUS_UNUSED);
+        visitGraphProxy(graph);
+        simplifyTransitionRelation();
+        if (isTrivial()) {
           return null;
         }
         final UnifiedEFATransitionRelation unifiedEFATransitionRelation =
@@ -361,14 +346,12 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       throws VisitorException
     {
       final Collection<NodeProxy> nodes = graph.getNodes();
-      if (!mRevisiting) {
-        mStateMap =
-          new TObjectIntHashMap<SimpleNodeProxy>(nodes.size(), 0.5f, -1);
-        if (mSourceInfoBuilder != null) {
-          mNodeList = new ArrayList<SimpleNodeProxy>(nodes.size());
-        } else {
-          mNodeList = null;
-        }
+      mStateMap =
+        new TObjectIntHashMap<SimpleNodeProxy>(nodes.size(), 0.5f, -1);
+      if (mSourceInfoBuilder != null) {
+        mNodeList = new ArrayList<SimpleNodeProxy>(nodes.size());
+      } else {
+        mNodeList = null;
       }
       visitCollection(nodes);
       final Collection<EdgeProxy> edges = graph.getEdges();
@@ -379,17 +362,10 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
     public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
     {
       final int code;
-      if (mRevisiting) {
-        code = mStateMap.get(node);
-        if (code < 0) {
-          return null;
-        }
-      } else {
-        code = mStateMap.size();
-        mStateMap.put(node, code);
-        if (mNodeList != null) {
-          mNodeList.add(node);
-        }
+      code = mStateMap.size();
+      mStateMap.put(node, code);
+      if (mNodeList != null) {
+        mNodeList.add(node);
       }
       if (node.isInitial()) {
         mTransitionRelation.setInitial(code, true);
@@ -465,134 +441,33 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
 
     //#######################################################################
     //# Auxiliary Methods
-    private boolean simplifyTransitionRelation
-      (final ListBufferTransitionRelation rel)
+    private boolean simplifyTransitionRelation()
     {
+      boolean change = false;
       if (mIsOptimizationEnabled) {
-        // 1. Check reachability
-        final boolean hasUnreachableStates = checkReachability(rel);
-        // 2. Check for unused events or selfloops
-        final boolean hasRemovableEvents = removeRedundantEvents(rel);
-        // 3. Check for redundant propositions
-        final boolean hasRemovablePropositions = rel.removeRedundantPropositions();
-        if (hasRemovablePropositions) {
-          mFoundDefaultMarking = rel.isUsedProposition(UnifiedEFAEventEncoding.OMEGA);
-        }
-        return hasUnreachableStates || hasRemovableEvents || hasRemovablePropositions;
-      } else {
-        return false;
+        change |= mTransitionRelation.checkReachability();
+        change |= mTransitionRelation.removeProperSelfLoopEvents();
+        change |= mTransitionRelation.removeRedundantPropositions();
       }
+      return change;
     }
 
-    private boolean checkReachability(final ListBufferTransitionRelation rel)
+    private boolean isTrivial()
     {
-      if (rel.checkReachability()) {
-        final int numStates = rel.getNumberOfStates();
-        final int[] newCodes = new int[numStates];
-        final List<SimpleNodeProxy> newNodeList;
-        if (mNodeList == null) {
-          newNodeList = null;
-        } else {
-          newNodeList = new ArrayList<SimpleNodeProxy>(numStates);
-        }
-        int newCode = 0;
-        for (int s = 0; s < numStates; s++) {
-          if (rel.isReachable(s)) {
-            newCodes[s] = newCode++;
-            if (newNodeList != null) {
-              final SimpleNodeProxy node = mNodeList.get(s);
-              newNodeList.add(node);
-            }
-          } else {
-            newCodes[s] = -1;
-          }
-        }
-        final TObjectIntHashMap<SimpleNodeProxy> newStateMap =
-          new TObjectIntHashMap<SimpleNodeProxy>(numStates, 0.5f, -1);
-        final TObjectIntIterator<SimpleNodeProxy> iter = mStateMap.iterator();
-        while (iter.hasNext()) {
-          iter.advance();
-          final int s = iter.value();
-          newCode = newCodes[s];
-          if (newCode >= 0) {
-            final SimpleNodeProxy node = iter.key();
-            newStateMap.put(node, newCode);
-          }
-        }
-        mStateMap = newStateMap;
-        mNodeList = newNodeList;
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    private boolean removeRedundantEvents(final ListBufferTransitionRelation rel)
-    {
-      final int oldNumEvents = rel.getNumberOfProperEvents();
-      final boolean[] usedEvents = new boolean[oldNumEvents];
-      final int[] selfloops = new int[oldNumEvents];
-      final TransitionIterator iter =
-        rel.createAllTransitionsReadOnlyIterator();
-      while (iter.advance()) {
-        final int event = iter.getCurrentEvent();
-        if (event != EventEncoding.TAU) {
-          final int source = iter.getCurrentSourceState();
-          if (rel.isReachable(source)) {
-            usedEvents[event] = true;
-            if (selfloops[event] >= 0) {
-              final int target = iter.getCurrentTargetState();
-              if (source == target) {
-                selfloops[event]++;
-              } else {
-                selfloops[event] = -1;
-              }
-            }
-          }
-        }
-      }
-      final int numReachable = mStateMap.size();
-      int newNumEvents = 1;
-      boolean hasRemovableEvents = false;
-      for (int e = EventEncoding.NONTAU; e < oldNumEvents; e++) {
-        if (!usedEvents[e]) {
-          hasRemovableEvents = true;
-        } else if (selfloops[e] == numReachable) {
-          usedEvents[e] = false;
-          hasRemovableEvents = true;
-        } else {
-          newNumEvents++;
-        }
-      }
-      if (hasRemovableEvents) {
-        final UnifiedEFAEventEncoding newEncoding =
-          new UnifiedEFAEventEncoding(newNumEvents);
-        for (int e = EventEncoding.NONTAU; e < oldNumEvents; e++) {
-          if (usedEvents[e]) {
-            final UnifiedEFAEvent update = mEventEncoding.getUpdate(e);
-            newEncoding.createEventId(update);
-          }
-        }
-        mEventEncoding = newEncoding;
-      }
-      return hasRemovableEvents;
-    }
-
-    private boolean isTrivial(final ListBufferTransitionRelation rel)
-    {
-      for (int e = EventEncoding.TAU; e < rel.getNumberOfProperEvents(); e++) {
-        final byte status = rel.getProperEventStatus(e);
+      for (int e = EventEncoding.TAU;
+           e < mTransitionRelation.getNumberOfProperEvents(); e++) {
+        final byte status = mTransitionRelation.getProperEventStatus(e);
         if (EventEncoding.isUsedEvent(status)) {
           return false;
         }
       }
-      for (int p = 0; p < rel.getNumberOfPropositions(); p++) {
-        if (rel.isUsedProposition(p)) {
+      for (int p = 0; p < mTransitionRelation.getNumberOfPropositions(); p++) {
+        if (mTransitionRelation.isUsedProposition(p)) {
           return false;
         }
       }
-      for (int s = 0; s < rel.getNumberOfStates(); s++) {
-        if (rel.isInitial(s)){
+      for (int s = 0; s < mTransitionRelation.getNumberOfStates(); s++) {
+        if (mTransitionRelation.isInitial(s)){
           return true;
         }
       }
@@ -609,7 +484,6 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
     private boolean mFoundDefaultMarking;
     private int mSource;
     private int mTarget;
-    private boolean mRevisiting;
   }
 
 
