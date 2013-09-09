@@ -611,7 +611,6 @@ public class EFAUnifier extends AbortableCompiler
         visitCollection(edges);
         final LabelBlockProxy blocked = graph.getBlockedEvents();
         if (blocked != null) {
-          mCurrentUpdate = mTrueGuard;
           visitLabelBlockProxy(blocked);
         }
         final List<EFAEventInfo> events = new ArrayList<>(mCurrentEvents);
@@ -635,7 +634,6 @@ public class EFAUnifier extends AbortableCompiler
         mEdgeList = null;
         mCurrentEvents = null;
         mCurrentIdentifiers = null;
-        mCurrentUpdate = null;
       }
     }
 
@@ -686,8 +684,8 @@ public class EFAUnifier extends AbortableCompiler
       try {
         checkAbortInVisitor();
         final EFAEventInfo info = findEventInfo(ident);
-        if (info != null) {
-          mCurrentEvents.add(info);
+        mCurrentEvents.add(info);
+        if (mCurrentUpdate != null) {
           final List<EFAIdentifier> events =
             info.getEvents(mCurrentComponent, mCurrentUpdate);
           for (final EFAIdentifier event : events) {
@@ -1089,6 +1087,14 @@ public class EFAUnifier extends AbortableCompiler
       } catch (final IOException exception) {
         throw new WatersRuntimeException(exception);
       }
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mEventDecl.getName();
     }
 
     //#######################################################################
