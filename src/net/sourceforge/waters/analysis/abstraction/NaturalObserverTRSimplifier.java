@@ -82,6 +82,34 @@ public class NaturalObserverTRSimplifier
     mBisimulator.setStatistics(null);
   }
 
+  /**
+   * The constructor of the the natural observer simplifier. In this, the local
+   * events (i.e. events with local status {@link EventEncoding#STATUS_LOCAL})
+   * are considered as unobservable events hence will be projected.
+   * <p/>
+   * @param rel The original transition relation where the local events are
+   *            considered as unobservable events hence will be projected.
+   * <p/>
+   * @throws OverflowException
+   */
+  public NaturalObserverTRSimplifier(final ListBufferTransitionRelation rel)
+   throws OverflowException
+  {
+    super(null);
+    mRel = rel;
+    mRel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    mObsEvents = new TIntHashSet();
+    mUnObsEvents = new TIntHashSet();
+    findLocalEvents();
+    final ListBufferTransitionRelation prjRel = project();
+    super.setTransitionRelation(prjRel);
+    mBisimulator = new ObservationEquivalenceTRSimplifier();
+    mBisimulator.setEquivalence(
+     ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+    mBisimulator.setAppliesPartitionAutomatically(false);
+    mBisimulator.setStatistics(null);
+  }
+
   //#########################################################################
   //# Configuration
   /**
@@ -437,6 +465,24 @@ public class NaturalObserverTRSimplifier
       }
     }
     return unObsEvents;
+  }
+
+  private void findLocalEvents()
+  {
+    final TransitionIterator mIter = mRel.createSuccessorsReadOnlyIterator();
+    for (int source = 0; source < mRel.getNumberOfStates(); source++) {
+      if (mRel.isReachable(source)) {
+        mIter.resetState(source);
+        while (mIter.advance()) {
+          final int event = mIter.getCurrentEvent();
+          if (mRel.getProperEventStatus(event) != EventEncoding.STATUS_LOCAL) {
+            mObsEvents.add(event);
+          } else {
+            mUnObsEvents.add(event);
+          }
+        }
+      }
+    }
   }
 
   private ListBufferTransitionRelation project()

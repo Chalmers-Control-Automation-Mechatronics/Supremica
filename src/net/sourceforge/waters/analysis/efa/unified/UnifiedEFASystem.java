@@ -72,6 +72,37 @@ class UnifiedEFASystem
     mUnifiedEvents.remove(event);
   }
 
+  @Override
+  public boolean addTransitionRelation(
+   final UnifiedEFATransitionRelation transitionRelation)
+  {
+    return super.addTransitionRelation(transitionRelation);
+  }
+
+  @Override
+  public void removeTransitionRelation(
+   final UnifiedEFATransitionRelation transitionRelation)
+  {
+    super.removeTransitionRelation(transitionRelation);
+  }
+
+  @Override
+  public List<UnifiedEFATransitionRelation> getTransitionRelations()
+  {
+    return super.getTransitionRelations();
+  }
+
+  @Override
+  public void addVariable(final UnifiedEFAVariable variable)
+  {
+    super.addVariable(variable);
+  }
+
+  @Override
+  public void removeVariable(final UnifiedEFAVariable var)
+  {
+    super.removeVariable(var);
+  }
 
   //#########################################################################
   //# Data Members

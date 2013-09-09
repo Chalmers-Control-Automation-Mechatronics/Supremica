@@ -27,7 +27,10 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-
+/**
+ *
+ * @author Mohammad Reza Shoaei
+ */
 public class SimpleEFAEventDecl
 {
 
@@ -113,6 +116,11 @@ public class SimpleEFAEventDecl
     mComponents.add(component.getIdentifier());
   }
 
+  public void removeComponent(final SimpleEFAComponent component)
+  {
+    mComponents.remove(component.getIdentifier());
+  }
+
   public Set<SimpleEFAVariable> getVariables()
   {
     return mVariables;
@@ -121,6 +129,11 @@ public class SimpleEFAEventDecl
   public boolean isLocal()
   {
     return mComponents.size() < 2;
+  }
+
+  public boolean isLocalIn(final SimpleEFAComponent component)
+  {
+    return isLocal() && mComponents.contains(component.getIdentifier());
   }
 
   public void addVariable(final SimpleEFAVariable var)

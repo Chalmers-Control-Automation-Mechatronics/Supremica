@@ -17,15 +17,18 @@ import java.util.List;
 import java.util.TreeMap;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
- * An implementation of the {@link AbstractEFASystem}.
+ * A simple implementation of the abstract system {@link AbstractEFASystem}.
  * <p/>
  * @author Mohammad Reza Shoaei
  */
@@ -112,8 +115,8 @@ public class SimpleEFASystem
   public void removeVariable(final SimpleEFAVariable variable)
   {
     super.removeVariable(variable);
-    for (final SimpleEFAComponent tran : getTransitionRelations()) {
-      tran.removeVariable(variable);
+    for (final SimpleEFAComponent comp : getComponents()) {
+      comp.removeVariable(variable);
     }
 
   }
@@ -121,27 +124,40 @@ public class SimpleEFASystem
   public void removeVariables(final Collection<SimpleEFAVariable> variables)
   {
     for (final SimpleEFAVariable var : variables) {
-      super.removeVariable(var);
+      removeVariable(var);
     }
   }
 
   public void removeComponent(final SimpleEFAComponent component)
   {
-    final THashSet<SimpleEFAEventDecl> otherEvents =
-     new THashSet<>(getEvents().size());
-    for (final SimpleEFAComponent other : getComponents()) {
-      final String otherName = other.getIdentifier().getName();
-      if (!component.getIdentifier().getName().equalsIgnoreCase(otherName)) {
-        otherEvents.addAll(other.getAlphabet());
+    for (final SimpleEFAEventDecl event : component.getAlphabet()) {
+      if (event.isLocalIn(component)) {
+        removeEvent(event);
       }
     }
-    final Collection<SimpleEFAEventDecl> alphabet = component.getAlphabet();
-    alphabet.removeAll(otherEvents);
-    for (final SimpleEFAEventDecl event : alphabet) {
-      removeEvent(event);
-    }
+    component.removeSystem(this);
     component.dispose();
     super.removeTransitionRelation(component);
+  }
+
+  public void updateTransitionRelations()
+  {
+    for (final SimpleEFAComponent comp : getComponents()) {
+      final ListBufferTransitionRelation tr = comp.getTransitionRelation();
+      final SimpleEFATransitionLabelEncoding trEncoding =
+       comp.getTransitionLabelEncoding();
+      for (int id = 0; id < trEncoding.size(); id++) {
+        final SimpleEFATransitionLabel label = trEncoding.getTransitionLabel(id);
+        byte status = EventEncoding.STATUS_NONE;
+        if (label.getKind() == EventKind.CONTROLLABLE) {
+          status |= EventEncoding.STATUS_CONTROLLABLE;
+        }
+        if (label.getEvent().isLocalIn(comp)) {
+          status |= EventEncoding.STATUS_LOCAL;
+        }
+        tr.setProperEventStatus(id, status);
+      }
+    }
   }
 
   public ModuleProxy getModuleProxy(final ModuleProxyFactory factory)
