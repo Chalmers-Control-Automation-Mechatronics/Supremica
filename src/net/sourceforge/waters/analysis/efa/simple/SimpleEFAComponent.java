@@ -83,12 +83,13 @@ public class SimpleEFAComponent
     return (SimpleEFATransitionLabelEncoding) super.getTransitionLabelEncoding();
   }
 
-  protected void addVariable(final SimpleEFAVariable variable)
+  public void addVariable(final SimpleEFAVariable variable)
   {
     mVariables.add(variable);
     variable.addTransitionRelation(this);
   }
-  protected void removeVariable(final SimpleEFAVariable variable)
+
+  public void removeVariable(final SimpleEFAVariable variable)
   {
     mVariables.remove(variable);
     variable.removeTransitionRelation(this);
@@ -101,7 +102,7 @@ public class SimpleEFAComponent
 
   /**
    * Registers this transition relation by adding its reference to all its
-   * variables.
+   * variables and events.
    */
   public void register()
   {
@@ -115,19 +116,16 @@ public class SimpleEFAComponent
 
   /**
    * Deregisters this transition relation by removing its reference from all its
-   * variables.
+   * variables and events.
    */
   public void dispose()
   {
     for (final SimpleEFAVariable var : mVariables) {
       var.removeTransitionRelation(this);
     }
-  }
-
-  @Override
-  public ListBufferTransitionRelation getTransitionRelation()
-  {
-    return super.getTransitionRelation();
+    for (final SimpleEFAEventDecl event : mAlphabet) {
+      event.removeComponent(this);
+    }
   }
 
   public Collection<SimpleEFAEventDecl> getAlphabet()
@@ -285,6 +283,11 @@ public class SimpleEFAComponent
   public boolean addSystem(final SimpleEFASystem system)
   {
     return mSystems.add(system);
+  }
+
+  public boolean removeSystem(final SimpleEFASystem system)
+  {
+    return mSystems.remove(system);
   }
 
   public ArrayList<SimpleEFASystem> getSystems()

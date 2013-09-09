@@ -86,17 +86,17 @@ public abstract class AbstractEFASystem<L,
     return mVariableContext;
   }
 
-  public List<TR> getTransitionRelations()
+  protected List<TR> getTransitionRelations()
   {
     return mTransitionRelations;
   }
 
-  public boolean addTransitionRelation(final TR transitionRelation)
+  protected boolean addTransitionRelation(final TR transitionRelation)
   {
     return mTransitionRelations.add(transitionRelation);
   }
 
-  public void removeTransitionRelation(final TR transitionRelation)
+  protected void removeTransitionRelation(final TR transitionRelation)
   {
     mTransitionRelations.remove(transitionRelation);
   }
