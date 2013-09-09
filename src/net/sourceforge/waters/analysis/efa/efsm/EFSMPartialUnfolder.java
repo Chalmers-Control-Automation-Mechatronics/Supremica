@@ -24,6 +24,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionRelation;
 import net.sourceforge.waters.analysis.efa.base.EFASimplifierStatistics;
+import net.sourceforge.waters.analysis.efa.base.UnfoldingVariableContext;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;

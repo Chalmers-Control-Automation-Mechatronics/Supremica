@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -446,6 +448,23 @@ public class IntListBuffer
     return result;
   }
 
+  /**
+   * Adds the contents of the given list to the end of a {@link TIntArrayList}.
+   * @param  list   The unique list number that identifies the list to be
+   *                examined in this buffer.
+   * @param  array  The array list to receive the data.
+   */
+  public void toArrayList(final int list, final TIntArrayList array)
+  {
+    int next = getNext(list);
+    while (next != NULL) {
+      final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
+      final int offset = next & BLOCK_MASK;
+      array.add(block[offset + OFFSET_DATA]);
+      next = block[offset + OFFSET_NEXT];
+    }
+  }
+
 
   //#########################################################################
   //# Low Level Access
@@ -635,17 +654,20 @@ public class IntListBuffer
 
     //#########################################################################
     //# Interface WatersIntIterator
+    @Override
     public void reset()
     {
       mCurrent = mHead;
     }
 
+    @Override
     public boolean advance()
     {
       mCurrent = getNext(mCurrent);
       return mCurrent != NULL;
     }
 
+    @Override
     public int getCurrentData()
     {
       if (mCurrent != NULL) {
@@ -656,6 +678,7 @@ public class IntListBuffer
       }
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -665,6 +688,7 @@ public class IntListBuffer
 
     //#########################################################################
     //# Interface Iterator
+    @Override
     public void reset(final int list)
     {
       if (list != NULL) {
@@ -674,6 +698,7 @@ public class IntListBuffer
       }
     }
 
+    @Override
     public void reset(final int list, final int prev)
     {
       if (list == NULL || prev == NULL) {
@@ -683,6 +708,7 @@ public class IntListBuffer
       }
     }
 
+    @Override
     public void setCurrentData(final int data)
     {
       if (mCurrent != NULL) {
@@ -726,12 +752,14 @@ public class IntListBuffer
 
     //#########################################################################
     //# Interface WatersIntIterator
+    @Override
     public void reset()
     {
       mPrevious = NULL;
       mCurrent = mHead;
     }
 
+    @Override
     public boolean advance()
     {
       mPrevious = mCurrent;
@@ -739,6 +767,7 @@ public class IntListBuffer
       return mCurrent != NULL;
     }
 
+    @Override
     public int getCurrentData()
     {
       if (mCurrent != NULL) {
@@ -749,6 +778,7 @@ public class IntListBuffer
       }
     }
 
+    @Override
     public void remove()
     {
       if (mPrevious != NULL) {
@@ -775,6 +805,7 @@ public class IntListBuffer
 
     //#########################################################################
     //# Interface Iterator
+    @Override
     public void reset(final int list)
     {
       if (list != NULL) {
@@ -785,6 +816,7 @@ public class IntListBuffer
       }
     }
 
+    @Override
     public void reset(final int list, final int prev)
     {
       if (list == NULL || prev == NULL) {
@@ -796,6 +828,7 @@ public class IntListBuffer
       }
     }
 
+    @Override
     public void setCurrentData(final int data)
     {
       if (mCurrent != NULL) {

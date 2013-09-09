@@ -7,7 +7,7 @@
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa.efsm;
+package net.sourceforge.waters.analysis.efa.base;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
@@ -21,17 +21,17 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * A variable context for EFSM compilation. Contains ranges of all
- * variables, and identifies enumeration atoms.
+ * A variable context for EFA unfolding.
+ * Can assign special current and next state value of a variable.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
-class UnfoldingVariableContext implements VariableContext
+public class UnfoldingVariableContext implements VariableContext
 {
 
-  UnfoldingVariableContext(final CompilerOperatorTable op,
-                           final EFSMVariableContext context,
-                           final EFSMVariable var)
+  public UnfoldingVariableContext(final CompilerOperatorTable op,
+                                  final AbstractEFAVariableContext<?, ?> context,
+                                  final AbstractEFAVariable<?> var)
   {
     mOperatorTable = op;
     mRootContext = context;
@@ -91,21 +91,26 @@ class UnfoldingVariableContext implements VariableContext
 
   //#######################################################################
   //# Simple Access
-  void setCurrentValue(final SimpleExpressionProxy current)
+  public void setCurrentValue(final SimpleExpressionProxy current)
   {
     mCurrentValue = current;
   }
 
-  void setPrimedValue(final SimpleExpressionProxy primed)
+  public void setPrimedValue(final SimpleExpressionProxy primed)
   {
     mPrimedValue = primed;
+  }
+
+  public void resetCurrentAndPrimedValue()
+  {
+    mCurrentValue = mPrimedValue = null;
   }
 
 
   //#######################################################################
   //# Data Members
   private final CompilerOperatorTable mOperatorTable;
-  private final EFSMVariableContext mRootContext;
+  private final AbstractEFAVariableContext<?, ?> mRootContext;
   private final SimpleExpressionProxy mUnfoldedVariableName;
 
   private SimpleExpressionProxy mCurrentValue;

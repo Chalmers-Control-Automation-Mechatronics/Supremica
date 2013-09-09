@@ -609,6 +609,11 @@ public class EFAUnifier extends AbortableCompiler
         mCurrentEvents = new THashSet<>();
         mCurrentIdentifiers = new THashSet<>();
         visitCollection(edges);
+        final LabelBlockProxy blocked = graph.getBlockedEvents();
+        if (blocked != null) {
+          mCurrentUpdate = mTrueGuard;
+          visitLabelBlockProxy(blocked);
+        }
         final List<EFAEventInfo> events = new ArrayList<>(mCurrentEvents);
         Collections.sort(events);
         final List<IdentifierProxy> blockedList = new LinkedList<>();
@@ -619,17 +624,18 @@ public class EFAUnifier extends AbortableCompiler
             }
           }
         }
-        final LabelBlockProxy blocked = blockedList.isEmpty() ? null :
+        final LabelBlockProxy newBlocked = blockedList.isEmpty() ? null :
           mFactory.createLabelBlockProxy(blockedList, null);
         final boolean deterministic = graph.isDeterministic();
         return mFactory.createGraphProxy
-          (deterministic, blocked, mNodeList, mEdgeList);
+          (deterministic, newBlocked, mNodeList, mEdgeList);
       } finally {
         mNodeList = null;
         mNodeMap = null;
         mEdgeList = null;
         mCurrentEvents = null;
         mCurrentIdentifiers = null;
+        mCurrentUpdate = null;
       }
     }
 
@@ -680,14 +686,16 @@ public class EFAUnifier extends AbortableCompiler
       try {
         checkAbortInVisitor();
         final EFAEventInfo info = findEventInfo(ident);
-        mCurrentEvents.add(info);
-        final List<EFAIdentifier> events =
-          info.getEvents(mCurrentComponent, mCurrentUpdate);
-        for (final EFAIdentifier event : events) {
-          final IdentifierProxy subident = event.getIdentifier();
-          mLabelList.add(subident);
-          mCurrentIdentifiers.add(event);
-          addSourceInfo(subident, ident);
+        if (info != null) {
+          mCurrentEvents.add(info);
+          final List<EFAIdentifier> events =
+            info.getEvents(mCurrentComponent, mCurrentUpdate);
+          for (final EFAIdentifier event : events) {
+            final IdentifierProxy subident = event.getIdentifier();
+            mLabelList.add(subident);
+            mCurrentIdentifiers.add(event);
+            addSourceInfo(subident, ident);
+          }
         }
         return null;
       } catch(final UndefinedIdentifierException exception) {
@@ -913,7 +921,8 @@ public class EFAUnifier extends AbortableCompiler
     private void setBlocked(final SimpleComponentProxy comp)
     {
       if (!mMap.containsKey(comp)) {
-        if (comp.getKind() == ComponentKind.PLANT) {
+        if (mEventDecl.getKind() != EventKind.PROPOSITION &&
+            comp.getKind() == ComponentKind.PLANT) {
           setBlocked();
         } else {
           addUpdate(comp, mTrueGuard);
@@ -961,7 +970,7 @@ public class EFAUnifier extends AbortableCompiler
 
     private void combineUpdates() throws EvalException
     {
-      if (mEventDecl.getKind() != EventKind.PROPOSITION && !isBlocked()) {
+      if (!isBlocked()) {
         Collections.sort(mList);
         final ConstraintPropagator propagator =
           new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
@@ -971,7 +980,7 @@ public class EFAUnifier extends AbortableCompiler
 
     private void generateEventNames(final Comparator<EFAIdentifier> comparator)
     {
-      if (mEventDecl.getKind() == EventKind.PROPOSITION || isBlocked()) {
+      if (isBlocked()) {
         return;
       }
       final IdentifierProxy base = mEventDecl.getIdentifier();

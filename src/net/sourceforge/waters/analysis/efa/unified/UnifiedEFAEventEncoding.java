@@ -44,19 +44,19 @@ public class UnifiedEFAEventEncoding
 
   //#########################################################################
   //# Simple Access
-  public int getEventId(final UnifiedEFAEvent update)
+  public int getEventId(final UnifiedEFAEvent event)
   {
-    return super.getTransitionLabelId(update);
+    return super.getTransitionLabelId(event);
   }
 
-  public UnifiedEFAEvent getUpdate(final int event)
+  public UnifiedEFAEvent getUpdate(final int code)
   {
-    return super.getTransitionLabel(event);
+    return super.getTransitionLabel(code);
   }
 
-  public int createEventId(final UnifiedEFAEvent update)
+  public int createEventId(final UnifiedEFAEvent event)
   {
-    return super.createTransitionLabelId(update);
+    return super.createTransitionLabelId(event);
   }
 
 

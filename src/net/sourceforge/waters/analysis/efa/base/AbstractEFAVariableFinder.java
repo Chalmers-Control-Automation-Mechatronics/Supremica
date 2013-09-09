@@ -26,7 +26,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * <p/>
  * @author Robi Malik
  */
-public abstract class AbstractEFAVariableFinder<L, 
+public abstract class AbstractEFAVariableFinder<L,
                                                 V extends AbstractEFAVariable<L>>
  extends DefaultModuleProxyVisitor
 {
@@ -43,10 +43,8 @@ public abstract class AbstractEFAVariableFinder<L,
   //# Invocation
   /**
    * Determines if a given variable is in the given expression.
-   * <p/>
    * @param expr The expression to be searched.
    * @param var  The variable to be searched for.
-   * <p/>
    * @return <CODE>true</CODE> if the variable has been found in its primed or
    *         unprimed form. More detailed results can be queried using the
    *         {@link #containsVariable()} and {@link #containsPrimedVariable()}
@@ -250,7 +248,7 @@ public abstract class AbstractEFAVariableFinder<L,
       throw exception.getRuntimeException();
     }
   }
-  
+
   //#########################################################################
   //# Data Members
   private final ModuleEqualityVisitor mEqualityVisitor;

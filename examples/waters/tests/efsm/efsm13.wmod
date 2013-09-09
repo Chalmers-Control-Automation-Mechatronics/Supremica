@@ -6,7 +6,7 @@
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="G">
-            <Graph>
+            <Graph Deterministic="false">
                 <LabelBlock>
                     <SimpleIdentifier Name=":accepting"/>
                     <LabelGeometry Anchor="NW">
@@ -19,7 +19,7 @@
                             <Point X="96" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="9" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -27,7 +27,7 @@
                             <Point X="96" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="10" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
@@ -35,7 +35,7 @@
                             <Point X="96" Y="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="8" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -43,6 +43,9 @@
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-17"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="112" Y="128"/>
@@ -58,13 +61,16 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="6" Y="-9"/>
+                                <Point X="6" Y="-4"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Source="S1" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="8" Y="-11"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="112" Y="192"/>
@@ -73,6 +79,9 @@
                     <Edge Source="S2" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-11"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="80" Y="192"/>
@@ -81,6 +90,9 @@
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-9"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="80" Y="128"/>

@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -159,12 +160,14 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   {
     final List<EventDeclProxy> eventDecls = mInputModule.getEventDeclList();
     for (final EventDeclProxy eventDec : eventDecls) {
-      final IdentifierProxy ident = eventDec.getIdentifier();
-      final ConstraintList update = mEventUpdateMap.getByProxy(ident);
-      if (update != null) {
-        final UnifiedEFAEvent event = new UnifiedEFAEvent(eventDec, update);
-        mResultEFASystem.addEvent(event);
-        mIdentifierMap.putByProxy(ident, event);
+      if (eventDec.getKind() != EventKind.PROPOSITION) {
+        final IdentifierProxy ident = eventDec.getIdentifier();
+        final ConstraintList update = mEventUpdateMap.getByProxy(ident);
+        if (update != null) {
+          final UnifiedEFAEvent event = new UnifiedEFAEvent(eventDec, update);
+          mResultEFASystem.addEvent(event);
+          mIdentifierMap.putByProxy(ident, event);
+        }
       }
     }
   }
