@@ -18,10 +18,8 @@ import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.efa.efsm.SharedEventException;
-import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
@@ -30,7 +28,6 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.InstanceProxy;
-import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -41,7 +38,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 public class UnifiedEFACompilerTest
-  extends AbstractWatersTest
+  extends AbstractAnalysisTest
 {
   //#########################################################################
   //# Entry points in junit.framework.TestCase
@@ -101,128 +98,148 @@ public class UnifiedEFACompilerTest
   public void testEFSMCompiler1()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm1");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm1");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler2()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm2");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm2");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler3()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm3");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm3");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler4()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm4");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm4");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler5()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm5");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm5");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler6()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm6");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm6");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler7()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm7");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm7");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler8()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm8");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm8");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler9()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm9");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm9");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler10()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm10");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm10");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler11()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm11");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm11");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler12()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm12");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm12");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler13()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm13");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm13");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler14()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm14");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm14");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler15()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm15");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm15");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler16()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm16");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm16");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler17()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm17");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm17");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler18()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm18");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm18");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler19()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm19");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm19");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler20()
     throws IOException, WatersException
   {
-    compileError("tests", "efsm", "efsm20", null,
-                 SharedEventException.class, ":accepting");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm20");
+    compileAndTest(module);
   }
 
   public void testEFSMCompiler21()
     throws IOException, WatersException
   {
-    compile("tests", "efsm", "efsm21");
+    final ModuleProxy module = loadModule("tests", "efsm", "efsm21");
+    compileAndTest(module);
   }
 
 
@@ -241,211 +258,14 @@ public class UnifiedEFACompilerTest
 
   //#########################################################################
   //# Utilities
-  @SuppressWarnings("unused")
-  private void compileError(final String dirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass)
-    throws IOException, WatersException
+  private UnifiedEFASystem compile(final ModuleProxy module)
+    throws EvalException, AnalysisException
   {
-    final String[] culprits = {};
-    compileError(dirname, name, bindings, exclass, culprits);
+    return compile(module, null);
   }
-
-  @SuppressWarnings("unused")
-  private void compileError(final String dirname,
-                            final String subdirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {};
-    compileError(dirname, subdirname, name, bindings, exclass, culprits);
-  }
-
-  @SuppressWarnings("unused")
-  private void compileError(final String dirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String culprit)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {culprit};
-    compileError(dirname, name, bindings, exclass, culprits);
-  }
-
-  private void compileError(final String dirname,
-                            final String subdirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String culprit)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {culprit};
-    compileError(dirname, subdirname, name, bindings, exclass, culprits);
-  }
-
-  @SuppressWarnings("unused")
-  private void compileError(final String dirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String culprit1,
-                            final String culprit2)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {culprit1, culprit2};
-    compileError(dirname, name, bindings, exclass, culprits);
-  }
-
-  @SuppressWarnings("unused")
-  private void compileError(final String dirname,
-                            final String subdirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String culprit1,
-                            final String culprit2)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {culprit1, culprit2};
-    compileError(dirname, subdirname, name, bindings, exclass, culprits);
-  }
-
-  private void compileError(final String dirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String[] culprits)
-    throws IOException, WatersException
-  {
-    final File root = getWatersInputRoot();
-    final File dir = new File(root, dirname);
-    compileError(dir, name, bindings, exclass, culprits);
-  }
-
-  private void compileError(final String dirname,
-                            final String subdirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String[] culprits)
-    throws IOException, WatersException
-  {
-    final File root = getWatersInputRoot();
-    final File dir = new File(root, dirname);
-    final File subdir = new File(dir, subdirname);
-    compileError(subdir, name, bindings, exclass, culprits);
-  }
-
-  private void compileError(final File dir,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String[] culprits)
-    throws IOException, WatersException
-  {
-    try {
-      compile(dir, name, bindings, true);
-      fail("Expected " + exclass.getName() + " not caught!");
-    } catch (final WatersException exception) {
-      if (exception.getClass() == exclass) {
-        for (int i = 0; i < culprits.length; i++) {
-          final String culprit = culprits[i];
-          final String msg = exception.getMessage();
-          assertNotNull("Caught " + exclass.getName() +
-                        " as expected, but no error message found!", msg);
-          assertTrue("Caught " + exclass.getName() +
-                     " as expected, but message '" + msg +
-                     "' does not mention culprit: " + culprit + "!",
-                     msg.indexOf(culprit) >= 0);
-        }
-        if (exception instanceof EvalException) {
-          final EvalException evalException = (EvalException) exception;
-          final Proxy location = evalException.getLocation();
-          assertNotNull("Caught " + exception.getClass().getName() + " <" +
-                        exception.getMessage() + "> provides no location!",
-                        location);
-        }
-      } else {
-        throw exception;
-      }
-    }
-  }
-
-  @SuppressWarnings("unused")
-  private void compile(final String dirname, final String name)
-    throws IOException, WatersException
-  {
-    final File root = getWatersInputRoot();
-    final File dir = new File(root, dirname);
-    compile(dir, name, null, false);
-  }
-
-  private void compile(final String dirname,
-                       final String subdirname,
-                       final String name)
-    throws IOException, WatersException
-  {
-    final File root = getWatersInputRoot();
-    final File dir = new File(root, dirname);
-    final File subdir = new File(dir, subdirname);
-    compile(subdir, name, null, false);
-  }
-
-  private void compile(final File dir,
-                       final String name,
-                       final List<ParameterBindingProxy> bindings,
-                       final boolean appendToName)
-    throws IOException, WatersException
-  {
-    final String inextname = name + mModuleMarshaller.getDefaultExtension();
-    final File infilename = new File(dir, inextname);
-    final StringBuffer buffer = new StringBuffer(name);
-    if (bindings != null && appendToName) {
-      for (final ParameterBindingProxy binding : bindings) {
-        buffer.append('-');
-        buffer.append(binding.getExpression().toString());
-      }
-    }
-    final String ext = mModuleMarshaller.getDefaultExtension();
-    final int pos = buffer.length();
-    buffer.append(ext);
-    final String outextname = buffer.toString();
-    final File outfilename = new File(mOutputDirectory, outextname);
-    ensureParentDirectoryExists(outfilename);
-    final ModuleProxy outputModule = compile(infilename, outfilename, bindings);
-    final String suffix = getTestSuffix();
-    buffer.setLength(pos);
-    buffer.append('-');
-    buffer.append(suffix);
-    buffer.append(ext);
-    final String suffixedname = buffer.toString();
-    final File suffixedfilename = new File(dir, suffixedname);
-    compare(outputModule, suffixedfilename);
-  }
-
-  private ModuleProxy compile(final File infilename,
-                             final File outfilename,
-                             final List<ParameterBindingProxy> bindings)
-    throws IOException, WatersException
-  {
-    final URI uri = infilename.toURI();
-    final ModuleProxy inputModule = mModuleMarshaller.unmarshal(uri);
-    final UnifiedEFASystem system = compile(inputModule, bindings);
-    final String name = system.getName() + "-" + getTestSuffix();
-    system.setName(name);
-    final ModuleProxy outputModule = mImporter.importModule(system);
-    mModuleMarshaller.marshal(outputModule, outfilename);
-    return outputModule;
-  }
-
 
   private UnifiedEFASystem compile(final ModuleProxy module,
-                             final List<ParameterBindingProxy> bindings)
+                                   final List<ParameterBindingProxy> bindings)
     throws EvalException, AnalysisException
   {
     final UnifiedEFACompiler compiler =
@@ -454,10 +274,38 @@ public class UnifiedEFACompilerTest
     return compiler.compile(bindings);
   }
 
-  private UnifiedEFASystem compile(final ModuleProxy module)
-    throws EvalException, AnalysisException
+  private void compileAndTest(final ModuleProxy module)
+    throws IOException, WatersException
   {
-    return compile(module, null);
+    compileAndTest(module, null);
+  }
+
+  private void compileAndTest(final ModuleProxy module,
+                              final List<ParameterBindingProxy> bindings)
+    throws IOException, WatersException
+  {
+    final UnifiedEFASystem system = compile(module, bindings);
+    final String name = system.getName();
+    final StringBuffer buffer = new StringBuffer(name);
+    if (bindings != null) {
+      for (final ParameterBindingProxy binding : bindings) {
+        buffer.append('-');
+        buffer.append(binding.getExpression().toString());
+      }
+    }
+    buffer.append('-');
+    buffer.append(getTestSuffix());
+    system.setName(buffer.toString());
+    final ModuleProxy outputModule = mImporter.importModule(system);
+    final String ext = mModuleMarshaller.getDefaultExtension();
+    buffer.append(ext);
+    final String suffixedname = buffer.toString();
+    final File outfilename = new File(getOutputDirectory(), suffixedname);
+    mModuleMarshaller.marshal(outputModule, outfilename);
+    final File infilename = module.getFileLocation();
+    final File indirname = infilename.getParentFile();
+    final File cmpfilename = new File(indirname, suffixedname);
+    compare(outputModule, cmpfilename);
   }
 
   private void compare(final ModuleProxy module, final File expectedFile)
@@ -469,24 +317,6 @@ public class UnifiedEFACompilerTest
     assertProxyEquals(eq, "Unexpected module in output", module, expectedModule);
   }
 
-//  private void compare(final File filename1, final File filename2)
-//    throws IOException, WatersUnmarshalException
-//  {
-//    final URI uri1 = filename1.toURI();
-//    final URI uri2 = filename2.toURI();
-//    final DocumentProxy proxy1 = mProductDESMarshaller.unmarshal(uri1);
-//    final DocumentProxy proxy2 = mProductDESMarshaller.unmarshal(uri2);
-//    assertProductDESProxyEquals(proxy1, proxy2);
-//  }
-
-  @SuppressWarnings("unused")
-  private ParameterBindingProxy createBinding(final String name,
-                                              final int value)
-  {
-    final IntConstantProxy expr = mModuleFactory.createIntConstantProxy(value);
-    return mModuleFactory.createParameterBindingProxy(name, expr);
-  }
-
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
@@ -495,7 +325,6 @@ public class UnifiedEFACompilerTest
     throws Exception
   {
     super.setUp();
-    mOutputDirectory = getOutputDirectory();
     mModuleFactory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
@@ -509,7 +338,6 @@ public class UnifiedEFACompilerTest
   protected void tearDown()
     throws Exception
   {
-    mOutputDirectory = null;
     mModuleFactory = null;
     mModuleMarshaller = null;
     mDocumentManager = null;
@@ -519,7 +347,6 @@ public class UnifiedEFACompilerTest
 
   //#########################################################################
   //# Data Members
-  private File mOutputDirectory;
   private ModuleProxyFactory mModuleFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
@@ -527,6 +354,4 @@ public class UnifiedEFACompilerTest
   private UnifiedEFASystemImporter mImporter;
 
 }
-
-
 
