@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters EFA Analysis
+//# PROJECT: Waters/Supremica GUI
 //# PACKAGE: net.sourceforge.waters.analysis.efa.unified
-//# CLASS:   UnifiedEFAEvent
+//# CLASS:   AbstractEFAEvent
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -10,61 +10,53 @@
 package net.sourceforge.waters.analysis.efa.unified;
 
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-
 /**
+ * An event in a unified EFA system.
+ * Consists of an event name plus associated update.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
-
-public class UnifiedEFAEvent extends AbstractEFAEvent
+public abstract class AbstractEFAEvent
 {
   //#########################################################################
   //# Constructors
-  public UnifiedEFAEvent(final EventDeclProxy eventDecl,
-                         final ConstraintList update)
+  public AbstractEFAEvent()
   {
-    super(update);
-    mEventDecl = eventDecl;
+    mUpdate = new ConstraintList();
+  }
+
+  public AbstractEFAEvent(final ConstraintList update)
+  {
+    mUpdate = update;
   }
 
 
   //#########################################################################
   //# Simple Access
-  public EventDeclProxy getEventDecl()
+  public ConstraintList getUpdate()
   {
-    return mEventDecl;
+    return mUpdate;
   }
 
+  public abstract String getName();
 
+  public abstract EventKind getKind();
+
+  public abstract boolean isObservable();
+
+
+  //#######################################################################
+  //# Debugging
   @Override
-  public String getName()
+  public String toString()
   {
-    if (mEventDecl != null) {
-      return mEventDecl.getName();
-    } else {
-      return "(null)";
-    }
-  }
-
-
-  @Override
-  public EventKind getKind()
-  {
-    return mEventDecl.getKind();
-  }
-
-
-  @Override
-  public boolean isObservable()
-  {
-    return mEventDecl.isObservable();
+    return getName() + mUpdate.toString();
   }
 
 
   //#########################################################################
   //# Data Members
-  private final EventDeclProxy mEventDecl;
+  private final ConstraintList mUpdate;
 }

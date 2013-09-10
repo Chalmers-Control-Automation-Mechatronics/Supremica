@@ -9,9 +9,7 @@
 
 package net.sourceforge.waters.analysis.efa.unified;
 
-import gnu.trove.set.hash.THashSet;
-
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
@@ -22,7 +20,7 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
  */
 
 class UnifiedEFASystem
-  extends AbstractEFASystem<UnifiedEFAEvent,
+  extends AbstractEFASystem<AbstractEFAEvent,
                             UnifiedEFAVariable,
                             UnifiedEFATransitionRelation,
                             UnifiedEFAVariableContext>
@@ -33,7 +31,7 @@ class UnifiedEFASystem
   UnifiedEFASystem(final String name, final UnifiedEFAVariableContext context)
   {
     super(name, context);
-    mUnifiedEvents = new THashSet<UnifiedEFAEvent>();
+    mUnifiedEvents = new ArrayList<>();
   }
 
   UnifiedEFASystem(final String name,
@@ -41,13 +39,13 @@ class UnifiedEFASystem
                    final int size)
   {
     super(name, context, size);
-    mUnifiedEvents = new THashSet<UnifiedEFAEvent>();
+    mUnifiedEvents = new ArrayList<>();
   }
 
   UnifiedEFASystem(final String name,
                    final List<UnifiedEFAVariable> variables,
                    final List<UnifiedEFATransitionRelation> transitionRelations,
-                   final Collection<UnifiedEFAEvent> unifiedEvents,
+                   final List<AbstractEFAEvent> unifiedEvents,
                    final UnifiedEFAVariableContext context)
   {
     super(name, variables, transitionRelations, context);
@@ -57,19 +55,18 @@ class UnifiedEFASystem
 
   //#########################################################################
   //# Simple Access
-  public Collection<UnifiedEFAEvent> getEvents()
+  public List<AbstractEFAEvent> getEvents()
   {
     return mUnifiedEvents;
   }
 
+  /**
+   * Adds the given event to the EFA system. The new event is added
+   * to the end of the event list without checking for duplicates.
+   */
   public void addEvent(final UnifiedEFAEvent event)
   {
     mUnifiedEvents.add(event);
-  }
-
-  public void removeEvent(final UnifiedEFAEvent event)
-  {
-    mUnifiedEvents.remove(event);
   }
 
   @Override
@@ -106,6 +103,6 @@ class UnifiedEFASystem
 
   //#########################################################################
   //# Data Members
-  private final Collection<UnifiedEFAEvent> mUnifiedEvents;
+  private final List<AbstractEFAEvent> mUnifiedEvents;
 
 }

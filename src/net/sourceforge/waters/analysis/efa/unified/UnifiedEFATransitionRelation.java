@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
  */
 
 public class UnifiedEFATransitionRelation
-  extends AbstractEFATransitionRelation<UnifiedEFAEvent>
+  extends AbstractEFATransitionRelation<AbstractEFAEvent>
 {
 
   //#########################################################################

@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
  */
 
 class UnifiedEFAVariableFinder
-  extends AbstractEFAVariableFinder<UnifiedEFAEvent,UnifiedEFAVariable>
+  extends AbstractEFAVariableFinder<AbstractEFAEvent,UnifiedEFAVariable>
 {
 
   //#########################################################################

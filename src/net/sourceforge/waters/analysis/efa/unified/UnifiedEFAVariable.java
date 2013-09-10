@@ -29,7 +29,7 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
  */
 
 public class UnifiedEFAVariable
-  extends AbstractEFAVariable<UnifiedEFAEvent>
+  extends AbstractEFAVariable<AbstractEFAEvent>
 {
 
   //#########################################################################

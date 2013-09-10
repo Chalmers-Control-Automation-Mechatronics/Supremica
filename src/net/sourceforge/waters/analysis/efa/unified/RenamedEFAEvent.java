@@ -10,61 +10,76 @@
 package net.sourceforge.waters.analysis.efa.unified;
 
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- *
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class UnifiedEFAEvent extends AbstractEFAEvent
+public class RenamedEFAEvent extends AbstractEFAEvent
 {
   //#########################################################################
   //# Constructors
-  public UnifiedEFAEvent(final EventDeclProxy eventDecl,
+  public RenamedEFAEvent(final AbstractEFAEvent original,
                          final ConstraintList update)
   {
+    this(original, update, 0);
+  }
+
+  public RenamedEFAEvent(final AbstractEFAEvent original,
+                         final ConstraintList update,
+                         final int index)
+  {
     super(update);
-    mEventDecl = eventDecl;
+    mOriginalEvent = original;
+    mIndex = index;
   }
 
 
   //#########################################################################
   //# Simple Access
-  public EventDeclProxy getEventDecl()
+  public AbstractEFAEvent getOriginalEvent()
   {
-    return mEventDecl;
+    return mOriginalEvent;
   }
 
+  public int getIndex()
+  {
+    return mIndex;
+  }
+
+  public void setIndex(final int index)
+  {
+    mIndex = index;
+  }
 
   @Override
   public String getName()
   {
-    if (mEventDecl != null) {
-      return mEventDecl.getName();
+    if (mIndex < 0) {
+      return mOriginalEvent.getName();
     } else {
-      return "(null)";
+      return mOriginalEvent.getName() + ":" + mIndex;
     }
   }
-
 
   @Override
   public EventKind getKind()
   {
-    return mEventDecl.getKind();
+    return mOriginalEvent.getKind();
   }
-
 
   @Override
   public boolean isObservable()
   {
-    return mEventDecl.isObservable();
+    return mOriginalEvent.isObservable();
   }
 
 
   //#########################################################################
   //# Data Members
-  private final EventDeclProxy mEventDecl;
+  private final AbstractEFAEvent mOriginalEvent;
+  private int mIndex;
+
 }

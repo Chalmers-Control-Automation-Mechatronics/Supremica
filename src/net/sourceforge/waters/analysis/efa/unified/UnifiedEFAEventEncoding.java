@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
-//# CLASS:   UnifiedEFAEventEncoding
+//# CLASS:   AbstractEFAEventEncoding
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -10,7 +10,6 @@
 package net.sourceforge.waters.analysis.efa.unified;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
-import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 
 /**
@@ -18,7 +17,7 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
  */
 
 public class UnifiedEFAEventEncoding
-  extends AbstractEFATransitionLabelEncoding<UnifiedEFAEvent>
+  extends AbstractEFATransitionLabelEncoding<AbstractEFAEvent>
 {
 
   //#########################################################################
@@ -31,8 +30,7 @@ public class UnifiedEFAEventEncoding
   public UnifiedEFAEventEncoding(final int size)
   {
     super(size);
-    final ConstraintList empty = new ConstraintList();
-    final UnifiedEFAEvent tau = new UnifiedEFAEvent(null, empty);
+    final SilentEFAEvent tau = new SilentEFAEvent(null);
     createEventId(tau);
   }
 
@@ -44,17 +42,17 @@ public class UnifiedEFAEventEncoding
 
   //#########################################################################
   //# Simple Access
-  public int getEventId(final UnifiedEFAEvent event)
+  public int getEventId(final AbstractEFAEvent event)
   {
     return super.getTransitionLabelId(event);
   }
 
-  public UnifiedEFAEvent getUpdate(final int code)
+  public AbstractEFAEvent getUpdate(final int code)
   {
     return super.getTransitionLabel(code);
   }
 
-  public int createEventId(final UnifiedEFAEvent event)
+  public int createEventId(final AbstractEFAEvent event)
   {
     return super.createTransitionLabelId(event);
   }

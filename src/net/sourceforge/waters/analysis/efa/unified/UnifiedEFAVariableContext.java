@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
  */
 
 class UnifiedEFAVariableContext
-  extends AbstractEFAVariableContext<UnifiedEFAEvent,UnifiedEFAVariable>
+  extends AbstractEFAVariableContext<AbstractEFAEvent,UnifiedEFAVariable>
 {
 
   //#######################################################################

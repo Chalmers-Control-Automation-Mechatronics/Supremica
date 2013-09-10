@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.efa.unified;
 
-import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -19,52 +17,43 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class UnifiedEFAEvent extends AbstractEFAEvent
+public class SilentEFAEvent extends AbstractEFAEvent
 {
   //#########################################################################
   //# Constructors
-  public UnifiedEFAEvent(final EventDeclProxy eventDecl,
-                         final ConstraintList update)
+  public SilentEFAEvent(final String suffix)
   {
-    super(update);
-    mEventDecl = eventDecl;
+    mSuffix = suffix;
   }
 
 
   //#########################################################################
   //# Simple Access
-  public EventDeclProxy getEventDecl()
-  {
-    return mEventDecl;
-  }
-
-
   @Override
   public String getName()
   {
-    if (mEventDecl != null) {
-      return mEventDecl.getName();
-    } else {
-      return "(null)";
+    if (mSuffix != null) {
+      return "tau:" + mSuffix;
     }
+    return "tau";
   }
 
 
   @Override
   public EventKind getKind()
   {
-    return mEventDecl.getKind();
+    return EventKind.CONTROLLABLE;
   }
 
 
   @Override
   public boolean isObservable()
   {
-    return mEventDecl.isObservable();
+    return false;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final EventDeclProxy mEventDecl;
+  private final String mSuffix;
 }
