@@ -131,6 +131,17 @@ public class IntListBuffer
   }
 
   /**
+   * Clears this buffer.
+   * This method removes all information stored in the buffer.
+   * All list identifiers become invalid and can be allocated again.
+   */
+  public void clear()
+  {
+    mRecycleStart = NULL;
+    mNextFreeIndex = NODE_SIZE;
+  }
+
+  /**
    * Tests whether the given list contains the given data element
    * This method does a full list search and is of linear complexity.
    * @param  list   The unique list number that identifies the list to be
@@ -532,8 +543,11 @@ public class IntListBuffer
       return result;
     } else {
       if ((mNextFreeIndex & BLOCK_MASK) == 0) {
-        final int[] block = new int[BLOCK_SIZE];
-        mBlocks.add(block);
+        final int blockno = mNextFreeIndex >>> BLOCK_SHIFT;
+        if (blockno >= mBlocks.size()) {
+          final int[] block = new int[BLOCK_SIZE];
+          mBlocks.add(block);
+        }
       }
       final int result = mNextFreeIndex;
       mNextFreeIndex += 2;

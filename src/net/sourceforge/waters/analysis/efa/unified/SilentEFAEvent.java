@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.unified
-//# CLASS:   UnifiedEFAEvent
+//# CLASS:   SilentEFAEvent
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -13,12 +13,14 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
+ * A silent (tau) event for use in unified EFA.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
 
 public class SilentEFAEvent extends AbstractEFAEvent
 {
+
   //#########################################################################
   //# Constructors
   public SilentEFAEvent(final String suffix)
@@ -34,17 +36,16 @@ public class SilentEFAEvent extends AbstractEFAEvent
   {
     if (mSuffix != null) {
       return "tau:" + mSuffix;
+    } else {
+      return "tau";
     }
-    return "tau";
   }
-
 
   @Override
   public EventKind getKind()
   {
     return EventKind.CONTROLLABLE;
   }
-
 
   @Override
   public boolean isObservable()
@@ -56,4 +57,5 @@ public class SilentEFAEvent extends AbstractEFAEvent
   //#########################################################################
   //# Data Members
   private final String mSuffix;
+
 }

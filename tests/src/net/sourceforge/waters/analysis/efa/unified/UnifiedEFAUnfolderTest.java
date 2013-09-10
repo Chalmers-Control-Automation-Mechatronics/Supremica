@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
-//# CLASS:   UnifiedEFACompilerTest
+//# PROJECT: Waters EFA Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efa.unified
+//# CLASS:   UnifiedEFAUnfolderTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -31,7 +31,6 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-
 public class UnifiedEFAUnfolderTest
   extends AbstractAnalysisTest
 {
@@ -50,74 +49,53 @@ public class UnifiedEFAUnfolderTest
 
   //#########################################################################
   //# Successful Test Cases using EFA
-  public void testUnifiedUnfolding1Succ()
+  public void testUnifiedUnfolding1()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding01");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    unfoldAndTest(module);
   }
 
-  public void testUnifiedUnfolding1Pred()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding01");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-  }
-
-  public void testUnifiedUnfolding2Succ()
+  public void testUnifiedUnfolding2()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding02");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    unfoldAndTest(module);
   }
 
-  public void testUnifiedUnfolding2Pred()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding02");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-  }
-
-  public void testUnifiedUnfolding3Succ()
+  public void testUnifiedUnfolding3()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding03");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    unfoldAndTest(module);
   }
 
-  public void testUnifiedUnfolding3Pred()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding03");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-  }
-
-  public void testUnifiedUnfolding4Succ()
+  public void testUnifiedUnfolding4()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding04");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-  }
-
-  public void testUnifiedUnfolding4Pred()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding04");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    unfoldAndTest(module);
   }
 
   public void testUnifiedUnfolding5()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding05");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    unfoldAndTest(module);
   }
 
   public void testUnifiedUnfolding6()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding06");
-    unfoldAndTest(module, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    unfoldAndTest(module);
+  }
+
+  public void testUnifiedUnfolding7()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding07");
+    unfoldAndTest(module);
   }
 
 
@@ -128,24 +106,19 @@ public class UnifiedEFAUnfolderTest
     compiler.setSourceInfoEnabled(true);
   }
 
-  String getTestSuffix()
-  {
-    return "unified";
-  }
-
 
   //#########################################################################
   //# Utilities
-  private void unfoldAndTest(final ModuleProxy module, final int config)
+  private void unfoldAndTest(final ModuleProxy module)
     throws IOException, WatersException
   {
-    final List<Proxy> components = new ArrayList<Proxy>();
+    final List<Proxy> components = new ArrayList<>();
     SimpleComponentProxy expectedUnfolding = null;
     SimpleComponentProxy expectedUpdates = null;
     for (final Proxy proxy : module.getComponentList()) {
       if (proxy instanceof SimpleComponentProxy) {
         final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
-        if(comp.getName().equals(":unfolded")) {
+        if (comp.getName().equals(":unfolded")) {
           expectedUnfolding = comp;
         } else if (comp.getName().equals(":updates")) {
           expectedUpdates = comp;
@@ -159,9 +132,9 @@ public class UnifiedEFAUnfolderTest
     final String moduleName = module.getName();
     final ModuleProxy inputModule =
       mModuleFactory.createModuleProxy(moduleName, null, null,
-                                module.getConstantAliasList(),
-                                module.getEventDeclList(),
-                                module.getEventAliasList(), components);
+                                       module.getConstantAliasList(),
+                                       module.getEventDeclList(),
+                                       module.getEventAliasList(), components);
     final UnifiedEFACompiler compiler =
       new UnifiedEFACompiler(mDocumentManager, inputModule);
     configure(compiler);
@@ -169,19 +142,23 @@ public class UnifiedEFAUnfolderTest
     final UnifiedEFAVariableUnfolder unfolder =
       new UnifiedEFAVariableUnfolder(mModuleFactory, mOperatorTable,
                                      inputSystem.getVariableContext());
-    final UnifiedEFAVariable unfoldedVariable = inputSystem.getVariables().remove(0);
-    unfolder.setVariable(unfoldedVariable);
+    final UnifiedEFAVariable unfoldedVariable =
+      inputSystem.getVariables().remove(0);
+    unfolder.setUnfoldedVariable(unfoldedVariable);
     final List<AbstractEFAEvent> events = inputSystem.getEvents();
-    unfolder.setEvents(events);
-    unfolder.setTRConfiguration(config);
+    unfolder.setOriginalEvents(events);
     unfolder.run();
-    final UnifiedEFATransitionRelation variableTR = unfolder.getTransitionRelation();
-    variableTR.getTransitionRelation().setName(":unfolded");
-    final List<UnifiedEFATransitionRelation> TRList = Collections.singletonList(variableTR);
-    final List<AbstractEFAEvent> outputEvents = variableTR.getEventEncoding().getTransitionLabels();
+    final UnifiedEFATransitionRelation variableTR =
+      unfolder.getTransitionRelation();
+    final ListBufferTransitionRelation rel = variableTR.getTransitionRelation();
+    rel.setName(":unfolded");
+    final List<UnifiedEFATransitionRelation> trList =
+      Collections.singletonList(variableTR);
+    final List<AbstractEFAEvent> outputEvents =
+      variableTR.getEventEncoding().getTransitionLabels();
     final UnifiedEFASystem outputSystem =
-      new UnifiedEFASystem(moduleName, inputSystem.getVariables(),
-                           TRList, outputEvents, inputSystem.getVariableContext());
+      new UnifiedEFASystem(moduleName, inputSystem.getVariables(), trList,
+                           outputEvents, inputSystem.getVariableContext());
     final ModuleProxy outputModule = mImporter.importModule(outputSystem);
     final File outputDirectory = getOutputDirectory();
     final String outputName = outputModule.getName();
@@ -191,19 +168,21 @@ public class UnifiedEFAUnfolderTest
     for (final Proxy proxy : outputModule.getComponentList()) {
       if (proxy instanceof SimpleComponentProxy) {
         final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
-        if(comp.getName().equals(":unfolded")) {
-          assertProxyEquals(comp, expectedUnfolding);
+        if (comp.getName().equals(":unfolded")) {
+          assertProxyEquals("Unexpected output automaton!",
+                            comp, expectedUnfolding);
         } else if (comp.getName().equals(":updates")) {
-          assertNotNull("Unexpected update in output", expectedUpdates);
-          assertProxyEquals(comp, expectedUpdates);
+          assertNotNull("Unexpected update in output!", expectedUpdates);
+          assertProxyEquals("Unexpected unfolded events!",
+                            comp, expectedUpdates);
           expectedUpdates = null;
         } else {
           fail("Unexpected simple component '" + comp.getName() + "' in output!");
         }
       }
     }
-    assertNull("Missing update in output", expectedUpdates);
- }
+    assertNull("Missing update in output!", expectedUpdates);
+  }
 
 
   //#########################################################################
@@ -215,7 +194,8 @@ public class UnifiedEFAUnfolderTest
     super.setUp();
     mModuleFactory = ModuleElementFactory.getInstance();
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, mOperatorTable);
+    mModuleMarshaller =
+      new JAXBModuleMarshaller(mModuleFactory, mOperatorTable);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);

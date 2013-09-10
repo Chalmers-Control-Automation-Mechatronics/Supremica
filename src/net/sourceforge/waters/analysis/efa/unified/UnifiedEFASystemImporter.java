@@ -185,27 +185,28 @@ public class UnifiedEFASystemImporter
     }
     final List<IdentifierProxy> blockedList = new LinkedList<>();
     if (numMarkedStates == 0) {
-      final SimpleIdentifierProxy ident =
-        mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+      final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy
+        (EventDeclProxy.DEFAULT_MARKING_NAME);
       blockedList.add(ident);
     }
     final int numEvents = rel.getNumberOfProperEvents();
-    final boolean[] foundEvent = new boolean[numEvents];
-    final List<EdgeProxy> edgeList =
-      new ArrayList<EdgeProxy>(rel.getNumberOfTransitions());
-    final TransitionIterator iter = rel.createAnyReadOnlyIterator();
     final boolean forward =
       (rel.getConfiguration() & ListBufferTransitionRelation.CONFIG_SUCCESSORS)!=0;
-    for (int fromState=0; fromState < numStates; fromState++) {
-      final TIntIntHashMap transitionMap = new TIntIntHashMap();
-      final IntListBuffer toStateBuffer = new IntListBuffer();
-      final IntListBuffer.ReadOnlyIterator bufferIter =
-        toStateBuffer.createReadOnlyIterator();
-      iter.resetState(fromState);
-      while (iter.advance()) {
-        final int e = iter.getCurrentEvent();
+    final boolean[] foundEvent = new boolean[numEvents];
+    final List<EdgeProxy> edgeList =
+      new ArrayList<>(rel.getNumberOfTransitions());
+    final TransitionIterator transIter = rel.createAnyReadOnlyIterator();
+    final TIntIntHashMap transitionMap = new TIntIntHashMap();
+    final IntListBuffer toStateBuffer = new IntListBuffer();
+    final IntListBuffer.ReadOnlyIterator bufferIter =
+      toStateBuffer.createReadOnlyIterator();
+    final List<IdentifierProxy> labels =new ArrayList<>();
+    for (int fromState = 0; fromState < numStates; fromState++) {
+      transIter.resetState(fromState);
+      while (transIter.advance()) {
+        final int e = transIter.getCurrentEvent();
         foundEvent[e] = true;
-        final int toState = iter.getCurrentToState();
+        final int toState = transIter.getCurrentToState();
         int list = transitionMap.get(toState);
         if (list== IntListBuffer.NULL) {
           list = toStateBuffer.createList();
@@ -217,8 +218,6 @@ public class UnifiedEFASystemImporter
         final int list = transitionMap.get(toState);
         if (list != IntListBuffer.NULL) {
           bufferIter.reset(list);
-          final List<IdentifierProxy> labels =
-            new ArrayList<>(toStateBuffer.getLength(list));
           while (bufferIter.advance()) {
             final int e = bufferIter.getCurrentData();
             final AbstractEFAEvent event = eventEncoding.getUpdate(e);
@@ -229,7 +228,8 @@ public class UnifiedEFASystemImporter
           }
           final LabelBlockProxy block =
             mFactory.createLabelBlockProxy(labels, null);
-          final SimpleNodeProxy source;// = nodeArray[s];
+          labels.clear();
+          final SimpleNodeProxy source;
           final SimpleNodeProxy target;
           if (forward) {
             source = nodeArray[fromState];
@@ -238,18 +238,21 @@ public class UnifiedEFASystemImporter
             source = nodeArray[toState];
             target = nodeArray[fromState];
           }
-          final EdgeProxy edge =
-            mFactory.createEdgeProxy(source, target, block, null, null, null, null);
+          final EdgeProxy edge = mFactory.createEdgeProxy
+            (source, target, block, null, null, null, null);
           edgeList.add(edge);
         }
       }
+      transitionMap.clear();
+      toStateBuffer.clear();
     }
     for (int e = 0; e < numEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
       if (EventEncoding.isUsedEvent(status) && !foundEvent[e]) {
         final AbstractEFAEvent event = eventEncoding.getUpdate(e);
         final String eventName = event.getName();
-        final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy(eventName);
+        final IdentifierProxy ident =
+          mFactory.createSimpleIdentifierProxy(eventName);
         blockedList.add(ident);
       }
     }
@@ -275,7 +278,8 @@ public class UnifiedEFASystemImporter
       final ConstraintList update = event.getUpdate();
       if (update != null && !update.isTrue()) {
         final String name = event.getName();
-        final IdentifierProxy ident =  mFactory.createSimpleIdentifierProxy(name);
+        final IdentifierProxy ident =
+          mFactory.createSimpleIdentifierProxy(name);
         final SimpleExpressionProxy guard =
           update.createExpression(mFactory, mOperatorTable.getAndOperator());
         final List<SimpleExpressionProxy> guards =

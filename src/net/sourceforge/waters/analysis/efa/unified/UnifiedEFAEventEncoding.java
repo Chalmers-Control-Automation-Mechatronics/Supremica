@@ -22,15 +22,15 @@ public class UnifiedEFAEventEncoding
 
   //#########################################################################
   //# Constructors
-  public UnifiedEFAEventEncoding()
+  public UnifiedEFAEventEncoding(final String name)
   {
-    this(DEFAULT_SIZE);
+    this(name, DEFAULT_SIZE);
   }
 
-  public UnifiedEFAEventEncoding(final int size)
+  public UnifiedEFAEventEncoding(final String name, final int size)
   {
     super(size);
-    final SilentEFAEvent tau = new SilentEFAEvent(null);
+    final SilentEFAEvent tau = new SilentEFAEvent(name);
     createEventId(tau);
   }
 

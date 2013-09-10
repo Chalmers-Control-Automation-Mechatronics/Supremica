@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.unified
 //# CLASS:   AbstractEFAEvent
 //###########################################################################
@@ -18,6 +18,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *
  * @author Robi Malik, Sahar Mohajerani
  */
+
 public abstract class AbstractEFAEvent
 {
   //#########################################################################
@@ -59,4 +60,5 @@ public abstract class AbstractEFAEvent
   //#########################################################################
   //# Data Members
   private final ConstraintList mUpdate;
+
 }

@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters EFSM Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
+//# PROJECT: Waters EFA Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efa.unified
 //# CLASS:   UnifiedEFASystemBuilder
 //###########################################################################
 //# $Id$
@@ -50,10 +50,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>
  * A compiler to convert an instantiated module ({@link ModuleProxy}) into and
  * EFSM system ({@link UnifiedEFASystem}).
- * </P>
  *
  * @author Robi Malik, Sahar Mohajerani
  */
@@ -190,10 +188,11 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   {
     //#######################################################################
     //# Invocation
-    private UnifiedEFAEventEncoding collectEvents(final SimpleComponentProxy comp)
+    private UnifiedEFAEventEncoding collectEvents
+      (final SimpleComponentProxy comp)
     {
       try {
-        mCollectedEvents = new UnifiedEFAEventEncoding();
+        mCollectedEvents = new UnifiedEFAEventEncoding(comp.getName());
         mFoundDefaultMarking = false;
         visitSimpleComponentProxy(comp);
         return mCollectedEvents;

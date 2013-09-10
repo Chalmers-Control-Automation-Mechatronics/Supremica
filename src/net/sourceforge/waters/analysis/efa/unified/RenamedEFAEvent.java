@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.unified
-//# CLASS:   UnifiedEFAEvent
+//# CLASS:   RenamedEFAEvent
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -14,6 +14,11 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
+ * An event in a unified EFA system.
+ * This class is used for intermediate events that have been generated
+ * as a result of renaming or substitution during compositional verification
+ * or synthesis.
+ *
  * @author Robi Malik, Sahar Mohajerani
  */
 
@@ -24,7 +29,7 @@ public class RenamedEFAEvent extends AbstractEFAEvent
   public RenamedEFAEvent(final AbstractEFAEvent original,
                          final ConstraintList update)
   {
-    this(original, update, 0);
+    this(original, update, -1);
   }
 
   public RenamedEFAEvent(final AbstractEFAEvent original,

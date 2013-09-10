@@ -15,6 +15,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
+ * An event in a unified EFA system.
+ * This class is used for original events that are directly related
+ * to an event declaration in the input module.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
@@ -38,7 +41,6 @@ public class UnifiedEFAEvent extends AbstractEFAEvent
     return mEventDecl;
   }
 
-
   @Override
   public String getName()
   {
@@ -49,13 +51,11 @@ public class UnifiedEFAEvent extends AbstractEFAEvent
     }
   }
 
-
   @Override
   public EventKind getKind()
   {
     return mEventDecl.getKind();
   }
-
 
   @Override
   public boolean isObservable()
@@ -67,4 +67,5 @@ public class UnifiedEFAEvent extends AbstractEFAEvent
   //#########################################################################
   //# Data Members
   private final EventDeclProxy mEventDecl;
+
 }
