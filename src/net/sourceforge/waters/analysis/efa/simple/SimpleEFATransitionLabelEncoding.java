@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.efa.simple;
 
 import gnu.trove.set.hash.TIntHashSet;
+
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
@@ -30,11 +31,10 @@ public class SimpleEFATransitionLabelEncoding
   public SimpleEFATransitionLabelEncoding(final int size)
   {
     super(size);
-    final ConstraintList trueg = new ConstraintList();
     final SimpleEFAHelper helper = new SimpleEFAHelper();
     final SimpleEFAEventDecl event = new SimpleEFAEventDecl(helper.getTAUDecl());
     final SimpleEFATransitionLabel label =
-     new SimpleEFATransitionLabel(event, trueg);
+     new SimpleEFATransitionLabel(event, ConstraintList.TRUE);
     createTransitionLabelId(label);
   }
 
@@ -54,7 +54,7 @@ public class SimpleEFATransitionLabelEncoding
     }
     return events.toArray();
   }
-  
+
   @Override
   public String toString(){
     if (super.isEmpty()){
@@ -70,9 +70,9 @@ public class SimpleEFATransitionLabelEncoding
                    + sep;
       events.append(out);
     }
-    events.delete(events.length() - sep.length(), events.length());    
+    events.delete(events.length() - sep.length(), events.length());
     events.append("]");
     return events.toString();
   }
-  
+
 }

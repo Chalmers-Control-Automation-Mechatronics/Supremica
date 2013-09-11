@@ -48,7 +48,7 @@ public abstract class AbstractEFATransitionLabel
 
   public AbstractEFATransitionLabel(final SimpleEFAEventDecl event)
   {
-    this(new ConstraintList(), event);
+    this(ConstraintList.TRUE, event);
   }
 
   public SimpleEFAEventDecl getEvent()

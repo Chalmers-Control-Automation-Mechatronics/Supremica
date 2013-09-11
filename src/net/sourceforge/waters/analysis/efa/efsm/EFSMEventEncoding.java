@@ -32,9 +32,7 @@ public class EFSMEventEncoding extends AbstractEFATransitionLabelEncoding<Constr
   EFSMEventEncoding(final int size)
   {
     super(size);
-    // empty constraint list represents true
-    final ConstraintList empty = new ConstraintList();
-    createEventId(empty);
+    createEventId(ConstraintList.TRUE);
   }
 
   EFSMEventEncoding(final EFSMEventEncoding encoding)

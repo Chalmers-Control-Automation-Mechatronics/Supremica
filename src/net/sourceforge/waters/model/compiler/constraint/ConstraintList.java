@@ -38,7 +38,7 @@ public class ConstraintList
 
   //#########################################################################
   //# Constructors
-  public ConstraintList()
+  private ConstraintList()
   {
     mConstraints = mUnmodifiableConstraints = Collections.emptyList();
   }
@@ -165,5 +165,13 @@ public class ConstraintList
   //# Data Members
   private final List<SimpleExpressionProxy> mConstraints;
   private final List<SimpleExpressionProxy> mUnmodifiableConstraints;
+
+
+  //#########################################################################
+  //# Class Constants
+  /**
+   * An empty constraint list, representing the logical formula <I>true</I>.
+   */
+  public static final ConstraintList TRUE = new ConstraintList();
 
 }

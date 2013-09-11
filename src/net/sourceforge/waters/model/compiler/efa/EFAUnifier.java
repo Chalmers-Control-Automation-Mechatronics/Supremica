@@ -110,7 +110,6 @@ public class EFAUnifier extends AbortableCompiler
       new ExpressionComparator(mOperatorTable);
     mComparator = new EFAIdentifierComparator(comparator);
     mSourceInfoBuilder = builder;
-    mTrueGuard = new ConstraintList();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mInputModule = module;
@@ -406,7 +405,7 @@ public class EFAUnifier extends AbortableCompiler
       try {
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
         if (ga == null) {
-          mCurrentUpdate = mTrueGuard;
+          mCurrentUpdate = ConstraintList.TRUE;
         } else {
           visitGuardActionBlockProxy(ga);
         }
@@ -578,7 +577,7 @@ public class EFAUnifier extends AbortableCompiler
         final NodeProxy target1 = mNodeMap.get(target0);
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
         if (ga == null) {
-          mCurrentUpdate = mTrueGuard;
+          mCurrentUpdate = ConstraintList.TRUE;
         } else {
           visitGuardActionBlockProxy(ga);
         }
@@ -923,7 +922,7 @@ public class EFAUnifier extends AbortableCompiler
             comp.getKind() == ComponentKind.PLANT) {
           setBlocked();
         } else {
-          addUpdate(comp, mTrueGuard);
+          addUpdate(comp, ConstraintList.TRUE);
         }
       }
     }
@@ -1345,7 +1344,6 @@ public class EFAUnifier extends AbortableCompiler
   private final CompilerOperatorTable mOperatorTable;
   private final EFAIdentifierComparator mComparator;
   private final SourceInfoBuilder mSourceInfoBuilder;
-  private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
 
   private final ModuleProxy mInputModule;

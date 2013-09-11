@@ -121,7 +121,6 @@ public class EFACompiler extends AbortableCompiler
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mTrueGuard = new ConstraintList();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mInputModule = module;
@@ -528,7 +527,7 @@ public class EFACompiler extends AbortableCompiler
       try {
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
         if (ga == null) {
-          mCurrentGuard = mTrueGuard;
+          mCurrentGuard = ConstraintList.TRUE;
         } else {
           if (mIsUsingEventAlphabet) {
             mCollectedVariables = new THashSet<EFAVariable>();
@@ -1050,7 +1049,6 @@ public class EFACompiler extends AbortableCompiler
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
   private final CompilerOperatorTable mOperatorTable;
-  private final ConstraintList mTrueGuard;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleProxy mInputModule;
 

@@ -495,6 +495,9 @@ public class ConstraintPropagator
         new ArrayList<SimpleExpressionProxy>(mNormalizedConstraints);
       mContext.addAllConstraints(list, pretty);
       addPrimedVariables(list);
+      if (list.isEmpty()) {
+        return ConstraintList.TRUE;
+      }
       Collections.sort(list, mListComparator);
       return new ConstraintList(list);
     }

@@ -79,7 +79,6 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mTrueGuard = new ConstraintList();
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mOperatorTable);
     mEFSMVariableFinder = new EFSMVariableFinder(mOperatorTable);
@@ -476,8 +475,8 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
       checkAbortInVisitor();
       final GuardActionBlockProxy update = edge.getGuardActionBlock();
       if (update == null) {
-        mSimplifiedGuardActionBlockMap.putByProxy(update, mTrueGuard);
-        mEventEncoding.createEventId(mTrueGuard);
+        mSimplifiedGuardActionBlockMap.putByProxy(update, ConstraintList.TRUE);
+        mEventEncoding.createEventId(ConstraintList.TRUE);
       } else {
         visitGuardActionBlockProxy(update);
       }
@@ -722,7 +721,6 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final EFSMVariableFinder mEFSMVariableFinder;
-  private final ConstraintList mTrueGuard;
 
   private boolean mIsOptimizationEnabled;
   private IdentifierProxy mDefaultMarking;

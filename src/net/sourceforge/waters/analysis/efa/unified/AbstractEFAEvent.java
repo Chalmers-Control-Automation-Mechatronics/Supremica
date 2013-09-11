@@ -25,7 +25,7 @@ public abstract class AbstractEFAEvent
   //# Constructors
   public AbstractEFAEvent()
   {
-    mUpdate = new ConstraintList();
+    this(ConstraintList.TRUE);
   }
 
   public AbstractEFAEvent(final ConstraintList update)

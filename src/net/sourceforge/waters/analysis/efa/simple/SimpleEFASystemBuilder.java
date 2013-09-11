@@ -76,7 +76,6 @@ public class SimpleEFASystemBuilder implements Abortable
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mTrueGuard = new ConstraintList();
     mSimpleExpressionCompiler =
      new SimpleExpressionCompiler(mFactory, mOperatorTable);
 //    mEFAVariableFinder = new SimpleEFAVariableFinder(mOperatorTable);
@@ -541,10 +540,10 @@ public class SimpleEFASystemBuilder implements Abortable
       final GuardActionBlockProxy conditions = edge.getGuardActionBlock();
       if (conditions == null) {
         // no gurad and action then it is always true
-        mSimplifyConstraint = mTrueGuard;
+        mSimplifyConstraint = ConstraintList.TRUE;
       } else if (conditions.getGuards().isEmpty() && conditions.getActions()
        .isEmpty()) {
-        mSimplifyConstraint = mTrueGuard;
+        mSimplifyConstraint = ConstraintList.TRUE;
       } else {
         // it has a guard and/or action then visit visitGuardActionBlockProxy
         mSimplifyConstraint = visitGuardActionBlockProxy(conditions);
@@ -882,7 +881,6 @@ public class SimpleEFASystemBuilder implements Abortable
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   //  private final SimpleEFAVariableFinder mEFAVariableFinder;
-  private final ConstraintList mTrueGuard;
   private ProxyAccessorHashMap<IdentifierProxy, SimpleEFAEventDecl> mEFAEventDeclMap;
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsMarkingVariablEFAEnable = false;

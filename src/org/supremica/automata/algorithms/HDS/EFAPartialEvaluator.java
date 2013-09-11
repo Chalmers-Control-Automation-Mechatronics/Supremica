@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 
-import net.sourceforge.waters.analysis.efa.simple.SimpleEFAHelper;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAEventDecl;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAHelper;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAState;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAStateEncoding;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFATransitionLabel;
@@ -754,7 +754,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
 
     Tuple()
     {
-      this(-1, new ConstraintList());
+      this(-1, ConstraintList.TRUE);
     }
 
     public int getStateId()
