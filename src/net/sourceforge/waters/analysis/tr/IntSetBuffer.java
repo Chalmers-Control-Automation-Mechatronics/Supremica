@@ -27,7 +27,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  *
  * <P>An <I>integer set buffer</I> maintains a collection of sets of integers.
  * Each set is identified by its <I>index</I>, an integer that is assigned
- * by the set buffer upon creation of set list and remains a unique set
+ * by the set buffer upon creation of the set and remains a unique
  * identifier throughout the set's lifetime.</P>
  *
  * <P>Each set is represented by its size followed by its ordered list of
@@ -35,7 +35,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  * arrays to minimise memory usage and allocation.</P>
  *
  * <P>A hash table is used to identify sets already present in the buffer.
- * If the same set is added a second time, it already existing index is
+ * If the same set is added a second time, the already existing index is
  * found and used instead of adding a second copy.</P>
  *
  * <P>The integer set buffer does not support deletion or modification of
