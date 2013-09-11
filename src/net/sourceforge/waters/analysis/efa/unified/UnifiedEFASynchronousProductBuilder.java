@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.efa.unified;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,6 @@ import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
@@ -30,8 +30,10 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
+public class UnifiedEFASynchronousProductBuilder
+  extends AbstractEFAAlgorithm
 {
+
   //#########################################################################
   //# Constructors
   public UnifiedEFASynchronousProductBuilder()
@@ -52,16 +54,38 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
     return mInputTransitionRelations;
   }
 
+  public void setStateLimit(final int limit)
+  {
+    mStateLimit = limit;
+  }
+
+  public int getStateLimit()
+  {
+    return mStateLimit;
+  }
+
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+  public int getTransitionLimit()
+  {
+    return mTransitionLimit;
+  }
+
 
   //#########################################################################
   //# Invocation
   @Override
-  protected void setUp() throws AnalysisException
+  protected void setUp()
+    throws AnalysisException
   {
     super.setUp();
   }
 
-  public void run() throws AnalysisException, EvalException
+  public void run()
+    throws AnalysisException
   {
     try {
       setUp();
@@ -77,6 +101,11 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
   protected void tearDown()
   {
     super.tearDown();
+    mEventEncoding = null;
+    mEventInfoList = null;
+    mTransitionIterators = null;
+    mStateSpace = null;
+    mPreTransitionBuffer = null;
   }
 
   public UnifiedEFATransitionRelation getSynchronousProduct()
@@ -90,12 +119,12 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
   private void createEventEncoding()
   {
     // Step 1: Collect event information.
-    final Map<AbstractEFAEvent, EventInfo> renamingMap = new HashMap<>();
+    final Map<AbstractEFAEvent,EventInfo> renamingMap = new HashMap<>();
     final List<AbstractEFAEvent> orderedEvents = new ArrayList<>();
     int trIndex = 0;
     for (final UnifiedEFATransitionRelation tr : mInputTransitionRelations) {
       final UnifiedEFAEventEncoding encoding = tr.getEventEncoding();
-      for (int e=EventEncoding.NONTAU; e<encoding.size(); e++) {
+      for (int e = EventEncoding.NONTAU; e < encoding.size(); e++) {
         final AbstractEFAEvent event = encoding.getEvent(e);
         EventInfo eventInfo = renamingMap.get(event);
         if (eventInfo == null) {
@@ -120,7 +149,8 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
       }
     }
     // Step 3: Create event encoding.
-    mEventEncoding = new UnifiedEFAEventEncoding("Sahar");
+    final String name = getOutputName();
+    mEventEncoding = new UnifiedEFAEventEncoding(name);
     mEventInfoList = new ArrayList<>();
     final AbstractEFAEvent tau = mEventEncoding.getEvent(EventEncoding.TAU);
     final EventInfo tauInfo = new EventInfo(tau);
@@ -145,28 +175,31 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
 
   private void exploreSynchronousProduct() throws OverflowException
   {
-    mUsesMarking = false;
-    mUsesTau = false;
-    mPreTransitionBuffer = new PreTransitionBuffer(mEventEncoding.size());
-    mStateSpace = new IntArrayBuffer(mInputTransitionRelations.size());
-    final int[] sourceTuple = new int[mInputTransitionRelations.size()];
+    final int numTR = mInputTransitionRelations.size();
+    mStateSpace = new IntArrayBuffer(numTR, mStateLimit);
+    final int[] sourceTuple = new int[numTR];
     createInitialStates(sourceTuple, 0);
     mNumberOfInitialStates = mStateSpace.size();
-    mTransitionIterators = new TransitionIterator[mInputTransitionRelations.size()];
-    for (int trIndex = 0; trIndex < mInputTransitionRelations.size(); trIndex++) {
-      final UnifiedEFATransitionRelation tr = mInputTransitionRelations.get(trIndex);
+    mUsesMarking = false;
+    mUsesTau = false;
+    mTransitionIterators = new TransitionIterator[numTR];
+    mPreTransitionBuffer =
+      new PreTransitionBuffer(mEventEncoding.size(), mTransitionLimit);
+    for (int trIndex = 0; trIndex < numTR; trIndex++) {
+      final UnifiedEFATransitionRelation tr =
+        mInputTransitionRelations.get(trIndex);
       final ListBufferTransitionRelation rel = tr.getTransitionRelation();
       mUsesMarking |= rel.isUsedProposition(UnifiedEFAEventEncoding.OMEGA);
       final byte tauStatus = rel.getProperEventStatus(EventEncoding.TAU);
       mUsesTau |= EventEncoding.isUsedEvent(tauStatus);
       mTransitionIterators[trIndex] = rel.createSuccessorsReadOnlyIterator();
     }
-    final int[] targetTuple = new int[mInputTransitionRelations.size()];
+    final int[] targetTuple = new int[numTR];
     for (int stateNumber = 0; stateNumber < mStateSpace.size(); stateNumber++) {
       mStateSpace.getContents(stateNumber, sourceTuple);
       if (mUsesTau) {
         mStateSpace.getContents(stateNumber, targetTuple);
-        for (int trIndex = 0; trIndex < mInputTransitionRelations.size(); trIndex++) {
+        for (int trIndex = 0; trIndex < numTR; trIndex++) {
           targetTuple[trIndex] = sourceTuple[trIndex];
           final TransitionIterator iter = mTransitionIterators[trIndex];
           iter.reset(sourceTuple[trIndex], EventEncoding.TAU);
@@ -182,12 +215,14 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
         mStateSpace.getContents(stateNumber, targetTuple);
         final EventInfo eventInfo = mEventInfoList.get(e);
         final List<EventTRInfo> infoList = eventInfo.getEventTRInfo();
-        createSuccessorStates(stateNumber, e, sourceTuple, targetTuple, infoList, 0);
+        createSuccessorStates(stateNumber, sourceTuple, e,
+                              targetTuple, infoList, 0);
       }
     }
   }
 
   private void createInitialStates(final int[] tuple, final int trIndex)
+    throws OverflowException
   {
     if (trIndex < tuple.length) {
       final ListBufferTransitionRelation rel =
@@ -204,12 +239,13 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
     }
   }
 
-  private void createSuccessorStates(final int source, final int event,
+  private void createSuccessorStates(final int source,
                                      final int[] sourceTuple,
+                                     final int event,
                                      final int[] targetTuple,
                                      final List<EventTRInfo> infoList,
                                      final int index)
-  throws OverflowException
+    throws OverflowException
   {
     if (index < infoList.size()) {
       final EventTRInfo info = infoList.get(index);
@@ -219,8 +255,8 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
       iter.reset(sourceTuple[trIndex], eventCode);
       while (iter.advance()) {
         targetTuple[trIndex] = iter.getCurrentTargetState();
-        createSuccessorStates(source, event, sourceTuple, targetTuple,
-                              infoList, index+1);
+        createSuccessorStates(source, sourceTuple, event,
+                              targetTuple, infoList, index + 1);
       }
     } else {
       final int target = mStateSpace.add(targetTuple);
@@ -230,12 +266,14 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
 
   private void createTransitionRelation() throws OverflowException
   {
+    final String name = getOutputName();
+    final ComponentKind kind = getOutputKind();
     final int numPropositions = mUsesMarking ? 1 : 0;
+    final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     final ListBufferTransitionRelation resultRel =
-      new ListBufferTransitionRelation("Robi", ComponentKind.PLANT,
-                                       mEventEncoding.size(), numPropositions,
-                                       mStateSpace.size(),
-                                       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      new ListBufferTransitionRelation(name, kind, mEventEncoding.size(),
+                                       numPropositions, mStateSpace.size(),
+                                       config);
     if (!mUsesTau) {
       resultRel.setProperEventStatus(EventEncoding.TAU,
                                      EventEncoding.STATUS_FULLY_LOCAL |
@@ -246,8 +284,8 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
     }
     if (mUsesMarking) {
       final int[] tuple = new int[mInputTransitionRelations.size()];
-      for (int i=0; i<mStateSpace.size(); i++) {
-        mStateSpace.getContents(i, tuple);
+      for (int s = 0; s < mStateSpace.size(); s++) {
+        mStateSpace.getContents(s, tuple);
         boolean marked = true;
         for (int trIndex = 0; trIndex < tuple.length; trIndex++) {
           final UnifiedEFATransitionRelation tr =
@@ -259,7 +297,7 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
           }
         }
         if (marked) {
-          resultRel.setMarked(i, UnifiedEFAEventEncoding.OMEGA, true);
+          resultRel.setMarked(s, UnifiedEFAEventEncoding.OMEGA, true);
         }
       }
     }
@@ -268,8 +306,49 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
       new UnifiedEFATransitionRelation(resultRel, mEventEncoding);
   }
 
+  private String getOutputName()
+  {
+    final int numTR = mInputTransitionRelations.size();
+    final StringBuffer buffer = new StringBuffer("{");
+    boolean first = true;
+    for (int trIndex = 0; trIndex < numTR; trIndex++) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(',');
+      }
+      final UnifiedEFATransitionRelation tr =
+        mInputTransitionRelations.get(trIndex);
+      final String name = tr.getName();
+      buffer.append(name);
+    }
+    buffer.append('}');
+    return buffer.toString();
+  }
+
+  private ComponentKind getOutputKind()
+  {
+    final int numTR = mInputTransitionRelations.size();
+    if (numTR == 0) {
+      return ComponentKind.PLANT;
+    } else {
+      ComponentKind result = null;
+      for (int trIndex = 0; trIndex < numTR; trIndex++) {
+        final UnifiedEFATransitionRelation tr =
+          mInputTransitionRelations.get(trIndex);
+        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+        final ComponentKind kind = rel.getKind();
+        if (result == null || kind.compareTo(result) < 0) {
+          result = kind;
+        }
+      }
+      return result;
+    }
+  }
+
+
   //#########################################################################
-  //# Inner Class
+  //# Inner Class EventInfo
   private class EventInfo
   {
     //#######################################################################
@@ -280,7 +359,6 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
       mEventCode = -1;
       mEventTRInfo = new ArrayList<>(mInputTransitionRelations.size());
     }
-
 
     //#######################################################################
     //# Simple Access
@@ -325,6 +403,32 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
     {
       mEventTRInfo.addAll(info.mEventTRInfo);
     }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      final StringWriter writer = new StringWriter();
+      dump(writer);
+      return writer.toString();
+    }
+
+    private void dump(final StringWriter writer)
+    {
+      writer.write(mEvent.getName());
+      writer.write("@");
+      writer.write(mEventCode);
+      if (mRenamed) {
+        writer.write(" (renamed)");
+      }
+      writer.write("\n");
+      for (final EventTRInfo info : mEventTRInfo) {
+        info.dump(writer);
+        writer.write("\n");
+      }
+    }
+
     //#######################################################################
     //# Data Members
     private final AbstractEFAEvent mEvent;
@@ -335,7 +439,7 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
 
 
   //#########################################################################
-  //# Inner Class
+  //# Inner Class EventTRInfo
   private class EventTRInfo
   {
     //#######################################################################
@@ -359,6 +463,31 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
     }
 
     //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      final StringWriter writer = new StringWriter();
+      dump(writer);
+      return writer.toString();
+    }
+
+    private void dump(final StringWriter writer)
+    {
+      final UnifiedEFATransitionRelation tr =
+        mInputTransitionRelations.get(mTRIndex);
+      writer.write(tr.getName());
+      writer.write("@");
+      writer.write(mTRIndex);
+      writer.write(" : ");
+      final UnifiedEFAEventEncoding enc = tr.getEventEncoding();
+      final AbstractEFAEvent event = enc.getEvent(mEventCode);
+      writer.write(event.getName());
+      writer.write("@");
+      writer.write(mEventCode);
+    }
+
+    //#######################################################################
     //# Data Members
     private final int mTRIndex;
     private final int mEventCode;
@@ -367,15 +496,19 @@ public class UnifiedEFASynchronousProductBuilder extends AbstractEFAAlgorithm
 
   //#########################################################################
   //# Data Members
-  private UnifiedEFATransitionRelation mSynchronousProduct;
   private List<UnifiedEFATransitionRelation> mInputTransitionRelations;
+  private int mStateLimit = Integer.MAX_VALUE;
+  private int mTransitionLimit = Integer.MAX_VALUE;
+
+  private UnifiedEFATransitionRelation mSynchronousProduct;
+
   private UnifiedEFAEventEncoding mEventEncoding;
-  private IntArrayBuffer mStateSpace;
-  private int mNumberOfInitialStates;
   private List<EventInfo> mEventInfoList;
+  private int mNumberOfInitialStates;
   private boolean mUsesMarking;
   private boolean mUsesTau;
   private TransitionIterator[] mTransitionIterators;
+  private IntArrayBuffer mStateSpace;
   private PreTransitionBuffer mPreTransitionBuffer;
 
 }

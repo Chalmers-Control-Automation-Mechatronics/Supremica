@@ -14,6 +14,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.OverflowException;
 
 
 /**
@@ -39,7 +40,7 @@ public class IntArrayBufferTest extends AbstractWatersTest
 
   //#########################################################################
   //# Test Cases
-  public void testAddArrays()
+  public void testAddArrays() throws OverflowException
   {
     final IntArrayBuffer buffer = new IntArrayBuffer(3);
     final int[] data1 = {1, 2, 3};
@@ -59,7 +60,7 @@ public class IntArrayBufferTest extends AbstractWatersTest
     assertEquals("Unexpected offset for existing array!", offset3, alt3);
   }
 
-  public void testAddArrayLists()
+  public void testAddArrayLists() throws OverflowException
   {
     final IntArrayBuffer buffer = new IntArrayBuffer(4);
     final TIntArrayList data1 = new TIntArrayList(4);
@@ -91,35 +92,35 @@ public class IntArrayBufferTest extends AbstractWatersTest
     assertEquals("Unexpected offset for existing array!", offset3, alt3);
   }
 
-  public void testSmallArray1()
+  public void testSmallArray1() throws OverflowException
   {
     final int[] data = {1, 2, 3};
     final IntArrayBuffer buffer = new IntArrayBuffer(data.length);
     addArray(buffer, data);
   }
 
-  public void testSmallArrayList1()
+  public void testSmallArrayList1() throws OverflowException
   {
     final int[] data = {1, 2, 3};
     final IntArrayBuffer buffer = new IntArrayBuffer(data.length);
     addArrayList(buffer, data);
   }
 
-  public void testSmallArray2()
+  public void testSmallArray2() throws OverflowException
   {
     final int[] data = {0, 1, 2, 4, 9, 14, 15};
     final IntArrayBuffer buffer = new IntArrayBuffer(data.length);
     addArray(buffer, data);
   }
 
-  public void testSmallArrayList2()
+  public void testSmallArrayList2() throws OverflowException
   {
     final int[] data = {0, 1, 2, 4, 9, 14, 15};
     final IntArrayBuffer buffer = new IntArrayBuffer(data.length);
     addArrayList(buffer, data);
   }
 
-  public void testSmallArray3()
+  public void testSmallArray3() throws OverflowException
   {
     final int[] data =
       {1, 3, 5, 6, 140, 142, 144, 145, 147, 149, 151, 153, 155, 157, 158,
@@ -149,6 +150,7 @@ public class IntArrayBufferTest extends AbstractWatersTest
   //#########################################################################
   //# Auxiliary Method
   private void addArray(final IntArrayBuffer buffer, final int[] data)
+    throws OverflowException
   {
     final int offset = buffer.add(data);
     final int[] fetch = new int[data.length];
@@ -161,6 +163,7 @@ public class IntArrayBufferTest extends AbstractWatersTest
   }
 
   private void addArrayList(final IntArrayBuffer buffer, final int[] data)
+    throws OverflowException
   {
     final TIntArrayList list = new TIntArrayList(data.length);
     for (final int d : data) {

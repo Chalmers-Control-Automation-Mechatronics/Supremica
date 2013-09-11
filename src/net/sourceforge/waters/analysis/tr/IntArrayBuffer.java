@@ -16,6 +16,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
+
 
 /**
  * <P>A memory efficient container to store several arrays of integers.</P>
@@ -56,16 +59,21 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
   /**
    * Creates a new integer array buffer.
    * @param  arraySize   The size of all arrays to be stored.
-   * @param  initialSize The estimated initial capacity of the hash table.
+   * @param  limit       Maximum number of arrays that can be added.
+   *                     Adding more entries than the limit results
+   *                     in an {@link OverflowException} being thrown.
    */
-  public IntArrayBuffer(final int arraySize, final int initialSize)
+  public IntArrayBuffer(final int arraySize, final int limit)
   {
-    this(arraySize, 0, -1);
+    this(arraySize, limit, 0, -1);
   }
 
   /**
    * Creates a new integer array buffer.
    * @param  arraySize   The size of all arrays to be stored.
+   * @param  limit       Maximum number of arrays that can be added.
+   *                     Adding more entries than the limit results
+   *                     in an {@link OverflowException} being thrown.
    * @param  initialSize The estimated initial capacity of the hash table.
    * @param  defaultHashSetValue
    *                     The value to be returned by the {@link #get(int[])
@@ -74,11 +82,13 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
    *                     this constructor.
    */
   public IntArrayBuffer(final int arraySize,
+                        final int limit,
                         final int initialSize,
                         final int defaultHashSetValue)
   {
     mArraySize = arraySize;
     mBlockSize = arraySize * BLOCK_SIZE;
+    mSizeLimit = limit;
     mDefaultHashValue = defaultHashSetValue;
     mBlocks = new ArrayList<int[]>();
     final int[] block = new int[mBlockSize];
@@ -97,7 +107,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
    *         contents in this buffer. This may be a newly created or an
    *         already existent array.
    */
-  public int add(final int[] data)
+  public int add(final int[] data) throws OverflowException
   {
     ensureCapacity(1);
     final int blockno = mNextFreeIndex >>> BLOCK_SHIFT;
@@ -108,6 +118,9 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
     }
     final int result = mDirectory.getOrAdd(mNextFreeIndex);
     if (result == mNextFreeIndex) {
+      if (mNextFreeIndex >= mSizeLimit) {
+        throw new OverflowException(OverflowKind.STATE, mSizeLimit);
+      }
       mNextFreeIndex++;
     }
     return result;
@@ -120,7 +133,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
    *         contents in this buffer. This may be a newly created or an
    *         already existent array.
    */
-  public int add(final TIntArrayList data)
+  public int add(final TIntArrayList data) throws OverflowException
   {
     ensureCapacity(1);
     final int blockno = mNextFreeIndex >>> BLOCK_SHIFT;
@@ -131,6 +144,9 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
     }
     final int result = mDirectory.getOrAdd(mNextFreeIndex);
     if (result == mNextFreeIndex) {
+      if (mNextFreeIndex >= mSizeLimit) {
+        throw new OverflowException(OverflowKind.STATE, mSizeLimit);
+      }
       mNextFreeIndex++;
     }
     return result;
@@ -289,6 +305,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
   //#########################################################################
   //# Data Members
   private final int mArraySize;
+  private final int mSizeLimit;
   private final int mBlockSize;
   private final int mDefaultHashValue;
   private final List<int[]> mBlocks;
