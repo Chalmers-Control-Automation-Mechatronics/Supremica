@@ -177,6 +177,7 @@ public class PreTransitionBuffer
 
   public void dump(final PrintWriter printer)
   {
+    close();
     final int size = (mBlocks.size() - 1) * BLOCK_SIZE + mCurrentOffset + 1;
     if (size <= 0) {
       printer.print("<empty>");

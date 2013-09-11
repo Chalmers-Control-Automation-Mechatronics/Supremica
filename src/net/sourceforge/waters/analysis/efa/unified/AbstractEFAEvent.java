@@ -41,6 +41,11 @@ public abstract class AbstractEFAEvent
     return mUpdate;
   }
 
+  public AbstractEFAEvent getOriginalEvent()
+  {
+    return null;
+  }
+
   public abstract String getName();
 
   public abstract EventKind getKind();

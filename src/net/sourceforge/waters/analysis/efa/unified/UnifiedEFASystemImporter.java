@@ -95,51 +95,8 @@ public class UnifiedEFASystemImporter
       (system.getName(), null, null, null, eventList, null, compList);
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void importEvent(final List<EventDeclProxy> eventList,
-                           final AbstractEFAEvent unifiedEvent)
-  {
-    final String eventName = unifiedEvent.getName();
-    final IdentifierProxy ident =
-      mFactory.createSimpleIdentifierProxy(eventName);
-    final EventDeclProxy eventDecl =
-      mFactory.createEventDeclProxy(ident, unifiedEvent.getKind(),
-                                    unifiedEvent.isObservable(),
-                                    ScopeKind.LOCAL, null, null, null);
-    eventList.add(eventDecl);
-  }
-
-  private void importVariable(final List<ComponentProxy> compList,
-                              final UnifiedEFAVariable variable)
-  {
-    final String variableName = variable.getName();
-    final SimpleIdentifierProxy identifier =
-      mFactory.createSimpleIdentifierProxy(variableName);
-    final CompiledRange range = variable.getRange();
-    final SimpleExpressionProxy type =
-      range.createExpression(mFactory, mOperatorTable);
-    final SimpleExpressionProxy initialStatePredicate =
-      variable.getInitialStatePredicate();
-    List<VariableMarkingProxy> markings = null;
-    final SimpleExpressionProxy markedStatePredicate =
-      variable.getMarkedStatePredicate();
-    if (markedStatePredicate != null) {
-      final SimpleIdentifierProxy markingIdent =
-        mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
-      final VariableMarkingProxy marking =
-        mFactory.createVariableMarkingProxy(markingIdent, markedStatePredicate);
-      markings = Collections.singletonList(marking);
-    }
-    final VariableComponentProxy var =
-      mFactory.createVariableComponentProxy
-        (identifier, type, initialStatePredicate, markings);
-    compList.add(var);
-  }
-
-  private void importTransitionRelation(final List<ComponentProxy> compList,
-                                        final UnifiedEFATransitionRelation efsmTransition)
+  public SimpleComponentProxy importTransitionRelation
+    (final UnifiedEFATransitionRelation efsmTransition)
   {
     final List<SimpleNodeProxy> nodeListFromEFA =
       efsmTransition.getNodeList();
@@ -265,7 +222,57 @@ public class UnifiedEFASystemImporter
       mFactory.createSimpleIdentifierProxy(name);
     final SimpleComponentProxy simpleComponent =
       mFactory.createSimpleComponentProxy(ident, rel.getKind(), graph);
-    compList.add(simpleComponent);
+    return simpleComponent;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void importEvent(final List<EventDeclProxy> eventList,
+                           final AbstractEFAEvent unifiedEvent)
+  {
+    final String eventName = unifiedEvent.getName();
+    final IdentifierProxy ident =
+      mFactory.createSimpleIdentifierProxy(eventName);
+    final EventDeclProxy eventDecl =
+      mFactory.createEventDeclProxy(ident, unifiedEvent.getKind(),
+                                    unifiedEvent.isObservable(),
+                                    ScopeKind.LOCAL, null, null, null);
+    eventList.add(eventDecl);
+  }
+
+  private void importVariable(final List<ComponentProxy> compList,
+                              final UnifiedEFAVariable variable)
+  {
+    final String variableName = variable.getName();
+    final SimpleIdentifierProxy identifier =
+      mFactory.createSimpleIdentifierProxy(variableName);
+    final CompiledRange range = variable.getRange();
+    final SimpleExpressionProxy type =
+      range.createExpression(mFactory, mOperatorTable);
+    final SimpleExpressionProxy initialStatePredicate =
+      variable.getInitialStatePredicate();
+    List<VariableMarkingProxy> markings = null;
+    final SimpleExpressionProxy markedStatePredicate =
+      variable.getMarkedStatePredicate();
+    if (markedStatePredicate != null) {
+      final SimpleIdentifierProxy markingIdent =
+        mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+      final VariableMarkingProxy marking =
+        mFactory.createVariableMarkingProxy(markingIdent, markedStatePredicate);
+      markings = Collections.singletonList(marking);
+    }
+    final VariableComponentProxy var =
+      mFactory.createVariableComponentProxy
+        (identifier, type, initialStatePredicate, markings);
+    compList.add(var);
+  }
+
+  private void importTransitionRelation(final List<ComponentProxy> compList,
+                                        final UnifiedEFATransitionRelation efsmTransition)
+  {
+    final SimpleComponentProxy comp = importTransitionRelation(efsmTransition);
+    compList.add(comp);
   }
 
   private SimpleComponentProxy createGuardAutomaton

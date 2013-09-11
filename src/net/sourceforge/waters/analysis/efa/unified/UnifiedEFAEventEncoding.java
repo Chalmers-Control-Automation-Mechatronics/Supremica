@@ -47,6 +47,11 @@ public class UnifiedEFAEventEncoding
     return super.getTransitionLabelId(event);
   }
 
+  public AbstractEFAEvent getEvent(final int code)
+  {
+    return getTransitionLabel(code);
+  }
+
   public AbstractEFAEvent getUpdate(final int code)
   {
     return super.getTransitionLabel(code);
