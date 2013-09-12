@@ -49,6 +49,11 @@ public class UnifiedEFATransitionRelation
     return (UnifiedEFAEventEncoding) super.getTransitionLabelEncoding();
   }
 
+  public List<AbstractEFAEvent> getUsedEvents()
+  {
+    return getUsedTransitionLabels();
+  }
+
 
   //#########################################################################
   //# Data Members
