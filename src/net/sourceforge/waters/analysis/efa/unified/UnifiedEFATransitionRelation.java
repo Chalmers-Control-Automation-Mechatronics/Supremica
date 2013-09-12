@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.efa.unified;
 
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionRelation;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -49,7 +50,7 @@ public class UnifiedEFATransitionRelation
     return (UnifiedEFAEventEncoding) super.getTransitionLabelEncoding();
   }
 
-  public List<AbstractEFAEvent> getUsedEvents()
+  public Set<AbstractEFAEvent> getUsedEvents()
   {
     return getUsedTransitionLabels();
   }

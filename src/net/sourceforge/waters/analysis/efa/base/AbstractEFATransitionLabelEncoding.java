@@ -122,6 +122,7 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
     return buffer.toString();
   }
 
+
   //#########################################################################
   //# Class Constants
   protected static final int DEFAULT_SIZE = 16;
@@ -131,7 +132,6 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
   //# Data Members
   private final TObjectIntHashMap<L> mTransitionLabelMap;
   private final List<L> mTransitionLabelList;
-
 
 }
 

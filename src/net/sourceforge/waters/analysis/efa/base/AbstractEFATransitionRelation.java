@@ -9,10 +9,11 @@
 
 package net.sourceforge.waters.analysis.efa.base;
 
-import java.util.AbstractSequentialList;
+import java.util.AbstractSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -74,7 +75,7 @@ public abstract class AbstractEFATransitionRelation<L>
 
   //#########################################################################
   //# Accessing Events
-  public List<L> getUsedTransitionLabels()
+  public Set<L> getUsedTransitionLabels()
   {
     return new UsedLabelList();
   }
@@ -108,14 +109,14 @@ public abstract class AbstractEFATransitionRelation<L>
 
   //#########################################################################
   //# Inner Class UsedLabelList
-  private class UsedLabelList extends AbstractSequentialList<L>
+  private class UsedLabelList extends AbstractSet<L>
   {
     //#######################################################################
     //# Interface java.util.List
     @Override
-    public ListIterator<L> listIterator(final int index)
+    public Iterator<L> iterator()
     {
-      return new UsedLabelIterator(index);
+      return new UsedLabelIterator();
     }
 
     @Override
@@ -134,31 +135,13 @@ public abstract class AbstractEFATransitionRelation<L>
 
   //#########################################################################
   //# Inner Class UsedLabelIterator
-  private class UsedLabelIterator implements ListIterator<L>
+  private class UsedLabelIterator implements Iterator<L>
   {
     //#######################################################################
     //# Constructor
-    private UsedLabelIterator(final int startIndex)
+    private UsedLabelIterator()
     {
-      if (startIndex < 0) {
-        throw new NoSuchElementException
-          ("Attempt to create " + ProxyTools.getShortClassName(this) +
-           " with negative start index!");
-      }
-      mEventIndex = mPreviousEventIndex = mNextEventIndex = mIteratorIndex = -1;
-      int index = -1;
-      while (index < startIndex && hasNext()) {
-        mEventIndex = mNextEventIndex;
-        index++;
-      }
-      if (index == startIndex) {
-        mEventIndex--;
-        mPreviousEventIndex = mNextEventIndex = mEventIndex;
-        mIteratorIndex = startIndex - 1;
-      } else {
-        mPreviousEventIndex = mNextEventIndex = mEventIndex;
-        mIteratorIndex = index;
-      }
+      mIndex = -1;
     }
 
     //#######################################################################
@@ -166,53 +149,24 @@ public abstract class AbstractEFATransitionRelation<L>
     @Override
     public boolean hasNext()
     {
-      findNextIndex();
-      return mNextEventIndex < mTransitionLabelEncoding.size();
+      final int numEvents = mTransitionLabelEncoding.size();
+      for (mIndex++; mIndex < numEvents; mIndex++) {
+        if (isUsedLabel(mIndex)) {
+          break;
+        }
+      }
+      return mIndex < numEvents;
     }
 
     @Override
     public L next()
     {
       if (hasNext()) {
-        mEventIndex = mPreviousEventIndex = mNextEventIndex;
-        mIteratorIndex++;
-        return mTransitionLabelEncoding.getTransitionLabel(mEventIndex);
+        return mTransitionLabelEncoding.getTransitionLabel(mIndex);
       } else {
         throw new NoSuchElementException
           ("Reached end of list in " + ProxyTools.getShortClassName(this) + "!");
       }
-    }
-
-    @Override
-    public boolean hasPrevious()
-    {
-      findPreviousIndex();
-      return mPreviousEventIndex >= 0;
-    }
-
-    @Override
-    public L previous()
-    {
-      if (hasNext()) {
-        mEventIndex = mNextEventIndex = mPreviousEventIndex;
-        mIteratorIndex--;
-        return mTransitionLabelEncoding.getTransitionLabel(mEventIndex);
-      } else {
-        throw new NoSuchElementException
-          ("Reached start of list in " + ProxyTools.getShortClassName(this) + "!");
-      }
-    }
-
-    @Override
-    public int nextIndex()
-    {
-      return mIteratorIndex + 1;
-    }
-
-    @Override
-    public int previousIndex()
-    {
-      return mIteratorIndex - 1;
     }
 
     @Override
@@ -222,51 +176,9 @@ public abstract class AbstractEFATransitionRelation<L>
         (ProxyTools.getShortClassName(this) + " does not support modifications!");
     }
 
-    @Override
-    public void set(final L e)
-    {
-      throw new UnsupportedOperationException
-        (ProxyTools.getShortClassName(this) + " does not support modifications!");
-    }
-
-    @Override
-    public void add(final L e)
-    {
-      throw new UnsupportedOperationException
-        (ProxyTools.getShortClassName(this) + " does not support modifications!");
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private void findNextIndex()
-    {
-      if (mNextEventIndex == mEventIndex) {
-        final int numEvents = mTransitionLabelEncoding.size();
-        for (mNextEventIndex++; mNextEventIndex < numEvents; mNextEventIndex++) {
-          if (isUsedLabel(mNextEventIndex)) {
-            break;
-          }
-        }
-      }
-    }
-
-    private void findPreviousIndex()
-    {
-      if (mPreviousEventIndex == mEventIndex) {
-        for (mPreviousEventIndex--; mPreviousEventIndex >=0; mPreviousEventIndex--) {
-          if (isUsedLabel(mPreviousEventIndex)) {
-            break;
-          }
-        }
-      }
-    }
-
     //#######################################################################
     //# Data Members
-    private int mEventIndex;
-    private int mNextEventIndex;
-    private int mPreviousEventIndex;
-    private int mIteratorIndex;
+    private int mIndex;
   }
 
 
