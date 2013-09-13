@@ -89,6 +89,7 @@ public class UnifiedEFASynchronousProductBuilder
   {
     try {
       setUp();
+      configureTransitionRelations();
       createEventEncoding();
       exploreSynchronousProduct();
       createTransitionRelation();
@@ -170,6 +171,14 @@ public class UnifiedEFASynchronousProductBuilder
           original = original.getOriginalEvent();
         }
       }
+    }
+  }
+
+  private void configureTransitionRelations()
+  {
+    for (final UnifiedEFATransitionRelation tr : mInputTransitionRelations) {
+      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     }
   }
 

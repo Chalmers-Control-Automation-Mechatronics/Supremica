@@ -19,6 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
+import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
+import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecker;
@@ -129,6 +133,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     mEFASynchronizer = new UnifiedEFASynchronousProductBuilder();
     mSimplifier = UnifiedEFASimplifier.createStandardNonblockingProcedure
       (Equivalence.OBSERVATION_EQUIVALENCE, mInternalTransitionLimit);
+    mNonblockingChecker = new EFANonblockingChecker();
+
   }
 
   @Override
@@ -149,10 +155,21 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         (mCompilerOperatorTable, mCurrentEFASystem.getVariableContext());
       createEventInfo();
       createVariableInfo();
-      createCandidates();
-      @SuppressWarnings("unused")
-      final Candidate minCandidate = Collections.min(mCandidateMap.keySet());
-      return false;
+      mTransitionRelations =
+        new THashSet<>(mCurrentEFASystem.getTransitionRelations());
+      for (final UnifiedEFATransitionRelation tr : mTransitionRelations) {
+        simplifyTR(tr);
+      }
+      while (mTransitionRelations.size() > 1 || mVariableInfoMap.size() > 0) {
+        createCandidates();
+        final Candidate minCandidate = Collections.min(mCandidateMap.keySet());
+        applyCandidate(minCandidate);
+      }
+      if (mTransitionRelations.isEmpty()) {
+        return true;
+      }
+      final UnifiedEFATransitionRelation finalTR = mTransitionRelations.iterator().next();
+      return mNonblockingChecker.run(finalTR);
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -195,24 +212,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     }
   }
 
-  private void createCandidates()
-  {
-    final List<AbstractEFAEvent> events = mCurrentEFASystem.getEvents();
-    for (final AbstractEFAEvent event : events) {
-      final EventInfo info = mEventInfoMap.get(event);
-      final List<UnifiedEFATransitionRelation> trs = info.getTransitionRelations();
-      final List<UnifiedEFAVariable> vars = info.getVariables();
-      Candidate candidate = new Candidate(trs, vars);
-      final Candidate existing = mCandidateMap.get(candidate);
-      if (existing != null) {
-        mCandidateMap.put(candidate, candidate);
-      } else {
-        candidate = existing;
-      }
-      candidate.addLocalEvent(event);
-    }
-  }
-
   private void createVariableInfo()
   {
     final List<UnifiedEFAVariable> vars = mCurrentEFASystem.getVariables();
@@ -222,22 +221,45 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mVariableInfoMap.put(var, info);
     }
     for (final EventInfo eventInfo : mEventInfoMap.values()) {
-      final AbstractEFAEvent event = eventInfo.getEvent();
       for (final UnifiedEFAVariable var : eventInfo.getVariables()){
         final VariableInfo varInfo = mVariableInfoMap.get(var);
-        varInfo.addEvent(event);
+        varInfo.addEvent(eventInfo);
       }
     }
   }
 
-  @SuppressWarnings("unused")
+  private void createCandidates()
+  {
+    mCandidateMap = new HashMap<>(mEventInfoMap.size());
+    for (final Map.Entry<AbstractEFAEvent,EventInfo> entry :
+      mEventInfoMap.entrySet()) {
+      final EventInfo info = entry.getValue();
+      final AbstractEFAEvent event = entry.getKey();
+      if (isRoot(event)) {
+        final Set<UnifiedEFATransitionRelation> trs =
+          new THashSet<>();
+        final Set<UnifiedEFAVariable> vars = new THashSet<>();
+        info.collectCandidate(trs, vars);
+        Candidate candidate = new Candidate(trs, vars);
+        final Candidate existing = mCandidateMap.get(candidate);
+        if (existing == null) {
+          mCandidateMap.put(candidate, candidate);
+        } else {
+          candidate = existing;
+        }
+        candidate.addLocalEvent(event);
+      }
+    }
+  }
+
   private void applyCandidate(final Candidate candidate)
     throws AnalysisException, EvalException
   {
-    int smallest = 0;
-    UnifiedEFAVariable selectedVar = null;
     final List<UnifiedEFAVariable> vars = candidate.getVariables();
+    final UnifiedEFATransitionRelation result;
     if (!vars.isEmpty()) {
+      int smallest = Integer.MAX_VALUE;
+      UnifiedEFAVariable selectedVar = null;
       for (final UnifiedEFAVariable var: vars) {
         final int size = var.getRange().size();
         if (smallest > size) {
@@ -245,20 +267,66 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
           selectedVar = var;
         }
       }
+      mUnfolder = new UnifiedEFAVariableUnfolder
+        (getFactory(), mCompilerOperatorTable, mCurrentEFASystem.getVariableContext());
+      mUnfolder.setUnfoldedVariable(selectedVar);
+      final VariableInfo varInfo = mVariableInfoMap.get(selectedVar);
+      final List<AbstractEFAEvent> originalEvents = varInfo.getChildrenEvents();
+      mUnfolder.setOriginalEvents(originalEvents);
+      mUnfolder.run();
+      result = mUnfolder.getTransitionRelation();
+      registerTR(result);
+      unregisterVariable(selectedVar);
+    } else {
+      final List<UnifiedEFATransitionRelation> trs =
+        candidate.getTransitionRelations();
+      if (trs.size() > 1) {
+        mEFASynchronizer.setInputTransitionRelations(trs);
+        mEFASynchronizer.run();
+        result =  mEFASynchronizer.getSynchronousProduct();
+        registerTR(result);
+        for (final UnifiedEFATransitionRelation tr : trs) {
+          unregisterTR(tr);
+        }
+      } else {
+        result = trs.get(0);
+      }
     }
-    mUnfolder = new UnifiedEFAVariableUnfolder
-      (getFactory(), mCompilerOperatorTable, mCurrentEFASystem.getVariableContext());
-    mUnfolder.setUnfoldedVariable(selectedVar);
-    final VariableInfo varInfo = mVariableInfoMap.get(selectedVar);
-    final List<AbstractEFAEvent> originalEvents = varInfo.getEvents();
-    mUnfolder.setOriginalEvents(originalEvents);
-    mUnfolder.run();
-    final UnifiedEFATransitionRelation unfoldedTR =
-      mUnfolder.getTransitionRelation();
-    registerTR(unfoldedTR);
-    unregisterVariable(selectedVar);
-    //TODO hide
-    final UnifiedEFATransitionRelation simplifiedTR = mSimplifier.run(unfoldedTR);
+    simplifyTR(result);
+  }
+
+  private boolean isRoot(final AbstractEFAEvent event)
+  {
+    AbstractEFAEvent original = event.getOriginalEvent();
+    while (original != null) {
+      final EventInfo info = mEventInfoMap.get(original);
+      if (info != null) {
+        return false;
+      } else {
+        original = original.getOriginalEvent();
+      }
+    }
+    return true;
+  }
+
+  private void simplifyTR(final UnifiedEFATransitionRelation tr)
+    throws AnalysisException
+  {
+    final UnifiedEFAEventEncoding encoding = tr.getEventEncoding();
+    final ListBufferTransitionRelation resultRel = tr.getTransitionRelation();
+    for (final AbstractEFAEvent event : tr.getUsedEvents()) {
+      final EventInfo localInfo = mEventInfoMap.get(event);
+      if (localInfo.isLocal()) {
+        final int code = encoding.getEventId(event);
+        final byte status = resultRel.getProperEventStatus(code);
+        resultRel.setProperEventStatus(code, status | EventEncoding.STATUS_LOCAL);
+      }
+    }
+    final UnifiedEFATransitionRelation simplifiedTR = mSimplifier.run(tr);
+    if (simplifiedTR != null) {
+      registerTR(simplifiedTR);
+      unregisterTR(tr);
+    }
   }
 
   private void registerTR(final UnifiedEFATransitionRelation tr)
@@ -271,26 +339,24 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         final AbstractEFAEvent originalEvent = event.getOriginalEvent();
         if (originalEvent != null) {
           final EventInfo originalInfo = mEventInfoMap.get(originalEvent);
-          originalInfo.addChild();
+          originalInfo.addChild(info);
         }
       }
       info.addTransitionRelation(tr);
     }
+    mTransitionRelations.add(tr);
   }
 
   private void unregisterVariable(final UnifiedEFAVariable var)
   {
-    mVariableInfoMap.remove(var);
-    final VariableInfo varInfo = mVariableInfoMap.get(var);
-    final List<AbstractEFAEvent> originalEvents = varInfo.getEvents();
-    for (final AbstractEFAEvent event : originalEvents) {
-      final EventInfo eventInfo = mEventInfoMap.get(event);
+    final VariableInfo varInfo = mVariableInfoMap.remove(var);
+    final List<EventInfo> originalInfo = varInfo.getEvents();
+    for (final EventInfo eventInfo : originalInfo) {
       eventInfo.removeVariable(var);
       removeEmptyEventInfo(eventInfo);
     }
   }
 
-  @SuppressWarnings("unused")
   private void unregisterTR(final UnifiedEFATransitionRelation tr)
   {
     for (final AbstractEFAEvent event : tr.getUsedEvents()) {
@@ -298,6 +364,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       info.removeTransitionRelation(tr);
       removeEmptyEventInfo(info);
     }
+    mTransitionRelations.remove(tr);
   }
 
   private void removeEmptyEventInfo(final EventInfo info)
@@ -309,8 +376,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       while (originalEvent != null) {
         final EventInfo originalInfo = mEventInfoMap.get(originalEvent);
         if (originalInfo != null) {
-          final int numChildren = info.getNumberOfChildren();
-          originalInfo.addChildren(numChildren - 1);
+          originalInfo.removeChild(info);
           break;
         }
         originalEvent = originalEvent.getOriginalEvent();
@@ -318,13 +384,41 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     }
   }
 
+  @SuppressWarnings("unused")
+  private void splitSubsystems()
+  {
+
+  }
+
+  @SuppressWarnings("unused")
+  private void collectSybsystem(final EventInfo startInfo)
+  {
+    final BFSSearchSpace<EventInfo> search = new BFSSearchSpace<>();
+    search.add(startInfo);
+    while (!search.isEmpty()) {
+      final EventInfo info = search.remove();
+      final List<UnifiedEFATransitionRelation> trs = info.getTransitionRelations();
+      for (final UnifiedEFATransitionRelation tr : trs) {
+        final Set<AbstractEFAEvent> events = tr.getUsedEvents();
+        for (final AbstractEFAEvent nextEvent : events) {
+          AbstractEFAEvent originalEvent = nextEvent.getOriginalEvent();
+          while (originalEvent != null) {
+            originalEvent = originalEvent.getOriginalEvent();
+          }
+          search.add(mEventInfoMap.get(originalEvent));
+        }
+      }
+    }
+  }
 
   //#########################################################################
   //# Inner Class Candidate
   private class Candidate implements Comparable<Candidate>
   {
-    private Candidate(final List<UnifiedEFATransitionRelation> trs,
-                      final List<UnifiedEFAVariable> vars)
+    //#######################################################################
+    //# Constructors
+    private Candidate(final Set<UnifiedEFATransitionRelation> trs,
+                      final Set<UnifiedEFAVariable> vars)
     {
       mTransitionRelations = new ArrayList<>(trs);
       Collections.sort(mTransitionRelations);
@@ -335,7 +429,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
     //#######################################################################
     //# Simple Access
-    @SuppressWarnings("unused")
     private List<UnifiedEFATransitionRelation> getTransitionRelations()
     {
       return mTransitionRelations;
@@ -366,7 +459,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       for (final UnifiedEFAVariable var : mVariables) {
         numStates *= var.getRange().size();
         final VariableInfo info = mVariableInfoMap.get(var);
-        final List<AbstractEFAEvent> events = info.getEvents();
+        final List<AbstractEFAEvent> events = info.getChildrenEvents();
         eventSet.addAll(events);
       }
       for (final UnifiedEFATransitionRelation tr : mTransitionRelations) {
@@ -432,7 +525,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     {
       mEvent = event;
       mTransitionRelations = new ArrayList<>();
-      mVariables = new ArrayList<>();
+      mChildrenEvents = new ArrayList<UnifiedEFAConflictChecker.EventInfo>();
+      mVariables = new THashSet<>();
       mVariableCollector.collectAllVariables(mEvent.getUpdate(), mVariables);
     }
 
@@ -458,7 +552,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mTransitionRelations.remove(tr);
     }
 
-    private List<UnifiedEFAVariable> getVariables()
+    private Set<UnifiedEFAVariable> getVariables()
     {
       return mVariables;
     }
@@ -468,19 +562,46 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mVariables.remove(selectedVar);
     }
 
-    private int getNumberOfChildren()
+    private List<EventInfo> getChildren()
     {
-      return mNumberOfChildren;
+      return mChildrenEvents;
     }
 
-    private void addChild()
+    private void addChild(final EventInfo event)
     {
-      mNumberOfChildren++;
+      mChildrenEvents.add(event);
     }
 
-    private void addChildren(final int children)
+    private void removeChild(final EventInfo event)
     {
-      mNumberOfChildren += children;
+      mChildrenEvents.remove(event);
+      mChildrenEvents.addAll(event.getChildren());
+    }
+
+    private void collectLeaves(final List<AbstractEFAEvent> leaves)
+    {
+      if (mChildrenEvents.isEmpty()) {
+        leaves.add(mEvent);
+      } else {
+        for (final EventInfo info : mChildrenEvents) {
+          info.collectLeaves(leaves);
+        }
+      }
+    }
+
+    /**
+     * Collects data for a candidate with this event. All transition
+     * relations and variables associated with this event and all its
+     * descendants are added to the sets trs and vars, respectively.
+     */
+    private void collectCandidate(final Set<UnifiedEFATransitionRelation> trs,
+                                  final Set<UnifiedEFAVariable> vars)
+    {
+      trs.addAll(getTransitionRelations());
+      vars.addAll(getVariables());
+      for (final EventInfo info : mChildrenEvents) {
+        info.collectCandidate(trs, vars);
+      }
     }
 
     //#######################################################################
@@ -490,10 +611,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       return mTransitionRelations.isEmpty() && mVariables.isEmpty();
     }
 
-    @SuppressWarnings("unused")
     private boolean isLocal()
     {
-      if (mNumberOfChildren != 0) {
+      if (mChildrenEvents.size() != 0) {
         return false;
       } else if (mTransitionRelations.size() + mVariables.size() > 1) {
         return false;
@@ -511,11 +631,19 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     }
 
     //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mEvent.getName();
+    }
+
+    //#######################################################################
     //# Data Members
     private final AbstractEFAEvent mEvent;
     private final List<UnifiedEFATransitionRelation> mTransitionRelations;
-    private final List<UnifiedEFAVariable> mVariables;
-    private int mNumberOfChildren = 0;
+    private final Set<UnifiedEFAVariable> mVariables;
+    private final List<EventInfo> mChildrenEvents;
   }
 
 
@@ -527,24 +655,41 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     //# Constructor
     private VariableInfo()
     {
-      mEvents = new ArrayList<>();
+      mEventInfo = new ArrayList<>();
     }
 
     //#######################################################################
     //# Simple Access
-    private List<AbstractEFAEvent> getEvents()
+    private List<AbstractEFAEvent> getChildrenEvents()
     {
-      return mEvents;
+      final List<AbstractEFAEvent> result = new ArrayList<>();
+      for (final EventInfo info : mEventInfo) {
+        info.collectLeaves(result);
+      }
+      return result;
     }
 
-    private void addEvent(final AbstractEFAEvent event)
+    private List<EventInfo> getEvents()
     {
-      mEvents.add(event);
+      return mEventInfo;
     }
 
-    //#########################################################################
+    private void addEvent(final EventInfo event)
+    {
+      mEventInfo.add(event);
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mEventInfo.toString();
+    }
+
+    //#######################################################################
     //# Data Members
-    private final List<AbstractEFAEvent> mEvents;
+    private final List<EventInfo> mEventInfo;
   }
 
 
@@ -555,7 +700,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
   private DocumentManager mDocumentManager;
   private UnifiedEFAVariableCollector mVariableCollector;
-  @SuppressWarnings("unused")
   private UnifiedEFASynchronousProductBuilder mEFASynchronizer;
   private UnifiedEFASimplifier mSimplifier;
   private UnifiedEFAVariableUnfolder mUnfolder;
@@ -564,5 +708,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   private Map<AbstractEFAEvent, EventInfo> mEventInfoMap;
   private Map<UnifiedEFAVariable, VariableInfo> mVariableInfoMap;
   private Map<Candidate, Candidate> mCandidateMap;
+  private Set<UnifiedEFATransitionRelation> mTransitionRelations;
+  private EFANonblockingChecker mNonblockingChecker;
 
 }

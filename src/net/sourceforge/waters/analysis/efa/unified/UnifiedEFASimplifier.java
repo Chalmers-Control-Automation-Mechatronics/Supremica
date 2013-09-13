@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.efa.unified;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.HidingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
@@ -51,6 +52,8 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
        final int limit)
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final HidingTRSimplifier hiding = new HidingTRSimplifier();
+    chain.add(hiding);
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
@@ -72,6 +75,8 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
        final int limit)
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final HidingTRSimplifier hiding = new HidingTRSimplifier();
+    chain.add(hiding);
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
@@ -114,6 +119,8 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
        final int limit)
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final HidingTRSimplifier hiding = new HidingTRSimplifier();
+    chain.add(hiding);
     final TauLoopRemovalTRSimplifier tauLoopRemover =
       new TauLoopRemovalTRSimplifier();
     tauLoopRemover.setDumpStateAware(true);
@@ -224,6 +231,8 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
       }
       final long start = System.currentTimeMillis();
       ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      final int config = mSimplifier.getPreferredInputConfiguration();
+      rel = new ListBufferTransitionRelation(rel, config);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = rel.getNumberOfTransitions();
       final int numMarkings = rel.getNumberOfMarkings();

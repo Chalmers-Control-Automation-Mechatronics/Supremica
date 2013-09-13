@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
 import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -240,7 +241,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     result.addUnfoldingStatistics(mPartialUnfolder.getStatistics());
     mSimplifier = mEFSMTRSimplifierFactory.createAbstractionProcedure(this);
     result.setSimplifierStatistics(mSimplifier);
-    mNonblockingChecker = new EFSMTRNonblockingChecker();
+    mNonblockingChecker = new EFANonblockingChecker();
     mEFSMSystemQueue = new PriorityQueue<EFSMSystem>();
     mNextSubsystemNumber = 1;
   }
@@ -641,7 +642,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   private EFSMPartialUnfolder mPartialUnfolder;
   private CompositionSelectionHeuristic mCompositionSelectionHeuristic;
   private EFSMSynchronizer mEFSMSynchronizer;
-  private EFSMTRNonblockingChecker mNonblockingChecker;
+  private EFANonblockingChecker mNonblockingChecker;
   private EFSMVariableCollector mEFSMVariableCollector;
   private Queue<EFSMSystem> mEFSMSystemQueue;
   private String mSystemName;

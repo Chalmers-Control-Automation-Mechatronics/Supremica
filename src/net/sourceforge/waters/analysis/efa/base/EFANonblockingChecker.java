@@ -2,12 +2,12 @@
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
-//# CLASS:   EFSMTRNonblockingChecker
+//# CLASS:   EFANonblockingChecker
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa.efsm;
+package net.sourceforge.waters.analysis.efa.base;
 
 import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
@@ -20,15 +20,15 @@ import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-public class EFSMTRNonblockingChecker extends AbstractEFSMAlgorithm
+public class EFANonblockingChecker extends AbstractEFAAlgorithm
 {
 
   //#########################################################################
   //# Invocation
-  public boolean run(final EFSMTransitionRelation efsmTR)
+  public boolean run(final AbstractEFATransitionRelation<?> tr)
     throws AnalysisAbortException
   {
-    final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
+    final ListBufferTransitionRelation rel = tr.getTransitionRelation();
     if (rel.getNumberOfPropositions() == 0) {
       return true;
     }

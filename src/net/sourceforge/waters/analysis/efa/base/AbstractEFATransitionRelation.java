@@ -141,7 +141,7 @@ public abstract class AbstractEFATransitionRelation<L>
     //# Constructor
     private UsedLabelIterator()
     {
-      mIndex = -1;
+      mIndex = mNextIndex = -1;
     }
 
     //#######################################################################
@@ -150,18 +150,21 @@ public abstract class AbstractEFATransitionRelation<L>
     public boolean hasNext()
     {
       final int numEvents = mTransitionLabelEncoding.size();
-      for (mIndex++; mIndex < numEvents; mIndex++) {
-        if (isUsedLabel(mIndex)) {
-          break;
+      if (mNextIndex == mIndex) {
+        for (mNextIndex = mIndex + 1; mNextIndex < numEvents; mNextIndex++) {
+          if (isUsedLabel(mNextIndex)) {
+            break;
+          }
         }
       }
-      return mIndex < numEvents;
+      return mNextIndex < numEvents;
     }
 
     @Override
     public L next()
     {
       if (hasNext()) {
+        mIndex = mNextIndex;
         return mTransitionLabelEncoding.getTransitionLabel(mIndex);
       } else {
         throw new NoSuchElementException
@@ -179,6 +182,7 @@ public abstract class AbstractEFATransitionRelation<L>
     //#######################################################################
     //# Data Members
     private int mIndex;
+    private int mNextIndex;
   }
 
 
