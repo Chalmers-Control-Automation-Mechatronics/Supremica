@@ -57,7 +57,9 @@ public enum SynthesisAlgorithm
 
     PARTITIONBDD("Partitioning (symbolic)", false),
     CLOCKPARTITION("Clock partitioning", false),
-	MINIMALITY("Minimality approach", false),
+    MINIMALITY_C("Minimality approach (classic)", false),
+    MINIMALITY_M("Minimality approach (monolithic)", false),
+    MINIMALITY_P("Minimality approach (partition)", false),
 
     MODULAR("Modular"),
     COMPOSITIONAL("Compositional"),

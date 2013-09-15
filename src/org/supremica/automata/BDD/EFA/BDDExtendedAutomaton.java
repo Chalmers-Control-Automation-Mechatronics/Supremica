@@ -116,7 +116,8 @@ public class BDDExtendedAutomaton {
 
         //System.err.println(theExAutomaton.getName());
         for (final NodeProxy currLocation : theExAutomaton.getNodes()) {
-            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD) 
+                    || bddExAutomata.synType.equals(SynthesisAlgorithm.MINIMALITY_P)) {
                 // Add the node proxy in the map
                 for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {
                     final EdgeSubject currEdge = edgeIt.next();

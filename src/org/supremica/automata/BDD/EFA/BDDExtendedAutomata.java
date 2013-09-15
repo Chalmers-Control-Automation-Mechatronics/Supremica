@@ -56,8 +56,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     List<EventDeclProxy> unionAlphabet;
     BDDEdges bddEdges = null;
     private BDDDomain eventDomain;
-    @SuppressWarnings("unused")
-    private BDDDomain constantDomain;
     private BDDVarSet sourceStateVarSet = null;
     private BDDVarSet destStateVarSet = null;
     //Related to locations
@@ -71,8 +69,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     private BDDVarSet sourceResourceVarSet = null;
     private BDDVarSet destResourceVarSet = null;
     HashMap<VariableComponentProxy, BDDVarSet> stageVar2BDDTempVarSetMap;
-    public BDD loadEventsBDD = null;
-    public BDD lastEventsBDD = null;
+    BDD loadEventsBDD = null;
     
     //Related to all variables including regular variables and clocks
     BDDDomain[] tempVarDomains = null;
@@ -124,7 +121,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     long nbrOfBlockingStates = -1;
     long nbrOfNonblockingControllableStates = -1;
     long nbrOfControllableStates = -1;
-    long nbrOfUnsafeStates = -1; // for RAS models
+    long nbrOfBoundaryUnsafeStates = -1; // for RAS models
     private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecSourceVarsMap;
     private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTargetVarsMap;
     private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTempVarsMap;
@@ -141,9 +138,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     BDD[][] forwardTransAndNextValsForV;
     private BDD[] forwardClockExtensionBDD;
     private BDD forwardClocksExtensionBDD;
-//    TIntObjectHashMap<TIntArrayList> reversedDestVarOrderings;
-//    TIntObjectHashMap<TIntArrayList> reversedSourceVarOrderings;
-//    TIntObjectHashMap<TIntArrayList> reversedTempVarOrderings;
     private BDD[] backwardClockExtensionBDD;
     private BDD backwardClocksExtensionBDD;
     BDD[][] backwardTransWhereVisUpdated;
@@ -210,7 +204,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         plantAlphabetBDD = manager.getZeroBDD();
 
         loadEventsBDD = manager.getZeroBDD();
-        lastEventsBDD = manager.getZeroBDD();
 
         this.options = options;
         this.synType = options.getSynthesisAlgorithm();
@@ -234,7 +227,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     @SuppressWarnings("unchecked")
     private void initialize() {
         unionAlphabet = orgExAutomata.getUnionAlphabet();
-        if (synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+        if (synType.equals(SynthesisAlgorithm.PARTITIONBDD) 
+                || synType.equals(SynthesisAlgorithm.MINIMALITY_P)) {
             event2AutomatonsEdges = new TIntObjectHashMap<HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>>(unionAlphabet.size());
         }
 
@@ -322,7 +316,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         setVariableOrdering();
         
-        if(synType.equals(SynthesisAlgorithm.MINIMALITY))
+        if(synType.equals(SynthesisAlgorithm.MINIMALITY_C) 
+                || synType.equals(SynthesisAlgorithm.MINIMALITY_M)
+                || synType.equals(SynthesisAlgorithm.PARTITIONBDD))
         {
             BDDPartitionVarOrdSorter forceSorter = new BDDPartitionVarOrdSorter(orgExAutomata, variableOrdering, variableOrderingNames);
             forceSorter.sort();
@@ -351,16 +347,13 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
                 for (final EventDeclProxy event : ((List<EventDeclProxy>) obj)) {
                     final int currEventIndex = getEventIndex(event);
-                    if(synType.equals(SynthesisAlgorithm.PARTITIONBDD)){
+                    if(synType.equals(SynthesisAlgorithm.PARTITIONBDD)
+                            || synType.equals(SynthesisAlgorithm.MINIMALITY_P)){
                         event2AutomatonsEdges.put(currEventIndex, new HashMap<ExtendedAutomaton, ArrayList<EdgeProxy>>());
                     }
                     final BDD eventBDD = manager.createBDD(currEventIndex, eventDomain);
                     if (event.getName().contains(FlowerEFABuilder.LOAD_EVENT_PREFIX)) {
                         loadEventsBDD = loadEventsBDD.or(eventBDD);
-                    }
-                    
-                    if (FlowerEFABuilder.lastEventList.contains(event.getName())) {
-                        lastEventsBDD = lastEventsBDD.or(eventBDD);
                     }
 
                     if (orgExAutomata.getPlantAlphabet().contains(event)) {
@@ -394,11 +387,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                     bddVar2AutVarName.put(sourceVars[i], automatonName);
                 }
 
-                System.err.println("sourceLocation variables: " + sourceLocationDomain.set().toString());
+//                System.err.println("sourceLocation variables: " + sourceLocationDomain.set().toString());
                 final BDDDomain destLocationDomain = manager.createDomain(nbrOfStates);
                 numberOfUsedBDDVariables += destLocationDomain.varNum();
 
-                System.err.println("destLocation variables: " + destLocationDomain.set().toString());
+//                System.err.println("destLocation variables: " + destLocationDomain.set().toString());
 
                 sourceLocationVarSet.unionWith(sourceLocationDomain.set());
                 destLocationVarSet.unionWith(destLocationDomain.set());
@@ -507,9 +500,11 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        }
 
         if (options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.MONOLITHICBDD)
-                || options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.MINIMALITY)) {
+                || options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.MINIMALITY_M)
+                || options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.MINIMALITY_C)) {
             computeBDDEdges();
-        } else if (options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD)) {
+        } else if (options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.PARTITIONBDD)
+                || options.getSynthesisAlgorithm().equals(SynthesisAlgorithm.MINIMALITY_P)) {
             parAlgoWorker = getParAlgoWorker();
         }
         
@@ -628,7 +623,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         final String varName = var.getName();
         final int varIndex = theIndexMap.getVariableIndex(var);
 
-        System.err.println("variable name: " + varName);
+//        System.err.println("variable name: " + varName);
 //        int domain = orgExAutomata.getDomain();
         final int domain = orgExAutomata.getVarDomain(varName);
 
@@ -647,7 +642,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //        int[] reversedTempVarOrdering = manager.partialReverseVarOrdering(tempDomain.vars());
 //        reversedTempVarOrderings.put(varIndex, new TIntArrayList(reversedTempVarOrdering));
         tempVarDomains[varIndex] = tempDomain;
-        System.err.println("tempVar variables: " + tempDomain.set().toString());
+//        System.err.println("tempVar variables: " + tempDomain.set().toString());
         
         tempVariablesVarSet = tempVariablesVarSet.union(tempDomain.set());
 
@@ -656,7 +651,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         variableToMinSourceBDDVar.put(varName, sourceDomain.vars()[0]);
 //        int[] reversedSourceVarOrdering = manager.partialReverseVarOrdering(sourceDomain.vars());
 //        reversedSourceVarOrderings.put(varIndex, new TIntArrayList(reversedSourceVarOrdering));
-        System.err.println("sourceVar variables: " + sourceDomain.set().toString());
+//        System.err.println("sourceVar variables: " + sourceDomain.set().toString());
         
         numberOfUsedBDDVariables += sourceDomain.varNum();
 
@@ -694,7 +689,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
 
         numberOfUsedBDDVariables += destDomain.varNum();
-        System.err.println("destVar variables: " + destDomain.set().toString());
+//        System.err.println("destVar variables: " + destDomain.set().toString());
         BDDBitVecTargetVarsMap.put(theIndexMap.getVariableIndex(var),
                 manager.createSupremicaBDDBitVector(BDDBitVectoryType,
                 orgExAutomata.getMinValueofVar(varName) < 0,
@@ -1297,21 +1292,30 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     public BDD getUnsafeStates() {
         manager.setBDDExAutomata(this);
-        synType = SynthesisAlgorithm.MONOLITHICBDD;
+        //synType = SynthesisAlgorithm.MONOLITHICBDD;
 //        System.err.println("compute reachable states --- begin");
 //        computeReachableStates();
 //        System.err.println("compute reachable states --- end");
-        final BDD unsafeStates = manager.computeUnsafeStates2();
-
+        
+        BDD boundaryUnsafeStates = null;
+        
+        if (synType.equals(SynthesisAlgorithm.MINIMALITY_M)){
+            boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesAlternative();
+            boundaryUnsafeStates = manager.removeLargerStates(boundaryUnsafeStates);
+        }
+        else if (synType.equals(SynthesisAlgorithm.MINIMALITY_C)) {
+            boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesClassic();
+            boundaryUnsafeStates = manager.removeLargerStates(boundaryUnsafeStates);
+        }
 //        unsafeStates.printDot();
 
         //       final IDD idd = generateIDD(unsafeStates, unsafeStates);
         // printDOT(idd);
-        nbrOfUnsafeStates = (long) unsafeStates.satCount(sourceStagesVarSet);
+        nbrOfBoundaryUnsafeStates = (long) boundaryUnsafeStates.satCount(sourceStagesVarSet);
         //System.err.println();
-        //System.err.println("Complete! Number of minimal unsafe states: " + nbrOfUnsafeStates);
+        //System.err.println("Complete! Number of minimal unsafe states: " + nbrOfBoundaryUnsafeStates);
 
-        return unsafeStates;
+        return boundaryUnsafeStates;
     }
 
     public TIntArrayList BDD2valuations(final BDD bdd, final String variable) {

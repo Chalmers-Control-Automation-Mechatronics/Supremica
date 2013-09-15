@@ -60,7 +60,7 @@ public class BDDPartitionVarOrdSorter {
         final List<AutVar> autVarList = new ArrayList<AutVar>(automatonList.size() + variableList.size());
 
         // Build the autVarList by iterating each efa and extracting variables from transitiions
-        final Map<String, AutVar> var2AutVar = new HashMap<String, AutVar>(variableList.size());
+        final Map<String, AutVar> var2AutVar = new HashMap<String, AutVar>(automatonList.size() + variableList.size());
 
         for (final ExtendedAutomaton efa : automatonList) {
             var2AutVar.put(efa.getName(), new AutVar(AutVar.TYPE_EFA, efa, efa.getName(), new HashSet<EventDeclProxy>(efa.getAlphabet())));
@@ -72,8 +72,12 @@ public class BDDPartitionVarOrdSorter {
                 }
                 if (anEdge.getGuardActionBlock() != null && anEdge.getGuardActionBlock().getGuards() != null
                         && !anEdge.getGuardActionBlock().getGuards().isEmpty()) {
-                    @SuppressWarnings("deprecation")
-                    final Set<VariableComponentProxy> variablesOfCurrEdge = efa.extractVariablesFromExpr(anEdge.getGuardActionBlock().getGuards().get(0));
+                    final Set<VariableComponentProxy> variablesOfCurrEdge = new HashSet<VariableComponentProxy>();
+                    String guardExpr = anEdge.getGuardActionBlock().getGuards().get(0).toString();
+                    for(VariableComponentProxy var: origin.getVars()) {
+                        if (guardExpr.contains(var.getName()))
+                            variablesOfCurrEdge.add(var);
+                    }
                     for (final VariableComponentProxy aVar : variablesOfCurrEdge) {
                         final String varName = aVar.getName();
                         if (!var2AutVar.containsKey(varName)) {
