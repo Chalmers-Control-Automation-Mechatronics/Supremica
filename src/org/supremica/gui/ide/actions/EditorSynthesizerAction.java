@@ -214,7 +214,7 @@ public class EditorSynthesizerAction
 
 
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
-        logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.numberOfReachableStates());
+        //logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.numberOfReachableStates());
         if(options.getOptimization())
             logger.info("The minimum time to 'safely' reach a marked state from the initial state: "+bddSynthesizer.bddAutomata.getOptimalTime(bddSynthesizer.getResult())+".");       
         

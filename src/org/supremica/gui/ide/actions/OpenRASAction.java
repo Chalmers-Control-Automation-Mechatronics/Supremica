@@ -2,18 +2,19 @@ package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
-
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import org.supremica.automata.FlowerEFABuilder;
+import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 
 /**
- *
+ * Create a EFA model for a Resource Allocation System (RAS)
+ * 
  * @ author Sajed, Zhennan
  */
 
@@ -42,13 +43,21 @@ public class OpenRASAction extends net.sourceforge.waters.gui.actions.IDEAction 
         final int choice = chooser.showOpenDialog(frame);
         // Load the files ...
         if (choice == JFileChooser.APPROVE_OPTION) {
-           final File selectedRAS = chooser.getSelectedFile();
+           
+            final File selectedRAS = chooser.getSelectedFile();
+            final String rasName = selectedRAS.getName();
 
-           FlowerEFABuilder flbuilder = null;
-           try{
-                flbuilder = new FlowerEFABuilder(selectedRAS, ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject());
-           }catch(final IOException e){e.printStackTrace();};
-           flbuilder.buildEFA();
+            final DocumentContainerManager cmanager =
+                    ide.getDocumentContainerManager();
+
+            ModuleSubject module = ModuleSubjectFactory.getInstance()
+                    .createModuleProxy(rasName, null);
+
+            cmanager.newContainer(module);
+
+            FlowerEFABuilder flbuilder = null;
+            flbuilder = new FlowerEFABuilder(selectedRAS, module);
+            flbuilder.buildEFA();
         }
     }
     // #########################################################################

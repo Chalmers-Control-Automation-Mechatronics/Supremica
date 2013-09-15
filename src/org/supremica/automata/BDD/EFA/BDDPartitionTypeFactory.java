@@ -57,6 +57,11 @@ public class BDDPartitionTypeFactory {
         } else if (synType == SynthesisAlgorithm.CLOCKPARTITION) {
             logger.info("TEFAs: the clock-based partitioning algorithm is chosen.");
             throw new UnsupportedOperationException();
+        } else if (synType == SynthesisAlgorithm.MINIMALITY_P) {
+            logger.info("RAS models: the resource-based partitioning algorithm is choosen.");
+            BDDPartitionSet eventPartitions = new BDDPartitionSetEve(bddExAutomata);
+            BDDPartitionCoordinator eventCoordinator = new BDDPartitionCoordinatorEve(eventPartitions);
+            parAlgoWorker = new BDDPartitionAlgoWorkerRan(eventPartitions, eventCoordinator);
         }
         return parAlgoWorker;
     }

@@ -81,15 +81,15 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     private final ArrayList<ExtendedAutomaton> theExAutomata;
     private Map<String, EventDeclProxy> eventIdToProxyMap;
     private final Map<ExtendedAutomaton,Integer> exAutomatonToIndex;
-    private final Map<String, ExtendedAutomaton> stringToExAutomaton;
+    private Map<String, ExtendedAutomaton> stringToExAutomaton;
     private boolean negativeValuesIncluded = false;
     public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
     private final List<VariableComponentProxy> clocks;
-    int domain = 0;
+    private int domain = 0;
     private int largestClockDomain = 0;
     private List<VariableComponentProxy> parameters = null;
-    private Map<String, MinMax> var2MinMaxValMap = null;
+    Map<String, MinMax> var2MinMaxValMap = null;
     Map<String, Integer> var2domainMap = null;
     public HashSet<EventDeclProxy> uncontrollableAlphabet = null;
     public HashSet<EventDeclProxy> controllableAlphabet = null;
@@ -128,6 +128,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         plantAlphabet = new HashSet<EventDeclProxy>();
         exAutomatonToIndex = new HashMap<ExtendedAutomaton, Integer>();
         stringToExAutomaton = new HashMap<String, ExtendedAutomaton>();
+        eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
+        var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>(); 
     }
 
     public ExtendedAutomata(final String name) {
@@ -142,7 +144,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public ExtendedAutomata(final ModuleSubject module) {
         this(module, 0);
     }
-
+    
     public ExtendedAutomata(final ModuleSubject module, final int globalClockDomain) {
         this();
 
@@ -161,13 +163,13 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 }
             }
         }
-        eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
+        
         for (final EventDeclProxy e : module.getEventDeclList()) {
             eventIdToProxyMap.put(e.getName(), e);
         }
 
         var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
-
+        
         final ArrayList<Proxy> components = new ArrayList<Proxy>(module.getComponentList());
         if (globalClockDomain > 0) {
             components.add(VariableHelper.createIntegerVariable(CLOCK_PREFIX + GLOBAL_PREFIX, 0, globalClockDomain, 0, null));
@@ -376,6 +378,14 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public int size() {
         return nbrOfExAutomata;
     }
+    
+    public int getNbrExAutomata() {
+        return nbrOfExAutomata;
+    }
+    
+    public void setNbrOfExAutomata(int i) {
+        nbrOfExAutomata = i;
+    }
 
     public VariableComponentProxy getVariableByName(final String varName) {
         for (final VariableComponentProxy var : variables) {
@@ -516,6 +526,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public void addAutomaton(final ExtendedAutomaton exAutomaton)
     {
         theExAutomata.add(exAutomaton);
+        nbrOfExAutomata ++;
         stringToExAutomaton.put(exAutomaton.getName(), exAutomaton);
         module.getComponentListModifiable().add(exAutomaton.getComponent());
         for(final EventDeclProxy event : exAutomaton.getAlphabet()){
@@ -545,7 +556,19 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public HashSet<EventDeclProxy> getPlantAlphabet() {
         return plantAlphabet;
     }
+    
+    public Map<String, EventDeclProxy> getEventIdToProxyMap() {
+        return eventIdToProxyMap;
+    }
 
+    public Map<String, ExtendedAutomaton> getStringToExAutomaton() {
+        return stringToExAutomaton;
+    }
+    
+    public void setDomain(int domain) {
+        this.domain = domain;
+    }
+    
     public ArrayList<AbstractSubject> getComponents() {
         final ArrayList<AbstractSubject> components = new ArrayList<AbstractSubject>();
 
@@ -593,7 +616,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             module.getEventDeclListModifiable().add(decl);
         }
     }
-
+    
     class MinMax {
 
         private int min;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
 <project name="Supremica" default="build" basedir=".">
-
+    
     <property name="arch.properties" location="arch.properties"/>
 
     <property file="build.properties"/>
@@ -83,7 +83,23 @@
         <include name="**/*.class"/>
     </patternset>
 
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+        <classpath>
+            <pathelement location="${lib}/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+    
+    <!-- test if abtlib works -->
+    <!--<target name="test-ant-contrib"> 
+    
+        <echo message="Testing ant-contrib is working by looping through a list of letters."/>
+        <for list="a,b,c,d,e" param="letter">
+            <sequential>
+                <echo>Letter @{letter}</echo>
+            </sequential>
+        </for>
 
+    </target>-->
     <!-- 
 *       Build this target after checking out the sources for the
 *       first time. 
@@ -1142,6 +1158,202 @@ Class-Path: ${manifest.pathlist}</echo>
             <message>The daily build has completed</message>
         </mail>
     </target>
+    
+    <!-- Run the BDD algorithms for cpmputing RAS unsafe states-->
+    
+    <target name="run-small-ras" 
+            depends="-run-all-small-ras-algo-classic,-run-all-small-ras-algo-alternative"/>
+    
+    <target name="-run-all-small-ras-algo-classic">
+        <foreach param="ras-path" target="-execute-small-ras-classic">
+            <path> 
+                <fileset dir="${examples}/ras-small" casesensitive="no"/>
+            </path>
+        </foreach>
+    </target>
+    
+    
+    <target name="-execute-small-ras-classic">
+        <echo message="executing the classic algo on ${ras-path}"/>
+        <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
+                      fork="yes" 
+                      output="small_ras_algo1_log.txt" append="true"> 
+            <arg value="${ras-path}"/> 
+            <arg value="MINIMALITY_C"/>
+            <arg value="100000"/>
+            <arg value="10000"/>
+            <arg value="16"/>
+            <arg value="500000"/>
+            <classpath>
+                <pathelement location="build" />
+                <pathelement location="lib/unjared" />
+                <pathelement path="${java.class.path}" />
+            </classpath>            
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx1024M" />
+            <jvmarg value="-Djava.library.path=${dist}"/>
+        </java>
+    </target>
+    
+    <target name="-run-all-small-ras-algo-alternative">
+        <foreach param="ras-path" target="-execute-small-ras-alternative">
+            <path> 
+                <fileset dir="${examples}/ras-small" casesensitive="no"/>
+            </path>
+        </foreach>
+    </target>
+    
+    <target name="-execute-small-ras-alternative">
+        <echo message="executing the alternative algo on ${ras-path}"/>
+        <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
+                      fork="yes" 
+                      output="small_ras_algo2_log.txt" append="true"> 
+            <arg value="${ras-path}"/> 
+            <arg value="MINIMALITY_M"/>
+            <arg value="100000"/>
+            <arg value="10000"/>
+            <arg value="16"/>
+            <arg value="500000"/>
+            <classpath>
+                <pathelement location="build" />
+                <pathelement location="lib/unjared" />
+                <pathelement path="${java.class.path}" />
+            </classpath>            
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx1024M" />
+            <jvmarg value="-Djava.library.path=${dist}"/>
+        </java>
+    </target>
+    
+    <target name="run-median-ras" 
+            depends="-run-all-median-ras-algo-classic,-run-all-median-ras-algo-alternative"/>
+    
+    <target name="-run-all-median-ras-algo-classic">
+        <foreach param="ras-path" target="-execute-median-ras-classic">
+            <path> 
+                <fileset dir="${examples}/ras-median" casesensitive="no"/>
+            </path>
+        </foreach>
+    </target>
+    
+    
+    <target name="-execute-median-ras-classic">
+        <echo message="executing the classic algo on ${ras-path}"/>
+        <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
+                      fork="yes" 
+                      output="median_ras_algo1_log.txt" append="true"> 
+            <arg value="${ras-path}"/> 
+            <arg value="MINIMALITY_C"/>
+            <arg value="1000000"/>
+            <arg value="100000"/>
+            <arg value="32"/>
+            <arg value="2500000"/>
+            <classpath>
+                <pathelement location="build" />
+                <pathelement location="lib/unjared" />
+                <pathelement path="${java.class.path}" />
+            </classpath>            
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx2048M" />
+            <jvmarg value="-Djava.library.path=${dist}"/>
+        </java>
+    </target>
+    
+    <target name="-run-all-median-ras-algo-alternative">
+        <foreach param="ras-path" target="-execute-median-ras-alternative">
+            <path> 
+                <fileset dir="${examples}/ras-median" casesensitive="no"/>
+            </path>
+        </foreach>
+    </target>
+    
+    <target name="-execute-median-ras-alternative">
+        <echo message="executing the alternative algo on ${ras-path}"/>
+        <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
+                      fork="yes" 
+                      output="median_ras_algo2_log.txt" append="true"> 
+            <arg value="${ras-path}"/> 
+            <arg value="MINIMALITY_M"/>
+            <arg value="1000000"/>
+            <arg value="100000"/>
+            <arg value="32"/>
+            <arg value="2500000"/>
+            <classpath>
+                <pathelement location="build" />
+                <pathelement location="lib/unjared" />
+                <pathelement path="${java.class.path}" />
+            </classpath>            
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx2048M" />
+            <jvmarg value="-Djava.library.path=${dist}"/>
+        </java>
+    </target>
+    
+    <target name="run-large-ras" 
+                depends="-run-all-large-ras-algo-classic,-run-all-large-ras-algo-alternative"/>
+    
+    <target name="-run-all-large-ras-algo-classic">
+        <foreach param="ras-path" target="-execute-large-ras-classic">
+            <path> 
+                <fileset dir="${examples}/ras-large" casesensitive="no"/>
+            </path>
+        </foreach>
+    </target>
+    
+    
+    <target name="-execute-large-ras-classic">
+        <echo message="executing the classic algo on ${ras-path}"/>
+        <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
+                      fork="yes" 
+                      output="large_ras_algo1_log.txt" append="true"> 
+            <arg value="${ras-path}"/> 
+            <arg value="MINIMALITY_C"/>
+            <arg value="10000000"/>
+            <arg value="1000000"/>
+            <arg value="64"/>
+            <arg value="50000000"/>
+            <classpath>
+                <pathelement location="build" />
+                <pathelement location="lib/unjared" />
+                <pathelement path="${java.class.path}" />
+            </classpath>            
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx4096M" />
+            <jvmarg value="-Djava.library.path=${dist}"/>
+        </java>
+    </target>
+    
+    <target name="-run-all-large-ras-algo-alternative">
+        <foreach param="ras-path" target="-execute-large-ras-alternative">
+            <path> 
+                <fileset dir="${examples}/ras-large" casesensitive="no"/>
+            </path>
+        </foreach>
+    </target>
+    
+    <target name="-execute-large-ras-alternative">
+        <echo message="executing the alternative algo on ${ras-path}"/>
+        <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
+                      fork="yes" 
+                      output="large_ras_algo2_log.txt" append="true"> 
+            <arg value="${ras-path}"/> 
+            <arg value="MINIMALITY_M"/>
+            <arg value="10000000"/>
+            <arg value="1000000"/>
+            <arg value="64"/>
+            <arg value="50000000"/>
+            <classpath>
+                <pathelement location="build" />
+                <pathelement location="lib/unjared" />
+                <pathelement path="${java.class.path}" />
+            </classpath>            
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx4096M" />
+            <jvmarg value="-Djava.library.path=${dist}"/>
+        </java>
+    </target>
+    
+    <target name="run-all-ras" depends="run-small-ras, run-median-ras,run-large-ras"/>
     
 </project>
 

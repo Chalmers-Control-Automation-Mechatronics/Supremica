@@ -114,9 +114,10 @@ public class BDDExtendedAutomaton {
 
         boolean anyMarkedLocation = false;
 
-        System.err.println(theExAutomaton.getName());
+        //System.err.println(theExAutomaton.getName());
         for (final NodeProxy currLocation : theExAutomaton.getNodes()) {
-            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD) 
+                    || bddExAutomata.synType.equals(SynthesisAlgorithm.MINIMALITY_P)) {
                 // Add the node proxy in the map
                 for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {
                     final EdgeSubject currEdge = edgeIt.next();
@@ -139,7 +140,7 @@ public class BDDExtendedAutomaton {
 
             // Then add state properties
             final int locationIndex = bddExAutomata.getLocationIndex(theExAutomaton, currLocation);
-            System.err.println(currLocation.getName() + ": " + locationIndex);
+            //System.err.println(currLocation.getName() + ": " + locationIndex);
             SimpleExpressionProxy invariant = TimeInvariantAttributeFactory.getInvariant(currLocation.getAttributes());
             if (invariant != null) {                
                 manager.addLocationInvariant(locationInvariants, manager.guard2BDD(invariant), locationIndex, sourceLocationDomain);

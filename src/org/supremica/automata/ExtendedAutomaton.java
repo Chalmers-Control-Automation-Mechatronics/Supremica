@@ -155,10 +155,10 @@ public class ExtendedAutomaton {
         controllableAlphabet = new HashSet<EventDeclProxy>();
         allGuards = new HashSet<SimpleExpressionProxy>();
         allActions = new HashSet<BinaryExpressionProxy>();
-        usedSourceVariables = null;
-        usedTargetVariables = null;
-        guardVariables = null;
-        actionVariables = null;
+        usedSourceVariables = new HashSet<VariableComponentProxy>();
+        usedTargetVariables = new HashSet<VariableComponentProxy>();
+        guardVariables = new HashMap<EventDeclProxy, Set<VariableComponentProxy>>();
+        actionVariables = new HashMap<EventDeclProxy, Set<VariableComponentProxy>>();
     }
 
     public ExtendedAutomaton(final ExtendedAutomata automata, final SimpleComponentSubject component) {

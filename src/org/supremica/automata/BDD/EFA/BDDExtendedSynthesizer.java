@@ -122,7 +122,7 @@ public class BDDExtendedSynthesizer {
 //
 //            BDD minimalDeadlocks = state1.or(state2);
             statesAfterSynthesis =  bddAutomata.getUnsafeStates();
-            nbrOfStates = bddAutomata.nbrOfUnsafeStates;
+            nbrOfStates = bddAutomata.nbrOfBoundaryUnsafeStates;
             synthesisTimer.stop();
         }
 
