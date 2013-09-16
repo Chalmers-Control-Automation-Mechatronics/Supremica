@@ -601,7 +601,8 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
    final Collection<SimpleEFAVariable> primed)
   {
     final List<SimpleExpressionProxy> list = new ArrayList<>();
-    for (final SimpleEFATransitionLabel label : labelEncoding.getTransitionLabels()) {
+    for (final SimpleEFATransitionLabel label :
+         labelEncoding.getTransitionLabelsIncludingTau()) {
       list.addAll(label.getConstraint().getConstraints());
     }
     final ConstraintList constraints = new ConstraintList(list);

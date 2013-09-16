@@ -37,13 +37,14 @@ public class SimpleEFAVariableCollector
   }
 
   void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
-   final Collection<SimpleEFAVariable> unprimed,
-   final Collection<SimpleEFAVariable> primed)
+                           final Collection<SimpleEFAVariable> unprimed,
+                           final Collection<SimpleEFAVariable> primed)
   {
-    for (final SimpleEFATransitionLabel label : encoding.getTransitionLabels()) {
+    for (final SimpleEFATransitionLabel label :
+         encoding.getTransitionLabelsIncludingTau()) {
       final ConstraintList update = label.getConstraint();
       collectAllVariables(update, unprimed, primed);
     }
   }
-  
+
 }

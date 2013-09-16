@@ -146,12 +146,13 @@ public class SimpleEFAComponent
 
   public Collection<ConstraintList> getConstrainSet()
   {
-    final Collection<ConstraintList> constrains = new THashSet<>(
-     getTransitionLabelEncoding().size());
-    for (final SimpleEFATransitionLabel label : getTransitionLabelEncoding()) {
-      constrains.add(label.getConstraint());
+    final Collection<ConstraintList> constraints =
+      new THashSet<>(getTransitionLabelEncoding().size());
+    for (final SimpleEFATransitionLabel label :
+         getTransitionLabelEncoding().getTransitionLabelsIncludingTau()) {
+      constraints.add(label.getConstraint());
     }
-    return constrains;
+    return constraints;
   }
 
   public SimpleEFAStateEncoding getStateEncoding()

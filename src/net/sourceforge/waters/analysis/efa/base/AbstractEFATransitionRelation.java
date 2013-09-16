@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.efa
+//# PACKAGE: net.sourceforge.waters.analysis.efa.base
 //# CLASS:   AbstractEFATransitionRelation
 //###########################################################################
 //# $Id$
@@ -57,11 +57,6 @@ public abstract class AbstractEFATransitionRelation<L>
     mTransitionRelation.setName(name);
   }
 
-  public AbstractEFATransitionLabelEncoding<L> getTransitionLabelEncoding()
-  {
-    return mTransitionLabelEncoding;
-  }
-
   public ListBufferTransitionRelation getTransitionRelation()
   {
     return mTransitionRelation;
@@ -75,15 +70,35 @@ public abstract class AbstractEFATransitionRelation<L>
 
   //#########################################################################
   //# Accessing Events
-  public Set<L> getUsedTransitionLabels()
+  protected AbstractEFATransitionLabelEncoding<L> getTransitionLabelEncoding()
   {
-    return new UsedLabelList();
+    return mTransitionLabelEncoding;
   }
 
-  public boolean isUsedLabel(final int e)
+  protected Set<L> getUsedTransitionLabels(final int start)
   {
-    final byte status = mTransitionRelation.getProperEventStatus(e);
+    return new UsedLabelList(start);
+  }
+
+  /**
+   * Returns whether the given transition label is marked as used in the
+   * transition relation.
+   * @param  event  Code of transition label to be checked.
+   */
+  protected boolean isUsedTransitionLabel(final int code)
+  {
+    final byte status = mTransitionRelation.getProperEventStatus(code);
     return EventEncoding.isUsedEvent(status);
+  }
+
+  /**
+   * Returns whether the given transition label is marked as used in the
+   * transition relation.
+   */
+  protected boolean isUsedTransitionLabel(final L label)
+  {
+    final int code = mTransitionLabelEncoding.getTransitionLabelId(label);
+    return code >= 0 ? isUsedTransitionLabel(code) : false;
   }
 
 
@@ -112,11 +127,18 @@ public abstract class AbstractEFATransitionRelation<L>
   private class UsedLabelList extends AbstractSet<L>
   {
     //#######################################################################
+    //# Constructor
+    private UsedLabelList(final int start)
+    {
+      mStart = start;
+    }
+
+    //#######################################################################
     //# Interface java.util.List
     @Override
     public Iterator<L> iterator()
     {
-      return new UsedLabelIterator();
+      return new UsedLabelIterator(mStart);
     }
 
     @Override
@@ -124,12 +146,16 @@ public abstract class AbstractEFATransitionRelation<L>
     {
       int count = 0;
       for (int e = EventEncoding.TAU; e < mTransitionLabelEncoding.size(); e++) {
-        if (isUsedLabel(e)) {
+        if (isUsedTransitionLabel(e)) {
           count++;
         }
       }
       return count;
     }
+
+    //#######################################################################
+    //# Data Members
+    private final int mStart;
   }
 
 
@@ -139,9 +165,9 @@ public abstract class AbstractEFATransitionRelation<L>
   {
     //#######################################################################
     //# Constructor
-    private UsedLabelIterator()
+    private UsedLabelIterator(final int start)
     {
-      mIndex = mNextIndex = -1;
+      mIndex = mNextIndex = start;
     }
 
     //#######################################################################
@@ -152,7 +178,7 @@ public abstract class AbstractEFATransitionRelation<L>
       final int numEvents = mTransitionLabelEncoding.size();
       if (mNextIndex == mIndex) {
         for (mNextIndex = mIndex + 1; mNextIndex < numEvents; mNextIndex++) {
-          if (isUsedLabel(mNextIndex)) {
+          if (isUsedTransitionLabel(mNextIndex)) {
             break;
           }
         }

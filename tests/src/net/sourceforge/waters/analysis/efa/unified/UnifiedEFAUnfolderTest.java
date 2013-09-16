@@ -155,7 +155,7 @@ public class UnifiedEFAUnfolderTest
     final List<UnifiedEFATransitionRelation> trList =
       Collections.singletonList(variableTR);
     final List<AbstractEFAEvent> outputEvents =
-      variableTR.getEventEncoding().getTransitionLabels();
+      variableTR.getEventEncoding().getEventsIncludingTau();
     final UnifiedEFASystem outputSystem =
       new UnifiedEFASystem(moduleName, inputSystem.getVariables(), trList,
                            outputEvents, inputSystem.getVariableContext());

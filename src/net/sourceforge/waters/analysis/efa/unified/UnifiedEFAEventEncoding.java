@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.efa.unified;
 
+import java.util.List;
+
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
 
 
@@ -60,6 +62,26 @@ public class UnifiedEFAEventEncoding
   public int createEventId(final AbstractEFAEvent event)
   {
     return super.createTransitionLabelId(event);
+  }
+
+  /**
+   * Retrieves the list of all events in this encoding, except the
+   * silent (tau) event.
+   * @return An unmodifiable list backed by the encoding.
+   */
+  public List<AbstractEFAEvent> getEventsExceptTau()
+  {
+    return getTransitionLabelsExceptTau();
+  }
+
+  /**
+   * Retrieves the list of all events in this encoding, including the
+   * silent (tau) event.
+   * @return An unmodifiable list backed by the encoding.
+   */
+  public List<AbstractEFAEvent> getEventsIncludingTau()
+  {
+    return getTransitionLabelsIncludingTau();
   }
 
 
