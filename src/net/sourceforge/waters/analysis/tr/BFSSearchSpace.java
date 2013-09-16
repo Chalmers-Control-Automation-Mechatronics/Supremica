@@ -134,6 +134,14 @@ public class BFSSearchSpace<E>
     return mVisited.size();
   }
 
+  /**
+   * Returns all the visited items in the search space.
+   */
+  public Set<E> getVisitedSet()
+  {
+    return mVisited;
+  }
+
 
   //#########################################################################
   //# Data Members
