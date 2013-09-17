@@ -316,41 +316,41 @@ public class UnifiedEFAConflictCheckerTest
 
   /*----------------------------- PSL --------------------------------------*/
 
-  public void testPsl()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "psl", "psl");
-    checkConflict(module, false);
-  }
-
-  public void testPslBig()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "psl", "pslBig");
-    checkConflict(module, false);
-  }
-
-  public void testPslBigNonblocking()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "psl", "pslBigNonblocking");
-    checkConflict(module, true);
-  }
-
-  public void testPslBigBlocking()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "psl", "pslBigBlocking");
-    checkConflict(module, false);
-  }
-
-  public void testPslBigWithManyRestartTrans()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "psl", "pslBigWithManyRestartTrans");
-    checkConflict(module, false);
-  }
+//  public void testPsl()
+//    throws IOException, WatersException
+//  {
+//    final ModuleProxy module = loadModule("tests", "psl", "psl");
+//    checkConflict(module, false);
+//  }
+//
+//  public void testPslBig()
+//    throws IOException, WatersException
+//  {
+//    final ModuleProxy module = loadModule("tests", "psl", "pslBig");
+//    checkConflict(module, false);
+//  }
+//
+//  public void testPslBigNonblocking()
+//    throws IOException, WatersException
+//  {
+//    final ModuleProxy module = loadModule("tests", "psl", "pslBigNonblocking");
+//    checkConflict(module, true);
+//  }
+//
+//  public void testPslBigBlocking()
+//    throws IOException, WatersException
+//  {
+//    final ModuleProxy module = loadModule("tests", "psl", "pslBigBlocking");
+//    checkConflict(module, false);
+//  }
+//
+//  public void testPslBigWithManyRestartTrans()
+//    throws IOException, WatersException
+//  {
+//    final ModuleProxy module =
+//      loadModule("tests", "psl", "pslBigWithManyRestartTrans");
+//    checkConflict(module, false);
+//  }
 
   /*
    * This file is not in the repository :-(

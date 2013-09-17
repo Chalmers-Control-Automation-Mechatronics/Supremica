@@ -14,7 +14,7 @@
                             <Point X="96" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="10" Y="-9"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -25,7 +25,7 @@
                             <Point X="96" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="8" Y="-4"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -34,7 +34,7 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="8" Y="-9"/>
+                                <Point X="11" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -45,7 +45,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="-9"/>
+                                <Point X="-43" Y="-5"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -63,7 +63,7 @@
                             <Point X="96" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-18" Y="9"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -73,7 +73,7 @@
                             <SimpleIdentifier Name="d"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="145" Y="164"/>
+                            <Point X="138" Y="200"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>

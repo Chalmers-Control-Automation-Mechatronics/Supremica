@@ -145,7 +145,7 @@ public abstract class AbstractEFATransitionRelation<L>
     public int size()
     {
       int count = 0;
-      for (int e = EventEncoding.TAU; e < mTransitionLabelEncoding.size(); e++) {
+      for (int e = mStart+1; e < mTransitionLabelEncoding.size(); e++) {
         if (isUsedTransitionLabel(e)) {
           count++;
         }

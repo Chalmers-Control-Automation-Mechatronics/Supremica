@@ -199,9 +199,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   {
     try {
       setUp();
-        Collection<UnifiedEFATransitionRelation> trs =
+      Collection<UnifiedEFATransitionRelation> trs =
         mMainEFASystem.getTransitionRelations();
-        mCurrentSubSystem = new SubSystemInfo(mMainEFASystem.getEvents().size(),
+      mCurrentSubSystem = new SubSystemInfo(mMainEFASystem.getEvents().size(),
                                             mMainEFASystem.getVariables().size(),
                                             trs);
       createVariableInfo();
@@ -376,13 +376,13 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mUnfolder.setOriginalEvents(originalEvents);
       mUnfolder.run();
       result = mUnfolder.getTransitionRelation();
-      registerTR(result);
+      registerTR(result, true);
       unregisterVariable(selectedVarInfo);
     } else if (trs.size() > 1) {
       mSynchronizer.setInputTransitionRelations(trs);
       mSynchronizer.run();
       result =  mSynchronizer.getSynchronousProduct();
-      registerTR(result);
+      registerTR(result, false);
       for (final UnifiedEFATransitionRelation tr : trs) {
         unregisterTR(tr);
       }
@@ -411,28 +411,31 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     final UnifiedEFATransitionRelation simplifiedTR = mSimplifier.run(tr);
     // 3. Update index structures.
     if (simplifiedTR != null) {
-      registerTR(simplifiedTR);
+      registerTR(simplifiedTR, false);
       unregisterTR(tr);
     }
   }
 
-  private void registerTR(final UnifiedEFATransitionRelation tr)
+  private void registerTR(final UnifiedEFATransitionRelation tr,
+                          final boolean registerChildren)
   {
     for (final AbstractEFAEvent event : tr.getAllEventsExceptTau()) {
       EventInfo info = mCurrentSubSystem.getEventInfo(event);
-      if (info == null) {
-        info = new EventInfo(event);
-        mCurrentSubSystem.addEventInfo(info);
-        final AbstractEFAEvent originalEvent = event.getOriginalEvent();
-        if (originalEvent != null) {
-          final EventInfo originalInfo =
-            mCurrentSubSystem.getEventInfo(originalEvent);
-          originalInfo.addChildEvent(info);
-        }
-      }
       if (tr.isUsedEvent(event)) {
+        if (info == null) {
+          info = new EventInfo(event);
+          mCurrentSubSystem.addEventInfo(info);
+          if (registerChildren) {
+            final AbstractEFAEvent originalEvent = event.getOriginalEvent();
+            if (originalEvent != null) {
+              final EventInfo originalInfo =
+                mCurrentSubSystem.getEventInfo(originalEvent);
+              originalInfo.addChildEvent(info);
+            }
+          }
+        }
         info.addTransitionRelation(tr);
-      } else {
+      } else if (info != null) {
         removeEmptyEventInfo(info);
       }
     }
@@ -473,7 +476,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
   private void removeEmptyEventInfo(final EventInfo info)
   {
-    if (info.isEmpty()) {
+    if (info.isRemovable()) {
       final AbstractEFAEvent event = info.getEvent();
       mCurrentSubSystem.removeEventInfo(event);
       AbstractEFAEvent originalEvent = event.getOriginalEvent();
@@ -510,7 +513,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     while (original != null) {
       final EventInfo info = mCurrentSubSystem.getEventInfo(original);
       if (info != null) {
-        root = event;
+        root = original;
       }
       original = original.getOriginalEvent();
     }
@@ -609,7 +612,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       } else if (candidate.getHeuristicValue() > getHeuristicValue()) {
         return 1;
       } else {
-        return 0;
+        return toString().compareTo(candidate.toString());
       }
     }
 
@@ -731,9 +734,27 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
     //#######################################################################
     //# Checking for Local Events
-    private boolean isEmpty()
+    private boolean isRemovable()
     {
-      return mTransitionRelations.isEmpty() && mVariables.isEmpty();
+      if (mTransitionRelations.isEmpty() && mVariables.isEmpty()) {
+        if (!mChildrenEvents.isEmpty()) {
+          return true;
+        }
+        AbstractEFAEvent original = mEvent.getOriginalEvent();
+        while (original != null) {
+          final EventInfo originalInfo =
+            mCurrentSubSystem.getEventInfo(original);
+          if (originalInfo != null &&
+              !(originalInfo.getTransitionRelations().isEmpty() &&
+                originalInfo.getVariables().isEmpty())) {
+            return false;
+          }
+          original = original.getOriginalEvent();
+        }
+        return true;
+      } else {
+        return false;
+      }
     }
 
     private boolean isLocal()
@@ -745,6 +766,14 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       } else {
         return isRootEvent(mEvent);
       }
+    }
+
+    @SuppressWarnings("unused")
+    private boolean hasAtLeastTwoAutomata(int foundAutomata)
+    {
+      //TODO
+      foundAutomata += mTransitionRelations.size() + mVariables.size();
+      return false;
     }
 
     //#######################################################################
@@ -1025,6 +1054,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         buffer.append(sep);
         buffer.append(' ');
         buffer.append(tr.getName());
+        sep = ',';
       }
       buffer.append("\nVariables");
       sep = ':';
@@ -1032,6 +1062,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         buffer.append(sep);
         buffer.append(' ');
         buffer.append(var.getName());
+        sep = ',';
       }
       return buffer.toString();
     }
