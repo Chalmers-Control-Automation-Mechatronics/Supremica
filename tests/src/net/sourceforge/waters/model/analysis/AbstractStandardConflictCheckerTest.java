@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -1054,6 +1055,26 @@ public abstract class AbstractStandardConflictCheckerTest
     checkTransferline(4);
   }
 
+  public void testDynamicSieve__2() throws Exception
+  {
+    checkDynamicSieve("dynamic_prime_sieve.wmod", 2, 24, true);
+  }
+
+
+  protected void checkDynamicSieve(final String name,
+                                   final int s,
+                                   final int n,
+                                   final boolean result)
+  throws Exception
+  {
+    final String group = "efa";
+    final ParameterBindingProxy bindingS = createBinding("S", s);
+    final ParameterBindingProxy bindingN = createBinding("N", n);
+    final List<ParameterBindingProxy> bindings = new ArrayList<>(2);
+    bindings.add(bindingS);
+    bindings.add(bindingN);
+    runModelVerifier(group, name, bindings, result);
+  }
 
   protected void checkPhilosophers(final String name,
                                    final int n,

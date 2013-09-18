@@ -25,6 +25,7 @@ import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -175,11 +176,11 @@ public class UnifiedEFAUnfolderTest
       if (proxy instanceof SimpleComponentProxy) {
         final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
         if (comp.getName().equals(":unfolded")) {
-          assertProxyEquals("Unexpected output automaton!",
+          assertProxyEquals(mEqualityChecker, "Unexpected output automaton!",
                             comp, expectedUnfolding);
         } else if (comp.getName().equals(":updates")) {
           assertNotNull("Unexpected update in output!", expectedUpdates);
-          assertProxyEquals("Unexpected unfolded events!",
+          assertProxyEquals(mEqualityChecker, "Unexpected unfolded events!",
                             comp, expectedUpdates);
           expectedUpdates = null;
         } else {
@@ -206,7 +207,7 @@ public class UnifiedEFAUnfolderTest
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mImporter = new UnifiedEFASystemImporter(mModuleFactory, mOperatorTable);
-
+    mEqualityChecker = new ModuleEqualityVisitor(true, false);
   }
 
   @Override
@@ -217,6 +218,7 @@ public class UnifiedEFAUnfolderTest
     mOperatorTable = null;
     mModuleMarshaller = null;
     mDocumentManager = null;
+    mEqualityChecker = null;
     super.tearDown();
   }
 
@@ -227,6 +229,7 @@ public class UnifiedEFAUnfolderTest
   private CompilerOperatorTable mOperatorTable;
   private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
+  private ModuleEqualityVisitor mEqualityChecker;
 
   private UnifiedEFASystemImporter mImporter;
 
