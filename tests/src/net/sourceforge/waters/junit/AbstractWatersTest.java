@@ -16,12 +16,12 @@ import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-
-import junit.framework.TestCase;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
@@ -52,6 +52,7 @@ public abstract class AbstractWatersTest
 
   //#########################################################################
   //# Overrides for base class junit.framework.TestCase
+  @Override
   protected void setUp() throws Exception
   {
     super.setUp();
@@ -68,6 +69,7 @@ public abstract class AbstractWatersTest
     root.addAppender(appender);
   }
 
+  @Override
   protected void tearDown() throws Exception
   {
     if (mLogFile != null) {

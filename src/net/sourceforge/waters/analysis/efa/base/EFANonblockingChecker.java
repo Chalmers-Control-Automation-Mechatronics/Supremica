@@ -39,7 +39,7 @@ public class EFANonblockingChecker extends AbstractEFAAlgorithm
     final boolean[] coReachable = new boolean[numStates];
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     for (int s = 0; s < numStates; s++) {
-      if (rel.isMarked(s, 0) && !coReachable[s]) {
+      if (rel.isMarked(s, 0) && !coReachable[s] && rel.isReachable(s)) {
         coReachable[s] = true;
         stack.push(s);
         while (stack.size() > 0) {
@@ -57,7 +57,7 @@ public class EFANonblockingChecker extends AbstractEFAAlgorithm
       }
     }
     for (int s=0; s < numStates; s++) {
-      if (!coReachable[s]) {
+      if (!coReachable[s] && rel.isReachable(s)) {
         return false;
       }
     }

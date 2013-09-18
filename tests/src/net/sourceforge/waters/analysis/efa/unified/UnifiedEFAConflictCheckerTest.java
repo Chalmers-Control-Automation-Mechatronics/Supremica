@@ -230,12 +230,17 @@ public class UnifiedEFAConflictCheckerTest
     checkProfisafe("profisafe_ihost_efsm", 4 ,true);
   }
 
+  public void testProfisafeISlave1()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_islave_efsm", 1 ,true);
+  }
+
   public void testProfisafeISlave4()
     throws IOException, WatersException
   {
     checkProfisafe("profisafe_islave_efsm", 4 ,true);
   }
-
 
   /*--------------------------- Prime Sieve --------------------------------*/
 
@@ -352,18 +357,7 @@ public class UnifiedEFAConflictCheckerTest
 //    checkConflict(module, false);
 //  }
 
-  /*
-   * This file is not in the repository :-(
-  public void testPslWithResetTrans()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "psl", "pslWithResetTrans");
-    checkConflict(module, false);
-  }
-   */
-
-
-  //#########################################################################
+   //#########################################################################
   //# Parametrised Tests
   void checkPhilosophers(final String name,
                          final int n,

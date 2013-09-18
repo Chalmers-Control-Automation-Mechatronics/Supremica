@@ -98,6 +98,12 @@ public class UnifiedEFAUnfolderTest
     unfoldAndTest(module);
   }
 
+  public void testUnifiedUnfolding8()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding08");
+    unfoldAndTest(module);
+  }
 
   //#########################################################################
   //# Customisation
