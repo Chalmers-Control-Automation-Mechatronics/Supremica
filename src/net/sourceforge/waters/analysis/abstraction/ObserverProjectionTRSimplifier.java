@@ -193,7 +193,7 @@ public class ObserverProjectionTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int tau = EventEncoding.TAU;
     rel.replaceEvent(mVisibleTau, tau);
-    rel.removeEvent(mVisibleTau);
+    rel.removeEvent(mVisibleTau, true);
     rel.removeRedundantPropositions();
   }
 

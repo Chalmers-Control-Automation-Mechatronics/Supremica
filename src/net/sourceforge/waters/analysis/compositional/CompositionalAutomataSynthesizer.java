@@ -659,7 +659,7 @@ public class CompositionalAutomataSynthesizer extends
           final int e = mTempEventEncoding.getEventCode(event);
           if (e >= 0) {
             checkAbort();
-            rel.removeEvent(e);
+            rel.removeEvent(e, true);
           }
         }
       } else {

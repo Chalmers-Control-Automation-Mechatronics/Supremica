@@ -208,17 +208,17 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mCurrentSubSystem = new SubSystemInfo(mMainEFASystem.getEvents().size(),
                                             mMainEFASystem.getVariables().size(),
                                             trs);
+      mDirtyTRs = new THashSet<>(trs);
       createVariableInfo();
       createEventInfo();
-      for (final UnifiedEFATransitionRelation tr : trs) {
-        simplifyTR(tr);
-      }
+      simplifyDirtyTransitionRelations();
       splitSubsystems();
       while (mCurrentSubSystem != null) {
         while (mCurrentSubSystem.isReducible()) {
           mCurrentSubSystem.createCandidates();
           final Candidate minCandidate = Collections.min(mCandidateMap.keySet());
           applyCandidate(minCandidate);
+          simplifyDirtyTransitionRelations();
           splitSubsystems();
         }
         trs = mCurrentSubSystem.getTransitionRelations();
@@ -383,14 +383,12 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mUnfolder.setOriginalEvents(originalEvents);
       mUnfolder.run();
       result = mUnfolder.getTransitionRelation();
-      showNumberOfBlockedEvents(result);
       registerTR(result, true);
       unregisterVariable(selectedVarInfo);
     } else if (trs.size() > 1) {
       mSynchronizer.setInputTransitionRelations(trs);
       mSynchronizer.run();
       result =  mSynchronizer.getSynchronousProduct();
-      showNumberOfBlockedEvents(result);
       registerTR(result, false);
       for (final UnifiedEFATransitionRelation tr : trs) {
         unregisterTR(tr);
@@ -401,6 +399,15 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     simplifyTR(result);
   }
 
+  private void simplifyDirtyTransitionRelations() throws AnalysisException
+  {
+    while (!mDirtyTRs.isEmpty()) {
+      final UnifiedEFATransitionRelation tr = mDirtyTRs.iterator().next();
+      mDirtyTRs.remove(tr);
+      simplifyTR(tr);
+    }
+  }
+
   private void simplifyTR(final UnifiedEFATransitionRelation tr)
     throws AnalysisException
   {
@@ -408,13 +415,16 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     final ListBufferTransitionRelation resultRel = tr.getTransitionRelation();
     // 1. Mark local events for hiding.
     for (final AbstractEFAEvent event : tr.getUsedEventsExceptTau()) {
-      final EventInfo localInfo = mCurrentSubSystem.getEventInfo(event);
-      if (localInfo.isLocal(tr)) {
-        final int code = encoding.getEventId(event);
-        final byte status = resultRel.getProperEventStatus(code);
-        resultRel.setProperEventStatus(code,
-                                       status | EventEncoding.STATUS_LOCAL);
+      final EventInfo info = mCurrentSubSystem.getEventInfo(event);
+      final int code = encoding.getEventId(event);
+      byte status = resultRel.getProperEventStatus(code);
+      if (info.isLocal(tr)) {
+        status |= EventEncoding.STATUS_LOCAL;
       }
+      if (info.isBlocked()) {
+        status |= EventEncoding.STATUS_BLOCKED;
+      }
+      resultRel.setProperEventStatus(code, status);
     }
     // 2. Run abstraction chain.
     final UnifiedEFATransitionRelation simplifiedTR = mSimplifier.run(tr);
@@ -423,7 +433,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       getLogger().debug("nonblocking: " + mNonblockingChecker.run(simplifiedTR));
       registerTR(simplifiedTR, false);
       unregisterTR(tr);
-      showNumberOfBlockedEvents(simplifiedTR);
     }
 
   }
@@ -454,7 +463,31 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
     }
     mCurrentSubSystem.addTransitionRelation(tr);
+    recordBlockedEvents(tr);
   }
+
+  private void recordBlockedEvents(final UnifiedEFATransitionRelation tr)
+  {
+    final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+    final int numberOfProperEvents = rel.getNumberOfProperEvents();
+    final boolean[] used = new boolean[numberOfProperEvents];
+    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+    while (iter.advance()) {
+      final int event = iter.getCurrentEvent();
+      used[event] = true;
+    }
+    final UnifiedEFAEventEncoding encoding = tr.getEventEncoding();
+    for (int e = EventEncoding.NONTAU; e < numberOfProperEvents; e++) {
+      final byte status = rel.getProperEventStatus(e);
+      if (EventEncoding.isUsedEvent(status) && !used[e]){
+        final AbstractEFAEvent event = encoding.getEvent(e);
+        final EventInfo info = mCurrentSubSystem.getEventInfo(event);
+        info.setBlocked();
+      }
+    }
+  }
+
+
 
   /**
    * Marks a variable as removed. This method is called after a variable
@@ -542,26 +575,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     return root;
   }
 
-
-  private void showNumberOfBlockedEvents(final UnifiedEFATransitionRelation tr)
-  {
-    final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-    final int numberOfProperEvents = rel.getNumberOfProperEvents();
-    final boolean[] used = new boolean[numberOfProperEvents];
-    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
-    while (iter.advance()) {
-      final int event = iter.getCurrentEvent();
-      used[event] = true;
-    }
-    int blocked = 0;
-    for (int e = 0; e < numberOfProperEvents; e++) {
-      final byte status = rel.getProperEventStatus(e);
-      if (EventEncoding.isUsedEvent(status) && !used[e]){
-        blocked++;
-      }
-    }
-    System.err.println(blocked + "/" + numberOfProperEvents);
-  }
 
   //#########################################################################
   //# Inner Class Candidate
@@ -922,6 +935,20 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       return false;
     }
 
+     private boolean isBlocked()
+     {
+       return mIsBlocked;
+     }
+
+     private void setBlocked()
+     {
+       mIsBlocked = true;
+       mDirtyTRs.addAll(mTransitionRelations);
+       for (final EventInfo childInfo : mChildrenEvents) {
+         childInfo.setBlocked();
+       }
+     }
+
     //#######################################################################
     //# Debugging
     @Override
@@ -945,6 +972,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     private final List<EventInfo> mChildrenEvents;
     private final Collection<VariableInfo> mPrimedVariables;
     private final Collection<VariableInfo> mUnPrimedVariables;
+    private boolean mIsBlocked = false;
 
   }
 
@@ -1297,6 +1325,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
   private UnifiedEFASystem mMainEFASystem;
   private PriorityQueue<SubSystemInfo> mSubSystemQueue;
+  private Set<UnifiedEFATransitionRelation> mDirtyTRs;
   private SubSystemInfo mCurrentSubSystem;
   private Map<Candidate,Candidate> mCandidateMap;
   private boolean mOnlyAutomata;

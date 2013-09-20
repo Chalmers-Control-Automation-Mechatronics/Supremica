@@ -2119,24 +2119,29 @@ public class ListBufferTransitionRelation
   /**
    * Removes the given event from this transition relation. This method
    * removes the given event including all its transitions from the transition
-   * relation. The event is marked as unused, and all associated transitions
-   * are deleted.
+   * relation. All associated transitions are deleted.
    *
    * @param event
    *          The ID of the event to be removed.
+   * @param setUnused
+   *          Set if the event should be set as unused.
    */
-  public void removeEvent(final int event)
+  public boolean removeEvent(final int event, final boolean setUnused)
   {
     final byte status = mEventStatus[event];
+    boolean changed = false;
     if ((status & EventEncoding.STATUS_UNUSED) == 0) {
-      mEventStatus[event] = (byte) (status | EventEncoding.STATUS_UNUSED);
+      if (setUnused) {
+        mEventStatus[event] = (byte) (status | EventEncoding.STATUS_UNUSED);
+      }
       if (mSuccessorBuffer != null) {
-        mSuccessorBuffer.removeEventTransitions(event);
+        changed |= mSuccessorBuffer.removeEventTransitions(event);
       }
       if (mPredecessorBuffer != null) {
-        mPredecessorBuffer.removeEventTransitions(event);
+        changed |= mPredecessorBuffer.removeEventTransitions(event);
       }
     }
+    return changed;
   }
 
   /**
@@ -2342,7 +2347,7 @@ public class ListBufferTransitionRelation
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0 &&
           isProperSelfloopEvent(e)) {
-        removeEvent(e);
+        removeEvent(e, true);
         modified = true;
       }
     }
@@ -2377,7 +2382,7 @@ public class ListBufferTransitionRelation
       for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
         if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0 &&
             isProperSelfloopEvent(e, prop)) {
-          removeEvent(e);
+          removeEvent(e, true);
           modified = true;
         }
       }
@@ -2413,7 +2418,7 @@ public class ListBufferTransitionRelation
             }
           }
           if (hasTransition) {
-            removeEvent(e);
+            removeEvent(e, true);
             modified = true;
           }
         }
