@@ -106,6 +106,20 @@ public class UnifiedEFAUnfolderTest
     unfoldAndTest(module);
   }
 
+  public void testUnifiedUnfolding9()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding09");
+    unfoldAndTest(module);
+  }
+
+  public void testUnifiedUnfolding10()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding10");
+    unfoldAndTest(module);
+  }
+
   //#########################################################################
   //# Customisation
   void configure(final UnifiedEFACompiler compiler)

@@ -26,6 +26,7 @@ import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
 import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -171,6 +172,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     if (mDocumentManager == null) {
       mDocumentManager = new DocumentManager();
     }
+    mOnlyAutomata = true;
     final ModuleProxy module = getModel();
     final List<ParameterBindingProxy> binding = getBindings();
     final UnifiedEFACompiler compiler =
@@ -381,12 +383,14 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mUnfolder.setOriginalEvents(originalEvents);
       mUnfolder.run();
       result = mUnfolder.getTransitionRelation();
+      showNumberOfBlockedEvents(result);
       registerTR(result, true);
       unregisterVariable(selectedVarInfo);
     } else if (trs.size() > 1) {
       mSynchronizer.setInputTransitionRelations(trs);
       mSynchronizer.run();
       result =  mSynchronizer.getSynchronousProduct();
+      showNumberOfBlockedEvents(result);
       registerTR(result, false);
       for (final UnifiedEFATransitionRelation tr : trs) {
         unregisterTR(tr);
@@ -419,6 +423,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       getLogger().debug("nonblocking: " + mNonblockingChecker.run(simplifiedTR));
       registerTR(simplifiedTR, false);
       unregisterTR(tr);
+      showNumberOfBlockedEvents(simplifiedTR);
     }
 
   }
@@ -538,6 +543,26 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   }
 
 
+  private void showNumberOfBlockedEvents(final UnifiedEFATransitionRelation tr)
+  {
+    final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+    final int numberOfProperEvents = rel.getNumberOfProperEvents();
+    final boolean[] used = new boolean[numberOfProperEvents];
+    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+    while (iter.advance()) {
+      final int event = iter.getCurrentEvent();
+      used[event] = true;
+    }
+    int blocked = 0;
+    for (int e = 0; e < numberOfProperEvents; e++) {
+      final byte status = rel.getProperEventStatus(e);
+      if (EventEncoding.isUsedEvent(status) && !used[e]){
+        blocked++;
+      }
+    }
+    System.err.println(blocked + "/" + numberOfProperEvents);
+  }
+
   //#########################################################################
   //# Inner Class Candidate
   private class Candidate implements Comparable<Candidate>
@@ -574,7 +599,11 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     private double getHeuristicValue()
     {
       if (mHeuristicValue < 0) {
-        mHeuristicValue = calculateMinS();
+        if (!mOnlyAutomata || mVariables.isEmpty()) {
+          mHeuristicValue = calculateMinS();
+        } else {
+          mHeuristicValue = calculateMaxSelflopps();
+        }
       }
       return mHeuristicValue;
     }
@@ -601,6 +630,43 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final double numLocalEvents = localSet.size();
       final double numEvents = eventSet.size();
       return (1.0 - numLocalEvents / numEvents) * numStates;
+    }
+
+    @SuppressWarnings("unused")
+    private double calculateMaxEvents()
+    {
+      final VariableInfo varInfo = mVariables.get(0);
+      return - varInfo.getEvents().size();
+    }
+
+    private double calculateMaxSelflopps()
+    {
+      final VariableInfo varInfo = mVariables.get(0);
+      final Collection<EventInfo> eventInfo = varInfo.getEvents();
+      int selfloop = 0;
+      for (final EventInfo info : eventInfo) {
+        List<UnifiedEFATransitionRelation> trs = info.getTransitionRelations();
+        if (trs.size() > 0) {
+          break;
+        }
+        AbstractEFAEvent original = info.getEvent().getOriginalEvent();
+        while (original != null) {
+          final EventInfo originalInfo = mCurrentSubSystem.mEventInfoMap.get(original);
+          if (originalInfo == null) {
+            original = original.getOriginalEvent();
+            continue;
+          } else {
+            trs =
+              mCurrentSubSystem.mEventInfoMap.get(original).getTransitionRelations();
+            if (trs.size() > 0) {
+              break;
+            }
+            original = original.getOriginalEvent();
+          }
+        }
+        selfloop++;
+      }
+      return -selfloop;
     }
 
     private Set<AbstractEFAEvent> removeNonLeaves
@@ -696,7 +762,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final Set<UnifiedEFAVariable> primed = new THashSet<>();
       final Set<UnifiedEFAVariable> unprimed = new THashSet<>();
       mVariableCollector.collectAllVariables(mEvent.getUpdate(),
-                                             primed, unprimed);
+                                             unprimed, primed);
       //TODO primed variables are not correct
       mPrimedVariables = collectVariableInfo(primed);
       mUnPrimedVariables = collectVariableInfo(unprimed);
@@ -1100,6 +1166,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       if (mCandidateMap.isEmpty()) {
         createMustLCandidates();
       }
+      if (mCandidateMap.isEmpty()) {
+        createOneVariableCandidates();
+      }
     }
 
     private void createOnlyPrimedCandidates()
@@ -1128,15 +1197,28 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
             new THashSet<>();
           final Set<VariableInfo> vars = new THashSet<>();
           info.collectCandidate(trs, vars);
-          Candidate candidate = new Candidate(trs, vars);
-          final Candidate existing = mCandidateMap.get(candidate);
-          if (existing == null) {
-            mCandidateMap.put(candidate, candidate);
-          } else {
-            candidate = existing;
+          if (!mOnlyAutomata || vars.isEmpty()) {
+            Candidate candidate = new Candidate(trs, vars);
+            final Candidate existing = mCandidateMap.get(candidate);
+            if (existing == null) {
+              mCandidateMap.put(candidate, candidate);
+            } else {
+              candidate = existing;
+            }
+            candidate.addLocalEvent(info);
           }
-          candidate.addLocalEvent(info);
         }
+      }
+    }
+
+    private void createOneVariableCandidates()
+    {
+      final Collection<VariableInfo> vars = mVariableInfoMap.values();
+      for (final VariableInfo var : vars) {
+        final Set<UnifiedEFATransitionRelation> trs = Collections.emptySet();
+          final Set<VariableInfo> varCandidate = Collections.singleton(var);
+          final Candidate candidate = new Candidate(trs, varCandidate);
+          mCandidateMap.put(candidate, candidate);
       }
     }
 
@@ -1217,5 +1299,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   private PriorityQueue<SubSystemInfo> mSubSystemQueue;
   private SubSystemInfo mCurrentSubSystem;
   private Map<Candidate,Candidate> mCandidateMap;
+  private boolean mOnlyAutomata;
 
 }

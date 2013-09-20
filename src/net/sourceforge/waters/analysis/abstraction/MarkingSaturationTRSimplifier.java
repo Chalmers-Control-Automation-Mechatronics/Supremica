@@ -87,6 +87,7 @@ public class MarkingSaturationTRSimplifier
       rel.createAllTransitionsReadOnlyIterator(tauID);
     if (!all.advance()) {
       // No tau transitions - no simplification
+      rel.removeRedundantPropositions();
       return false;
     }
 
@@ -123,6 +124,7 @@ public class MarkingSaturationTRSimplifier
       }
       visitedStates.clear();
     }
+    rel.removeRedundantPropositions();
     return modified;
   }
 
