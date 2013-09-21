@@ -240,7 +240,12 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
         source++;
       }
     }
-    if (mUpdateRenamedEventMap.size() == 1) {
+    switch (mUpdateRenamedEventMap.size()) {
+    case 0:
+      mPropagator.init(ConstraintList.TRUE);
+      createUnfoldedEvent(update);
+      // fall through ...
+    case 1:
       final int[] finalEventCodes =
         mUpdateRenamedEventMap.values().iterator().next();
       for (final int finalEventCode : finalEventCodes) {
@@ -248,6 +253,9 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
           (RenamedEFAEvent) mEventEncoding.getEvent(finalEventCode);
         finalEvent.setIndex(-1);
       }
+      break;
+    default:
+      break;
     }
   }
 

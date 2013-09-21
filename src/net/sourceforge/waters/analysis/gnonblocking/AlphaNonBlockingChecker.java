@@ -683,7 +683,7 @@ public class AlphaNonBlockingChecker
             if (evcode == -1) {continue;}
             if (evcode == EventEncoding.TAU) {continue;}
             tr.replaceEvent(evcode, tau);
-            tr.removeEvent(evcode, true);
+            tr.removeEvent(evcode);
           }
           final int marking = ee.getEventCode(getUsedDefaultMarking());
           final int alpha = ee.getEventCode(mAlpha);

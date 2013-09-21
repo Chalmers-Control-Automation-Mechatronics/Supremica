@@ -350,7 +350,7 @@ public class SubsetConstructionTRSimplifier
       final int numTrans = mTransitionBuffer.size();
       final int config = getPreferredInputConfiguration();
       rel.reset(detStates, numTrans, config);
-      rel.removeEvent(EventEncoding.TAU, true);
+      rel.removeEvent(EventEncoding.TAU);
       mTransitionBuffer.addOutgoingTransitions(rel);
       mTransitionBuffer = null;
       if (mForbiddenEvents == null) {
@@ -364,13 +364,13 @@ public class SubsetConstructionTRSimplifier
             if (mForbiddenEvents.get(event)) {
               forbiddenVictims.add(event);
             } else {
-              rel.removeEvent(event, true);
+              rel.removeEvent(event);
             }
           }
         }
         for (int e = 0; e < forbiddenVictims.size(); e++) {
           final int event = forbiddenVictims.get(e);
-          rel.removeEvent(event, true);
+          rel.removeEvent(event);
         }
       }
     }

@@ -1383,6 +1383,115 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
+        <ForeachComponent Name="data">
+            <EnumSetExpression Text="[PV,FV]">
+                <SimpleIdentifier Name="PV"/>
+                <SimpleIdentifier Name="FV"/>
+            </EnumSetExpression>
+            <ComponentList>
+                <ForeachComponent Name="s4">
+                    <BinaryExpression Operator="..">
+                        <IntConstant Value="0"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                    <ComponentList>
+                        <ForeachComponent Name="s3">
+                            <BinaryExpression Operator="..">
+                                <IntConstant Value="0"/>
+                                <IntConstant Value="1"/>
+                            </BinaryExpression>
+                            <ComponentList>
+                                <ForeachComponent Name="s2">
+                                    <BinaryExpression Operator="..">
+                                        <IntConstant Value="0"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <ComponentList>
+                                        <ForeachComponent Name="seq">
+                                            <BinaryExpression Operator="..">
+                                                <IntConstant Value="0"/>
+                                                <SimpleIdentifier Name="MAXSEQNO"/>
+                                            </BinaryExpression>
+                                            <ComponentList>
+                                                <SimpleComponent Kind="PROPERTY">
+                                                    <IndexedIdentifier Name="never_send">
+                                                        <SimpleIdentifier Name="data"/>
+                                                        <SimpleIdentifier Name="s4"/>
+                                                        <SimpleIdentifier Name="s3"/>
+                                                        <SimpleIdentifier Name="s2"/>
+                                                        <SimpleIdentifier Name="seq"/>
+                                                    </IndexedIdentifier>
+                                                    <Graph>
+                                                        <NodeList>
+                                                            <SimpleNode Initial="true" Name="never">
+                                                                <PointGeometry>
+                                                                    <Point X="192" Y="144"/>
+                                                                </PointGeometry>
+                                                                <LabelGeometry Anchor="NW">
+                                                                    <Point X="-37" Y="5"/>
+                                                                </LabelGeometry>
+                                                            </SimpleNode>
+                                                        </NodeList>
+                                                        <EdgeList>
+                                                            <Edge Source="never" Target="never">
+                                                                <LabelBlock>
+                                                                    <SimpleIdentifier Name="send"/>
+                                                                    <LabelGeometry Anchor="NW">
+                                                                        <Point X="-103" Y="-51"/>
+                                                                    </LabelGeometry>
+                                                                </LabelBlock>
+                                                                <SplineGeometry>
+                                                                    <Point X="240" Y="144"/>
+                                                                </SplineGeometry>
+                                                                <GuardActionBlock>
+                                                                    <Guards>
+                                                                        <BinaryExpression Operator="|" Text="out_ps_f_process_data!=data | out_ps_status_bit4_FV!=s4 | out_ps_status_bit3_TO!=s3 | out_ps_status_bit2_CRCNO!=s2 | out_cons_num!=seq">
+                                                                            <BinaryExpression Operator="|">
+                                                                                <BinaryExpression Operator="|">
+                                                                                    <BinaryExpression Operator="|">
+                                                                                        <BinaryExpression Operator="!=">
+                                                                                            <SimpleIdentifier Name="out_ps_f_process_data"/>
+                                                                                            <SimpleIdentifier Name="data"/>
+                                                                                        </BinaryExpression>
+                                                                                        <BinaryExpression Operator="!=">
+                                                                                            <SimpleIdentifier Name="out_ps_status_bit4_FV"/>
+                                                                                            <SimpleIdentifier Name="s4"/>
+                                                                                        </BinaryExpression>
+                                                                                    </BinaryExpression>
+                                                                                    <BinaryExpression Operator="!=">
+                                                                                        <SimpleIdentifier Name="out_ps_status_bit3_TO"/>
+                                                                                        <SimpleIdentifier Name="s3"/>
+                                                                                    </BinaryExpression>
+                                                                                </BinaryExpression>
+                                                                                <BinaryExpression Operator="!=">
+                                                                                    <SimpleIdentifier Name="out_ps_status_bit2_CRCNO"/>
+                                                                                    <SimpleIdentifier Name="s2"/>
+                                                                                </BinaryExpression>
+                                                                            </BinaryExpression>
+                                                                            <BinaryExpression Operator="!=">
+                                                                                <SimpleIdentifier Name="out_cons_num"/>
+                                                                                <SimpleIdentifier Name="seq"/>
+                                                                            </BinaryExpression>
+                                                                        </BinaryExpression>
+                                                                    </Guards>
+                                                                    <LabelGeometry Anchor="NW">
+                                                                        <Point X="-104" Y="-40"/>
+                                                                    </LabelGeometry>
+                                                                </GuardActionBlock>
+                                                            </Edge>
+                                                        </EdgeList>
+                                                    </Graph>
+                                                </SimpleComponent>
+                                            </ComponentList>
+                                        </ForeachComponent>
+                                    </ComponentList>
+                                </ForeachComponent>
+                            </ComponentList>
+                        </ForeachComponent>
+                    </ComponentList>
+                </ForeachComponent>
+            </ComponentList>
+        </ForeachComponent>
         <SimpleComponent Kind="PLANT" Name="rcv_msg">
             <Graph>
                 <NodeList>
@@ -1470,7 +1579,7 @@
                 </BinaryExpression>
             </VariableMarking>
         </VariableComponent>
-        <VariableComponent Name="in_cons_num">
+        <VariableComponent Deterministic="false" Name="in_cons_num">
             <VariableRange>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
@@ -1491,7 +1600,7 @@
                 </BinaryExpression>
             </VariableMarking>
         </VariableComponent>
-        <VariableComponent Name="in_CRC">
+        <VariableComponent Deterministic="false" Name="in_CRC">
             <VariableRange>
                 <EnumSetExpression Text="[ok,nok]">
                     <SimpleIdentifier Name="ok"/>
@@ -1617,7 +1726,7 @@
                 </BinaryExpression>
             </VariableMarking>
         </VariableComponent>
-        <VariableComponent Name="app_process_data">
+        <VariableComponent Deterministic="false" Name="app_process_data">
             <VariableRange>
                 <EnumSetExpression Text="[PV,FV]">
                     <SimpleIdentifier Name="PV"/>

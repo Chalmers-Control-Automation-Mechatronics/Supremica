@@ -1128,7 +1128,7 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
             if (evcode == -1) {System.out.println(event);continue;}
             if (evcode == EventEncoding.TAU) {continue;}
             orig.replaceEvent(evcode, EventEncoding.TAU);
-            orig.removeEvent(evcode, true);
+            orig.removeEvent(evcode);
           }
           //mRIT.removeAutomata(mCompautomata);
           /*RemoveEvents rev = new RemoveEvents(minAutomaton, mRIT.findEventsWhichAreImpossibleAfter(minAutomaton.getEvents()),

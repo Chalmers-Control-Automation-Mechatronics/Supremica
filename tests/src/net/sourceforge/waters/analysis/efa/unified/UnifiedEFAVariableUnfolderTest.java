@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.unified
-//# CLASS:   UnifiedEFAUnfolderTest
+//# CLASS:   UnifiedEFAVariableUnfolderTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -32,14 +32,14 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-public class UnifiedEFAUnfolderTest
+public class UnifiedEFAVariableUnfolderTest
   extends AbstractAnalysisTest
 {
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    return new TestSuite(UnifiedEFAUnfolderTest.class);
+    return new TestSuite(UnifiedEFAVariableUnfolderTest.class);
   }
 
   public static void main(final String[] args)
@@ -119,6 +119,14 @@ public class UnifiedEFAUnfolderTest
     final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding10");
     unfoldAndTest(module);
   }
+
+  public void testUnifiedUnfolding11()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding11");
+    unfoldAndTest(module);
+  }
+
 
   //#########################################################################
   //# Customisation

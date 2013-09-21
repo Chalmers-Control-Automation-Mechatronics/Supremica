@@ -1271,7 +1271,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
               final int evcode = ee.getEventCode(event);
               if (evcode == -1) {System.out.println("no: " + event); continue;}
               tr.replaceEvent(evcode, tau);
-              tr.removeEvent(evcode, true);
+              tr.removeEvent(evcode);
             }
             //System.out.println("initial tr:" + tr);
             if (mCompautomata.size() == 1) {

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters EFSM Analysis
+//# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
 //# CLASS:   UnifiedEFAConflictCheckerTest
 //###########################################################################
@@ -17,7 +17,6 @@ import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.efa.efsm.EFSMConflictChecker;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.WatersException;
@@ -29,7 +28,7 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
 /**
- * A test for the {@link EFSMConflictChecker}.
+ * A test for the {@link UnifiedEFAConflictChecker}.
  *
  * @author Sahar Mohajerani, Robi Malik
  */
@@ -37,6 +36,7 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 public class UnifiedEFAConflictCheckerTest
   extends AbstractAnalysisTest
 {
+
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
@@ -320,7 +320,6 @@ public class UnifiedEFAConflictCheckerTest
   }
 
   /*----------------------------- PSL --------------------------------------*/
-
   public void testPsl()
     throws IOException, WatersException
   {
@@ -357,7 +356,8 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, false);
   }
 
-   //#########################################################################
+
+  //#########################################################################
   //# Parametrised Tests
   void checkPhilosophers(final String name,
                          final int n,

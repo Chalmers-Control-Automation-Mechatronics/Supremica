@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   HidingTRSimplifier
+//# CLASS:   BlockedEventsRemovalTRSimplifier
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -11,20 +11,20 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 
 
 /**
- * A transition relation simplifier that implements hiding.
- * This simplifier replaces all local events found in its input
+ * A transition relation simplifier to remove blocked events.
+ * This simplifier removes all blocked events found in its input
  * transition relation (i.e., all events with {@link
- * EventEncoding#STATUS_LOCAL}) with silent events
- * ({@link EventEncoding#TAU}).
+ * EventEncoding#STATUS_BLOCKED}). These events are marked as unused.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
 
 public class BlockedEventsRemovalTRSimplifier
-  extends AbstractTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
@@ -36,6 +36,25 @@ public class BlockedEventsRemovalTRSimplifier
   public BlockedEventsRemovalTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Sets whether this simplifier should consider deadlock states when
+   * removing selfloops.
+   * @see #isDumpStateAware()
+   */
+  public void setDumpStateAware(final boolean aware)
+  {
+    mDumpStateAware = aware;
+  }
+
+  @Override
+  public boolean isDumpStateAware()
+  {
+    return mDumpStateAware;
   }
 
 
@@ -64,7 +83,8 @@ public class BlockedEventsRemovalTRSimplifier
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()
   {
@@ -76,10 +96,25 @@ public class BlockedEventsRemovalTRSimplifier
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
       if ((status & mask) == pattern) {
-        modified |= rel.removeEvent(e, false);
+        rel.removeEvent(e);
+        modified = true;
+      }
+    }
+    if (modified) {
+      if (rel.checkReachability()) {
+        removeProperSelfLoopEvents();
+        rel.removeRedundantPropositions();
+        final TRPartition partition =
+          TRPartition.createReachabilityPartition(rel);
+        setResultPartition(partition);
       }
     }
     return modified;
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private boolean mDumpStateAware;
 
 }

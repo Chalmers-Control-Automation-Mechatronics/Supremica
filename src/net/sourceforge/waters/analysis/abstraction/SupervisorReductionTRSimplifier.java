@@ -141,7 +141,7 @@ public class SupervisorReductionTRSimplifier
           }
         }
         if (selfloopOnly) {
-          rel.removeEvent(e, true);
+          rel.removeEvent(e);
         }
       }
     }
