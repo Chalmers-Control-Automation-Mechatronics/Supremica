@@ -101,7 +101,8 @@ public class BlockedEventsRemovalTRSimplifier
       }
     }
     if (modified) {
-      if (rel.checkReachability()) {
+      final int config = getPreferredOutputConfiguration();
+      if (rel.checkReachability(config)) {
         removeProperSelfLoopEvents();
         rel.removeRedundantPropositions();
         final TRPartition partition =

@@ -2555,6 +2555,29 @@ public class ListBufferTransitionRelation
    * the transition relation, and resets the reachability status of all states
    * according to the result. If any states are found to be unreachable,
    * transitions attached to these states are removed.
+   * @param  config  Preferred output configuration, either {@link
+   *                 #CONFIG_SUCCESSORS}, {@link #CONFIG_PREDECESSORS},
+   *                 or {@link #CONFIG_ALL}. If the transition
+   *                 relation is not configured to use an outgoing
+   *                 transition buffer, it will be reconfigured to the
+   *                 given configuration plus an outgoing
+   *                 transition buffer.
+   * @return <CODE>true</CODE> if the reachability status of at least one
+   *         state was changed, <CODE>false</CODE> otherwise.
+   */
+  public boolean checkReachability(final int config)
+  {
+    if (mSuccessorBuffer == null) {
+      reconfigure(config | CONFIG_SUCCESSORS);
+    }
+    return checkReachability();
+  }
+
+  /**
+   * Re-evaluates reachability. This method does a full reachability search of
+   * the transition relation, and resets the reachability status of all states
+   * according to the result. If any states are found to be unreachable,
+   * transitions attached to these states are removed.
    *
    * @return <CODE>true</CODE> if the reachability status of at least one
    *         state was changed, <CODE>false</CODE> otherwise.
