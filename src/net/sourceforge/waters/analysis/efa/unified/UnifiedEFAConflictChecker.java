@@ -172,7 +172,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     if (mDocumentManager == null) {
       mDocumentManager = new DocumentManager();
     }
-    mOnlyAutomata = true;
+    mOnlyAutomata = false;
     final ModuleProxy module = getModel();
     final List<ParameterBindingProxy> binding = getBindings();
     final UnifiedEFACompiler compiler =
@@ -471,6 +471,13 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     mCurrentSubSystem.addTransitionRelation(tr);
   }
 
+  /**
+   * Checks the given transition relation for blocked events.
+   * This method checks whether the given transition relation uses any
+   * events that does not appear on any transition. Such events are
+   * marked as blocked and their remaining transition relations are
+   * added to the set {@link #mDirtyTRs} for blocked events removal.
+   */
   private void recordBlockedEvents(final UnifiedEFATransitionRelation tr)
   {
     final ListBufferTransitionRelation rel = tr.getTransitionRelation();
@@ -489,9 +496,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         final EventInfo info = mCurrentSubSystem.getEventInfo(event);
         rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
         info.removeTransitionRelation(tr);
-        if (!removeEmptyEventInfo(info)) {
-          info.setBlocked();
-        }
+        info.setBlocked();
+        removeEmptyEventInfo(info);
       }
     }
   }
@@ -501,8 +507,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
    * has been unfolded, and all its events have been renamed and the event
    * information updated. Therefore, the variable is removed, and the
    * associated event informations are updated by removing <I>all</I>
-   * variables, and by removing those variables from the associated
-   * event information records.
+   * variables, and by removing the event from the associated variable
+   * information records.
    */
   private void unregisterVariable(final VariableInfo varInfo)
   {
@@ -993,8 +999,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     private void setBlockedDownwards()
     {
       if (!mIsBlocked) {
-        mIsBlocked = true;
-        mDirtyTRs.addAll(mTransitionRelations);
+        setBlockedHere();
         for (final EventInfo childInfo : mChildrenEvents) {
           childInfo.setBlockedDownwards();
         }
@@ -1009,13 +1014,22 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
             return;
           }
         }
-        mIsBlocked = true;
-        mDirtyTRs.addAll(mTransitionRelations);
+        setBlockedHere();
         final EventInfo parent = getParent();
         if (parent != null) {
           parent.setBlockedUpwards();
         }
       }
+    }
+
+    private void setBlockedHere()
+    {
+      mIsBlocked = true;
+      mDirtyTRs.addAll(mTransitionRelations);
+      for (final VariableInfo var : mVariables) {
+        var.removeEvent(this);
+      }
+      clearVariables();
     }
 
     //#######################################################################
