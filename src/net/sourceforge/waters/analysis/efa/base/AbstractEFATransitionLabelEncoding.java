@@ -85,6 +85,14 @@ public class AbstractEFATransitionLabelEncoding<L>
     }
   }
 
+  protected void replaceTransitionLabel(final int labelID, final L label)
+  {
+    final L oldL = mTransitionLabelList.get(labelID);
+    mTransitionLabelMap.remove(oldL);
+    mTransitionLabelMap.put(label, labelID);
+    mTransitionLabelList.set(labelID, label);
+  }
+
   /**
    * Adds all updates found in the given event encoding to this event
    * encoding.

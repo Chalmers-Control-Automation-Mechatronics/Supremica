@@ -64,6 +64,11 @@ public class UnifiedEFAEventEncoding
     return super.createTransitionLabelId(event);
   }
 
+  public void replaceEvent(final int code, final AbstractEFAEvent event)
+  {
+    replaceTransitionLabel(code, event);
+  }
+
   /**
    * Retrieves the list of all events in this encoding, except the
    * silent (tau) event.

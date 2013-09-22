@@ -231,6 +231,12 @@ abstract public class WatersObjectHash<T>
     return index((T) obj) >= 0;
   }
 
+  public T getExisting(final T obj)
+  {
+    final int index = index(obj);
+    return (T) (index >= 0 ? _set[index] : null);
+  }
+
   /**
    * Locates the index of <tt>obj</tt>.
    *

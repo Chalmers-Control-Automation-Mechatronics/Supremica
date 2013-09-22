@@ -192,18 +192,18 @@ public class UnifiedEFAConflictCheckerTest
 
   /*--------------------------- Goran --------------------------------------*/
 
-  public void testGoran() throws Exception
-  {
-    final ModuleProxy module = loadModule("tests", "goran", "goran-Kulbana-nb");
-    checkConflict(module, true);
-  }
-
-
-  public void testGoranSImple() throws Exception
-  {
-    final ModuleProxy module = loadModule("tests", "goran", "goran-SimpleTestSystem");
-    checkConflict(module, true);
-  }
+//  public void testGoran() throws Exception
+//  {
+//    final ModuleProxy module = loadModule("tests", "goran", "goran-Kulbana-nb");
+//    checkConflict(module, true);
+//  }
+//
+//
+//  public void testGoranSImple() throws Exception
+//  {
+//    final ModuleProxy module = loadModule("tests", "goran", "goran-sm-b");
+//    checkConflict(module, false);
+//  }
 
   /*--------------------------- Transfer Line ------------------------------*/
 
@@ -219,11 +219,11 @@ public class UnifiedEFAConflictCheckerTest
     checkTransferLine("transferline_efsm", 2, 1, true);
   }
 
-  public void testTransferLine22()
-    throws IOException, WatersException
-  {
-    checkTransferLine("transferline_efsm", 2, 2, true);
-  }
+//  public void testTransferLine22()
+//    throws IOException, WatersException
+//  {
+//    checkTransferLine("transferline_efsm", 2, 2, true);
+//  }
 
   public void testTransferLine12Block()
     throws IOException, WatersException
@@ -236,12 +236,12 @@ public class UnifiedEFAConflictCheckerTest
   {
     checkTransferLine("transferline_efsm_block", 2, 1, false);
   }
-
-  public void testTransferLine22Block()
-    throws IOException, WatersException
-  {
-    checkTransferLine("transferline_efsm_block", 2, 2, false);
-  }
+//
+//  public void testTransferLine22Block()
+//    throws IOException, WatersException
+//  {
+//    checkTransferLine("transferline_efsm_block", 2, 2, false);
+//  }
 
   /*---------------------------- PROFIsafe ---------------------------------*/
 
