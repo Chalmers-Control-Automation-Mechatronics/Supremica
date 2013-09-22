@@ -48,9 +48,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
     BDD feasibleSourceStates = null;
     BDD unreachableStates = null;
     TIntObjectHashMap<BDD> event2ParitionBDD = null;
-    //BDD[] feasiableStatesBDDs = null; // represent the feasiable state set as a set of BDDs
     BDD[] partitionBDDs = null;
-    BDD[] deltaTransBDDs = null;
+    BDD[] possUnsafeStatesBDDs = null;
+    BDD[] unsafeStatesTargetTrans = null;
     int componentSize;
     BDD minimalBoundaryUnsafeStates = null;
     TIntArrayList stageVarIndexList = null;
@@ -66,6 +66,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
     public int maxBDDSizeClassic = 0;
     public int maxBDDSizeAlternative = 0;
     public int maxBDDSizeMinimization = 0;
+    public int maxBDDSizePartitioning = 0;
 
     public BDDExtendedManager() {
         this(BDDLibraryType.fromDescription(Config.BDD2_BDDLIBRARY.getAsString()));
@@ -708,10 +709,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
         
         frwdLoadingTrans = frwdTrans.relprod(bddExAutomata.loadEventsBDD,
                 bddExAutomata.getEventVarSet());
-
+                
         BDD deadlocks = getDeadlocks();
-        System.out.println("The number of deadlocks is: "
-                + deadlocks.satCount(bddExAutomata.getSourceVariablesVarSet()));
 
         BDD boundaryUnsafeStates  = computeBoundaryUnsafeStates(deadlocks);
         System.out.println("the number of boundary states is " + 
@@ -742,7 +741,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
             BDD possibleUnsafeStates = fTransToUnsafeStates
                     .exist(bddExAutomata.getDestVariablesVarSet());
-
+            
             BDD transFromPossUnStates = possibleUnsafeStates.and(frwdTrans);
             if (maxBDDSizeAlternative < transFromPossUnStates.nodeCount()) {
                 maxBDDSizeAlternative = transFromPossUnStates.nodeCount();
@@ -753,23 +752,23 @@ public class BDDExtendedManager extends BDDAbstractManager {
                 maxBDDSizeAlternative = nonUnsafeStates.nodeCount();
             }
 
-
+            
             nonUnsafeStates = nonUnsafeStates.relprod(fTransToUnsafeStates.not(),
                     bddExAutomata.getDestVariablesVarSet());
             if (maxBDDSizeAlternative < nonUnsafeStates.nodeCount()) {
                 maxBDDSizeAlternative = nonUnsafeStates.nodeCount();
             }
-
+            
             newUnsafeStates = possibleUnsafeStates.and(nonUnsafeStates.not());
 
             newUnsafeStates.andWith(unsafeStates.not());
             unsafeStates = unsafeStates.or(newUnsafeStates);
-
+            
             tTrans.orWith(fTransToUnsafeStates).and(newUnsafeStates.not());
             if (maxBDDSizeAlternative < tTrans.nodeCount()) {
                 maxBDDSizeAlternative = tTrans.nodeCount();
             }
-
+            
         } while (!newUnsafeStates.isZero());       
         
         BDD boundaryUnsafeStates = unsafeStates
@@ -808,7 +807,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         BDD deadlocks = potentialDeadlockStates
                 .andWith(notDeadlockStates.not()).andWith(initv.not());
-
+        
         // a series of BDDs together representing the feasible states
 //        for (BDD feasiableSet : feasiableStatesBDDs) {
 //            deadlocks = deadlocks.and(feasiableSet);
@@ -971,7 +970,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         System.err.println("Computing the deadlock states with the event-based "
                 + "partitioning approach.");
-        BDD deadlocks = getDeadlocksWithPartitions();
+        BDD deadlocks = getDeadlocksWithPartitions();   
         System.err.println("The number of deadlocks is: "
                 + deadlocks.satCount(bddExAutomata.getSourceVariablesVarSet()));
 
@@ -996,15 +995,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
         componentSize = event2ParitionBDD.size();
 
         partitionBDDs = new BDD[componentSize];
-        partitionBDDs = event2ParitionBDD.values(partitionBDDs);
-
-        for (int i = 0; i < componentSize; i++) {
-            partitionBDDs[i] = partitionBDDs[i]
-                    .exist(bddExAutomata.getSourceLocationVarSet()
-                    .union(bddExAutomata.getDestLocationVarSet()));
-        }
-
-        partitionBDDs = new BDD[componentSize];
 
         frwdLoadingTrans = getZeroBDD();
 
@@ -1012,6 +1002,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
             BDDVarSet locationVars = bddExAutomata.getSourceLocationVarSet()
                     .union(bddExAutomata.getDestLocationVarSet());
 
+            @Override
             public boolean execute(int eventIndex, BDD partition) {
 
                 String eventName = bddExAutomata.theIndexMap
@@ -1031,12 +1022,14 @@ public class BDDExtendedManager extends BDDAbstractManager {
             }
         });
 
-        deltaTransBDDs = new BDD[componentSize];
+        possUnsafeStatesBDDs = new BDD[componentSize];
+        unsafeStatesTargetTrans = new BDD[componentSize];
 
         for (int i = 0; i < componentSize; i++) {
-            deltaTransBDDs[i] = getZeroBDD();
+            possUnsafeStatesBDDs[i] = getZeroBDD();
+            unsafeStatesTargetTrans[i] = getZeroBDD();
         }
-
+        
         buildHelpers();
 
         feasibleSourceStates = getFeasibleSourceStatesBDD();
@@ -1075,7 +1068,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
         return deadlocks;
     }
     
-    // BUGGY!
     // Backtrack deadlock states to find all boundary unsafe states from partition
     private BDD computeBoundaryUnsafeStatesWithEventPartitions(BDD deadlocks) {
 
@@ -1084,7 +1076,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
         BDD unsafeStates = deadlocks.id();
 
         BDD[] notUnsafeStates = new BDD[componentSize];
+        BDD[] partitionSourceStates = new BDD[componentSize];
         BDD[] possiableUnsafeStates = new BDD[componentSize];
+        
+        for (int i = 0; i < componentSize; i++)
+            partitionSourceStates[i] = partitionBDDs[i]
+                    .exist(bddExAutomata.getDestVariablesVarSet());
 
         do {
 
@@ -1095,15 +1092,17 @@ public class BDDExtendedManager extends BDDAbstractManager {
                 BDD transToUnsafeStates = newFoundUnsafeStates
                         .replace(bddExAutomata.getSourceToDestVariablePairing())
                         .and(partition);
-                
+                      
                 possiableUnsafeStates[i] = transToUnsafeStates
                         .exist(bddExAutomata.getDestVariablesVarSet());
                 
-                deltaTransBDDs[i] = deltaTransBDDs[i].or(possiableUnsafeStates[i]);
+                possUnsafeStatesBDDs[i] = possUnsafeStatesBDDs[i]
+                        .or(possiableUnsafeStates[i]);
 
-                notUnsafeStates[i] = partition
-                        .exist(bddExAutomata.getDestVariablesVarSet())
-                        .and(deltaTransBDDs[i].not());
+                notUnsafeStates[i] = partitionSourceStates[i]
+                        .and(possUnsafeStatesBDDs[i].not());
+                
+                unsafeStatesTargetTrans[i].orWith(transToUnsafeStates);
             }
 
             newFoundUnsafeStates = getZeroBDD();
@@ -1117,68 +1116,35 @@ public class BDDExtendedManager extends BDDAbstractManager {
                         localNewUnStates.andWith(notUnsafeStates[j2].not());
                     }
                 }
-
-                BDD nonBoundaryStates = localNewUnStates.relprod(deltaTransBDDs[j1], 
-                        bddExAutomata.getSourceVariablesVarSet())
-                        .replace(bddExAutomata.getDestToSourceVariablePairing());
-
-                minimalBoundaryUnsafeStates.andWith(nonBoundaryStates.not());
-
-                deltaTransBDDs[j1].andWith(localNewUnStates.not());
-                newFoundUnsafeStates = newFoundUnsafeStates.or(localNewUnStates);
+                
+                unsafeStatesTargetTrans[j1].andWith(localNewUnStates.not());
+                if (unsafeStatesTargetTrans[j1].nodeCount() > maxBDDSizePartitioning) {
+                    maxBDDSizePartitioning = unsafeStatesTargetTrans[j1].nodeCount();
+                }
+                
+                newFoundUnsafeStates.orWith(localNewUnStates);
+                if (newFoundUnsafeStates.nodeCount() > maxBDDSizePartitioning)
+                    maxBDDSizePartitioning = newFoundUnsafeStates.nodeCount();
             }
 
+            newFoundUnsafeStates.andWith(unsafeStates.not());
+            if (newFoundUnsafeStates.nodeCount() > maxBDDSizePartitioning)
+                    maxBDDSizePartitioning = newFoundUnsafeStates.nodeCount();
+            
             unsafeStates = unsafeStates.or(newFoundUnsafeStates);
-
-            minimalBoundaryUnsafeStates =
-                    minimalBoundaryUnsafeStates.or(newFoundUnsafeStates);
+            if (unsafeStates.nodeCount() > maxBDDSizePartitioning)
+                    maxBDDSizePartitioning = unsafeStates.nodeCount();
 
         } while (!newFoundUnsafeStates.isZero());
+        
+        /* 1. The target states in the unsafeStatesTrans are boundary unsafe states ;
+           2. The non-minimal boundary unsafe states can be removed from each partition;
+           3. This is tomorrow's task!
+        */
+        
+        System.err.println("Maximal number of BDD nodes is " + unsafeStates.nodeCount());
 
         return unsafeStates;
     }
-    
-    // Compute a series of BDDs representing the feasiable states
-//    public BDD[] computeFeasiableStatesBDDs() {
-//
-//        if (feasiableStatesBDDs == null) {
-//
-//            TIntObjectHashMap<String> r2FeaEquations = bddExAutomata.orgExAutomata
-//                    .resourceToFeasibleEquationMap;
-////              TIntObjectHashMap<String> r2FeaEquations = FlowerEFABuilder
-////                      .resourceToFeasibleEquationMap;
-//
-//            feasiableStatesBDDs = new BDD[r2FeaEquations.size()];
-//
-//            final ExpressionParser parser =
-//                    new ExpressionParser(ModuleSubjectFactory.getInstance(),
-//                    CompilerOperatorTable.getInstance());
-//
-//            r2FeaEquations.forEachEntry(new TIntObjectProcedure<String>() {
-//                public boolean execute(int rIndex, String equation) {
-//
-//                    SimpleExpressionSubject equationExpression = null;
-//                    BDD equationBDD = null;
-//
-//                    if (!equation.isEmpty()) {
-//                        try {
-//                            equationExpression = (SimpleExpressionSubject) (parser.parse(equation, Operator.TYPE_BOOLEAN));
-//                        } catch (final ParseException pe) {
-//                            System.err.println(pe);
-//                        }
-//                        equationBDD = guard2BDD(equationExpression);
-//                    } else {
-//                        equationBDD = getOneBDD();
-//                    }
-//
-//
-//                    feasiableStatesBDDs[rIndex] = equationBDD;
-//                    return true;
-//                }
-//            });
-//        }
-//
-//        return feasiableStatesBDDs;
-//    }
 }
 

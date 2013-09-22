@@ -325,6 +325,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         
         if(synType.equals(SynthesisAlgorithm.MINIMALITY_C) 
                 || synType.equals(SynthesisAlgorithm.MINIMALITY_M)
+                || synType.equals(SynthesisAlgorithm.MINIMALITY_P)
                 || synType.equals(SynthesisAlgorithm.PARTITIONBDD))
         {
             BDDPartitionVarOrdSorter forceSorter = new BDDPartitionVarOrdSorter(orgExAutomata, variableOrdering, variableOrderingNames);
@@ -1368,6 +1369,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
         else if (synType.equals(SynthesisAlgorithm.MINIMALITY_C)) {
             boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesClassic();
+            boundaryUnsafeStates = manager.removeLargerStates(boundaryUnsafeStates);
+        }
+        else if (synType.equals(SynthesisAlgorithm.MINIMALITY_P)) {
+            boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesEventPartitioning();
             boundaryUnsafeStates = manager.removeLargerStates(boundaryUnsafeStates);
         }
 //        unsafeStates.printDot();
