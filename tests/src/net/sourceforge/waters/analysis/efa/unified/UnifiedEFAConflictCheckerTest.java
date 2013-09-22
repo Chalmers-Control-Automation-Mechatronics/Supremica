@@ -184,6 +184,27 @@ public class UnifiedEFAConflictCheckerTest
     checkPhilosophers("dining_philosophers", 5, false);
   }
 
+  public void testDosingTankWithJellyEFA1() throws Exception
+  {
+    final ModuleProxy module = loadModule("handwritten", "DosingTankWithJellyEFA1");
+    checkConflict(module, false);
+  }
+
+  /*--------------------------- Goran --------------------------------------*/
+
+  public void testGoran() throws Exception
+  {
+    final ModuleProxy module = loadModule("tests", "goran", "goran-Kulbana-nb");
+    checkConflict(module, true);
+  }
+
+
+  public void testGoranSImple() throws Exception
+  {
+    final ModuleProxy module = loadModule("tests", "goran", "goran-SimpleTestSystem");
+    checkConflict(module, true);
+  }
+
   /*--------------------------- Transfer Line ------------------------------*/
 
   public void testTransferLine12()

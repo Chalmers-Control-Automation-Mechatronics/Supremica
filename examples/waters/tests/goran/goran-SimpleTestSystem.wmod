@@ -1,0 +1,1999 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Simple Test System" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="send_output_COLD_restart"/>
+        <EventDecl Kind="CONTROLLABLE" Name="receive_event_EI2_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="received_event_EI2_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="remove_fb"/>
+        <EventDecl Kind="CONTROLLABLE" Name="queue_fb_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="queue_fb_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="handle_event_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="handling_event_done_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="handle_event_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="handling_event_done_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="execute_TestAlg_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="finished_execution_TestAlg_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="remove_event_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="update_ECC_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="no_more_actions_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="no_transition_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="receive_event_EI_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="queue_event_EI_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="received_event_EI_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="reset_event_EI_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="event_input_EI_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="send_output_EO_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="receive_event_EI1_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="received_event_EI1_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="one_transition_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="statement_1_TestAlg_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="statement_2_TestAlg_test1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="remove_event_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="update_ECC_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="no_more_actions_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="no_transition_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="queue_event_EI1_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="queue_event_EI2_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="reset_event_EI1_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="reset_event_EI2_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="event_input_EI1_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="event_input_EI2_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="send_output_EO_merge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="one_transition_merge"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="Startup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="send_output_COLD_restart"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive_event_EI2_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="received_event_EI2_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_fb"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="current_fb">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="current_fb"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="fb_first">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="fb_first"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="fb_place_1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="fb_place_1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="fb_place_2">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="fb_place_2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="Instance Queue">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 1">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fb_place_1 = 1">
+                                    <SimpleIdentifier Name="fb_place_1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 2">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fb_place_2 = 1">
+                                    <SimpleIdentifier Name="fb_place_2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 1">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fb_place_1 = 2">
+                                    <SimpleIdentifier Name="fb_place_1"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 2">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fb_place_2 = 2">
+                                    <SimpleIdentifier Name="fb_place_2"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_fb"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 1">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="current_fb = fb_place_1">
+                                    <SimpleIdentifier Name="current_fb"/>
+                                    <SimpleIdentifier Name="fb_place_1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="fb_first = 2">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="fb_place_1 = 0">
+                                    <SimpleIdentifier Name="fb_place_1"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_fb"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 2">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="current_fb = fb_place_2">
+                                    <SimpleIdentifier Name="current_fb"/>
+                                    <SimpleIdentifier Name="fb_place_2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="fb_first = 1">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="fb_place_2 = 0">
+                                    <SimpleIdentifier Name="fb_place_2"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 1">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fb_place_2 = 1">
+                                    <SimpleIdentifier Name="fb_place_2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 2">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fb_place_1 = 1">
+                                    <SimpleIdentifier Name="fb_place_1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 1">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fb_place_2 = 2">
+                                    <SimpleIdentifier Name="fb_place_2"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 2">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="fb_place_1 = 2">
+                                    <SimpleIdentifier Name="fb_place_1"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_fb"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 1">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="current_fb = fb_place_1">
+                                    <SimpleIdentifier Name="current_fb"/>
+                                    <SimpleIdentifier Name="fb_place_1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="fb_first = 2">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="fb_place_1 = 0">
+                                    <SimpleIdentifier Name="fb_place_1"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_fb"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="fb_first == 2">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="current_fb = fb_place_2">
+                                    <SimpleIdentifier Name="current_fb"/>
+                                    <SimpleIdentifier Name="fb_place_2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="fb_first = 1">
+                                    <SimpleIdentifier Name="fb_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="fb_place_2 = 0">
+                                    <SimpleIdentifier Name="fb_place_2"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Event Execution">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_fb"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handle_event_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="current_fb == 1">
+                                    <SimpleIdentifier Name="current_fb"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handling_event_done_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handle_event_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="current_fb == 2">
+                                    <SimpleIdentifier Name="current_fb"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Guards>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handling_event_done_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Algorithm Execution">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="execute_TestAlg_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s0" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finished_execution_TestAlg_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="test1: Event Handling">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handle_event_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_event_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="update_ECC_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_more_actions_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_transition_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handling_event_done_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="event_EI_test1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="event_EI_test1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="data_DI_test1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="data_DI_test1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="data_DO_test1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="data_DO_test1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="event_test1_first">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="event_test1_first"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="event_place_1_test1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="event_place_1_test1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="data_place_1_DI_test1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="data_place_1_DI_test1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="test1: Event Queue">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive_event_EI_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_event_EI_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="event_test1_first == 1">
+                                    <SimpleIdentifier Name="event_test1_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="event_place_1_test1 = 1">
+                                    <SimpleIdentifier Name="event_place_1_test1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="data_place_1_DI_test1 = data_DO_test1">
+                                    <SimpleIdentifier Name="data_place_1_DI_test1"/>
+                                    <SimpleIdentifier Name="data_DO_test1"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s1" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="received_event_EI_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s5" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_event_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="(event_test1_first == 1) &amp; (event_place_1_test1 == 1)">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_test1_first"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_place_1_test1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="event_EI_test1 = 1">
+                                    <SimpleIdentifier Name="event_EI_test1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="event_test1_first = 1">
+                                    <SimpleIdentifier Name="event_test1_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="event_place_1_test1 = 0">
+                                    <SimpleIdentifier Name="event_place_1_test1"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="data_DI_test1 = data_place_1_DI_test1">
+                                    <SimpleIdentifier Name="data_DI_test1"/>
+                                    <SimpleIdentifier Name="data_place_1_DI_test1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="data_place_1_DI_test1 = 0">
+                                    <SimpleIdentifier Name="data_place_1_DI_test1"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset_event_EI_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="event_EI_test1 = 0">
+                                    <SimpleIdentifier Name="event_EI_test1"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="internal_invoked_test1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="internal_invoked_test1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="test1: Execution Control Chart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="INIT">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="STATE_actions">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="STATE">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="INIT_actions">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s9">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s10">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s11">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="INIT">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="update_ECC_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="event_input_EI_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="event_EI_test1 == 1 &amp; (event_EI_test1 == 1)">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_EI_test1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_EI_test1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="STATE_actions" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset_event_EI_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s2" Source="STATE_actions">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="execute_TestAlg_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finished_execution_TestAlg_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="send_output_EO_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive_event_EI1_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="received_event_EI1_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="STATE" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_more_actions_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s7" Source="STATE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="update_ECC_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="INIT_actions" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="one_transition_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s8" Source="INIT_actions">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_more_actions_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s9" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="update_ECC_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="INIT" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handling_event_done_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s10" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_transition_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <UnaryExpression Operator="!" Text="!(event_EI_test1 == 1)">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_EI_test1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </UnaryExpression>
+                            </Guards>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s11" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset_event_EI_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="event_EI_test1 == 1">
+                                    <SimpleIdentifier Name="event_EI_test1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="INIT" Source="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handling_event_done_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="test1 TestAlg: Algorithm">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="execute_TestAlg_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="statement_1_TestAlg_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="internal_invoked_test1 = (internal_invoked_test1 + 1 ) % 2">
+                                    <SimpleIdentifier Name="internal_invoked_test1"/>
+                                    <BinaryExpression Operator="%">
+                                        <BinaryExpression Operator="+">
+                                            <SimpleIdentifier Name="internal_invoked_test1"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="statement_2_TestAlg_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="data_DO_test1 = (data_DI_test1 + 1 ) % 2">
+                                    <SimpleIdentifier Name="data_DO_test1"/>
+                                    <BinaryExpression Operator="%">
+                                        <BinaryExpression Operator="+">
+                                            <SimpleIdentifier Name="data_DI_test1"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finished_execution_TestAlg_test1"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="merge: Event Handling">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handle_event_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_event_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="update_ECC_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s2" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_more_actions_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_transition_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s0" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handling_event_done_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="event_EI1_merge">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="event_EI1_merge"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="event_EI2_merge">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="event_EI2_merge"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="event_merge_first">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="event_merge_first"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="event_place_1_merge">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="event_place_1_merge"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="merge: Event Queue">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s9">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive_event_EI1_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_event_EI1_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="event_merge_first == 1">
+                                    <SimpleIdentifier Name="event_merge_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="event_place_1_merge = 1">
+                                    <SimpleIdentifier Name="event_place_1_merge"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s1" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="received_event_EI1_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s5" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive_event_EI2_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s6" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_event_EI2_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="event_merge_first == 1">
+                                    <SimpleIdentifier Name="event_merge_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="event_place_1_merge = 2">
+                                    <SimpleIdentifier Name="event_place_1_merge"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="queue_fb_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s1" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="received_event_EI2_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="s8" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_event_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="(event_merge_first == 1) &amp; (event_place_1_merge == 1)">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_merge_first"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_place_1_merge"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="event_EI1_merge = 1">
+                                    <SimpleIdentifier Name="event_EI1_merge"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="event_merge_first = 1">
+                                    <SimpleIdentifier Name="event_merge_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="event_place_1_merge = 0">
+                                    <SimpleIdentifier Name="event_place_1_merge"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset_event_EI1_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="event_EI1_merge = 0">
+                                    <SimpleIdentifier Name="event_EI1_merge"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="remove_event_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="(event_merge_first == 1) &amp; (event_place_1_merge == 2)">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_merge_first"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_place_1_merge"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="event_EI2_merge = 1">
+                                    <SimpleIdentifier Name="event_EI2_merge"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="event_merge_first = 1">
+                                    <SimpleIdentifier Name="event_merge_first"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=" Text="event_place_1_merge = 0">
+                                    <SimpleIdentifier Name="event_place_1_merge"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s0" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset_event_EI2_merge"/>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=" Text="event_EI2_merge = 0">
+                                    <SimpleIdentifier Name="event_EI2_merge"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="merge: Execution Control Chart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="304" X="368"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="144" X="496"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1_actions">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="326" X="779"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="134" X="683"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="288" X="592"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="400" X="752"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="464" X="720"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="551" X="667"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="608" X="592"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="617" X="498"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S0_actions">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="577" X="410"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-14" X="19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s7">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="497" X="352"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s8">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="391" X="337"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s9">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="134" X="347"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s10">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="256" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s0" Source="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="update_ECC_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="53" X="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="223" X="427"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="event_input_EI1_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-28" X="-61"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="127" X="593"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="event_EI1_merge == 1 &amp; (event_EI1_merge == 1 | event_EI2_merge == 1)">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_EI1_merge"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="event_EI1_merge"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="event_EI2_merge"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-48" X="-61"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="S1_actions" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset_event_EI1_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="5" X="20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="220" X="747"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="event_input_EI2_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-40" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="222" X="525"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="event_EI2_merge == 1 &amp; (event_EI1_merge == 1 | event_EI2_merge == 1)">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="event_EI2_merge"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="event_EI1_merge"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="event_EI2_merge"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="9"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="S1_actions" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset_event_EI2_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="-120"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s3" Source="S1_actions">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="send_output_EO_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-1" X="12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="365" X="769"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s4" Source="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive_event_EI_test1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-2" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="434" X="739"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s5" Source="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="received_event_EI_test1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="511" X="698"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="S1" Source="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_more_actions_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="584" X="633"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s6" Source="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="update_ECC_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="19" X="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="618" X="545"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="S0_actions" Source="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="one_transition_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="16" X="-119"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="602" X="452"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s7" Source="S0_actions">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_more_actions_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="540" X="377"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s8" Source="s7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="update_ECC_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="5" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="446" X="340"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="S0" Source="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handling_event_done_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="347" X="349"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s9" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="no_transition_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-30" X="-54"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="130" X="418"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <UnaryExpression Operator="!" Text="!(event_EI1_merge == 1 | event_EI2_merge == 1)">
+                                    <BinaryExpression Operator="|">
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="event_EI1_merge"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="event_EI2_merge"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                </UnaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-55" X="-228"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset_event_EI1_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="28"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="197" X="255"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="event_EI1_merge == 1">
+                                    <SimpleIdentifier Name="event_EI1_merge"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="9"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s10" Source="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset_event_EI2_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="-156"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="143" X="226"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="event_EI2_merge == 1">
+                                    <SimpleIdentifier Name="event_EI2_merge"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="17" X="-164"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="S0" Source="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="handling_event_done_merge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="14" X="-114"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="291" X="272"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="20" X="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
