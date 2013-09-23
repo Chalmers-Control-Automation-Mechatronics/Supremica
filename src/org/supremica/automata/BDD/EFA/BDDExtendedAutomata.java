@@ -122,7 +122,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     long nbrOfBlockingStates = -1;
     long nbrOfNonblockingControllableStates = -1;
     long nbrOfControllableStates = -1;
-    long nbrOfBoundaryUnsafeStates = -1; // for RAS models
+    int nbrOfBoundaryUnsafeStates = -1; // for RAS models
     private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecSourceVarsMap;
     private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTargetVarsMap;
     private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTempVarsMap;
@@ -1355,12 +1355,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     }
 
     public BDD getUnsafeStates() {
-        manager.setBDDExAutomata(this);
-        //synType = SynthesisAlgorithm.MONOLITHICBDD;
-//        System.err.println("compute reachable states --- begin");
-//        computeReachableStates();
-//        System.err.println("compute reachable states --- end");
-        
+        manager.setBDDExAutomata(this);        
         BDD boundaryUnsafeStates = null;
         
         if (synType.equals(SynthesisAlgorithm.MINIMALITY_M)){
@@ -1375,14 +1370,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesEventPartitioning();
             boundaryUnsafeStates = manager.removeLargerStates(boundaryUnsafeStates);
         }
-//        unsafeStates.printDot();
 
-        //       final IDD idd = generateIDD(unsafeStates, unsafeStates);
-        // printDOT(idd);
-        nbrOfBoundaryUnsafeStates = (long) boundaryUnsafeStates.satCount(sourceStagesVarSet);
-        //System.err.println();
-        //System.err.println("Complete! Number of minimal unsafe states: " + nbrOfBoundaryUnsafeStates);
-
+        nbrOfBoundaryUnsafeStates = manager.nbrMinBoundUnsafeStates;
         return boundaryUnsafeStates;
     }
 
