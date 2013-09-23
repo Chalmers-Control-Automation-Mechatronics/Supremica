@@ -35,6 +35,7 @@ import net.sourceforge.waters.model.analysis.module.AbstractModuleConflictChecke
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -143,6 +144,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     if (mSimplifier != null) {
       mSimplifier.requestAbort();
     }
+    if (mUpdateMerger != null) {
+      mUpdateMerger.requestAbort();
+    }
     if (mSynchronizer != null) {
       mSynchronizer.requestAbort();
     }
@@ -160,6 +164,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     }
     if (mSimplifier != null) {
       mSimplifier.resetAbort();
+    }
+    if (mUpdateMerger != null) {
+      mUpdateMerger.resetAbort();
     }
     if (mSynchronizer != null) {
       mSynchronizer.resetAbort();
@@ -654,6 +661,27 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       original = original.getOriginalEvent();
     }
     return root;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @SuppressWarnings("unused")
+  private void saveCurrentSystem(final String name)
+  {
+    final UnifiedEFAVariableContext context =
+      mMainEFASystem.getVariableContext();
+    final List<UnifiedEFAVariable> vars = mCurrentSubSystem.getVariables();
+    final List<UnifiedEFATransitionRelation> trs =
+      new ArrayList<>(mCurrentSubSystem.getTransitionRelations());
+    Collections.sort(trs);
+    final List<AbstractEFAEvent> events = mCurrentSubSystem.getEvents();
+    final UnifiedEFASystem system =
+      new UnifiedEFASystem(name, vars, trs, events, context);
+    final UnifiedEFASystemImporter importer =
+      new UnifiedEFASystemImporter(getFactory(), mCompilerOperatorTable);
+    final ModuleProxy module = importer.importModule(system);
+    MarshallingTools.saveModule(module, name + ".wmod");
   }
 
 
@@ -1263,6 +1291,14 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mEventInfoMap.remove(event);
     }
 
+    private List<AbstractEFAEvent> getEvents()
+    {
+      final List<AbstractEFAEvent> events =
+        new ArrayList<>(mEventInfoMap.keySet());
+      Collections.sort(events);
+      return events;
+    }
+
     private VariableInfo getVariableInfo(final UnifiedEFAVariable var)
     {
       return mVariableInfoMap.get(var);
@@ -1283,7 +1319,15 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     @SuppressWarnings("unused")
     private void removeVariableInfo(final UnifiedEFAVariable var)
     {
-      mEventInfoMap.remove(var);
+      mVariableInfoMap.remove(var);
+    }
+
+    private List<UnifiedEFAVariable> getVariables()
+    {
+      final List<UnifiedEFAVariable> vars =
+        new ArrayList<>(mVariableInfoMap.keySet());
+      Collections.sort(vars);
+      return vars;
     }
 
     private Set<UnifiedEFATransitionRelation> getTransitionRelations()

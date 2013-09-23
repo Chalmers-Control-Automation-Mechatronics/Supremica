@@ -20,6 +20,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public abstract class AbstractEFAEvent
+  implements Comparable<AbstractEFAEvent>
 {
   //#########################################################################
   //# Constructors
@@ -51,6 +52,15 @@ public abstract class AbstractEFAEvent
   public abstract EventKind getKind();
 
   public abstract boolean isObservable();
+
+
+  //#######################################################################
+  //# Interface java.util.Comparable<AbstractEFAEvent>
+  @Override
+  public int compareTo(final AbstractEFAEvent event)
+  {
+    return getName().compareTo(event.getName());
+  }
 
 
   //#######################################################################
