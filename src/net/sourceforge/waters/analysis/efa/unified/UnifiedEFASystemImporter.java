@@ -256,9 +256,10 @@ public class UnifiedEFASystemImporter
       new HashMap<>(events.size() - leaveSet.size());
     for (final UnifiedEFATransitionRelation tr : trs) {
       for (final AbstractEFAEvent event : tr.getUsedEventsExceptTau()) {
-        if (!leaveSet.contains(event) && !aliasMap.containsKey(event)) {
+        final AbstractEFAEvent root = getAliasRoot(event);
+        if (!leaveSet.contains(root) && !aliasMap.containsKey(root)) {
           final List<AbstractEFAEvent> list = new ArrayList<>();
-          aliasMap.put(event, list);
+          aliasMap.put(root, list);
         }
       }
     }
@@ -287,7 +288,8 @@ public class UnifiedEFASystemImporter
       }
       if (!elist.isEmpty()) {
         Collections.sort(elist);
-        final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy(name);
+        final IdentifierProxy ident =
+          mFactory.createSimpleIdentifierProxy(name);
         final PlainEventListProxy expr =
           mFactory.createPlainEventListProxy(elist);
         final EventAliasProxy alias =
@@ -296,6 +298,18 @@ public class UnifiedEFASystemImporter
       }
     }
     return leaveList;
+  }
+
+  private AbstractEFAEvent getAliasRoot(final AbstractEFAEvent event)
+  {
+    if (event instanceof RenamedEFAEvent) {
+      final RenamedEFAEvent renamed = (RenamedEFAEvent) event;
+      if (renamed.getIndex() < 0) {
+        final AbstractEFAEvent original = renamed.getOriginalEvent();
+        return getAliasRoot(original);
+      }
+    }
+    return event;
   }
 
   private void importEvent(final List<EventDeclProxy> eventList,

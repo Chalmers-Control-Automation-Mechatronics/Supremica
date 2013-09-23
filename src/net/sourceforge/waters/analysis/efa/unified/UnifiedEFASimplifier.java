@@ -15,6 +15,7 @@ import net.sourceforge.waters.analysis.abstraction.BlockedEventsRemovalTRSimplif
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.HidingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
@@ -155,9 +156,9 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
       new IncomingEquivalenceTRSimplifier();
     incomingEquivalenceSimplifier.setTransitionLimit(limit);
     chain.add(incomingEquivalenceSimplifier);
-//    final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
-//      new LimitedCertainConflictsTRSimplifier();
-//    chain.add(certainConflictsRemover);
+    final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
+      new LimitedCertainConflictsTRSimplifier();
+    chain.add(certainConflictsRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);

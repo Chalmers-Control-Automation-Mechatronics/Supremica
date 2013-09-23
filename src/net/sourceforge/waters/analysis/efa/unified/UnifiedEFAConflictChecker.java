@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.efa.unified;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,11 +21,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
 import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
-import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -354,39 +355,47 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   private SubSystemInfo collectSubSystem(final Collection<EventInfo> remaining)
     throws AnalysisAbortException
   {
+    final Iterator<EventInfo> iter = remaining.iterator();
+    final EventInfo startInfo = iter.next();
+    iter.remove();
+    final Queue<EventInfo> queue = new ArrayDeque<>();
+    queue.add(startInfo);
     final SubSystemInfo sub = new SubSystemInfo();
-    final BFSSearchSpace<EventInfo> search = new BFSSearchSpace<>();
-    final EventInfo startInfo = remaining.iterator().next();
-    remaining.remove(startInfo);
-    search.add(startInfo);
-    while (!search.isEmpty()) {
+    sub.addEventInfo(startInfo);
+    while (!queue.isEmpty()) {
       checkAbort();
-      final EventInfo info = search.remove();
+      final EventInfo info = queue.remove();
       final Set<UnifiedEFATransitionRelation> trs =
         new THashSet<UnifiedEFATransitionRelation>();
       final Set<VariableInfo> vars = new THashSet<VariableInfo>();
       info.collectCandidate(trs, vars);
       for (final UnifiedEFATransitionRelation tr : trs) {
-        sub.addTransitionRelation(tr);
-        final Set<AbstractEFAEvent> events = tr.getUsedEventsExceptTau();
-        for (final AbstractEFAEvent nextEvent : events) {
-          final AbstractEFAEvent rootEvent = getRootEvent(nextEvent);
-          final EventInfo rootInfo = mCurrentSubSystem.getEventInfo(rootEvent);
-          search.add(rootInfo);
-          sub.addEventInfo(rootInfo);
-          remaining.remove(rootInfo);
+        if (sub.addTransitionRelation(tr)) {
+          final Set<AbstractEFAEvent> events = tr.getUsedEventsExceptTau();
+          for (final AbstractEFAEvent nextEvent : events) {
+            final AbstractEFAEvent rootEvent = getRootEvent(nextEvent);
+            final EventInfo rootInfo =
+              mCurrentSubSystem.getEventInfo(rootEvent);
+            if (sub.addEventInfo(rootInfo)) {
+              queue.add(rootInfo);
+              remaining.remove(rootInfo);
+            }
+          }
         }
       }
       for (final VariableInfo var : vars) {
-        sub.addVariableInfo(var);
-        final Collection<EventInfo> events = var.getEvents();
-        for (final EventInfo eventInfo : events) {
-          final AbstractEFAEvent nextEvent = eventInfo.getEvent();
-          final AbstractEFAEvent rootEvent = getRootEvent(nextEvent);
-          final EventInfo rootInfo = mCurrentSubSystem.getEventInfo(rootEvent);
-          search.add(rootInfo);
-          sub.addEventInfo(rootInfo);
-          remaining.remove(rootInfo);
+        if (sub.addVariableInfo(var)) {
+          final Collection<EventInfo> events = var.getEvents();
+          for (final EventInfo eventInfo : events) {
+            final AbstractEFAEvent nextEvent = eventInfo.getEvent();
+            final AbstractEFAEvent rootEvent = getRootEvent(nextEvent);
+            final EventInfo rootInfo =
+              mCurrentSubSystem.getEventInfo(rootEvent);
+            if (sub.addEventInfo(rootInfo)) {
+              queue.add(rootInfo);
+              remaining.remove(rootInfo);
+            }
+          }
         }
       }
     }
@@ -440,9 +449,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
   private void simplifyDirtyTransitionRelations() throws AnalysisException
   {
-    // TODO Avoid nondeterminism
     while (!mDirtyTRs.isEmpty()) {
-      final UnifiedEFATransitionRelation tr = mDirtyTRs.iterator().next();
+      final UnifiedEFATransitionRelation tr = Collections.min(mDirtyTRs);
       mDirtyTRs.remove(tr);
       simplifyTR(tr);
     }
@@ -717,10 +725,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         if (mCurrentSubSystem.getEventInfo(original) != null) {
           final SyncInfo originalInfo = syncMap.get(original);
           if (originalInfo != null) {
-            if (events.contains(original)) {
-              originalInfo.setIsLeave(false);
-              eventInfo.setIsRoot(false);
-            }
+            originalInfo.setIsLeave(false);
+            eventInfo.setIsRoot(false);
+            break;
           } else {
             final SyncInfo syncInfo = new SyncInfo(false, false);
             syncMap.put(original, syncInfo);
@@ -746,6 +753,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   @SuppressWarnings("unused")
   private void saveCurrentSystem(final String name)
   {
+    // TODO Include blocked events ...
     final UnifiedEFAVariableContext context =
       mMainEFASystem.getVariableContext();
     final List<UnifiedEFAVariable> vars = mCurrentSubSystem.getVariables();
@@ -1191,14 +1199,14 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     private void findAdditionalChildren(final Map<AbstractEFAEvent, SyncInfo> syncMap,
                                         final Collection<AbstractEFAEvent> children)
     {
-      final SyncInfo syncInfo = syncMap.get(mEvent);
-      if (syncInfo == null) {
-        if (!isBlocked()) {
+      if (!isBlocked()) {
+        final SyncInfo syncInfo = syncMap.get(mEvent);
+        if (syncInfo == null) {
           children.add(mEvent);
-        }
-      } else if (!syncInfo.isLeave()) {
-        for (final EventInfo child : mChildrenEvents) {
-          child.findAdditionalChildren(syncMap, children);
+        } else if (!syncInfo.isLeave()) {
+          for (final EventInfo child : mChildrenEvents) {
+            child.findAdditionalChildren(syncMap, children);
+          }
         }
       }
     }
@@ -1403,10 +1411,11 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       return mEventInfoMap.get(event);
     }
 
-    private void addEventInfo(final EventInfo info)
+    private boolean addEventInfo(final EventInfo info)
     {
       final AbstractEFAEvent event = info.getEvent();
-      mEventInfoMap.put(event, info);
+      final EventInfo previous = mEventInfoMap.put(event, info);
+      return previous == null;
     }
 
     private void removeEventInfo(final EventInfo info)
@@ -1433,10 +1442,11 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       return mVariableInfoMap.get(var);
     }
 
-    private void addVariableInfo(final VariableInfo info)
+    private boolean addVariableInfo(final VariableInfo info)
     {
       final UnifiedEFAVariable var = info.getVariable();
-      mVariableInfoMap.put(var, info);
+      final VariableInfo previous = mVariableInfoMap.put(var, info);
+      return previous == null;
     }
 
     private void removeVariableInfo(final VariableInfo info)
@@ -1464,9 +1474,10 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       return mTransitionRelations;
     }
 
-    private void addTransitionRelation(final UnifiedEFATransitionRelation tr)
+    private boolean addTransitionRelation
+      (final UnifiedEFATransitionRelation tr)
     {
-      mTransitionRelations.add(tr);
+      return mTransitionRelations.add(tr);
     }
 
     private void removeTransitionRelation(final UnifiedEFATransitionRelation tr)

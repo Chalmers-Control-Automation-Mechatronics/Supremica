@@ -569,7 +569,7 @@ public class UnifiedEFAConflictCheckerTest
   void configure(final UnifiedEFAConflictChecker checker)
   {
     // TODO Configure here ...
-    checker.setPrefersAutomataCandidates(true);
+    checker.setPrefersAutomataCandidates(false);
   }
 
 

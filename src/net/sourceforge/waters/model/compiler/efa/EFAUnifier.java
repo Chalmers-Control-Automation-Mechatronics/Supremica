@@ -917,7 +917,7 @@ public class EFAUnifier extends AbortableCompiler
      */
     private void setBlocked(final SimpleComponentProxy comp)
     {
-      if (mMap != null && mMap.containsKey(comp)) {
+      if (mMap != null && !mMap.containsKey(comp)) {
         if (mEventDecl.getKind() != EventKind.PROPOSITION &&
             comp.getKind() == ComponentKind.PLANT) {
           setBlocked();
