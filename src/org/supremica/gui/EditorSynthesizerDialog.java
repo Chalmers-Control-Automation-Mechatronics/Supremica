@@ -438,7 +438,7 @@ class EditorSynthesizerDialogStandardPanel
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY_C);
             algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY_M);
-            //algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY_P);
+            algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY_P);
         }
 
 
