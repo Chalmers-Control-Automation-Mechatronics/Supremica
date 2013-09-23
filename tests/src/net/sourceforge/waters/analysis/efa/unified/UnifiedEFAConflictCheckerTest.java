@@ -461,12 +461,23 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, false);
   }
 
+
   public void testPslTest()
     throws IOException, WatersException
   {
     final ModuleProxy module =
       loadModule("tests", "psl", "pslTest");
     checkConflict(module, true);
+  }
+
+  public void testPslTest_100times()
+    throws IOException, WatersException
+  {
+    for (int i=0; i< 100; i++) {
+      final ModuleProxy module =
+        loadModule("tests", "psl", "pslTest");
+      checkConflict(module, true);
+    }
   }
 
   //#########################################################################

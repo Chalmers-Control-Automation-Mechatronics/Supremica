@@ -236,9 +236,10 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
     try {
       final Logger logger = getLogger();
       if (logger.isDebugEnabled()) {
+        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
         logger.debug("Simplifying: " + tr.getName() + " ...");
-        logger.debug(tr.getTransitionRelation().getNumberOfReachableStates() +
-                     " states");
+        logger.debug(rel.getNumberOfReachableStates() + " states, " +
+                     rel.getNumberOfTransitions() + " transitions");
       }
       final long start = System.currentTimeMillis();
       final ListBufferTransitionRelation oldRel = tr.getTransitionRelation();

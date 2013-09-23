@@ -40,6 +40,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
@@ -252,8 +253,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         }
         final UnifiedEFATransitionRelation finalTR =
           trs.iterator().next();
-        if (!mNonblockingChecker.run(finalTR)) {
-          getLogger().debug("Final TR " + finalTR.getName() + " is blocking.");
+        final boolean nonblocking = mNonblockingChecker.run(finalTR);
+        getLogger().debug("Result for final TR " + finalTR.getName() + ": " + nonblocking);
+        if (!nonblocking) {
           return false;
         } else {
           mCurrentSubSystem = mSubSystemQueue.poll();
@@ -396,7 +398,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   {
     checkAbort();
     final List<VariableInfo> vars = candidate.getVariables();
-    final List<UnifiedEFATransitionRelation> trs =
+    List<UnifiedEFATransitionRelation> trs =
       candidate.getTransitionRelations();
     if (!vars.isEmpty()) {
       final VariableInfo selectedVarInfo = vars.iterator().next();
@@ -412,11 +414,12 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       unregisterVariable(selectedVarInfo);
       final UnifiedEFATransitionRelation simplifiedTR = simplifyTR(unfoldedTR);
       if (simplifiedTR == null) {
-//        recordBlockedEvents(unfoldedTR);
+        recordBlockedEvents(unfoldedTR);
       } else {
-//        mergeUpdates(simplifiedTR, originalEvents);
+        mergeUpdates(simplifiedTR, originalEvents);
       }
     } else if (trs.size() > 1) {
+      trs = addSelfloopTR(trs);
       mSynchronizer.setInputTransitionRelations(trs);
       mSynchronizer.run();
       final UnifiedEFATransitionRelation syncTR =
@@ -426,9 +429,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         unregisterTR(tr);
       }
       final UnifiedEFATransitionRelation simplifiedTR = simplifyTR(syncTR);
-//      if (simplifiedTR == null) {
-//        recordBlockedEvents(syncTR);
-//      }
+      if (simplifiedTR == null) {
+        recordBlockedEvents(syncTR);
+      }
     } else {
       final UnifiedEFATransitionRelation tr = trs.get(0);
       simplifyTR(tr);
@@ -468,7 +471,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     if (simplifiedTR != null) {
       registerTR(simplifiedTR, false);
       unregisterTR(tr);
-//      recordBlockedEvents(simplifiedTR);
+      recordBlockedEvents(simplifiedTR);
     }
     return simplifiedTR;
   }
@@ -664,6 +667,79 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     return root;
   }
 
+  private List<UnifiedEFATransitionRelation> addSelfloopTR
+    (final List<UnifiedEFATransitionRelation> trs) throws OverflowException
+  {
+    final Collection<AbstractEFAEvent> missingEvents = findMissingChildren(trs);
+    if (missingEvents.isEmpty()) {
+      return trs;
+    } else {
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(":missingSelfloops", ComponentKind.PLANT,
+                                         missingEvents.size() + 1, 0, 1,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final UnifiedEFAEventEncoding encoding =
+        new UnifiedEFAEventEncoding(":missingSelfloops", missingEvents.size()+1);
+      for (final AbstractEFAEvent missingEvent : missingEvents) {
+        final int code = encoding.createEventId(missingEvent);
+        rel.addTransition(0, code, 0);
+      }
+      rel.setProperEventStatus(EventEncoding.TAU,
+                               EventEncoding.STATUS_FULLY_LOCAL |
+                               EventEncoding.STATUS_UNUSED);
+      rel.setInitial(0, true);
+      final UnifiedEFATransitionRelation selfloop = new
+        UnifiedEFATransitionRelation(rel, encoding);
+      final List<UnifiedEFATransitionRelation> selfloopsTR =
+        new ArrayList<>(trs.size() + 1);
+      selfloopsTR.addAll(trs);
+      selfloopsTR.add(selfloop);
+      return selfloopsTR;
+    }
+  }
+
+  private Collection<AbstractEFAEvent> findMissingChildren
+    (final Collection<UnifiedEFATransitionRelation> trs)
+  {
+    final Set<AbstractEFAEvent> events = new THashSet<>();
+    for (final UnifiedEFATransitionRelation tr : trs) {
+      events.addAll(tr.getUsedEventsExceptTau());
+    }
+    final Map<AbstractEFAEvent, SyncInfo> syncMap = new HashMap<>();
+    for (final AbstractEFAEvent event : events) {
+      final SyncInfo syncInfo = new SyncInfo(true, true);
+      syncMap.put(event, syncInfo);
+    }
+    for (final AbstractEFAEvent event : events) {
+      final SyncInfo eventInfo = syncMap.get(event);
+      AbstractEFAEvent original = event.getOriginalEvent();
+      while (original != null) {
+        if (mCurrentSubSystem.getEventInfo(original) != null) {
+          final SyncInfo originalInfo = syncMap.get(original);
+          if (originalInfo != null) {
+            if (events.contains(original)) {
+              originalInfo.setIsLeave(false);
+              eventInfo.setIsRoot(false);
+            }
+          } else {
+            final SyncInfo syncInfo = new SyncInfo(false, false);
+            syncMap.put(original, syncInfo);
+          }
+        }
+        original = original.getOriginalEvent();
+      }
+    }
+    final List<AbstractEFAEvent> children = new ArrayList<>();
+    for (final AbstractEFAEvent event : events) {
+      final SyncInfo syncInfo = syncMap.get(event);
+      if (syncInfo.isRoot()) {
+        final EventInfo eventInfo = mCurrentSubSystem.getEventInfo(event);
+        eventInfo.findAdditionalChildren(syncMap, children);
+      }
+    }
+    Collections.sort(children);
+    return children;
+  }
 
   //#########################################################################
   //# Debugging
@@ -1112,6 +1188,21 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       clearVariables();
     }
 
+    private void findAdditionalChildren(final Map<AbstractEFAEvent, SyncInfo> syncMap,
+                                        final Collection<AbstractEFAEvent> children)
+    {
+      final SyncInfo syncInfo = syncMap.get(mEvent);
+      if (syncInfo == null) {
+        if (!isBlocked()) {
+          children.add(mEvent);
+        }
+      } else if (!syncInfo.isLeave()) {
+        for (final EventInfo child : mChildrenEvents) {
+          child.findAdditionalChildren(syncMap, children);
+        }
+      }
+    }
+
     //#######################################################################
     //# Debugging
     @Override
@@ -1138,7 +1229,44 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     private boolean mIsBlocked = false;
 
   }
+  //#########################################################################
+  //# Inner Class SyncInfo
+  private static class SyncInfo
+  {
+    private SyncInfo(final boolean isLeave, final boolean isRoot)
+    {
+      mIsLeave = isLeave;
+      mIsRoot = isRoot;
+    }
 
+    //#######################################################################
+    //# Simple Access
+    private boolean isLeave()
+    {
+      return mIsLeave;
+    }
+
+    private boolean isRoot()
+    {
+      return mIsRoot;
+    }
+
+    private void setIsLeave(final boolean isLeave)
+    {
+      mIsLeave = isLeave;
+    }
+
+    private void setIsRoot(final boolean isRoot)
+    {
+      mIsRoot = isRoot;
+    }
+
+
+    //#######################################################################
+    //# Data Members
+    private boolean mIsLeave;
+    private boolean mIsRoot;
+  }
 
   //#########################################################################
   //# Inner Class VariableInfo
