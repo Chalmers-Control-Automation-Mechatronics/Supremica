@@ -145,6 +145,7 @@ public class OnlySilentOutgoingTRSimplifier
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
+    rel.removeRedundantPropositions();
     removeProperSelfLoopEvents();
   }
 

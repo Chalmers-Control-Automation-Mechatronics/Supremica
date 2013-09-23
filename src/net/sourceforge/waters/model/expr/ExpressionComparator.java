@@ -333,7 +333,7 @@ public class ExpressionComparator
       DEFAULTMAP.put(EnumSetExpressionProxy.class, 4);
       DEFAULTMAP.put(UnaryExpressionProxy.class, 5);
       DEFAULTMAP.put(BinaryExpressionProxy.class, 6);
-      DEFAULTMAP.put(FunctionCallExpressionProxy.class, 6);
+      DEFAULTMAP.put(FunctionCallExpressionProxy.class, 7);
       INSTANCE = new ExpressionComparator(DEFAULTMAP, null);
     }
 

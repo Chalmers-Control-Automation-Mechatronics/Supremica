@@ -243,6 +243,34 @@ public class TRPartition
     }
   }
 
+  /**
+   * Creates a partition to remove unreachable states from a transition
+   * relation. This method creates a partition that assigns all reachable
+   * states in the given transition relation to one-element classes,
+   * and removes all unreachable states.
+   * @return The computed partition or <CODE>null</CODE> if all states
+   *         are reachable.
+   */
+  public static TRPartition createReachabilityPartition
+    (final ListBufferTransitionRelation rel)
+  {
+    final int numStates = rel.getNumberOfStates();
+    final int[] stateToClass = new int[numStates];
+    int count = 0;
+    for (int s = 0; s < numStates; s++) {
+      if (rel.isReachable(s)) {
+        stateToClass[s] = count++;
+      } else {
+        stateToClass[s] = -1;
+      }
+    }
+    if (count == numStates) {
+      return null;
+    } else {
+      return new TRPartition(stateToClass, count);
+    }
+  }
+
 
   /**
    * Combines two partitions. This method computes the partition that results

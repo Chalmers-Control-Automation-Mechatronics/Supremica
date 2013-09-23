@@ -11,6 +11,8 @@ package net.sourceforge.waters.analysis.efa.simple;
 
 import gnu.trove.set.hash.TIntHashSet;
 
+import java.util.List;
+
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
@@ -44,17 +46,30 @@ public class SimpleEFATransitionLabelEncoding
     super(encoding);
   }
 
+
+  @Override
+  public List<SimpleEFATransitionLabel> getTransitionLabelsExceptTau()
+  {
+    return super.getTransitionLabelsExceptTau();
+  }
+
+  @Override
+  public List<SimpleEFATransitionLabel> getTransitionLabelsIncludingTau()
+  {
+    return super.getTransitionLabelsExceptTau();
+  }
+
   public int[] getTransitionLabelIdByEvent(final SimpleEFAEventDecl e)
   {
     final TIntHashSet events = new TIntHashSet();
-    for (final SimpleEFATransitionLabel label : getTransitionLabels()) {
+    for (final SimpleEFATransitionLabel label :
+         getTransitionLabelsIncludingTau()) {
       if (label.getEvent().equals(e)) {
         events.add(getTransitionLabelId(label));
       }
     }
     return events.toArray();
   }
-
   @Override
   public String toString(){
     if (super.isEmpty()){
@@ -63,7 +78,8 @@ public class SimpleEFATransitionLabelEncoding
     final StringBuilder events = new StringBuilder();
     final String sep = " <> ";
     events.append("[");
-    for (final SimpleEFATransitionLabel label : getTransitionLabels()){
+    for (final SimpleEFATransitionLabel label :
+         getTransitionLabelsIncludingTau()){
       final String out = Integer.toString(getTransitionLabelId(label))
                    + " -> "
                    + label.toString()

@@ -50,9 +50,63 @@ public class UnifiedEFATransitionRelation
     return (UnifiedEFAEventEncoding) super.getTransitionLabelEncoding();
   }
 
-  public Set<AbstractEFAEvent> getUsedEvents()
+  /**
+   * Returns whether the given event is marked as used in the transition
+   * relation.
+   * @param  code   Code of event to be checked.
+   */
+  public boolean isUsedEvent(final int code)
   {
-    return getUsedTransitionLabels();
+    return isUsedTransitionLabel(code);
+  }
+
+  /**
+   * Returns whether the given event is marked as used in the transition
+   * relation.
+   */
+  public boolean isUsedEvent(final AbstractEFAEvent event)
+  {
+    return isUsedTransitionLabel(event);
+  }
+
+  /**
+   * Returns a set of all events in the encoding, except for the silent
+   * event tau.
+   * @return An unmodifiable set backed by the event encoding.
+   */
+  public List<AbstractEFAEvent> getAllEventsExceptTau()
+  {
+    return getEventEncoding().getEventsExceptTau();
+  }
+
+  /**
+   * Returns a set of all events in the encoding, including the silent
+   * event tau.
+   * @return An unmodifiable set backed by the event encoding.
+   */
+  public List<AbstractEFAEvent> getAllEventsIncludingTau()
+  {
+    return getEventEncoding().getEventsIncludingTau();
+  }
+
+  /**
+   * Returns a set of all events in the encoding that are marked as
+   * used in the transition relation, except for the silent event tau.
+   * @return An unmodifiable set backed by the event encoding.
+   */
+  public Set<AbstractEFAEvent> getUsedEventsExceptTau()
+  {
+    return getUsedTransitionLabels(0);
+  }
+
+  /**
+   * Returns a set of all events in the encoding that are marked as
+   * used in the transition relation, including the silent event tau.
+   * @return An unmodifiable set backed by the event encoding.
+   */
+  public Set<AbstractEFAEvent> getUsedEventsIncludingTau()
+  {
+    return getUsedTransitionLabels(-1);
   }
 
 

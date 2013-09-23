@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.efa.unified;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.abstraction.BlockedEventsRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.HidingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
@@ -28,6 +29,7 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.analysis.efa.efsm.EFSMConflictChecker;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
@@ -54,6 +56,9 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final HidingTRSimplifier hiding = new HidingTRSimplifier();
     chain.add(hiding);
+    final BlockedEventsRemovalTRSimplifier blockedRemover =
+      new BlockedEventsRemovalTRSimplifier();
+    chain.add(blockedRemover);
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
@@ -77,6 +82,9 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final HidingTRSimplifier hiding = new HidingTRSimplifier();
     chain.add(hiding);
+    final BlockedEventsRemovalTRSimplifier blockedRemover =
+      new BlockedEventsRemovalTRSimplifier();
+    chain.add(blockedRemover);
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
@@ -121,6 +129,9 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final HidingTRSimplifier hiding = new HidingTRSimplifier();
     chain.add(hiding);
+    final BlockedEventsRemovalTRSimplifier blockedRemover =
+      new BlockedEventsRemovalTRSimplifier();
+    chain.add(blockedRemover);
     final TauLoopRemovalTRSimplifier tauLoopRemover =
       new TauLoopRemovalTRSimplifier();
     tauLoopRemover.setDumpStateAware(true);
@@ -227,12 +238,14 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
       final Logger logger = getLogger();
       if (logger.isDebugEnabled()) {
         logger.debug("Simplifying: " + tr.getName() + " ...");
-        logger.debug(tr.getTransitionRelation().getNumberOfStates() + " states");
+        logger.debug(tr.getTransitionRelation().getNumberOfReachableStates() +
+                     " states");
       }
       final long start = System.currentTimeMillis();
-      ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      final ListBufferTransitionRelation oldRel = tr.getTransitionRelation();
       final int config = mSimplifier.getPreferredInputConfiguration();
-      rel = new ListBufferTransitionRelation(rel, config);
+      ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(oldRel, config);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = rel.getNumberOfTransitions();
       final int numMarkings = rel.getNumberOfMarkings();
@@ -245,7 +258,8 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
         final int newNumReachableStates = rel.getNumberOfReachableStates();
         if (newNumReachableStates == numStates &&
             rel.getNumberOfTransitions() == numTrans &&
-            rel.getNumberOfMarkings() == numMarkings) {
+            rel.getNumberOfMarkings() == numMarkings &&
+            !isAlphabetChanged(oldRel, rel)) {
           return null;
         }
         final UnifiedEFATransitionRelation newEFSMTR =
@@ -273,6 +287,22 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
     }
   }
 
+  private boolean isAlphabetChanged(final ListBufferTransitionRelation rel1,
+                                    final ListBufferTransitionRelation rel2)
+  {
+    if (rel1.getNumberOfProperEvents() != rel2.getNumberOfProperEvents()) {
+      return true;
+    } else {
+      for (int e = EventEncoding.TAU; e < rel1.getNumberOfProperEvents(); e++) {
+        final byte status1 = rel1.getProperEventStatus(e);
+        final byte status2 = rel2.getProperEventStatus(e);
+        if (status1 != status2) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
 
   //#########################################################################
   //# Logging

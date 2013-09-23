@@ -2118,9 +2118,9 @@ public class ListBufferTransitionRelation
 
   /**
    * Removes the given event from this transition relation. This method
-   * removes the given event including all its transitions from the transition
-   * relation. The event is marked as unused, and all associated transitions
-   * are deleted.
+   * removes the given event including all its transitions from the
+   * transition relation. All associated transitions are deleted,
+   * and the event is marked as unused.
    *
    * @param event
    *          The ID of the event to be removed.
@@ -2129,7 +2129,7 @@ public class ListBufferTransitionRelation
   {
     final byte status = mEventStatus[event];
     if ((status & EventEncoding.STATUS_UNUSED) == 0) {
-      mEventStatus[event] = (byte) (status | EventEncoding.STATUS_UNUSED);
+        mEventStatus[event] = (byte) (status | EventEncoding.STATUS_UNUSED);
       if (mSuccessorBuffer != null) {
         mSuccessorBuffer.removeEventTransitions(event);
       }
@@ -2548,6 +2548,29 @@ public class ListBufferTransitionRelation
         throw new WatersRuntimeException(exception);
       }
     }
+  }
+
+  /**
+   * Re-evaluates reachability. This method does a full reachability search of
+   * the transition relation, and resets the reachability status of all states
+   * according to the result. If any states are found to be unreachable,
+   * transitions attached to these states are removed.
+   * @param  config  Preferred output configuration, either {@link
+   *                 #CONFIG_SUCCESSORS}, {@link #CONFIG_PREDECESSORS},
+   *                 or {@link #CONFIG_ALL}. If the transition
+   *                 relation is not configured to use an outgoing
+   *                 transition buffer, it will be reconfigured to the
+   *                 given configuration plus an outgoing
+   *                 transition buffer.
+   * @return <CODE>true</CODE> if the reachability status of at least one
+   *         state was changed, <CODE>false</CODE> otherwise.
+   */
+  public boolean checkReachability(final int config)
+  {
+    if (mSuccessorBuffer == null) {
+      reconfigure(config | CONFIG_SUCCESSORS);
+    }
+    return checkReachability();
   }
 
   /**

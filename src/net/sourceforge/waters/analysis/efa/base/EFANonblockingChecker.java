@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters EFSM Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
+//# PROJECT: Waters EFA Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efa.base
 //# CLASS:   EFANonblockingChecker
 //###########################################################################
 //# $Id$
@@ -20,6 +20,7 @@ import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
+
 public class EFANonblockingChecker extends AbstractEFAAlgorithm
 {
 
@@ -37,8 +38,8 @@ public class EFANonblockingChecker extends AbstractEFAAlgorithm
     final int numStates = rel.getNumberOfStates();
     final boolean[] coReachable = new boolean[numStates];
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    for (int s=0; s < numStates; s++) {
-      if (rel.isMarked(s, 0) && !coReachable[s]) {
+    for (int s = 0; s < numStates; s++) {
+      if (rel.isMarked(s, 0) && !coReachable[s] && rel.isReachable(s)) {
         coReachable[s] = true;
         stack.push(s);
         while (stack.size() > 0) {
@@ -56,7 +57,7 @@ public class EFANonblockingChecker extends AbstractEFAAlgorithm
       }
     }
     for (int s=0; s < numStates; s++) {
-      if (!coReachable[s]) {
+      if (!coReachable[s] && rel.isReachable(s)) {
         return false;
       }
     }

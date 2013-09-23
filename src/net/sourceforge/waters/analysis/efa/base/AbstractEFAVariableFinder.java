@@ -15,6 +15,7 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -214,6 +215,19 @@ public abstract class AbstractEFAVariableFinder<L,
     }
     final SimpleExpressionProxy rhs = expr.getRight();
     rhs.acceptVisitor(this);
+    return null;
+  }
+
+  @Override
+  public Object visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy expr) throws VisitorException
+  {
+    for (final SimpleExpressionProxy arg : expr.getArguments()) {
+      arg.acceptVisitor(this);
+      if (mContainsVariable && mContainsPrimedVariable) {
+        return null;
+      }
+    }
     return null;
   }
 

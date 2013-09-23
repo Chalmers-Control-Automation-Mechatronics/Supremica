@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.efa
+//# PACKAGE: net.sourceforge.waters.analysis.efa.base
 //# CLASS:   AbstractEFATransitionLabelEncoding
 //###########################################################################
 //# $Id$
@@ -12,14 +12,14 @@ package net.sourceforge.waters.analysis.efa.base;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Robi Malik
  */
 
-public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
+public class AbstractEFATransitionLabelEncoding<L>
 {
 
   //#########################################################################
@@ -35,10 +35,11 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
     mTransitionLabelList = new ArrayList<>(size);
   }
 
-  public AbstractEFATransitionLabelEncoding(final AbstractEFATransitionLabelEncoding<L> encoding)
+  public AbstractEFATransitionLabelEncoding
+    (final AbstractEFATransitionLabelEncoding<L> encoding)
   {
     this(encoding.size());
-    for (final L label : encoding) {
+    for (final L label : encoding.mTransitionLabelList) {
       createTransitionLabelId(label);
     }
   }
@@ -71,11 +72,6 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
     return mTransitionLabelList.get(labelId);
   }
 
-  public List<L> getTransitionLabels()
-  {
-    return mTransitionLabelList;
-  }
-
   public int createTransitionLabelId(final L label)
   {
     final int id = mTransitionLabelMap.get(label);
@@ -89,22 +85,49 @@ public class AbstractEFATransitionLabelEncoding<L> implements Iterable<L>
     }
   }
 
+  protected void replaceTransitionLabel(final int labelID, final L label)
+  {
+    final L oldL = mTransitionLabelList.get(labelID);
+    mTransitionLabelMap.remove(oldL);
+    mTransitionLabelMap.put(label, labelID);
+    mTransitionLabelList.set(labelID, label);
+  }
+
   /**
    * Adds all updates found in the given event encoding to this event
    * encoding.
    */
   public void merge(final AbstractEFATransitionLabelEncoding<L> enc)
   {
-    for (final L label : enc.getTransitionLabels()) {
+    for (final L label : enc.mTransitionLabelList) {
       createTransitionLabelId(label);
     }
   }
 
-  @Override
-  public Iterator<L> iterator()
+
+  //#########################################################################
+  //# List Access
+  /**
+   * Retrieves the list of all transition labels in this encoding, except the
+   * silent (tau) label.
+   * @return An unmodifiable list backed by the encoding.
+   */
+  protected List<L> getTransitionLabelsExceptTau()
   {
-    return mTransitionLabelList.iterator();
+    final List<L> sublist = mTransitionLabelList.subList(1, size());
+    return Collections.unmodifiableList(sublist);
   }
+
+  /**
+   * Retrieves the list of all transition labels in this encoding, including
+   * the silent (tau) label.
+   * @return An unmodifiable list backed by the encoding.
+   */
+  protected List<L> getTransitionLabelsIncludingTau()
+  {
+    return Collections.unmodifiableList(mTransitionLabelList);
+  }
+
 
   //#########################################################################
   //# Debugging

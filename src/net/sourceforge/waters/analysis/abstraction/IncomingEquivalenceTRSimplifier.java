@@ -393,7 +393,7 @@ public class IncomingEquivalenceTRSimplifier
         int result = 0;
         mPredecessorsTauClosureIterator.resetState(root);
         mPredecessorsPreEventClosureIterator.resetEvents(EventEncoding.NONTAU,
-                                                          Integer.MAX_VALUE);
+                                                         Integer.MAX_VALUE);
         while (mPredecessorsTauClosureIterator.advance()) {
           final int taupred =
             mPredecessorsTauClosureIterator.getCurrentSourceState();

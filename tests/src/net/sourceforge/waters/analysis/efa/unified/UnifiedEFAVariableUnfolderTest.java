@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.unified
-//# CLASS:   UnifiedEFAUnfolderTest
+//# CLASS:   UnifiedEFAVariableUnfolderTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -25,20 +25,21 @@ import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-public class UnifiedEFAUnfolderTest
+public class UnifiedEFAVariableUnfolderTest
   extends AbstractAnalysisTest
 {
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    return new TestSuite(UnifiedEFAUnfolderTest.class);
+    return new TestSuite(UnifiedEFAVariableUnfolderTest.class);
   }
 
   public static void main(final String[] args)
@@ -95,6 +96,34 @@ public class UnifiedEFAUnfolderTest
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding07");
+    unfoldAndTest(module);
+  }
+
+  public void testUnifiedUnfolding8()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding08");
+    unfoldAndTest(module);
+  }
+
+  public void testUnifiedUnfolding9()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding09");
+    unfoldAndTest(module);
+  }
+
+  public void testUnifiedUnfolding10()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding10");
+    unfoldAndTest(module);
+  }
+
+  public void testUnifiedUnfolding11()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "unified_unfolding11");
     unfoldAndTest(module);
   }
 
@@ -155,7 +184,7 @@ public class UnifiedEFAUnfolderTest
     final List<UnifiedEFATransitionRelation> trList =
       Collections.singletonList(variableTR);
     final List<AbstractEFAEvent> outputEvents =
-      variableTR.getEventEncoding().getTransitionLabels();
+      variableTR.getEventEncoding().getEventsIncludingTau();
     final UnifiedEFASystem outputSystem =
       new UnifiedEFASystem(moduleName, inputSystem.getVariables(), trList,
                            outputEvents, inputSystem.getVariableContext());
@@ -169,11 +198,11 @@ public class UnifiedEFAUnfolderTest
       if (proxy instanceof SimpleComponentProxy) {
         final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
         if (comp.getName().equals(":unfolded")) {
-          assertProxyEquals("Unexpected output automaton!",
+          assertProxyEquals(mEqualityChecker, "Unexpected output automaton!",
                             comp, expectedUnfolding);
         } else if (comp.getName().equals(":updates")) {
           assertNotNull("Unexpected update in output!", expectedUpdates);
-          assertProxyEquals("Unexpected unfolded events!",
+          assertProxyEquals(mEqualityChecker, "Unexpected unfolded events!",
                             comp, expectedUpdates);
           expectedUpdates = null;
         } else {
@@ -200,7 +229,7 @@ public class UnifiedEFAUnfolderTest
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mImporter = new UnifiedEFASystemImporter(mModuleFactory, mOperatorTable);
-
+    mEqualityChecker = new ModuleEqualityVisitor(true, false);
   }
 
   @Override
@@ -211,6 +240,7 @@ public class UnifiedEFAUnfolderTest
     mOperatorTable = null;
     mModuleMarshaller = null;
     mDocumentManager = null;
+    mEqualityChecker = null;
     super.tearDown();
   }
 
@@ -221,6 +251,7 @@ public class UnifiedEFAUnfolderTest
   private CompilerOperatorTable mOperatorTable;
   private JAXBModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
+  private ModuleEqualityVisitor mEqualityChecker;
 
   private UnifiedEFASystemImporter mImporter;
 

@@ -286,31 +286,6 @@ public class ModuleProxyPrinter
   }
 
   @Override
-  public Object visitFunctionCallExpressionProxy
-      (final FunctionCallExpressionProxy proxy)
-    throws VisitorException
-  {
-    final String text = proxy.getPlainText();
-    if (text != null) {
-      print(text);
-    } else {
-      print(proxy.getFunctionName());
-      print('(');
-      final List<SimpleExpressionProxy> args = proxy.getArguments();
-      final Iterator<SimpleExpressionProxy> iter = args.iterator();
-      while (iter.hasNext()) {
-        final SimpleExpressionProxy arg = iter.next();
-        arg.acceptVisitor(this);
-        if (iter.hasNext()) {
-          print(", ");
-        }
-      }
-      print(')');
-    }
-    return null;
-  }
-
-  @Override
   public Object visitForeachProxy
       (final ForeachProxy proxy)
     throws VisitorException
@@ -327,6 +302,37 @@ public class ModuleProxyPrinter
     }
     print(' ');
     printEmptyCollection(proxy.getBody());
+    return null;
+  }
+
+  @Override
+  public Object visitFunctionCallExpressionProxy
+      (final FunctionCallExpressionProxy proxy)
+    throws VisitorException
+  {
+    final String text = proxy.getPlainText();
+    if (text != null) {
+      print(text);
+    } else {
+      final int savedPriority = mPriority;
+      print(proxy.getFunctionName());
+      print('(');
+      try {
+        mPriority = OperatorTable.PRIORITY_OUTER;
+        final List<SimpleExpressionProxy> args = proxy.getArguments();
+        final Iterator<SimpleExpressionProxy> iter = args.iterator();
+        while (iter.hasNext()) {
+          final SimpleExpressionProxy arg = iter.next();
+          arg.acceptVisitor(this);
+          if (iter.hasNext()) {
+            print(", ");
+          }
+        }
+      } finally {
+        mPriority = savedPriority;
+      }
+      print(')');
+    }
     return null;
   }
 

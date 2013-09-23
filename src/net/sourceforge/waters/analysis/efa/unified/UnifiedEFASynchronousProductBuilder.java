@@ -126,15 +126,17 @@ public class UnifiedEFASynchronousProductBuilder
     for (final UnifiedEFATransitionRelation tr : mInputTransitionRelations) {
       final UnifiedEFAEventEncoding encoding = tr.getEventEncoding();
       for (int e = EventEncoding.NONTAU; e < encoding.size(); e++) {
-        final AbstractEFAEvent event = encoding.getEvent(e);
-        EventInfo eventInfo = renamingMap.get(event);
-        if (eventInfo == null) {
-          eventInfo = new EventInfo(event);
-          renamingMap.put(event, eventInfo);
-          orderedEvents.add(event);
+        if (tr.isUsedEvent(e)) {
+          final AbstractEFAEvent event = encoding.getEvent(e);
+          EventInfo eventInfo = renamingMap.get(event);
+          if (eventInfo == null) {
+            eventInfo = new EventInfo(event);
+            renamingMap.put(event, eventInfo);
+            orderedEvents.add(event);
+          }
+          final EventTRInfo trInfo = new EventTRInfo(trIndex, e);
+          eventInfo.addEventTRInfo(trInfo);
         }
-        final EventTRInfo trInfo = new EventTRInfo(trIndex, e);
-        eventInfo.addEventTRInfo(trInfo);
       }
       trIndex++;
     }
@@ -287,6 +289,17 @@ public class UnifiedEFASynchronousProductBuilder
       resultRel.setProperEventStatus(EventEncoding.TAU,
                                      EventEncoding.STATUS_FULLY_LOCAL |
                                      EventEncoding.STATUS_UNUSED);
+    }
+    for (int e = EventEncoding.NONTAU; e < mEventEncoding.size(); e++) {
+      final EventInfo eventInfo = mEventInfoList.get(e);
+      final EventTRInfo trInfo = eventInfo.getEventTRInfo().get(0);
+      final int trIndex = trInfo.getTRIndex();
+      final UnifiedEFATransitionRelation tr =
+        mInputTransitionRelations.get(trIndex);
+      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      final int eventCode = trInfo.getEventCode();
+      final byte status = rel.getProperEventStatus(eventCode);
+      resultRel.setProperEventStatus(e, status);
     }
     for (int i = 0; i < mNumberOfInitialStates; i++) {
       resultRel.setInitial(i, true);

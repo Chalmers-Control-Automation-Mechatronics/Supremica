@@ -683,6 +683,16 @@ public class EventEncoding
 
   /**
    * Returns whether the given event status bits identify an event as
+   * blocked in an event encoding.
+   * @see #STATUS_BLOCKED
+   */
+  public static boolean isBlockedEvent(final byte status)
+  {
+    return (status & STATUS_BLOCKED) == 0;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
    * used (i.e., not unused) in an event encoding.
    * @see #STATUS_UNUSED
    */
@@ -1098,11 +1108,15 @@ public class EventEncoding
    */
   public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x08;
   /**
+   * A status flag indicating an event known to be globally disabled.
+   */
+  public static final byte STATUS_BLOCKED = 0x10;
+  /**
    * A status flag indicating an event not in the alphabet of the current
    * transition relation. This event is assumed to be implicitly selflooped
    * in all states.
    */
-  public static final byte STATUS_UNUSED = 0x10;
+  public static final byte STATUS_UNUSED = 0x20;
 
   /**
    * Status flags indicating a local event.
@@ -1121,11 +1135,11 @@ public class EventEncoding
    */
   public static final byte STATUS_ALL =
     STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP |
-    STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_UNUSED;
+    STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_BLOCKED | STATUS_UNUSED;
 
   private static final String[] STATUS_NAMES = {
     "CONTROLLABLE", "LOCAL", "OUTSIDE_ONLY_SELFLOOP",
-    "OUTSIDE_ALWAYS_ENABLED", "UNUSED"
+    "OUTSIDE_ALWAYS_ENABLED", "BLOCKED", "UNUSED"
   };
 
   private static final Collection<EventProxy> NO_EVENTS =

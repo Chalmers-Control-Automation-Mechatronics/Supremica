@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.efa.unified;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TLongIntHashMap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -88,6 +89,7 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
   protected void setUp() throws AnalysisException
   {
     super.setUp();
+    mUpdateOriginalEventMap = new HashMap<>();
     mUnfoldingContext = new UnfoldingVariableContext
       (mOperatorTable, mVariableContext, mUnfoldedVariable);
     mPropagator =
@@ -102,9 +104,8 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
   {
     try {
       setUp();
-      for (final AbstractEFAEvent event : mOriginalEvents) {
-        expandEvent(event);
-      }
+      createUpdateOriginalEventMap();
+      expandEvents();
       createTransitionRelation();
     } finally {
       tearDown();
@@ -128,12 +129,35 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
 
   //#########################################################################
   //# Auxiliary Methods
-  private void expandEvent(final AbstractEFAEvent event) throws EvalException
+  private void createUpdateOriginalEventMap()
+  {
+    for (final AbstractEFAEvent event : mOriginalEvents) {
+      final ConstraintList update = event.getUpdate();
+      List<AbstractEFAEvent> eventList =  mUpdateOriginalEventMap.get(update);
+      if (eventList == null) {
+        eventList = new ArrayList<>();
+        mUpdateOriginalEventMap.put(update, eventList);
+      }
+      eventList.add(event);
+    }
+  }
+
+  private void expandEvents() throws EvalException
+  {
+    for (final AbstractEFAEvent event : mOriginalEvents) {
+      final ConstraintList update = event.getUpdate();
+      final List<AbstractEFAEvent> events = mUpdateOriginalEventMap.get(update);
+      if (event == events.get(0)) {
+        expandEvents(update);
+      }
+    }
+  }
+
+  private void expandEvents(final ConstraintList update) throws EvalException
   {
     mUnfoldingContext.resetCurrentAndPrimedValue();
-    final ConstraintList update = event.getUpdate();
     final CompiledRange range = mUnfoldedVariable.getRange();
-    mEventUpdateMap = new HashMap<ConstraintList,RenamedEFAEvent>(range.size());
+    mUpdateRenamedEventMap = new HashMap<>(range.size());
     if (!mVariableFinder.findVariable(update, mUnfoldedVariable)) {
       return;
     } else if (!mVariableFinder.containsPrimedVariable()) {
@@ -144,16 +168,16 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
         context.getBoundExpression(variableName);
       int value = getValueIndex(currentExpression);
       if (value >= 0) {
-        final int code = createUnfoldedEvent(event);
-        addTransition(value, code, value);
+        final int[] codes = createUnfoldedEvent(update);
+        addTransitions(value, codes, value);
       } else {
         value = 0;
         for (final SimpleExpressionProxy expr : range.getValues()) {
           mUnfoldingContext.setCurrentValue(expr);
           mPropagator.init(update);
           mPropagator.propagate();
-          final int code = createUnfoldedEvent(event);
-          addTransition(value, code, value);
+          final int[] codes = createUnfoldedEvent(update);
+          addTransitions(value, codes, value);
           value++;
         }
       }
@@ -166,9 +190,9 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
         context.getBoundExpression(variableName);
       int value = getValueIndex(nextExpression);
       if (value >= 0) {
-        final int code = createUnfoldedEvent(event);
+        final int[] codes = createUnfoldedEvent(update);
         for (int i=0; i<range.size(); i++) {
-          addTransition(i, code, value);
+          addTransitions(i, codes, value);
         }
       } else {
         value = 0;
@@ -176,9 +200,9 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
           mUnfoldingContext.setPrimedValue(expr);
           mPropagator.init(update);
           mPropagator.propagate();
-          final int code = createUnfoldedEvent(event);
+          final int[] codes = createUnfoldedEvent(update);
           for (int i=0; i<range.size(); i++) {
-            addTransition(i, code, value);
+            addTransitions(i, codes, value);
           }
           value++;
         }
@@ -199,16 +223,16 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
             context.getBoundExpression(variableName);
           int value = getValueIndex(nextExpression);
           if (value >= 0) {
-            final int code = createUnfoldedEvent(event);
-            addTransition(source, code, value);
+            final int[] codes = createUnfoldedEvent(update);
+            addTransitions(source, codes, value);
           } else {
             value = 0;
             for (final SimpleExpressionProxy nextExpr : range.getValues()) {
               mUnfoldingContext.setPrimedValue(nextExpr);
               mPropagator.init(update);
               mPropagator.propagate();
-              final int code = createUnfoldedEvent(event);
-              addTransition(source, code, value);
+              final int[] codes = createUnfoldedEvent(update);
+              addTransitions(source, codes, value);
               value++;
             }
           }
@@ -216,14 +240,26 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
         source++;
       }
     }
-    if (mEventUpdateMap.size() == 1) {
-      final RenamedEFAEvent finalEvent =
-        mEventUpdateMap.values().iterator().next();
-      finalEvent.setIndex(-1);
+    switch (mUpdateRenamedEventMap.size()) {
+    case 0:
+      mPropagator.init(ConstraintList.TRUE);
+      createUnfoldedEvent(update);
+      // fall through ...
+    case 1:
+      final int[] finalEventCodes =
+        mUpdateRenamedEventMap.values().iterator().next();
+      for (final int finalEventCode : finalEventCodes) {
+        final RenamedEFAEvent finalEvent =
+          (RenamedEFAEvent) mEventEncoding.getEvent(finalEventCode);
+        finalEvent.setIndex(-1);
+      }
+      break;
+    default:
+      break;
     }
   }
 
-  private int createUnfoldedEvent(final AbstractEFAEvent event)
+  private int[] createUnfoldedEvent(final ConstraintList update)
     throws EvalException
   {
     if (!mPropagator.isUnsatisfiable()) {
@@ -231,30 +267,42 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
       mPropagator.removeVariable(variableName);
       mPropagator.removeUnchangedVariables();
       final ConstraintList simplifiedUpdate = mPropagator.getAllConstraints();
-      final AbstractEFAEvent foundEvent = mEventUpdateMap.get(simplifiedUpdate);
-      if (foundEvent == null) {
-        final RenamedEFAEvent newEvent =
-          new RenamedEFAEvent(event, simplifiedUpdate, mEventUpdateMap.size());
-        mEventUpdateMap.put(simplifiedUpdate, newEvent);
-        return mEventEncoding.createEventId(newEvent);
-      } else {
-        return mEventEncoding.getEventId(foundEvent);
+      int[] renamedEventCodes =
+        mUpdateRenamedEventMap.get(simplifiedUpdate);
+      if (renamedEventCodes == null) {
+        final List<AbstractEFAEvent> originalEventList =
+          mUpdateOriginalEventMap.get(update);
+        renamedEventCodes = new int[originalEventList.size()];
+        int index = 0;
+        for (final AbstractEFAEvent event : originalEventList) {
+          final RenamedEFAEvent newEvent =
+            new RenamedEFAEvent(event, simplifiedUpdate, mUpdateRenamedEventMap.size());
+          final int code = mEventEncoding.createEventId(newEvent);
+          renamedEventCodes[index] = code;
+          index++;
+        }
+        mUpdateRenamedEventMap.put(simplifiedUpdate, renamedEventCodes);
       }
+      return renamedEventCodes;
     } else {
-      return -1;
+      return null;
     }
   }
 
-  private void addTransition(final int source, final int event, final int target)
+  private void addTransitions(final int source,
+                              final int[] events,
+                              final int target)
   {
-    if (event >= 0) {
-      final long key = (((long) source) << 32) | event;
-      int list = mTransitionMap.get(key);
-      if (IntListBuffer.NULL == list) {
-        list = mTargetStatesBuffer.createList();
-        mTransitionMap.put(key, list);
+    if (events != null) {
+      for (final int event : events) {
+        final long key = (((long) source) << 32) | event;
+        int list = mTransitionMap.get(key);
+        if (IntListBuffer.NULL == list) {
+          list = mTargetStatesBuffer.createList();
+          mTransitionMap.put(key, list);
+        }
+        mTargetStatesBuffer.append(list, target);
       }
-      mTargetStatesBuffer.append(list, target);
     }
   }
 
@@ -337,7 +385,8 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
   private UnfoldingVariableContext mUnfoldingContext;
   private ConstraintPropagator mPropagator;
   private UnifiedEFAEventEncoding mEventEncoding;
-  private Map<ConstraintList,RenamedEFAEvent> mEventUpdateMap;
+  private Map<ConstraintList,List<AbstractEFAEvent>> mUpdateOriginalEventMap;
+  private Map<ConstraintList,int[]> mUpdateRenamedEventMap;
   private TLongIntHashMap mTransitionMap;
   private IntListBuffer mTargetStatesBuffer;
   private UnifiedEFATransitionRelation mTransitionRelation;
