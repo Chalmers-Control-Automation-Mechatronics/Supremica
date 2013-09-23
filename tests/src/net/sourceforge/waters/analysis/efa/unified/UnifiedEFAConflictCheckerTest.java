@@ -184,25 +184,57 @@ public class UnifiedEFAConflictCheckerTest
     checkPhilosophers("dining_philosophers", 5, false);
   }
 
-  public void testDosingTankWithJellyEFA1() throws Exception
+  /*---------------------------- EFA ---------------------------------------*/
+
+  public void testCaseStudy()
+    throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "DosingTankWithJellyEFA1");
+    final ModuleProxy module = loadModule("efa", "caseStudy-original");
     checkConflict(module, false);
+  }
+
+  public void testDosingTankWithJellyEFA1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("handwritten", "DosingTankWithJellyEFA1");
+    checkConflict(module, false);
+  }
+
+  public void testRoundRobin2()
+    throws IOException, WatersException
+  {
+    checkRoundRobin(2);
+  }
+
+  public void testRoundRobin5()
+    throws IOException, WatersException
+  {
+    checkRoundRobin(5);
   }
 
   /*--------------------------- Goran --------------------------------------*/
 
-//  public void testGoran() throws Exception
+//  public void testGoranSimpleTestSystem()
+//    throws IOException, WatersException
 //  {
-//    final ModuleProxy module = loadModule("tests", "goran", "goran-Kulbana-nb");
+//    final ModuleProxy module =
+//      loadModule("tests", "goran", "goran-SimpleTestSystem");
 //    checkConflict(module, true);
 //  }
 //
-//
-//  public void testGoranSImple() throws Exception
+//  public void testGoranSMB()
+//    throws IOException, WatersException
 //  {
 //    final ModuleProxy module = loadModule("tests", "goran", "goran-sm-b");
 //    checkConflict(module, false);
+//  }
+//
+//  public void testGoranKulbanaNB()
+//    throws IOException, WatersException
+//  {
+//    final ModuleProxy module = loadModule("tests", "goran", "goran-Kulbana-nb");
+//    checkConflict(module, true);
 //  }
 
   /*--------------------------- Transfer Line ------------------------------*/
@@ -219,11 +251,11 @@ public class UnifiedEFAConflictCheckerTest
     checkTransferLine("transferline_efsm", 2, 1, true);
   }
 
-//  public void testTransferLine22()
-//    throws IOException, WatersException
-//  {
-//    checkTransferLine("transferline_efsm", 2, 2, true);
-//  }
+  public void testTransferLine22()
+    throws IOException, WatersException
+  {
+    checkTransferLine("transferline_efsm", 2, 2, true);
+  }
 
   public void testTransferLine12Block()
     throws IOException, WatersException
@@ -236,31 +268,44 @@ public class UnifiedEFAConflictCheckerTest
   {
     checkTransferLine("transferline_efsm_block", 2, 1, false);
   }
-//
-//  public void testTransferLine22Block()
-//    throws IOException, WatersException
-//  {
-//    checkTransferLine("transferline_efsm_block", 2, 2, false);
-//  }
+
+  public void testTransferLine22Block()
+    throws IOException, WatersException
+  {
+    checkTransferLine("transferline_efsm_block", 2, 2, false);
+  }
 
   /*---------------------------- PROFIsafe ---------------------------------*/
 
-  public void testProfisafeIHost4()
-    throws IOException, WatersException
-  {
-    checkProfisafe("profisafe_ihost_efsm", 4 ,true);
-  }
-
-  public void testProfisafeISlave1()
+  public void testProfisafeISlaveEFSM1()
     throws IOException, WatersException
   {
     checkProfisafe("profisafe_islave_efsm", 1 ,true);
   }
 
-  public void testProfisafeISlave4()
+  public void testProfisafeISlaveEFSM4()
     throws IOException, WatersException
   {
     checkProfisafe("profisafe_islave_efsm", 4 ,true);
+  }
+
+  /* TODO These tests require group nodes ...
+  public void testProfisafeISlaveEFA4()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_i4_slave_efa", 4 ,true);
+  }
+
+  public void testProfisafeIHostEFABlock3()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_ihost_efa_block", 3 ,false);
+  }*/
+
+  public void testProfisafeIHostEFSM4()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_ihost_efsm", 4 ,true);
   }
 
   /*--------------------------- Prime Sieve --------------------------------*/
@@ -341,6 +386,7 @@ public class UnifiedEFAConflictCheckerTest
   }
 
   /*----------------------------- PSL --------------------------------------*/
+
   public void testPsl()
     throws IOException, WatersException
   {
@@ -451,11 +497,23 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, bindings, expect);
   }
 
+  void checkRoundRobin(final int n)
+    throws IOException, WatersException
+  {
+    final ParameterBindingProxy binding = createBinding("N", n);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    final ModuleProxy module = loadModule("efa", "round_robin_efa.wmod");
+    checkConflict(module, bindings, false);
+  }
+
 
   //#########################################################################
   //# Customisation
   void configure(final UnifiedEFAConflictChecker checker)
   {
+    // TODO Configure here ...
+    checker.setPrefersAutomataCandidates(true);
   }
 
 

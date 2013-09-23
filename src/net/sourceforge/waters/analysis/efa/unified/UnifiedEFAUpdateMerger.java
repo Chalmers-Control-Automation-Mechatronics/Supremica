@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
+//# PACKAGE: net.sourceforge.waters.analysis.efa.unified
 //# CLASS:   UnifiedEFAUpdateMerger
 //###########################################################################
 //# $Id$
@@ -25,15 +25,23 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+
+
+/**
+ * A tool to recombine events that have been renamed by
+ * {@link UnifiedEFAConflictChecker}.
+ *
+ * @author Sahar Mohajerani, Robi Malik
+ */
 
 class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
 {
@@ -85,16 +93,20 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   //#########################################################################
   //# Invocation
   @Override
-  protected void setUp() throws AnalysisException
+  protected void setUp()
+    throws AnalysisException
   {
     super.setUp();
-    mRemovedEvents = new ArrayList<>();
-    mAddedEvents = new ArrayList<>();
+    mVariableCollector =
+      new UnifiedEFAVariableCollector(mOperatorTable, mContext);
+    mRemovedEvents = new ArrayList<>(mOriginalEvents.size());
+    mAddedEvents = new ArrayList<>(mOriginalEvents.size() / 2);
     mEventMap = new HashMap<>(mOriginalEvents.size());
-    mVariableCollector = new UnifiedEFAVariableCollector(mOperatorTable, mContext);
+    mUnusedEvents = new TIntArrayList();
   }
 
-  public void run() throws AnalysisException, EvalException
+  public void run()
+    throws AnalysisException
   {
     try {
       setUp();
@@ -111,65 +123,86 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
     super.tearDown();
     mVariableCollector = null;
     mEventMap = null;
+    mUnusedEvents = null;
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
   private void findIdenticalEvents()
-  {
-    final ListBufferTransitionRelation rel = mTransitionRelation.getTransitionRelation();
-    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
-    for (final AbstractEFAEvent event : mOriginalEvents) {
-      final TLongArrayList transitions = new TLongArrayList();
-      final int code = mTransitionRelation.getEventEncoding().getEventId(event);
-      iter.resetEvent(code);
-      while (iter.advance()) {
-        final long source = iter.getCurrentSourceState();
-        final long target = iter.getCurrentTargetState();
-        final long states = source<<32 | target;
-        transitions.add(states);
-      }
-      TIntArrayList list = mEventMap.get(transitions);
-      if (list == null) {
-        list = new TIntArrayList();
-        mEventMap.put(transitions, list);
-      }
-      list.add(code);
-    }
-  }
-
-  private void mergeEvents()
+    throws AnalysisAbortException
   {
     final UnifiedEFAEventEncoding encoding =
       mTransitionRelation.getEventEncoding();
     final ListBufferTransitionRelation rel =
       mTransitionRelation.getTransitionRelation();
-    for (final TIntArrayList events : mEventMap.values()) {
-      if (events.size() > 1) {
-        final List<ConstraintList> updates = new ArrayList<>(events.size());
-        AbstractEFAEvent original = null;
-        int index = -1;
-        int firstEventCode = -1;
-        for (int i = 0; i < events.size(); i++) {
-          final int eventCode = events.get(i);
-          final RenamedEFAEvent event = (RenamedEFAEvent) encoding.getEvent(eventCode);
-          mRemovedEvents.add(event);
-          if (original == null) {
-            firstEventCode = eventCode;
-            original = event.getOriginalEvent();
-            index = event.getIndex();
-          } else {
-            rel.removeEvent(eventCode);
-          }
-          updates.add(event.getUpdate());
+    final TransitionIterator iter =
+      rel.createAllTransitionsReadOnlyIterator();
+    for (final AbstractEFAEvent event : mOriginalEvents) {
+      checkAbort();
+      final int code = encoding.getEventId(event);
+      if (mTransitionRelation.isUsedEvent(code)) {
+        final TLongArrayList transitions = new TLongArrayList();
+        iter.resetEvent(code);
+        while (iter.advance()) {
+          final long source = iter.getCurrentSourceState();
+          final long target = iter.getCurrentTargetState();
+          final long states = (source << 32) | target;
+          transitions.add(states);
         }
-        final ConstraintList mergedUpdate = createMergedUpdate(updates);
-        final RenamedEFAEvent newEvent =
-          new RenamedEFAEvent(original, mergedUpdate, index);
-        encoding.replaceEvent(firstEventCode, newEvent);
-        mAddedEvents.add(newEvent);
+        TIntArrayList list = mEventMap.get(transitions);
+        if (list == null) {
+          list = new TIntArrayList();
+          mEventMap.put(transitions, list);
+        }
+        list.add(code);
+      } else {
+        mUnusedEvents.add(code);
       }
+    }
+  }
+
+  private void mergeEvents()
+    throws AnalysisAbortException
+  {
+    mergeEvents(mUnusedEvents);
+    for (final TIntArrayList events : mEventMap.values()) {
+      mergeEvents(events);
+    }
+  }
+
+  private void mergeEvents(final TIntArrayList events)
+    throws AnalysisAbortException
+  {
+    if (events.size() > 1) {
+      checkAbort();
+      final UnifiedEFAEventEncoding encoding =
+        mTransitionRelation.getEventEncoding();
+      final ListBufferTransitionRelation rel =
+        mTransitionRelation.getTransitionRelation();
+      final List<ConstraintList> updates = new ArrayList<>(events.size());
+      AbstractEFAEvent original = null;
+      int index = -1;
+      int firstEventCode = -1;
+      for (int i = 0; i < events.size(); i++) {
+        final int eventCode = events.get(i);
+        final RenamedEFAEvent event =
+          (RenamedEFAEvent) encoding.getEvent(eventCode);
+        mRemovedEvents.add(event);
+        if (original == null) {
+          firstEventCode = eventCode;
+          original = event.getOriginalEvent();
+          index = event.getIndex();
+        } else {
+          rel.removeEvent(eventCode);
+        }
+        updates.add(event.getUpdate());
+      }
+      final ConstraintList mergedUpdate = createMergedUpdate(updates);
+      final RenamedEFAEvent newEvent =
+        new RenamedEFAEvent(original, mergedUpdate, index);
+      encoding.replaceEvent(firstEventCode, newEvent);
+      mAddedEvents.add(newEvent);
     }
   }
 
@@ -195,8 +228,8 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
       }
       if (!unchanged.isEmpty()) {
         unchanged.addAll(update.getConstraints());
-        Collections.sort(unchanged, comparator);
         update = new ConstraintList(unchanged);
+        update.sort(comparator);
       }
       final SimpleExpressionProxy expr = update.createExpression
         (mFactory, mOperatorTable.getAndOperator());
@@ -229,10 +262,15 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final UnifiedEFAVariableContext mContext;
-  private UnifiedEFAVariableCollector mVariableCollector;
+
   private UnifiedEFATransitionRelation mTransitionRelation;
   private List<AbstractEFAEvent> mOriginalEvents;
-  private Map<TLongArrayList, TIntArrayList> mEventMap;
   private List<AbstractEFAEvent> mRemovedEvents;
   private List<AbstractEFAEvent> mAddedEvents;
+
+  private UnifiedEFAVariableCollector mVariableCollector;
+
+  private Map<TLongArrayList,TIntArrayList> mEventMap;
+  private TIntArrayList mUnusedEvents;
+
 }
