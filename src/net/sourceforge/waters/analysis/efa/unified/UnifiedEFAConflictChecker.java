@@ -246,6 +246,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         final UnifiedEFATransitionRelation finalTR =
           trs.iterator().next();
         if (!mNonblockingChecker.run(finalTR)) {
+          getLogger().debug("Final TR " + finalTR.getName() + " is blocking.");
           return false;
         } else {
           mCurrentSubSystem = mSubSystemQueue.poll();
@@ -404,9 +405,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       unregisterVariable(selectedVarInfo);
       final UnifiedEFATransitionRelation simplifiedTR = simplifyTR(unfoldedTR);
       if (simplifiedTR == null) {
-        recordBlockedEvents(unfoldedTR);
+//        recordBlockedEvents(unfoldedTR);
       } else {
-        mergeUpdates(simplifiedTR, originalEvents);
+//        mergeUpdates(simplifiedTR, originalEvents);
       }
     } else if (trs.size() > 1) {
       mSynchronizer.setInputTransitionRelations(trs);
@@ -418,9 +419,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         unregisterTR(tr);
       }
       final UnifiedEFATransitionRelation simplifiedTR = simplifyTR(syncTR);
-      if (simplifiedTR == null) {
-        recordBlockedEvents(syncTR);
-      }
+//      if (simplifiedTR == null) {
+//        recordBlockedEvents(syncTR);
+//      }
     } else {
       final UnifiedEFATransitionRelation tr = trs.get(0);
       simplifyTR(tr);
@@ -460,7 +461,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     if (simplifiedTR != null) {
       registerTR(simplifiedTR, false);
       unregisterTR(tr);
-      recordBlockedEvents(simplifiedTR);
+//      recordBlockedEvents(simplifiedTR);
     }
     return simplifiedTR;
   }

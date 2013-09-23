@@ -351,6 +351,14 @@ public class EFSMConflictCheckerTest
     checkConflict(module, false);
   }
 
+  public void testPslTest()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslTest");
+    checkConflict(module, true);
+  }
+
   /*
    * This file is not in the repository :-(
   public void testPslWithResetTrans()

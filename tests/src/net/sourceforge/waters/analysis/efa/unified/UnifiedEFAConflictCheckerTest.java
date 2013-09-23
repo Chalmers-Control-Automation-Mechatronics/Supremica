@@ -177,6 +177,13 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, false);
   }
 
+  public void testEFSMConflict4()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "efsm", "conflict04");
+    checkConflict(module, true);
+  }
+
 
   public void testPhilosophers5()
     throws IOException, WatersException
@@ -191,6 +198,13 @@ public class UnifiedEFAConflictCheckerTest
   {
     final ModuleProxy module = loadModule("efa", "caseStudy-original");
     checkConflict(module, false);
+  }
+
+  public void testCaseStudyNonblocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("efa", "caseStudy-nonblocking");
+    checkConflict(module, true);
   }
 
   public void testDosingTankWithJellyEFA1()
@@ -423,6 +437,37 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, false);
   }
 
+  public void testPslSmallNonblocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslSmallNonblocking");
+    checkConflict(module, true);
+  }
+
+  public void testPslVerySmallNonblocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslVerySmallNonblocking");
+    checkConflict(module, true);
+  }
+
+  public void testPslVerySmallBlocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslVerySmallBlocking");
+    checkConflict(module, false);
+  }
+
+  public void testPslTest()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslTest");
+    checkConflict(module, true);
+  }
 
   //#########################################################################
   //# Parametrised Tests

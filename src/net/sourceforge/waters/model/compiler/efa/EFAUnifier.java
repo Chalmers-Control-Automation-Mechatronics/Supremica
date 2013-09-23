@@ -910,14 +910,14 @@ public class EFAUnifier extends AbortableCompiler
      * blocked events depends on the component kind.
      * If an event only occurs in a blocked events list of a plant, then it
      * is marked as blocked&nbsp;- effectively removing it from the model.
-     * If an event occurs in blocked events list of some other type of
+     * If an event occurs in a blocked events list of some other type of
      * component, an update associated with a true guard is recorded for
      * the automaton.</P>
      * @param  comp       The automaton containing the blocked events list.
      */
     private void setBlocked(final SimpleComponentProxy comp)
     {
-      if (!mMap.containsKey(comp)) {
+      if (mMap != null && mMap.containsKey(comp)) {
         if (mEventDecl.getKind() != EventKind.PROPOSITION &&
             comp.getKind() == ComponentKind.PLANT) {
           setBlocked();
