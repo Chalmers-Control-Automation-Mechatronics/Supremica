@@ -44,8 +44,7 @@ public class FlowerEFABuilder {
     public static String RESOURCE_PREFIX = "r";
     public static String LOAD_EVENT_PREFIX = "load";
     public String feasibleEquation = "";
-    public static TIntObjectHashMap<String> resourceToFeasibleEquationMap; // use for ant
-    public static TIntObjectHashMap<List<String>> resourceToEventNamesMap; // use for ant
+    public TIntObjectHashMap<List<String>> resourceToEventNamesMap; // temporary
     public ExtendedAutomata exAutomata;
     private ModuleSubject module;
     
@@ -65,7 +64,6 @@ public class FlowerEFABuilder {
             jobToInitialStages = new HashMap<Integer, Set<Integer>>();
             jobToLastStages = new HashMap<Integer, Set<Integer>>();
             nbrOfResources = Integer.parseInt(br.readLine());
-            resourceToFeasibleEquationMap = new TIntObjectHashMap<String>(nbrOfResources);
             resourceToEventNamesMap = new TIntObjectHashMap<List<String>>(nbrOfResources);
             resourceToUsedInStages = new HashMap<Integer, Set<Pair>>();
             resourceCapacities = new int[nbrOfResources];
@@ -150,7 +148,6 @@ public class FlowerEFABuilder {
                             + ") == " + resourceCapacities[i];
                     final String and = feasibleEquation.isEmpty() ? "" : " & ";
                     feasibleEquation = feasibleEquation + and + resourceGuard;
-                    resourceToFeasibleEquationMap.put(i, resourceGuard);
                 
                 resourceToEventNamesMap.put(i, new ArrayList<String>());
             }
@@ -555,7 +552,8 @@ public class FlowerEFABuilder {
                             .add(varName2VariableMap.get(rVarName));
                 }
             }  
-        }        
+        }      
+        exAutomata.feasiableEquation = this.feasibleEquation;
         return exAutomata;
     }
 }

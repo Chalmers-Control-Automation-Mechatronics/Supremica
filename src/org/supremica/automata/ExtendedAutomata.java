@@ -52,6 +52,7 @@
  * @author Goran Cengic (cengic@chalmers.se)
  * @author Sajed Miremadi (miremads@chalmers.se)
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
+ * @author Zhennan Fei
  * @version %I%, %G%
  * @since 1.0
  */
@@ -59,16 +60,34 @@
 package org.supremica.automata;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+
 import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
 
 
@@ -79,9 +98,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
     private int nbrOfExAutomata = 0;
     private final ArrayList<ExtendedAutomaton> theExAutomata;
-    private Map<String, EventDeclProxy> eventIdToProxyMap;
+    private final Map<String, EventDeclProxy> eventIdToProxyMap;
     private final Map<ExtendedAutomaton,Integer> exAutomatonToIndex;
-    private Map<String, ExtendedAutomaton> stringToExAutomaton;
+    private final Map<String, ExtendedAutomaton> stringToExAutomaton;
     private boolean negativeValuesIncluded = false;
     public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
@@ -112,6 +131,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     private boolean modelHasNoPlants = true;
     private boolean modelHasNoSpecs = true;
 
+    public String feasiableEquation = "";
+
     public ExtendedAutomata() {
         factory = ModuleSubjectFactory.getInstance();
         theExAutomata = new ArrayList<ExtendedAutomaton>();
@@ -129,7 +150,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         exAutomatonToIndex = new HashMap<ExtendedAutomaton, Integer>();
         stringToExAutomaton = new HashMap<String, ExtendedAutomaton>();
         eventIdToProxyMap = new HashMap<String, EventDeclProxy>();
-        var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>(); 
+        var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
     }
 
     public ExtendedAutomata(final String name) {
@@ -144,7 +165,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public ExtendedAutomata(final ModuleSubject module) {
         this(module, 0);
     }
-    
+
     public ExtendedAutomata(final ModuleSubject module, final int globalClockDomain) {
         this();
 
@@ -163,13 +184,13 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 }
             }
         }
-        
+
         for (final EventDeclProxy e : module.getEventDeclList()) {
             eventIdToProxyMap.put(e.getName(), e);
         }
 
         var2relatedVarsMap = new HashMap<VariableComponentProxy, List<VariableComponentProxy>>();
-        
+
         final ArrayList<Proxy> components = new ArrayList<Proxy>(module.getComponentList());
         if (globalClockDomain > 0) {
             components.add(VariableHelper.createIntegerVariable(CLOCK_PREFIX + GLOBAL_PREFIX, 0, globalClockDomain, 0, null));
@@ -231,9 +252,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
                 final MinMax minMax = new MinMax(lowerBound, upperBound);
                 if (theoNbrOfReachableStates == 0) {
-                    theoNbrOfReachableStates = (double) (Math.abs(upperBound - lowerBound + 1));
+                    theoNbrOfReachableStates = (Math.abs(upperBound - lowerBound + 1));
                 } else {
-                    theoNbrOfReachableStates *= ((double) Math.abs(upperBound - lowerBound + 1));
+                    theoNbrOfReachableStates *= (Math.abs(upperBound - lowerBound + 1));
                 }
 
                 if (!var2MinMaxValMap.containsKey(varName)) {
@@ -271,9 +292,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 final ExtendedAutomaton exAutomaton = new ExtendedAutomaton(this, (SimpleComponentSubject) sub);
 
                 if (theoNbrOfReachableStates == 0) {
-                    theoNbrOfReachableStates = ((double) exAutomaton.nbrOfNodes());
+                    theoNbrOfReachableStates = (exAutomaton.nbrOfNodes());
                 } else {
-                    theoNbrOfReachableStates *= ((double) exAutomaton.nbrOfNodes());
+                    theoNbrOfReachableStates *= (exAutomaton.nbrOfNodes());
                 }
 
                 if (exAutomaton.isSpecification()) {
@@ -378,12 +399,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public int size() {
         return nbrOfExAutomata;
     }
-    
+
     public int getNbrExAutomata() {
         return nbrOfExAutomata;
     }
-    
-    public void setNbrOfExAutomata(int i) {
+
+    public void setNbrOfExAutomata(final int i) {
         nbrOfExAutomata = i;
     }
 
@@ -443,6 +464,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     }
 
 
+    @Override
     public Iterator<ExtendedAutomaton> iterator() {
         return theExAutomata.iterator();
     }
@@ -498,7 +520,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                       eventIdToProxyMap.put(name, event);
                   }
               }
-            return event;            
+            return event;
         } catch (final NullPointerException e) {
             throw e;
         }
@@ -556,7 +578,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public HashSet<EventDeclProxy> getPlantAlphabet() {
         return plantAlphabet;
     }
-    
+
     public Map<String, EventDeclProxy> getEventIdToProxyMap() {
         return eventIdToProxyMap;
     }
@@ -564,11 +586,11 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public Map<String, ExtendedAutomaton> getStringToExAutomaton() {
         return stringToExAutomaton;
     }
-    
-    public void setDomain(int domain) {
+
+    public void setDomain(final int domain) {
         this.domain = domain;
     }
-    
+
     public ArrayList<AbstractSubject> getComponents() {
         final ArrayList<AbstractSubject> components = new ArrayList<AbstractSubject>();
 
@@ -616,7 +638,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             module.getEventDeclListModifiable().add(decl);
         }
     }
-    
+
     class MinMax {
 
         private int min;

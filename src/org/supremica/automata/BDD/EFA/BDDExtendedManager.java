@@ -817,11 +817,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
                 maxBDDSizeAlternative = nonUnsafeStates.nodeCount();
             }
 
-            nonUnsafeStates = nonUnsafeStates.and(fTransToUnsafeStates.not());
-            if (maxBDDSizeAlternative < nonUnsafeStates.nodeCount()) {
-                maxBDDSizeAlternative = nonUnsafeStates.nodeCount();
-            }
-
             nonUnsafeStates = nonUnsafeStates.relprod(fTransToUnsafeStates.not(),
                     bddExAutomata.getDestVariablesVarSet());
             if (maxBDDSizeAlternative < nonUnsafeStates.nodeCount()) {
@@ -831,21 +826,10 @@ public class BDDExtendedManager extends BDDAbstractManager {
             newUnsafeStates = possibleUnsafeStates.and(nonUnsafeStates.not());
 
             newUnsafeStates.andWith(unsafeStates.not());
-            if (maxBDDSizeAlternative < newUnsafeStates.nodeCount()) {
-                maxBDDSizeAlternative = newUnsafeStates.nodeCount();
-            }
 
             unsafeStates = unsafeStates.or(newUnsafeStates);
-            if (maxBDDSizeAlternative < unsafeStates.nodeCount()) {
-                maxBDDSizeAlternative = unsafeStates.nodeCount();
-            }
 
-            tTrans.orWith(fTransToUnsafeStates);
-            if (maxBDDSizeAlternative < tTrans.nodeCount()) {
-                maxBDDSizeAlternative = tTrans.nodeCount();
-            }
-
-            tTrans.andWith(newUnsafeStates.not());
+            tTrans.orWith(fTransToUnsafeStates).andWith(newUnsafeStates.not());
             if (maxBDDSizeAlternative < tTrans.nodeCount()) {
                 maxBDDSizeAlternative = tTrans.nodeCount();
             }
@@ -1088,10 +1072,15 @@ public class BDDExtendedManager extends BDDAbstractManager {
             SimpleExpressionSubject feasibleEquation = null;
 
             try {
-
-                feasibleEquation = (SimpleExpressionSubject)
+                if (bddExAutomata.orgExAutomata.getModule() != null) {    
+                    feasibleEquation = (SimpleExpressionSubject)
                         (parser.parse(bddExAutomata.orgExAutomata.getModule().getComment(),
                         Operator.TYPE_BOOLEAN));
+                } else {               
+                   feasibleEquation = (SimpleExpressionSubject)
+                        (parser.parse(bddExAutomata.orgExAutomata.feasiableEquation,
+                        Operator.TYPE_BOOLEAN));
+                } 
             } catch (final ParseException pe) {
                 System.err.println(pe);
             }
