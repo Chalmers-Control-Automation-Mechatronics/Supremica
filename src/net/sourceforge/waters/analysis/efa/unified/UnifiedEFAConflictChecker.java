@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
@@ -425,7 +426,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       if (simplifiedTR == null) {
         recordBlockedEvents(unfoldedTR);
       } else {
-        mergeUpdates(simplifiedTR, originalEvents);
+        mergeUpdates(simplifiedTR);
       }
     } else if (trs.size() > 1) {
       trs = addSelfloopTR(trs);
@@ -440,10 +441,16 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final UnifiedEFATransitionRelation simplifiedTR = simplifyTR(syncTR);
       if (simplifiedTR == null) {
         recordBlockedEvents(syncTR);
+        mergeUpdates(syncTR);
+      } else {
+        mergeUpdates(simplifiedTR);
       }
     } else {
       final UnifiedEFATransitionRelation tr = trs.get(0);
-      simplifyTR(tr);
+      final UnifiedEFATransitionRelation simplifiedTR = simplifyTR(tr);
+      if (simplifiedTR != null) {
+        mergeUpdates(simplifiedTR);
+      }
     }
   }
 
@@ -484,27 +491,17 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     return simplifiedTR;
   }
 
-  private void mergeUpdates(final UnifiedEFATransitionRelation tr,
-                            final List<AbstractEFAEvent> originalEvents)
+  private void mergeUpdates(final UnifiedEFATransitionRelation tr)
     throws AnalysisException
   {
     mUpdateMerger.setTransitionRelation(tr);
-    for (final AbstractEFAEvent event : originalEvents) {
+    final Map<AbstractEFAEvent,List<AbstractEFAEvent>> candidates = findMergeCandidates(tr);
+    for (final Entry<AbstractEFAEvent,List<AbstractEFAEvent>> entry :
+         candidates.entrySet()) {
+      final AbstractEFAEvent event = entry.getKey();
       final EventInfo info = mCurrentSubSystem.getEventInfo(event);
-      if (info == null || info.isBlocked()) {
-        continue;
-      }
-      final List<EventInfo> childrenInfo = info.getChildren();
-      final int numChildren = childrenInfo.size();
-      if (numChildren <= 1) {
-        continue;
-      }
-      final List<AbstractEFAEvent> childrenEvents =
-        new ArrayList<>(numChildren);
-      for (final EventInfo childInfo : childrenInfo) {
-        childrenEvents.add(childInfo.getEvent());
-      }
-      mUpdateMerger.setUnfoldedEvents(childrenEvents);
+      final List<AbstractEFAEvent> events = entry.getValue();
+      mUpdateMerger.setCandidateEvents(events);
       mUpdateMerger.run();
       for (final AbstractEFAEvent removedEvent : mUpdateMerger.getRemovedEvents()) {
         final EventInfo removedInfo = mCurrentSubSystem.getEventInfo(removedEvent);
@@ -521,6 +518,32 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
     }
   }
+
+  private Map<AbstractEFAEvent,List<AbstractEFAEvent>> findMergeCandidates
+    (final UnifiedEFATransitionRelation tr)
+  {
+    final Collection<AbstractEFAEvent> events = tr.getUsedEventsExceptTau();
+    final Map<AbstractEFAEvent,List<AbstractEFAEvent>> mergeCandidates = new HashMap<>();
+    for (final AbstractEFAEvent event : events) {
+      final EventInfo info = mCurrentSubSystem.getEventInfo(event);
+      if (info.getChildren().isEmpty() &&
+          info.getTransitionRelations().size() == 1 &&
+          !info.isBlocked()) {
+        final EventInfo parentInfo = info.getParent();
+        if (parentInfo != null) {
+          final AbstractEFAEvent parent = parentInfo.getEvent();
+          List<AbstractEFAEvent> children = mergeCandidates.get(parent);
+          if (children == null) {
+            children = new ArrayList<>();
+            mergeCandidates.put(parent, children);
+          }
+          children.add(event);
+        }
+      }
+    }
+    return mergeCandidates;
+  }
+
 
   private void registerTR(final UnifiedEFATransitionRelation tr,
                           final boolean unfolding)
@@ -725,9 +748,10 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         if (mCurrentSubSystem.getEventInfo(original) != null) {
           final SyncInfo originalInfo = syncMap.get(original);
           if (originalInfo != null) {
-            originalInfo.setIsLeave(false);
-            eventInfo.setIsRoot(false);
-            break;
+            if (events.contains(original)) {
+              originalInfo.setIsLeave(false);
+              eventInfo.setIsRoot(false);
+            }
           } else {
             final SyncInfo syncInfo = new SyncInfo(false, false);
             syncMap.put(original, syncInfo);
@@ -769,6 +793,16 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     MarshallingTools.saveModule(module, name + ".wmod");
   }
 
+  @SuppressWarnings("unused")
+  private void checkConsistency()
+  {
+    for (final AbstractEFAEvent event : mCurrentSubSystem.getEvents()) {
+      final EventInfo info = mCurrentSubSystem.getEventInfo(event);
+      for (final UnifiedEFATransitionRelation tr : info.getTransitionRelations()) {
+        assert tr.isUsedEvent(event);
+      }
+    }
+  }
 
   //#########################################################################
   //# Inner Class Candidate
