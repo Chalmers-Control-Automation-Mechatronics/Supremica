@@ -52,12 +52,14 @@
  * @author Goran Cengic (cengic@chalmers.se)
  * @author Sajed Miremadi (miremads@chalmers.se)
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
+ * @author Zhennan Fei
  * @version %I%, %G%
  * @since 1.0
  */
 
 package org.supremica.automata;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
 import java.io.File;
 import java.util.*;
 import net.sourceforge.waters.model.base.Proxy;
@@ -112,6 +114,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     private boolean modelHasNoPlants = true;
     private boolean modelHasNoSpecs = true;
 
+    public String feasiableEquation = "";
+    
     public ExtendedAutomata() {
         factory = ModuleSubjectFactory.getInstance();
         theExAutomata = new ArrayList<ExtendedAutomaton>();

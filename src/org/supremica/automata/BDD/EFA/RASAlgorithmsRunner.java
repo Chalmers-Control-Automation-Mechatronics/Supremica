@@ -2,6 +2,7 @@ package org.supremica.automata.BDD.EFA;
 
 import java.io.File;
 import net.sf.javabdd.BDD;
+import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.FlowerEFABuilder;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
@@ -27,10 +28,10 @@ public class RASAlgorithmsRunner {
         FlowerEFABuilder fbuilder = new FlowerEFABuilder(ras, null);
         ExtendedAutomata exAutomata = fbuilder.getEFAforRAS();
         
+        Config.BDD2_BDDLIBRARY.setValue(BDDLibraryType.BUDDY);
         Config.BDD2_INITIALNODETABLESIZE.set(args[2]);
         Config.BDD2_CACHESIZE.set(args[3]);
         Config.BDD2_CACHERATIO.set(args[4]);
-        Config.BDD2_MAXINCREASENODES.set(args[5]);
      
         
         BDDExtendedSynthesizer synthesizer =
