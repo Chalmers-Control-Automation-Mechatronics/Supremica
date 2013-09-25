@@ -1,0 +1,2032 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="benchmarkNew" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="b1_R1_o1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b1_R4_o2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b1_R7_o2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b1_R7_o4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b1_R3_o5"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b1_R2_o3_R4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b1_R2_o3_R7"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b2_R1_o1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b2_R4_o2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="b2_o3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b2_R5_o3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="b2_o4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b2_R6_o4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b2_R5_o5_from_o3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b2_R5_o5_from_o4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b3_R2_o1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b3_R5_o2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b3_R7_o2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b3_R2_o3_R5"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b3_R2_o3_R7"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b4_R2_o1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="b4_o2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b4_R1_o2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="b4_o3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b4_R6_o3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b4_R7_and_R3_o4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b4_R2_o5_from_o4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b4_R2_o5_from_o3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b5_R8_o1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b5_R9_o2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b5_R2_o3"/>
+    </EventDeclList>
+    <ComponentList>
+        <VariableComponent Name="vR1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR1"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR1"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="vR2">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR2"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR2"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="vR3">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR3"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR3"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="vR4">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR4"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR4"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="vR5">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR5"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR5"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="vR6">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR6"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR6"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="vR7">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR7"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR7"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b1v1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b1v21">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v21"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v21"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b1v22">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v22"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v22"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b1v3">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v3"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v3"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b1v4">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v4"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b1v4"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b2v1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b2v2">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b2v3tmp">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v3tmp"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v3tmp"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b2v3">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v3"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v3"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b2v4tmp">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v4tmp"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v4tmp"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b2v4">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v4"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b2v4"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b3v1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="4"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b3v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b3v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b3v21">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b3v21"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b3v21"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b3v22">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b3v22"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b3v22"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b4v1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b4v2tmp">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v2tmp"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v2tmp"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b4v2">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b4v3tmp">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v3tmp"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v3tmp"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b4v3">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v3"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v3"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b4v4">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v4"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b4v4"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="vR8">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR8"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==" Text="vR8 == 2">
+                    <SimpleIdentifier Name="vR8"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="vR9">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="vR9"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==" Text="vR9 == 2">
+                    <SimpleIdentifier Name="vR9"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b5v1">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b5v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b5v1"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="b5v2">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b5v2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="b5v2"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="b1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="r1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="416" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="r1" Target="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b1_R1_o1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-6" Y="-66"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="480" Y="196"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=" Text="vR1 &gt;= 1">
+                                    <SimpleIdentifier Name="vR1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="vR1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b1v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-7" Y="-47"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r1" Target="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b1_R4_o2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="8" Y="-57"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="542" Y="247"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b1v1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR4"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b1v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b1v21"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="vR1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="vR4"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="10" Y="-37"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r1" Target="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b1_R7_o2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="10" Y="-51"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="559" Y="340"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b1v1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b1v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b1v21"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="vR1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="vR7"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="11" Y="-33"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r1" Target="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b1_R3_o5"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-107" Y="-61"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="360" Y="198"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b1v4"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b1v4"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="vR7"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-105" Y="-44"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r1" Target="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b1_R7_o4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-103" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="279" Y="297"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b1v3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR7"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b1v3"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b1v4"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="vR7"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-105" Y="8"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r1" Target="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b1_R2_o3_R4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="25" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="479" Y="426"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b1v21"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b1v21"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b1v3"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="vR4"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="24" Y="2"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r1" Target="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b1_R2_o3_R7"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="349" Y="424"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b1v22"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b1v22"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b1v3"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="vR7"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="23"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="b2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="r2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="400" Y="336"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="r2" Target="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b2_R1_o1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="-71"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="400" Y="206"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="vR1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b2v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="vR1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="-48"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r2" Target="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b2_R4_o2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="11" Y="-64"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="498" Y="247"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b2v1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR4"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR4 -= 2">
+                                    <SimpleIdentifier Name="vR4"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="vR1 += 1">
+                                    <SimpleIdentifier Name="vR1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b2v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b2v2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="10" Y="-48"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r2" Target="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b2_o3"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-46"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="540" Y="347"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="b2v2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b2v2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b2v3tmp"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-30"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r2" Target="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b2_R5_o3"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="29" Y="-46"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="510" Y="437"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b2v3tmp"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR5"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR5 -= 2">
+                                    <SimpleIdentifier Name="vR5"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="vR4 += 2">
+                                    <SimpleIdentifier Name="vR4"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b2v3 += 1">
+                                    <SimpleIdentifier Name="b2v3"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b2v3tmp -=1">
+                                    <SimpleIdentifier Name="b2v3tmp"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="25" Y="-30"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r2" Target="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b2_o4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-15" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="405" Y="476"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="b2v2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b2v2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b2v4tmp +=1">
+                                    <SimpleIdentifier Name="b2v4tmp"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-13" Y="20"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r2" Target="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b2_R6_o4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-59" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="308" Y="447"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b2v4tmp"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR6"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="vR6"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="vR4"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="b2v4"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=">
+                                    <SimpleIdentifier Name="b2v4tmp"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-59" Y="25"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r2" Target="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b2_R5_o5_from_o4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-93" Y="-68"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="297" Y="250"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b2v4"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=" Text="vR6 += 2">
+                                    <SimpleIdentifier Name="vR6"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b2v4 -= 1">
+                                    <SimpleIdentifier Name="b2v4"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-95" Y="-51"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r2" Target="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b2_R5_o5_from_o3"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-116" Y="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="262" Y="352"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b2v3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=" Text="vR5 += 2">
+                                    <SimpleIdentifier Name="vR5"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b2v3 -= 1">
+                                    <SimpleIdentifier Name="b2v3"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-116" Y="-25"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="b3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="r3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="464" Y="336"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="r3" Target="r3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b3_R2_o1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-44" Y="-69"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="395" Y="254"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR2 -= 1">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b3v1 += 1">
+                                    <SimpleIdentifier Name="b3v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-45" Y="-52"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r3" Target="r3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b3_R5_o2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="12" Y="-63"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="548" Y="275"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b3v1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR5"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR5 -= 1">
+                                    <SimpleIdentifier Name="vR5"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="vR2 += 1">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b3v1 -= 1">
+                                    <SimpleIdentifier Name="b3v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b3v21 += 1">
+                                    <SimpleIdentifier Name="b3v21"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="12" Y="-49"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r3" Target="r3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b3_R7_o2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="563" Y="371"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b3v1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR7"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR7 -= 2">
+                                    <SimpleIdentifier Name="vR7"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="vR2 += 1">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b3v1 -= 1">
+                                    <SimpleIdentifier Name="b3v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b3v22 +=1">
+                                    <SimpleIdentifier Name="b3v22"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-2" Y="10"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r3" Target="r3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b3_R2_o3_R5"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="489" Y="429"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b3v21"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=" Text="vR5 += 1">
+                                    <SimpleIdentifier Name="vR5"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b3v21 -= 1">
+                                    <SimpleIdentifier Name="b3v21"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="23"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r3" Target="r3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b3_R2_o3_R7"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-85" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="405" Y="411"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b3v22"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=" Text="vR5 += 1">
+                                    <SimpleIdentifier Name="vR5"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b3v22 -= 1">
+                                    <SimpleIdentifier Name="b3v22"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-92" Y="24"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="b4">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="r4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="400" Y="256"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="1" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="r4" Target="r4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b4_R2_o1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-21" Y="-65"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="465" Y="115"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=" Text="vR2 &gt;= 2">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR2 -= 2">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b4v1 += 1">
+                                    <SimpleIdentifier Name="b4v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="-50"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r4" Target="r4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b4_o2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="22" Y="-43"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="558" Y="180"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=" Text="b4v1 &gt;= 1">
+                                    <SimpleIdentifier Name="b4v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="b4v1 -= 1">
+                                    <SimpleIdentifier Name="b4v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b4v2tmp += 1">
+                                    <SimpleIdentifier Name="b4v2tmp"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="18" Y="-28"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r4" Target="r4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b4_R1_o2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="10" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="573" Y="305"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b4v2tmp"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR1 -= 1">
+                                    <SimpleIdentifier Name="vR1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="vR2 += 2">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b4v2tmp -= 1">
+                                    <SimpleIdentifier Name="b4v2tmp"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b4v2 += 1">
+                                    <SimpleIdentifier Name="b4v2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="9" Y="-2"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r4" Target="r4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b4_o3"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="495" Y="404"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=">
+                                    <SimpleIdentifier Name="b4v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="b4v1 -= 1">
+                                    <SimpleIdentifier Name="b4v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b4v3tmp += 1">
+                                    <SimpleIdentifier Name="b4v3tmp"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-2" Y="25"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r4" Target="r4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b4_R6_o3"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="372" Y="424"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b4v3tmp"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR6"/>
+                                        <IntConstant Value="2"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR6 -= 2">
+                                    <SimpleIdentifier Name="vR6"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="vR2 += 2">
+                                    <SimpleIdentifier Name="vR2"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b4v3tmp -= 1">
+                                    <SimpleIdentifier Name="b4v3tmp"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b4v3 += 1">
+                                    <SimpleIdentifier Name="b4v3"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-51" Y="18"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r4" Target="r4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b4_R7_and_R3_o4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-152" Y="-66"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="276" Y="376"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&amp;">
+                                        <BinaryExpression Operator="&gt;=">
+                                            <SimpleIdentifier Name="b4v2"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="&gt;=">
+                                            <SimpleIdentifier Name="vR7"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR7 -= 1">
+                                    <SimpleIdentifier Name="vR7"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="vR3 -= 1">
+                                    <SimpleIdentifier Name="vR3"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="vR1 += 1">
+                                    <SimpleIdentifier Name="vR1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b4v4 += 1">
+                                    <SimpleIdentifier Name="b4v4"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b4v2 -= 1">
+                                    <SimpleIdentifier Name="b4v2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-173" Y="-46"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r4" Target="r4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b4_R2_o5_from_o4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-117" Y="-53"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="229" Y="234"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b4v4"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=" Text="vR7 += 1">
+                                    <SimpleIdentifier Name="vR7"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="vR3 += 1">
+                                    <SimpleIdentifier Name="vR3"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b4v4 -= 1">
+                                    <SimpleIdentifier Name="b4v4"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-116" Y="-40"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r4" Target="r4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b4_R2_o5_from_o3"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-112" Y="-67"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="305" Y="126"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="b4v3 &gt;= 1 &amp; vR2&gt;=1">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b4v3"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=" Text="vR6 += 2">
+                                    <SimpleIdentifier Name="vR6"/>
+                                    <IntConstant Value="2"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b4v3 -= 1">
+                                    <SimpleIdentifier Name="b4v3"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-110" Y="-46"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="b5">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="r5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="336" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="r5" Target="r5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b5_R8_o1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="12" Y="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="430" Y="340"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;=" Text="vR8 &gt;= 1">
+                                    <SimpleIdentifier Name="vR8"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="vR8 -= 1">
+                                    <SimpleIdentifier Name="vR8"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b5v1 += 1">
+                                    <SimpleIdentifier Name="b5v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="13" Y="-24"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r5" Target="r5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b5_R9_o2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-120" Y="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="248" Y="348"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="vR9 &gt;=1 &amp; b5v1 &gt;= 1">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR9"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b5v1"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="b5v1 -= 1">
+                                    <SimpleIdentifier Name="b5v1"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="b5v2 += 1">
+                                    <SimpleIdentifier Name="b5v2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="+=" Text="vR8 += 1">
+                                    <SimpleIdentifier Name="vR8"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="vR9 -= 1">
+                                    <SimpleIdentifier Name="vR9"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-121" Y="-15"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="r5" Target="r5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b5_R2_o3"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-61"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="339" Y="209"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="vR2&gt;= 1&amp; b5v2&gt;=1">
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="vR2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="&gt;=">
+                                        <SimpleIdentifier Name="b5v2"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="+=" Text="vR9 += 1">
+                                    <SimpleIdentifier Name="vR9"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="-=" Text="b5v2 -= 1">
+                                    <SimpleIdentifier Name="b5v2"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-44"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

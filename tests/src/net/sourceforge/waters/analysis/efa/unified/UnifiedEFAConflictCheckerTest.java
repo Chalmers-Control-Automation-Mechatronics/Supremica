@@ -247,7 +247,7 @@ public class UnifiedEFAConflictCheckerTest
 //  public void testGoranKulbanaNB()
 //    throws IOException, WatersException
 //  {
-//    final ModuleProxy module = loadModule("tests", "goran", "goran-Kulbana-nb");
+//    final ModuleProxy module = loadModule("tests", "goran", "goran-Kulbana");
 //    checkConflict(module, true);
 //  }
 
@@ -303,18 +303,17 @@ public class UnifiedEFAConflictCheckerTest
     checkProfisafe("profisafe_islave_efsm", 4 ,true);
   }
 
-  /* TODO These tests require group nodes ...
   public void testProfisafeISlaveEFA4()
     throws IOException, WatersException
   {
-    checkProfisafe("profisafe_i4_slave_efa", 4 ,true);
+    checkProfisafe("profisafe_islave_efa", 4 ,true);
   }
 
   public void testProfisafeIHostEFABlock3()
     throws IOException, WatersException
   {
     checkProfisafe("profisafe_ihost_efa_block", 3 ,false);
-  }*/
+  }
 
   public void testProfisafeIHostEFSM4()
     throws IOException, WatersException
@@ -401,84 +400,84 @@ public class UnifiedEFAConflictCheckerTest
 
   /*----------------------------- PSL --------------------------------------*/
 
-//  public void testPsl()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module = loadModule("tests", "psl", "psl");
-//    checkConflict(module, false);
-//  }
-//
-//  public void testPslBig()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module = loadModule("tests", "psl", "pslBig");
-//    checkConflict(module, false);
-//  }
-//
-//  public void testPslBigNonblocking()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module = loadModule("tests", "psl", "pslBigNonblocking");
-//    checkConflict(module, true);
-//  }
-//
-//  public void testPslBigBlocking()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module = loadModule("tests", "psl", "pslBigBlocking");
-//    checkConflict(module, false);
-//  }
-//
-//  public void testPslBigWithManyRestartTrans()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module =
-//      loadModule("tests", "psl", "pslBigWithManyRestartTrans");
-//    checkConflict(module, false);
-//  }
-//
-//  public void testPslSmallNonblocking()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module =
-//      loadModule("tests", "psl", "pslSmallNonblocking");
-//    checkConflict(module, true);
-//  }
-//
-//  public void testPslVerySmallNonblocking()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module =
-//      loadModule("tests", "psl", "pslVerySmallNonblocking");
-//    checkConflict(module, true);
-//  }
-//
-//  public void testPslVerySmallBlocking()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module =
-//      loadModule("tests", "psl", "pslVerySmallBlocking");
-//    checkConflict(module, false);
-//  }
-//
-//
-//  public void testPslTest()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module =
-//      loadModule("tests", "psl", "pslTest");
-//    checkConflict(module, true);
-//  }
-//
-//  public void testPslTest_100times()
-//    throws IOException, WatersException
-//  {
-//    for (int i=0; i< 100; i++) {
-//      final ModuleProxy module =
-//        loadModule("tests", "psl", "pslTest");
-//      checkConflict(module, true);
-//    }
-//  }
+  public void testPsl()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "psl");
+    checkConflict(module, false);
+  }
+
+  public void testPslBig()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "pslBig");
+    checkConflict(module, false);
+  }
+
+  public void testPslBigNonblocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "pslBigNonblocking");
+    checkConflict(module, true);
+  }
+
+  public void testPslBigBlocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "pslBigBlocking");
+    checkConflict(module, false);
+  }
+
+  public void testPslBigWithManyRestartTrans()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslBigWithManyRestartTrans");
+    checkConflict(module, false);
+  }
+
+  public void testPslSmallNonblocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslSmallNonblocking");
+    checkConflict(module, true);
+  }
+
+  public void testPslVerySmallNonblocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslVerySmallNonblocking");
+    checkConflict(module, true);
+  }
+
+  public void testPslVerySmallBlocking()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslVerySmallBlocking");
+    checkConflict(module, false);
+  }
+
+
+  public void testPslTest()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslTest");
+    checkConflict(module, true);
+  }
+
+  public void testPslTest_100times()
+    throws IOException, WatersException
+  {
+    for (int i=0; i< 100; i++) {
+      final ModuleProxy module =
+        loadModule("tests", "psl", "pslTest");
+      checkConflict(module, true);
+    }
+  }
 
   //#########################################################################
   //# Parametrised Tests
@@ -569,7 +568,7 @@ public class UnifiedEFAConflictCheckerTest
   void configure(final UnifiedEFAConflictChecker checker)
   {
     // TODO Configure here ...
-    checker.setPrefersAutomataCandidates(false);
+    checker.setUsesLocalVariable(true);
   }
 
 
