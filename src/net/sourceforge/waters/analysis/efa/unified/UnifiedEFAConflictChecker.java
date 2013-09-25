@@ -794,17 +794,20 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
   //#########################################################################
   //# Debugging
-
   @SuppressWarnings("unused")
   private void saveCurrentSystem(final String name)
+    throws OverflowException
   {
-    // TODO Include blocked events ...
     final UnifiedEFAVariableContext context =
       mMainEFASystem.getVariableContext();
     final List<UnifiedEFAVariable> vars = mCurrentSubSystem.getVariables();
     final List<UnifiedEFATransitionRelation> trs =
       new ArrayList<>(mCurrentSubSystem.getTransitionRelations());
     Collections.sort(trs);
+    final UnifiedEFATransitionRelation blocked = createBlockedEventsTR();
+    if (blocked != null) {
+      trs.add(blocked);
+    }
     final List<AbstractEFAEvent> events = mCurrentSubSystem.getEvents();
     final UnifiedEFASystem system =
       new UnifiedEFASystem(name, vars, trs, events, context);
@@ -812,6 +815,33 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       new UnifiedEFASystemImporter(getFactory(), mCompilerOperatorTable);
     final ModuleProxy module = importer.importModule(system);
     MarshallingTools.saveModule(module, name + ".wmod");
+  }
+
+  private UnifiedEFATransitionRelation createBlockedEventsTR()
+    throws OverflowException
+  {
+    final List<AbstractEFAEvent> events = mCurrentSubSystem.getEvents();
+    final UnifiedEFAEventEncoding encoding =
+      new UnifiedEFAEventEncoding(":blocked");
+    for (final AbstractEFAEvent event : events) {
+      final EventInfo info = mCurrentSubSystem.getEventInfo(event);
+      if (info.isBlocked() && info.getChildren().isEmpty()) {
+        encoding.createEventId(event);
+      }
+    }
+    if (encoding.size() > 1) {
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(":blocked", ComponentKind.PLANT,
+                                         encoding.size(), 0, 1,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      rel.setProperEventStatus(EventEncoding.TAU,
+                               EventEncoding.STATUS_FULLY_LOCAL |
+                               EventEncoding.STATUS_UNUSED);
+      rel.setInitial(0, true);
+      return new UnifiedEFATransitionRelation(rel, encoding);
+    } else {
+      return null;
+    }
   }
 
   @SuppressWarnings("unused")
