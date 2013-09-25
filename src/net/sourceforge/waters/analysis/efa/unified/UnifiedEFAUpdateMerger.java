@@ -13,10 +13,10 @@ package net.sourceforge.waters.analysis.efa.unified;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.strategy.HashingStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,13 +28,16 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
-import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
@@ -52,11 +55,13 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   //# Constructors
   public UnifiedEFAUpdateMerger(final ModuleProxyFactory factory,
                                 final CompilerOperatorTable optable,
-                                final UnifiedEFAVariableContext context)
+                                final UnifiedEFAVariableContext context,
+                                final AbstractEFAEvent dummy)
   {
     mFactory = factory;
     mOperatorTable = optable;
     mContext = context;
+    mDummyRoot = dummy;
   }
 
 
@@ -104,10 +109,12 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
       new UnifiedEFAVariableCollector(mOperatorTable, mContext);
     mRemovedEvents = new ArrayList<>(mCandidateEvents.size());
     mAddedEvents = new ArrayList<>(mCandidateEvents.size() / 2);
+    mEqualityVisitor = ModuleEqualityVisitor.getInstance(false);
+    mPropagator = new ConstraintPropagator(mFactory, mOperatorTable, mContext);
   }
 
   public void run()
-    throws AnalysisException
+    throws AnalysisException, EvalException
   {
     try {
       setUp();
@@ -129,6 +136,8 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   {
     super.tearDown();
     mVariableCollector = null;
+    mEqualityVisitor = null;
+    mPropagator = null;
   }
 
 
@@ -184,7 +193,7 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
 
   private void mergeEvents
     (final Map<Set<UnifiedEFAVariable>, List<AbstractEFAEvent>> variableMap)
-    throws AnalysisAbortException
+    throws AnalysisAbortException, EvalException
   {
     final Collection<List<AbstractEFAEvent>> groups = variableMap.values();
     final UnifiedEFAEventEncoding encoding =
@@ -226,7 +235,7 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
 
   private void mergeEvents(final Map<TLongArrayList,TIntArrayList> eventMap,
                            final TIntArrayList unusedEvents)
-    throws AnalysisAbortException
+    throws AnalysisAbortException, EvalException
   {
     mergeEvents(unusedEvents);
     for (final TIntArrayList events : eventMap.values()) {
@@ -235,8 +244,9 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   }
 
   private void mergeEvents(final TIntArrayList events)
-    throws AnalysisAbortException
+    throws AnalysisAbortException, EvalException
   {
+
     if (events.size() > 1) {
       checkAbort();
       final UnifiedEFAEventEncoding encoding =
@@ -249,13 +259,17 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
       int firstEventCode = -1;
       for (int i = 0; i < events.size(); i++) {
         final int eventCode = events.get(i);
-        final RenamedEFAEvent event =
-          (RenamedEFAEvent) encoding.getEvent(eventCode);
+        final AbstractEFAEvent event = encoding.getEvent(eventCode);
         mRemovedEvents.add(event);
         if (original == null) {
           firstEventCode = eventCode;
           original = event.getOriginalEvent();
-          index = event.getIndex();
+          if (original == null) {
+            original = mDummyRoot;
+          } else {
+            final RenamedEFAEvent renamed = (RenamedEFAEvent)event;
+            index = renamed.getIndex();
+          }
         } else {
           rel.removeEvent(eventCode);
         }
@@ -270,54 +284,61 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   }
 
   private ConstraintList createMergedUpdate(final List<ConstraintList> updates)
+    throws EvalException
   {
-    final Set<UnifiedEFAVariable> allPrimed = new THashSet<>();
+    final HashingStrategy<Proxy> strategy =
+      mEqualityVisitor.getTObjectHashingStrategy();
+     Set<SimpleExpressionProxy> commonLiterals = new WatersHashSet<>(strategy);
+    final ConstraintList firstUpdate = updates.get(0);
+    final List<SimpleExpressionProxy> firstLiterals = firstUpdate.getConstraints();
+    commonLiterals.addAll(firstLiterals);
     for (final ConstraintList update : updates) {
-      mVariableCollector.collectAllVariables(update, null, allPrimed);
-    }
-    final int size = updates.size();
-    final Comparator<SimpleExpressionProxy> comparator =
-      new ExpressionComparator(mOperatorTable);
-    final List<SimpleExpressionProxy> disjunction =
-      new ArrayList<SimpleExpressionProxy>(size);
-    for (ConstraintList update : updates) {
-      final Set<UnifiedEFAVariable> primed = new THashSet<>();
-      mVariableCollector.collectAllVariables(update, null, primed);
-      final List<SimpleExpressionProxy> unchanged = new ArrayList<>();
-      for (final UnifiedEFAVariable var : allPrimed) {
-        if (!primed.contains(var)) {
-          unchanged.add(createUnchanged(var));
+      if (update != firstUpdate) {
+        final List<SimpleExpressionProxy> literals = update.getConstraints();
+        final Set<SimpleExpressionProxy> newLiterals = new WatersHashSet<>(strategy);
+        for (final SimpleExpressionProxy exp : literals) {
+          if (commonLiterals.contains(exp)) {
+            newLiterals.add(exp);
+          }
+        }
+        commonLiterals = newLiterals;
+        if (newLiterals.isEmpty()) {
+          break;
         }
       }
-      if (!unchanged.isEmpty()) {
-        unchanged.addAll(update.getConstraints());
-        update = new ConstraintList(unchanged);
-        update.sort(comparator);
-      }
-      final SimpleExpressionProxy expr = update.createExpression
-        (mFactory, mOperatorTable.getAndOperator());
-      disjunction.add(expr);
     }
-    final ConstraintList disjunctiveUpdate = new ConstraintList(disjunction);
-    disjunctiveUpdate.sort(comparator);
-    final SimpleExpressionProxy expr = disjunctiveUpdate.createExpression
-      (mFactory, mOperatorTable.getOrOperator());
-    final List<SimpleExpressionProxy> singleton =
-      Collections.singletonList(expr);
-    return new ConstraintList(singleton);
+    mPropagator.reset();
+    for (final ConstraintList update : updates) {
+      if (!commonLiterals.isEmpty()) {
+        final List<SimpleExpressionProxy> allCommonLiterals = update.getConstraints();
+        final List<SimpleExpressionProxy> nonCommonLiterals = new ArrayList<>();
+        for (final SimpleExpressionProxy list : allCommonLiterals) {
+          if (!commonLiterals.contains(list)) {
+            nonCommonLiterals.add(list);
+          }
+        }
+        final ConstraintList newUpdate = new ConstraintList(nonCommonLiterals);
+        mPropagator.addNegation(newUpdate);
+      } else {
+        mPropagator.addNegation(update);
+      }
+    }
+    mPropagator.propagate();
+    if (mPropagator.isUnsatisfiable()) {
+      final Comparator<SimpleExpressionProxy> comparator =
+        new ExpressionComparator(mOperatorTable);
+      final ConstraintList newUpdate = new ConstraintList(commonLiterals);
+      newUpdate.sort(comparator);
+      return newUpdate;
+    }
+    final ConstraintList negatedUpdate = mPropagator.getAllConstraints();
+    mPropagator.reset();
+    mPropagator.addNegation(negatedUpdate);
+    mPropagator.addConstraints(commonLiterals);
+    mPropagator.propagate();
+    return mPropagator.getAllConstraints();
   }
 
-  private SimpleExpressionProxy createUnchanged
-    (final UnifiedEFAVariable var)
-  {
-    final ModuleProxyCloner cloner = mFactory.getCloner();
-    final SimpleExpressionProxy varName =
-      (SimpleExpressionProxy) cloner.getClone(var.getVariableName());
-    final SimpleExpressionProxy varPrime =
-      (SimpleExpressionProxy) cloner.getClone(var.getPrimedVariableName());
-    final BinaryOperator eqOp = mOperatorTable.getEqualsOperator();
-    return mFactory.createBinaryExpressionProxy(eqOp, varPrime, varName);
-  }
 
 
   //#########################################################################
@@ -330,8 +351,10 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   private List<AbstractEFAEvent> mCandidateEvents;
   private List<AbstractEFAEvent> mRemovedEvents;
   private List<AbstractEFAEvent> mAddedEvents;
+  private ConstraintPropagator mPropagator;
 
   private UnifiedEFAVariableCollector mVariableCollector;
-
+  private ModuleEqualityVisitor mEqualityVisitor;
+  private final AbstractEFAEvent mDummyRoot;
 
 }

@@ -469,6 +469,22 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, true);
   }
 
+  public void testPslSmallNonblockingTest()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslSmallnonblockingtest");
+    checkConflict(module, true);
+  }
+
+  public void testPslSmallBlockingTest()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "psl", "pslSmallblocking");
+    checkConflict(module, false);
+  }
+
   public void testPslTest_100times()
     throws IOException, WatersException
   {
