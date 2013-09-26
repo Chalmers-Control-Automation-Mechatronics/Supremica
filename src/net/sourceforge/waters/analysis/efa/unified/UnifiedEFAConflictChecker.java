@@ -246,7 +246,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       createEventInfo();
       simplifyDirtyTransitionRelations();
       splitSubsystems();
-//      int i = 0;
+      int i = 0;
       while (mCurrentSubSystem != null) {
         while (mCurrentSubSystem.isReducible()) {
           final Candidate minCandidate = mCurrentSubSystem.selectCandidate();
@@ -254,8 +254,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
           simplifyDirtyTransitionRelations();
           splitSubsystems();
 //          saveCurrentSystem("debug/sub" + i);
-//          getLogger().debug("wrote debug/sub" + i);
-//          i++;
+          getLogger().debug("wrote debug/sub" + i);
+          i++;
         }
         trs = mCurrentSubSystem.getTransitionRelations();
         if (trs.isEmpty()) {
