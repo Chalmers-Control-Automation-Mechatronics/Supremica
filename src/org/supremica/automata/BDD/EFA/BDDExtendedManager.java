@@ -871,11 +871,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
         System.out.println("The maximal size of intermediate BDDs is "
                 + maxBDDSizeAlternative);
 
-
-        // TEST
-        System.err.println("number of all unsafe states for the partition approach is " +
-          unsafeStates.satCount(bddExAutomata.getSourceVariablesVarSet()));
-
         // cleanup
         newUnsafeStates.free();
         unsafeStates.free();
@@ -916,7 +911,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
                     .nbrOfStatesIDD(deadlockStatesIDD).intValue();
         }
 
-        System.out.println("The number of feasiable deadlock states is: " +
+        System.out.println("The number of feasible deadlock states is: " +
                 nbrOfDeadlockStates);
 
         // cleanup
