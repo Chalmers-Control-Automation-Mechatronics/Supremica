@@ -110,7 +110,8 @@ abstract public class WatersObjectHash<T>
    * @param strategy
    *          used to compute hash codes and to compare objects.
    */
-  public WatersObjectHash(final int initialCapacity, final HashingStrategy<T> strategy)
+  public WatersObjectHash(final int initialCapacity,
+                          final HashingStrategy<? super T> strategy)
   {
     super(initialCapacity);
     this._hashingStrategy = strategy;

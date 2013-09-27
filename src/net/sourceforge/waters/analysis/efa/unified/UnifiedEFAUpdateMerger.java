@@ -35,9 +35,11 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
@@ -286,32 +288,58 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   private ConstraintList createMergedUpdate(final List<ConstraintList> updates)
     throws EvalException
   {
+    // 1. Find literals common to all updates
+    final Set<UnifiedEFAVariable> allPrimedVars = new THashSet<>();
+    for (final ConstraintList update : updates) {
+      mVariableCollector.collectAllVariables(update, null, allPrimedVars);
+    }
+    // 2. Make sure any primed variables in the combined update are kept
+    //    unchanged in any part missing them.
+    // 3. Find literals common to all updates
+    final List<ConstraintList> extendedUpdates =
+      new ArrayList<ConstraintList>(updates.size());
+    final Set<UnifiedEFAVariable> primedVars = new THashSet<>();
     final HashingStrategy<Proxy> strategy =
       mEqualityVisitor.getTObjectHashingStrategy();
-     Set<SimpleExpressionProxy> commonLiterals = new WatersHashSet<>(strategy);
-    final ConstraintList firstUpdate = updates.get(0);
-    final List<SimpleExpressionProxy> firstLiterals = firstUpdate.getConstraints();
-    commonLiterals.addAll(firstLiterals);
-    for (final ConstraintList update : updates) {
-      if (update != firstUpdate) {
-        final List<SimpleExpressionProxy> literals = update.getConstraints();
-        final Set<SimpleExpressionProxy> newLiterals = new WatersHashSet<>(strategy);
+    Set<SimpleExpressionProxy> commonLiterals = null;
+    for (ConstraintList update : updates) {
+      mVariableCollector.collectAllVariables(update, null, primedVars);
+      if (primedVars.size() < allPrimedVars.size()) {
+        mPropagator.init(update);
+        for (final UnifiedEFAVariable var : allPrimedVars) {
+          if (!primedVars.contains(var)) {
+            final SimpleExpressionProxy literal = createUnchangedLiteral(var);
+            mPropagator.addConstraint(literal);
+          }
+        }
+        mPropagator.propagate();
+        update = mPropagator.getAllConstraints();
+      }
+      primedVars.clear();
+      extendedUpdates.add(update);
+      final List<SimpleExpressionProxy> literals = update.getConstraints();
+      if (commonLiterals == null) {
+        commonLiterals = new WatersHashSet<>(literals.size(), strategy);
+        commonLiterals.addAll(literals);
+      } else {
+        final Set<SimpleExpressionProxy> newLiterals =
+          new WatersHashSet<>(commonLiterals.size(), strategy);
         for (final SimpleExpressionProxy exp : literals) {
           if (commonLiterals.contains(exp)) {
             newLiterals.add(exp);
           }
         }
         commonLiterals = newLiterals;
-        if (newLiterals.isEmpty()) {
-          break;
-        }
       }
     }
+    // 4. Create combined update.
     mPropagator.reset();
-    for (final ConstraintList update : updates) {
+    for (final ConstraintList update : extendedUpdates) {
       if (!commonLiterals.isEmpty()) {
-        final List<SimpleExpressionProxy> allCommonLiterals = update.getConstraints();
-        final List<SimpleExpressionProxy> nonCommonLiterals = new ArrayList<>();
+        final List<SimpleExpressionProxy> allCommonLiterals =
+          update.getConstraints();
+        final List<SimpleExpressionProxy> nonCommonLiterals =
+          new ArrayList<>();
         for (final SimpleExpressionProxy list : allCommonLiterals) {
           if (!commonLiterals.contains(list)) {
             nonCommonLiterals.add(list);
@@ -339,6 +367,17 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
     return mPropagator.getAllConstraints();
   }
 
+  private SimpleExpressionProxy createUnchangedLiteral
+    (final UnifiedEFAVariable var)
+  {
+    final ModuleProxyCloner cloner = mFactory.getCloner();
+    final SimpleExpressionProxy varName =
+      (SimpleExpressionProxy) cloner.getClone(var.getVariableName());
+    final SimpleExpressionProxy varPrime =
+      (SimpleExpressionProxy) cloner.getClone(var.getPrimedVariableName());
+    final BinaryOperator eqOp = mOperatorTable.getEqualsOperator();
+    return mFactory.createBinaryExpressionProxy(eqOp, varPrime, varName);
+  }
 
 
   //#########################################################################

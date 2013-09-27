@@ -96,7 +96,8 @@ public class WatersHashSet<E>
    * @param strategy
    *          used to compute hash codes and to compare objects.
    */
-  public WatersHashSet(final int initialCapacity, final HashingStrategy<E> strategy)
+  public WatersHashSet(final int initialCapacity,
+                       final HashingStrategy<? super E> strategy)
   {
     super(initialCapacity, strategy);
   }

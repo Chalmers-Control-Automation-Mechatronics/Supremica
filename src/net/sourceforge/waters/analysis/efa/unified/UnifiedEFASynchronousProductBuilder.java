@@ -121,7 +121,7 @@ public class UnifiedEFASynchronousProductBuilder
   {
     // Step 1: Collect event information.
     final Map<AbstractEFAEvent,EventInfo> renamingMap = new HashMap<>();
-    final List<AbstractEFAEvent> orderedEvents = new ArrayList<>();
+    final List<EventInfo> orderedEvents = new ArrayList<>();
     int trIndex = 0;
     for (final UnifiedEFATransitionRelation tr : mInputTransitionRelations) {
       final UnifiedEFAEventEncoding encoding = tr.getEventEncoding();
@@ -132,7 +132,7 @@ public class UnifiedEFASynchronousProductBuilder
           if (eventInfo == null) {
             eventInfo = new EventInfo(event);
             renamingMap.put(event, eventInfo);
-            orderedEvents.add(event);
+            orderedEvents.add(eventInfo);
           }
           final EventTRInfo trInfo = new EventTRInfo(trIndex, e);
           eventInfo.addEventTRInfo(trInfo);
@@ -141,7 +141,8 @@ public class UnifiedEFASynchronousProductBuilder
       trIndex++;
     }
     // Step 2: Find ancestors.
-    for (final AbstractEFAEvent event : orderedEvents) {
+    for (final EventInfo info : orderedEvents) {
+      final AbstractEFAEvent event = info.getEvent();
       AbstractEFAEvent original = event.getOriginalEvent();
       while (original != null) {
         final EventInfo originalInfo = renamingMap.get(original);
@@ -158,9 +159,9 @@ public class UnifiedEFASynchronousProductBuilder
     final AbstractEFAEvent tau = mEventEncoding.getEvent(EventEncoding.TAU);
     final EventInfo tauInfo = new EventInfo(tau);
     mEventInfoList.add(tauInfo);
-    for (final AbstractEFAEvent event : orderedEvents) {
-      final EventInfo info = renamingMap.get(event);
+    for (final EventInfo info : orderedEvents) {
       if (!info.isRenamed()) {
+        final AbstractEFAEvent event = info.getEvent();
         final int code = mEventEncoding.createEventId(event);
         mEventInfoList.add(info);
         info.setEventCode(code);
@@ -384,7 +385,6 @@ public class UnifiedEFASynchronousProductBuilder
 
     //#######################################################################
     //# Simple Access
-    @SuppressWarnings("unused")
     private AbstractEFAEvent getEvent()
     {
       return mEvent;
@@ -440,7 +440,7 @@ public class UnifiedEFASynchronousProductBuilder
     {
       writer.write(mEvent.getName());
       writer.write("@");
-      writer.write(mEventCode);
+      writer.write(Integer.toString(mEventCode));
       if (mRenamed) {
         writer.write(" (renamed)");
       }
@@ -500,13 +500,13 @@ public class UnifiedEFASynchronousProductBuilder
         mInputTransitionRelations.get(mTRIndex);
       writer.write(tr.getName());
       writer.write("@");
-      writer.write(mTRIndex);
+      writer.write(Integer.toString(mTRIndex));
       writer.write(" : ");
       final UnifiedEFAEventEncoding enc = tr.getEventEncoding();
       final AbstractEFAEvent event = enc.getEvent(mEventCode);
       writer.write(event.getName());
       writer.write("@");
-      writer.write(mEventCode);
+      writer.write(Integer.toString(mEventCode));
     }
 
     //#######################################################################

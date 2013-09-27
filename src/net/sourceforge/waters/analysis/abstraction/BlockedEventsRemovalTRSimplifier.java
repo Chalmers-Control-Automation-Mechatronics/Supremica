@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TRPartition;
 
 
 /**
@@ -105,9 +104,6 @@ public class BlockedEventsRemovalTRSimplifier
       if (rel.checkReachability(config)) {
         removeProperSelfLoopEvents();
         rel.removeRedundantPropositions();
-        final TRPartition partition =
-          TRPartition.createReachabilityPartition(rel);
-        setResultPartition(partition);
       }
     }
     return modified;
