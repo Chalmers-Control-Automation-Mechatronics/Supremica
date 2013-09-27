@@ -471,15 +471,16 @@ public class FlowerEFABuilder {
 
                 for (int r = 0; r < nbrOfResources; r++) {
                     final int sourceDemand = demandAtStage[i][tran.p1][r];
-                    if (sourceDemand > 0) {
+                    final int targetDemand = demandAtStage[i][tran.p2][r];
+
+                    if (sourceDemand > 0 && targetDemand == 0) {
                         final String resourceVar = RESOURCE_PREFIX + r;
 
                         action = action + ";" + resourceVar + "+="
                                 + sourceDemand + ";";
                     }
 
-                    final int targetDemand = demandAtStage[i][tran.p2][r];
-                    if (targetDemand > 0) {
+                    if (targetDemand > 0 && sourceDemand == 0) {
                         final String resourceVar = RESOURCE_PREFIX + r;
                         guard = guard + " & " + resourceVar + ">="
                                 + targetDemand;
@@ -488,10 +489,42 @@ public class FlowerEFABuilder {
                             action = action + ";" + resourceVar + "-="
                                     + targetDemand + ";";
                         }
-                        resourceToEventNamesMap.get(r)
-                                .add(sourceStageVar + targetStageVar);
-                        relatedVarNames.add(resourceVar);
                     }
+
+                    if (sourceDemand > 0 && targetDemand > 0) {
+
+                        final String resourceVar = RESOURCE_PREFIX + r;
+
+                        int difference = targetDemand - sourceDemand;
+
+                        if (difference > 0) {
+                            guard = guard + " & " + resourceVar + ">="
+                                    + difference;
+
+                            if (!jobToLastStages.get(i).contains(tran.p2)) {
+                                action = action + ";" + resourceVar + "-="
+                                        + difference + ";";
+                            } else {
+                                action = action + ";" + resourceVar + "+="
+                                        + sourceDemand + ";";
+                            }
+                        } else if (difference < 0) {
+                            if (!jobToLastStages.get(i).contains(tran.p2)) {
+                                action = action + ";" + resourceVar + "+="
+                                        + -difference + ";";
+                            } else {
+                                action = action + ";" + resourceVar + "+="
+                                        + sourceDemand + ";";
+                            }
+                        } else {
+                            if (jobToLastStages.get(i).contains(tran.p2)) {
+                                action = action + ";" + resourceVar + "+="
+                                        + sourceDemand + ";";
+                            }
+                        }
+                    }
+
+                    resourceToEventNamesMap.get(r).add(sourceStageVar + targetStageVar);
 
                 }
 

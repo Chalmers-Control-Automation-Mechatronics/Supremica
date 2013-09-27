@@ -1193,7 +1193,7 @@ Class-Path: ${manifest.pathlist}</echo>
     </target>
     
     <target name="-run-all-ras-algo-alternative">
-        <foreach param="ras-path" target="-execute-large-ras-alternative">
+        <foreach param="ras-path" target="-execute-ras-alternative">
             <path> 
                 <fileset dir="${examples}/ras-examples" casesensitive="no"/>
             </path>
