@@ -1,7 +1,7 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.set.hash.TIntHashSet;
 import java.util.Random;
 import net.sf.javabdd.BDD;
 import static org.supremica.automata.BDD.EFA.BDDPartitionReachabilityUti.restrictedImage;
@@ -116,14 +116,13 @@ public class BDDPartitionAlgoWorkerEve extends BDDPartitionAlgoWorker {
         
     }
     
-    // This function is buggy.
     @Override
     public BDD reachableBackwardRestrictedWorkSetAlgorithm(BDD markedStates, BDD forbiddenStates, BDD reachableStates) {
 
         if (partitions.bddExAutomata.isAllMarked() && forbiddenStates.isZero()) {
             return reachableStates;
         }
-
+        
         resetCoordinator();
 
         BDD targetMarkedStates = markedStates.id()
