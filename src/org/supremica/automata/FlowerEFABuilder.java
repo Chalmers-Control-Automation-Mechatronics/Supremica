@@ -188,33 +188,48 @@ public class FlowerEFABuilder {
             
             final ExtendedAutomaton efa = new ExtendedAutomaton("Job" + i, ComponentKind.PLANT);
             efa.addState("J" + i, false, true, false);
-
-            efa.addEvent(LOAD_EVENT_PREFIX + i, "CONTROLLABLE");
-
+            
             for (final Integer init : jobToInitialStages.get(i)) {
+
                 final String targetStageVar = STAGE_PREFIX + i + init;
 
+                final String loadingEvent = LOAD_EVENT_PREFIX + "_" + targetStageVar;
+
+                efa.addEvent(loadingEvent, "CONTROLLABLE");
+
                 String guard = "";
-                String action = targetStageVar + "+=1";;
+                String action = "";
 
-                for (int r = 0; r < nbrOfResources; r++) {
-                    final int targetDemand = demandAtStage[i][init][r];
-                    if (targetDemand > 0) {
-                        final String resourceVar = RESOURCE_PREFIX + r;
-                        final String and = guard.isEmpty() ? "" : " & ";
-                        guard = guard + and + resourceVar + ">="
-                                + targetDemand;
+                if (!jobToLastStages.get(i).contains(init)) {
+                    action = targetStageVar + "+=1";
+                    for (int r = 0; r < nbrOfResources; r++) {
+                        final int targetDemand = demandAtStage[i][init][r];
+                        if (targetDemand > 0) {
+                            final String resourceVar = RESOURCE_PREFIX + r;
+                            final String and = guard.isEmpty() ? "" : " & ";
+                            guard = guard + and + resourceVar + ">="
+                                    + targetDemand;
 
-                        action = action + ";" + resourceVar + "-="
-                                + targetDemand + ";";                      
-                        resourceToEventNamesMap.get(r).add(LOAD_EVENT_PREFIX + i);
+                            action = action + ";" + resourceVar + "-="
+                                    + targetDemand + ";";
+                            resourceToEventNamesMap.get(r).add(loadingEvent);
+                        }
                     }
-
+                } else {
+                    for (int r = 0; r < nbrOfResources; r++) {
+                        final int targetDemand = demandAtStage[i][init][r];
+                        if (targetDemand > 0) {
+                            final String resourceVar = RESOURCE_PREFIX + r;
+                            final String and = guard.isEmpty() ? "" : " & ";
+                            guard = guard + and + resourceVar + ">="
+                                    + targetDemand;
+                            resourceToEventNamesMap.get(r).add(loadingEvent);
+                        }
+                    }
                 }
-
                 efa.addTransition("J" + i,
                         "J" + i,
-                        LOAD_EVENT_PREFIX + i + ";",
+                        loadingEvent,
                         guard,
                         action);
             }
@@ -299,41 +314,16 @@ public class FlowerEFABuilder {
                         action);            
             }
 
-            for (int j = 0; j < nbrOfStagesForJob[i] - 1; j++) {
-                exAutomata.addIntegerVariable(STAGE_PREFIX + i + j,
-                        0,
-                        maxInstancesAtStage[i][j],
-                        0,
-                        0);
+            for (int j = 0; j < nbrOfStagesForJob[i]; j++) {                
+                if (!jobToLastStages.get(i).contains(j)) {
+                    exAutomata.addIntegerVariable(STAGE_PREFIX + i + j,
+                            0,
+                            maxInstancesAtStage[i][j],
+                            0,
+                            0);
+                }
             }
             
-            for (int j = 0; j < nbrOfStagesForJob[i] - 1; j++) {
-
-                String stageVarName = STAGE_PREFIX + i + j;
-
-                VariableComponentProxy stageVar = VariableHelper.createIntegerVariable(
-                        stageVarName,
-                        0,
-                        maxInstancesAtStage[i][j],
-                        0,
-                        0);
-                exAutomata.getVars().add(stageVar);
-                exAutomata.getStageVars().add(stageVar);
-
-                if (!exAutomata.var2MinMaxValMap.containsKey(stageVarName)) {
-
-                    ExtendedAutomata.MinMax minMax = exAutomata
-                            .new MinMax(0, maxInstancesAtStage[i][j]);
-
-                    exAutomata.var2MinMaxValMap.put(stageVarName, minMax);
-                }
-
-                if (!exAutomata.var2domainMap.containsKey(stageVarName)) {
-                    exAutomata.var2domainMap.
-                            put(stageVarName, maxInstancesAtStage[i][j] + 1);
-                }
-            }
-                      
             exAutomata.addAutomaton(efa);
         }
         
@@ -414,24 +404,39 @@ public class FlowerEFABuilder {
                 
                 final String targetStageVar = STAGE_PREFIX + i + init;
 
+                final String loadingEvent = LOAD_EVENT_PREFIX + "_" + targetStageVar;
+
+                efa.addEvent(loadingEvent, "CONTROLLABLE");
+
                 String guard = "";
-                String action = targetStageVar + "+=1";;
+                String action = "";
 
-                for (int r = 0; r < nbrOfResources; r++) {
-                    final int targetDemand = demandAtStage[i][init][r];
-                    if (targetDemand > 0) {
-                        final String resourceVar = RESOURCE_PREFIX + r;
-                        relatedVars.add(resourceVar);
-                        final String and = guard.isEmpty() ? "" : " & ";
-                        guard = guard + and + resourceVar + ">="
-                                + targetDemand;
+                if (!jobToLastStages.get(i).contains(init)) {
+                    action = targetStageVar + "+=1";
+                    for (int r = 0; r < nbrOfResources; r++) {
+                        final int targetDemand = demandAtStage[i][init][r];
+                        if (targetDemand > 0) {
+                            final String resourceVar = RESOURCE_PREFIX + r;
+                            final String and = guard.isEmpty() ? "" : " & ";
+                            guard = guard + and + resourceVar + ">="
+                                    + targetDemand;
 
-                        action = action + ";" + resourceVar + "-="
-                                + targetDemand + ";";
-                        resourceToEventNamesMap.get(r).add(LOAD_EVENT_PREFIX + i);
-                        
+                            action = action + ";" + resourceVar + "-="
+                                    + targetDemand + ";";
+                            resourceToEventNamesMap.get(r).add(loadingEvent);
+                        }
                     }
-
+                } else {
+                    for (int r = 0; r < nbrOfResources; r++) {
+                        final int targetDemand = demandAtStage[i][init][r];
+                        if (targetDemand > 0) {
+                            final String resourceVar = RESOURCE_PREFIX + r;
+                            final String and = guard.isEmpty() ? "" : " & ";
+                            guard = guard + and + resourceVar + ">="
+                                    + targetDemand;
+                            resourceToEventNamesMap.get(r).add(loadingEvent);
+                        }
+                    }
                 }
 
                 efa.addTransition("J" + i,
@@ -548,38 +553,40 @@ public class FlowerEFABuilder {
             }
 
             // instance variables
-            for (int j = 0; j < nbrOfStagesForJob[i] - 1; j++) {
+            for (int j = 0; j < nbrOfStagesForJob[i]; j++) {
 
-                String stageVarName = STAGE_PREFIX + i + j;
+                if (!jobToLastStages.get(i).contains(j)) {
+                    String stageVarName = STAGE_PREFIX + i + j;
 
-                VariableComponentProxy stageVar = VariableHelper.createIntegerVariable(
-                        stageVarName,
-                        0,
-                        maxInstancesAtStage[i][j],
-                        0,
-                        0);
-                exAutomata.getVars().add(stageVar);
-                exAutomata.getStageVars().add(stageVar);
+                    VariableComponentProxy stageVar = VariableHelper.createIntegerVariable(
+                            stageVarName,
+                            0,
+                            maxInstancesAtStage[i][j],
+                            0,
+                            0);
+                    exAutomata.getVars().add(stageVar);
+                    exAutomata.getStageVars().add(stageVar);
 
-                if (!exAutomata.var2MinMaxValMap.containsKey(stageVarName)) {
+                    if (!exAutomata.var2MinMaxValMap.containsKey(stageVarName)) {
 
-                    ExtendedAutomata.MinMax minMax = exAutomata
-                            .new MinMax(0, maxInstancesAtStage[i][j]);
+                        ExtendedAutomata.MinMax minMax = exAutomata.new MinMax(0, maxInstancesAtStage[i][j]);
 
-                    exAutomata.var2MinMaxValMap.put(stageVarName, minMax);
+                        exAutomata.var2MinMaxValMap.put(stageVarName, minMax);
+                    }
+
+                    if (!exAutomata.var2domainMap.containsKey(stageVarName)) {
+                        exAutomata.var2domainMap.
+                                put(stageVarName, maxInstancesAtStage[i][j] + 1);
+                    }
+
+                    if (!varName2VariableMap.containsKey(stageVarName)) {
+                        varName2VariableMap.put(stageVarName, stageVar);
+                    }
+
+                    if (domain < maxInstancesAtStage[i][j] + 1) {
+                        domain = maxInstancesAtStage[i][j] + 1;
+                    }
                 }
-
-                if (!exAutomata.var2domainMap.containsKey(stageVarName)) {
-                    exAutomata.var2domainMap.
-                            put(stageVarName, maxInstancesAtStage[i][j] + 1);
-                }
-                
-                if (!varName2VariableMap.containsKey(stageVarName)) {
-                    varName2VariableMap.put(stageVarName, stageVar);
-                }
-                
-                if(domain < maxInstancesAtStage[i][j] + 1)
-                    domain = maxInstancesAtStage[i][j] + 1;
             }
             
             // set the domain to exAutomata 
