@@ -227,6 +227,14 @@ public class UnifiedEFAConflictCheckerTest
     checkRoundRobin(5);
   }
 
+  public void testProductionCell()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "efa", "Production_cell ");
+    checkConflict(module, false);
+  }
+
   /*--------------------------- Goran --------------------------------------*/
 
 //  public void testGoranSimpleTestSystem()

@@ -139,6 +139,22 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     return mDummyRoot;
   }
 
+  public Set<UnifiedEFATransitionRelation> getTransitionRelations()
+  {
+    return mCurrentSubSystem.getTransitionRelations();
+  }
+
+  public List<UnifiedEFAVariable> getVariables()
+  {
+    return mCurrentSubSystem.getVariables();
+  }
+
+  public int getNumberOfAutomata()
+  {
+    return mMainEFASystem.getVariables().size() +
+      mMainEFASystem.getTransitionRelations().size();
+  }
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
@@ -218,15 +234,36 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     mAutomataComparator = new CandidateComparator(minStates);
     mUnfolder = new UnifiedEFAVariableUnfolder
       (getFactory(), mCompilerOperatorTable, context);
-    mSimplifier = UnifiedEFASimplifier.createStandardNonblockingProcedure
-      (Equivalence.OBSERVATION_EQUIVALENCE, mInternalTransitionLimit);
     mDummyRoot = new SilentEFAEvent("Dummy");
     mUpdateMerger =
       new UnifiedEFAUpdateMerger(getFactory(), mCompilerOperatorTable, context,mDummyRoot);
     mSynchronizer = new UnifiedEFASynchronousProductBuilder();
     mSynchronizer.setStateLimit(mInternalStateLimit);
     mSynchronizer.setTransitionLimit(mInternalTransitionLimit);
+    if (mSimplifierFactory == null) {
+      mSimplifierFactory = UnifiedEFASimplifierFactory.NB;
+    }
+    mSimplifier = UnifiedEFASimplifier.createStandardNonblockingProcedure
+      (Equivalence.OBSERVATION_EQUIVALENCE, mInternalTransitionLimit);
+    final UnifiedEFAConflictCheckerAnalysisResult result = getAnalysisResult();
+
+    result.addSynchronousProductStatistics(mSynchronizer.getStatistics());
+    mSimplifier = mSimplifierFactory.createAbstractionProcedure(this);
+    result.setSimplifierStatistics(mSimplifier);
     mNonblockingChecker = new EFANonblockingChecker();
+
+  }
+
+  @Override
+  protected UnifiedEFAConflictCheckerAnalysisResult createAnalysisResult()
+  {
+    return new UnifiedEFAConflictCheckerAnalysisResult();
+  }
+
+  @Override
+  public UnifiedEFAConflictCheckerAnalysisResult getAnalysisResult()
+  {
+    return (UnifiedEFAConflictCheckerAnalysisResult) super.getAnalysisResult();
   }
 
   @Override
@@ -241,18 +278,22 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mCurrentSubSystem = new SubSystemInfo(mMainEFASystem.getEvents().size(),
                                             mMainEFASystem.getVariables().size(),
                                             trs);
+      final UnifiedEFAConflictCheckerAnalysisResult result = getAnalysisResult();
       mDirtyTRs = new THashSet<>(trs);
       createVariableInfo();
       createEventInfo();
       simplifyDirtyTransitionRelations();
       splitSubsystems();
+      result.setUnifiedSystem(this);
       int i = 0;
       while (mCurrentSubSystem != null) {
         while (mCurrentSubSystem.isReducible()) {
+          result.setUnifiedSystem(this);
           final Candidate minCandidate = mCurrentSubSystem.selectCandidate();
           applyCandidate(minCandidate);
           simplifyDirtyTransitionRelations();
           splitSubsystems();
+          result.setUnifiedSystem(this);
 //          saveCurrentSystem("debug/sub" + i);
           getLogger().debug("wrote debug/sub" + i);
           i++;
@@ -2000,6 +2041,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   private Comparator<Candidate> mAutomataComparator;
   private UnifiedEFAVariableUnfolder mUnfolder;
   private UnifiedEFASimplifier mSimplifier;
+  private UnifiedEFASimplifierFactory mSimplifierFactory;
   private UnifiedEFAUpdateMerger mUpdateMerger;
   private UnifiedEFASynchronousProductBuilder mSynchronizer;
   private EFANonblockingChecker mNonblockingChecker;
