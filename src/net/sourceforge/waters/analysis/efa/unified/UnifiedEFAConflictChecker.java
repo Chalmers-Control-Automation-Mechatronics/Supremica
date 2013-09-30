@@ -83,9 +83,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     return mDocumentManager;
   }
 
-  public void setDocumentManager(final DocumentManager document)
+  public void setDocumentManager(final DocumentManager manager)
   {
-    mDocumentManager = document;
+    mDocumentManager = manager;
   }
 
   public CompilerOperatorTable getOperatorTable()
@@ -151,9 +151,11 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
   public int getNumberOfAutomata()
   {
-    return mMainEFASystem.getVariables().size() +
+    return
+      mMainEFASystem.getVariables().size() +
       mMainEFASystem.getTransitionRelations().size();
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -279,15 +281,16 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
                                             mMainEFASystem.getVariables().size(),
                                             trs);
       final UnifiedEFAConflictCheckerAnalysisResult result = getAnalysisResult();
+      result.setUnifiedSystem(this);
       mDirtyTRs = new THashSet<>(trs);
       createVariableInfo();
       createEventInfo();
       simplifyDirtyTransitionRelations();
       splitSubsystems();
-      result.setUnifiedSystem(this);
-      int i = 0;
+//      int i = 0;
       while (mCurrentSubSystem != null) {
         while (mCurrentSubSystem.isReducible()) {
+          // TODO Not counting correctly :-p
           result.setUnifiedSystem(this);
           final Candidate minCandidate = mCurrentSubSystem.selectCandidate();
           applyCandidate(minCandidate);
@@ -295,8 +298,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
           splitSubsystems();
           result.setUnifiedSystem(this);
 //          saveCurrentSystem("debug/sub" + i);
-          getLogger().debug("wrote debug/sub" + i);
-          i++;
+//          getLogger().debug("wrote debug/sub" + i);
+//          i++;
         }
         trs = mCurrentSubSystem.getTransitionRelations();
         if (trs.isEmpty()) {

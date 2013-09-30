@@ -31,6 +31,7 @@ print p[k]
 do
   await c[k-1] &gt; 0
   x[k] = c[k-1]
+  c[k-1] = 0
   if x[k] % p[k] != 0 then
     await c[k] == 0
     c[k] = x[k]

@@ -21,6 +21,7 @@ import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -235,6 +236,7 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, false);
   }
 
+
   /*--------------------------- Goran --------------------------------------*/
 
 //  public void testGoranSimpleTestSystem()
@@ -261,40 +263,59 @@ public class UnifiedEFAConflictCheckerTest
 
   /*--------------------------- Transfer Line ------------------------------*/
 
-  public void testTransferLine12()
+  public void testTransferLineEFA131()
     throws IOException, WatersException
   {
-    checkTransferLine("transferline_efsm", 1, 2, true);
+    checkTransferLineEFA("transferline_efa", 1, 3, 1, true);
   }
 
-  public void testTransferLine21()
+  public void testTransferLineEFA131Block()
     throws IOException, WatersException
   {
-    checkTransferLine("transferline_efsm", 2, 1, true);
+    checkTransferLineEFA("transferline_efa_block", 1, 3, 1, false);
   }
 
-  public void testTransferLine22()
+  public void testTransferLineEFA10Block()
     throws IOException, WatersException
   {
-    checkTransferLine("transferline_efsm", 2, 2, true);
+    checkTransferLineEFA("transferline_efa_block", 3, 10, 10, false);
   }
 
-  public void testTransferLine12Block()
+  // TODO Argh! This one is much too slow ...
+  public void testTransferLineEFA20Block()
     throws IOException, WatersException
   {
-    checkTransferLine("transferline_efsm_block", 1, 2, false);
+    checkTransferLineEFA("transferline_efa_block", 3, 20, 20, false);
   }
 
-  public void testTransferLine21Block()
+  public void testTransferLineEFSM21()
     throws IOException, WatersException
   {
-    checkTransferLine("transferline_efsm_block", 2, 1, false);
+    checkTransferLineEFSM("transferline_efsm", 2, 1, true);
   }
 
-  public void testTransferLine22Block()
+  public void testTransferLineEFSM22()
     throws IOException, WatersException
   {
-    checkTransferLine("transferline_efsm_block", 2, 2, false);
+    checkTransferLineEFSM("transferline_efsm", 2, 2, true);
+  }
+
+  public void testTransferLineEFSM12Block()
+    throws IOException, WatersException
+  {
+    checkTransferLineEFSM("transferline_efsm_block", 1, 2, false);
+  }
+
+  public void testTransferLineEFSM21Block()
+    throws IOException, WatersException
+  {
+    checkTransferLineEFSM("transferline_efsm_block", 2, 1, false);
+  }
+
+  public void testTransferLineEFSM22Block()
+    throws IOException, WatersException
+  {
+    checkTransferLineEFSM("transferline_efsm_block", 2, 2, false);
   }
 
   /*---------------------------- PROFIsafe ---------------------------------*/
@@ -405,6 +426,20 @@ public class UnifiedEFAConflictCheckerTest
   {
     checkPrimeSieve("dynamic_prime_sieve", 5, 168, true);
   }
+
+  /*
+  public void testDynamicPrimeSieve6()
+    throws IOException, WatersException
+  {
+    checkPrimeSieve("dynamic_prime_sieve", 6, 288, true);
+  }
+
+  public void testDynamicPrimeSieve7()
+    throws IOException, WatersException
+  {
+    checkPrimeSieve("dynamic_prime_sieve", 7, 360, true);
+  }
+  */
 
   /*----------------------------- PSL --------------------------------------*/
   public void testPslVerySmallNonblocking()
@@ -543,9 +578,33 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, bindings, expect);
   }
 
-  void checkTransferLine(final String name,
-                         final int n, final int m,
-                         final boolean expect)
+  void checkTransferLineEFA(final String name,
+                            final int n, final int a, final int b,
+                            final boolean expect)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final List<ParameterBindingProxy> bindings =
+      new ArrayList<ParameterBindingProxy>(3);
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy bindingN =
+      factory.createParameterBindingProxy("N", constN);
+    bindings.add(bindingN);
+    final IntConstantProxy constA = factory.createIntConstantProxy(a);
+    final ParameterBindingProxy bindingA =
+      factory.createParameterBindingProxy("A", constA);
+    bindings.add(bindingA);
+    final IntConstantProxy constB = factory.createIntConstantProxy(b);
+    final ParameterBindingProxy bindingB =
+      factory.createParameterBindingProxy("B", constB);
+    bindings.add(bindingB);
+    final ModuleProxy module = loadModule("efa", name);
+    checkConflict(module, bindings, expect);
+  }
+
+  void checkTransferLineEFSM(final String name,
+                             final int n, final int m,
+                             final boolean expect)
     throws IOException, WatersException
   {
     final ModuleProxyFactory factory = getModuleProxyFactory();
@@ -579,6 +638,8 @@ public class UnifiedEFAConflictCheckerTest
   void configure(final UnifiedEFAConflictChecker checker)
   {
     // TODO Configure here ...
+    final DocumentManager manager = getDocumentManager();
+    checker.setDocumentManager(manager);
     checker.setUsesLocalVariable(true);
   }
 
