@@ -64,8 +64,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
     HashMap<BDD, BDD> eventBDDToTransitionBDD = null;
 
     private boolean iddSatCount = false;
-    private int minStatesIDDSatCountDenominator = 1;
-    public int nbrMinBoundUnsafeStates = -1;
+    private long minStatesIDDSatCountDenominator = 1L;
+    public long nbrMinBoundUnsafeStates = 0L;
 
     public int maxBDDSizeClassic = 0;
     public int maxBDDSizeAlternative = 0;
@@ -653,10 +653,10 @@ public class BDDExtendedManager extends BDDAbstractManager {
         Qk.free();
         Qkn.free();
 
-        int nbrOfReachableStates = (int) reachableStatesBDD
+        long nbrOfReachableStates = (long) reachableStatesBDD
                 .satCount(bddExAutomata.getSourceVariablesVarSet());
 
-        if (nbrOfReachableStates == 1) {
+        if (nbrOfReachableStates <= 1L) {
 
             iddSatCount = true;
 
@@ -664,7 +664,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
                 .generateIDD(reachableStatesBDD, reachableStatesBDD);
 
             nbrOfReachableStates = bddExAutomata
-                    .nbrOfStatesIDD(reachableStatesIDD).intValue();
+                    .nbrOfStatesIDD(reachableStatesIDD).longValue();
         }
 
         System.out.println("The number of reachable states is " + nbrOfReachableStates);
@@ -724,15 +724,15 @@ public class BDDExtendedManager extends BDDAbstractManager {
         System.out.println("The maximal size of intermediate BDDs is "
                 + maxBDDSizeClassic);
 
-        int nbrBoundaryUnsafeStates = 0;
+        long nbrBoundaryUnsafeStates = 0;
 
         if (iddSatCount) {
             final IDD boundaryUnsafeStatesIDD = bddExAutomata
                     .generateIDD(boundaryUnsafeStatesBDD, boundaryUnsafeStatesBDD);
             nbrBoundaryUnsafeStates = bddExAutomata
-                    .nbrOfStatesIDD(boundaryUnsafeStatesIDD).intValue();
+                    .nbrOfStatesIDD(boundaryUnsafeStatesIDD).longValue();
         } else {
-            nbrBoundaryUnsafeStates = (int) boundaryUnsafeStatesBDD
+            nbrBoundaryUnsafeStates = (long) boundaryUnsafeStatesBDD
                 .satCount(bddExAutomata.getSourceVariablesVarSet());
         }
 
@@ -763,15 +763,15 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         BDD boundaryUnsafeStates  = computeBoundaryUnsafeStates(deadlocks);
 
-        int nbrOfBoundUnsafeStates = 0;
+        long nbrOfBoundUnsafeStates = 0;
         if (iddSatCount) {
             final IDD boundUnsafeStatesIDD = bddExAutomata
                     .generateIDD(boundaryUnsafeStates, boundaryUnsafeStates);
 
             nbrOfBoundUnsafeStates = bddExAutomata
-                    .nbrOfStatesIDD(boundUnsafeStatesIDD).intValue();
+                    .nbrOfStatesIDD(boundUnsafeStatesIDD).longValue();
         } else {
-            nbrOfBoundUnsafeStates = (int) boundaryUnsafeStates
+            nbrOfBoundUnsafeStates = (long) boundaryUnsafeStates
                     .satCount(bddExAutomata.getSourceVariablesVarSet());
         }
 
@@ -899,16 +899,16 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         deadlocks.andWith(feasibleSourceStates);
 
-        int nbrOfDeadlockStates = (int) deadlocks
+        long nbrOfDeadlockStates = (long) deadlocks
                 .satCount(bddExAutomata.getSourceVariablesVarSet());
-        if (nbrOfDeadlockStates == 1) {
+        if (nbrOfDeadlockStates <= 1L) {
 
             iddSatCount = true;
 
             final IDD deadlockStatesIDD = bddExAutomata
                     .generateIDD(deadlocks, deadlocks);
             nbrOfDeadlockStates = bddExAutomata
-                    .nbrOfStatesIDD(deadlockStatesIDD).intValue();
+                    .nbrOfStatesIDD(deadlockStatesIDD).longValue();
         }
 
         System.out.println("The number of feasible deadlock states is: " +
@@ -944,16 +944,18 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
                 for (int i = 0; i < stageVarIndexList.size(); i++) {
 
-                    final BDD partialLargerState =
-                            tempUnsafeState.exist(varSetsTobeExisted.get(i))
-                            .relprod(largerVarValues.get(i),
-                            bddExAutomata.tempVariablesVarSet);
+                    final BDD partialLargerTempStates = tempUnsafeState.exist(varSetsTobeExisted.get(i));
+                    
+                    final BDD partialLargerState = partialLargerTempStates
+                            .relprod(largerVarValues.get(i),bddExAutomata.tempVariablesVarSet);
 
                     localLargerStates.andWith(partialLargerState);
 
                     if (maxBDDSizeMinimization < localLargerStates.nodeCount()) {
                         maxBDDSizeMinimization = localLargerStates.nodeCount();
                     }
+                    
+                    partialLargerTempStates.free();
                 }
                 largerStates.orWith(localLargerStates.andWith(possibleLargerStates));
                 if (maxBDDSizeMinimization < largerStates.nodeCount()) {
@@ -975,9 +977,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
                     .generateIDD(minimalBoundaryUnsafeStates, minimalBoundaryUnsafeStates);
             nbrMinBoundUnsafeStates = bddExAutomata
                     .nbrOfStatesIDD(minBoundUnsafeStatesIDD)
-                    .intValue() / minStatesIDDSatCountDenominator;
+                    .longValue() / minStatesIDDSatCountDenominator;
         } else {
-            nbrMinBoundUnsafeStates = (int) minimalBoundaryUnsafeStates
+            nbrMinBoundUnsafeStates = (long) minimalBoundaryUnsafeStates
                 .satCount(bddExAutomata.getSourceStagesVarSet());
         }
 
@@ -990,6 +992,87 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         for(final BDD largValue: largerVarValues)
             largValue.free();
+
+        return minimalBoundaryUnsafeStates;
+    }
+    
+    // an alternative way to remove non-minimal RAS states
+    public BDD removeLargerStatesAlternative(final BDD boundaryStates) {
+
+        final BDDIterator itr = boundaryStates.iterator(bddExAutomata.getSourceStagesVarSet());
+
+        final BDD largerStates = getZeroBDD();
+
+        while (itr.hasNext()) {
+
+            final BDD anUnsafeState = itr.nextBDD();
+
+            if (anUnsafeState.and(largerStates).isZero()) {
+
+                final BDD tempUnsafeState = anUnsafeState
+                        .replace(bddExAutomata.sourceToTempVariablePairing);
+
+                final BDD possibleLargerStates = boundaryStates.and(anUnsafeState.not());
+
+                for (int i = 0; i < stageVarIndexList.size(); i++) {
+
+                    final BDD partialLargerTempStates = tempUnsafeState.exist(varSetsTobeExisted.get(i));
+
+                    final BDD partialLargerState = partialLargerTempStates
+                            .relprod(largerVarValues.get(i), bddExAutomata.tempVariablesVarSet);
+
+                    possibleLargerStates.andWith(partialLargerState);
+
+                    if (maxBDDSizeMinimization < possibleLargerStates.nodeCount()) {
+                        maxBDDSizeMinimization = possibleLargerStates.nodeCount();
+                    }
+
+                    partialLargerTempStates.free();
+
+                    if (possibleLargerStates.isZero()) {
+                        break;
+                    }
+
+                }
+
+                largerStates.orWith(possibleLargerStates);
+
+                if (maxBDDSizeMinimization < largerStates.nodeCount()) {
+                    maxBDDSizeMinimization = largerStates.nodeCount();
+                }
+
+                tempUnsafeState.free();
+            }
+
+            anUnsafeState.free();
+        }
+
+        minimalBoundaryUnsafeStates = boundaryStates.and(largerStates.not());
+        System.out.println("The maximal size of BDDs during the minimization is: "
+                + maxBDDSizeMinimization);
+
+        if (iddSatCount) {
+            computeMinStatesIDDSatCountDenominator();
+            final IDD minBoundUnsafeStatesIDD = bddExAutomata
+                    .generateIDD(minimalBoundaryUnsafeStates, minimalBoundaryUnsafeStates);
+            nbrMinBoundUnsafeStates = bddExAutomata
+                    .nbrOfStatesIDD(minBoundUnsafeStatesIDD)
+                    .longValue() / minStatesIDDSatCountDenominator;
+        } else {
+            nbrMinBoundUnsafeStates = (long) minimalBoundaryUnsafeStates
+                    .satCount(bddExAutomata.getSourceStagesVarSet());
+        }
+
+        System.out.println("The number of minimal boundary unsafe states is: "
+                + nbrMinBoundUnsafeStates);
+
+        //cleanup
+        boundaryStates.free();
+        largerStates.free();
+
+        for (final BDD largValue : largerVarValues) {
+            largValue.free();
+        }
 
         return minimalBoundaryUnsafeStates;
     }
@@ -1123,15 +1206,15 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         final BDD boundaryUnsafeStates = computeBoundaryUnsafeStatesWithEventPartitions(deadlocks);
 
-        int nbrOfBoundUnsafeStates = 0;
+        long nbrOfBoundUnsafeStates = 0L;
         if (iddSatCount) {
             final IDD boundUnsafeStatesIDD = bddExAutomata
                     .generateIDD(boundaryUnsafeStates, boundaryUnsafeStates);
 
             nbrOfBoundUnsafeStates = bddExAutomata
-                    .nbrOfStatesIDD(boundUnsafeStatesIDD).intValue();
+                    .nbrOfStatesIDD(boundUnsafeStatesIDD).longValue();
         } else {
-            nbrOfBoundUnsafeStates = (int) boundaryUnsafeStates
+            nbrOfBoundUnsafeStates = (long) boundaryUnsafeStates
                     .satCount(bddExAutomata.getSourceVariablesVarSet());
         }
 
@@ -1230,12 +1313,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
         initv.free();
 
         // compute the number of deadlock states
-        int nbrOfDeadlockStates = (int) deadlocks.satCount(bddExAutomata.getSourceVariablesVarSet());
+        long nbrOfDeadlockStates = (long) deadlocks.satCount(bddExAutomata.getSourceVariablesVarSet());
 
-        if (nbrOfDeadlockStates == 1) {
+        if (nbrOfDeadlockStates <= 1) {
           iddSatCount = true;
           final IDD deadlockStatesIDD = bddExAutomata.generateIDD(deadlocks, deadlocks);
-          nbrOfDeadlockStates = bddExAutomata.nbrOfStatesIDD(deadlockStatesIDD).intValue();
+          nbrOfDeadlockStates = bddExAutomata.nbrOfStatesIDD(deadlockStatesIDD).longValue();
         }
 
         System.out.println("The number of feasiable deadlock states is: " + nbrOfDeadlockStates);
