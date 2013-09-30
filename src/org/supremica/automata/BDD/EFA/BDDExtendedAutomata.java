@@ -122,7 +122,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     long nbrOfBlockingStates = -1;
     long nbrOfNonblockingControllableStates = -1;
     long nbrOfControllableStates = -1;
-    int nbrOfBoundaryUnsafeStates = -1; // for RAS models
+    long nbrOfBoundaryUnsafeStates = -1; // for RAS models
     private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecSourceVarsMap;
     private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTargetVarsMap;
     private final HashMap<Integer, SupremicaBDDBitVector> BDDBitVecTempVarsMap;
