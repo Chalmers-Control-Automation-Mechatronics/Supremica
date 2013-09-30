@@ -96,7 +96,8 @@ public class UnifiedEFAConflictCheckerAnalysisResult
 
   //#########################################################################
   //# Providing Statistics
-  public void setUnifiedSystem (final UnifiedEFAConflictChecker checker) {
+  public void setUnifiedSystem(final UnifiedEFAConflictChecker checker)
+  {
     setNumberOfAutomata(checker.getNumberOfAutomata());
     for (final UnifiedEFATransitionRelation tr :
       checker.getTransitionRelations()) {

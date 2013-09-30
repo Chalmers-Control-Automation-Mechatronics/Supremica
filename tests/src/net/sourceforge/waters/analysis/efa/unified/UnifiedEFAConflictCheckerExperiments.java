@@ -149,7 +149,7 @@ public class UnifiedEFAConflictCheckerExperiments
       for (int m = 2; m <= 10; m += 2) {
         try {
           for (int n = 200; n <= 2000; n+= 200) {
-            checkTransferLine("transferline_efsm", n, m, true);
+            checkTransferLineEFSM("transferline_efsm", n, m, true);
           }
         } catch (final AnalysisException exception) {
           // next please ...
@@ -158,7 +158,7 @@ public class UnifiedEFAConflictCheckerExperiments
         }
         try {
           for (int n = 200; n <= 2000; n+= 200) {
-            checkTransferLine("transferline_efsm_block", n, m, false);
+            checkTransferLineEFSM("transferline_efsm_block", n, m, false);
           }
         } catch (final AnalysisException exception) {
           // next please ...

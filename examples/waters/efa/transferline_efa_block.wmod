@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="transferline_efa_block" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>EFA model of Wonham's tranferline. 
+Parametrised by:
+A - size of buffers A
+B - size of buffers B
+N - number of serially connected cells.
+This is the blocking version.
+Use to demonstrate nonblocking verification, not suitable for controllability or synthesis.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+            <ConstantAliasExpression>
+                <IntConstant Value="1"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="A">
+            <ConstantAliasExpression>
+                <IntConstant Value="3"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="B">
+            <ConstantAliasExpression>
+                <IntConstant Value="1"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="GROUPS">
+            <ConstantAliasExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="IGROUPS">
+            <ConstantAliasExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="rejectT">
+            <RangeList>
+                <SimpleIdentifier Name="GROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="startT">
+            <RangeList>
+                <SimpleIdentifier Name="IGROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="acceptT">
+            <RangeList>
+                <SimpleIdentifier Name="IGROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finishM">
+            <RangeList>
+                <SimpleIdentifier Name="GROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="startM">
+            <RangeList>
+                <SimpleIdentifier Name="GROUPS"/>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="startM0"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finishM0"/>
+        <EventDecl Kind="CONTROLLABLE" Name="unload"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="loading_unit">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="WORKING">
+                        <PointGeometry>
+                            <Point X="214" Y="249"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="11" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="IDLE">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="214" Y="162"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-5" Y="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point X="11" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="IDLE" Target="WORKING">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="startT">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-57" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="214" Y="162"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point X="192" Y="207"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="214" Y="249"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="WORKING" Target="IDLE">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="acceptT">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="214" Y="249"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point X="235" Y="206"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="214" Y="162"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="+=" Text="bufferA[1] += 1">
+                                    <IndexedIdentifier Name="bufferA">
+                                        <IntConstant Value="1"/>
+                                    </IndexedIdentifier>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-2"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <ForeachComponent Name="i">
+            <SimpleIdentifier Name="GROUPS"/>
+            <ComponentList>
+                <VariableComponent>
+                    <IndexedIdentifier Name="bufferA">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="0"/>
+                            <SimpleIdentifier Name="A"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="bufferA">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                    <VariableMarking>
+                        <SimpleIdentifier Name=":accepting"/>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="bufferA">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableMarking>
+                </VariableComponent>
+                <SimpleComponent Kind="SPEC">
+                    <IndexedIdentifier Name="bufferAspec">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="S0">
+                                <PointGeometry>
+                                    <Point X="112" Y="96"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="-26" Y="0"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="S0" Target="S0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="startT">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="startT">
+                                        <BinaryExpression Operator="-">
+                                            <SimpleIdentifier Name="i"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="4" Y="-6"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="159" Y="96"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&lt;" Text="bufferA[i] &lt; A">
+                                            <IndexedIdentifier Name="bufferA">
+                                                <SimpleIdentifier Name="i"/>
+                                            </IndexedIdentifier>
+                                            <SimpleIdentifier Name="A"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="3" Y="-21"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="machine">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Name="WORKING">
+                                <PointGeometry>
+                                    <Point X="160" Y="144"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point X="10" Y="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="IDLE">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="160" Y="57"/>
+                                </PointGeometry>
+                                <InitialArrowGeometry>
+                                    <Point X="-5" Y="-5"/>
+                                </InitialArrowGeometry>
+                                <LabelGeometry>
+                                    <Point X="9" Y="-9"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="IDLE" Target="WORKING">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="startM">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-60" Y="-17"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point X="160" Y="57"/>
+                                </StartPointGeometry>
+                                <SplineGeometry>
+                                    <Point X="134" Y="100"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point X="160" Y="144"/>
+                                </EndPointGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="-=" Text="bufferA[i] -= 1">
+                                            <IndexedIdentifier Name="bufferA">
+                                                <SimpleIdentifier Name="i"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-95" Y="-2"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="WORKING" Target="IDLE">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="finishM">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="2" Y="-20"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point X="160" Y="144"/>
+                                </StartPointGeometry>
+                                <SplineGeometry>
+                                    <Point X="184" Y="101"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point X="160" Y="57"/>
+                                </EndPointGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="+=" Text="bufferB[i] += 1">
+                                            <IndexedIdentifier Name="bufferB">
+                                                <SimpleIdentifier Name="i"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="4" Y="-6"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+                <VariableComponent>
+                    <IndexedIdentifier Name="bufferB">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="0"/>
+                            <SimpleIdentifier Name="B"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="bufferB">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                    <VariableMarking>
+                        <SimpleIdentifier Name=":accepting"/>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="bufferB">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableMarking>
+                </VariableComponent>
+                <SimpleComponent Kind="SPEC">
+                    <IndexedIdentifier Name="bufferBspec">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="S0">
+                                <PointGeometry>
+                                    <Point X="112" Y="96"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="-26" Y="0"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="S0" Target="S0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="startM">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="4" Y="-6"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="159" Y="96"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&lt;" Text="bufferB[i] &lt; B">
+                                            <IndexedIdentifier Name="bufferB">
+                                                <SimpleIdentifier Name="i"/>
+                                            </IndexedIdentifier>
+                                            <SimpleIdentifier Name="B"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="3" Y="-21"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="testunit">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Name="WORKING">
+                                <PointGeometry>
+                                    <Point X="128" Y="128"/>
+                                </PointGeometry>
+                                <LabelGeometry>
+                                    <Point X="2" Y="8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="IDLE">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="128" Y="41"/>
+                                </PointGeometry>
+                                <InitialArrowGeometry>
+                                    <Point X="-5" Y="-5"/>
+                                </InitialArrowGeometry>
+                                <LabelGeometry>
+                                    <Point X="5" Y="-18"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="WORKING" Target="IDLE">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="acceptT">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="5" Y="-19"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point X="128" Y="128"/>
+                                </StartPointGeometry>
+                                <SplineGeometry>
+                                    <Point X="265" Y="84"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point X="128" Y="41"/>
+                                </EndPointGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="+=" Text="bufferA[i+1] += 1">
+                                            <IndexedIdentifier Name="bufferA">
+                                                <BinaryExpression Operator="+">
+                                                    <SimpleIdentifier Name="i"/>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="4" Y="-2"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="IDLE" Target="WORKING">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="startT">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-60" Y="-18"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point X="128" Y="41"/>
+                                </StartPointGeometry>
+                                <SplineGeometry>
+                                    <Point X="101" Y="86"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point X="128" Y="128"/>
+                                </EndPointGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="-=" Text="bufferB[i] -= 1">
+                                            <IndexedIdentifier Name="bufferB">
+                                                <SimpleIdentifier Name="i"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-96" Y="-2"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="WORKING" Target="IDLE">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="rejectT">
+                                        <SimpleIdentifier Name="i"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="3" Y="-17"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="149" Y="83"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="+=" Text="bufferA[i] += 1">
+                                            <IndexedIdentifier Name="bufferA">
+                                                <SimpleIdentifier Name="i"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="3" Y="0"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <VariableComponent>
+            <IndexedIdentifier Name="bufferA">
+                <BinaryExpression Operator="+">
+                    <SimpleIdentifier Name="N"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </IndexedIdentifier>
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="A"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==" Text="bufferA[N+1] == 0">
+                    <IndexedIdentifier Name="bufferA">
+                        <BinaryExpression Operator="+">
+                            <SimpleIdentifier Name="N"/>
+                            <IntConstant Value="1"/>
+                        </BinaryExpression>
+                    </IndexedIdentifier>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==" Text="bufferA[N+1] == 0">
+                    <IndexedIdentifier Name="bufferA">
+                        <BinaryExpression Operator="+">
+                            <SimpleIdentifier Name="N"/>
+                            <IntConstant Value="1"/>
+                        </BinaryExpression>
+                    </IndexedIdentifier>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="unloading_unit">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="IDLE">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="64" Y="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-5" Y="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point X="-37" Y="4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="IDLE" Target="IDLE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unload"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="64" Y="64"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point X="108" Y="67"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="64" Y="64"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="-=" Text="bufferA[N+1] -= 1">
+                                    <IndexedIdentifier Name="bufferA">
+                                        <BinaryExpression Operator="+">
+                                            <SimpleIdentifier Name="N"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </IndexedIdentifier>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-8"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
