@@ -163,7 +163,6 @@ public class EnabledEventsSilentIncomingTRSimplifier
     } else if (getPreconditionMarkingID() < 0) {        //what is the precondition marking alpha
       mTauTestIterator = rel.createSuccessorsReadOnlyIterator();
       mTauTestIterator.resetEvents(0, mNumberOfEnabledEvents);               //Definitely change this to include enabled events
-
     }
     final int numStates = rel.getNumberOfStates();
     final BitSet keep = new BitSet(numStates);  //Creates a BitSet which remembers which states will be kept

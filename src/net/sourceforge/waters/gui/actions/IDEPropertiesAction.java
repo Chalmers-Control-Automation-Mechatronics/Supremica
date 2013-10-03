@@ -12,12 +12,13 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.EditorEditEdgeDialog;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.dialog.ConstantAliasEditorDialog;
+import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
 import net.sourceforge.waters.gui.dialog.EventAliasEditorDialog;
 import net.sourceforge.waters.gui.dialog.EventDeclEditorDialog;
 import net.sourceforge.waters.gui.dialog.ForeachEditorDialog;
@@ -190,7 +191,7 @@ public class IDEPropertiesAction
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
         final EdgeSubject subject = (EdgeSubject) edge;
-        EditorEditEdgeDialog.showDialog(subject, root);
+        EdgeEditorDialog.showDialog(subject, root);
       }
       return true;
     }

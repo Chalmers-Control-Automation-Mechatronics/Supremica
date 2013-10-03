@@ -61,6 +61,7 @@ import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
 import net.sourceforge.waters.gui.dialog.NodeEditorDialog;
 import net.sourceforge.waters.gui.dialog.SimpleExpressionCell;
 import net.sourceforge.waters.gui.dialog.SimpleIdentifierInputParser;
@@ -326,10 +327,10 @@ public class GraphEditorPanel
   {
     if (mSelection.size() == 1) {
       return getCurrentSelection().iterator().next();
-    } else if(mSelection.size() > 1){   // range selection
+    } else if (mSelection.size() > 1) { // range selection
       final Iterator<ProxySubject> iter = getCurrentSelection().iterator();
-      if(labelsAreSelected()){
-        iter.next(); //LabelBlock
+      if (labelsAreSelected()){
+        iter.next(); // LabelBlock
         return iter.next();
       }
       return null;
@@ -2095,10 +2096,10 @@ public class GraphEditorPanel
             (SimpleNodeSubject) mFocusedObject.getParent();
           editStateName(node);
         } else if (mFocusedObject instanceof EdgeSubject) {
-          EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject, mRoot);
+          EdgeEditorDialog.showDialog((EdgeSubject) mFocusedObject, mRoot);
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
           final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
-          EditorEditEdgeDialog.showDialog(edge, mRoot);
+          EdgeEditorDialog.showDialog(edge, mRoot);
         }
         else if (mFocusedObject instanceof NodeSubject) {
           final NodeSubject node = (NodeSubject) mFocusedObject;
@@ -2402,10 +2403,10 @@ public class GraphEditorPanel
             manager.getNodeSelfloopAction(mFocusedObject);
           manager.invokeMouseClickAction(action, event);
         } else if (mFocusedObject instanceof EdgeSubject) {
-          EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject, mRoot);
+          EdgeEditorDialog.showDialog((EdgeSubject) mFocusedObject, mRoot);
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
           final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
-          EditorEditEdgeDialog.showDialog(edge, mRoot);
+          EdgeEditorDialog.showDialog(edge, mRoot);
         }
       }
     }

@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler
-//# CLASS:   ExpressionComparator
+//# PROJECT: Waters GUI
+//# PACKAGE: net.sourceforge.waters.gui.dialog
+//# CLASS:   EdgeEditorDialog
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-package net.sourceforge.waters.gui;
+package net.sourceforge.waters.gui.dialog;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -30,8 +30,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
@@ -48,7 +54,7 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import org.supremica.gui.Utility;
 
 
-public class EditorEditEdgeDialog
+public class EdgeEditorDialog
   extends JDialog
   implements ActionListener
 {
@@ -59,25 +65,26 @@ public class EditorEditEdgeDialog
                                 final EditorWindowInterface root)
   {
     final ModuleWindowInterface rroot = root.getModuleWindowInterface();
-    new EditorEditEdgeDialog(edge, rroot);
+    new EdgeEditorDialog(edge, rroot);
   }
 
   public static void showDialog(final EdgeSubject edge,
                                 final ModuleWindowInterface root)
   {
-    new EditorEditEdgeDialog(edge, root);
+    new EdgeEditorDialog(edge, root);
   }
 
 
   //#########################################################################
   //# Constructors
-  public EditorEditEdgeDialog(final EdgeSubject edge,
-                              final ModuleWindowInterface root)
+  public EdgeEditorDialog(final EdgeSubject edge,
+                          final ModuleWindowInterface root)
   {
-	super(root.getRootWindow());
+    super(root.getRootWindow());
     setMinimumSize(MIN_SIZE);
     mEdge = edge;
     mRoot = root;
+    mPanel = root.getActiveEditorWindowInterface().getGraphEditorPanel();
 
     GridBagConstraints con = new GridBagConstraints();
 
@@ -199,6 +206,7 @@ public class EditorEditEdgeDialog
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     if (event.getActionCommand().equals("OK")) {
@@ -253,15 +261,13 @@ public class EditorEditEdgeDialog
       final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
       // Store parsed results ...
       final GuardActionBlockSubject block = mEdge.getGuardActionBlock();
-      EditCommand command = null;
+      Command command = null;
       if (block == null) {
         if (guard != null || actions != null) {
           final EdgeSubject newEdge = (EdgeSubject)cloner.getClone(mEdge);
           final List<SimpleExpressionSubject> guards =
             guard == null ? null : Collections.singletonList(guard);
-          // *** BUG ***
-          // Not a very good position!
-          // ***
+          // TODO Find a better position ...
           final LabelGeometrySubject geo = new LabelGeometrySubject
             (new Point(LabelBlockProxyShape.DEFAULT_OFFSET_X,
                        LabelBlockProxyShape.DEFAULT_OFFSET_Y + 10));
@@ -274,9 +280,17 @@ public class EditorEditEdgeDialog
         }
       } else {
         if (guard == null && actions == null) {
-          mEdge.setGuardActionBlock(null);
+          final List<GuardActionBlockSubject> selection =
+            Collections.singletonList(block);
+          final List<InsertInfo> deletes =
+            mPanel.getDeletionVictims(selection);
+          // The user may now have cancelled the deletion (?)
+          if (deletes != null) {
+            command = new DeleteCommand(deletes, mPanel);
+          }
         } else {
-          final GuardActionBlockSubject newblock = (GuardActionBlockSubject) cloner.getClone(block);
+          final GuardActionBlockSubject newblock =
+            (GuardActionBlockSubject) cloner.getClone(block);
           final List<SimpleExpressionSubject> bguards =
             newblock.getGuardsModifiable();
           bguards.clear();
@@ -294,7 +308,7 @@ public class EditorEditEdgeDialog
           }
         }
       }
-      if(command != null){
+      if (command != null){
         mRoot.getUndoInterface().executeCommand(command);
       }
       dispose();
@@ -308,6 +322,7 @@ public class EditorEditEdgeDialog
   //# Data Members
   private final EdgeSubject mEdge;
   private final ModuleWindowInterface mRoot;
+  private final SelectionOwner mPanel;
   private final JButton okButton, cancelButton;
   private final JTextPane guardField, actionField;
   private final JLabel guardLabel = new JLabel("Guard:");
