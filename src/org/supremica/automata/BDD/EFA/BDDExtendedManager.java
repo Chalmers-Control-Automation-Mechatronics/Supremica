@@ -25,9 +25,9 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.FlowerEFABuilder;
@@ -611,8 +611,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
     // Compute the boundary unsafe states with the extension of the SCT algorithm
     public BDD computeBoundaryUnsafeStatesClassic() {
 
-        buildHelpers();
-
         frwdTrans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges())
                 .getMonolithicEdgesForwardBDD()
                 .exist(bddExAutomata.getSourceLocationVarSet()
@@ -748,10 +746,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
     // Compute boundary unsafe states with the alternative algorithm
     public BDD computeBoundaryUnsafeStatesAlternative() {
 
-        // compute some helper BDDs and maps
-        buildHelpers();
+      feasibleSourceStates = getFeasibleSourceStatesBDD();
 
-        frwdTrans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges())
+      frwdTrans = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges())
                 .getMonolithicEdgesForwardWithEventsBDD()
                 .exist(bddExAutomata.getSourceLocationVarSet()
                 .union(bddExAutomata.getDestLocationVarSet()));
@@ -925,6 +922,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
     // subroutine: remove the larger states from unsafeStates
     public BDD removeLargerStates(final BDD boundaryStates) {
 
+        buildHelpers();
+
         final BDDIterator itr = boundaryStates.iterator(bddExAutomata.getSourceStagesVarSet());
 
         final BDD largerStates = getZeroBDD();
@@ -945,7 +944,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
                 for (int i = 0; i < stageVarIndexList.size(); i++) {
 
                     final BDD partialLargerTempStates = tempUnsafeState.exist(varSetsTobeExisted.get(i));
-                    
+
                     final BDD partialLargerState = partialLargerTempStates
                             .relprod(largerVarValues.get(i),bddExAutomata.tempVariablesVarSet);
 
@@ -954,7 +953,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
                     if (maxBDDSizeMinimization < localLargerStates.nodeCount()) {
                         maxBDDSizeMinimization = localLargerStates.nodeCount();
                     }
-                    
+
                     partialLargerTempStates.free();
                 }
                 largerStates.orWith(localLargerStates.andWith(possibleLargerStates));
@@ -995,9 +994,11 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         return minimalBoundaryUnsafeStates;
     }
-    
+
     // an alternative way to remove non-minimal RAS states
     public BDD removeLargerStatesAlternative(final BDD boundaryStates) {
+
+        buildHelpers();
 
         final BDDIterator itr = boundaryStates.iterator(bddExAutomata.getSourceStagesVarSet());
 
@@ -1137,9 +1138,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
             largerVarValues.add(largerValues);
         }
-
-        // compute the feasible state set BDD
-        feasibleSourceStates = getFeasibleSourceStatesBDD();
     }
 
     // Build the BDD of feasible states from the resource invariants (module comments)
@@ -1147,27 +1145,35 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         if (feasibleSourceStates == null) {
 
+            String[] feasibleEquationStrings = null;
+
+            if (bddExAutomata.orgExAutomata.getModule() != null) {
+              feasibleEquationStrings = bddExAutomata.orgExAutomata
+                .getModule().getComment().split("&");
+            } else {
+              feasibleEquationStrings = bddExAutomata.orgExAutomata.feasiableEquation.split("&");
+            }
+
+            final SimpleExpressionProxy[] feasibleEquationExpressions =
+              new SimpleExpressionProxy[feasibleEquationStrings.length];;
+
             final ExpressionParser parser =
                     new ExpressionParser(ModuleSubjectFactory.getInstance(),
                     CompilerOperatorTable.getInstance());
 
-            SimpleExpressionSubject feasibleEquation = null;
-
             try {
-                if (bddExAutomata.orgExAutomata.getModule() != null) {
-                    feasibleEquation = (SimpleExpressionSubject)
-                        (parser.parse(bddExAutomata.orgExAutomata.getModule().getComment(),
-                        Operator.TYPE_BOOLEAN));
-                } else {
-                   feasibleEquation = (SimpleExpressionSubject)
-                        (parser.parse(bddExAutomata.orgExAutomata.feasiableEquation,
-                        Operator.TYPE_BOOLEAN));
+                for (int i = 0; i < feasibleEquationStrings.length; i++) {
+                  feasibleEquationExpressions[i] = (parser.parse(feasibleEquationStrings[i], Operator.TYPE_BOOLEAN));
                 }
             } catch (final ParseException pe) {
                 System.err.println(pe);
             }
 
-            feasibleSourceStates = guard2BDD(feasibleEquation);
+            feasibleSourceStates = getOneBDD();
+            for (final SimpleExpressionProxy fe: feasibleEquationExpressions) {
+              System.err.println("hh");
+              feasibleSourceStates.andWith(guard2BDD(fe));
+            }
 
             return feasibleSourceStates;
         }
