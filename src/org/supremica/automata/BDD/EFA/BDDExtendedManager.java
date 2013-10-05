@@ -1341,22 +1341,21 @@ public class BDDExtendedManager extends BDDAbstractManager {
                     .union(bddExAutomata.getDestLocationVarSet());
 
             @Override
-            public boolean execute(final int eventIndex, BDD partition) {
+            public boolean execute(final int eventIndex, final BDD partition) {
 
                 final String eventName = bddExAutomata.theIndexMap
                         .getEventAt(eventIndex).getName();
 
-                partition = partition.exist(locationVars);
+                final BDD partitionNoLocation = partition.exist(locationVars);
+                partition.free();
 
                 if (!eventName.contains(FlowerEFABuilder.LOAD_EVENT_PREFIX)) {
 
-                    partitionBDDs[eventIndex] = partition;
+                    partitionBDDs[eventIndex] = partitionNoLocation;
 
                 } else {
                     partitionBDDs[eventIndex] = getZeroBDD();
-                    final BDD tmp = frwdLoadingTrans;
-                    frwdLoadingTrans = frwdLoadingTrans.or(partition);
-                    tmp.free();
+                    frwdLoadingTrans.orWith(partitionNoLocation.id());
                 }
                 return true;
             }
@@ -1369,8 +1368,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
             possUnsafeStatesBDDs[i] = getZeroBDD();
             unsafeStatesTargetTrans[i] = getZeroBDD();
         }
-
-        buildHelpers();
 
         feasibleSourceStates = getFeasibleSourceStatesBDD();
     }
@@ -1412,7 +1409,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         // compute the number of deadlock states
         long nbrOfDeadlockStates = (long) deadlocks.satCount(bddExAutomata.getSourceVariablesVarSet());
 
-        if (nbrOfDeadlockStates <= 1) {
+        if (nbrOfDeadlockStates <= 1L) {
           iddSatCount = true;
           final IDD deadlockStatesIDD = bddExAutomata.generateIDD(deadlocks, deadlocks);
           nbrOfDeadlockStates = bddExAutomata.nbrOfStatesIDD(deadlockStatesIDD).longValue();
@@ -1430,8 +1427,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         BDD unsafeStates = deadlocks.id();
 
-        final BDD[] notUnsafeStates = new BDD[componentSize];
         final BDD[] partitionSourceStates = new BDD[componentSize];
+        final BDD[] notUnsafeStates = new BDD[componentSize];
         final BDD[] possiableUnsafeStates = new BDD[componentSize];
 
         for (int i = 0; i < componentSize; i++)
@@ -1440,9 +1437,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         do {
 
             final BDD newFoundUnsafeTargetStates = newFoundUnsafeStates
-              .replace(bddExAutomata.getSourceToDestVariablePairing());
-
-            newFoundUnsafeStates.free();
+              .replaceWith(bddExAutomata.getSourceToDestVariablePairing());
 
             for (int i = 0; i < componentSize; i++) {
 
@@ -1458,9 +1453,9 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
                 notUnsafeStates[i] = partitionSourceStates[i].and(notPartitionUnsafeStates);
 
-                unsafeStatesTargetTrans[i].orWith(transToUnsafeStates);
-
                 notPartitionUnsafeStates.free();
+
+                unsafeStatesTargetTrans[i].orWith(transToUnsafeStates);
             }
 
             newFoundUnsafeTargetStates.free();

@@ -1370,7 +1370,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         }
         else if (synType.equals(SynthesisAlgorithm.MINIMALITY_P)) {
             boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesEventPartitioning();
-            boundaryUnsafeStates = manager.removeLargerStates(boundaryUnsafeStates);
+            boundaryUnsafeStates = manager.removeLargerStatesThirdWay(boundaryUnsafeStates);
         }
 
         nbrOfBoundaryUnsafeStates = manager.nbrMinBoundUnsafeStates;
