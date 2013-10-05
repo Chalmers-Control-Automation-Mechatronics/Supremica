@@ -1078,6 +1078,53 @@ public class BDDExtendedManager extends BDDAbstractManager {
         return minimalBoundaryUnsafeStates;
     }
 
+    public BDD removeLargerStatesThirdWay (final BDD boundaryStates) {
+
+      getGlobalStrictLargerBDD();
+
+      final BDD boundaryTempStates = boundaryStates.replace(bddExAutomata.sourceToTempVariablePairing);
+
+      final BDD largerStatePairs = globalLargerBDD.and(boundaryTempStates);
+      boundaryTempStates.free();
+
+      if (maxBDDSizeMinimization < largerStatePairs.nodeCount()) {
+        maxBDDSizeMinimization = largerStatePairs.nodeCount();
+      }
+
+      final BDD largerStates = largerStatePairs.exist(bddExAutomata.tempVariablesVarSet);
+      largerStatePairs.free();
+
+      if (maxBDDSizeMinimization < largerStates.nodeCount()) {
+        maxBDDSizeMinimization = largerStates.nodeCount();
+      }
+
+      minimalBoundaryUnsafeStates = boundaryStates.andWith(largerStates.not());
+      largerStates.free();
+
+      globalLargerBDD.free();
+
+      System.out.println("The maximal size of BDDs during the minimization is: "
+        + maxBDDSizeMinimization);
+
+      if (iddSatCount) {
+        computeMinStatesIDDSatCountDenominator();
+        final IDD minBoundUnsafeStatesIDD = bddExAutomata.generateIDD(minimalBoundaryUnsafeStates,
+                                                                      minimalBoundaryUnsafeStates);
+        nbrMinBoundUnsafeStates = bddExAutomata.nbrOfStatesIDD(minBoundUnsafeStatesIDD).longValue()
+            / minStatesIDDSatCountDenominator;
+      } else {
+        nbrMinBoundUnsafeStates = (long) minimalBoundaryUnsafeStates
+          .satCount(bddExAutomata.getSourceStagesVarSet());
+      }
+
+      System.out.println("The number of minimal boundary unsafe states is: "
+                       + nbrMinBoundUnsafeStates);
+
+      return minimalBoundaryUnsafeStates;
+    }
+
+
+
     // Build auxiliary BDDs used for computing the boundary unsafe states
     private void buildHelpers() {
 
@@ -1134,17 +1181,62 @@ public class BDDExtendedManager extends BDDAbstractManager {
                 final BDD greaterThanJBDD = stageBDDBitVectorSource.gte(vector_j);
 
                 largerValues.orWith(tmp.andWith(greaterThanJBDD));
+                vector_j.free();
             }
-
+            stageBDDBitVectorSource.free();
             largerVarValues.add(largerValues);
         }
+    }
+
+    private BDD getGlobalStrictLargerBDD() {
+
+      final BDD equalsBDD = getOneBDD();
+      globalLargerBDD = getOneBDD();
+
+      final List<VariableComponentProxy> stageVars = bddExAutomata.orgExAutomata.getStageVars();
+      for (final VariableComponentProxy stage: stageVars) {
+        final int stageIndex = bddExAutomata.theIndexMap.getVariableIndex(stage);
+        final int stageDomain = bddExAutomata.orgExAutomata.getVarDomain(stage.getName());
+        final BDDDomain stageSourceDomain = bddExAutomata.sourceVarDomains[stageIndex];
+        final BDDDomain stageTempDomain = bddExAutomata.tempVarDomains[stageIndex];
+
+        final SupremicaBDDBitVector stageBDDBitVectorSource =
+          createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
+                                      bddExAutomata.orgExAutomata.getMinValueofVar(stage.getName()) < 0,
+                                      stageSourceDomain);
+
+        final SupremicaBDDBitVector stageBDDBitVectorTemp =
+          createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
+                                      bddExAutomata.orgExAutomata.getMinValueofVar(stage.getName()) < 0,
+                                      stageTempDomain);
+
+        final BDD stageLargerBDD = getZeroBDD();
+
+        for (int j = 0; j < stageDomain; j++) {
+
+          final BDD jTemp = createBDD(j, bddExAutomata.getTempVariableDomain(stageIndex));
+          final SupremicaBDDBitVector vector_j =
+            createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, stageTempDomain.varNum(), j);
+          final BDD greaterThanJBDD = stageBDDBitVectorSource.gte(vector_j);
+          stageLargerBDD.orWith(jTemp.andWith(greaterThanJBDD));
+          vector_j.free();
+        }
+
+        equalsBDD.andWith(stageBDDBitVectorTemp.equ(stageBDDBitVectorSource));
+        globalLargerBDD.andWith(stageLargerBDD);
+        stageBDDBitVectorSource.free();
+        stageBDDBitVectorTemp.free();
+      }
+
+      globalLargerBDD.andWith(equalsBDD.not());
+      equalsBDD.free();
+      return globalLargerBDD;
     }
 
     // Build the BDD of feasible states from the resource invariants (module comments)
     private BDD getFeasibleSourceStatesBDD() {
 
         if (feasibleSourceStates == null) {
-
             String[] feasibleEquationStrings = null;
 
             if (bddExAutomata.orgExAutomata.getModule() != null) {
@@ -1171,7 +1263,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
             feasibleSourceStates = getOneBDD();
             for (final SimpleExpressionProxy fe: feasibleEquationExpressions) {
-              System.err.println("hh");
               feasibleSourceStates.andWith(guard2BDD(fe));
             }
 
