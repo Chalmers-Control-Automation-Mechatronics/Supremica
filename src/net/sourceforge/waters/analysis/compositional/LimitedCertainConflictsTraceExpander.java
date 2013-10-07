@@ -153,8 +153,15 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     copy = null;
     mSimplifier.setTransitionRelation(rel);
     final TRPartition partition = mSimplifier.getResultPartition();
-    final int initTest =
-      partition == null || initResult < 0 ? initResult : partition.getClassCode(initResult);
+    final int initTest;
+    if (partition == null || initResult < 0) {
+      initTest = initResult;
+    } else {
+      final int[] clazz = partition.getStates(initResult);
+      assert clazz.length == 1 :
+        "Non-certain-conflict state merged into multiple states?";
+      initTest = clazz[0];
+    }
 
     // Extend the trace to lowest (= most blocking) possible level ...
     final AbstractCompositionalModelVerifier verifier = getModelVerifier();
@@ -222,7 +229,9 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
   //#########################################################################
   //# Trace Extension
   private List<TraceStepProxy> relabelInitialTraceSteps
-  (final List<TraceStepProxy> steps, final TRPartition partition, final int ccState)
+    (final List<TraceStepProxy> steps,
+     final TRPartition partition,
+     final int ccState)
   {
     final int numSteps = steps.size();
     final List<TraceStepProxy> newSteps =
@@ -236,7 +245,9 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
   }
 
   private TraceStepProxy relabelInitialTraceStep
-    (final TraceStepProxy resultStep, final TRPartition partition, final int ccState)
+    (final TraceStepProxy resultStep,
+     final TRPartition partition,
+     final int ccState)
   {
     final AutomatonProxy resultAut = getResultAutomaton();
     final Map<AutomatonProxy,StateProxy> resultMap = resultStep.getStateMap();
@@ -244,7 +255,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     final Map<AutomatonProxy,StateProxy> origMap =
       new HashMap<AutomatonProxy,StateProxy>(size);
     for (final Map.Entry<AutomatonProxy,StateProxy> entry :
-      resultMap.entrySet()) {
+         resultMap.entrySet()) {
       final AutomatonProxy aut = entry.getKey();
       final StateProxy state = entry.getValue();
       if (aut == resultAut) {
@@ -253,10 +264,9 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
         final int origCode;
         if (partition == null) {
           origCode = resultCode;
-        } else if (partition.getClassCode(resultCode) >= 0) {
-          origCode = partition.getClassCode(resultCode);
         } else {
-          origCode = ccState;
+          final int[] clazz = partition.getStates(resultCode);
+          origCode = clazz.length == 1 ? clazz[0] : ccState;
         }
         assert origCode >= 0;
         final StateProxy origState = getOriginalAutomatonState(origCode);

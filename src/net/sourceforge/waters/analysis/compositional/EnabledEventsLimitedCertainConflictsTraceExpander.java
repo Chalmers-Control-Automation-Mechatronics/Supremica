@@ -167,8 +167,15 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     copy = null;
     mSimplifier.setTransitionRelation(rel);
     final TRPartition partition = mSimplifier.getResultPartition();
-    final int initTest =
-      partition == null || initResult < 0 ? initResult : partition.getClassCode(initResult);
+    final int initTest;
+    if (partition == null || initResult < 0) {
+      initTest = initResult;
+    } else {
+      final int[] clazz = partition.getStates(initResult);
+      assert clazz.length == 1 :
+        "Non-certain-conflict state merged into multiple states?";
+      initTest = clazz[0];
+    }
 
     // Extend the trace to lowest (= most blocking) possible level ...
     final AbstractCompositionalModelVerifier verifier = getModelVerifier();
@@ -269,10 +276,9 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
         final int origCode;
         if (partition == null) {
           origCode = resultCode;
-        } else if (partition.getClassCode(resultCode) >= 0) {
-          origCode = partition.getClassCode(resultCode);
         } else {
-          origCode = ccState;
+          final int[] clazz = partition.getStates(resultCode);
+          origCode = clazz.length == 1 ? clazz[0] : ccState;
         }
         assert origCode >= 0;
         final StateProxy origState = getOriginalAutomatonState(origCode);
